@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Alquileres premium en Buenos Aires sin garantía propietaria. Departamentos temporales amoblados y tradicionales en CABA y GBA Norte. Contratos digitales en USD." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://bairengroup.com/" />
+  <meta property="og:title" content="Grupo Bairen — Alquileres Premium en Buenos Aires" />
+  <meta property="og:description" content="Departamentos amoblados sin garantía. CABA y GBA Norte. Contratos digitales en USD." />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="es_AR" />
+  <meta property="og:site_name" content="Grupo Bairen" />
+  <meta property="og:url" content="https://bairengroup.com/" />
+  <meta property="og:image" content="https://bairengroup.com/104.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Grupo Bairen — Alquileres premium en Buenos Aires" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Grupo Bairen — Alquileres Premium en Buenos Aires" />
+  <meta name="twitter:description" content="Departamentos amoblados sin garantía. CABA y GBA Norte. Contratos digitales en USD." />
+  <meta name="twitter:image" content="https://bairengroup.com/104.png" />
+  <meta name="theme-color" content="#081227" />
+  <title>Grupo Bairen — Alquileres Premium en Buenos Aires</title>
+  <link rel="icon" href="bairen_logo.png?v=2">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+  <link rel="preload" as="image" href="104.png" fetchpriority="high" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy:#15243F; --navy-dark:#0D1A30; --navy-deeper:#081227;
+      --gold:#C9A961; --gold-dark:#8C6E40; --gold-light:#E0CB95;
+      --white:#FBFAF6; --off-white:#F4EEDF;
+      --gray-light:#D6D2C8;
+      --text-dark:#16202E; --text-mid:#5E6678;
+      --font-display:'Playfair Display',Georgia,serif;
+      --font-body:'Jost',sans-serif;
+      --ease:cubic-bezier(0.22,1,0.36,1);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{font-family:var(--font-body);font-weight:300;color:var(--text-dark);background:var(--white);-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+    a{text-decoration:none;color:inherit;}
+    ul{list-style:none;}
+
+    .reveal{opacity:0;transform:translateY(30px);transition:opacity .55s var(--ease),transform .55s var(--ease);}
+    .reveal.visible{opacity:1;transform:none;}
+    .d1{transition-delay:.08s;}.d2{transition-delay:.18s;}.d3{transition-delay:.28s;}.d4{transition-delay:.38s;}
+
+    /* ─── TIPOS (Temporal vs Tradicional) ─────────────────────────── */
+    .tipos{background:var(--navy-deeper);padding:92px 24px;}
+    .tipos-inner{max-width:980px;margin:0 auto;}
+    .tipos-hd{text-align:center;margin-bottom:56px;}
+    .tipos-hd .sec-title{font-size:clamp(1.7rem,4vw,2.6rem);max-width:520px;margin:0 auto;}
+    .tipos-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;}
+    .tipo-card{background:rgba(255,255,255,.03);border:1px solid rgba(201,169,97,.1);padding:40px 36px;}
+    .tipo-card--trad{background:rgba(255,255,255,.02);border-color:rgba(255,255,255,.07);}
+    .tipo-tag{display:inline-block;font-size:.56rem;font-weight:700;letter-spacing:.25em;text-transform:uppercase;background:var(--gold);color:var(--navy);padding:5px 12px;margin-bottom:14px;}
+    .tipo-tag--trad{background:transparent;color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.18);}
+    .tipo-plazo{font-family:var(--font-display);font-size:1.5rem;font-weight:400;color:var(--white);margin-bottom:28px;line-height:1.2;}
+    .tipo-list{list-style:none;display:flex;flex-direction:column;gap:12px;margin-bottom:32px;}
+    .tipo-list li{font-size:.85rem;color:rgba(255,255,255,.55);line-height:1.6;display:flex;gap:10px;align-items:baseline;}
+    .tipo-check{color:var(--gold);font-size:.8rem;flex-shrink:0;}
+    .tipo-check--trad{color:rgba(255,255,255,.3);}
+    .tipo-cta{font-size:.66rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);border-bottom:1px solid rgba(201,169,97,.3);padding-bottom:2px;transition:color .22s,border-color .22s;}
+    .tipo-cta:hover{color:var(--gold-light);border-color:rgba(201,169,97,.6);}
+    .tipo-cta--trad{color:rgba(255,255,255,.35);border-color:rgba(255,255,255,.12);}
+    .tipo-cta--trad:hover{color:rgba(255,255,255,.65);}
+    @media(max-width:700px){
+      .tipos{padding:64px 24px;}
+      .tipos-grid{grid-template-columns:1fr;}
+    }
+
+    /* ─── PROPIEDADES DESTACADAS ─────────────────────────────── */
+    .destacadas{padding:90px 60px;background:var(--off-white);}
+    .destacadas-inner{max-width:1200px;margin:0 auto;}
+    .destacadas-hd{text-align:center;margin-bottom:48px;}
+    .destacadas-sub{font-size:.85rem;color:var(--text-mid);margin-top:14px;}
+    .destacadas-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+    .dest-card{background:#FFFFFF;border:1px solid rgba(21,36,63,.08);cursor:pointer;transition:transform .25s var(--ease),box-shadow .25s var(--ease);display:flex;flex-direction:column;text-decoration:none;color:inherit;overflow:hidden;}
+    .dest-card:hover{transform:translateY(-4px);box-shadow:0 22px 48px rgba(8,18,39,.22),0 6px 14px rgba(140,110,64,.08);}
+    .dest-img{aspect-ratio:4/3;background:var(--navy);background-size:cover;background-position:center;position:relative;}
+    .dest-tag{position:absolute;top:14px;left:14px;background:var(--gold);color:var(--navy);font-size:.55rem;letter-spacing:.18em;font-weight:700;padding:4px 11px;text-transform:uppercase;}
+    .dest-status{position:absolute;top:14px;right:14px;background:rgba(42,122,75,.92);color:var(--white);font-size:.52rem;letter-spacing:.16em;font-weight:700;padding:4px 9px;text-transform:uppercase;}
+    .dest-status.res{background:rgba(185,74,74,.92);}
+    .dest-body{padding:20px 22px;flex:1;display:flex;flex-direction:column;}
+    .dest-addr{font-family:var(--font-display);font-size:1.18rem;font-weight:500;line-height:1.18;color:var(--navy);margin-bottom:4px;}
+    .dest-barrio{font-size:.7rem;letter-spacing:.1em;color:var(--text-mid);margin-bottom:14px;}
+    .dest-meta{display:flex;gap:8px;font-size:.62rem;color:var(--text-mid);letter-spacing:.05em;margin-bottom:18px;flex-wrap:wrap;}
+    .dest-meta span{background:var(--off-white);padding:4px 9px;border:1px solid rgba(21,36,63,.06);}
+    .dest-bottom-row{margin-top:auto;display:flex;justify-content:space-between;align-items:baseline;padding-top:14px;border-top:1px solid rgba(21,36,63,.06);gap:10px;}
+    .dest-price{font-family:var(--font-display);font-size:1.15rem;font-weight:700;color:var(--gold-dark);line-height:1;}
+    .dest-cta-txt{font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;font-weight:600;color:var(--navy);}
+    .destacadas-footer{text-align:center;margin-top:42px;}
+    @media(max-width:960px){.destacadas{padding:60px 24px;}.destacadas-grid{grid-template-columns:1fr;gap:18px;}}
+
+    @media(prefers-reduced-motion:reduce){
+      html{scroll-behavior:auto;}
+      .mobile-menu{transition:none;}
+      .reveal{transition:opacity .2s ease!important;transform:none!important;}
+      *{animation-duration:.01ms!important;animation-iteration-count:1!important;}
+    }
+
+    .navbar{position:fixed;inset:0 0 auto 0;z-index:1000;height:64px;background:var(--navy-deeper);border-bottom:2px solid var(--gold);display:flex;align-items:center;justify-content:space-between;padding:0 24px;gap:16px;}
+    .nav-logo{display:flex;align-items:center;white-space:nowrap;}
+    .nav-links{display:none;align-items:center;gap:28px;}
+    .nav-links a{font-size:.7rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.65);transition:color .25s;}
+    .nav-links a:hover{color:var(--gold);}
+    .nav-cta-desk{display:none;font-size:.68rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--navy);background:var(--gold);padding:9px 22px;white-space:nowrap;transition:background .25s;}
+    .nav-cta-desk:hover{background:var(--gold-dark);}
+    .burger{display:flex;flex-direction:column;gap:5px;cursor:pointer;padding:5px;flex-shrink:0;background:none;border:none;}
+    .burger span{display:block;width:23px;height:1.5px;background:var(--white);transition:transform .3s,opacity .3s;}
+    .burger.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg);}
+    .burger.open span:nth-child(2){opacity:0;}
+    .burger.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg);}
+    .mobile-menu{position:fixed;top:64px;left:0;right:0;z-index:999;background:var(--navy-deeper);padding:28px 24px;border-bottom:1px solid rgba(201,169,97,.18);transform:translateY(-110%);
+  visibility:hidden;
+  transition:transform .38s var(--ease), visibility 0s .38s;
+}
+    .mobile-menu.open{transform:none;visibility:visible;transition:transform .38s var(--ease), visibility 0s 0s;}
+    .mobile-menu a{display:block;font-family:var(--font-display);font-size:1.1rem;color:rgba(255,255,255,.8);padding:13px 0;border-bottom:1px solid rgba(255,255,255,.06);transition:color .2s;}
+    .mobile-menu a:hover{color:var(--gold);}
+    .mobile-menu a:last-child{border-bottom:none;}
+    @media(min-width:701px){.burger{display:none;}.nav-links{display:flex;}.nav-cta-desk{display:block;}}
+
+    .btn-gold{display:inline-flex;align-items:center;gap:12px;background:var(--gold);color:var(--navy);font-family:var(--font-body);font-size:.7rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;padding:17px 36px;border:none;cursor:pointer;transition:background .3s,box-shadow .25s;text-decoration:none;white-space:nowrap;}
+    .btn-gold svg{width:14px;height:14px;stroke:var(--navy);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .3s;}
+    @media(hover:hover) and (pointer:fine){
+      .btn-gold{transition:background .3s,transform .25s,box-shadow .25s;}
+      .btn-gold:hover{background:var(--gold-dark);transform:translateY(-2px);box-shadow:0 12px 40px rgba(201,169,97,.22);}
+      .btn-gold:hover svg{transform:translateX(4px);}
+    }
+    .btn-gold:active{transform:scale(0.97);}
+    @media(max-width:700px){.btn-gold{padding:20px 32px;width:100%;justify-content:center;}}
+
+    .hero{min-height:100svh;display:flex;align-items:flex-start;position:relative;background:var(--navy-deeper);}
+    .hero-bg{position:absolute;inset:0;overflow:hidden;}
+    .hero-bg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 35%;opacity:0;transform:scale(1.05);animation:heroPhotoIn 1.4s var(--ease) .15s forwards;}
+    .hero-bg::after{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(105deg,rgba(8,18,39,1) 0%,rgba(8,18,39,.97) 30%,rgba(8,18,39,.82) 50%,rgba(8,18,39,.44) 68%,rgba(8,18,39,.12) 82%,transparent 94%);}
+    @keyframes heroPhotoIn{to{opacity:1;transform:scale(1);}}
+
+    .hero-content{position:relative;z-index:2;max-width:580px;padding:140px 68px 100px;}
+
+    .hero-eyebrow{
+      display:block;font-size:.68rem;letter-spacing:.3em;text-transform:uppercase;
+      color:var(--gold);margin-bottom:28px;
+      text-shadow:0 1px 12px rgba(0,0,0,.55), 0 0 32px rgba(0,0,0,.35);
+      opacity:0;animation:fadeUp .8s var(--ease) .2s forwards;
+    }
+    .hero-title{
+      font-family:var(--font-display);font-weight:500;
+      font-size:clamp(1.8rem,3.8vw,3rem);
+      line-height:1.12;color:var(--white);
+      text-shadow:0 2px 28px rgba(0,0,0,.38);
+      opacity:0;animation:fadeUp .9s var(--ease) .35s forwards;
+    }
+    .hero-title em{font-style:italic;font-weight:400;color:var(--gold);}
+    .hero-rule{width:44px;height:1px;background:var(--gold);margin:28px 0;opacity:0;animation:fadeUp .6s var(--ease) .5s forwards;}
+    .hero-sub{font-size:.92rem;font-weight:400;line-height:1.8;color:rgba(224,203,149,.82);max-width:380px;margin-bottom:48px;opacity:0;animation:fadeUp .8s var(--ease) .62s forwards;}
+    .hero-actions{display:flex;flex-direction:column;gap:16px;opacity:0;animation:fadeUp .8s var(--ease) .76s forwards;}
+    .hero-trad-link{font-size:.72rem;font-weight:400;letter-spacing:.03em;color:rgba(255,255,255,.58);transition:color .25s;align-self:flex-start;}
+    .hero-trad-link:hover{color:rgba(255,255,255,.62);}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(26px);}to{opacity:1;transform:none;}}
+
+    @media(max-width:700px){
+      .hero{flex-direction:column;align-items:stretch;min-height:100svh;}
+      .hero-bg{position:relative;height:48vh;flex-shrink:0;}
+      .hero-bg img{object-position:center 58%;}
+      .hero-bg::after{background:linear-gradient(to bottom,transparent 0%,transparent 70%,rgba(8,18,39,.55) 85%,rgba(8,18,39,1) 100%);}
+      .hero-content{position:relative;z-index:2;padding:32px 24px 48px;max-width:100%;background:var(--navy-deeper);flex:1;}
+      .hero-title{font-size:clamp(2rem,7.5vw,2.6rem);}
+      .hero-eyebrow{font-size:.66rem;letter-spacing:.24em;margin-bottom:20px;}
+      .hero-sub{display:block;font-size:.88rem;color:rgba(224,203,149,.78);margin-bottom:32px;line-height:1.7;}
+      .hero-rule{margin:18px 0;}
+      .hero-trad-link{align-self:center;color:rgba(255,255,255,.65);}
+    }
+
+    .sec-eyebrow{display:block;font-size:.6rem;font-weight:600;letter-spacing:.38em;text-transform:uppercase;margin-bottom:14px;}
+    .eyebrow-gold{color:var(--gold-dark);}
+    .eyebrow-goldlt{color:var(--gold-light);}
+    .sec-title{font-family:var(--font-display);font-weight:500;line-height:1.18;}
+
+    .social-proof{background:var(--off-white);padding:92px 24px 80px;}
+    .social-inner{max-width:920px;margin:0 auto;}
+    .proof-line{font-family:var(--font-display);font-weight:400;font-size:clamp(1.35rem,2.6vw,1.85rem);line-height:1.5;color:var(--navy);text-align:center;max-width:720px;margin:0 auto 56px;letter-spacing:-.005em;}
+    .proof-line strong{font-weight:700;color:var(--gold-dark);font-feature-settings:"lnum" 1;}
+    .proof-line .proof-star{color:var(--gold);margin:0 .12em;}
+    .proof-line .proof-sep{display:inline-block;width:6px;height:6px;background:var(--gold);border-radius:50%;margin:0 .65em .12em;vertical-align:middle;}
+    @media(max-width:560px){.social-proof{padding:64px 24px 56px;}.proof-line{font-size:1.18rem;line-height:1.55;margin-bottom:44px;text-align:left;}.proof-line br{display:none;}}
+
+    .testimonials{display:grid;grid-template-columns:1fr;gap:20px;}
+    @media(min-width:700px){.testimonials{grid-template-columns:1fr 1fr;}}
+    .t-card{padding:36px;position:relative;overflow:hidden;}
+    .t-card--light{background:var(--white);border:1px solid rgba(21,36,63,.08);}
+    .t-card--dark{background:var(--navy);}
+    .t-quote{position:absolute;top:8px;left:18px;font-family:var(--font-display);font-style:italic;font-size:5.5rem;line-height:1;pointer-events:none;}
+    .t-card--light .t-quote{color:var(--gold);opacity:.15;}
+    .t-card--dark .t-quote{color:var(--gold);opacity:.1;}
+    .t-body{font-family:var(--font-body);font-style:normal;font-weight:300;font-size:.95rem;line-height:1.82;position:relative;z-index:1;padding-top:18px;margin-bottom:24px;letter-spacing:.01em;}
+    .t-card--light .t-body{color:var(--navy);}
+    .t-card--dark .t-body{color:var(--white);}
+    .t-sep{height:1px;margin-bottom:20px;}
+    .t-card--light .t-sep{background:var(--gold-light);}
+    .t-card--dark .t-sep{background:rgba(201,169,97,.2);}
+    .t-foot{display:flex;align-items:center;gap:14px;}
+    .t-avatar{width:40px;height:40px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:1rem;font-weight:700;}
+    .t-card--light .t-avatar{background:var(--navy);color:var(--gold);}
+    .t-card--dark .t-avatar{background:var(--gold);color:var(--navy);}
+    .t-name{font-size:.8rem;font-weight:500;}
+    .t-card--light .t-name{color:var(--navy);}
+    .t-card--dark .t-name{color:var(--white);}
+    .t-role{font-size:.7rem;font-weight:300;margin-top:2px;}
+    .t-card--light .t-role{color:var(--text-mid);}
+    .t-card--dark .t-role{color:rgba(224,203,149,.62);}
+
+    .pillars{padding:100px 24px 110px;background:var(--white);}
+    .pillars-hd{text-align:center;margin-bottom:72px;}
+    .pillars-hd .sec-title{font-size:clamp(1.7rem,4vw,2.6rem);color:var(--navy);max-width:520px;margin:0 auto;}
+    .pillars-list{max-width:880px;margin:0 auto;display:flex;flex-direction:column;}
+    .p-row{display:grid;grid-template-columns:140px 1fr;gap:32px;align-items:baseline;padding:36px 0;border-bottom:1px solid rgba(21,36,63,.08);}
+    .p-row:last-child{border-bottom:none;}
+    .p-num{font-family:var(--font-display);font-size:clamp(2.6rem,4.6vw,4rem);font-weight:400;color:var(--gold-dark);line-height:1;font-feature-settings:"lnum" 1;font-style:italic;}
+    .p-body-wrap{padding-top:6px;}
+    .p-title{font-family:var(--font-display);font-size:clamp(1.18rem,2.2vw,1.5rem);font-weight:500;color:var(--navy);margin-bottom:10px;line-height:1.22;}
+    .p-body{font-size:.95rem;line-height:1.78;color:var(--text-mid);max-width:54ch;}
+    @media(max-width:700px){
+      .pillars{padding:72px 24px 80px;}
+      .pillars-hd{margin-bottom:48px;}
+      .p-row{grid-template-columns:88px 1fr;gap:18px;padding:28px 0;}
+      .p-num{font-size:2.2rem;}
+      .p-title{font-size:1.12rem;margin-bottom:8px;}
+      .p-body{font-size:.95rem;line-height:1.75;}
+    }
+
+    .photo-strip{height:380px;overflow:hidden;position:relative;}
+    .photo-strip img{width:100%;height:100%;object-fit:cover;object-position:center 55%;display:block;}
+    .photo-strip::after{content:'';position:absolute;inset:0;background:linear-gradient(to right,rgba(21,36,63,.2) 0%,transparent 55%);pointer-events:none;}
+    @media(max-width:700px){.photo-strip{height:240px;}}
+
+    .zonas{background:var(--navy);padding:92px 24px;position:relative;overflow:hidden;}
+    .zonas-inner{max-width:1060px;margin:0 auto;display:grid;grid-template-columns:1fr;gap:48px;}
+    @media(min-width:800px){.zonas-inner{grid-template-columns:2fr 3fr;gap:64px;align-items:start;}}
+    .zonas-hd .sec-title{font-size:clamp(1.7rem,4vw,2.6rem);color:var(--white);max-width:340px;margin-bottom:14px;}
+    .zonas-sub{font-size:.86rem;color:rgba(255,255,255,.42);line-height:1.7;max-width:300px;margin-bottom:22px;}
+    .zonas-wa-hint{font-size:.7rem;color:rgba(255,255,255,.26);display:block;margin-bottom:5px;}
+    .zonas-wa{font-size:.75rem;color:var(--gold);display:inline-block;transition:opacity .2s;}
+    .zonas-wa:hover{opacity:.7;text-decoration:underline;}
+    .pills{display:flex;flex-wrap:wrap;gap:10px;}
+    .pill{font-size:.72rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.7);border:1px solid rgba(201,169,97,.3);padding:13px 20px;min-height:44px;cursor:pointer;position:relative;overflow:hidden;transition:color .35s,border-color .35s;background:transparent;font-family:var(--font-body);display:inline-flex;align-items:center;gap:7px;}
+    .pill::before{content:'';position:absolute;inset:0;background:var(--gold);transform:translateX(-101%);transition:transform .38s var(--ease);z-index:0;}
+    .pill:hover::before{transform:none;}
+    .pill:hover{color:var(--navy);border-color:var(--gold);}
+    .pill span{position:relative;z-index:1;}
+    .pill-count{font-size:.6rem;color:var(--gold);position:relative;z-index:1;transition:color .35s;font-weight:600;}
+    .pill:hover .pill-count{color:var(--navy);}
+    .pill--empty{display:none;}
+
+    .steps{background:var(--off-white);padding:80px 24px;}
+    @media(max-width:700px){.steps{padding:60px 24px;}}
+    .steps-hd{text-align:center;margin-bottom:64px;}
+    .steps-hd .sec-title{font-size:clamp(1.7rem,4vw,2.6rem);color:var(--navy);max-width:380px;margin:0 auto;}
+    .steps-wrap{max-width:900px;margin:0 auto;display:grid;grid-template-columns:1fr;position:relative;}
+    .steps-wrap::before{content:'';position:absolute;left:21px;top:44px;bottom:44px;width:1px;background:linear-gradient(180deg,var(--gold),rgba(201,169,97,.08));}
+    .step{display:flex;gap:26px;align-items:flex-start;padding-bottom:44px;}
+    .step:last-child{padding-bottom:0;}
+    .step-badge{flex-shrink:0;width:42px;height:42px;border:1px solid var(--gold);background:var(--off-white);display:flex;align-items:center;justify-content:center;position:relative;z-index:1;}
+    .step-badge-num{font-family:var(--font-display);font-size:1rem;font-weight:700;color:var(--gold-dark);}
+    .step-body{padding-top:5px;}
+    .step-title{font-family:var(--font-display);font-size:1.18rem;font-weight:500;color:var(--navy);margin-bottom:8px;}
+    .step-desc{font-size:.84rem;line-height:1.85;color:var(--text-mid);}
+    @media(min-width:768px){
+      .steps-wrap::before{display:none;}
+      .steps-wrap{grid-template-columns:repeat(4,1fr);}
+      .step{flex-direction:column;gap:20px;padding-bottom:0;padding-right:24px;position:relative;}
+      .step:not(:last-child)::after{content:'';position:absolute;top:20px;left:52px;width:calc(100% - 52px - 24px);height:1px;background:linear-gradient(90deg,var(--gold),rgba(201,169,97,.08));}
+    }
+
+    .cta-final{background:var(--navy);padding:80px 24px;text-align:center;position:relative;overflow:hidden;}
+    @media(max-width:700px){.cta-final{padding:60px 24px;}}
+    .cta-final::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 55% 70% at 50% 110%,rgba(201,169,97,.07) 0%,transparent 65%);pointer-events:none;}
+    .cta-final-in{position:relative;z-index:1;}
+    .cta-label{display:block;font-size:.6rem;letter-spacing:.44em;text-transform:uppercase;color:var(--gold);margin-bottom:18px;}
+    .cta-title{font-family:var(--font-display);font-weight:400;font-size:clamp(1.9rem,5vw,3.2rem);color:var(--white);max-width:580px;margin:0 auto 40px;line-height:1.18;}
+    .cta-title em{font-style:italic;color:var(--gold-light);}
+
+    .footer{background:var(--navy-dark);border-top:2px solid var(--gold);padding:56px 24px 32px;}
+    .footer-grid{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:1fr;gap:40px;padding-bottom:40px;border-bottom:1px solid rgba(255,255,255,.06);}
+    .ft-brand-rule{width:30px;height:1px;background:var(--gold);margin:14px 0;}
+    .ft-brand-tag{font-size:.8rem;color:rgba(255,255,255,.38);line-height:1.7;max-width:230px;}
+    .ft-col-ttl{font-size:.58rem;font-weight:600;letter-spacing:.32em;text-transform:uppercase;color:var(--gold);margin-bottom:16px;}
+    .ft-col ul li{margin-bottom:9px;}
+    .ft-col ul li a{font-size:.83rem;color:rgba(255,255,255,.5);transition:color .2s;}
+    .ft-col ul li a:hover{color:var(--gold-light);}
+    .ft-contact-row{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px;}
+    .ft-icon{width:15px;height:15px;stroke:var(--gold);fill:none;stroke-width:1.5;flex-shrink:0;margin-top:2px;}
+    .ft-contact-txt{font-size:.81rem;color:rgba(255,255,255,.46);line-height:1.5;}
+    .footer-bottom{max-width:1080px;margin:26px auto 0;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;}
+    .footer-copy{font-size:.7rem;color:rgba(255,255,255,.5);letter-spacing:.06em;}
+    .footer-legal{display:flex;gap:18px;}
+    .footer-legal span{font-size:.7rem;color:rgba(255,255,255,.42);letter-spacing:.06em;}
+    @media(min-width:780px){
+      .footer-grid{grid-template-columns:1.6fr 1fr 1fr 1.5fr;}
+      .footer-bottom{flex-direction:row;justify-content:space-between;text-align:left;}
+    }
+
+    .wa-btn{position:fixed;bottom:26px;right:22px;z-index:800;width:52px;height:52px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px rgba(37,211,102,.3);transition:transform .25s;}
+    .wa-btn:hover{transform:scale(1.08);}
+    .wa-btn svg{width:27px;height:27px;fill:#fff;}
+
+    @media(max-width:700px){
+      .sec-eyebrow{font-size:.66rem;letter-spacing:.24em;}
+      .cta-label{font-size:.66rem;letter-spacing:.3em;}
+      .p-body{font-size:.92rem;line-height:1.82;}
+      .step-desc{font-size:.92rem;line-height:1.82;}
+      .zonas-sub{font-size:.92rem;color:rgba(255,255,255,.55);}
+      .stat-label{font-size:.66rem;letter-spacing:.16em;}
+      .zonas-wa-hint{font-size:.78rem;color:rgba(255,255,255,.48);}
+      .zonas-wa{font-size:.86rem;}
+      .t-name{font-size:.9rem;}
+      .t-role{font-size:.78rem;}
+      .hero-trad-link{font-size:.78rem;color:rgba(255,255,255,.52);}
+      .pill-count{font-size:.66rem;}
+      .ft-col-ttl{font-size:.66rem;letter-spacing:.22em;}
+      .ft-col ul li a{font-size:.9rem;}
+      .ft-contact-txt{font-size:.88rem;}
+      .ft-brand-tag{font-size:.86rem;}
+      .social-proof{padding:56px 24px;}
+      .pillars{padding:64px 24px;}
+      .zonas{padding:64px 24px;}
+      .steps-hd{margin-bottom:44px;}
+      .pillars-hd{margin-bottom:40px;}
+      .p-card{padding:32px 24px 28px;}
+      .t-card{padding:28px 24px;}
+      .stats-row{margin-bottom:36px;}
+      .step-title{font-size:1.1rem;}
+    }
+  *:focus-visible{outline:2px solid var(--gold);outline-offset:3px;}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a class="nav-logo" href="index.html">
+    <img src="bairen_logo.png?v=2" alt="Grupo Bairen" style="height:46px;width:auto;">
+  </a>
+  <div class="nav-links">
+    <a href="catalogo.html">Propiedades</a>
+    <a href="#nosotros">Por qué Bairen</a>
+    <a href="#contacto">Contacto</a>
+  </div>
+  <a class="nav-cta-desk" href="catalogo.html">Ver propiedades</a>
+  <button class="burger" id="burger" type="button" aria-label="Menú" aria-expanded="false" aria-controls="mobileMenu"><span></span><span></span><span></span></button>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="catalogo.html" class="m-link">Propiedades</a>
+  <a href="#nosotros" class="m-link">Por qué Bairen</a>
+  <a href="#pasos" class="m-link">Cómo funciona</a>
+  <a href="#contacto" class="m-link">Contacto</a>
+</div>
+
+<section class="hero" id="inicio">
+  <div class="hero-bg">
+    <img src="104.png" alt="Living amoblado con balcón y vista a Buenos Aires — Grupo Bairen" loading="eager" fetchpriority="high" decoding="async">
+  </div>
+  <div class="hero-content">
+    <span class="hero-eyebrow">Buenos Aires · Sin garantía · Amoblados</span>
+    <h1 class="hero-title">
+      El departamento que querés.<br>
+      <em>Sin garantía y sin caución.</em>
+    </h1>
+    <div class="hero-rule"></div>
+    <div class="hero-actions">
+      <a class="btn-gold" href="catalogo.html?tipo=temporal">
+        Ver propiedades temporales
+        <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <a class="hero-trad-link" href="catalogo.html?tipo=tradicional">
+        ¿Buscás alquiler tradicional? Ver propiedades →
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="social-proof">
+  <div class="social-inner">
+    <p class="proof-line reveal">
+      Más de <strong>120 propiedades</strong> alquiladas en CABA y GBA Norte,<br>
+      <strong>4.9<span class="proof-star">★</span></strong> en Google sobre 47 reseñas,<br>
+      contrato listo en <strong>menos de 48 horas</strong>.
+    </p>
+    <div class="testimonials">
+      <article class="t-card t-card--light reveal d1" role="article">
+        <div class="t-quote">"</div>
+        <p class="t-body">Hasta la fecha son los que mejor trato me han dado. Más que sorprendido y agradecido. Estamos en contacto, Julián.</p>
+        <div class="t-sep"></div>
+        <div class="t-foot">
+          <div class="t-avatar">T</div>
+          <div>
+            <div class="t-name">Tadeo T.</div>
+            <div class="t-role">Inquilino · Alquiler Temporal</div>
+          </div>
+        </div>
+      </article>
+      <article class="t-card t-card--dark reveal d2" role="article">
+        <div class="t-quote">"</div>
+        <p class="t-body">Julián, la verdad nos solucionaste todo. Respondiste todas las dudas sin importar la hora. Nos diste la confianza que necesitábamos. Son unos genios.</p>
+        <div class="t-sep"></div>
+        <div class="t-foot">
+          <div class="t-avatar">M</div>
+          <div>
+            <div class="t-name">Marcela R.</div>
+            <div class="t-role">Propietaria</div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="tipos" id="tipos">
+  <div class="tipos-inner">
+    <div class="tipos-hd reveal">
+      <span class="sec-eyebrow eyebrow-gold">Dos formas de alquilar</span>
+      <h2 class="sec-title" style="color:var(--white)">¿Temporal o Tradicional?<br><em style="font-style:italic;color:var(--gold-light);">Encontrá el que te queda.</em></h2>
+    </div>
+    <div class="tipos-grid">
+      <div class="tipo-card reveal d1">
+        <div class="tipo-tag">Temporal</div>
+        <div class="tipo-plazo">3 a 12 meses</div>
+        <ul class="tipo-list">
+          <li><span class="tipo-check">✓</span> Amoblado y equipado desde el día uno</li>
+          <li><span class="tipo-check">✓</span> Precio all-in: luz, gas, agua, wifi y expensas incluidos</li>
+          <li><span class="tipo-check">✓</span> Sin garantía propietaria ni seguro de caución</li>
+          <li><span class="tipo-check">✓</span> Ideal para reubicaciones, estadías largas o transición</li>
+        </ul>
+        <a class="tipo-cta" href="catalogo.html?tipo=temporal">Ver propiedades temporales →</a>
+      </div>
+      <div class="tipo-card tipo-card--trad reveal d2">
+        <div class="tipo-tag tipo-tag--trad">Tradicional</div>
+        <div class="tipo-plazo">12 meses o más</div>
+        <ul class="tipo-list">
+          <li><span class="tipo-check tipo-check--trad">✓</span> Sin amoblar — la unidad es tuya para decorar</li>
+          <li><span class="tipo-check tipo-check--trad">✓</span> Precio en USD, sin indexación en pesos</li>
+          <li><span class="tipo-check tipo-check--trad">✓</span> Servicios a cargo del inquilino</li>
+        </ul>
+        <a class="tipo-cta tipo-cta--trad" href="catalogo.html?tipo=tradicional">Ver propiedades tradicionales →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="pillars" id="nosotros">
+  <div class="pillars-hd reveal">
+    <span class="sec-eyebrow eyebrow-gold">Por qué Bairen</span>
+    <h2 class="sec-title">Una forma distinta de alquilar en Buenos Aires</h2>
+  </div>
+  <div class="pillars-list">
+    <article class="p-row reveal d1">
+      <div class="p-num">I</div>
+      <div class="p-body-wrap">
+        <h3 class="p-title">Sin garantía propietaria</h3>
+        <p class="p-body">Olvidate del garante y el seguro de caución. Contratos 100% digitales, en dólares, sin papeleo. Firmás desde donde estés.</p>
+      </div>
+    </article>
+    <article class="p-row reveal d2">
+      <div class="p-num">II</div>
+      <div class="p-body-wrap">
+        <h3 class="p-title">Precio en dólares, estabilidad real</h3>
+        <p class="p-body">Operamos en USD para darte previsibilidad. Sin indexación en pesos, sin sorpresas al tercer mes. Lo que acordás, es lo que pagás.</p>
+      </div>
+    </article>
+    <article class="p-row reveal d3">
+      <div class="p-num">III</div>
+      <div class="p-body-wrap">
+        <h3 class="p-title">Propiedades curadas, no listadas</h3>
+        <p class="p-body">No somos un portal. Cada unidad fue seleccionada, fotografiada y verificada por nuestro equipo. Fotos HD y recorridos en video para decidir a distancia.</p>
+      </div>
+    </article>
+  </div>
+</section>
+
+<div class="photo-strip">
+  <img src="23.png" alt="Terraza solarium con vista a Buenos Aires — Grupo Bairen" loading="lazy">
+</div>
+
+<section class="destacadas" id="destacadas" style="display:none">
+  <div class="destacadas-inner">
+    <div class="destacadas-hd reveal">
+      <span class="sec-eyebrow eyebrow-goldlt">Disponibles ahora</span>
+      <h2 class="sec-title">Propiedades destacadas</h2>
+      <p class="destacadas-sub">Las últimas unidades publicadas, listas para visitar.</p>
+    </div>
+    <div class="destacadas-grid reveal d2" id="destacadasGrid"></div>
+    <div class="destacadas-footer reveal d3">
+      <a class="btn-gold" href="catalogo.html">
+        Ver todas las propiedades
+        <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="zonas" id="zonas">
+  <div class="zonas-inner">
+    <div class="reveal">
+      <div class="zonas-hd">
+        <span class="sec-eyebrow eyebrow-goldlt">Dónde operamos</span>
+        <h2 class="sec-title">Los mejores barrios,<br>en un solo lugar</h2>
+      </div>
+      <p class="zonas-sub">CABA y GBA Norte. Palermo, Recoleta, Las Cañitas, San Isidro y más.</p>
+      <span class="zonas-wa-hint">¿Tu barrio no aparece?</span>
+      <a class="zonas-wa" href="https://wa.me/5491123106629" target="_blank" rel="noopener">Consultanos por WhatsApp →</a>
+    </div>
+    <div class="pills reveal d2">
+      <button class="pill" onclick="window.location='catalogo.html?barrio=Palermo'"><span>Palermo</span><span class="pill-count">1</span></button>
+      <button class="pill" onclick="window.location='catalogo.html?barrio=Recoleta'"><span>Recoleta</span><span class="pill-count">5</span></button>
+      <button class="pill" onclick="window.location='catalogo.html?barrio=Las%20Ca%C3%B1itas'"><span>Las Cañitas</span><span class="pill-count">1</span></button>
+      <button class="pill" onclick="window.location='catalogo.html?barrio=San%20Isidro'"><span>San Isidro</span><span class="pill-count">1</span></button>
+      <button class="pill" onclick="window.location='catalogo.html?barrio=Almagro'"><span>Almagro</span><span class="pill-count">1</span></button>
+      <button class="pill" onclick="window.location='catalogo.html?barrio=Centro'"><span>Centro</span><span class="pill-count">1</span></button>
+      <button class="pill" onclick="window.location='catalogo.html?barrio=Palermo%20Hollywood'"><span>Palermo Hollywood</span><span class="pill-count">3</span></button>
+      <button class="pill pill--empty" disabled><span>Belgrano</span><span class="pill-count">0</span></button>
+    </div>
+  </div>
+</section>
+
+<section class="steps" id="pasos">
+  <div class="steps-hd reveal">
+    <span class="sec-eyebrow eyebrow-gold">El proceso</span>
+    <h2 class="sec-title">Cómo funciona Bairen</h2>
+  </div>
+  <div class="steps-wrap">
+    <div class="step reveal d1">
+      <div class="step-badge"><span class="step-badge-num">1</span></div>
+      <div class="step-body">
+        <h3 class="step-title">Elegís la propiedad</h3>
+        <p class="step-desc">Navegás el catálogo con fotos HD y recorridos de video. Filtrás por barrio, tipo y precio. Decidís desde donde estés, sin venir a una oficina.</p>
+      </div>
+    </div>
+    <div class="step reveal d2">
+      <div class="step-badge"><span class="step-badge-num">2</span></div>
+      <div class="step-body">
+        <h3 class="step-title">Calificás tu perfil</h3>
+        <p class="step-desc">Un formulario breve para entender tu situación y mostrarte solo las opciones que encajan. Sin llamadas innecesarias, sin presión.</p>
+      </div>
+    </div>
+    <div class="step reveal d3">
+      <div class="step-badge"><span class="step-badge-num">3</span></div>
+      <div class="step-body">
+        <h3 class="step-title">Coordinamos la visita</h3>
+        <p class="step-desc">Agendás online en el horario que te convenga. Te mandamos el video de la unidad para que llegues con todo claro y aproveches cada minuto.</p>
+      </div>
+    </div>
+    <div class="step reveal d4">
+      <div class="step-badge"><span class="step-badge-num">4</span></div>
+      <div class="step-body">
+        <h3 class="step-title">Firmás el contrato</h3>
+        <p class="step-desc">100% digital. Sin filas, sin papeles, sin seguro de caución. Contrato listo en horas desde la visita.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-final" id="contacto">
+  <div class="cta-final-in reveal">
+    <span class="cta-label">Empezá hoy</span>
+    <h2 class="cta-title">Tu próximo Hogar<br>en Buenos Aires.<br><em>Todo listo.</em></h2>
+    <a class="btn-gold" href="catalogo.html?tipo=temporal">
+      Ver propiedades temporales
+      <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </a>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-grid">
+    <div>
+      <div><img src="bairen_logo.png?v=2" alt="Grupo Bairen" style="height:40px;width:auto;opacity:.85;margin-bottom:8px;"></div>
+      <div class="ft-brand-rule"></div>
+      <p class="ft-brand-tag">La inmobiliaria digital premium de Buenos Aires. Alquileres en CABA y GBA Norte.</p>
+    </div>
+    <div class="ft-col">
+      <div class="ft-col-ttl">Alquileres</div>
+      <ul>
+        <li><a href="catalogo.html?tipo=temporal">Alquiler Temporal</a></li>
+        <li><a href="catalogo.html?tipo=tradicional">Alquiler Tradicional</a></li>
+        <li><a href="catalogo.html">Ver propiedades</a></li>
+      </ul>
+    </div>
+    <div class="ft-col">
+      <div class="ft-col-ttl">Empresa</div>
+      <ul>
+        <li><a href="#nosotros">Quiénes somos</a></li>
+        <li><a href="#pasos">Cómo funciona</a></li>
+        <li><a href="mailto:grupobairen@gmail.com?subject=Soy propietario">Para propietarios</a></li>
+      </ul>
+    </div>
+    <div class="ft-col">
+      <div class="ft-col-ttl">Contacto</div>
+      <div class="ft-contact-row">
+        <svg class="ft-icon" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 6.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012.18 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.09a16 16 0 006 6l.56-.56a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg>
+        <span class="ft-contact-txt">+54 11 2310 6629</span>
+      </div>
+      <div class="ft-contact-row">
+        <svg class="ft-icon" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <span class="ft-contact-txt">grupobairen@gmail.com</span>
+      </div>
+      <div class="ft-contact-row">
+        <svg class="ft-icon" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span class="ft-contact-txt">CABA · GBA Norte<br>Buenos Aires, Argentina</span>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span class="footer-copy">© 2026 Grupo Bairen. Todos los derechos reservados.</span>
+    <div class="footer-legal">
+      <span title="Próximamente">Términos y condiciones</span>
+      <span title="Próximamente">Política de privacidad</span>
+    </div>
+  </div>
+</footer>
+
+<a class="wa-btn" href="https://wa.me/5491123106629" target="_blank" rel="noopener" aria-label="Contactar por WhatsApp">
+  <svg viewBox="0 0 32 32"><path d="M16 0C7.163 0 0 7.163 0 16c0 2.83.736 5.487 2.023 7.793L0 32l8.438-2.01A15.93 15.93 0 0016 32c8.837 0 16-7.163 16-16S24.837 0 16 0zm0 29.333a13.278 13.278 0 01-6.77-1.848l-.484-.287-5.013 1.195 1.228-4.88-.317-.502A13.278 13.278 0 012.667 16C2.667 8.636 8.636 2.667 16 2.667S29.333 8.636 29.333 16 23.364 29.333 16 29.333zm7.3-9.96c-.4-.2-2.363-1.166-2.728-1.3-.366-.133-.633-.2-.9.2-.266.4-1.033 1.3-1.266 1.566-.233.267-.466.3-.866.1-2.367-1.183-3.917-2.117-5.475-4.8-.413-.712.413-.663 1.183-2.202.133-.267.067-.5-.033-.7-.1-.2-.9-2.163-1.233-2.963-.324-.778-.653-.672-.9-.685l-.767-.013a1.47 1.47 0 00-1.067.5c-.366.4-1.4 1.367-1.4 3.33s1.434 3.863 1.634 4.13c.2.267 2.823 4.312 6.837 6.05 2.54 1.097 3.534 1.19 4.804.999.773-.115 2.363-.966 2.696-1.9.333-.933.333-1.733.233-1.9-.1-.166-.366-.266-.766-.466z"/></svg>
+</a>
+
+<script src="supabase-config.js"></script>
+<script>
+  const burger = document.getElementById('burger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  burger.addEventListener('click', () => {
+    const open = burger.classList.toggle('open');
+    mobileMenu.classList.toggle('open');
+    burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  document.querySelectorAll('.m-link').forEach(l =>
+    l.addEventListener('click', () => {
+      burger.classList.remove('open');
+      mobileMenu.classList.remove('open');
+      burger.setAttribute('aria-expanded', 'false');
+    })
+  );
+  document.querySelectorAll('.pill').forEach(pill => {
+    pill.setAttribute('aria-pressed', 'false');
+    pill.addEventListener('click', () => pill.setAttribute('aria-pressed', 'true'));
+  });
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+    });
+  }, { threshold: .1, rootMargin: '0px 0px -20px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // ─── BAIREN: destacadas + conteos dinámicos de barrios ───
+  (async () => {
+    function escapeHTML(s) {
+      return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+    try {
+      const sb = await window.bairenReady;
+      const { data, error } = await sb
+        .from('propiedades')
+        .select('*, imagenes(url, orden)')
+        .eq('publicada', true)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      const props = data || [];
+
+      // Conteos por barrio
+      const pillCount = {};
+      props.forEach(p => {
+        const b = (p.barrio || '').trim();
+        if (b) pillCount[b] = (pillCount[b] || 0) + 1;
+      });
+
+      // Actualizar pills
+      document.querySelectorAll('.pill').forEach(pill => {
+        const spanNombre = pill.querySelector('span:first-child');
+        if (!spanNombre) return;
+        const barrio = spanNombre.textContent.trim();
+        const matchKey = Object.keys(pillCount).find(k => k.toLowerCase() === barrio.toLowerCase());
+        const n = matchKey ? pillCount[matchKey] : 0;
+        const countEl = pill.querySelector('.pill-count');
+        if (countEl) countEl.textContent = n;
+        if (n === 0) {
+          pill.classList.add('pill--empty');
+          pill.setAttribute('disabled', '');
+          pill.onclick = null;
+        } else {
+          pill.classList.remove('pill--empty');
+          pill.removeAttribute('disabled');
+          pill.onclick = () => window.location = 'catalogo.html?barrio=' + encodeURIComponent(barrio);
+        }
+      });
+
+      // Destacadas: las 3 más recientes
+      const top3 = props.slice(0, 3);
+      if (top3.length) {
+        const grid = document.getElementById('destacadasGrid');
+        grid.innerHTML = top3.map(p => {
+          const portada = (p.imagenes || []).sort((a,b) => a.orden - b.orden)[0];
+          const fotoStyle = portada ? "background-image:url('" + portada.url + "')" : '';
+          const reservado = p.estado === 'Reservado';
+          const precio = (p.tipo === 'Tradicional' ? p.precio_tradicional : p.precio_temporal) || 0;
+          const precioStr = precio > 0 ? 'USD ' + Number(precio).toLocaleString('es-AR') : 'Consultar';
+          const tipoTag = p.tipo === 'Ambos' ? 'Temporal · Tradic.' : p.tipo;
+          const slugHref = 'propiedad.html?slug=' + encodeURIComponent(p.slug);
+          return (
+            '<a class="dest-card" href="' + slugHref + '" aria-label="Ver ' + escapeHTML(p.dir) + (p.unidad ? ' ' + escapeHTML(p.unidad) : '') + '">' +
+              '<div class="dest-img" style="' + fotoStyle + '">' +
+                '<span class="dest-tag">' + escapeHTML(tipoTag) + '</span>' +
+                '<span class="dest-status' + (reservado ? ' res' : '') + '">' + (reservado ? 'Reservado' : 'Disponible') + '</span>' +
+              '</div>' +
+              '<div class="dest-body">' +
+                '<div class="dest-addr">' + escapeHTML(p.dir) + (p.unidad ? ' ' + escapeHTML(p.unidad) : '') + '</div>' +
+                '<div class="dest-barrio">' + escapeHTML(p.barrio || '') + '</div>' +
+                '<div class="dest-meta">' +
+                  (p.ambientes ? '<span>' + p.ambientes + ' amb</span>' : '') +
+                  (p.m2 ? '<span>' + p.m2 + ' m²</span>' : '') +
+                '</div>' +
+                '<div class="dest-bottom-row">' +
+                  '<span class="dest-price">' + precioStr + '</span>' +
+                  '<span class="dest-cta-txt">Ver más →</span>' +
+                '</div>' +
+              '</div>' +
+            '</a>'
+          );
+        }).join('');
+        document.getElementById('destacadas').style.display = '';
+        document.querySelectorAll('#destacadas .reveal').forEach(el => io.observe(el));
+      }
+    } catch (err) {
+      console.error('[index] Error cargando destacadas:', err);
+    }
+  })();
+</script>
+</body>
+</html>

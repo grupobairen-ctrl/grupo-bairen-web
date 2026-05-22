@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="robots" content="noindex, nofollow"/>
+<title>Generador de sitemap — Grupo Bairen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{--navy:#15243F;--gold:#C9A961;--gold-dark:#8C6E40;--white:#FBFAF6;--off:#F4EEDF;--mid:#5E6678;--border:rgba(21,36,63,.12);}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Jost',sans-serif;background:var(--off);color:var(--navy);padding:32px 20px;min-height:100vh;}
+.wrap{max-width:780px;margin:0 auto;}
+h1{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:500;margin-bottom:6px;}
+.sub{font-size:.85rem;color:var(--mid);margin-bottom:24px;}
+.card{background:var(--white);border:1px solid var(--border);padding:24px 28px;margin-bottom:18px;}
+.btn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:var(--navy);border:none;padding:12px 24px;font-family:'Jost',sans-serif;font-size:.7rem;letter-spacing:.18em;font-weight:700;text-transform:uppercase;cursor:pointer;text-decoration:none;}
+.btn:hover{background:var(--gold-dark);color:var(--white);}
+.btn:disabled{background:rgba(21,36,63,.12);color:var(--mid);cursor:not-allowed;}
+.warn{background:rgba(237,200,45,.08);border-left:3px solid var(--gold);padding:14px 18px;font-size:.8rem;line-height:1.6;margin-bottom:20px;}
+.lbl{font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--mid);font-weight:600;margin-bottom:8px;}
+.xml{background:#0d1622;color:#e4e7ec;padding:18px 22px;font-family:'SF Mono',Menlo,monospace;font-size:.72rem;line-height:1.6;max-height:480px;overflow:auto;white-space:pre;border:1px solid var(--border);}
+.count{color:var(--gold-dark);font-weight:700;}
+.status{font-size:.85rem;color:var(--mid);margin-top:12px;}
+.actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;}
+.actions .btn-sec{background:transparent;border:1px solid var(--border);color:var(--navy);}
+.actions .btn-sec:hover{background:var(--navy);color:var(--white);}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Generador de sitemap.xml</h1>
+<p class="sub">Genera el sitemap actualizado a partir de las propiedades publicadas en Supabase.</p>
+
+<div class="warn">
+  <strong>Cómo se usa:</strong> click en "Generar" → revisás el XML → click "Descargar sitemap.xml" → reemplazás el archivo <code>sitemap.xml</code> de la carpeta del proyecto. Repetí cada vez que cargues una propiedad nueva.
+</div>
+
+<div class="card">
+  <div class="lbl">Estado</div>
+  <p class="status" id="statusTxt">Listo para generar.</p>
+  <div class="actions">
+    <button class="btn" id="btnGen">▶ Generar sitemap</button>
+    <button class="btn" id="btnDl" style="display:none">↓ Descargar sitemap.xml</button>
+    <button class="btn-sec btn" id="btnCopy" style="display:none">Copiar XML al portapapeles</button>
+  </div>
+</div>
+
+<div class="card" id="xmlCard" style="display:none">
+  <div class="lbl">XML generado</div>
+  <p class="status"><span class="count" id="urlCount">0</span> URLs incluidas.</p>
+  <div class="xml" id="xmlOut"></div>
+</div>
+</div>
+
+<script src="supabase-config.js"></script>
+<script>
+'use strict';
+const SITE = 'https://bairengroup.com';
+
+function $(id){ return document.getElementById(id); }
+function pad(n){ return String(n).padStart(2,'0'); }
+function today(){
+  const d = new Date();
+  return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+}
+function esc(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+async function generate(){
+  $('btnGen').disabled = true;
+  $('statusTxt').textContent = 'Conectando a Supabase...';
+  try {
+    const sb = await window.bairenReady;
+    $('statusTxt').textContent = 'Bajando propiedades publicadas...';
+    const { data, error } = await sb
+      .from('propiedades')
+      .select('slug, updated_at')
+      .eq('publicada', true)
+      .order('updated_at', { ascending: false });
+    if (error) throw error;
+
+    const props = data || [];
+    const td = today();
+
+    const urls = [
+      { loc: SITE + '/',              freq: 'weekly',  pri: '1.0', lastmod: td },
+      { loc: SITE + '/catalogo.html', freq: 'weekly',  pri: '0.9', lastmod: td },
+    ];
+    props.forEach(p => {
+      const lastmod = p.updated_at ? p.updated_at.slice(0,10) : td;
+      urls.push({ loc: `${SITE}/propiedades/${p.slug}`, freq: 'monthly', pri: '0.8', lastmod });
+    });
+
+    let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+    xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+    urls.forEach(u => {
+      xml += '  <url>\n';
+      xml += '    <loc>' + esc(u.loc) + '</loc>\n';
+      xml += '    <lastmod>' + u.lastmod + '</lastmod>\n';
+      xml += '    <changefreq>' + u.freq + '</changefreq>\n';
+      xml += '    <priority>' + u.pri + '</priority>\n';
+      xml += '  </url>\n';
+    });
+    xml += '</urlset>\n';
+
+    $('xmlOut').textContent = xml;
+    $('urlCount').textContent = urls.length;
+    $('xmlCard').style.display = '';
+    $('btnDl').style.display = '';
+    $('btnCopy').style.display = '';
+    $('btnGen').textContent = '↻ Regenerar';
+    $('statusTxt').textContent = `Listo · ${urls.length} URLs (2 fijas + ${props.length} propiedades).`;
+    window.__currentXml = xml;
+  } catch (err) {
+    $('statusTxt').textContent = 'Error: ' + (err.message || err);
+  } finally {
+    $('btnGen').disabled = false;
+  }
+}
+
+function download(){
+  if (!window.__currentXml) return;
+  const blob = new Blob([window.__currentXml], { type: 'application/xml' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'sitemap.xml';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+async function copyXml(){
+  if (!window.__currentXml) return;
+  try {
+    await navigator.clipboard.writeText(window.__currentXml);
+    $('btnCopy').textContent = '✓ Copiado';
+    setTimeout(() => $('btnCopy').textContent = 'Copiar XML al portapapeles', 2000);
+  } catch (err) {
+    alert('No se pudo copiar: ' + err.message);
+  }
+}
+
+$('btnGen').addEventListener('click', generate);
+$('btnDl').addEventListener('click', download);
+$('btnCopy').addEventListener('click', copyXml);
+</script>
+</body>
+</html>

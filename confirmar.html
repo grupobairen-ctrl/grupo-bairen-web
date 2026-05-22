@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="robots" content="noindex, nofollow">
+<title>Coordiná tu visita — Grupo Bairen</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link rel="icon" href="bairen_logo.png?v=2">
+<link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet"/>
+<style>
+:root{
+  --navy:#15243F;--navy-dark:#0D1A30;--navy-deeper:#081227;
+  --gold:#C9A961;--gold-dark:#8C6E40;--gold-light:#E0CB95;
+  --white:#FBFAF6;--off-white:#F4EEDF;
+  --font-display:'Playfair Display',Georgia,serif;
+  --font-body:'Jost',sans-serif;
+  --ease:cubic-bezier(0.22,1,0.36,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--font-body);font-weight:300;background:var(--navy);color:var(--white);min-height:100vh;-webkit-font-smoothing:antialiased;}
+a{text-decoration:none;color:inherit;}
+
+/* NAV */
+nav{height:64px;background:var(--navy-deeper);border-bottom:2px solid var(--gold);display:flex;align-items:center;justify-content:space-between;padding:0 40px;position:fixed;top:0;left:0;right:0;z-index:100;}
+.nav-logo{display:flex;align-items:center;}
+.nav-back{font-size:.68rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);opacity:.8;transition:opacity .2s;}
+.nav-back:hover{opacity:1;}
+
+/* AMBIENT */
+.ambient{position:fixed;inset:0;pointer-events:none;z-index:0;}
+.ambient::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(201,169,97,.04) 0%,transparent 65%);}
+
+/* PAGE */
+.page{padding:100px 24px 80px;position:relative;z-index:1;max-width:900px;margin:0 auto;}
+
+/* HEADER */
+.confirm-header{text-align:center;margin-bottom:52px;animation:fadeUp .7s var(--ease) forwards;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:none;}}
+.confirm-eyebrow{font-size:.58rem;letter-spacing:.4em;text-transform:uppercase;color:var(--gold);margin-bottom:16px;}
+.confirm-title{font-family:var(--font-display);font-size:clamp(1.8rem,4vw,2.6rem);font-weight:400;color:var(--white);line-height:1.2;margin-bottom:12px;}
+.confirm-title em{font-style:italic;color:var(--gold-light);}
+.confirm-sub{font-size:.88rem;color:rgba(255,255,255,.38);line-height:1.75;max-width:480px;margin:0 auto;}
+
+/* PROP PILL */
+.prop-pill{display:inline-flex;align-items:center;gap:10px;border:1px solid rgba(201,169,97,.18);padding:8px 18px;margin-bottom:40px;font-size:.68rem;letter-spacing:.12em;color:rgba(255,255,255,.4);}
+.prop-pill span{color:var(--gold-light);font-weight:500;}
+
+/* STEPS MINI */
+.steps-mini{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:48px;animation:fadeUp .7s var(--ease) .1s both;}
+.step-mini{display:flex;align-items:center;gap:8px;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.25);}
+.step-mini.done{color:rgba(201,169,97,.6);}
+.step-mini.current{color:var(--gold);}
+.step-mini-dot{width:20px;height:20px;border-radius:50%;border:1px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:600;flex-shrink:0;}
+.step-mini.done .step-mini-dot::after{content:'✓';}
+.step-mini-line{width:32px;height:1px;background:rgba(255,255,255,.1);margin:0 8px;}
+
+/* CALENDLY WRAPPER */
+.calendly-wrap{
+  background:var(--white);
+  border-top:3px solid var(--gold);
+  overflow:hidden;
+  animation:fadeUp .7s var(--ease) .2s both;
+}
+.calendly-inline-widget{
+  min-width:320px;
+  height:700px;
+}
+
+/* INFO CARDS */
+.info-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:2px;animation:fadeUp .7s var(--ease) .3s both;}
+.info-card{background:rgba(255,255,255,.03);border:1px solid rgba(201,169,97,.08);padding:24px 22px;display:flex;align-items:flex-start;gap:14px;}
+.info-icon{width:36px;height:36px;border:1px solid rgba(201,169,97,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.info-icon svg{width:16px;height:16px;stroke:var(--gold);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+.info-text-title{font-size:.7rem;font-weight:600;letter-spacing:.08em;color:var(--white);margin-bottom:4px;}
+.info-text-sub{font-size:.72rem;color:rgba(255,255,255,.3);line-height:1.6;}
+
+/* FOOTER */
+footer{background:var(--navy-deeper);border-top:2px solid var(--gold);padding:32px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-top:60px;}
+.ft-logo{display:flex;align-items:center;}
+.ft-copy{font-size:.65rem;color:rgba(255,255,255,.2);letter-spacing:.06em;}
+
+/* WA */
+.wa-btn{position:fixed;bottom:26px;right:22px;z-index:800;width:52px;height:52px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px rgba(37,211,102,.3);transition:transform .25s;}
+.wa-btn:hover{transform:scale(1.08);}
+.wa-btn svg{width:27px;height:27px;fill:#fff;}
+
+/* BURGER */
+.burger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:5px;flex-shrink:0;}
+.burger span{display:block;width:22px;height:1.5px;background:var(--white);transition:transform .3s,opacity .3s;}
+.burger.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg);}
+.burger.open span:nth-child(2){opacity:0;}
+.burger.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg);}
+@media(max-width:700px){.burger{display:flex;}}
+
+.mobile-menu{position:fixed;top:64px;left:0;right:0;background:var(--navy-deeper);border-bottom:1px solid rgba(201,169,97,.15);z-index:999;padding:16px 0;transform:translateY(-110%);
+  visibility:hidden;
+  transition:transform .38s var(--ease), visibility 0s .38s;
+}
+.mobile-menu.open{transform:none;visibility:visible;transition:transform .38s var(--ease), visibility 0s 0s;}
+.mm-link{display:block;padding:13px 24px;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.65);font-weight:500;transition:color .2s;}
+.mm-link:hover{color:var(--gold);}
+
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto;}
+  .mobile-menu{transition:none;}
+  *{animation-duration:.01ms!important;animation-iteration-count:1!important;}
+}
+
+@media(max-width:700px){
+  nav{padding:0 20px;}
+  .page{padding:88px 16px 60px;}
+  .steps-mini{gap:0;flex-wrap:wrap;justify-content:center;}
+  .step-mini-line{width:16px;}
+  .info-cards{grid-template-columns:1fr;}
+  footer{padding:24px 20px;flex-direction:column;text-align:center;}
+}
+*:focus-visible{outline:2px solid var(--gold);outline-offset:3px;}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+</head>
+<body>
+<div class="ambient"></div>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="index.html"><img src="bairen_logo.png?v=2" alt="Grupo Bairen" style="height:46px;width:auto;"></a>
+  <a class="nav-back" href="javascript:history.back()">← Volver</a>
+  <div class="burger" id="burger"><span></span><span></span><span></span></div>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html" class="mm-link">Inicio</a>
+  <a href="catalogo.html" class="mm-link">Propiedades</a>
+  <a href="index.html#contacto" class="mm-link">Contacto</a>
+</div>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div style="text-align:center;margin-bottom:20px;">
+    <div class="prop-pill">Coordinando visita para · <span id="propPillText">Grupo Bairen</span></div>
+  </div>
+
+  <div class="confirm-header">
+    <div class="confirm-eyebrow">Último paso</div>
+    <div class="confirm-title">Elegí el día y horario<br>que mejor <em>te quede</em></div>
+    <div class="confirm-sub">Una vez confirmado, recibís un WhatsApp con toda la info de la unidad para que llegues preparado el día de la visita.</div>
+  </div>
+
+  <!-- PASOS MINI -->
+  <div class="steps-mini">
+    <div class="step-mini done">
+      <div class="step-mini-dot"></div>
+      <span>Elegiste la unidad</span>
+    </div>
+    <div class="step-mini-line"></div>
+    <div class="step-mini done">
+      <div class="step-mini-dot"></div>
+      <span>Perfil calificado</span>
+    </div>
+    <div class="step-mini-line"></div>
+    <div class="step-mini current">
+      <div class="step-mini-dot">3</div>
+      <span>Confirmá la visita</span>
+    </div>
+  </div>
+
+  <!-- CALENDLY -->
+  <div class="calendly-wrap">
+    <div
+      class="calendly-inline-widget"
+      data-url="https://calendly.com/grupobairen/30min?hide_event_type_details=1&hide_gdpr_banner=1&primary_color=B9932E&text_color=22334B&background_color=ffffff"
+      style="min-width:320px;height:700px;">
+    </div>
+  </div>
+
+  <!-- INFO CARDS -->
+  <div class="info-cards">
+    <div class="info-card">
+      <div class="info-icon">
+        <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 6.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012.18 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.09a16 16 0 006 6l.56-.56a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg>
+      </div>
+      <div>
+        <div class="info-text-title">Te contactamos antes</div>
+        <div class="info-text-sub">Julián te llama 24hs antes para confirmar y resolver cualquier duda.</div>
+      </div>
+    </div>
+    <div class="info-card">
+      <div class="info-icon">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      </div>
+      <div>
+        <div class="info-text-title">Video de la unidad</div>
+        <div class="info-text-sub">Recibís un video de 3 a 5 min por WhatsApp con toda la info antes de la visita.</div>
+      </div>
+    </div>
+    <div class="info-card">
+      <div class="info-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <div>
+        <div class="info-text-title">Sin compromiso</div>
+        <div class="info-text-sub">La visita es gratis y sin obligación. Cancelá o reprogramá cuando quieras.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft-logo"><img src="bairen_logo.png?v=2" alt="Grupo Bairen" style="height:40px;width:auto;opacity:.85;"></div>
+  <div class="ft-copy">© 2026 Grupo Bairen · Todos los derechos reservados</div>
+</footer>
+
+<!-- WA -->
+<a class="wa-btn" href="https://wa.me/5491123106629" target="_blank" rel="noopener">
+  <svg viewBox="0 0 32 32"><path d="M16 0C7.163 0 0 7.163 0 16c0 2.83.736 5.487 2.023 7.793L0 32l8.438-2.01A15.93 15.93 0 0016 32c8.837 0 16-7.163 16-16S24.837 0 16 0zm0 29.333a13.278 13.278 0 01-6.77-1.848l-.484-.287-5.013 1.195 1.228-4.88-.317-.502A13.278 13.278 0 012.667 16C2.667 8.636 8.636 2.667 16 2.667S29.333 8.636 29.333 16 23.364 29.333 16 29.333zm7.3-9.96c-.4-.2-2.363-1.166-2.728-1.3-.366-.133-.633-.2-.9.2-.266.4-1.033 1.3-1.266 1.566-.233.267-.466.3-.866.1-2.367-1.183-3.917-2.117-5.475-4.8-.413-.712.413-.663 1.183-2.202.133-.267.067-.5-.033-.7-.1-.2-.9-2.163-1.233-2.963-.324-.778-.653-.672-.9-.685l-.767-.013a1.47 1.47 0 00-1.067.5c-.366.4-1.4 1.367-1.4 3.33s1.434 3.863 1.634 4.13c.2.267 2.823 4.312 6.837 6.05 2.54 1.097 3.534 1.19 4.804.999.773-.115 2.363-.966 2.696-1.9.333-.933.333-1.733.233-1.9-.1-.166-.366-.266-.766-.466z"/></svg>
+</a>
+
+<script src="https://assets.calendly.com/assets/external/widget.js" async></script>
+<script>
+(function(){
+  const urlP = new URLSearchParams(window.location.search);
+  const propName = urlP.get('prop') || '';
+  const propBarrio = urlP.get('barrio') || '';
+  const pillText = propName ? `${propName} · ${propBarrio}` : 'Grupo Bairen';
+  document.getElementById('propPillText').textContent = pillText;
+})();
+
+document.getElementById('burger').addEventListener('click', function() {
+  this.classList.toggle('open');
+  document.getElementById('mobileMenu').classList.toggle('open');
+});
+</script>
+
+<script>
+(function() {
+  // ── EmailJS — notificación de lead calificado ──────────────────
+  // Dispara SOLO cuando el usuario confirma la cita en Calendly
+  emailjs.init('x_bJ-nlzs5uVeH6wM');
+
+  var p = new URLSearchParams(window.location.search);
+
+  var templateParams = {
+    propiedad:   p.get('prop')          || 'No especificada',
+    barrio:      p.get('barrio')        || 'No especificado',
+    tipo:        p.get('tipo')          || 'No especificado',
+    mudanza:     p.get('r_mudanza')     || 'No respondido',
+    plazo:       p.get('r_plazo')       || 'No respondido',
+    personas:    p.get('r_personas')    || 'No respondido',
+    mascotas:    p.get('r_mascotas')    || 'No respondido',
+    presupuesto: p.get('r_presupuesto') || 'No respondido'
+  };
+
+  // Escucha el evento nativo de Calendly: solo dispara cuando hay reserva real
+  window.addEventListener('message', function(e) {
+    if (e.data && e.data.event === 'calendly.event_scheduled') {
+      emailjs.send('service_wpvj18e', 'template_z52ebjn', templateParams)
+        .catch(function(err) { console.warn('EmailJS error:', err); });
+    }
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+# ═══════════════════════════════════════════════════════════════════════
+# Netlify config — Grupo Bairen
+#
+# Deploy: drag-and-drop manual al dashboard de Netlify.
+# (Si en el futuro se conecta a un repo Git, agregar sección [build].)
+# ═══════════════════════════════════════════════════════════════════════
+
+# ─── URLs limpias para propiedades ─────────────────────────────────────
+# /propiedades/<slug>  →  propiedad.html?slug=<slug>  (rewrite, no redirect)
+#
+# force = false → si existe un archivo físico con ese nombre, gana el archivo.
+# Esto permite convivir con las páginas .html viejas durante la migración.
+[[redirects]]
+  from = "/propiedades/:slug"
+  to = "/propiedad.html?slug=:slug"
+  status = 200
+  force = false
+
+# ─── Headers de seguridad básicos para todo el sitio ───────────────────
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), camera=(), microphone=()"
+    X-Frame-Options = "SAMEORIGIN"
+
+# ─── Admin: bloqueo total de iframe + sin caché ────────────────────────
+[[headers]]
+  for = "/admin.html"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    Cache-Control = "no-store, no-cache, must-revalidate, max-age=0"
+
+# ─── Assets estáticos: caché largo ─────────────────────────────────────
+[[headers]]
+  for = "/*.png"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.jpg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
