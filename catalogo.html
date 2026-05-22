@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Propiedades — Grupo Bairen</title>
+<meta name="description" content="Catálogo de alquileres premium en CABA y GBA Norte. Temporales y tradicionales sin garantía.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://bairengroup.com/catalogo.html">
+<meta property="og:title" content="Propiedades — Grupo Bairen">
+<meta property="og:description" content="Catálogo de alquileres premium en CABA y GBA Norte. Temporales y tradicionales sin garantía.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_AR">
+<meta property="og:site_name" content="Grupo Bairen">
+<meta property="og:url" content="https://bairengroup.com/catalogo.html">
+<meta property="og:image" content="https://bairengroup.com/104.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Propiedades — Grupo Bairen">
+<meta name="twitter:description" content="Catálogo de alquileres premium en CABA y GBA Norte. Temporales y tradicionales sin garantía.">
+<meta name="twitter:image" content="https://bairengroup.com/104.png">
+<link rel="icon" href="bairen_logo.png?v=2">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+/* ─── TOKENS ─────────────────────────────────────────────────────────── */
+:root {
+  --navy:#15243F; --navy-dark:#0D1A30; --navy-deeper:#081227; --navy-darker:#0A1525;
+  --gold:#C9A961; --gold-dark:#8C6E40; --gold-light:#E0CB95;
+  --white:#FBFAF6; --off-white:#F4EEDF; --gray-light:#D6D2C8;
+  --text-dark:#16202E; --text-mid:#5E6678;
+  --font-display:'Playfair Display',Georgia,serif;
+  --font-body:'Jost',sans-serif;
+  --ease:cubic-bezier(0.22,1,0.36,1);
+  --ease-snap:cubic-bezier(0.16,1,0.3,1);
+  --nav-h:64px;
+  --filter-h:52px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font-body);font-weight:300;color:var(--navy);background:var(--off-white);-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+a{text-decoration:none;color:inherit;}
+button{cursor:pointer;font-family:var(--font-body);}
+
+/* ─── NAV ─────────────────────────────────────────────────────────────── */
+nav {
+  position:fixed;inset:0 0 auto 0;z-index:1000;
+  height:var(--nav-h);
+  background:var(--navy-deeper);
+  border-bottom:2px solid var(--gold);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 28px;
+  gap:12px;
+}
+.nav-logo{display:flex;align-items:center;}
+.nav-links{display:flex;gap:24px;}
+.nav-links a{
+  font-size:.68rem;font-weight:500;letter-spacing:.18em;
+  text-transform:uppercase;color:rgba(255,255,255,.6);
+  transition:color .22s;
+}
+.nav-links a:hover{color:var(--gold);}
+.nav-back{
+  font-size:.66rem;font-weight:600;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--gold);
+  border:1px solid rgba(201,169,97,.35);padding:8px 16px;
+  transition:background .22s,color .22s;white-space:nowrap;
+  flex-shrink:0;
+}
+.nav-back:hover{background:var(--gold);color:var(--navy);}
+@media(max-width:700px){
+  .nav-links{display:none;}
+  nav{padding:0 20px;}
+}
+
+/* ─── BURGER ──────────────────────────────────────────────────────────── */
+.burger{display:none;flex-direction:column;gap:5px;padding:5px;flex-shrink:0;background:none;border:none;cursor:pointer;}
+.burger span{display:block;width:22px;height:1.5px;background:var(--gold);transition:transform .3s var(--ease),opacity .3s;}
+.burger.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg);}
+.burger.open span:nth-child(2){opacity:0;}
+.burger.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg);}
+@media(max-width:700px){.burger{display:flex;}}
+
+.mobile-menu{
+  position:fixed;top:var(--nav-h);left:0;right:0;
+  background:var(--navy-dark);border-bottom:1px solid rgba(201,169,97,.15);
+  z-index:999;padding:16px 0;
+  transform:translateY(-110%);
+  visibility:hidden;
+  transition:transform .38s var(--ease), visibility 0s .38s;
+}
+.mobile-menu.open{transform:none;visibility:visible;transition:transform .38s var(--ease), visibility 0s 0s;}
+.m-link{
+  display:block;padding:13px 28px;
+  font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;
+  color:rgba(255,255,255,.65);font-weight:500;
+  transition:color .2s;
+}
+.m-link:hover{color:var(--gold);}
+
+/* ─── HERO ────────────────────────────────────────────────────────────── */
+.cat-hero {
+  margin-top:var(--nav-h);
+  background:var(--navy);
+  padding:52px 28px 44px;
+  position:relative;overflow:hidden;
+  text-align:center;
+}
+.cat-hero::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 55% 90% at 50% 120%, rgba(201,169,97,.07) 0%, transparent 70%),
+    radial-gradient(ellipse 30% 50% at 10% 50%, rgba(140,110,64,.04) 0%, transparent 60%);
+  pointer-events:none;
+}
+.cat-hero-inner{position:relative;z-index:1;}
+.cat-eyebrow{
+  font-size:.58rem;letter-spacing:.4em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:12px;
+  opacity:.8;
+}
+.cat-title{
+  font-family:var(--font-display);
+  font-size:clamp(1.75rem,4vw,2.6rem);
+  font-weight:500;color:var(--white);
+  margin-bottom:8px;line-height:1.12;
+}
+.cat-sub{
+  font-size:.85rem;color:var(--gold-light);
+  letter-spacing:.04em;opacity:.75;
+}
+
+/* ─── TYPE BANNER ─────────────────────────────────────────────────────── */
+.type-banner{
+  background:var(--navy-dark);
+  border-bottom:1px solid rgba(201,169,97,.12);
+  padding:14px 28px;
+  display:none;
+}
+.type-banner-inner{
+  max-width:1100px;margin:0 auto;
+  display:flex;align-items:center;gap:16px;
+}
+.type-banner-tag{
+  font-size:.54rem;font-weight:700;letter-spacing:.25em;
+  text-transform:uppercase;background:var(--gold);
+  color:var(--navy);padding:4px 10px;flex-shrink:0;
+}
+.type-banner-text{
+  font-size:.78rem;color:rgba(255,255,255,.52);
+  line-height:1.55;letter-spacing:.02em;
+}
+@media(max-width:700px){
+  .type-banner{padding:12px 20px;}
+  .type-banner-inner{flex-direction:column;align-items:flex-start;gap:6px;}
+}
+
+/* ─── FILTER BAR (SLIM STICKY) ───────────────────────────────────────── */
+.filters-bar {
+  position:sticky;top:var(--nav-h);z-index:200;
+  background:#FFFFFF;
+  border-bottom:1px solid rgba(21,36,63,.1);
+  height:var(--filter-h);
+  display:flex;align-items:center;
+  padding:0 28px;gap:10px;
+}
+
+/* Barrio dropdown trigger */
+.barrio-trigger {
+  position:relative;
+  display:flex;align-items:center;gap:7px;
+  font-size:.68rem;font-weight:500;letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--navy);
+  border:1px solid rgba(21,36,63,.2);
+  background:transparent;
+  padding:9px 14px;
+  height:34px;
+  transition:border-color .22s,background .22s,color .22s;
+  white-space:nowrap;
+  flex-shrink:0;
+}
+.barrio-trigger:hover{border-color:var(--navy);}
+.barrio-trigger.has-filter{
+  background:var(--navy);color:var(--white);
+  border-color:var(--navy);
+}
+.barrio-trigger.has-filter .bt-badge{
+  background:var(--gold);color:var(--navy);
+}
+.bt-label{pointer-events:none;}
+.bt-badge{
+  min-width:18px;height:18px;border-radius:50%;
+  background:var(--gold);color:var(--navy);
+  font-size:.55rem;font-weight:700;
+  display:none;align-items:center;justify-content:center;
+  padding:0 3px;
+}
+.bt-badge.visible{display:flex;}
+.bt-arrow{
+  width:8px;height:8px;pointer-events:none;
+  border-right:1.5px solid currentColor;
+  border-bottom:1.5px solid currentColor;
+  transform:rotate(45deg) translateY(-2px);
+  transition:transform .22s var(--ease);
+  flex-shrink:0;
+}
+.barrio-trigger.open .bt-arrow{transform:rotate(225deg) translateY(-2px);}
+
+/* Barrio dropdown panel */
+.barrio-dropdown {
+  position:absolute;
+  top:calc(var(--nav-h) + var(--filter-h));
+  left:28px;
+  background:var(--white);
+  border:1px solid rgba(21,36,63,.12);
+  box-shadow:0 20px 56px rgba(8,18,39,.22),0 6px 14px rgba(140,110,64,.06);
+  padding:20px;
+  min-width:320px;
+  z-index:500;
+  opacity:0;
+  transform:translateY(-8px);
+  pointer-events:none;
+  transition:opacity .22s var(--ease),transform .22s var(--ease);
+}
+.barrio-dropdown.open{
+  opacity:1;transform:none;pointer-events:all;
+}
+.bd-head{
+  font-size:.58rem;letter-spacing:.3em;text-transform:uppercase;
+  color:var(--text-mid);margin-bottom:14px;
+}
+.bd-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:6px;
+  margin-bottom:14px;
+}
+.bd-pill{
+  font-size:.66rem;font-weight:500;letter-spacing:.08em;
+  text-transform:uppercase;
+  padding:9px 12px;
+  border:1px solid rgba(21,36,63,.15);
+  color:var(--navy);background:transparent;
+  text-align:left;
+  transition:all .2s;
+  font-family:var(--font-body);
+}
+.bd-pill:hover{border-color:var(--navy);background:var(--off-white);}
+.bd-pill.active{background:var(--navy);color:var(--white);border-color:var(--navy);}
+.bd-clear{
+  font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--gold-dark);background:none;border:none;
+  padding:0;cursor:pointer;font-family:var(--font-body);
+  transition:color .2s;
+  display:none;
+}
+.bd-clear:hover{color:var(--navy);}
+.bd-clear.visible{display:block;}
+@media(max-width:500px){
+  .barrio-dropdown{left:16px;right:16px;min-width:0;}
+}
+
+/* ─── SEPARADOR ───────────────────────────────────────────────────────── */
+.filter-sep{width:1px;height:24px;background:rgba(21,36,63,.12);flex-shrink:0;}
+
+/* ─── TIPO PILLS ──────────────────────────────────────────────────────── */
+.tipo-pills{display:flex;gap:6px;flex-shrink:0;}
+.pill-tipo{
+  font-size:.66rem;font-weight:500;letter-spacing:.1em;
+  text-transform:uppercase;padding:9px 14px;height:34px;
+  border:1px solid rgba(21,36,63,.18);
+  color:var(--navy);background:transparent;
+  transition:all .22s;display:flex;align-items:center;
+  font-family:var(--font-body);
+  white-space:nowrap;
+}
+.pill-tipo:hover{border-color:var(--navy);}
+.pill-tipo.active{background:var(--navy);color:var(--white);border-color:var(--navy);}
+
+/* ─── SEARCH ──────────────────────────────────────────────────────────── */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+.search-wrap{margin-left:auto;display:flex;align-items:center;}
+.search-input{
+  font-family:var(--font-body);font-size:.78rem;font-weight:300;
+  padding:9px 14px;height:34px;
+  border:1px solid rgba(21,36,63,.18);
+  outline:none;width:190px;
+  color:var(--navy);background:#FFFFFF;
+  transition:border-color .22s,width .3s var(--ease);
+}
+.search-input:focus{border-color:var(--gold);width:220px;}
+.search-input::placeholder{color:rgba(21,36,63,.38);}
+@media(max-width:900px){.search-input{width:140px;}}
+@media(max-width:700px){
+  :root{--filter-h:64px;}
+  .filters-bar{height:auto;min-height:var(--filter-h);padding:12px 16px;gap:8px;flex-wrap:wrap;}
+  .filter-sep{display:none;}
+  .barrio-trigger,.pill-tipo{height:44px;padding:0 16px;font-size:.7rem;}
+  .search-wrap{order:99;flex:1 0 100%;margin:4px 0 2px;}
+  .search-input{width:100%;height:44px;font-size:.92rem;padding:0 14px;}
+  .search-input:focus{width:100%;}
+  .sort-select{height:40px;padding:0 12px;font-size:.78rem;}
+  .bd-pill{min-height:40px;padding:10px 12px;font-size:.7rem;}
+  .results-bar{padding:14px 16px;}
+  .results-count{font-size:.74rem;}
+  .card-body{padding:24px 22px 22px;}
+  .card-address{font-size:1.18rem;}
+  .card-barrio{font-size:.7rem;}
+  .card-cta{padding:11px 16px;font-size:.66rem;min-height:44px;display:inline-flex;align-items:center;}
+  .spec-val{font-size:1rem;}
+  .spec-lbl{font-size:.6rem;}
+  .chip{font-size:.6rem;padding:4px 10px;}
+}
+
+/* ─── RESULTADOS BAR ──────────────────────────────────────────────────── */
+.results-bar{
+  padding:12px 28px;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;
+  border-bottom:1px solid rgba(21,36,63,.05);
+}
+.results-count{
+  font-size:.7rem;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--text-mid);
+}
+.sort-select{
+  font-family:var(--font-body);font-size:.72rem;
+  padding:6px 10px;
+  border:1px solid rgba(21,36,63,.15);
+  color:var(--navy);background:var(--white);
+  outline:none;
+}
+@media(max-width:700px){.results-bar{padding:10px 16px;}}
+
+/* ─── GRID ────────────────────────────────────────────────────────────── */
+.catalog-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+  gap:28px;
+  padding:32px 32px 96px;
+}
+@media(max-width:700px){
+  .catalog-grid{padding:24px 16px 72px;grid-template-columns:1fr;gap:20px;}
+}
+
+/* ─── CARD ────────────────────────────────────────────────────────────── */
+.prop-card{
+  background:#FFFFFF;
+  border:1px solid rgba(21,36,63,.07);
+  overflow:hidden;
+  display:flex;flex-direction:column;
+  transition:transform .3s var(--ease),box-shadow .3s var(--ease);
+  cursor:pointer;
+  text-decoration:none;color:inherit;
+}
+@media(hover:hover) and (pointer:fine){
+  .prop-card:hover{
+    transform:translateY(-4px);
+    box-shadow:0 22px 48px rgba(8,18,39,.22),0 6px 14px rgba(140,110,64,.08);
+  }
+  .prop-card:hover .card-img img{transform:scale(1.04);}
+}
+.prop-card.hidden{display:none;}
+
+.card-img{
+  height:210px;background:var(--navy);
+  position:relative;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+.card-img img{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;object-position:center;
+  transition:transform .5s var(--ease);
+}
+.card-img-placeholder{
+  font-family:var(--font-display);font-size:.6rem;
+  letter-spacing:.22em;color:rgba(201,169,97,.25);
+  text-transform:uppercase;
+}
+.card-tag{
+  position:absolute;top:14px;left:14px;z-index:2;
+  font-size:.56rem;font-weight:700;letter-spacing:.2em;
+  text-transform:uppercase;padding:5px 11px;
+}
+.tag-temporal{background:var(--gold);color:var(--navy);}
+.tag-tradicional{background:rgba(21,36,63,.9);color:var(--gold);border:1px solid rgba(201,169,97,.6);}
+.card-status{
+  position:absolute;top:14px;right:14px;z-index:2;
+  font-size:.56rem;font-weight:600;letter-spacing:.15em;
+  text-transform:uppercase;padding:5px 10px;
+}
+.status-disponible{background:rgba(255,255,255,.95);color:#2a7a4b;}
+.status-reservado{background:rgba(255,255,255,.95);color:#b94a4a;}
+
+.card-body{padding:22px 22px 18px;flex:1;display:flex;flex-direction:column;}
+.card-address{
+  font-family:var(--font-display);font-size:1.08rem;
+  font-weight:500;color:var(--navy);
+  margin-bottom:3px;line-height:1.2;
+}
+.card-barrio{
+  font-size:.64rem;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--gold-dark);
+  margin-bottom:16px;font-weight:500;
+}
+.card-specs{display:flex;gap:18px;margin-bottom:16px;}
+.spec{display:flex;flex-direction:column;gap:2px;}
+.spec-val{font-size:.95rem;font-weight:600;color:var(--navy);}
+.spec-lbl{font-size:.56rem;letter-spacing:.15em;text-transform:uppercase;color:var(--text-mid);}
+.card-divider{height:1px;background:rgba(21,36,63,.07);margin-bottom:16px;}
+.card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:auto;}
+.card-price{font-family:var(--font-display);}
+.price-amount{font-size:1.28rem;font-weight:700;color:var(--navy);}
+.price-consult{font-size:.85rem;font-weight:500;color:var(--text-mid);font-style:italic;}
+.price-period{font-size:.62rem;color:var(--text-mid);letter-spacing:.06em;}
+.card-cta{
+  font-size:.6rem;font-weight:600;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--navy);
+  border:1px solid rgba(21,36,63,.25);padding:9px 14px;
+  transition:all .22s;font-family:var(--font-body);
+  background:transparent;
+}
+.card-cta:hover{background:var(--navy);color:var(--white);border-color:var(--navy);}
+
+/* Amenity chips */
+.card-amenities{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;}
+.chip{
+  font-size:.56rem;letter-spacing:.08em;
+  text-transform:uppercase;padding:4px 10px;
+  background:#ECE9E1;color:var(--text-mid);
+  border:1px solid rgba(21,36,63,.04);
+}
+
+/* ─── EMPTY STATE ─────────────────────────────────────────────────────── */
+.empty-state{grid-column:1/-1;text-align:center;padding:80px 24px;}
+.empty-title{font-family:var(--font-display);font-size:1.5rem;color:var(--navy);margin-bottom:10px;}
+.empty-sub{font-size:.85rem;color:var(--text-mid);}
+
+/* ─── WA FLOAT ────────────────────────────────────────────────────────── */
+.wa-btn{
+  position:fixed;bottom:26px;right:22px;z-index:800;
+  width:52px;height:52px;background:#25D366;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 6px 24px rgba(37,211,102,.3);
+  transition:transform .25s;
+}
+.wa-btn:hover{transform:scale(1.08);}
+.wa-btn svg{width:27px;height:27px;fill:#fff;}
+
+/* ─── FOOTER ──────────────────────────────────────────────────────────── */
+footer{
+  background:var(--navy-dark);border-top:2px solid var(--gold);
+  padding:36px 28px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:16px;
+}
+.ft-copy{font-size:.65rem;color:rgba(255,255,255,.22);letter-spacing:.06em;}
+
+/* ─── REDUCED MOTION ──────────────────────────────────────────────────── */
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto;}
+  .mobile-menu,.barrio-dropdown,.prop-card,.card-img img{transition:none!important;}
+  *{animation-duration:.01ms!important;}
+}
+*:focus-visible{outline:2px solid var(--gold);outline-offset:3px;}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="index.html">
+    <img src="bairen_logo.png?v=2" alt="Grupo Bairen" style="height:46px;width:auto;">
+  </a>
+  <div class="nav-links">
+    <a href="index.html#nosotros">Por qué Bairen</a>
+    <a href="index.html#pasos">Cómo funciona</a>
+    <a href="index.html#contacto">Contacto</a>
+  </div>
+  <a class="nav-back" href="index.html">← Inicio</a>
+  <button class="burger" id="burger" type="button" aria-label="Menú" aria-expanded="false" aria-controls="mobileMenu"><span></span><span></span><span></span></button>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html" class="m-link">Inicio</a>
+  <a href="index.html#nosotros" class="m-link">Por qué Bairen</a>
+  <a href="index.html#pasos" class="m-link">Cómo funciona</a>
+  <a href="index.html#contacto" class="m-link">Contacto</a>
+</div>
+
+<!-- HERO -->
+<div class="cat-hero">
+  <div class="cat-hero-inner">
+    <p class="cat-eyebrow">Grupo Bairen · Buenos Aires</p>
+    <h1 class="cat-title" id="catTitle">Propiedades disponibles</h1>
+    <p class="cat-sub" id="catSub">Alquileres temporales y tradicionales en CABA y GBA Norte</p>
+  </div>
+</div>
+
+<!-- TYPE BANNER -->
+<div class="type-banner" id="typeBanner">
+  <div class="type-banner-inner">
+    <span class="type-banner-tag" id="typeBannerTag"></span>
+    <p class="type-banner-text" id="typeBannerText"></p>
+  </div>
+</div>
+
+<!-- FILTER BAR (slim sticky) -->
+<div class="filters-bar" id="filtersBar">
+
+  <!-- BARRIO DROPDOWN TRIGGER -->
+  <button class="barrio-trigger" id="barrioTrigger" aria-haspopup="listbox" aria-expanded="false">
+    <span class="bt-label">Barrios</span>
+    <span class="bt-badge" id="btBadge">1</span>
+    <span class="bt-arrow"></span>
+  </button>
+
+  <div class="filter-sep"></div>
+
+  <!-- TIPO PILLS -->
+  <div class="tipo-pills">
+    <button class="pill-tipo active" data-tipo="todos">Todos</button>
+    <button class="pill-tipo" data-tipo="Temporal">Temporal</button>
+    <button class="pill-tipo" data-tipo="Tradicional">Tradicional</button>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="search-wrap">
+    <label class="sr-only" for="searchInput">Buscar propiedad</label>
+    <input class="search-input" type="search" id="searchInput" placeholder="Buscar dirección o barrio…" autocomplete="off" aria-label="Buscar dirección o barrio"/>
+  </div>
+
+</div>
+
+<!-- BARRIO DROPDOWN PANEL (outside sticky bar so it overflows correctly) -->
+<div class="barrio-dropdown" id="barrioDropdown" role="listbox" aria-label="Filtrar por barrio">
+  <p class="bd-head">Seleccioná un barrio</p>
+  <div class="bd-grid" id="bdGrid">
+    <!-- pills rendered by JS -->
+  </div>
+  <button class="bd-clear" id="bdClear">Limpiar filtro</button>
+</div>
+
+<!-- RESULTADOS -->
+<div class="results-bar">
+  <span class="results-count" id="resultsCount">0 propiedades</span>
+  <label class="sr-only" for="sortSelect">Ordenar propiedades</label>
+  <select class="sort-select" id="sortSelect" aria-label="Ordenar propiedades">
+    <option value="default">Ordenar por defecto</option>
+    <option value="precio-asc">Precio: menor a mayor</option>
+    <option value="precio-desc">Precio: mayor a menor</option>
+    <option value="m2-desc">Mayor superficie</option>
+  </select>
+</div>
+
+<!-- GRID -->
+<div class="catalog-grid" id="catalogGrid"></div>
+
+<!-- WA -->
+<a class="wa-btn" href="https://wa.me/5491123106629" target="_blank" rel="noopener" aria-label="Contactar por WhatsApp">
+  <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 0C7.163 0 0 7.163 0 16c0 2.83.736 5.487 2.023 7.793L0 32l8.438-2.01A15.93 15.93 0 0016 32c8.837 0 16-7.163 16-16S24.837 0 16 0zm0 29.333a13.278 13.278 0 01-6.77-1.848l-.484-.287-5.013 1.195 1.228-4.88-.317-.502A13.278 13.278 0 012.667 16C2.667 8.636 8.636 2.667 16 2.667S29.333 8.636 29.333 16 23.364 29.333 16 29.333zm7.3-9.96c-.4-.2-2.363-1.166-2.728-1.3-.366-.133-.633-.2-.9.2-.266.4-1.033 1.3-1.266 1.566-.233.267-.466.3-.866.1-2.367-1.183-3.917-2.117-5.475-4.8-.413-.712.413-.663 1.183-2.202.133-.267.067-.5-.033-.7-.1-.2-.9-2.163-1.233-2.963-.324-.778-.653-.672-.9-.685l-.767-.013a1.47 1.47 0 00-1.067.5c-.366.4-1.4 1.367-1.4 3.33s1.434 3.863 1.634 4.13c.2.267 2.823 4.312 6.837 6.05 2.54 1.097 3.534 1.19 4.804.999.773-.115 2.363-.966 2.696-1.9.333-.933.333-1.733.233-1.9-.1-.166-.366-.266-.766-.466z"/></svg>
+</a>
+
+<!-- FOOTER -->
+<footer>
+  <img src="bairen_logo.png?v=2" alt="Grupo Bairen" style="height:40px;width:auto;opacity:.85;">
+  <span class="ft-copy">© 2026 Grupo Bairen · Todos los derechos reservados</span>
+</footer>
+
+<script src="supabase-config.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   DATA
+═══════════════════════════════════════════════════════════════ */
+const BARRIOS = [
+  'Palermo','Recoleta','Belgrano','Villa Crespo',
+  'Las Cañitas','San Isidro','Almagro','Centro',
+  'Palermo Hollywood','Otros'
+];
+
+// Datos cargados dinámicamente desde Supabase en loadFromSupabase()
+let props = [];
+
+/* ═══════════════════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════════════════ */
+let activeBarrio = 'todos';
+let activeTipo   = 'todos';
+let sortMode     = 'default';
+let searchQ      = '';
+let dropdownOpen = false;
+
+/* ═══════════════════════════════════════════════════════════════
+   BARRIO DROPDOWN — build pills
+═══════════════════════════════════════════════════════════════ */
+function buildBarrioPills() {
+  const grid = document.getElementById('bdGrid');
+  const allBtn = document.createElement('button');
+  allBtn.className = 'bd-pill active';
+  allBtn.dataset.barrio = 'todos';
+  allBtn.textContent = 'Todos';
+  grid.appendChild(allBtn);
+
+  BARRIOS.forEach(b => {
+    const btn = document.createElement('button');
+    btn.className = 'bd-pill';
+    btn.dataset.barrio = b;
+    btn.textContent = b === 'Palermo Hollywood' ? 'P. Hollywood' : b;
+    grid.appendChild(btn);
+  });
+
+  grid.addEventListener('click', e => {
+    const btn = e.target.closest('.bd-pill');
+    if (!btn) return;
+    grid.querySelectorAll('.bd-pill').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeBarrio = btn.dataset.barrio;
+    updateBarrioTrigger();
+    closeDropdown();
+    render();
+  });
+}
+
+function updateBarrioTrigger() {
+  const trigger = document.getElementById('barrioTrigger');
+  const badge   = document.getElementById('btBadge');
+  const clear   = document.getElementById('bdClear');
+
+  if (activeBarrio !== 'todos') {
+    trigger.classList.add('has-filter');
+    badge.classList.add('visible');
+    badge.textContent = '1';
+    clear.classList.add('visible');
+    const label = activeBarrio === 'Palermo Hollywood' ? 'P. Hollywood' : activeBarrio;
+    trigger.querySelector('.bt-label').textContent = label;
+  } else {
+    trigger.classList.remove('has-filter');
+    badge.classList.remove('visible');
+    clear.classList.remove('visible');
+    trigger.querySelector('.bt-label').textContent = 'Barrios';
+  }
+}
+
+function openDropdown() {
+  dropdownOpen = true;
+  document.getElementById('barrioTrigger').classList.add('open');
+  document.getElementById('barrioTrigger').setAttribute('aria-expanded','true');
+  document.getElementById('barrioDropdown').classList.add('open');
+}
+function closeDropdown() {
+  dropdownOpen = false;
+  document.getElementById('barrioTrigger').classList.remove('open');
+  document.getElementById('barrioTrigger').setAttribute('aria-expanded','false');
+  document.getElementById('barrioDropdown').classList.remove('open');
+}
+
+document.getElementById('barrioTrigger').addEventListener('click', e => {
+  e.stopPropagation();
+  dropdownOpen ? closeDropdown() : openDropdown();
+});
+
+document.getElementById('bdClear').addEventListener('click', () => {
+  activeBarrio = 'todos';
+  document.getElementById('bdGrid').querySelectorAll('.bd-pill').forEach(b => {
+    b.classList.toggle('active', b.dataset.barrio === 'todos');
+  });
+  updateBarrioTrigger();
+  render();
+});
+
+document.addEventListener('click', e => {
+  if (dropdownOpen && !document.getElementById('barrioDropdown').contains(e.target) && e.target !== document.getElementById('barrioTrigger')) {
+    closeDropdown();
+  }
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   TIPO PILLS
+═══════════════════════════════════════════════════════════════ */
+document.querySelectorAll('[data-tipo]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-tipo]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeTipo = btn.dataset.tipo;
+    render();
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   SORT + SEARCH
+═══════════════════════════════════════════════════════════════ */
+document.getElementById('sortSelect').addEventListener('change', e => { sortMode = e.target.value; render(); });
+document.getElementById('searchInput').addEventListener('input', e => { searchQ = e.target.value; render(); });
+
+/* ═══════════════════════════════════════════════════════════════
+   FILTER + SORT LOGIC
+═══════════════════════════════════════════════════════════════ */
+function getBarrioGroup(b) {
+  if (BARRIOS.slice(0,-1).includes(b)) return b; // todo excepto 'Otros'
+  return 'Otros';
+}
+
+function filtered() {
+  return props.filter(p => {
+    const bMatch = activeBarrio === 'todos' || getBarrioGroup(p.barrio) === activeBarrio || p.barrio === activeBarrio;
+    const tMatch = activeTipo  === 'todos' || p.tipo === activeTipo;
+    const q = searchQ.toLowerCase();
+    const sMatch = !q || p.dir.toLowerCase().includes(q) || p.barrio.toLowerCase().includes(q);
+    return bMatch && tMatch && sMatch;
+  });
+}
+
+function sorted(arr) {
+  const a = [...arr];
+  if (sortMode === 'precio-asc')  return a.sort((x,y) => (x.precio||999999)-(y.precio||999999));
+  if (sortMode === 'precio-desc') return a.sort((x,y) => (y.precio||0)-(x.precio||0));
+  if (sortMode === 'm2-desc')     return a.sort((x,y) => (y.m2||0)-(x.m2||0));
+  return a;
+}
+
+function priceHTML(p) {
+  if (p.precio > 0) {
+    const fmt = p.precio.toLocaleString('es-AR').replace(/\./g,'.'); // punto como miles
+    const period = p.tipo === 'Temporal' ? 'por mes · all in' : 'por mes';
+    return `<div class="card-price"><span class="price-amount">USD ${fmt}</span><br><span class="price-period">${period}</span></div>`;
+  }
+  return `<div class="card-price"><span class="price-consult">Consultar precio</span></div>`;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   HERO UPDATE
+═══════════════════════════════════════════════════════════════ */
+function updateCatalogHero() {
+  const title  = document.getElementById('catTitle');
+  const sub    = document.getElementById('catSub');
+  const banner = document.getElementById('typeBanner');
+  const bTag   = document.getElementById('typeBannerTag');
+  const bText  = document.getElementById('typeBannerText');
+
+  if (activeTipo === 'Temporal') {
+    title.textContent = 'Alquileres temporales';
+    sub.textContent   = 'Estadías de 3 a 12 meses · Amoblados · Todo incluido';
+    banner.style.display = 'block';
+    bTag.textContent  = 'PRECIO FINAL';
+    bText.textContent = 'Los precios publicados son finales e incluyen garantía inmobiliaria, mobiliario completo y todos los servicios (luz, gas, agua, wifi, expensas).';
+  } else if (activeTipo === 'Tradicional') {
+    title.textContent = 'Alquileres tradicionales';
+    sub.textContent   = 'Contratos anuales · Sin amoblar · Servicios no incluídos';
+    banner.style.display = 'block';
+    bTag.textContent  = 'ALQUILER TRADICIONAL';
+    bText.textContent = 'Contratos a 12 meses sin amoblar. La propiedad es tuya para decorar y habitar a tu manera.';
+  } else {
+    title.textContent = 'Todas las propiedades';
+    sub.textContent   = 'Alquileres temporales y tradicionales en CABA y GBA Norte';
+    banner.style.display = 'block';
+    bTag.textContent  = 'DISPONIBLES AHORA';
+    bText.textContent = 'Temporales con todo incluido desde el día uno, y tradicionales anuales sin amoblar. Filtrá por tipo o buscá por dirección para encontrar tu próxima propiedad.';
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RENDER
+═══════════════════════════════════════════════════════════════ */
+function render() {
+  const grid = document.getElementById('catalogGrid');
+  const list = sorted(filtered());
+  updateCatalogHero();
+  document.getElementById('resultsCount').textContent = `${list.length} propiedad${list.length !== 1 ? 'es' : ''}`;
+
+  if (!list.length) {
+    grid.innerHTML = `<div class="empty-state"><div class="empty-title">Sin resultados</div><div class="empty-sub">Probá con otro barrio o tipo de alquiler.</div></div>`;
+    return;
+  }
+
+  grid.innerHTML = list.map(p => {
+    const unidad   = p.unidad && p.unidad !== '-' ? ` · ${p.unidad}` : '';
+    const m2txt    = p.m2 ? `${p.m2} m²` : '—';
+    const chips    = p.amenities.slice(0,4).map(a => `<span class="chip">${a}</span>`).join('');
+    const reservado= p.estado === 'Ocupado' || p.estado === 'Reservado';
+    const statCls  = reservado ? 'status-reservado' : 'status-disponible';
+    const statTxt  = reservado ? 'Reservado' : 'Disponible';
+    const destino  = p.slug ? `propiedad.html?slug=${encodeURIComponent(p.slug)}` : '#';
+    const ctaTxt   = 'Ver más →';
+    const serviciosSpec = p.tipo === 'Temporal'
+      ? `<div class="spec"><span class="spec-val">All in</span><span class="spec-lbl">Servicios</span></div>`
+      : `<div class="spec"><span class="spec-val">Sin incl.</span><span class="spec-lbl">Servicios</span></div>`;
+    const imgHTML = p.foto
+      ? `<img src="${p.foto}" alt="${p.dir} — foto principal" loading="lazy">`
+      : `<span class="card-img-placeholder">Fotografía de la unidad</span>`;
+
+    const aria = `Ver ${p.dir}${unidad} en ${p.barrio}`;
+    return `
+    <a class="prop-card" href="${destino}" aria-label="${aria.replace(/"/g,'&quot;')}">
+      <div class="card-img">
+        ${imgHTML}
+        <span class="card-tag tag-${p.tipo.toLowerCase()}">${p.tipo}</span>
+        <span class="card-status ${statCls}">${statTxt}</span>
+      </div>
+      <div class="card-body">
+        <div class="card-address">${p.dir}${unidad}</div>
+        <div class="card-barrio">${p.barrio}</div>
+        <div class="card-specs">
+          <div class="spec"><span class="spec-val">${p.amb}</span><span class="spec-lbl">Amb.</span></div>
+          <div class="spec"><span class="spec-val">${m2txt}</span><span class="spec-lbl">Sup.</span></div>
+          ${serviciosSpec}
+        </div>
+        ${chips ? `<div class="card-amenities">${chips}</div>` : ''}
+        <div class="card-divider"></div>
+        <div class="card-footer">
+          ${priceHTML(p)}
+          <span class="card-cta">${ctaTxt}</span>
+        </div>
+      </div>
+    </a>`;
+  }).join('');
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   URL PARAMS (desde home/zonas)
+═══════════════════════════════════════════════════════════════ */
+function readURLParams() {
+  const p = new URLSearchParams(window.location.search);
+  const pt = p.get('tipo');
+  const pb = p.get('barrio');
+
+  if (pt === 'temporal') {
+    activeTipo = 'Temporal';
+    document.querySelectorAll('[data-tipo]').forEach(b => b.classList.toggle('active', b.dataset.tipo==='Temporal'));
+  } else if (pt === 'tradicional') {
+    activeTipo = 'Tradicional';
+    document.querySelectorAll('[data-tipo]').forEach(b => b.classList.toggle('active', b.dataset.tipo==='Tradicional'));
+  }
+
+  if (pb) {
+    const match = BARRIOS.slice(0,-1).includes(pb) ? pb : 'Otros';
+    activeBarrio = match;
+    // mark pill in dropdown
+    document.getElementById('bdGrid').querySelectorAll('.bd-pill').forEach(b => {
+      b.classList.toggle('active', b.dataset.barrio === match);
+    });
+    updateBarrioTrigger();
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BURGER
+═══════════════════════════════════════════════════════════════ */
+document.getElementById('burger').addEventListener('click', function() {
+  const isOpen = this.classList.toggle('open');
+  document.getElementById('mobileMenu').classList.toggle('open');
+  this.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  closeDropdown();
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   SUPABASE — fetch de propiedades publicadas
+═══════════════════════════════════════════════════════════════ */
+async function loadFromSupabase() {
+  try {
+    const sb = await window.bairenReady;
+    const { data, error } = await sb
+      .from('propiedades')
+      .select('*, imagenes(url, orden), amenities(nombre)')
+      .eq('publicada', true)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+
+    props = (data || []).flatMap(p => {
+      const portada = (p.imagenes || []).sort((a, b) => a.orden - b.orden)[0];
+      const foto    = portada ? portada.url : null;
+      const amList  = (p.amenities || []).map(a => a.nombre);
+      const base = {
+        id: p.id,
+        slug: p.slug,
+        barrio: p.barrio,
+        dir: p.dir,
+        unidad: p.unidad,
+        amb: p.ambientes,
+        m2: p.m2,
+        estado: p.estado,
+        amenities: amList,
+        foto,
+      };
+      // tipo='Ambos' se expande en dos items (uno por modalidad) para preservar filtros
+      if (p.tipo === 'Ambos') {
+        const out = [];
+        if (p.precio_temporal)    out.push({ ...base, id: p.id + '-t', tipo: 'Temporal',    precio: Number(p.precio_temporal) });
+        if (p.precio_tradicional) out.push({ ...base, id: p.id + '-d', tipo: 'Tradicional', precio: Number(p.precio_tradicional) });
+        return out;
+      }
+      return [{
+        ...base,
+        tipo: p.tipo,
+        precio: Number(p.tipo === 'Temporal' ? p.precio_temporal : p.precio_tradicional) || 0,
+      }];
+    });
+  } catch (err) {
+    console.error('[catalogo] Error cargando propiedades:', err);
+    props = [];
+    const grid = document.getElementById('catalogGrid');
+    grid.innerHTML = '<div class="empty-state"><div class="empty-title">No pudimos cargar las propiedades</div><div class="empty-sub">Revisá la conexión a internet. Si el problema persiste, contactanos por WhatsApp.</div></div>';
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════════════════ */
+buildBarrioPills();
+readURLParams();
+
+// Loading state inicial
+document.getElementById('catalogGrid').innerHTML = '<div class="empty-state"><div class="empty-title">Cargando propiedades...</div></div>';
+document.getElementById('resultsCount').textContent = '';
+
+loadFromSupabase().then(() => render());
+</script>
+</body>
+</html>

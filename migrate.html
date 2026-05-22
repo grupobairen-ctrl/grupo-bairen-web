@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="robots" content="noindex, nofollow"/>
+<title>Migrador — Grupo Bairen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{--navy:#15243F;--gold:#C9A961;--gold-dark:#8C6E40;--white:#FBFAF6;--off:#F4EEDF;--mid:#5E6678;--border:rgba(21,36,63,.12);--ok:#2a7a4b;--err:#b94a4a;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Jost',sans-serif;background:var(--off);color:var(--navy);padding:32px 20px;min-height:100vh;}
+.wrap{max-width:780px;margin:0 auto;}
+h1{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:500;margin-bottom:6px;}
+.sub{font-size:.85rem;color:var(--mid);margin-bottom:24px;}
+.card{background:var(--white);border:1px solid var(--border);padding:24px 28px;margin-bottom:18px;}
+.warn{background:rgba(237,200,45,.08);border-left:3px solid var(--gold);padding:14px 18px;font-size:.8rem;line-height:1.6;margin-bottom:20px;}
+.warn strong{color:var(--navy);}
+.btn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:var(--navy);border:none;padding:14px 28px;font-family:'Jost',sans-serif;font-size:.7rem;letter-spacing:.18em;font-weight:700;text-transform:uppercase;cursor:pointer;}
+.btn:hover{background:var(--gold-dark);color:var(--white);}
+.btn:disabled{background:rgba(21,36,63,.12);color:var(--mid);cursor:not-allowed;}
+.btn-skip{background:transparent;color:var(--mid);border:1px solid var(--border);padding:14px 22px;font-family:'Jost',sans-serif;font-size:.7rem;letter-spacing:.18em;font-weight:700;text-transform:uppercase;cursor:pointer;margin-left:10px;}
+.btn-skip:hover{background:var(--off);color:var(--navy);}
+.lbl{font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--mid);font-weight:600;margin-bottom:8px;}
+.log{background:#0d1622;color:#e4e7ec;padding:18px 22px;font-family:'SF Mono',Menlo,monospace;font-size:.78rem;line-height:1.7;max-height:520px;overflow-y:auto;white-space:pre-wrap;border:1px solid var(--border);}
+.log-row{padding:2px 0;}
+.log-row.ok{color:#9ae6b4;}
+.log-row.err{color:#fc8181;}
+.log-row.warn{color:#f6e05e;}
+.log-row.info{color:#90cdf4;}
+.log-row.head{color:#fff;font-weight:600;margin-top:8px;}
+.status{font-size:.85rem;color:var(--mid);margin-top:14px;}
+.summary{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+.stat{background:var(--off);padding:8px 14px;font-size:.7rem;}
+.stat b{font-size:1rem;color:var(--navy);margin-right:6px;font-family:'Playfair Display',serif;}
+.login-msg{padding:24px;background:rgba(185,74,74,.06);border:1px solid rgba(185,74,74,.2);text-align:center;}
+.login-msg a{color:var(--gold-dark);font-weight:700;text-decoration:underline;}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Migrador de propiedades</h1>
+<p class="sub">Migra las 12 propiedades viejas (con sus fotos y videos) a Supabase. Se ejecuta una sola vez.</p>
+
+<div class="warn">
+  <strong>Cómo funciona:</strong> por cada propiedad, este script (1) descarga su <code>.html</code> viejo, (2) extrae las fotos del base64 embebido, (3) las sube al bucket de Supabase Storage, (4) crea las filas en <code>propiedades</code>, <code>imagenes</code> y <code>amenities</code>. Las propiedades quedan publicadas. <strong>Es idempotente:</strong> si una propiedad ya existe (mismo slug), la saltea.
+</div>
+
+<div id="loginGate" class="card login-msg" style="display:none">
+  <p>Tenés que iniciar sesión primero en <a href="admin.html">admin.html</a>. Después volvé a esta página.</p>
+</div>
+
+<div id="mainPanel" class="card" style="display:none">
+  <div class="lbl">Estado</div>
+  <p id="userInfo" class="status"></p>
+  <div class="summary">
+    <div class="stat"><b id="statTotal">12</b>total</div>
+    <div class="stat"><b id="statOk">0</b>migradas</div>
+    <div class="stat"><b id="statSkip">0</b>salteadas</div>
+    <div class="stat"><b id="statErr">0</b>errores</div>
+  </div>
+  <div style="margin-top:22px;">
+    <button class="btn" id="btnGo">▶ Migrar todas</button>
+    <button class="btn-skip" id="btnClose" style="display:none">Volver al admin</button>
+  </div>
+</div>
+
+<div class="card" id="logCard" style="display:none">
+  <div class="lbl" style="margin-bottom:10px">Progreso</div>
+  <div class="log" id="log"></div>
+</div>
+
+</div>
+
+<script src="supabase-config.js"></script>
+<script>
+'use strict';
+
+// ════════════════════════════════════════════════════════════════════
+// DATOS DE LAS 12 PROPIEDADES (Guido temporal+tradicional unificadas)
+// ════════════════════════════════════════════════════════════════════
+const PROPS = [
+  { dir:'Austria 1938',         unidad:'2D',    barrio:'Recoleta',          tipo:'Tradicional', precio_tradicional:750,  ambientes:2, m2:58,  estado:'Reservado',  amenities:['Pileta','Gimnasio','Spa / Sauna','SUM','Ascensor','Jardín / Terraza','Conserje 24hs','Seguridad 24hs','Aire acond.','Pet friendly','Bicicletero','Parrilla','Laundry'], source:'austria-1938-2d.html' },
+  { dir:'Austria 1938',         unidad:'2B',    barrio:'Recoleta',          tipo:'Tradicional', precio_tradicional:750,  ambientes:2, m2:58,  estado:'Disponible', amenities:['Pileta','Gimnasio','Spa / Sauna','SUM','Ascensor','Jardín / Terraza','Conserje 24hs','Seguridad 24hs','Aire acond.','Pet friendly','Bicicletero','Parrilla','Laundry'], source:'austria-1938-2b.html' },
+  { dir:'Húsares 1080',         unidad:'1º',    barrio:'San Isidro',        tipo:'Temporal',    precio_temporal:3500,    ambientes:4, m2:150, estado:'Disponible', amenities:['Pileta','Jardín / Terraza','Aire acond.','Pet friendly','Bicicletero','Parrilla','Laundry','Cochera','Seguridad 24hs','Calefacción central'], source:'husares-1080.html' },
+  { dir:'Medrano 333',          unidad:'7A',    barrio:'Almagro',           tipo:'Tradicional', precio_tradicional:2000, ambientes:4, m2:85,  estado:'Disponible', amenities:['Aire acond.','Pet friendly','Laundry','Seguridad 24hs','Ascensor'], source:'medrano-333-7a.html' },
+  { dir:'Bonpland 1976',        unidad:'PB C',  barrio:'Palermo Hollywood', tipo:'Temporal',    precio_temporal:1000,    ambientes:2, m2:62,  estado:'Disponible', amenities:['Aire acond.','Laundry','Ascensor','Jardín / Terraza'], source:'bonpland-1976-pb-c.html' },
+  { dir:'Gorriti 6051',         unidad:'1D',    barrio:'Palermo Hollywood', tipo:'Temporal',    precio_temporal:1100,    ambientes:2, m2:45,  estado:'Disponible', amenities:['Aire acond.','Laundry','Ascensor','Jardín / Terraza','Seguridad 24hs'], source:'gorriti-6051-1d.html' },
+  { dir:'Migueletes 680',       unidad:'3A',    barrio:'Las Cañitas',       tipo:'Temporal',    precio_temporal:1200,    ambientes:2, m2:45,  estado:'Disponible', amenities:['Aire acond.','Laundry','Ascensor','Jardín / Terraza','Seguridad 24hs'], source:'migueletes-680-3a.html' },
+  { dir:'Vicente López 2227',   unidad:'3A',    barrio:'Recoleta',          tipo:'Temporal',    precio_temporal:1300,    ambientes:3, m2:65,  estado:'Disponible', amenities:['Aire acond.','Ascensor','Jardín / Terraza','Seguridad 24hs'], source:'vicente-lopez-2227-3a.html' },
+  { dir:'Uruguay 115',          unidad:'6 - 3', barrio:'Centro',            tipo:'Temporal',    precio_temporal:1600,    ambientes:6, m2:180, estado:'Disponible', amenities:['Aire acond.','Ascensor','Jardín / Terraza','Seguridad 24hs','Laundry'], source:'uruguay-115-6-3.html' },
+  { dir:'Ravignani 2393',       unidad:'10 B',  barrio:'Palermo Hollywood', tipo:'Temporal',    precio_temporal:1500,    ambientes:3, m2:75,  estado:'Disponible', amenities:['Ascensor','Seguridad 24hs','Aire acond.','Laundry'], source:'ravignani-2393-10b.html' },
+  // Guido 1671 1B: dos páginas viejas unificadas como tipo='Ambos'
+  { dir:'Guido 1671',           unidad:'1B',    barrio:'Recoleta',          tipo:'Ambos',       precio_temporal:3500, precio_tradicional:2700, ambientes:4, m2:160, estado:'Disponible', amenities:['Aire acond.'], source:'guido-1671-1b-temporal.html' },
+  { dir:'Av. Santa Fe 4866',    unidad:'12 C',  barrio:'Palermo',           tipo:'Tradicional', precio_tradicional:1200, ambientes:3, m2:75,  estado:'Reservado',  amenities:['Ascensor','Seguridad 24hs','Aire acond.','Pet friendly'], source:'av-santa-fe-4866-12-c.html' },
+];
+
+const AMENITY_ICONS = {
+  'Pileta':'🏊','Gimnasio':'💪','Spa / Sauna':'🧖','SUM':'🏛️','Cochera':'🚗',
+  'Ascensor':'🛗','Aire acond.':'❄️','Jardín / Terraza':'🌿','Parrilla':'🔥',
+  'Laundry':'🧺','Seguridad 24hs':'🔐','Conserje 24hs':'🏢','Bicicletero':'🚲',
+  'Pet friendly':'🐾','Calefacción central':'🌡️',
+};
+
+let sb = null;
+let stats = { ok: 0, skip: 0, err: 0 };
+
+function $(id) { return document.getElementById(id); }
+function slugify(s) {
+  return (s||'').toLowerCase()
+    .replace(/[áàä]/g,'a').replace(/[éèë]/g,'e').replace(/[íìï]/g,'i')
+    .replace(/[óòö]/g,'o').replace(/[úùü]/g,'u').replace(/ñ/g,'n')
+    .replace(/[º°ª]/g,'').replace(/\./g,'').replace(/\s+/g,'-')
+    .replace(/[^a-z0-9-]/g,'').replace(/-+/g,'-').replace(/^-|-$/g,'');
+}
+function makeSlug(dir, unidad) {
+  const base = slugify(dir);
+  return unidad ? base + '-' + slugify(unidad) : base;
+}
+
+function log(msg, cls) {
+  const row = document.createElement('div');
+  row.className = 'log-row ' + (cls || '');
+  row.textContent = msg;
+  const el = $('log');
+  el.appendChild(row);
+  el.scrollTop = el.scrollHeight;
+}
+
+function updateStats() {
+  $('statOk').textContent   = stats.ok;
+  $('statSkip').textContent = stats.skip;
+  $('statErr').textContent  = stats.err;
+}
+
+// ════════════════════════════════════════════════════════════════════
+// PARSEO de los .html viejos
+// ════════════════════════════════════════════════════════════════════
+async function fetchOldHtml(filename) {
+  const r = await fetch(filename, { cache: 'no-store' });
+  if (!r.ok) throw new Error(`No se pudo bajar ${filename} (HTTP ${r.status})`);
+  return r.text();
+}
+
+function parseOldHtml(html) {
+  // PHOTOS: var PHOTOS=["data:image/jpeg;base64,...", ...]
+  const photosMatch = html.match(/var\s+PHOTOS\s*=\s*(\[[\s\S]*?\])\s*;/);
+  let photos = [];
+  if (photosMatch) {
+    try { photos = JSON.parse(photosMatch[1]); }
+    catch(e) { /* fall back to regex */ }
+  }
+  if (!photos.length) {
+    // fallback: extract all "data:image/jpeg;base64,..." strings
+    const dataUrls = html.match(/data:image\/(?:jpeg|jpg|png|webp);base64,[^"']+/g) || [];
+    photos = dataUrls;
+  }
+
+  // VIDEO: var VIDEO={"t":"iframe","src":"..."} o var VIDEO=null;
+  const videoMatch = html.match(/var\s+VIDEO\s*=\s*(\{[^}]+\}|null)\s*;/);
+  let video = null;
+  if (videoMatch && videoMatch[1] !== 'null') {
+    try { video = JSON.parse(videoMatch[1]); } catch(e) {}
+  }
+
+  // Descripción: <p class="prop-desc ...">texto</p>
+  const descMatch = html.match(/<p\s+class="prop-desc[^"]*"[^>]*>([\s\S]*?)<\/p>/);
+  const descripcion = descMatch ? descMatch[1].trim().replace(/\s+/g, ' ') : null;
+
+  return { photos, video, descripcion };
+}
+
+function videoTypeFromOld(video) {
+  if (!video) return null;
+  if (video.t === 'video') return 'mp4';
+  if (video.t === 'iframe' && /youtube\.com|youtu\.be/.test(video.src)) return 'youtube';
+  return 'bunny';
+}
+
+function dataUrlToBlob(dataUrl) {
+  const [head, b64] = dataUrl.split(',');
+  const mime = (head.match(/data:([^;]+);/) || [])[1] || 'image/jpeg';
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return new Blob([bytes], { type: mime });
+}
+
+// ════════════════════════════════════════════════════════════════════
+// MIGRACIÓN
+// ════════════════════════════════════════════════════════════════════
+async function migrateOne(p, idx) {
+  const slug = makeSlug(p.dir, p.unidad);
+  log(`\n[${idx+1}/${PROPS.length}] ${p.dir}${p.unidad ? ' ' + p.unidad : ''} (slug: ${slug})`, 'head');
+
+  // Skip if exists
+  const { data: existing } = await sb.from('propiedades').select('id').eq('slug', slug).maybeSingle();
+  if (existing) {
+    log('  ↩ ya existe, salteando', 'warn');
+    stats.skip++; updateStats();
+    return;
+  }
+
+  // 1. Bajar el .html viejo
+  log(`  ↓ descargando ${p.source}...`, 'info');
+  let html;
+  try {
+    html = await fetchOldHtml(p.source);
+  } catch (err) {
+    log(`  ✗ ${err.message}`, 'err');
+    stats.err++; updateStats();
+    return;
+  }
+
+  // 2. Parsear
+  const parsed = parseOldHtml(html);
+  log(`  ✓ ${parsed.photos.length} fotos · video: ${parsed.video ? 'sí' : 'no'} · desc: ${parsed.descripcion ? 'sí' : 'no'}`, 'info');
+
+  if (parsed.photos.length === 0) {
+    log('  ⚠ sin fotos detectadas — saltando', 'err');
+    stats.err++; updateStats();
+    return;
+  }
+
+  // 3. Construir registro de propiedad
+  const propRow = {
+    slug,
+    dir: p.dir,
+    unidad: p.unidad || null,
+    barrio: p.barrio,
+    tipo: p.tipo,
+    precio_temporal:    p.precio_temporal || null,
+    precio_tradicional: p.precio_tradicional || null,
+    ambientes:    p.ambientes || null,
+    m2:           p.m2 || null,
+    plazo:        p.tipo === 'Tradicional' ? '12 meses' : '3 a 24 meses',
+    estado:       p.estado,
+    descripcion:  parsed.descripcion,
+    video_url:    parsed.video ? parsed.video.src : null,
+    video_tipo:   videoTypeFromOld(parsed.video),
+    publicada:    true,
+  };
+
+  // 4. Insertar la propiedad
+  log('  ↑ creando registro propiedad...', 'info');
+  const { data: created, error: insErr } = await sb.from('propiedades').insert(propRow).select().single();
+  if (insErr) {
+    log(`  ✗ insert propiedad: ${insErr.message}`, 'err');
+    stats.err++; updateStats();
+    return;
+  }
+  const propId = created.id;
+
+  // 5. Subir fotos a Storage e insertar en tabla imagenes
+  log(`  ↑ subiendo ${parsed.photos.length} fotos...`, 'info');
+  const imgRows = [];
+  for (let i = 0; i < parsed.photos.length; i++) {
+    try {
+      const blob = dataUrlToBlob(parsed.photos[i]);
+      const filename = `foto-${i+1}.jpg`;
+      const path = `${slug}/${filename}`;
+      const { error: upErr } = await sb.storage.from('imagenes-propiedades').upload(path, blob, { contentType: 'image/jpeg', upsert: true });
+      if (upErr) throw upErr;
+      const { data: pub } = sb.storage.from('imagenes-propiedades').getPublicUrl(path);
+      imgRows.push({ propiedad_id: propId, url: pub.publicUrl, storage_path: path, orden: i });
+    } catch (err) {
+      log(`    ✗ foto ${i+1}: ${err.message}`, 'err');
+    }
+  }
+  if (imgRows.length) {
+    const { error: imgErr } = await sb.from('imagenes').insert(imgRows);
+    if (imgErr) log(`  ✗ insert imagenes: ${imgErr.message}`, 'err');
+    else log(`  ✓ ${imgRows.length} fotos guardadas`, 'ok');
+  }
+
+  // 6. Insertar amenities
+  if (p.amenities && p.amenities.length) {
+    const amRows = p.amenities
+      .filter(a => a !== 'All in')
+      .map(nombre => ({
+        propiedad_id: propId,
+        nombre,
+        icono: AMENITY_ICONS[nombre] || '✦',
+      }));
+    if (amRows.length) {
+      const { error: amErr } = await sb.from('amenities').insert(amRows);
+      if (amErr) log(`  ✗ insert amenities: ${amErr.message}`, 'err');
+      else log(`  ✓ ${amRows.length} amenities guardadas`, 'ok');
+    }
+  }
+
+  log(`  ✓ migrada → /propiedades/${slug}`, 'ok');
+  stats.ok++;
+  updateStats();
+}
+
+// ════════════════════════════════════════════════════════════════════
+// BOOT
+// ════════════════════════════════════════════════════════════════════
+async function boot() {
+  try {
+    sb = await window.bairenReady;
+  } catch (err) {
+    $('mainPanel').style.display = 'none';
+    $('loginGate').style.display = '';
+    $('loginGate').innerHTML = '<p>No se pudo conectar a Supabase: ' + err.message + '</p>';
+    return;
+  }
+
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) {
+    $('loginGate').style.display = '';
+    return;
+  }
+
+  $('mainPanel').style.display = '';
+  $('userInfo').textContent = 'Conectado como ' + session.user.email + '. Listo para migrar.';
+
+  $('btnGo').addEventListener('click', async () => {
+    $('btnGo').disabled = true;
+    $('btnGo').textContent = 'Migrando...';
+    $('logCard').style.display = '';
+    log('Iniciando migración de ' + PROPS.length + ' propiedades...', 'head');
+    log('(Esto puede tardar unos minutos por el peso de las fotos en base64)', 'info');
+
+    for (let i = 0; i < PROPS.length; i++) {
+      await migrateOne(PROPS[i], i);
+    }
+
+    log('\n══════════════════════════════════════════════', 'head');
+    log(`✓ Listo · ${stats.ok} migradas · ${stats.skip} salteadas · ${stats.err} errores`, stats.err ? 'warn' : 'ok');
+    if (stats.err === 0) {
+      log('Andá al catálogo para verificar: /catalogo.html', 'info');
+    }
+    $('btnGo').style.display = 'none';
+    $('btnClose').style.display = '';
+  });
+
+  $('btnClose').addEventListener('click', () => window.location = 'admin.html');
+}
+
+boot();
+</script>
+</body>
+</html>

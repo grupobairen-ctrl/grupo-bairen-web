@@ -1,0 +1,1564 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="robots" content="noindex, nofollow">
+<title>Admin — Grupo Bairen</title>
+<link rel="icon" href="bairen_logo.png?v=2">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --navy:#15243F;--navy-dark:#0D1A30;--navy-deeper:#081227;
+  --gold:#C9A961;--gold-dark:#8C6E40;--gold-light:#E0CB95;
+  --white:#FBFAF6;--off:#F4EEDF;--mid:#5E6678;--border:rgba(21,36,63,.12);
+  --ok:#2a7a4b;--err:#b94a4a;
+  --fd:'Playfair Display',Georgia,serif;
+  --fb:'Jost',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--fb);background:var(--off);color:var(--navy);-webkit-font-smoothing:antialiased;min-height:100vh;}
+a{text-decoration:none;color:inherit;}
+button{font-family:var(--fb);cursor:pointer;}
+input,select,textarea{font-family:var(--fb);}
+
+/* ─── NAV ───────────────────────────────────────────────── */
+nav{position:sticky;top:0;z-index:100;height:60px;background:var(--navy);border-bottom:2px solid var(--gold);display:flex;align-items:center;justify-content:space-between;padding:0 24px;}
+.nav-brand{font-family:var(--fd);font-size:.95rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--white);}
+.nav-brand b{color:var(--gold);}
+.nav-right{display:flex;align-items:center;gap:14px;}
+.nav-user{font-size:.7rem;color:var(--gold-light);letter-spacing:.05em;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.nav-logout{font-size:.58rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;background:transparent;color:var(--gold);border:1px solid rgba(237,200,45,.4);padding:7px 14px;transition:all .18s;}
+.nav-logout:hover{background:var(--gold);color:var(--navy);}
+.nav-badge{font-size:.58rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;background:var(--gold);color:var(--navy);padding:5px 13px;}
+@media(max-width:560px){.nav-user{display:none;}nav{padding:0 16px;}}
+
+/* ─── LAYOUT ────────────────────────────────────────────── */
+.page{max-width:1200px;margin:0 auto;padding:32px 24px 80px;}
+@media(max-width:700px){.page{padding:20px 14px 60px;}}
+.view{display:none;}
+.view.active{display:block;}
+
+/* ─── LOGIN ─────────────────────────────────────────────── */
+.login-wrap{min-height:calc(100vh - 60px);display:flex;align-items:center;justify-content:center;padding:24px;}
+.login-card{background:var(--white);border:1px solid var(--border);width:100%;max-width:380px;padding:36px 32px;}
+.login-ttl{font-family:var(--fd);font-size:1.4rem;font-weight:500;margin-bottom:6px;}
+.login-sub{font-size:.78rem;color:var(--mid);margin-bottom:24px;}
+.login-form{display:flex;flex-direction:column;gap:14px;}
+.login-form .fg{display:flex;flex-direction:column;gap:5px;}
+.login-form .btn-pri{margin-top:8px;}
+.login-err{font-size:.74rem;color:var(--err);background:rgba(185,74,74,.08);border-left:3px solid var(--err);padding:9px 12px;display:none;}
+.login-err.show{display:block;}
+
+/* ─── DASHBOARD ─────────────────────────────────────────── */
+.page-header{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:28px;flex-wrap:wrap;}
+.page-title{font-family:var(--fd);font-size:1.7rem;font-weight:500;line-height:1.1;}
+.page-sub{font-size:.78rem;color:var(--mid);margin-top:4px;}
+.stats-row{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:24px;}
+.stat-pill{background:var(--white);border:1px solid var(--border);padding:10px 16px;display:flex;align-items:baseline;gap:8px;}
+.stat-num{font-family:var(--fd);font-size:1.2rem;font-weight:700;color:var(--navy);}
+.stat-lbl{font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--mid);font-weight:600;}
+.dash-actions{display:flex;gap:10px;flex-wrap:wrap;}
+.search-bar{flex:1;min-width:200px;}
+.search-bar input{width:100%;}
+
+.props-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;}
+.prop-card{background:var(--white);border:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;transition:transform .18s,box-shadow .18s;}
+.prop-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(21,36,63,.08);}
+.pc-img{aspect-ratio:4/3;background:var(--navy-dark);background-size:cover;background-position:center;position:relative;}
+.pc-img.empty{display:flex;align-items:center;justify-content:center;font-size:.62rem;letter-spacing:.2em;color:rgba(237,200,45,.4);text-transform:uppercase;}
+.pc-badge{position:absolute;top:10px;left:10px;font-size:.55rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;padding:4px 10px;}
+.pc-badge.pub{background:var(--ok);color:var(--white);}
+.pc-badge.bor{background:var(--mid);color:var(--white);}
+.pc-badge.res{background:var(--err);color:var(--white);}
+.pc-body{padding:14px 16px 12px;flex:1;display:flex;flex-direction:column;}
+.pc-dir{font-family:var(--fd);font-size:1.05rem;font-weight:500;line-height:1.2;margin-bottom:3px;}
+.pc-sub{font-size:.7rem;color:var(--mid);letter-spacing:.05em;margin-bottom:8px;}
+.pc-meta{display:flex;gap:10px;flex-wrap:wrap;font-size:.66rem;color:var(--navy);margin-bottom:12px;}
+.pc-meta span{background:var(--off);padding:3px 8px;}
+.pc-price{font-family:var(--fd);font-size:1.05rem;font-weight:700;color:var(--gold-dark);margin-bottom:12px;}
+.pc-actions{display:flex;gap:6px;border-top:1px solid var(--border);padding-top:10px;margin-top:auto;}
+.pc-btn{flex:1;font-size:.56rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:8px 4px;border:1px solid var(--border);background:transparent;color:var(--navy);transition:all .18s;}
+.pc-btn:hover{background:var(--navy);color:var(--white);}
+.pc-btn.danger:hover{background:var(--err);color:var(--white);border-color:var(--err);}
+
+.empty-state{background:var(--white);border:1px dashed var(--border);padding:60px 24px;text-align:center;}
+.empty-ttl{font-family:var(--fd);font-size:1.2rem;color:var(--mid);margin-bottom:8px;}
+.empty-sub{font-size:.78rem;color:var(--mid);}
+
+/* ─── FORM ─────────────────────────────────────────────── */
+.back-link{display:inline-flex;align-items:center;gap:6px;font-size:.65rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--mid);margin-bottom:14px;background:none;border:none;padding:0;}
+.back-link:hover{color:var(--navy);}
+
+.form-grid{display:grid;grid-template-columns:1fr 320px;gap:24px;align-items:start;}
+@media(max-width:900px){.form-grid{grid-template-columns:1fr;}}
+
+.card{background:var(--white);border:1px solid var(--border);margin-bottom:18px;}
+.card-hd{padding:14px 20px;border-bottom:1px solid var(--border);}
+.card-ttl{font-size:.62rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--navy);}
+.card-bd{padding:18px 20px;}
+
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;}
+.row2:last-child,.row3:last-child{margin-bottom:0;}
+@media(max-width:560px){.row2,.row3{grid-template-columns:1fr;}}
+.fg{display:flex;flex-direction:column;gap:5px;}
+label.lbl{font-size:.56rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--navy);}
+label.lbl .req{color:var(--err);margin-left:3px;}
+input.fi,select.fi,textarea.fi{
+  font-size:.82rem;font-weight:400;
+  padding:9px 12px;border:1px solid rgba(21,36,63,.2);
+  background:var(--off);color:var(--navy);outline:none;
+  transition:border-color .18s,background .18s;
+  width:100%;
+}
+input.fi:focus,select.fi:focus,textarea.fi:focus{border-color:var(--gold);background:var(--white);}
+input.fi:disabled,select.fi:disabled{opacity:.6;cursor:not-allowed;}
+textarea.fi{resize:vertical;min-height:96px;line-height:1.6;}
+.hint{font-size:.62rem;color:var(--mid);margin-top:3px;}
+.char-count{font-size:.6rem;color:var(--mid);text-align:right;margin-top:3px;}
+
+/* ─── PHOTO GRID ────────────────────────────────────────── */
+.photo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+@media(max-width:480px){.photo-grid{grid-template-columns:repeat(2,1fr);}}
+.ph-slot{aspect-ratio:4/3;background:var(--off);border:1.5px dashed rgba(21,36,63,.2);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;overflow:hidden;transition:border-color .18s;}
+.ph-slot:hover{border-color:var(--gold);}
+.ph-slot.filled{border-style:solid;border-color:rgba(21,36,63,.15);cursor:move;}
+.ph-slot.dragging{opacity:.4;}
+.ph-slot.drag-over{border-color:var(--gold);background:var(--gold-light);}
+.ph-slot img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;}
+.ph-rm{position:absolute;top:4px;right:4px;width:22px;height:22px;background:rgba(21,36,63,.9);color:var(--gold);border:none;font-size:13px;display:flex;align-items:center;justify-content:center;line-height:1;padding:0;z-index:2;}
+.ph-num{font-size:.52rem;font-weight:600;letter-spacing:.1em;color:rgba(21,36,63,.28);margin-top:5px;}
+.ph-add-icon{width:22px;height:22px;opacity:.3;}
+.hero-badge{position:absolute;bottom:4px;left:4px;background:var(--gold);color:var(--navy);font-size:.48rem;font-weight:700;letter-spacing:.12em;padding:2px 7px;text-transform:uppercase;pointer-events:none;}
+.ph-uploading{position:absolute;inset:0;background:rgba(21,36,63,.7);display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:.6rem;letter-spacing:.1em;}
+
+/* ─── AMENITIES ─────────────────────────────────────────── */
+.am-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;}
+@media(max-width:480px){.am-grid{grid-template-columns:repeat(2,1fr);}}
+.am-cb{display:flex;align-items:center;gap:7px;padding:8px 11px;border:1px solid var(--border);cursor:pointer;transition:all .18s;user-select:none;background:var(--white);}
+.am-cb:hover{border-color:var(--gold-dark);}
+.am-cb.on{background:var(--navy);border-color:var(--navy);}
+.am-cb.on .am-lbl{color:var(--white);}
+.am-ico{font-size:.95rem;flex-shrink:0;}
+.am-lbl{font-size:.58rem;font-weight:500;letter-spacing:.06em;color:var(--navy);text-transform:uppercase;line-height:1.2;}
+.am-custom{margin-top:10px;display:flex;gap:6px;}
+.am-custom input{flex:1;}
+.am-custom button{font-size:.6rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:8px 14px;background:var(--navy);color:var(--white);border:none;}
+.am-custom button:hover{background:var(--navy-dark);}
+
+/* ─── VIDEO ─────────────────────────────────────────────── */
+.vtabs{display:flex;gap:6px;margin-bottom:12px;}
+.vtab{font-size:.58rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:7px 13px;border:1px solid rgba(21,36,63,.2);background:transparent;color:var(--navy);transition:all .18s;}
+.vtab.active{background:var(--navy);color:var(--white);border-color:var(--navy);}
+
+/* ─── SIDEBAR ───────────────────────────────────────────── */
+.sb{background:var(--white);border:1px solid var(--border);position:sticky;top:78px;}
+.sb-hd{background:var(--navy);padding:16px 18px;border-bottom:2px solid var(--gold);}
+.sb-ttl{font-family:var(--fd);font-size:.95rem;font-weight:700;color:var(--white);}
+.sb-sub{font-size:.6rem;color:var(--gold-light);margin-top:2px;}
+.sb-body{padding:16px 18px;}
+.sb-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(21,36,63,.06);}
+.sb-row:last-of-type{border-bottom:none;}
+.sb-lbl{font-size:.56rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--mid);}
+.sb-val{font-size:.76rem;font-weight:600;color:var(--navy);max-width:160px;text-align:right;word-break:break-all;}
+.divider{height:1px;background:rgba(21,36,63,.08);margin:14px 0;}
+
+/* ─── BOTONES ───────────────────────────────────────────── */
+.btn-pri{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:var(--gold);color:var(--navy);border:none;padding:14px;font-size:.66rem;letter-spacing:.18em;font-weight:700;text-transform:uppercase;transition:background .18s;margin-bottom:8px;}
+.btn-pri:hover{background:var(--gold-dark);color:var(--white);}
+.btn-pri:disabled{background:rgba(21,36,63,.12);color:var(--mid);cursor:not-allowed;}
+.btn-sec{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:transparent;color:var(--navy);border:1px solid rgba(21,36,63,.22);padding:11px;font-size:.62rem;letter-spacing:.14em;font-weight:600;text-transform:uppercase;transition:all .18s;margin-bottom:8px;}
+.btn-sec:hover{background:var(--navy);color:var(--white);}
+.btn-sec:disabled{opacity:.5;cursor:not-allowed;}
+.btn-danger{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:transparent;color:var(--err);border:1px solid rgba(185,74,74,.3);padding:11px;font-size:.62rem;letter-spacing:.14em;font-weight:600;text-transform:uppercase;transition:all .18s;}
+.btn-danger:hover{background:var(--err);color:var(--white);border-color:var(--err);}
+
+/* ─── TOAST ─────────────────────────────────────────────── */
+.toast-wrap{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none;}
+.toast{background:var(--navy);color:var(--white);padding:14px 20px;border-left:3px solid var(--gold);font-size:.78rem;max-width:340px;pointer-events:auto;animation:slideIn .25s ease;}
+.toast.ok{border-left-color:var(--ok);}
+.toast.err{border-left-color:var(--err);}
+@keyframes slideIn{from{transform:translateX(20px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+@media(max-width:560px){.toast-wrap{left:14px;right:14px;bottom:14px;}.toast{max-width:none;}}
+
+/* ─── LOADER OVERLAY ───────────────────────────────────── */
+.loader-ovl{position:fixed;inset:0;background:rgba(21,36,63,.5);z-index:9998;display:none;align-items:center;justify-content:center;}
+.loader-ovl.show{display:flex;}
+.loader-box{background:var(--white);padding:24px 32px;display:flex;align-items:center;gap:14px;}
+.spinner{width:22px;height:22px;border:3px solid rgba(21,36,63,.15);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loader-txt{font-size:.78rem;color:var(--navy);font-weight:500;}
+
+/* ─── CONFIRM DIALOG ───────────────────────────────────── */
+.confirm-ovl{position:fixed;inset:0;background:rgba(21,36,63,.5);z-index:9997;display:none;align-items:center;justify-content:center;padding:20px;}
+.confirm-ovl.show{display:flex;}
+.confirm-box{background:var(--white);padding:24px 28px;max-width:400px;border-top:3px solid var(--gold);}
+.confirm-ttl{font-family:var(--fd);font-size:1.1rem;font-weight:600;margin-bottom:8px;}
+.confirm-msg{font-size:.82rem;color:var(--mid);margin-bottom:18px;line-height:1.5;}
+.confirm-actions{display:flex;gap:10px;justify-content:flex-end;}
+.confirm-actions button{padding:9px 18px;font-size:.62rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;border:none;}
+.cf-cancel{background:transparent;color:var(--mid);border:1px solid var(--border);}
+.cf-cancel:hover{background:var(--off);}
+.cf-ok{background:var(--navy);color:var(--white);}
+.cf-ok.danger{background:var(--err);}
+.cf-ok:hover{background:var(--navy-dark);}
+
+*:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+
+/* ─── BANNER DE BORRADOR ────────────────────────────────── */
+.draft-banner{background:var(--white);border:1px solid var(--gold);border-left:4px solid var(--gold);padding:16px 22px;margin-bottom:20px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;}
+.draft-banner-txt{flex:1;min-width:220px;font-size:.78rem;line-height:1.55;color:var(--navy);}
+.draft-banner-txt strong{display:block;font-size:.62rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-dark);margin-bottom:3px;}
+.draft-banner-txt em{font-style:normal;color:var(--mid);font-size:.7rem;}
+.draft-banner-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.draft-banner-actions button{padding:9px 18px;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;}
+.draft-banner-actions .restore{background:var(--gold);color:var(--navy);}
+.draft-banner-actions .restore:hover{background:var(--gold-dark);color:var(--white);}
+.draft-banner-actions .discard{background:transparent;color:var(--mid);border:1px solid var(--border);}
+.draft-banner-actions .discard:hover{background:var(--off);color:var(--err);border-color:var(--err);}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">Grupo <b>Bairen</b></div>
+  <div class="nav-right">
+    <span class="nav-badge" id="navBadge">Panel Admin</span>
+    <span class="nav-user" id="navUser"></span>
+    <button class="nav-logout" id="btnLogout" style="display:none">Salir</button>
+  </div>
+</nav>
+
+<!-- ─── VISTA: LOGIN ─────────────────────────────────────── -->
+<section id="viewLogin" class="view">
+  <div class="login-wrap">
+    <div class="login-card">
+      <h1 class="login-ttl">Iniciar sesión</h1>
+      <p class="login-sub">Acceso al panel de administración de Grupo Bairen.</p>
+      <form class="login-form" id="loginForm">
+        <div class="fg">
+          <label class="lbl" for="loginEmail">Email</label>
+          <input class="fi" id="loginEmail" type="email" autocomplete="username" required>
+        </div>
+        <div class="fg">
+          <label class="lbl" for="loginPass">Contraseña</label>
+          <input class="fi" id="loginPass" type="password" autocomplete="current-password" required>
+        </div>
+        <div class="login-err" id="loginErr"></div>
+        <button class="btn-pri" type="submit" id="loginSubmit">Entrar</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ─── VISTA: DASHBOARD ─────────────────────────────────── -->
+<section id="viewDash" class="view">
+  <div class="page">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Propiedades</h1>
+        <p class="page-sub">Gestión completa del catálogo del sitio.</p>
+      </div>
+      <div class="dash-actions">
+        <button class="btn-pri" style="width:auto;padding:12px 22px;margin:0" id="btnNew">+ Nueva propiedad</button>
+      </div>
+    </div>
+
+    <div class="stats-row" id="statsRow"></div>
+
+    <div class="search-bar" style="margin-bottom:18px">
+      <input class="fi" id="searchInput" type="text" placeholder="Buscar por dirección, barrio, unidad...">
+    </div>
+
+    <div id="propsContainer"></div>
+  </div>
+</section>
+
+<!-- ─── VISTA: FORMULARIO ────────────────────────────────── -->
+<section id="viewForm" class="view">
+  <div class="page">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+      <button class="back-link" id="btnBack" style="margin-bottom:0">← Volver al listado</button>
+      <button id="btnDiscardDraft" style="display:none;background:none;border:none;color:var(--err);font-size:.62rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;padding:0">Descartar borrador</button>
+    </div>
+    <div class="page-header" style="margin-bottom:20px">
+      <div>
+        <h1 class="page-title" id="formTitle">Nueva propiedad</h1>
+        <p class="page-sub" id="formSub">Completá los datos y publicala.</p>
+      </div>
+    </div>
+
+    <div class="form-grid">
+      <div>
+        <!-- DATOS BASICOS -->
+        <div class="card">
+          <div class="card-hd"><div class="card-ttl">Datos básicos</div></div>
+          <div class="card-bd">
+            <div class="row2">
+              <div class="fg"><label class="lbl" for="fDir">Dirección<span class="req">*</span></label><input class="fi" id="fDir" type="text" placeholder="Austria 1938"></div>
+              <div class="fg"><label class="lbl" for="fUnidad">Unidad</label><input class="fi" id="fUnidad" type="text" placeholder="2D / PB C"></div>
+            </div>
+            <div class="row2">
+              <div class="fg"><label class="lbl" for="fBarrio">Barrio<span class="req">*</span></label>
+                <input class="fi" id="fBarrio" type="text" list="dlBarrios" placeholder="Palermo">
+                <datalist id="dlBarrios">
+                  <option value="Recoleta"><option value="Palermo"><option value="Palermo Hollywood">
+                  <option value="Palermo Soho"><option value="Las Cañitas"><option value="Belgrano">
+                  <option value="Núñez"><option value="Almagro"><option value="Caballito">
+                  <option value="Villa Crespo"><option value="San Telmo"><option value="Centro">
+                  <option value="Microcentro"><option value="Puerto Madero"><option value="Retiro">
+                  <option value="San Isidro"><option value="Vicente López"><option value="Olivos">
+                </datalist>
+              </div>
+              <div class="fg"><label class="lbl" for="fTipo">Tipo de alquiler<span class="req">*</span></label>
+                <select class="fi" id="fTipo">
+                  <option value="Temporal">Temporal</option>
+                  <option value="Tradicional">Tradicional</option>
+                  <option value="Ambos">Ambos (Temporal y Tradicional)</option>
+                </select>
+              </div>
+            </div>
+            <div class="row2">
+              <div class="fg" id="fgPrecioTemp"><label class="lbl" for="fPrecioTemp">Precio temporal (USD/mes)</label><input class="fi" id="fPrecioTemp" type="number" min="0" placeholder="0 = consultar"></div>
+              <div class="fg" id="fgPrecioTrad"><label class="lbl" for="fPrecioTrad">Precio tradicional (USD/mes)</label><input class="fi" id="fPrecioTrad" type="number" min="0" placeholder="0 = consultar"></div>
+            </div>
+            <div class="row3">
+              <div class="fg"><label class="lbl" for="fAmb">Ambientes</label><input class="fi" id="fAmb" type="number" min="1" max="10" placeholder="2"></div>
+              <div class="fg"><label class="lbl" for="fM2">Superficie (m²)</label><input class="fi" id="fM2" type="number" min="0" placeholder="60"></div>
+              <div class="fg"><label class="lbl" for="fEstado">Estado</label>
+                <select class="fi" id="fEstado">
+                  <option value="Disponible">Disponible</option>
+                  <option value="Reservado">Reservado</option>
+                </select>
+              </div>
+            </div>
+            <div class="row2">
+              <div class="fg"><label class="lbl" for="fPlazo">Plazo</label><input class="fi" id="fPlazo" type="text" placeholder="3 a 24 meses"></div>
+              <div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FOTOS -->
+        <div class="card">
+          <div class="card-hd"><div class="card-ttl">Fotos (hasta 12 — la primera es la portada)</div></div>
+          <div class="card-bd">
+            <div class="photo-grid" id="photoGrid"></div>
+            <input type="file" id="photoInput" accept="image/*" multiple style="display:none">
+            <p class="hint" style="margin-top:10px">Arrastrá imágenes al grid o click para seleccionar. Arrastrá entre slots para reordenar. Se comprimen automáticamente al subir.</p>
+          </div>
+        </div>
+
+        <!-- AMENITIES -->
+        <div class="card">
+          <div class="card-hd"><div class="card-ttl">Amenities del edificio</div></div>
+          <div class="card-bd">
+            <div class="am-grid" id="amGrid"></div>
+            <div class="am-custom">
+              <input class="fi" id="amCustom" type="text" placeholder="Agregar amenity personalizado...">
+              <button type="button" id="btnAmAdd">Agregar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIDEO -->
+        <div class="card">
+          <div class="card-hd"><div class="card-ttl">Video del recorrido (opcional)</div></div>
+          <div class="card-bd">
+            <div class="vtabs">
+              <button class="vtab active" type="button" data-vt="bunny">Bunny.net</button>
+              <button class="vtab" type="button" data-vt="youtube">YouTube</button>
+              <button class="vtab" type="button" data-vt="mp4">MP4 directo</button>
+            </div>
+            <div class="fg">
+              <label class="lbl" id="vLabel">URL embed de Bunny.net</label>
+              <input class="fi" id="fVideo" type="text" placeholder="https://iframe.mediadelivery.net/embed/...">
+              <span class="hint" id="vHint">Dashboard Bunny.net → tu video → Embed URL.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- DESCRIPCION -->
+        <div class="card">
+          <div class="card-hd"><div class="card-ttl">Descripción</div></div>
+          <div class="card-bd">
+            <div class="fg">
+              <textarea class="fi" id="fDesc" maxlength="1000" placeholder="Describí la propiedad: ubicación, puntos fuertes, estilo de vida..."></textarea>
+              <div class="char-count"><span id="descCount">0</span> / 1000</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SIDEBAR -->
+      <div>
+        <div class="sb">
+          <div class="sb-hd">
+            <div class="sb-ttl">Publicación</div>
+            <div class="sb-sub">Acciones de la propiedad</div>
+          </div>
+          <div class="sb-body">
+            <div class="sb-row"><span class="sb-lbl">Slug (URL)</span><span class="sb-val" id="pvSlug">—</span></div>
+            <div class="sb-row"><span class="sb-lbl">Fotos</span><span class="sb-val" id="pvPhotos">0 / 12</span></div>
+            <div class="sb-row"><span class="sb-lbl">Amenities</span><span class="sb-val" id="pvAm">0</span></div>
+            <div class="sb-row"><span class="sb-lbl">Estado</span><span class="sb-val" id="pvStatus">Borrador</span></div>
+            <div class="divider"></div>
+            <button class="btn-pri" id="btnPublish">Publicar</button>
+            <button class="btn-sec" id="btnDraft">Guardar borrador</button>
+            <button class="btn-sec" id="btnUnpublish" style="display:none">Despublicar</button>
+            <div class="divider"></div>
+            <button class="btn-danger" id="btnDelete" style="display:none">Eliminar propiedad</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── TOAST / LOADER / CONFIRM ────────────────────────── -->
+<div class="toast-wrap" id="toastWrap"></div>
+<div class="loader-ovl" id="loaderOvl"><div class="loader-box"><div class="spinner"></div><div class="loader-txt" id="loaderTxt">Cargando...</div></div></div>
+<div class="confirm-ovl" id="confirmOvl">
+  <div class="confirm-box">
+    <h2 class="confirm-ttl" id="cfTtl">¿Estás seguro?</h2>
+    <p class="confirm-msg" id="cfMsg"></p>
+    <div class="confirm-actions">
+      <button class="cf-cancel" id="cfCancel">Cancelar</button>
+      <button class="cf-ok" id="cfOk">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<script src="supabase-config.js"></script>
+<script>
+'use strict';
+
+// ════════════════════════════════════════════════════════════════════
+// ESTADO GLOBAL
+// ════════════════════════════════════════════════════════════════════
+const state = {
+  sb: null,                  // cliente Supabase
+  user: null,                // sesión actual
+  properties: [],            // lista cacheada del dashboard
+  editing: null,             // propiedad en edición (null = nueva)
+  photos: [],                // [{id?, url, storage_path?, file?, _new?}]
+  selAmenities: new Map(),   // nombre -> icono
+  vType: 'bunny',            // tipo de video activo
+  customAmenities: new Set(),// amenities custom agregadas en sesión
+};
+
+// ════════════════════════════════════════════════════════════════════
+// CONSTANTES
+// ════════════════════════════════════════════════════════════════════
+const AMENITIES_PRESET = [
+  {i:'🏊',n:'Pileta'},{i:'💪',n:'Gimnasio'},{i:'🧖',n:'Spa / Sauna'},
+  {i:'🏛️',n:'SUM'},{i:'🚗',n:'Cochera'},{i:'🛗',n:'Ascensor'},
+  {i:'🌿',n:'Jardín / Terraza'},{i:'🏢',n:'Conserje 24hs'},
+  {i:'🔐',n:'Seguridad 24hs'},{i:'🌡️',n:'Calefacción central'},
+  {i:'❄️',n:'Aire acond.'},{i:'🐾',n:'Pet friendly'},
+  {i:'🚲',n:'Bicicletero'},{i:'🔥',n:'Parrilla'},{i:'🧺',n:'Laundry'},
+  {i:'📦',n:'Baulera'},{i:'🛋️',n:'Amoblado'},
+];
+
+const MAX_PHOTOS = 12;
+
+const V_CFG = {
+  bunny:   { lbl:'URL embed de Bunny.net',     ph:'https://iframe.mediadelivery.net/embed/LIBRARY_ID/VIDEO_ID', hint:'Dashboard Bunny.net → tu video → Embed URL.' },
+  youtube: { lbl:'URL de YouTube',              ph:'https://www.youtube.com/watch?v=VIDEO_ID',                   hint:'Cualquier URL de YouTube (watch, share o embed).' },
+  mp4:     { lbl:'URL directa del archivo MP4', ph:'https://cdn.tuhosting.com/video.mp4',                        hint:'URL pública del archivo. Funciona con cualquier CDN.' },
+};
+
+// ════════════════════════════════════════════════════════════════════
+// HELPERS DE UI
+// ════════════════════════════════════════════════════════════════════
+function $(id) { return document.getElementById(id); }
+
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  $('view' + name).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'instant' });
+}
+
+function toast(msg, type) {
+  const el = document.createElement('div');
+  el.className = 'toast ' + (type || '');
+  el.textContent = msg;
+  $('toastWrap').appendChild(el);
+  setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity .3s'; }, 3500);
+  setTimeout(() => el.remove(), 3900);
+}
+
+function showLoader(txt) {
+  $('loaderTxt').textContent = txt || 'Cargando...';
+  $('loaderOvl').classList.add('show');
+}
+
+function hideLoader() {
+  $('loaderOvl').classList.remove('show');
+}
+
+function confirm(opts) {
+  return new Promise(resolve => {
+    $('cfTtl').textContent = opts.title || '¿Estás seguro?';
+    $('cfMsg').textContent = opts.msg || '';
+    const okBtn = $('cfOk');
+    okBtn.textContent = opts.okText || 'Confirmar';
+    okBtn.classList.toggle('danger', !!opts.danger);
+    $('confirmOvl').classList.add('show');
+    const onOk = () => { cleanup(); resolve(true); };
+    const onCancel = () => { cleanup(); resolve(false); };
+    function cleanup() {
+      $('confirmOvl').classList.remove('show');
+      okBtn.removeEventListener('click', onOk);
+      $('cfCancel').removeEventListener('click', onCancel);
+    }
+    okBtn.addEventListener('click', onOk);
+    $('cfCancel').addEventListener('click', onCancel);
+  });
+}
+
+function slugify(s) {
+  return (s || '').toLowerCase()
+    .replace(/[áàä]/g,'a').replace(/[éèë]/g,'e').replace(/[íìï]/g,'i')
+    .replace(/[óòö]/g,'o').replace(/[úùü]/g,'u').replace(/ñ/g,'n')
+    .replace(/\./g,'').replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'').replace(/-+/g,'-')
+    .replace(/^-|-$/g,'');
+}
+
+function makeSlug(dir, unidad) {
+  const base = slugify(dir);
+  return unidad ? base + '-' + slugify(unidad) : base;
+}
+
+function fmtUSD(n) {
+  if (!n || n === 0) return 'Consultar';
+  return 'USD ' + Number(n).toLocaleString('es-AR');
+}
+
+function priceForCard(p) {
+  if (p.tipo === 'Ambos') {
+    const a = p.precio_temporal ? fmtUSD(p.precio_temporal) : null;
+    const b = p.precio_tradicional ? fmtUSD(p.precio_tradicional) : null;
+    return [a, b].filter(Boolean).join(' / ');
+  }
+  if (p.tipo === 'Temporal')    return fmtUSD(p.precio_temporal);
+  if (p.tipo === 'Tradicional') return fmtUSD(p.precio_tradicional);
+  return '—';
+}
+
+// ════════════════════════════════════════════════════════════════════
+// AUTH
+// ════════════════════════════════════════════════════════════════════
+async function initAuth() {
+  const { data: { session } } = await state.sb.auth.getSession();
+  if (session) {
+    state.user = session.user;
+    onAuthed();
+  } else {
+    showView('Login');
+  }
+
+  state.sb.auth.onAuthStateChange((event, sess) => {
+    if (sess) {
+      state.user = sess.user;
+      onAuthed();
+    } else {
+      state.user = null;
+      showView('Login');
+    }
+  });
+}
+
+function onAuthed() {
+  $('navUser').textContent = state.user.email || '';
+  $('btnLogout').style.display = '';
+  loadDashboard();
+}
+
+async function doLogin(email, password) {
+  $('loginErr').classList.remove('show');
+  $('loginSubmit').disabled = true;
+  $('loginSubmit').textContent = 'Entrando...';
+  try {
+    const { error } = await state.sb.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    // onAuthStateChange dispara onAuthed
+  } catch (err) {
+    let msg = 'No pudimos iniciar sesión.';
+    if (/invalid/i.test(err.message)) msg = 'Email o contraseña incorrectos.';
+    else if (/network/i.test(err.message)) msg = 'Sin conexión. Revisá tu internet.';
+    else if (err.message) msg = err.message;
+    $('loginErr').textContent = msg;
+    $('loginErr').classList.add('show');
+  } finally {
+    $('loginSubmit').disabled = false;
+    $('loginSubmit').textContent = 'Entrar';
+  }
+}
+
+async function doLogout() {
+  if (!await confirm({ title: 'Cerrar sesión', msg: 'Vas a tener que volver a ingresar.', okText: 'Cerrar sesión' })) return;
+  clearDraft();
+  await state.sb.auth.signOut();
+}
+
+// ════════════════════════════════════════════════════════════════════
+// DASHBOARD
+// ════════════════════════════════════════════════════════════════════
+async function loadDashboard() {
+  showView('Dash');
+  $('propsContainer').innerHTML = '<div class="empty-state"><div class="empty-ttl">Cargando propiedades...</div></div>';
+  $('statsRow').innerHTML = '';
+  try {
+    const { data, error } = await state.sb
+      .from('propiedades')
+      .select('*, imagenes(id, url, storage_path, orden)')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    state.properties = data || [];
+    renderStats();
+    renderProperties();
+    // Si hay un borrador sin guardar (primera vez en esta sesión), restaurarlo automáticamente
+    const draft = loadDraft();
+    if (draft && !state._draftHandled) {
+      state._draftHandled = true;
+      await autoRestoreDraft(draft);
+    }
+  } catch (err) {
+    console.error(err);
+    toast('Error cargando propiedades: ' + err.message, 'err');
+    $('propsContainer').innerHTML = '<div class="empty-state"><div class="empty-ttl">No se pudieron cargar las propiedades</div><div class="empty-sub">Revisá tu conexión o las credenciales de Supabase.</div></div>';
+  }
+}
+
+function renderStats() {
+  const total = state.properties.length;
+  const pub   = state.properties.filter(p => p.publicada).length;
+  const bor   = total - pub;
+  const res   = state.properties.filter(p => p.estado === 'Reservado').length;
+  $('statsRow').innerHTML = `
+    <div class="stat-pill"><span class="stat-num">${total}</span><span class="stat-lbl">Total</span></div>
+    <div class="stat-pill"><span class="stat-num">${pub}</span><span class="stat-lbl">Publicadas</span></div>
+    <div class="stat-pill"><span class="stat-num">${bor}</span><span class="stat-lbl">Borradores</span></div>
+    <div class="stat-pill"><span class="stat-num">${res}</span><span class="stat-lbl">Reservadas</span></div>
+  `;
+}
+
+function renderProperties() {
+  const q = $('searchInput').value.trim().toLowerCase();
+  const list = q
+    ? state.properties.filter(p =>
+        (p.dir || '').toLowerCase().includes(q) ||
+        (p.barrio || '').toLowerCase().includes(q) ||
+        (p.unidad || '').toLowerCase().includes(q))
+    : state.properties;
+
+  if (!list.length) {
+    $('propsContainer').innerHTML = q
+      ? '<div class="empty-state"><div class="empty-ttl">Sin resultados</div><div class="empty-sub">No encontramos propiedades que coincidan con "' + q + '".</div></div>'
+      : '<div class="empty-state"><div class="empty-ttl">Todavía no hay propiedades</div><div class="empty-sub">Tocá "+ Nueva propiedad" para crear la primera.</div></div>';
+    return;
+  }
+
+  const html = list.map(p => {
+    const portada = (p.imagenes || []).sort((a,b) => a.orden - b.orden)[0];
+    const fotoStyle = portada ? `background-image:url('${portada.url}')` : '';
+    const fotoCls = portada ? '' : 'empty';
+    const fotoTxt = portada ? '' : 'Sin foto';
+    const badge = !p.publicada
+      ? '<span class="pc-badge bor">Borrador</span>'
+      : p.estado === 'Reservado'
+        ? '<span class="pc-badge res">Reservada</span>'
+        : '<span class="pc-badge pub">Publicada</span>';
+    return `
+      <div class="prop-card" data-id="${p.id}">
+        <div class="pc-img ${fotoCls}" style="${fotoStyle}">${fotoTxt}${badge}</div>
+        <div class="pc-body">
+          <div class="pc-dir">${escapeHTML(p.dir)}${p.unidad ? ' ' + escapeHTML(p.unidad) : ''}</div>
+          <div class="pc-sub">${escapeHTML(p.barrio || '')} · ${escapeHTML(p.tipo)}</div>
+          <div class="pc-meta">
+            ${p.ambientes ? `<span>${p.ambientes} amb</span>` : ''}
+            ${p.m2 ? `<span>${p.m2} m²</span>` : ''}
+          </div>
+          <div class="pc-price">${priceForCard(p)}</div>
+          <div class="pc-actions">
+            <button class="pc-btn" data-act="edit">Editar</button>
+            <button class="pc-btn" data-act="toggle">${p.publicada ? 'Despublicar' : 'Publicar'}</button>
+            <button class="pc-btn danger" data-act="delete">Eliminar</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  $('propsContainer').innerHTML = `<div class="props-grid">${html}</div>`;
+
+  $('propsContainer').querySelectorAll('.pc-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      const card = e.target.closest('.prop-card');
+      const id   = card.dataset.id;
+      const act  = btn.dataset.act;
+      const prop = state.properties.find(x => x.id === id);
+      if (!prop) return;
+      if (act === 'edit')   openForm(prop);
+      if (act === 'toggle') togglePublish(prop);
+      if (act === 'delete') deleteProperty(prop);
+    });
+  });
+}
+
+function escapeHTML(s) {
+  return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+async function togglePublish(p) {
+  const target = !p.publicada;
+  const ok = await confirm({
+    title: target ? 'Publicar propiedad' : 'Despublicar propiedad',
+    msg: target
+      ? `"${p.dir}${p.unidad ? ' ' + p.unidad : ''}" va a aparecer en el sitio público.`
+      : `"${p.dir}${p.unidad ? ' ' + p.unidad : ''}" se va a sacar del sitio público (no se borran los datos).`,
+    okText: target ? 'Publicar' : 'Despublicar',
+  });
+  if (!ok) return;
+  showLoader(target ? 'Publicando...' : 'Despublicando...');
+  try {
+    const { error } = await state.sb.from('propiedades').update({ publicada: target }).eq('id', p.id);
+    if (error) throw error;
+    toast(target ? 'Propiedad publicada' : 'Propiedad despublicada', 'ok');
+    await loadDashboard();
+  } catch (err) {
+    toast('Error: ' + err.message, 'err');
+  } finally {
+    hideLoader();
+  }
+}
+
+async function deleteProperty(p) {
+  const ok = await confirm({
+    title: 'Eliminar propiedad',
+    msg: `Se va a borrar "${p.dir}${p.unidad ? ' ' + p.unidad : ''}" y todas sus fotos. Esta acción no se puede deshacer.`,
+    okText: 'Eliminar',
+    danger: true,
+  });
+  if (!ok) return;
+  showLoader('Eliminando...');
+  try {
+    // borrar fotos del storage
+    const { data: imgs } = await state.sb.from('imagenes').select('storage_path').eq('propiedad_id', p.id);
+    const paths = (imgs || []).map(i => i.storage_path).filter(Boolean);
+    if (paths.length) {
+      await state.sb.storage.from('imagenes-propiedades').remove(paths);
+    }
+    // cascade borra imagenes + amenities por FK
+    const { error } = await state.sb.from('propiedades').delete().eq('id', p.id);
+    if (error) throw error;
+    toast('Propiedad eliminada', 'ok');
+    await loadDashboard();
+  } catch (err) {
+    toast('Error: ' + err.message, 'err');
+  } finally {
+    hideLoader();
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════
+// FORM: open / load
+// ════════════════════════════════════════════════════════════════════
+function openForm(prop) {
+  state.editing = prop || null;
+  state.photos = [];
+  state.selAmenities = new Map();
+  state.customAmenities = new Set();
+  state.vType = 'bunny';
+
+  // reset campos
+  ['fDir','fUnidad','fBarrio','fPrecioTemp','fPrecioTrad','fAmb','fM2','fPlazo','fDesc','fVideo'].forEach(id => $(id).value = '');
+  $('fTipo').value = 'Temporal';
+  $('fEstado').value = 'Disponible';
+  $('fPlazo').value = '3 a 24 meses';
+
+  if (prop) {
+    $('formTitle').textContent = 'Editar propiedad';
+    $('formSub').textContent = prop.dir + (prop.unidad ? ' ' + prop.unidad : '');
+    $('fDir').value         = prop.dir || '';
+    $('fUnidad').value      = prop.unidad || '';
+    $('fBarrio').value      = prop.barrio || '';
+    $('fTipo').value        = prop.tipo || 'Temporal';
+    $('fPrecioTemp').value  = prop.precio_temporal || '';
+    $('fPrecioTrad').value  = prop.precio_tradicional || '';
+    $('fAmb').value         = prop.ambientes || '';
+    $('fM2').value          = prop.m2 || '';
+    $('fEstado').value      = prop.estado || 'Disponible';
+    $('fPlazo').value       = prop.plazo || '3 a 24 meses';
+    $('fDesc').value        = prop.descripcion || '';
+    $('fVideo').value       = prop.video_url || '';
+    state.vType             = prop.video_tipo || 'bunny';
+
+    // fotos
+    state.photos = (prop.imagenes || [])
+      .sort((a,b) => a.orden - b.orden)
+      .map(i => ({ id: i.id, url: i.url, storage_path: i.storage_path }));
+
+    // amenities (await para no perderlas si el user guarda rápido)
+    loadAmenitiesForProp(prop.id);
+
+    // inicializar contador de descripción
+    $('descCount').textContent = ($('fDesc').value || '').length;
+
+    $('btnDelete').style.display = '';
+    $('btnUnpublish').style.display = prop.publicada ? '' : 'none';
+    $('btnPublish').textContent = prop.publicada ? 'Guardar y mantener publicada' : 'Publicar';
+  } else {
+    $('formTitle').textContent = 'Nueva propiedad';
+    $('formSub').textContent = 'Completá los datos y publicala.';
+    $('btnDelete').style.display = 'none';
+    $('btnUnpublish').style.display = 'none';
+    $('btnPublish').textContent = 'Publicar';
+    $('descCount').textContent = '0';
+  }
+
+  setVideoTab(state.vType);
+  renderPhotoGrid();
+  renderAmenities();
+  updateSidebar();
+  togglePricesByTipo();
+  showView('Form');
+  updateDiscardBtn();
+}
+
+async function loadAmenitiesForProp(propId) {
+  try {
+    const { data, error } = await state.sb.from('amenities').select('nombre, icono').eq('propiedad_id', propId);
+    if (error) throw error;
+    (data || []).forEach(a => {
+      state.selAmenities.set(a.nombre, a.icono || '✦');
+      if (!AMENITIES_PRESET.find(x => x.n === a.nombre)) {
+        state.customAmenities.add(a.nombre);
+      }
+    });
+    renderAmenities();
+    updateSidebar();
+  } catch (err) {
+    console.error('Error cargando amenities:', err);
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════
+// FORM: photo grid
+// ════════════════════════════════════════════════════════════════════
+function renderPhotoGrid() {
+  const grid = $('photoGrid');
+  grid.innerHTML = '';
+  for (let i = 0; i < MAX_PHOTOS; i++) {
+    const s = document.createElement('div');
+    s.className = 'ph-slot' + (state.photos[i] ? ' filled' : '');
+    s.dataset.idx = i;
+    if (state.photos[i]) {
+      const ph = state.photos[i];
+      const uploading = ph._uploading ? '<div class="ph-uploading">Subiendo...</div>' : '';
+      s.innerHTML =
+        `<img src="${ph.url}" alt="">
+         <button class="ph-rm" data-rm="${i}" title="Quitar">×</button>
+         ${i === 0 ? '<span class="hero-badge">Portada</span>' : ''}
+         ${uploading}`;
+      s.draggable = true;
+    } else {
+      s.innerHTML = `
+        <svg class="ph-add-icon" viewBox="0 0 24 24" fill="none" stroke="rgba(21,36,63,.35)" stroke-width="1.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <span class="ph-num">FOTO ${i + 1}</span>
+      `;
+    }
+    grid.appendChild(s);
+  }
+  $('pvPhotos').textContent = state.photos.length + ' / ' + MAX_PHOTOS;
+
+  // remove buttons
+  grid.querySelectorAll('.ph-rm').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const i = parseInt(btn.dataset.rm);
+      state.photos.splice(i, 1);
+      renderPhotoGrid();
+      updateSidebar();
+      saveDraftDebounced();
+    });
+  });
+
+  // click vacíos = open file picker
+  grid.querySelectorAll('.ph-slot:not(.filled)').forEach(s => {
+    s.addEventListener('click', () => $('photoInput').click());
+  });
+
+  // drag-and-drop reorder
+  let dragIdx = null;
+  grid.querySelectorAll('.ph-slot.filled').forEach(s => {
+    s.addEventListener('dragstart', e => {
+      dragIdx = parseInt(s.dataset.idx);
+      s.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    s.addEventListener('dragend', () => {
+      s.classList.remove('dragging');
+      dragIdx = null;
+    });
+    s.addEventListener('dragover', e => {
+      e.preventDefault();
+      s.classList.add('drag-over');
+    });
+    s.addEventListener('dragleave', () => s.classList.remove('drag-over'));
+    s.addEventListener('drop', e => {
+      e.preventDefault();
+      s.classList.remove('drag-over');
+      const targetIdx = parseInt(s.dataset.idx);
+      if (dragIdx === null || dragIdx === targetIdx) return;
+      const [moved] = state.photos.splice(dragIdx, 1);
+      state.photos.splice(targetIdx, 0, moved);
+      renderPhotoGrid();
+      updateSidebar();
+      saveDraftDebounced();
+    });
+  });
+}
+
+function compressImage(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX_W = 1600;
+        let w = img.width, h = img.height;
+        if (w > MAX_W) { h = Math.round(h * MAX_W / w); w = MAX_W; }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        canvas.toBlob(b => {
+          if (!b) return reject(new Error('No se pudo procesar la imagen'));
+          resolve(b);
+        }, 'image/jpeg', 0.72);
+      };
+      img.onerror = () => reject(new Error('Imagen inválida'));
+      img.src = e.target.result;
+    };
+    reader.onerror = () => reject(new Error('No se pudo leer el archivo'));
+    reader.readAsDataURL(file);
+  });
+}
+
+async function handleNewFiles(fileList) {
+  const slots = MAX_PHOTOS - state.photos.length;
+  if (slots <= 0) { toast('Ya tenés las 12 fotos. Quitá alguna antes.', 'err'); return; }
+  const files = Array.from(fileList).filter(f => f.type.startsWith('image/')).slice(0, slots);
+  if (!files.length) { toast('Esos archivos no son imágenes válidas.', 'err'); return; }
+  for (const f of files) {
+    try {
+      const blob = await compressImage(f);
+      const previewUrl = URL.createObjectURL(blob);
+      state.photos.push({ _new: true, file: blob, url: previewUrl });
+      renderPhotoGrid();
+      updateSidebar();
+      saveDraftDebounced();
+    } catch (err) {
+      toast('Error procesando "' + f.name + '": ' + err.message, 'err');
+    }
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════
+// FORM: amenities
+// ════════════════════════════════════════════════════════════════════
+function renderAmenities() {
+  // combinar preset + custom
+  const all = [
+    ...AMENITIES_PRESET,
+    ...[...state.customAmenities].map(n => ({ i: '✦', n })),
+  ];
+  $('amGrid').innerHTML = all.map((a, idx) =>
+    `<div class="am-cb ${state.selAmenities.has(a.n) ? 'on' : ''}" data-am="${escapeHTML(a.n)}" data-ico="${escapeHTML(a.i)}">
+       <span class="am-ico">${a.i}</span>
+       <span class="am-lbl">${escapeHTML(a.n)}</span>
+     </div>`
+  ).join('');
+  $('amGrid').querySelectorAll('.am-cb').forEach(el => {
+    el.addEventListener('click', () => {
+      const n = el.dataset.am;
+      const i = el.dataset.ico;
+      if (state.selAmenities.has(n)) state.selAmenities.delete(n);
+      else state.selAmenities.set(n, i);
+      el.classList.toggle('on');
+      updateSidebar();
+    });
+  });
+}
+
+function addCustomAmenity() {
+  const v = $('amCustom').value.trim();
+  if (!v) return;
+  if (AMENITIES_PRESET.find(a => a.n.toLowerCase() === v.toLowerCase())) {
+    toast('Esa amenity ya está en la lista.', 'err');
+    return;
+  }
+  state.customAmenities.add(v);
+  state.selAmenities.set(v, '✦');
+  $('amCustom').value = '';
+  renderAmenities();
+  updateSidebar();
+}
+
+// ════════════════════════════════════════════════════════════════════
+// FORM: video tabs
+// ════════════════════════════════════════════════════════════════════
+function setVideoTab(type) {
+  state.vType = type;
+  document.querySelectorAll('.vtab').forEach(b => b.classList.toggle('active', b.dataset.vt === type));
+  const c = V_CFG[type];
+  $('vLabel').textContent = c.lbl;
+  $('fVideo').placeholder = c.ph;
+  $('vHint').textContent = c.hint;
+}
+
+function processVideoUrl(url, type) {
+  url = (url || '').trim();
+  if (!url) return null;
+  if (type === 'youtube') {
+    const m = url.match(/(?:v=|youtu\.be\/|embed\/)([^&\?\s]+)/);
+    if (m) return 'https://www.youtube.com/embed/' + m[1];
+  }
+  return url;
+}
+
+// ════════════════════════════════════════════════════════════════════
+// FORM: sidebar live update
+// ════════════════════════════════════════════════════════════════════
+function updateSidebar() {
+  const dir = $('fDir').value.trim();
+  const unidad = $('fUnidad').value.trim();
+  $('pvSlug').textContent = dir ? makeSlug(dir, unidad) : '—';
+  $('pvPhotos').textContent = state.photos.length + ' / ' + MAX_PHOTOS;
+  $('pvAm').textContent = state.selAmenities.size;
+  if (state.editing) {
+    $('pvStatus').textContent = state.editing.publicada ? 'Publicada' : 'Borrador';
+  } else {
+    $('pvStatus').textContent = 'Borrador';
+  }
+}
+
+function togglePricesByTipo() {
+  const t = $('fTipo').value;
+  $('fgPrecioTemp').style.display = (t === 'Temporal' || t === 'Ambos') ? '' : 'none';
+  $('fgPrecioTrad').style.display = (t === 'Tradicional' || t === 'Ambos') ? '' : 'none';
+}
+
+// ════════════════════════════════════════════════════════════════════
+// FORM: validation + save
+// ════════════════════════════════════════════════════════════════════
+function collectFormData() {
+  const dir = $('fDir').value.trim();
+  const unidad = $('fUnidad').value.trim();
+  const barrio = $('fBarrio').value.trim();
+  const tipo = $('fTipo').value;
+  const precioTemp = parseFloat($('fPrecioTemp').value) || null;
+  const precioTrad = parseFloat($('fPrecioTrad').value) || null;
+  return {
+    slug: makeSlug(dir, unidad),
+    dir, unidad: unidad || null, barrio, tipo,
+    precio_temporal:    (tipo === 'Temporal' || tipo === 'Ambos') ? precioTemp : null,
+    precio_tradicional: (tipo === 'Tradicional' || tipo === 'Ambos') ? precioTrad : null,
+    ambientes:    parseInt($('fAmb').value) || null,
+    m2:           parseInt($('fM2').value) || null,
+    plazo:        $('fPlazo').value.trim() || '3 a 24 meses',
+    estado:       $('fEstado').value,
+    descripcion:  $('fDesc').value.trim() || null,
+    video_url:    processVideoUrl($('fVideo').value, state.vType),
+    video_tipo:   $('fVideo').value.trim() ? state.vType : null,
+  };
+}
+
+function validate(d) {
+  if (!d.dir)    return 'Falta la dirección.';
+  if (!d.barrio) return 'Falta el barrio.';
+  if (!d.tipo)   return 'Falta el tipo de alquiler.';
+  if (d.tipo === 'Temporal' && !d.precio_temporal)
+    return 'Falta el precio temporal (o poné 0 si es "consultar").';
+  if (d.tipo === 'Tradicional' && !d.precio_tradicional)
+    return 'Falta el precio tradicional.';
+  if (d.tipo === 'Ambos' && (!d.precio_temporal || !d.precio_tradicional))
+    return 'Si el tipo es "Ambos", necesitás los dos precios.';
+  if (state.photos.length === 0)
+    return 'Subí al menos una foto (será la portada).';
+  return null;
+}
+
+async function uploadNewPhotos(slug) {
+  for (let i = 0; i < state.photos.length; i++) {
+    const ph = state.photos[i];
+    if (!ph._new || !ph.file) continue;
+    const fileName = `foto-${i+1}-${Date.now()}.jpg`;
+    const path = `${slug}/${fileName}`;
+    ph._uploading = true;
+    renderPhotoGrid();
+    const { error: upErr } = await state.sb.storage
+      .from('imagenes-propiedades')
+      .upload(path, ph.file, { contentType: 'image/jpeg', upsert: false });
+    if (upErr) {
+      ph._uploading = false;
+      throw new Error('No se pudo subir la foto ' + (i+1) + ': ' + upErr.message);
+    }
+    const { data: pub } = state.sb.storage.from('imagenes-propiedades').getPublicUrl(path);
+    ph.url = pub.publicUrl;
+    ph.storage_path = path;
+    ph._uploading = false;
+    delete ph.file;
+    delete ph._new;
+  }
+}
+
+async function deleteRemovedPhotos(originalImgs) {
+  // original imgs presentes en DB pero no en state.photos = a eliminar
+  const stillThere = new Set(state.photos.map(p => p.id).filter(Boolean));
+  const toRemove = originalImgs.filter(i => !stillThere.has(i.id));
+  if (!toRemove.length) return;
+  const paths = toRemove.map(i => i.storage_path).filter(Boolean);
+  if (paths.length) {
+    await state.sb.storage.from('imagenes-propiedades').remove(paths);
+  }
+  const ids = toRemove.map(i => i.id);
+  await state.sb.from('imagenes').delete().in('id', ids);
+}
+
+async function saveProperty(publicar) {
+  const data = collectFormData();
+  const err = validate(data);
+  if (err) { toast(err, 'err'); return; }
+
+  showLoader(state.editing ? 'Guardando cambios...' : 'Creando propiedad...');
+  try {
+    data.publicada = publicar;
+    let propId;
+
+    if (state.editing) {
+      propId = state.editing.id;
+      const { error } = await state.sb.from('propiedades').update(data).eq('id', propId);
+      if (error) throw error;
+    } else {
+      const { data: inserted, error } = await state.sb.from('propiedades').insert(data).select().single();
+      if (error) throw error;
+      propId = inserted.id;
+    }
+
+    // 1. Subir fotos nuevas
+    showLoader('Subiendo fotos...');
+    await uploadNewPhotos(data.slug);
+
+    // 2. Borrar fotos quitadas (solo si editando)
+    if (state.editing) {
+      const originalImgs = state.editing.imagenes || [];
+      await deleteRemovedPhotos(originalImgs);
+    }
+
+    // 3. Reescribir registros de imagenes (orden importa)
+    showLoader('Guardando galería...');
+    // estrategia: borrar y reinsertar todo (más simple, propenso a 1 race pero OK en single user)
+    await state.sb.from('imagenes').delete().eq('propiedad_id', propId);
+    if (state.photos.length) {
+      const rows = state.photos.map((p, i) => ({
+        propiedad_id: propId,
+        url: p.url,
+        storage_path: p.storage_path || null,
+        orden: i,
+      }));
+      const { error: imgErr } = await state.sb.from('imagenes').insert(rows);
+      if (imgErr) throw imgErr;
+    }
+
+    // 4. Reescribir amenities
+    showLoader('Guardando amenities...');
+    await state.sb.from('amenities').delete().eq('propiedad_id', propId);
+    if (state.selAmenities.size) {
+      const arows = [...state.selAmenities.entries()].map(([nombre, icono]) => ({
+        propiedad_id: propId, nombre, icono
+      }));
+      const { error: amErr } = await state.sb.from('amenities').insert(arows);
+      if (amErr) throw amErr;
+    }
+
+    toast(publicar ? 'Propiedad publicada ✓' : 'Borrador guardado ✓', 'ok');
+    clearDraft();
+    await loadDashboard();
+  } catch (e) {
+    console.error(e);
+    toast('Error: ' + (e.message || e), 'err');
+  } finally {
+    hideLoader();
+  }
+}
+
+async function unpublishCurrent() {
+  if (!state.editing) return;
+  const ok = await confirm({
+    title: 'Despublicar',
+    msg: 'La propiedad va a desaparecer del sitio público pero se mantienen los datos y fotos.',
+    okText: 'Despublicar',
+  });
+  if (!ok) return;
+  showLoader('Despublicando...');
+  try {
+    const { error } = await state.sb.from('propiedades').update({ publicada: false }).eq('id', state.editing.id);
+    if (error) throw error;
+    toast('Propiedad despublicada', 'ok');
+    await loadDashboard();
+  } catch (err) {
+    toast('Error: ' + err.message, 'err');
+  } finally {
+    hideLoader();
+  }
+}
+
+async function deleteCurrent() {
+  if (!state.editing) return;
+  await deleteProperty(state.editing);
+}
+
+// ════════════════════════════════════════════════════════════════════
+// AUTOSAVE BORRADOR (localStorage)
+// ════════════════════════════════════════════════════════════════════
+const DRAFT_KEY = 'bairen.admin.draft.v1';
+const PHOTO_DB_NAME = 'bairen-admin-drafts';
+const PHOTO_STORE = 'photos';
+let draftSaveTimer = null;
+
+// ─── IndexedDB para fotos del borrador (localStorage no soporta blobs grandes) ───
+function openPhotoDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(PHOTO_DB_NAME, 1);
+    req.onupgradeneeded = () => {
+      const db = req.result;
+      if (!db.objectStoreNames.contains(PHOTO_STORE)) {
+        db.createObjectStore(PHOTO_STORE);
+      }
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function saveDraftPhotos(photos) {
+  try {
+    const db = await openPhotoDB();
+    const tx = db.transaction(PHOTO_STORE, 'readwrite');
+    const store = tx.objectStore(PHOTO_STORE);
+    store.clear();
+    photos.forEach((p, i) => {
+      store.put({
+        idx: i,
+        blob: p._new ? p.file : null,
+        id: p.id || null,
+        url: !p._new ? p.url : null,
+        storage_path: p.storage_path || null,
+      }, i);
+    });
+    await new Promise((res, rej) => { tx.oncomplete = res; tx.onerror = () => rej(tx.error); });
+  } catch (e) {
+    console.warn('[draft] no se pudieron guardar fotos en IDB:', e);
+  }
+}
+
+async function loadDraftPhotos() {
+  try {
+    const db = await openPhotoDB();
+    const tx = db.transaction(PHOTO_STORE, 'readonly');
+    const store = tx.objectStore(PHOTO_STORE);
+    return await new Promise((resolve, reject) => {
+      const req = store.getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => reject(req.error);
+    });
+  } catch (e) {
+    return [];
+  }
+}
+
+async function clearDraftPhotos() {
+  try {
+    const db = await openPhotoDB();
+    const tx = db.transaction(PHOTO_STORE, 'readwrite');
+    tx.objectStore(PHOTO_STORE).clear();
+  } catch {}
+}
+
+function updateDiscardBtn() {
+  const btn = $('btnDiscardDraft');
+  if (!btn) return;
+  btn.style.display = (loadDraft() && $('viewForm').classList.contains('active')) ? '' : 'none';
+}
+
+function snapshotForm() {
+  return {
+    editingId: state.editing ? state.editing.id : null,
+    editingSlug: state.editing ? state.editing.slug : null,
+    fields: {
+      dir:        $('fDir').value,
+      unidad:     $('fUnidad').value,
+      barrio:     $('fBarrio').value,
+      tipo:       $('fTipo').value,
+      precioTemp: $('fPrecioTemp').value,
+      precioTrad: $('fPrecioTrad').value,
+      amb:        $('fAmb').value,
+      m2:         $('fM2').value,
+      estado:     $('fEstado').value,
+      plazo:      $('fPlazo').value,
+      desc:       $('fDesc').value,
+      video:      $('fVideo').value,
+    },
+    amenities:       [...state.selAmenities.entries()],
+    customAmenities: [...state.customAmenities],
+    vType:           state.vType,
+    photoCount:      state.photos.length,
+    timestamp:       Date.now(),
+  };
+}
+
+function saveDraft() {
+  if (!$('viewForm').classList.contains('active')) return;
+  const snap = snapshotForm();
+  // No guardar si todo está vacío (form recién abierto sin tocar)
+  if (!snap.fields.dir && !snap.fields.barrio && snap.amenities.length === 0 && snap.photoCount === 0) {
+    return;
+  }
+  try { localStorage.setItem(DRAFT_KEY, JSON.stringify(snap)); }
+  catch (e) { console.warn('[draft] no se pudo guardar:', e); }
+  // Fotos a IndexedDB (fire-and-forget)
+  saveDraftPhotos(state.photos);
+  updateDiscardBtn();
+}
+
+function saveDraftDebounced() {
+  clearTimeout(draftSaveTimer);
+  draftSaveTimer = setTimeout(saveDraft, 500);
+}
+
+function loadDraft() {
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch { return null; }
+}
+
+function clearDraft() {
+  try { localStorage.removeItem(DRAFT_KEY); } catch {}
+  clearDraftPhotos();
+  updateDiscardBtn();
+}
+
+async function restoreDraftIntoForm(draft) {
+  const f = draft.fields || {};
+  $('fDir').value         = f.dir || '';
+  $('fUnidad').value      = f.unidad || '';
+  $('fBarrio').value      = f.barrio || '';
+  $('fTipo').value        = f.tipo || 'Temporal';
+  $('fPrecioTemp').value  = f.precioTemp || '';
+  $('fPrecioTrad').value  = f.precioTrad || '';
+  $('fAmb').value         = f.amb || '';
+  $('fM2').value          = f.m2 || '';
+  $('fEstado').value      = f.estado || 'Disponible';
+  $('fPlazo').value       = f.plazo || '3 a 24 meses';
+  $('fDesc').value        = f.desc || '';
+  $('fVideo').value       = f.video || '';
+  state.selAmenities    = new Map(draft.amenities || []);
+  state.customAmenities = new Set(draft.customAmenities || []);
+  state.vType           = draft.vType || 'bunny';
+  setVideoTab(state.vType);
+  togglePricesByTipo();
+  renderAmenities();
+
+  // Restaurar fotos desde IndexedDB
+  const records = await loadDraftPhotos();
+  records.sort((a, b) => a.idx - b.idx);
+  if (records.length) {
+    state.photos = records.map(r => {
+      if (r.blob) {
+        return { _new: true, file: r.blob, url: URL.createObjectURL(r.blob) };
+      }
+      return { id: r.id, url: r.url, storage_path: r.storage_path };
+    });
+    renderPhotoGrid();
+  }
+
+  updateSidebar();
+  $('descCount').textContent = $('fDesc').value.length;
+  updateDiscardBtn();
+}
+
+async function autoRestoreDraft(draft) {
+  // Si era edición, intentar reabrir esa propiedad
+  if (draft.editingId) {
+    const prop = state.properties.find(p => p.id === draft.editingId);
+    openForm(prop || null);
+  } else {
+    openForm(null);
+  }
+  await restoreDraftIntoForm(draft);
+  toast('Borrador restaurado — podés seguir donde lo dejaste.', 'ok');
+}
+
+function showDraftBanner(draft) {
+  // Eliminar cualquier banner previo
+  const existing = document.getElementById('draftBanner');
+  if (existing) existing.remove();
+
+  const minutos = Math.max(1, Math.round((Date.now() - (draft.timestamp || Date.now())) / 60000));
+  const tiempo = minutos < 60
+    ? `hace ${minutos} min`
+    : `hace ${Math.round(minutos/60)} h`;
+  const titulo = draft.fields.dir
+    ? `${draft.fields.dir}${draft.fields.unidad ? ' ' + draft.fields.unidad : ''}`
+    : 'Propiedad sin terminar';
+
+  const banner = document.createElement('div');
+  banner.id = 'draftBanner';
+  banner.className = 'draft-banner';
+  banner.innerHTML = `
+    <div class="draft-banner-txt">
+      <strong>Borrador sin guardar · ${tiempo}</strong>
+      ${escapeHTML(titulo)}
+      <em> — las fotos no se restauran, hay que volver a arrastrarlas.</em>
+    </div>
+    <div class="draft-banner-actions">
+      <button class="restore" id="draftRestore">Continuar editando</button>
+      <button class="discard" id="draftDiscard">Descartar</button>
+    </div>
+  `;
+
+  const pageEl = $('viewDash').querySelector('.page');
+  const header = pageEl.querySelector('.page-header');
+  pageEl.insertBefore(banner, header.nextSibling);
+
+  document.getElementById('draftRestore').addEventListener('click', async () => {
+    // Si era una edición y la propiedad sigue existiendo, abrimos esa
+    if (draft.editingId) {
+      const prop = state.properties.find(p => p.id === draft.editingId);
+      openForm(prop || null);
+    } else {
+      openForm(null);
+    }
+    // Esperar a que openForm termine de pintar y restaurar los campos del draft
+    await Promise.resolve();
+    restoreDraftIntoForm(draft);
+    banner.remove();
+  });
+
+  document.getElementById('draftDiscard').addEventListener('click', () => {
+    clearDraft();
+    banner.remove();
+  });
+}
+
+function wireAutosave() {
+  const ids = ['fDir','fUnidad','fBarrio','fTipo','fPrecioTemp','fPrecioTrad',
+               'fAmb','fM2','fEstado','fPlazo','fDesc','fVideo'];
+  ids.forEach(id => {
+    const el = $(id);
+    if (!el) return;
+    el.addEventListener('input', saveDraftDebounced);
+    el.addEventListener('change', saveDraftDebounced);
+  });
+}
+
+// ════════════════════════════════════════════════════════════════════
+// EVENT WIRING
+// ════════════════════════════════════════════════════════════════════
+function wireUI() {
+  // login
+  $('loginForm').addEventListener('submit', e => {
+    e.preventDefault();
+    doLogin($('loginEmail').value.trim(), $('loginPass').value);
+  });
+  $('btnLogout').addEventListener('click', doLogout);
+
+  // dashboard
+  $('btnNew').addEventListener('click', () => openForm(null));
+  $('searchInput').addEventListener('input', renderProperties);
+
+  // form
+  $('btnBack').addEventListener('click', () => { state.editing = null; loadDashboard(); });
+  $('btnDiscardDraft').addEventListener('click', async () => {
+    const ok = await confirm({
+      title: 'Descartar borrador',
+      msg: '¿Querés borrar los datos no guardados de esta propiedad? No se puede deshacer.',
+      okText: 'Descartar',
+      danger: true,
+    });
+    if (!ok) return;
+    clearDraft();
+    state._draftHandled = true; // no reabrir automáticamente
+    state.editing = null;
+    loadDashboard();
+  });
+  $('btnDraft').addEventListener('click', () => saveProperty(false));
+  $('btnPublish').addEventListener('click', () => saveProperty(true));
+  $('btnUnpublish').addEventListener('click', unpublishCurrent);
+  $('btnDelete').addEventListener('click', deleteCurrent);
+  $('btnAmAdd').addEventListener('click', addCustomAmenity);
+  $('amCustom').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addCustomAmenity(); } });
+
+  // video tabs
+  document.querySelectorAll('.vtab').forEach(b => {
+    b.addEventListener('click', () => setVideoTab(b.dataset.vt));
+  });
+
+  // photo input + drag-drop area
+  $('photoInput').addEventListener('change', e => {
+    handleNewFiles(e.target.files);
+    e.target.value = '';
+  });
+  const grid = $('photoGrid');
+  grid.addEventListener('dragover', e => { e.preventDefault(); });
+  grid.addEventListener('drop', e => {
+    if (e.dataTransfer.files && e.dataTransfer.files.length) {
+      e.preventDefault();
+      handleNewFiles(e.dataTransfer.files);
+    }
+  });
+
+  // live updates de sidebar
+  ['fDir','fUnidad'].forEach(id => $(id).addEventListener('input', updateSidebar));
+  $('fTipo').addEventListener('change', togglePricesByTipo);
+  $('fDesc').addEventListener('input', () => {
+    $('descCount').textContent = $('fDesc').value.length;
+  });
+
+  // Autosave de borrador + cuando se tocan amenities/fotos manualmente
+  wireAutosave();
+
+  // Save también cuando cambia state vía toggles de amenities, fotos, video tabs
+  document.addEventListener('click', e => {
+    if (!$('viewForm').classList.contains('active')) return;
+    if (e.target.closest('.am-cb, .ph-rm, .vtab, .ph-slot')) {
+      saveDraftDebounced();
+    }
+  });
+}
+
+// ════════════════════════════════════════════════════════════════════
+// BOOT
+// ════════════════════════════════════════════════════════════════════
+async function boot() {
+  try {
+    state.sb = await window.bairenReady;
+    wireUI();
+    await initAuth();
+  } catch (err) {
+    console.error('Boot failed:', err);
+    document.body.innerHTML = '<div style="padding:40px;text-align:center;font-family:Jost,sans-serif"><h1 style="font-family:Playfair Display,serif">Error al iniciar el panel</h1><p style="color:#777;margin-top:12px">No se pudo conectar a Supabase. Verificá <code>supabase-config.js</code>.</p><p style="color:#b94a4a;margin-top:18px;font-size:.8rem">' + (err.message || err) + '</p></div>';
+  }
+}
+
+boot();
+</script>
+</body>
+</html>

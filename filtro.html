@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="robots" content="noindex, nofollow">
+<title>Coordinar visita — Grupo Bairen</title>
+<link rel="icon" href="bairen_logo.png?v=2">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --navy:#15243F;--navy-dark:#0D1A30;--navy-deeper:#081227;
+  --gold:#C9A961;--gold-dark:#8C6E40;--gold-light:#E0CB95;--gold-pale:#F7F1E2;
+  --white:#FBFAF6;--off-white:#F4EEDF;
+  --font-display:'Playfair Display',Georgia,serif;
+  --font-body:'Jost',sans-serif;
+  --ease:cubic-bezier(0.22,1,0.36,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--font-body);font-weight:300;background:var(--navy);color:var(--white);min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+a{text-decoration:none;color:inherit;}
+
+/* NAV */
+nav{height:64px;background:var(--navy-deeper);border-bottom:2px solid var(--gold);display:flex;align-items:center;justify-content:space-between;padding:0 40px;position:fixed;top:0;left:0;right:0;z-index:1000;}
+.nav-logo{display:flex;align-items:center;}
+.nav-logo img{display:block;height:46px;width:auto;}
+.nav-gem{display:none;}
+.nav-back{font-size:.68rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);opacity:.8;transition:opacity .2s;}
+.nav-back:hover{opacity:1;}
+
+/* AMBIENT */
+.ambient{position:fixed;inset:0;pointer-events:none;z-index:0;}
+.ambient::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 0%,rgba(201,169,97,.04) 0%,transparent 65%);}
+.ambient::after{content:'';position:absolute;bottom:0;left:0;right:0;height:40%;background:radial-gradient(ellipse 60% 80% at 50% 100%,rgba(140,110,64,.04) 0%,transparent 70%);}
+
+/* PAGE */
+.page{min-height:100vh;padding:100px 24px 60px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;z-index:1;}
+
+/* PROGRESS */
+.progress-wrap{width:100%;max-width:580px;margin-bottom:44px;}
+.progress-top{display:flex;justify-content:space-between;margin-bottom:10px;}
+.progress-label{font-size:.58rem;letter-spacing:.35em;text-transform:uppercase;color:var(--gold);}
+.progress-count{font-size:.58rem;letter-spacing:.2em;color:rgba(255,255,255,.25);}
+.progress-track{height:1px;background:rgba(255,255,255,.08);}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--gold-dark),var(--gold));transition:transform .7s var(--ease);transform:scaleX(.2);transform-origin:left;}
+
+/* STEP */
+.step{width:100%;max-width:580px;display:none;}
+.step.active{display:block;animation:stepIn .55s var(--ease) forwards;}
+@keyframes stepIn{from{opacity:0;transform:translateY(22px);}to{opacity:1;transform:none;}}
+
+.step-eyebrow{font-size:.55rem;letter-spacing:.4em;text-transform:uppercase;color:rgba(201,169,97,.45);margin-bottom:18px;}
+.step-q{font-family:var(--font-display);font-size:clamp(1.5rem,4vw,2.1rem);font-weight:400;line-height:1.2;color:var(--white);margin-bottom:8px;}
+.step-sub{font-size:.78rem;color:rgba(255,255,255,.35);letter-spacing:.04em;margin-bottom:32px;}
+
+/* OPTIONS */
+.options{display:flex;flex-direction:column;gap:8px;border:none;padding:0;margin:0;}
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+.opt{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border:1px solid rgba(201,169,97,.14);cursor:pointer;transition:border-color .22s var(--ease),background .22s var(--ease);position:relative;overflow:hidden;user-select:none;min-height:60px;}
+.opt::before{content:'';position:absolute;inset:0;background:rgba(201,169,97,.06);opacity:0;transition:opacity .25s;pointer-events:none;}
+.opt:hover::before{opacity:1;}
+.opt:hover{border-color:rgba(201,169,97,.4);}
+.opt-input{position:absolute;opacity:0;pointer-events:none;width:0;height:0;}
+.opt-left{display:flex;align-items:center;gap:14px;position:relative;z-index:1;}
+.opt-dot{width:18px;height:18px;border-radius:50%;border:1px solid rgba(201,169,97,.35);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:border-color .22s,background .22s;}
+.opt-text{font-size:.95rem;font-weight:400;color:rgba(255,255,255,.85);}
+.opt-tag{font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.4);font-weight:500;position:relative;z-index:1;}
+.opt:has(.opt-input:checked){border-color:var(--gold);background:rgba(201,169,97,.08);}
+.opt:has(.opt-input:checked) .opt-dot{border-color:var(--gold);background:var(--gold);}
+.opt:has(.opt-input:checked) .opt-dot::after{content:'';width:7px;height:7px;border-radius:50%;background:var(--navy);}
+.opt:has(.opt-input:checked) .opt-text{color:var(--white);font-weight:500;}
+.opt:has(.opt-input:checked) .opt-tag{color:var(--gold-light);}
+.opt:has(.opt-input:focus-visible){outline:2px solid var(--gold);outline-offset:3px;}
+
+/* NAV BUTTONS */
+.step-nav{display:flex;align-items:center;justify-content:space-between;margin-top:28px;}
+.btn-prev{font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.3);cursor:pointer;transition:color .2s;background:none;border:none;font-family:var(--font-body);padding:0;}
+.btn-prev:hover{color:rgba(255,255,255,.7);}
+.btn-next{font-size:.7rem;letter-spacing:.22em;text-transform:uppercase;font-weight:700;color:var(--navy);background:var(--gold);border:none;padding:15px 36px;cursor:pointer;transition:all .25s;font-family:var(--font-body);}
+.btn-next:hover{background:var(--gold-dark);}
+.btn-next:disabled{opacity:.3;cursor:not-allowed;}
+
+/* ── PANTALLA: REVISANDO ── */
+.screen-review{display:none;width:100%;max-width:580px;text-align:center;}
+.screen-review.active{display:block;animation:stepIn .5s var(--ease) forwards;}
+.review-rings{position:relative;width:80px;height:80px;margin:0 auto 32px;}
+.ring{position:absolute;border-radius:50%;border:1px solid transparent;}
+.ring-1{inset:0;border-color:rgba(201,169,97,.15);animation:spin1 2.4s linear infinite;}
+.ring-2{inset:8px;border-top-color:var(--gold);animation:spin2 1.6s linear infinite;}
+.ring-3{inset:18px;border-top-color:rgba(201,169,97,.4);animation:spin1 2s linear infinite reverse;}
+@keyframes spin1{to{transform:rotate(360deg);}}
+@keyframes spin2{to{transform:rotate(-360deg);}}
+.review-title{font-family:var(--font-display);font-size:1.6rem;font-weight:400;color:var(--white);margin-bottom:10px;}
+.review-sub{font-size:.8rem;color:rgba(255,255,255,.35);letter-spacing:.06em;}
+
+/* ── PANTALLA: CALIFICA ── */
+.screen-ok{display:none;width:100%;max-width:580px;text-align:center;}
+.screen-ok.active{display:block;animation:stepIn .6s var(--ease) forwards;}
+.ok-icon{width:64px;height:64px;border-radius:50%;background:rgba(201,169,97,.1);border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;margin:0 auto 28px;}
+.ok-icon svg{width:28px;height:28px;stroke:var(--gold);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.ok-title{font-family:var(--font-display);font-size:clamp(1.6rem,4vw,2.2rem);font-weight:400;color:var(--white);margin-bottom:12px;line-height:1.2;}
+.ok-title em{font-style:italic;color:var(--gold-light);}
+.ok-sub{font-size:.88rem;color:rgba(255,255,255,.45);line-height:1.75;max-width:400px;margin:0 auto 36px;}
+.btn-calendly{display:inline-flex;align-items:center;gap:12px;background:var(--gold);color:var(--navy);font-family:var(--font-body);font-size:.72rem;letter-spacing:.22em;font-weight:700;text-transform:uppercase;padding:18px 44px;cursor:pointer;border:none;transition:background .25s;}
+.btn-calendly svg{width:14px;height:14px;stroke:var(--navy);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+@media(hover:hover) and (pointer:fine){
+  .btn-calendly:hover{background:var(--gold-dark);transform:translateY(-2px);box-shadow:0 12px 40px rgba(201,169,97,.18);}
+}
+
+/* ── PANTALLA: NO CALIFICA ── */
+.screen-no{display:none;width:100%;max-width:580px;text-align:center;}
+.screen-no.active{display:block;animation:stepIn .6s var(--ease) forwards;}
+.no-icon{width:64px;height:64px;border:1px solid rgba(255,255,255,.12);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 28px;}
+.no-icon svg{width:24px;height:24px;stroke:rgba(255,255,255,.35);fill:none;stroke-width:1.5;}
+.no-title{font-family:var(--font-display);font-size:clamp(1.5rem,4vw,2rem);font-weight:400;color:var(--white);margin-bottom:12px;line-height:1.2;}
+.no-sub{font-size:.86rem;color:rgba(255,255,255,.38);line-height:1.8;max-width:420px;margin:0 auto 32px;}
+.btn-wa{display:inline-flex;align-items:center;gap:10px;background:transparent;color:var(--gold);border:1px solid rgba(201,169,97,.4);font-family:var(--font-body);font-size:.68rem;letter-spacing:.18em;font-weight:600;text-transform:uppercase;padding:14px 32px;cursor:pointer;transition:all .25s;}
+.btn-wa:hover{background:rgba(201,169,97,.06);border-color:var(--gold);}
+
+/* PROPERTY PILL (top) */
+.prop-pill{display:inline-flex;align-items:center;gap:10px;border:1px solid rgba(201,169,97,.18);padding:8px 18px;margin-bottom:44px;font-size:.68rem;letter-spacing:.12em;color:rgba(255,255,255,.5);}
+.prop-pill span{color:var(--gold-light);font-weight:500;}
+
+/* BURGER */
+.burger{display:flex;flex-direction:column;gap:5px;cursor:pointer;padding:5px;flex-shrink:0;}
+.burger span{display:block;width:22px;height:1.5px;background:var(--white);transition:transform .3s,opacity .3s;}
+.burger.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg);}
+.burger.open span:nth-child(2){opacity:0;}
+.burger.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg);}
+@media(min-width:701px){.burger{display:none;}}
+
+.mobile-menu{position:fixed;top:64px;left:0;right:0;background:var(--navy-deeper);border-bottom:1px solid rgba(201,169,97,.15);z-index:999;padding:16px 0;transform:translateY(-110%);
+  visibility:hidden;
+  transition:transform .38s var(--ease), visibility 0s .38s;
+}
+.mobile-menu.open{transform:none;visibility:visible;transition:transform .38s var(--ease), visibility 0s 0s;}
+.mm-link{display:block;padding:13px 24px;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.65);font-weight:500;transition:color .2s;}
+.mm-link:hover{color:var(--gold);}
+
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto;}
+  .mobile-menu{transition:none;}
+  *{animation-duration:.01ms!important;animation-iteration-count:1!important;}
+}
+
+@media(max-width:700px){
+  nav{padding:0 20px;}
+  .page{padding:88px 16px 48px;}
+  .step-q{font-size:1.4rem;}
+  .btn-next{padding:14px 26px;}
+}
+*:focus-visible{outline:2px solid var(--gold);outline-offset:3px;}
+</style>
+</head>
+<body>
+<div class="ambient"></div>
+
+<nav>
+  <a class="nav-logo" href="index.html"><img src="bairen_logo.png?v=2" alt="Grupo Bairen"></a>
+  <a class="nav-back" href="javascript:history.back()">← Volver</a>
+  <div class="burger" id="burger"><span></span><span></span><span></span></div>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html" class="mm-link">Inicio</a>
+  <a href="catalogo.html" class="mm-link">Propiedades</a>
+  <a href="index.html#contacto" class="mm-link">Contacto</a>
+</div>
+
+<div class="page">
+
+  <!-- Pill de propiedad -->
+  <div class="prop-pill">Consultando para · <span id="propPillText">Grupo Bairen</span></div>
+
+  <!-- PROGRESO -->
+  <div class="progress-wrap" id="progressWrap">
+    <div class="progress-top">
+      <span class="progress-label" id="progressLabel">Paso 1 de 5</span>
+      <span class="progress-count" id="progressCount">Perfil de búsqueda</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+
+  <!-- ── PASO 1 ── -->
+  <div class="step active" id="step1">
+    <div class="step-eyebrow">Pregunta 1 de 5</div>
+    <div class="step-q">¿Cuándo necesitás mudarte?</div>
+    <fieldset class="options">
+      <legend class="sr-only">¿Cuándo necesitás mudarte?</legend>
+      <label class="opt">
+        <input type="radio" name="step1" value="urgente" class="opt-input">
+        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text">Antes de 2 semanas</span></span>
+        <span class="opt-tag">Urgente</span>
+      </label>
+      <label class="opt">
+        <input type="radio" name="step1" value="este-mes" class="opt-input">
+        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text">Este mes</span></span>
+        <span class="opt-tag"></span>
+      </label>
+      <label class="opt">
+        <input type="radio" name="step1" value="3-meses" class="opt-input">
+        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text">En los próximos 3 meses</span></span>
+        <span class="opt-tag"></span>
+      </label>
+    </fieldset>
+    <div class="step-nav">
+      <span></span>
+      <button class="btn-next" id="next1" disabled onclick="goNext(1)">Continuar →</button>
+    </div>
+  </div>
+
+  <!-- ── PASO 2 ── -->
+  <div class="step" id="step2">
+    <div class="step-eyebrow">Pregunta 2 de 5</div>
+    <div class="step-q">¿Por cuánto tiempo necesitás la propiedad?</div>
+    <fieldset class="options" id="step2Options">
+      <legend class="sr-only">¿Por cuánto tiempo necesitás la propiedad?</legend>
+      <!-- opciones renderizadas por JS según tipo de propiedad -->
+    </fieldset>
+    <div class="step-nav">
+      <button class="btn-prev" onclick="goPrev(2)">← Anterior</button>
+      <button class="btn-next" id="next2" disabled onclick="goNext(2)">Continuar →</button>
+    </div>
+  </div>
+
+  <!-- ── PASO 3 ── -->
+  <div class="step" id="step3">
+    <div class="step-eyebrow">Pregunta 3 de 5</div>
+    <div class="step-q">¿Cuántas personas van a habitar la unidad?</div>
+    <fieldset class="options">
+      <legend class="sr-only">¿Cuántas personas van a habitar la unidad?</legend>
+      <label class="opt">
+        <input type="radio" name="step3" value="1" class="opt-input">
+        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text">Solo yo</span></span>
+        <span class="opt-tag"></span>
+      </label>
+      <label class="opt">
+        <input type="radio" name="step3" value="2" class="opt-input">
+        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text">2 personas</span></span>
+        <span class="opt-tag"></span>
+      </label>
+      <label class="opt">
+        <input type="radio" name="step3" value="3+" class="opt-input">
+        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text">3 o más</span></span>
+        <span class="opt-tag"></span>
+      </label>
+    </fieldset>
+    <div class="step-nav">
+      <button class="btn-prev" onclick="goPrev(3)">← Anterior</button>
+      <button class="btn-next" id="next3" disabled onclick="goNext(3)">Continuar →</button>
+    </div>
+  </div>
+
+  <!-- ── PASO 4 ── -->
+  <div class="step" id="step4">
+    <div class="step-eyebrow">Pregunta 4 de 5</div>
+    <div class="step-q">¿Tenés mascotas?</div>
+    <fieldset class="options">
+      <legend class="sr-only">¿Tenés mascotas?</legend>
+      <label class="opt">
+        <input type="radio" name="step4" value="no" class="opt-input">
+        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text">No</span></span>
+        <span class="opt-tag"></span>
+      </label>
+      <label class="opt">
+        <input type="radio" name="step4" value="pequeña" class="opt-input">
+        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text">Sí, una pequeña</span></span>
+        <span class="opt-tag"></span>
+      </label>
+      <label class="opt">
+        <input type="radio" name="step4" value="grande" class="opt-input">
+        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text">Sí, una grande</span></span>
+        <span class="opt-tag"></span>
+      </label>
+      <label class="opt">
+        <input type="radio" name="step4" value="varias" class="opt-input">
+        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text">Sí, más de una</span></span>
+        <span class="opt-tag"></span>
+      </label>
+    </fieldset>
+    <div class="step-nav">
+      <button class="btn-prev" onclick="goPrev(4)">← Anterior</button>
+      <button class="btn-next" id="next4" disabled onclick="goNext(4)">Continuar →</button>
+    </div>
+  </div>
+
+  <!-- ── PASO 5 ── -->
+  <div class="step" id="step5">
+    <div class="step-eyebrow">Pregunta 5 de 5</div>
+    <div class="step-q">¿Con qué presupuesto mensual contás?</div>
+    <div class="step-sub" id="step5Sub">Incluyendo expensas y servicios</div>
+    <fieldset class="options">
+      <legend class="sr-only">¿Con qué presupuesto mensual contás?</legend>
+      <label class="opt">
+        <input type="radio" name="step5" value="menos700" data-qualify="no" class="opt-input">
+        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text">Menos de 700</span></span>
+        <span class="opt-tag"></span>
+      </label>
+      <label class="opt">
+        <input type="radio" name="step5" value="700-800" data-qualify="yes" class="opt-input">
+        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text">700 a 800</span></span>
+        <span class="opt-tag"></span>
+      </label>
+      <label class="opt">
+        <input type="radio" name="step5" value="800-1200" data-qualify="yes" class="opt-input">
+        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text">800 a 1.200</span></span>
+        <span class="opt-tag"></span>
+      </label>
+      <label class="opt">
+        <input type="radio" name="step5" value="1200-2000" data-qualify="yes" class="opt-input">
+        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text">1.200 a 2.000</span></span>
+        <span class="opt-tag"></span>
+      </label>
+      <label class="opt">
+        <input type="radio" name="step5" value="mas2000" data-qualify="yes" class="opt-input">
+        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text">Más de 2.000</span></span>
+        <span class="opt-tag"></span>
+      </label>
+    </fieldset>
+    <div class="step-nav">
+      <button class="btn-prev" onclick="goPrev(5)">← Anterior</button>
+      <button class="btn-next" id="next5" disabled onclick="submitForm()">Ver resultado →</button>
+    </div>
+  </div>
+
+  <!-- ── REVISANDO ── -->
+  <div class="screen-review" id="screenReview">
+    <div class="review-rings">
+      <div class="ring ring-1"></div>
+      <div class="ring ring-2"></div>
+      <div class="ring ring-3"></div>
+    </div>
+    <div class="review-title">Revisando tu perfil...</div>
+    <div class="review-sub">Un momento</div>
+  </div>
+
+  <!-- ── CALIFICA ── -->
+  <div class="screen-ok" id="screenOk">
+    <div class="ok-icon">
+      <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <div class="ok-title">¡Tu perfil <em>califica</em>!</div>
+    <div class="ok-sub">Esta propiedad se ajusta perfectamente a lo que buscás. Coordiná tu visita eligiendo el horario que mejor te quede.</div>
+    <button class="btn-calendly" onclick="goToConfirmar()">
+      Elegir día y horario
+      <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+
+  <!-- ── NO CALIFICA ── -->
+  <div class="screen-no" id="screenNo">
+    <div class="no-icon">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    </div>
+    <div class="no-title">Esta unidad no es la indicada para vos</div>
+    <div class="no-sub">Pero puede haber otra que sí lo sea. Contanos qué buscás y te ayudamos a encontrarla.</div>
+    <button class="btn-wa" onclick="window.open('https://wa.me/5491123106629','_blank')">
+      Hablar con un asesor
+    </button>
+  </div>
+
+</div>
+
+<script>
+const answers = {};
+const labels  = ['','¿Cuándo te mudás?','¿Cuánto tiempo?','¿Cuántas personas?','¿Tenés mascotas?','¿Presupuesto?'];
+
+// Burger
+document.getElementById('burger').addEventListener('click', function() {
+  this.classList.toggle('open');
+  document.getElementById('mobileMenu').classList.toggle('open');
+});
+
+function updateProgress(step) {
+  const pct = step / 5;
+  document.getElementById('progressFill').style.transform = 'scaleX(' + pct + ')';
+  document.getElementById('progressLabel').textContent = 'Paso ' + step + ' de 5';
+  document.getElementById('progressCount').textContent = labels[step] || '';
+}
+
+// Option selection (radios reales)
+function wireStepRadios(stepNum) {
+  const stepEl = document.getElementById('step' + stepNum);
+  if (!stepEl) return;
+  stepEl.querySelectorAll('input.opt-input[name="step' + stepNum + '"]').forEach(input => {
+    input.addEventListener('change', function() {
+      if (!this.checked) return;
+      answers[stepNum] = { val: this.value, qualify: this.dataset.qualify };
+      const nextBtn = document.getElementById('next' + stepNum);
+      if (nextBtn) nextBtn.disabled = false;
+    });
+  });
+}
+[1,3,4,5].forEach(wireStepRadios);
+
+function goNext(step) {
+  document.getElementById('step' + step).classList.remove('active');
+  const next = step + 1;
+  if (next <= 5) {
+    document.getElementById('step' + next).classList.add('active');
+    updateProgress(next);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+function goPrev(step) {
+  document.getElementById('step' + step).classList.remove('active');
+  const prev = step - 1;
+  if (prev >= 1) {
+    document.getElementById('step' + prev).classList.add('active');
+    updateProgress(prev);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+function goToConfirmar() {
+  const p = new URLSearchParams(window.location.search);
+
+  // Mapas de val → texto legible
+  const mapMudanza   = { 'urgente':'Antes de 2 semanas', 'este-mes':'Este mes', '3-meses':'En los próximos 3 meses' };
+  const mapPlazo     = { '3-6':'3 a 6 meses', '6-12':'6 a 12 meses', '12':'12 meses', '12-24':'12 a 24 meses', '24+':'Más de 24 meses' };
+  const mapPersonas  = { '1':'Solo yo', '2':'2 personas', '3+':'3 o más' };
+  const mapMascotas  = { 'no':'No', 'pequeña':'Sí, una pequeña', 'grande':'Sí, una grande', 'varias':'Sí, más de una' };
+  const mapPresup    = { 'menos700':'Menos de USD 700', '700-800':'USD 700 a 800', '800-1200':'USD 800 a 1.200', '1200-2000':'USD 1.200 a 2.000', 'mas2000':'Más de USD 2.000' };
+
+  if (answers['1']) p.set('r_mudanza',    mapMudanza[answers['1'].val]   || answers['1'].val);
+  if (answers['2']) p.set('r_plazo',      mapPlazo[answers['2'].val]     || answers['2'].val);
+  if (answers['3']) p.set('r_personas',   mapPersonas[answers['3'].val]  || answers['3'].val);
+  if (answers['4']) p.set('r_mascotas',   mapMascotas[answers['4'].val]  || answers['4'].val);
+  if (answers['5']) p.set('r_presupuesto',mapPresup[answers['5'].val]    || answers['5'].val);
+
+  window.location = 'confirmar.html?' + p.toString();
+}
+
+function submitForm() {
+  document.getElementById('step5').classList.remove('active');
+  document.getElementById('progressWrap').style.opacity = '0';
+  document.getElementById('progressWrap').style.pointerEvents = 'none';
+  document.getElementById('screenReview').classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // Califica si NINGUNA respuesta tiene qualify='no'
+  const qualifies = Object.values(answers).every(a => a.qualify !== 'no');
+
+  setTimeout(() => {
+    document.getElementById('screenReview').classList.remove('active');
+    if (qualifies) {
+      document.getElementById('screenOk').classList.add('active');
+    } else {
+      document.getElementById('screenNo').classList.add('active');
+    }
+  }, 900);
+}
+
+// ── Init ────────────────────────────────────────────────────────
+const urlP       = new URLSearchParams(window.location.search);
+const propName   = urlP.get('prop')    || '';
+const propBarrio = urlP.get('barrio')  || '';
+const propPrecio = parseInt(urlP.get('precio')) || 0;
+const propAmb    = parseInt(urlP.get('amb'))    || 0;
+const propTipo   = urlP.get('tipo') || '';
+
+const pillText = propName
+  ? decodeURIComponent(propName) + ' · ' + decodeURIComponent(propBarrio)
+  : 'Grupo Bairen';
+document.getElementById('propPillText').textContent = pillText;
+updateProgress(1);
+
+// ── Paso 2: opciones de plazo según tipo de propiedad ──────────
+(function buildStep2Options() {
+  var esTemp = /temporal/i.test(propTipo);
+
+  // Temporal: plazos cortos. Tradicional / sin tipo: plazos largos.
+  var opciones = esTemp
+    ? [
+        { val: '3-6',  txt: '3 a 6 meses',   tag: 'Más solicitado', qualify: 'yes' },
+        { val: '6-12', txt: '6 a 12 meses',  tag: '',               qualify: 'yes' }
+      ]
+    : [
+        { val: '12',    txt: '12 meses',       tag: '',               qualify: 'yes' },
+        { val: '12-24', txt: '12 a 24 meses',  tag: 'Más solicitado', qualify: 'yes' },
+        { val: '24+',   txt: 'Más de 24 meses',tag: '',               qualify: 'yes' }
+      ];
+
+  var container = document.getElementById('step2Options');
+  opciones.forEach(function(op) {
+    var label = document.createElement('label');
+    label.className = 'opt';
+    label.innerHTML =
+      '<input type="radio" name="step2" value="' + op.val + '" data-qualify="' + op.qualify + '" class="opt-input">' +
+      '<span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text">' + op.txt + '</span></span>' +
+      '<span class="opt-tag">' + op.tag + '</span>';
+    container.appendChild(label);
+  });
+
+  wireStepRadios(2);
+})();
+
+// ── Personalización por precio ───────────────────────────────────
+// Si se pasa ?precio=X, ajusta qué rangos califican y muestra el precio como referencia
+if (propPrecio > 0) {
+  const sub5 = document.getElementById('step5Sub');
+  if (sub5) sub5.textContent = 'Esta unidad cuesta USD ' + propPrecio.toLocaleString('es-AR') + ' por mes';
+
+  const qualifyMap = {
+    'menos700':  propPrecio <= 700,
+    '700-800':   propPrecio <= 800,
+    '800-1200':  propPrecio <= 1200,
+    '1200-2000': propPrecio <= 2000,
+    'mas2000':   true
+  };
+
+  document.querySelectorAll('#step5 input.opt-input').forEach(function(input) {
+    const val = input.value;
+    if (!(val in qualifyMap)) return;
+
+    const qualifica = qualifyMap[val];
+    input.dataset.qualify = qualifica ? 'yes' : 'no';
+
+    const tag = input.closest('.opt').querySelector('.opt-tag');
+    if (!tag) return;
+
+    if (!qualifica) {
+      tag.textContent = 'Fuera de rango';
+      tag.style.color  = 'rgba(220,100,100,.7)';
+    } else {
+      const esRangoCubierto =
+        (val === 'menos700'  && propPrecio <= 700) ||
+        (val === '700-800'   && propPrecio > 700   && propPrecio <= 800)   ||
+        (val === '800-1200'  && propPrecio > 800   && propPrecio <= 1200)  ||
+        (val === '1200-2000' && propPrecio > 1200  && propPrecio <= 2000)  ||
+        (val === 'mas2000'   && propPrecio > 2000);
+
+      if (esRangoCubierto) {
+        tag.textContent = '✓ Entra en presupuesto';
+        tag.style.color  = 'var(--gold-light)';
+      } else {
+        tag.textContent = '✓ Con margen';
+        tag.style.color  = 'rgba(255,255,255,.45)';
+      }
+    }
+  });
+}
+
+// ── Personalización por ambientes ────────────────────────────────
+// Para monoambientes (1 amb), "3 o más personas" no califica
+if (propAmb === 1) {
+  document.querySelectorAll('#step3 input.opt-input').forEach(function(input) {
+    if (input.value === '3+') {
+      input.dataset.qualify = 'no';
+      const tag = input.closest('.opt').querySelector('.opt-tag');
+      if (tag) {
+        tag.textContent = 'Excede capacidad';
+        tag.style.color  = 'rgba(220,100,100,.7)';
+      }
+    }
+  });
+}
+</script>
+</body>
+</html>

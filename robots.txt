@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin.html
+Disallow: /confirmar.html
+Disallow: /filtro.html
+Disallow: /propiedad.html
+
+Sitemap: https://bairengroup.com/sitemap.xml
