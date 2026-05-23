@@ -10,9 +10,9 @@
 <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet"/>
 <style>
 :root{
-  --navy:#15243F;--navy-dark:#0D1A30;--navy-deeper:#081227;
-  --gold:#C9A961;--gold-dark:#8C6E40;--gold-light:#E0CB95;
-  --white:#FBFAF6;--off-white:#F4EEDF;
+  --navy:#2A3A52;--navy-dark:#1E2A3F;--navy-deeper:#131D2D;
+  --gold:#C2A968;--gold-dark:#8A7547;--gold-light:#DECDA0;
+  --white:#FBFAF6;--off-white:#EEE5D0;
   --font-display:'Playfair Display',Georgia,serif;
   --font-body:'Jost',sans-serif;
   --ease:cubic-bezier(0.22,1,0.36,1);
@@ -29,7 +29,7 @@ nav{height:64px;background:var(--navy-deeper);border-bottom:2px solid var(--gold
 
 /* AMBIENT */
 .ambient{position:fixed;inset:0;pointer-events:none;z-index:0;}
-.ambient::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(201,169,97,.04) 0%,transparent 65%);}
+.ambient::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(194,169,104,.04) 0%,transparent 65%);}
 
 /* PAGE */
 .page{padding:100px 24px 80px;position:relative;z-index:1;max-width:900px;margin:0 auto;}
@@ -43,13 +43,13 @@ nav{height:64px;background:var(--navy-deeper);border-bottom:2px solid var(--gold
 .confirm-sub{font-size:.88rem;color:rgba(255,255,255,.38);line-height:1.75;max-width:480px;margin:0 auto;}
 
 /* PROP PILL */
-.prop-pill{display:inline-flex;align-items:center;gap:10px;border:1px solid rgba(201,169,97,.18);padding:8px 18px;margin-bottom:40px;font-size:.68rem;letter-spacing:.12em;color:rgba(255,255,255,.4);}
+.prop-pill{display:inline-flex;align-items:center;gap:10px;border:1px solid rgba(194,169,104,.18);padding:8px 18px;margin-bottom:40px;font-size:.68rem;letter-spacing:.12em;color:rgba(255,255,255,.4);}
 .prop-pill span{color:var(--gold-light);font-weight:500;}
 
 /* STEPS MINI */
 .steps-mini{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:48px;animation:fadeUp .7s var(--ease) .1s both;}
 .step-mini{display:flex;align-items:center;gap:8px;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.25);}
-.step-mini.done{color:rgba(201,169,97,.6);}
+.step-mini.done{color:rgba(194,169,104,.6);}
 .step-mini.current{color:var(--gold);}
 .step-mini-dot{width:20px;height:20px;border-radius:50%;border:1px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:600;flex-shrink:0;}
 .step-mini.done .step-mini-dot::after{content:'✓';}
@@ -69,8 +69,8 @@ nav{height:64px;background:var(--navy-deeper);border-bottom:2px solid var(--gold
 
 /* INFO CARDS */
 .info-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:2px;animation:fadeUp .7s var(--ease) .3s both;}
-.info-card{background:rgba(255,255,255,.03);border:1px solid rgba(201,169,97,.08);padding:24px 22px;display:flex;align-items:flex-start;gap:14px;}
-.info-icon{width:36px;height:36px;border:1px solid rgba(201,169,97,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.info-card{background:rgba(255,255,255,.03);border:1px solid rgba(194,169,104,.08);padding:24px 22px;display:flex;align-items:flex-start;gap:14px;}
+.info-icon{width:36px;height:36px;border:1px solid rgba(194,169,104,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .info-icon svg{width:16px;height:16px;stroke:var(--gold);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
 .info-text-title{font-size:.7rem;font-weight:600;letter-spacing:.08em;color:var(--white);margin-bottom:4px;}
 .info-text-sub{font-size:.72rem;color:rgba(255,255,255,.3);line-height:1.6;}
@@ -81,9 +81,12 @@ footer{background:var(--navy-deeper);border-top:2px solid var(--gold);padding:32
 .ft-copy{font-size:.65rem;color:rgba(255,255,255,.2);letter-spacing:.06em;}
 
 /* WA */
-.wa-btn{position:fixed;bottom:26px;right:22px;z-index:800;width:52px;height:52px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px rgba(37,211,102,.3);transition:transform .25s;}
-.wa-btn:hover{transform:scale(1.08);}
+.wa-btn{position:fixed;bottom:24px;right:20px;z-index:800;width:54px;height:54px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(37,211,102,.32),0 2px 6px rgba(0,0,0,.18);transition:transform .25s var(--ease),box-shadow .25s var(--ease);}
+.wa-btn:hover{transform:scale(1.06);box-shadow:0 10px 28px rgba(37,211,102,.4),0 2px 6px rgba(0,0,0,.18);}
 .wa-btn svg{width:27px;height:27px;fill:#fff;}
+@media(max-width:700px){.wa-btn{width:48px;height:48px;bottom:18px;right:16px;}.wa-btn svg{width:24px;height:24px;}}
+.wa-btn:hover{transform:scale(1.06);box-shadow:0 10px 28px rgba(37,211,102,.4),0 2px 6px rgba(0,0,0,.18);}
+@media(max-width:700px){.wa-btn{width:48px;height:48px;bottom:18px;right:16px;}.wa-btn svg{width:24px;height:24px;}}
 
 /* BURGER */
 .burger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:5px;flex-shrink:0;}
@@ -93,7 +96,7 @@ footer{background:var(--navy-deeper);border-top:2px solid var(--gold);padding:32
 .burger.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg);}
 @media(max-width:700px){.burger{display:flex;}}
 
-.mobile-menu{position:fixed;top:64px;left:0;right:0;background:var(--navy-deeper);border-bottom:1px solid rgba(201,169,97,.15);z-index:999;padding:16px 0;transform:translateY(-110%);
+.mobile-menu{position:fixed;top:64px;left:0;right:0;background:var(--navy-deeper);border-bottom:1px solid rgba(194,169,104,.15);z-index:999;padding:16px 0;transform:translateY(-110%);
   visibility:hidden;
   transition:transform .38s var(--ease), visibility 0s .38s;
 }
@@ -136,6 +139,8 @@ footer{background:var(--navy-deeper);border-top:2px solid var(--gold);padding:32
 </div>
 
 <div class="page">
+
+  <h1 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">Confirmá tu visita — Grupo Bairen</h1>
 
   <!-- HEADER -->
   <div style="text-align:center;margin-bottom:20px;">

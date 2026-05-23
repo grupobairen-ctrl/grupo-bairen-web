@@ -29,3 +29,10 @@ node_modules/
 
 # Netlify local
 .netlify/
+
+# Video sources (no van a producción — solo el hero.mp4 final)
+*.MOV
+*.mov
+out.mp4
+out*.mp4
+copy_*.MOV

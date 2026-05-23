@@ -13,11 +13,15 @@
 <meta property="og:locale" content="es_AR">
 <meta property="og:site_name" content="Grupo Bairen">
 <meta property="og:url" content="https://bairengroup.com/catalogo.html">
-<meta property="og:image" content="https://bairengroup.com/104.png">
+<meta property="og:image" content="https://bairengroup.com/og-card.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Grupo Bairen — Alquileres premium en Buenos Aires">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Propiedades — Grupo Bairen">
 <meta name="twitter:description" content="Catálogo de alquileres premium en CABA y GBA Norte. Temporales y tradicionales sin garantía.">
-<meta name="twitter:image" content="https://bairengroup.com/104.png">
+<meta name="twitter:image" content="https://bairengroup.com/og-card.jpg">
+<meta name="theme-color" content="#131D2D">
 <link rel="icon" href="bairen_logo.png?v=2">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,10 +29,10 @@
 <style>
 /* ─── TOKENS ─────────────────────────────────────────────────────────── */
 :root {
-  --navy:#15243F; --navy-dark:#0D1A30; --navy-deeper:#081227; --navy-darker:#0A1525;
-  --gold:#C9A961; --gold-dark:#8C6E40; --gold-light:#E0CB95;
-  --white:#FBFAF6; --off-white:#F4EEDF; --gray-light:#D6D2C8;
-  --text-dark:#16202E; --text-mid:#5E6678;
+  --navy:#2A3A52; --navy-dark:#1E2A3F; --navy-deeper:#131D2D; --navy-darker:#131D2D;
+  --gold:#C2A968; --gold-dark:#8A7547; --gold-light:#DECDA0;
+  --white:#FBFAF6; --off-white:#EEE5D0; --gray-light:#D6D2C8;
+  --text-dark:#1A2538; --text-mid:#6B7589;
   --font-display:'Playfair Display',Georgia,serif;
   --font-body:'Jost',sans-serif;
   --ease:cubic-bezier(0.22,1,0.36,1);
@@ -63,7 +67,7 @@ nav {
 .nav-back{
   font-size:.66rem;font-weight:600;letter-spacing:.15em;
   text-transform:uppercase;color:var(--gold);
-  border:1px solid rgba(201,169,97,.35);padding:8px 16px;
+  border:1px solid rgba(194,169,104,.35);padding:8px 16px;
   transition:background .22s,color .22s;white-space:nowrap;
   flex-shrink:0;
 }
@@ -83,7 +87,7 @@ nav {
 
 .mobile-menu{
   position:fixed;top:var(--nav-h);left:0;right:0;
-  background:var(--navy-dark);border-bottom:1px solid rgba(201,169,97,.15);
+  background:var(--navy-dark);border-bottom:1px solid rgba(194,169,104,.15);
   z-index:999;padding:16px 0;
   transform:translateY(-110%);
   visibility:hidden;
@@ -109,8 +113,8 @@ nav {
 .cat-hero::before{
   content:'';position:absolute;inset:0;
   background:
-    radial-gradient(ellipse 55% 90% at 50% 120%, rgba(201,169,97,.07) 0%, transparent 70%),
-    radial-gradient(ellipse 30% 50% at 10% 50%, rgba(140,110,64,.04) 0%, transparent 60%);
+    radial-gradient(ellipse 55% 90% at 50% 120%, rgba(194,169,104,.07) 0%, transparent 70%),
+    radial-gradient(ellipse 30% 50% at 10% 50%, rgba(138,117,71,.04) 0%, transparent 60%);
   pointer-events:none;
 }
 .cat-hero-inner{position:relative;z-index:1;}
@@ -133,7 +137,7 @@ nav {
 /* ─── TYPE BANNER ─────────────────────────────────────────────────────── */
 .type-banner{
   background:var(--navy-dark);
-  border-bottom:1px solid rgba(201,169,97,.12);
+  border-bottom:1px solid rgba(194,169,104,.12);
   padding:14px 28px;
   display:none;
 }
@@ -159,7 +163,7 @@ nav {
 .filters-bar {
   position:sticky;top:var(--nav-h);z-index:200;
   background:#FFFFFF;
-  border-bottom:1px solid rgba(21,36,63,.1);
+  border-bottom:1px solid rgba(42,58,82,.1);
   height:var(--filter-h);
   display:flex;align-items:center;
   padding:0 28px;gap:10px;
@@ -172,7 +176,7 @@ nav {
   font-size:.68rem;font-weight:500;letter-spacing:.12em;
   text-transform:uppercase;
   color:var(--navy);
-  border:1px solid rgba(21,36,63,.2);
+  border:1px solid rgba(42,58,82,.2);
   background:transparent;
   padding:9px 14px;
   height:34px;
@@ -213,8 +217,8 @@ nav {
   top:calc(var(--nav-h) + var(--filter-h));
   left:28px;
   background:var(--white);
-  border:1px solid rgba(21,36,63,.12);
-  box-shadow:0 20px 56px rgba(8,18,39,.22),0 6px 14px rgba(140,110,64,.06);
+  border:1px solid rgba(42,58,82,.12);
+  box-shadow:0 20px 56px rgba(19,29,45,.22),0 6px 14px rgba(138,117,71,.06);
   padding:20px;
   min-width:320px;
   z-index:500;
@@ -238,7 +242,7 @@ nav {
   font-size:.66rem;font-weight:500;letter-spacing:.08em;
   text-transform:uppercase;
   padding:9px 12px;
-  border:1px solid rgba(21,36,63,.15);
+  border:1px solid rgba(42,58,82,.15);
   color:var(--navy);background:transparent;
   text-align:left;
   transition:all .2s;
@@ -260,14 +264,14 @@ nav {
 }
 
 /* ─── SEPARADOR ───────────────────────────────────────────────────────── */
-.filter-sep{width:1px;height:24px;background:rgba(21,36,63,.12);flex-shrink:0;}
+.filter-sep{width:1px;height:24px;background:rgba(42,58,82,.12);flex-shrink:0;}
 
 /* ─── TIPO PILLS ──────────────────────────────────────────────────────── */
 .tipo-pills{display:flex;gap:6px;flex-shrink:0;}
 .pill-tipo{
   font-size:.66rem;font-weight:500;letter-spacing:.1em;
   text-transform:uppercase;padding:9px 14px;height:34px;
-  border:1px solid rgba(21,36,63,.18);
+  border:1px solid rgba(42,58,82,.18);
   color:var(--navy);background:transparent;
   transition:all .22s;display:flex;align-items:center;
   font-family:var(--font-body);
@@ -282,13 +286,13 @@ nav {
 .search-input{
   font-family:var(--font-body);font-size:.78rem;font-weight:300;
   padding:9px 14px;height:34px;
-  border:1px solid rgba(21,36,63,.18);
+  border:1px solid rgba(42,58,82,.18);
   outline:none;width:190px;
   color:var(--navy);background:#FFFFFF;
   transition:border-color .22s,width .3s var(--ease);
 }
 .search-input:focus{border-color:var(--gold);width:220px;}
-.search-input::placeholder{color:rgba(21,36,63,.38);}
+.search-input::placeholder{color:rgba(42,58,82,.38);}
 @media(max-width:900px){.search-input{width:140px;}}
 @media(max-width:700px){
   :root{--filter-h:64px;}
@@ -316,7 +320,7 @@ nav {
   padding:12px 28px;
   display:flex;align-items:center;justify-content:space-between;
   gap:12px;
-  border-bottom:1px solid rgba(21,36,63,.05);
+  border-bottom:1px solid rgba(42,58,82,.05);
 }
 .results-count{
   font-size:.7rem;letter-spacing:.1em;
@@ -325,7 +329,7 @@ nav {
 .sort-select{
   font-family:var(--font-body);font-size:.72rem;
   padding:6px 10px;
-  border:1px solid rgba(21,36,63,.15);
+  border:1px solid rgba(42,58,82,.15);
   color:var(--navy);background:var(--white);
   outline:none;
 }
@@ -345,7 +349,7 @@ nav {
 /* ─── CARD ────────────────────────────────────────────────────────────── */
 .prop-card{
   background:#FFFFFF;
-  border:1px solid rgba(21,36,63,.07);
+  border:1px solid rgba(42,58,82,.07);
   overflow:hidden;
   display:flex;flex-direction:column;
   transition:transform .3s var(--ease),box-shadow .3s var(--ease);
@@ -355,7 +359,7 @@ nav {
 @media(hover:hover) and (pointer:fine){
   .prop-card:hover{
     transform:translateY(-4px);
-    box-shadow:0 22px 48px rgba(8,18,39,.22),0 6px 14px rgba(140,110,64,.08);
+    box-shadow:0 22px 48px rgba(19,29,45,.22),0 6px 14px rgba(138,117,71,.08);
   }
   .prop-card:hover .card-img img{transform:scale(1.04);}
 }
@@ -373,7 +377,7 @@ nav {
 }
 .card-img-placeholder{
   font-family:var(--font-display);font-size:.6rem;
-  letter-spacing:.22em;color:rgba(201,169,97,.25);
+  letter-spacing:.22em;color:rgba(194,169,104,.25);
   text-transform:uppercase;
 }
 .card-tag{
@@ -382,14 +386,16 @@ nav {
   text-transform:uppercase;padding:5px 11px;
 }
 .tag-temporal{background:var(--gold);color:var(--navy);}
-.tag-tradicional{background:rgba(21,36,63,.9);color:var(--gold);border:1px solid rgba(201,169,97,.6);}
+.tag-tradicional{background:rgba(42,58,82,.9);color:var(--gold);border:1px solid rgba(194,169,104,.6);}
 .card-status{
   position:absolute;top:14px;right:14px;z-index:2;
-  font-size:.56rem;font-weight:600;letter-spacing:.15em;
-  text-transform:uppercase;padding:5px 10px;
+  font-size:.54rem;font-weight:600;letter-spacing:.22em;
+  text-transform:uppercase;padding:5px 11px;
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
 }
-.status-disponible{background:rgba(255,255,255,.95);color:#2a7a4b;}
-.status-reservado{background:rgba(255,255,255,.95);color:#b94a4a;}
+.status-disponible{background:rgba(255,255,255,.85);color:var(--gold-dark);}
+.status-reservado{background:rgba(42,58,82,.7);color:rgba(255,255,255,.85);}
 
 .card-body{padding:22px 22px 18px;flex:1;display:flex;flex-direction:column;}
 .card-address{
@@ -406,7 +412,7 @@ nav {
 .spec{display:flex;flex-direction:column;gap:2px;}
 .spec-val{font-size:.95rem;font-weight:600;color:var(--navy);}
 .spec-lbl{font-size:.56rem;letter-spacing:.15em;text-transform:uppercase;color:var(--text-mid);}
-.card-divider{height:1px;background:rgba(21,36,63,.07);margin-bottom:16px;}
+.card-divider{height:1px;background:rgba(42,58,82,.07);margin-bottom:16px;}
 .card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:auto;}
 .card-price{font-family:var(--font-display);}
 .price-amount{font-size:1.28rem;font-weight:700;color:var(--navy);}
@@ -415,7 +421,7 @@ nav {
 .card-cta{
   font-size:.6rem;font-weight:600;letter-spacing:.16em;
   text-transform:uppercase;color:var(--navy);
-  border:1px solid rgba(21,36,63,.25);padding:9px 14px;
+  border:1px solid rgba(42,58,82,.25);padding:9px 14px;
   transition:all .22s;font-family:var(--font-body);
   background:transparent;
 }
@@ -427,7 +433,7 @@ nav {
   font-size:.56rem;letter-spacing:.08em;
   text-transform:uppercase;padding:4px 10px;
   background:#ECE9E1;color:var(--text-mid);
-  border:1px solid rgba(21,36,63,.04);
+  border:1px solid rgba(42,58,82,.04);
 }
 
 /* ─── EMPTY STATE ─────────────────────────────────────────────────────── */
@@ -443,8 +449,9 @@ nav {
   box-shadow:0 6px 24px rgba(37,211,102,.3);
   transition:transform .25s;
 }
-.wa-btn:hover{transform:scale(1.08);}
+.wa-btn:hover{transform:scale(1.06);box-shadow:0 10px 28px rgba(37,211,102,.4),0 2px 6px rgba(0,0,0,.18);}
 .wa-btn svg{width:27px;height:27px;fill:#fff;}
+@media(max-width:700px){.wa-btn{width:48px;height:48px;bottom:18px;right:16px;}.wa-btn svg{width:24px;height:24px;}}
 
 /* ─── FOOTER ──────────────────────────────────────────────────────────── */
 footer{
