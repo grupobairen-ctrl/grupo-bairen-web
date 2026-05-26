@@ -103,9 +103,24 @@ nav{height:64px;background:var(--navy-deeper);border-bottom:2px solid var(--gold
 .ok-sub{font-size:.88rem;color:rgba(255,255,255,.45);line-height:1.75;max-width:400px;margin:0 auto 36px;}
 .btn-calendly{display:inline-flex;align-items:center;gap:12px;background:var(--gold);color:var(--navy);font-family:var(--font-body);font-size:.72rem;letter-spacing:.22em;font-weight:700;text-transform:uppercase;padding:18px 44px;cursor:pointer;border:none;transition:background .25s;}
 .btn-calendly svg{width:14px;height:14px;stroke:var(--navy);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+.btn-calendly:disabled{background:rgba(194,169,104,.25);color:rgba(255,255,255,.4);cursor:not-allowed;}
+.btn-calendly:disabled svg{stroke:rgba(255,255,255,.4);}
 @media(hover:hover) and (pointer:fine){
-  .btn-calendly:hover{background:var(--gold-dark);transform:translateY(-2px);box-shadow:0 12px 40px rgba(194,169,104,.18);}
+  .btn-calendly:hover:not(:disabled){background:var(--gold-dark);transform:translateY(-2px);box-shadow:0 12px 40px rgba(194,169,104,.18);}
 }
+/* CONTACTO (form en pantalla califica) */
+.contact-form{display:flex;flex-direction:column;gap:14px;max-width:440px;margin:0 auto 28px;text-align:left;}
+.cf-row{display:flex;gap:10px;}
+.cf-row .cf-field{flex:1;min-width:0;}
+.cf-field{display:flex;flex-direction:column;gap:6px;}
+.cf-lbl{font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.45);font-weight:500;}
+.cf-input{background:transparent;border:1px solid rgba(194,169,104,.18);color:var(--white);padding:13px 16px;font-family:var(--font-body);font-size:.95rem;font-weight:300;letter-spacing:.01em;transition:border-color .22s var(--ease),background .22s var(--ease);width:100%;}
+.cf-input::placeholder{color:rgba(255,255,255,.22);}
+.cf-input:hover{border-color:rgba(194,169,104,.4);}
+.cf-input:focus{outline:none;border-color:var(--gold);background:rgba(194,169,104,.04);}
+.cf-input:user-invalid{border-color:rgba(220,100,100,.5);}
+.cf-hint{font-size:.68rem;color:rgba(255,255,255,.3);letter-spacing:.02em;margin-top:-4px;}
+@media(max-width:560px){.cf-row{flex-direction:column;gap:14px;}}
 
 /* ── PANTALLA: NO CALIFICA ── */
 .screen-no{display:none;width:100%;max-width:580px;text-align:center;}
@@ -342,11 +357,28 @@ nav{height:64px;background:var(--navy-deeper);border-bottom:2px solid var(--gold
       <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
     </div>
     <div class="ok-title">¡Tu perfil <em>califica</em>!</div>
-    <div class="ok-sub">Esta propiedad se ajusta perfectamente a lo que buscás. Coordiná tu visita eligiendo el horario que mejor te quede.</div>
-    <button class="btn-calendly" onclick="goToConfirmar()">
-      Elegir día y horario
-      <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-    </button>
+    <div class="ok-sub">Esta propiedad se ajusta a lo que buscás. Dejanos tus datos para coordinar la visita.</div>
+    <form class="contact-form" id="contactForm" autocomplete="on" novalidate>
+      <div class="cf-row">
+        <div class="cf-field">
+          <label class="cf-lbl" for="cfNombre">Nombre</label>
+          <input class="cf-input" id="cfNombre" name="given-name" type="text" required autocomplete="given-name" placeholder="Tu nombre" minlength="2">
+        </div>
+        <div class="cf-field">
+          <label class="cf-lbl" for="cfApellido">Apellido</label>
+          <input class="cf-input" id="cfApellido" name="family-name" type="text" required autocomplete="family-name" placeholder="Tu apellido" minlength="2">
+        </div>
+      </div>
+      <div class="cf-field">
+        <label class="cf-lbl" for="cfTelefono">Teléfono / WhatsApp</label>
+        <input class="cf-input" id="cfTelefono" name="tel" type="tel" required autocomplete="tel" placeholder="+54 11 1234-5678" inputmode="tel" pattern="[0-9+\-\s()]{7,}">
+        <span class="cf-hint">Solo lo usamos para coordinar la visita.</span>
+      </div>
+      <button type="submit" class="btn-calendly" id="btnGoConfirm" disabled>
+        Elegir día y horario
+        <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </form>
   </div>
 
   <!-- ── NO CALIFICA ── -->
@@ -431,8 +463,38 @@ function goToConfirmar() {
   if (answers['4']) p.set('r_mascotas',   mapMascotas[answers['4'].val]  || answers['4'].val);
   if (answers['5']) p.set('r_presupuesto',mapPresup[answers['5'].val]    || answers['5'].val);
 
+  // Datos de contacto del form
+  const nombre   = (document.getElementById('cfNombre')   || {}).value;
+  const apellido = (document.getElementById('cfApellido') || {}).value;
+  const telefono = (document.getElementById('cfTelefono') || {}).value;
+  if (nombre)   p.set('r_nombre',   nombre.trim());
+  if (apellido) p.set('r_apellido', apellido.trim());
+  if (telefono) p.set('r_telefono', telefono.trim());
+
   window.location = 'confirmar.html?' + p.toString();
 }
+
+// Form de contacto: valida + submit lleva a confirmar.html
+(function wireContactForm() {
+  const form = document.getElementById('contactForm');
+  if (!form) return;
+  const btn = document.getElementById('btnGoConfirm');
+  const inputs = ['cfNombre','cfApellido','cfTelefono'].map(id => document.getElementById(id));
+
+  function validate() {
+    const allFilled = inputs.every(i => i && i.value.trim().length >= 2);
+    const telOk = /^[0-9+\-\s()]{7,}$/.test((document.getElementById('cfTelefono').value || '').trim());
+    btn.disabled = !(allFilled && telOk);
+  }
+
+  inputs.forEach(i => i && i.addEventListener('input', validate));
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    if (btn.disabled) return;
+    goToConfirmar();
+  });
+})();
 
 function submitForm() {
   document.getElementById('step5').classList.remove('active');

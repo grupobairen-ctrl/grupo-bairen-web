@@ -224,14 +224,35 @@ footer{background:var(--navy-deeper);border-top:2px solid var(--gold);padding:32
   <svg viewBox="0 0 32 32"><path d="M16 0C7.163 0 0 7.163 0 16c0 2.83.736 5.487 2.023 7.793L0 32l8.438-2.01A15.93 15.93 0 0016 32c8.837 0 16-7.163 16-16S24.837 0 16 0zm0 29.333a13.278 13.278 0 01-6.77-1.848l-.484-.287-5.013 1.195 1.228-4.88-.317-.502A13.278 13.278 0 012.667 16C2.667 8.636 8.636 2.667 16 2.667S29.333 8.636 29.333 16 23.364 29.333 16 29.333zm7.3-9.96c-.4-.2-2.363-1.166-2.728-1.3-.366-.133-.633-.2-.9.2-.266.4-1.033 1.3-1.266 1.566-.233.267-.466.3-.866.1-2.367-1.183-3.917-2.117-5.475-4.8-.413-.712.413-.663 1.183-2.202.133-.267.067-.5-.033-.7-.1-.2-.9-2.163-1.233-2.963-.324-.778-.653-.672-.9-.685l-.767-.013a1.47 1.47 0 00-1.067.5c-.366.4-1.4 1.367-1.4 3.33s1.434 3.863 1.634 4.13c.2.267 2.823 4.312 6.837 6.05 2.54 1.097 3.534 1.19 4.804.999.773-.115 2.363-.966 2.696-1.9.333-.933.333-1.733.233-1.9-.1-.166-.366-.266-.766-.466z"/></svg>
 </a>
 
-<script src="https://assets.calendly.com/assets/external/widget.js" async></script>
 <script>
+// ── Pill + prefill Calendly con nombre del lead ─────────────────
+// Esto corre ANTES de cargar widget.js para que la URL del iframe
+// salga ya con name pre-rellenado.
 (function(){
   const urlP = new URLSearchParams(window.location.search);
   const propName = urlP.get('prop') || '';
   const propBarrio = urlP.get('barrio') || '';
   const pillText = propName ? `${propName} · ${propBarrio}` : 'Grupo Bairen';
   document.getElementById('propPillText').textContent = pillText;
+
+  // Prefill Calendly con nombre y (si Calendly lo tiene activado) teléfono
+  const nombre   = urlP.get('r_nombre')   || '';
+  const apellido = urlP.get('r_apellido') || '';
+  const telefono = urlP.get('r_telefono') || '';
+  const nombreCompleto = (nombre + ' ' + apellido).trim();
+
+  const cEl = document.querySelector('.calendly-inline-widget');
+  if (cEl && (nombreCompleto || telefono)) {
+    let url = cEl.getAttribute('data-url') || '';
+    const extra = [];
+    if (nombreCompleto) extra.push('name=' + encodeURIComponent(nombreCompleto));
+    // Calendly: si el evento tiene el campo "Phone Number" habilitado, se prefilla con este param
+    if (telefono) extra.push('phone_number=' + encodeURIComponent(telefono));
+    if (extra.length) {
+      url += (url.indexOf('?') >= 0 ? '&' : '?') + extra.join('&');
+      cEl.setAttribute('data-url', url);
+    }
+  }
 })();
 
 document.getElementById('burger').addEventListener('click', function() {
@@ -239,6 +260,7 @@ document.getElementById('burger').addEventListener('click', function() {
   document.getElementById('mobileMenu').classList.toggle('open');
 });
 </script>
+<script src="https://assets.calendly.com/assets/external/widget.js" async></script>
 
 <script>
 (function() {
@@ -252,6 +274,9 @@ document.getElementById('burger').addEventListener('click', function() {
     propiedad:   p.get('prop')          || 'No especificada',
     barrio:      p.get('barrio')        || 'No especificado',
     tipo:        p.get('tipo')          || 'No especificado',
+    nombre:      p.get('r_nombre')      || 'No respondido',
+    apellido:    p.get('r_apellido')    || 'No respondido',
+    telefono:    p.get('r_telefono')    || 'No respondido',
     mudanza:     p.get('r_mudanza')     || 'No respondido',
     plazo:       p.get('r_plazo')       || 'No respondido',
     personas:    p.get('r_personas')    || 'No respondido',
