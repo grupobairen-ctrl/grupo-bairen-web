@@ -5,5 +5,7 @@ Disallow: /admin.html
 Disallow: /confirmar.html
 Disallow: /filtro.html
 Disallow: /propiedad.html
+Disallow: /migrate.html
+Disallow: /fix-plazos.html
 
 Sitemap: https://bairengroup.com/sitemap.xml

@@ -336,7 +336,7 @@ textarea.fi{resize:vertical;min-height:96px;line-height:1.6;}
               </div>
             </div>
             <div class="row2">
-              <div class="fg"><label class="lbl" for="fPlazo">Plazo</label><input class="fi" id="fPlazo" type="text" placeholder="3 a 24 meses"></div>
+              <div class="fg"><label class="lbl" for="fPlazo">Plazo</label><input class="fi" id="fPlazo" type="text" placeholder="3-12 meses"></div>
               <div></div>
             </div>
           </div>
@@ -464,6 +464,23 @@ const AMENITIES_PRESET = [
 ];
 
 const MAX_PHOTOS = 12;
+
+const DEFAULT_PLAZOS = {
+  Temporal:    '3-12 meses',
+  Tradicional: 'A partir de 2 años',
+  Ambos:       '3-12 meses · 2+ años',
+};
+// Valores que consideramos "no personalizados" — si el campo plazo está en
+// uno de estos, cambiarlo automáticamente al cambiar el tipo de alquiler.
+const DEFAULT_PLAZO_VALUES = new Set([
+  '',
+  '3 a 24 meses',      // legacy
+  '12 meses',          // legacy migrate.html
+  ...Object.values(DEFAULT_PLAZOS),
+]);
+function defaultPlazoForTipo(tipo) {
+  return DEFAULT_PLAZOS[tipo] || DEFAULT_PLAZOS.Temporal;
+}
 
 const V_CFG = {
   bunny:   { lbl:'URL embed de Bunny.net',     ph:'https://iframe.mediadelivery.net/embed/LIBRARY_ID/VIDEO_ID', hint:'Dashboard Bunny.net → tu video → Embed URL.' },
@@ -779,7 +796,7 @@ function openForm(prop) {
   ['fDir','fUnidad','fBarrio','fPrecioTemp','fPrecioTrad','fAmb','fM2','fPlazo','fDesc','fVideo'].forEach(id => $(id).value = '');
   $('fTipo').value = 'Temporal';
   $('fEstado').value = 'Disponible';
-  $('fPlazo').value = '3 a 24 meses';
+  $('fPlazo').value = defaultPlazoForTipo('Temporal');
 
   if (prop) {
     $('formTitle').textContent = 'Editar propiedad';
@@ -793,7 +810,7 @@ function openForm(prop) {
     $('fAmb').value         = prop.ambientes || '';
     $('fM2').value          = prop.m2 || '';
     $('fEstado').value      = prop.estado || 'Disponible';
-    $('fPlazo').value       = prop.plazo || '3 a 24 meses';
+    $('fPlazo').value       = prop.plazo || defaultPlazoForTipo(prop.tipo || 'Temporal');
     $('fDesc').value        = prop.descripcion || '';
     $('fVideo').value       = prop.video_url || '';
     state.vType             = prop.video_tipo || 'bunny';
@@ -1051,6 +1068,11 @@ function togglePricesByTipo() {
   const t = $('fTipo').value;
   $('fgPrecioTemp').style.display = (t === 'Temporal' || t === 'Ambos') ? '' : 'none';
   $('fgPrecioTrad').style.display = (t === 'Tradicional' || t === 'Ambos') ? '' : 'none';
+  // Si el plazo está en un valor default, actualizarlo al default del nuevo tipo.
+  const curPlazo = $('fPlazo').value.trim();
+  if (DEFAULT_PLAZO_VALUES.has(curPlazo)) {
+    $('fPlazo').value = defaultPlazoForTipo(t);
+  }
 }
 
 // ════════════════════════════════════════════════════════════════════
@@ -1070,7 +1092,7 @@ function collectFormData() {
     precio_tradicional: (tipo === 'Tradicional' || tipo === 'Ambos') ? precioTrad : null,
     ambientes:    parseInt($('fAmb').value) || null,
     m2:           parseInt($('fM2').value) || null,
-    plazo:        $('fPlazo').value.trim() || '3 a 24 meses',
+    plazo:        $('fPlazo').value.trim() || defaultPlazoForTipo(tipo),
     estado:       $('fEstado').value,
     descripcion:  $('fDesc').value.trim() || null,
     video_url:    processVideoUrl($('fVideo').value, state.vType),
@@ -1366,7 +1388,7 @@ async function restoreDraftIntoForm(draft) {
   $('fAmb').value         = f.amb || '';
   $('fM2').value          = f.m2 || '';
   $('fEstado').value      = f.estado || 'Disponible';
-  $('fPlazo').value       = f.plazo || '3 a 24 meses';
+  $('fPlazo').value       = f.plazo || defaultPlazoForTipo(f.tipo || 'Temporal');
   $('fDesc').value        = f.desc || '';
   $('fVideo').value       = f.video || '';
   state.selAmenities    = new Map(draft.amenities || []);

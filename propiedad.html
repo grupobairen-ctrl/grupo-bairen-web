@@ -353,6 +353,41 @@ function fmtUSD(n) {
   return 'USD ' + Number(n).toLocaleString('es-AR');
 }
 
+// Devuelve {val, lbl} para la stat de plazo a partir del texto libre cargado en admin.
+// Soporta meses ("3-12 meses", "3 a 24 meses") y años ("A partir de 2 años", "2+ años").
+// Si el plazo tiene ambas unidades (caso "Ambos"), prioriza la parte en meses.
+function formatPlazoStat(plazo, isTemp, isTrad) {
+  if (!plazo) {
+    if (isTemp) return { val: '3–12', lbl: 'Meses' };
+    if (isTrad) return { val: '2+',   lbl: 'Años'  };
+    return { val: '3–12+', lbl: 'Meses' };
+  }
+  const hasMeses  = /meses?/i.test(plazo);
+  const hasAnios  = /a[ñn]os?/i.test(plazo);
+  const hasPartir = /partir/i.test(plazo);
+  const unit = (!hasMeses && hasAnios) ? 'Años' : 'Meses';
+  // Recortar al primer segmento que matchee la unidad elegida (para "Ambos")
+  let target = plazo;
+  if (unit === 'Meses' && hasMeses) {
+    const m = plazo.match(/(.+?meses?)/i);
+    if (m) target = m[1];
+  } else if (unit === 'Años' && hasAnios) {
+    const m = plazo.match(/(.+?a[ñn]os?)/i);
+    if (m) target = m[1];
+  }
+  let val = target
+    .replace(/a\s*partir\s*de\s*/gi, '')
+    .replace(/\s*a[ñn]os?\s*/gi, '')
+    .replace(/\s*meses?\s*/gi, '')
+    .replace(/\s+a\s+/gi, '–')
+    .replace(/-/g, '–')
+    .trim();
+  if (hasPartir && unit === 'Años' && !val.includes('+') && !val.includes('–')) {
+    val += '+';
+  }
+  return { val: val || (unit === 'Años' ? '2+' : '3–12'), lbl: unit };
+}
+
 // ════════════════════════════════════════════════════════════════════
 // VIDEO URL HANDLING
 // ════════════════════════════════════════════════════════════════════
@@ -499,12 +534,12 @@ function renderProperty(p) {
   const ambStr   = p.ambientes ? `${p.ambientes}` : '—';
   const m2Str    = p.m2 ? `${p.m2}` : '—';
   const unidStr  = p.unidad || '—';
-  const plazoSt  = isTemp ? '1–12' : (isTrad ? '12+' : '1–12+');
+  const { val: plazoSt, lbl: plazoLbl } = formatPlazoStat(p.plazo, isTemp, isTrad);
   $('statsRow').innerHTML = `
     <div class="stat"><div class="stat-val">${escapeHTML(m2Str)}</div><div class="stat-lbl">M²</div></div>
     <div class="stat"><div class="stat-val">${escapeHTML(unidStr)}</div><div class="stat-lbl">Unidad</div></div>
     <div class="stat"><div class="stat-val">${escapeHTML(ambStr)}</div><div class="stat-lbl">Ambientes</div></div>
-    <div class="stat"><div class="stat-val">${escapeHTML(plazoSt)}</div><div class="stat-lbl">Meses</div></div>
+    <div class="stat"><div class="stat-val">${escapeHTML(plazoSt)}</div><div class="stat-lbl">${escapeHTML(plazoLbl)}</div></div>
   `;
 
   // ─── DESCRIPCIÓN ───

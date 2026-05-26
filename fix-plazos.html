@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="robots" content="noindex, nofollow"/>
+<title>Actualizar plazos — Grupo Bairen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{--navy:#2A3A52;--gold:#C2A968;--gold-dark:#8A7547;--white:#FBFAF6;--off:#EEE5D0;--mid:#6B7589;--border:rgba(42,58,82,.12);--ok:#2a7a4b;--err:#b94a4a;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Jost',sans-serif;background:var(--off);color:var(--navy);padding:32px 20px;min-height:100vh;}
+.wrap{max-width:780px;margin:0 auto;}
+h1{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:500;margin-bottom:6px;}
+.sub{font-size:.85rem;color:var(--mid);margin-bottom:24px;}
+.card{background:var(--white);border:1px solid var(--border);padding:24px 28px;margin-bottom:18px;}
+.warn{background:rgba(237,200,45,.08);border-left:3px solid var(--gold);padding:14px 18px;font-size:.8rem;line-height:1.6;margin-bottom:20px;}
+.warn strong{color:var(--navy);}
+.warn ul{margin:8px 0 0 18px;}
+.btn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:var(--navy);border:none;padding:14px 28px;font-family:'Jost',sans-serif;font-size:.7rem;letter-spacing:.18em;font-weight:700;text-transform:uppercase;cursor:pointer;}
+.btn:hover{background:var(--gold-dark);color:var(--white);}
+.btn:disabled{background:rgba(42,58,82,.12);color:var(--mid);cursor:not-allowed;}
+.btn-skip{background:transparent;color:var(--mid);border:1px solid var(--border);padding:14px 22px;font-family:'Jost',sans-serif;font-size:.7rem;letter-spacing:.18em;font-weight:700;text-transform:uppercase;cursor:pointer;margin-left:10px;text-decoration:none;}
+.btn-skip:hover{background:var(--off);color:var(--navy);}
+.lbl{font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--mid);font-weight:600;margin-bottom:8px;}
+.log{background:#0d1622;color:#e4e7ec;padding:18px 22px;font-family:'SF Mono',Menlo,monospace;font-size:.78rem;line-height:1.7;max-height:520px;overflow-y:auto;white-space:pre-wrap;border:1px solid var(--border);}
+.log-row{padding:2px 0;}
+.log-row.ok{color:#9ae6b4;}
+.log-row.err{color:#fc8181;}
+.log-row.warn{color:#f6e05e;}
+.log-row.info{color:#90cdf4;}
+.log-row.head{color:#fff;font-weight:600;margin-top:8px;}
+.status{font-size:.85rem;color:var(--mid);margin-top:14px;}
+.summary{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+.stat{background:var(--off);padding:8px 14px;font-size:.7rem;}
+.stat b{font-size:1rem;color:var(--navy);margin-right:6px;font-family:'Playfair Display',serif;}
+.login-msg{padding:24px;background:rgba(185,74,74,.06);border:1px solid rgba(185,74,74,.2);text-align:center;}
+.login-msg a{color:var(--gold-dark);font-weight:700;text-decoration:underline;}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Actualizar plazos</h1>
+<p class="sub">Aplica los nuevos valores predeterminados de plazo a todas las propiedades existentes.</p>
+
+<div class="warn">
+  <strong>Qué hace:</strong> recorre todas las propiedades de Supabase y actualiza el campo <code>plazo</code> según el tipo de alquiler:
+  <ul>
+    <li><strong>Temporal</strong> → <code>3-12 meses</code></li>
+    <li><strong>Tradicional</strong> → <code>A partir de 2 años</code></li>
+    <li><strong>Ambos</strong> → <code>3-12 meses · 2+ años</code></li>
+  </ul>
+  Sobrescribe el plazo actual de cada propiedad (ya sea default viejo o custom). Idempotente: si lo corrés dos veces no cambia nada la segunda vez.
+</div>
+
+<div id="loginGate" class="card login-msg" style="display:none">
+  <p>Tenés que iniciar sesión primero en <a href="admin.html">admin.html</a>. Después volvé a esta página.</p>
+</div>
+
+<div id="mainPanel" class="card" style="display:none">
+  <div class="lbl">Estado</div>
+  <p id="userInfo" class="status"></p>
+  <div class="summary">
+    <div class="stat"><b id="statTotal">0</b>total</div>
+    <div class="stat"><b id="statOk">0</b>actualizadas</div>
+    <div class="stat"><b id="statSkip">0</b>sin cambio</div>
+    <div class="stat"><b id="statErr">0</b>errores</div>
+  </div>
+  <div style="margin-top:22px;">
+    <button class="btn" id="btnGo">▶ Actualizar plazos</button>
+    <a class="btn-skip" href="admin.html">← Volver al admin</a>
+  </div>
+</div>
+
+<div class="card" id="logCard" style="display:none">
+  <div class="lbl" style="margin-bottom:10px">Progreso</div>
+  <div class="log" id="log"></div>
+</div>
+
+</div>
+
+<script src="supabase-config.js"></script>
+<script>
+'use strict';
+
+const DEFAULT_PLAZOS = {
+  Temporal:    '3-12 meses',
+  Tradicional: 'A partir de 2 años',
+  Ambos:       '3-12 meses · 2+ años',
+};
+function defaultPlazoForTipo(tipo) {
+  return DEFAULT_PLAZOS[tipo] || DEFAULT_PLAZOS.Temporal;
+}
+
+let sb = null;
+let stats = { ok: 0, skip: 0, err: 0 };
+
+function $(id) { return document.getElementById(id); }
+
+function log(msg, cls) {
+  const row = document.createElement('div');
+  row.className = 'log-row ' + (cls || '');
+  row.textContent = msg;
+  const el = $('log');
+  el.appendChild(row);
+  el.scrollTop = el.scrollHeight;
+}
+
+function updateStats() {
+  $('statOk').textContent   = stats.ok;
+  $('statSkip').textContent = stats.skip;
+  $('statErr').textContent  = stats.err;
+}
+
+async function fixAll() {
+  $('btnGo').disabled = true;
+  $('logCard').style.display = '';
+  stats = { ok: 0, skip: 0, err: 0 };
+  updateStats();
+
+  log('Buscando propiedades...', 'info');
+  const { data: props, error } = await sb
+    .from('propiedades')
+    .select('id, dir, unidad, tipo, plazo')
+    .order('dir', { ascending: true });
+
+  if (error) {
+    log('Error al leer propiedades: ' + error.message, 'err');
+    return;
+  }
+  $('statTotal').textContent = props.length;
+  log(`Encontradas ${props.length} propiedades.`, 'info');
+
+  for (let i = 0; i < props.length; i++) {
+    const p = props[i];
+    const label = `${p.dir}${p.unidad ? ' ' + p.unidad : ''}`;
+    const nuevo = defaultPlazoForTipo(p.tipo);
+
+    if (p.plazo === nuevo) {
+      log(`  ↩ ${label} (${p.tipo}) — ya está en "${nuevo}"`, 'warn');
+      stats.skip++; updateStats();
+      continue;
+    }
+
+    const { error: upErr } = await sb
+      .from('propiedades')
+      .update({ plazo: nuevo })
+      .eq('id', p.id);
+
+    if (upErr) {
+      log(`  ✗ ${label}: ${upErr.message}`, 'err');
+      stats.err++; updateStats();
+      continue;
+    }
+
+    log(`  ✓ ${label} (${p.tipo}): "${p.plazo || '—'}" → "${nuevo}"`, 'ok');
+    stats.ok++; updateStats();
+  }
+
+  log('\nListo.', 'head');
+  $('btnGo').disabled = false;
+}
+
+async function boot() {
+  try {
+    sb = await window.bairenReady;
+  } catch (err) {
+    log('No se pudo iniciar Supabase: ' + err.message, 'err');
+    return;
+  }
+
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) {
+    $('loginGate').style.display = '';
+    return;
+  }
+
+  $('mainPanel').style.display = '';
+  $('userInfo').textContent = 'Conectado como ' + session.user.email;
+  $('btnGo').addEventListener('click', fixAll);
+}
+
+boot();
+</script>
+</body>
+</html>
