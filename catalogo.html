@@ -51,7 +51,7 @@ nav {
   position:fixed;inset:0 0 auto 0;z-index:1000;
   height:var(--nav-h);
   background:var(--navy-deeper);
-  border-bottom:2px solid var(--gold);
+  border-bottom:1px solid var(--gold);
   display:flex;align-items:center;justify-content:space-between;
   padding:0 28px;
   gap:12px;
@@ -71,7 +71,7 @@ nav {
   transition:background .22s,color .22s;white-space:nowrap;
   flex-shrink:0;
 }
-.nav-back:hover{background:var(--gold);color:var(--navy);}
+.nav-back:hover{background:var(--white);color:var(--navy);border-color:var(--white);}
 @media(max-width:700px){
   .nav-links{display:none;}
   nav{padding:0 20px;}
@@ -385,8 +385,8 @@ nav {
   font-size:.56rem;font-weight:700;letter-spacing:.2em;
   text-transform:uppercase;padding:5px 11px;
 }
-.tag-temporal{background:var(--gold);color:var(--navy);}
-.tag-tradicional{background:rgba(42,58,82,.9);color:var(--gold);border:1px solid rgba(194,169,104,.6);}
+.tag-temporal{background:var(--navy);color:var(--white);}
+.tag-tradicional{background:rgba(251,250,246,.92);color:var(--navy);border:1px solid rgba(42,58,82,.25);}
 .card-status{
   position:absolute;top:14px;right:14px;z-index:2;
   font-size:.54rem;font-weight:600;letter-spacing:.22em;

@@ -76,8 +76,8 @@ nav{height:64px;background:var(--navy-deeper);border-bottom:2px solid var(--gold
 .step-nav{display:flex;align-items:center;justify-content:space-between;margin-top:28px;}
 .btn-prev{font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.3);cursor:pointer;transition:color .2s;background:none;border:none;font-family:var(--font-body);padding:0;}
 .btn-prev:hover{color:rgba(255,255,255,.7);}
-.btn-next{font-size:.7rem;letter-spacing:.22em;text-transform:uppercase;font-weight:700;color:var(--navy);background:var(--gold);border:none;padding:15px 36px;cursor:pointer;transition:all .25s;font-family:var(--font-body);}
-.btn-next:hover{background:var(--gold-dark);}
+.btn-next{font-size:.7rem;letter-spacing:.22em;text-transform:uppercase;font-weight:700;color:var(--navy);background:var(--white);border:none;padding:15px 36px;cursor:pointer;transition:all .25s;font-family:var(--font-body);}
+.btn-next:hover{background:var(--off-white);}
 .btn-next:disabled{opacity:.3;cursor:not-allowed;}
 
 /* ── PANTALLA: REVISANDO ── */
@@ -101,12 +101,12 @@ nav{height:64px;background:var(--navy-deeper);border-bottom:2px solid var(--gold
 .ok-title{font-family:var(--font-display);font-size:clamp(1.6rem,4vw,2.2rem);font-weight:400;color:var(--white);margin-bottom:12px;line-height:1.2;}
 .ok-title em{font-style:italic;color:var(--gold-light);}
 .ok-sub{font-size:.88rem;color:rgba(255,255,255,.45);line-height:1.75;max-width:400px;margin:0 auto 36px;}
-.btn-calendly{display:inline-flex;align-items:center;gap:12px;background:var(--gold);color:var(--navy);font-family:var(--font-body);font-size:.72rem;letter-spacing:.22em;font-weight:700;text-transform:uppercase;padding:18px 44px;cursor:pointer;border:none;transition:background .25s;}
+.btn-calendly{display:inline-flex;align-items:center;gap:12px;background:var(--white);color:var(--navy);font-family:var(--font-body);font-size:.72rem;letter-spacing:.22em;font-weight:700;text-transform:uppercase;padding:18px 44px;cursor:pointer;border:none;transition:background .25s;}
 .btn-calendly svg{width:14px;height:14px;stroke:var(--navy);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
 .btn-calendly:disabled{background:rgba(194,169,104,.25);color:rgba(255,255,255,.4);cursor:not-allowed;}
 .btn-calendly:disabled svg{stroke:rgba(255,255,255,.4);}
 @media(hover:hover) and (pointer:fine){
-  .btn-calendly:hover:not(:disabled){background:var(--gold-dark);transform:translateY(-2px);box-shadow:0 12px 40px rgba(194,169,104,.18);}
+  .btn-calendly:hover:not(:disabled){background:var(--off-white);transform:translateY(-2px);box-shadow:0 12px 40px rgba(0,0,0,.28);}
 }
 /* CONTACTO (form en pantalla califica) */
 .contact-form{display:flex;flex-direction:column;gap:14px;max-width:440px;margin:0 auto 28px;text-align:left;}

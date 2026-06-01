@@ -144,7 +144,7 @@
     .dest-card{background:#FFFFFF;border:1px solid rgba(42,58,82,.08);cursor:pointer;transition:transform .25s var(--ease),box-shadow .25s var(--ease);display:flex;flex-direction:column;text-decoration:none;color:inherit;overflow:hidden;}
     .dest-card:hover{transform:translateY(-4px);box-shadow:0 22px 48px rgba(19,29,45,.22),0 6px 14px rgba(138,117,71,.08);}
     .dest-img{aspect-ratio:4/3;background:var(--navy);background-size:cover;background-position:center;position:relative;}
-    .dest-tag{position:absolute;top:14px;left:14px;background:var(--gold);color:var(--navy);font-size:.55rem;letter-spacing:.18em;font-weight:700;padding:4px 11px;text-transform:uppercase;}
+    .dest-tag{position:absolute;top:14px;left:14px;background:var(--navy);color:var(--white);font-size:.55rem;letter-spacing:.18em;font-weight:700;padding:4px 11px;text-transform:uppercase;}
     .dest-status{position:absolute;top:14px;right:14px;background:rgba(255,255,255,.85);color:var(--gold-dark);font-size:.52rem;letter-spacing:.22em;font-weight:600;padding:5px 10px;text-transform:uppercase;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
     .dest-status.res{background:rgba(42,58,82,.7);color:rgba(255,255,255,.85);}
     .dest-body{padding:20px 22px;flex:1;display:flex;flex-direction:column;}
@@ -165,13 +165,13 @@
       *{animation-duration:.01ms!important;animation-iteration-count:1!important;}
     }
 
-    .navbar{position:fixed;inset:0 0 auto 0;z-index:1000;height:64px;background:var(--navy-deeper);border-bottom:2px solid var(--gold);display:flex;align-items:center;justify-content:space-between;padding:0 24px;gap:16px;}
+    .navbar{position:fixed;inset:0 0 auto 0;z-index:1000;height:64px;background:var(--navy-deeper);border-bottom:1px solid var(--gold);display:flex;align-items:center;justify-content:space-between;padding:0 24px;gap:16px;}
     .nav-logo{display:flex;align-items:center;white-space:nowrap;}
     .nav-links{display:none;align-items:center;gap:28px;}
     .nav-links a{font-size:.7rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.65);transition:color .25s;}
     .nav-links a:hover{color:var(--gold);}
-    .nav-cta-desk{display:none;font-size:.68rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--navy);background:var(--gold);padding:9px 22px;white-space:nowrap;transition:background .25s;}
-    .nav-cta-desk:hover{background:var(--gold-dark);}
+    .nav-cta-desk{display:none;font-size:.68rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-light);background:transparent;border:1px solid rgba(194,169,104,.5);padding:8px 21px;white-space:nowrap;transition:background .25s,color .25s,border-color .25s;}
+    .nav-cta-desk:hover{background:var(--white);color:var(--navy);border-color:var(--white);}
     .burger{display:flex;flex-direction:column;gap:5px;cursor:pointer;padding:5px;flex-shrink:0;background:none;border:none;}
     .burger span{display:block;width:23px;height:1.5px;background:var(--white);transition:transform .3s,opacity .3s;}
     .burger.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg);}
@@ -187,15 +187,19 @@
     .mobile-menu a:last-child{border-bottom:none;}
     @media(min-width:701px){.burger{display:none;}.nav-links{display:flex;}.nav-cta-desk{display:block;}}
 
-    .btn-gold{display:inline-flex;align-items:center;gap:12px;background:var(--gold);color:var(--navy);font-family:var(--font-body);font-size:.7rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;padding:17px 36px;border:none;cursor:pointer;transition:background .3s,box-shadow .25s;text-decoration:none;white-space:nowrap;}
-    .btn-gold svg{width:14px;height:14px;stroke:var(--navy);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .3s;}
+    .btn-gold{display:inline-flex;align-items:center;gap:12px;background:var(--navy);color:var(--white);font-family:var(--font-body);font-size:.7rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;padding:17px 36px;border:none;cursor:pointer;transition:background .3s,box-shadow .25s;text-decoration:none;white-space:nowrap;}
+    .btn-gold svg{width:14px;height:14px;stroke:var(--gold);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .3s;}
     @media(hover:hover) and (pointer:fine){
       .btn-gold{transition:background .3s,transform .25s,box-shadow .25s;}
-      .btn-gold:hover{background:var(--gold-dark);transform:translateY(-2px);box-shadow:0 12px 40px rgba(194,169,104,.22);}
+      .btn-gold:hover{background:var(--navy-dark);transform:translateY(-2px);box-shadow:0 12px 40px rgba(19,29,45,.28);}
       .btn-gold:hover svg{transform:translateX(4px);}
     }
     .btn-gold:active{transform:scale(0.97);}
     @media(max-width:700px){.btn-gold{padding:20px 32px;width:100%;justify-content:center;}}
+    /* CTA sobre superficie oscura (hero): relleno crema, texto navy, flecha oro */
+    .hero .btn-gold{background:var(--white);color:var(--navy);}
+    .hero .btn-gold svg{stroke:var(--gold-dark);}
+    @media(hover:hover) and (pointer:fine){.hero .btn-gold:hover{background:var(--off-white);box-shadow:0 12px 40px rgba(0,0,0,.32);}}
 
     .hero{min-height:100svh;display:flex;align-items:flex-end;position:relative;background:var(--navy-deeper);overflow:hidden;isolation:isolate;}
     .hero-bg{position:absolute;inset:0;overflow:hidden;background:var(--navy-deeper);}
@@ -383,7 +387,7 @@
       border:1px solid rgba(138,117,71,.32);
       transition:background .55s var(--ease),border-color .55s var(--ease);
     }
-    .step.visible .step-icon-wrap{background:var(--gold);border-color:var(--gold);}
+    .step.visible .step-icon-wrap{background:var(--navy);border-color:var(--navy);}
     .step-icon-wrap svg{width:26px;height:26px;color:var(--gold-dark);transition:color .55s var(--ease);}
     .step.visible .step-icon-wrap svg{color:var(--white);}
     .step-num-tag{
@@ -509,7 +513,7 @@
     </video>
   </div>
   <div class="hero-content">
-    <span class="hero-eyebrow">Buenos Aires · Inmobiliaria boutique</span>
+    <span class="hero-eyebrow">Buenos Aires · Curaduría residencial</span>
     <h1 class="hero-title">El departamento que querés.</h1>
     <span class="hero-tag">Sin garantía. Sin caución.</span>
     <div class="hero-rule"></div>
@@ -640,7 +644,7 @@
     <div>
       <div><img src="bairen_logo.png?v=2" alt="Grupo Bairen" style="height:40px;width:auto;opacity:.85;margin-bottom:8px;"></div>
       <div class="ft-brand-rule"></div>
-      <p class="ft-brand-tag">La inmobiliaria digital premium de Buenos Aires. Alquileres en CABA y GBA Norte.</p>
+      <p class="ft-brand-tag">Curaduría residencial en Buenos Aires. Alquileres en CABA y GBA Norte.</p>
     </div>
     <div class="ft-col">
       <div class="ft-col-ttl">Alquileres</div>
