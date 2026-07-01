@@ -519,7 +519,7 @@ function renderProperty(p) {
     $('heroPrice').textContent = priceTradStr;
     $('heroPriceMo').textContent = 'por mes';
     $('acPrice').textContent = priceTradStr;
-    $('acPriceMo').textContent = 'por mes · sin garantía';
+    $('acPriceMo').textContent = 'por mes';
   }
 
   // ─── GALLERY STRIP ───
@@ -587,7 +587,7 @@ function renderActionCard(p, titleFull, unidadLbl, reservado, isTemp, isTrad) {
   rows.push({ l:'Plazo',     v: p.plazo || '3 a 24 meses' });
   if (isTemp || p.tipo === 'Ambos') rows.push({ l:'Servicios', v: 'Todos incluidos' });
   else if (isTrad) rows.push({ l:'Servicios', v: 'A cargo del inquilino' });
-  rows.push({ l:'Garantía',  v: 'No requerida' });
+  rows.push({ l:'Garantía',  v: isTrad ? 'Gtía CABA / Seguro de Caución' : 'No requerida' });
   rows.push({ l:'Estado',    v: p.estado, color: reservado ? '#b94a4a' : '#2a7a4b' });
 
   let html = rows.map(r =>
