@@ -224,8 +224,9 @@
     .preview-wrap{overflow:visible;max-height:none;padding:0;display:block;background:none;}
     .ficha{width:100%;max-width:100%;box-shadow:none;}
     *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-    .mapbox{display:none !important;}
-    .gal img,.specs .s,.view,.numbers,.ffoot,.amn{page-break-inside:avoid;break-inside:avoid;}
+    html,body{background:var(--navy-deep) !important;}
+    .mapbox a.cover{display:none;}
+    .gal img,.specs .s,.view,.numbers,.ffoot,.amn,.mapbox{page-break-inside:avoid;break-inside:avoid;}
   }
 </style>
 </head>
@@ -698,8 +699,8 @@
       if(mb){
         var hl={es:"es",pt:"pt",en:"en"}[S.lang]||"es";
         var ifr=document.createElement("iframe");
-        ifr.src="https://www.google.com/maps?q="+encodeURIComponent(mapAddr)+"&output=embed&z=16&hl="+hl;
-        ifr.loading="lazy"; ifr.referrerPolicy="no-referrer-when-downgrade";
+        ifr.src="https://www.google.com/maps?q="+encodeURIComponent(mapAddr)+"&z=16&iwloc=&output=embed&hl="+hl;
+        ifr.referrerPolicy="no-referrer-when-downgrade";
         mb.appendChild(ifr);
         var cov=document.createElement("a");
         cov.className="cover"; cov.href=mapURL; cov.target="_blank"; cov.rel="noopener";
