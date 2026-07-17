@@ -348,7 +348,7 @@
       '<img src="'+LOGO_WM+'" alt="Grupo Bairen" style="height:'+wmPx+'px;width:auto;display:block;">'+
       '</div>';
   }
-  document.getElementById('logoTop').innerHTML = logoBlock(44,34);
+  document.getElementById('logoTop').innerHTML = logoBlock(44,26);
 
   /* ============ ICONOS DE AMENITIES ============ */
   var IC = {
@@ -651,7 +651,7 @@
       '<div class="disc">'+t.disc+'</div>';
 
     /* imagenes por DOM (nunca por string: es la garantía anti-bug) */
-    document.getElementById("fLogo").innerHTML=logoBlock(36,30);
+    document.getElementById("fLogo").innerHTML=logoBlock(36,23);
     if(S.fotos[0]){
       var h=document.getElementById("fHero");
       h.style.backgroundImage="url("+S.fotos[0]+")"; h.innerHTML="";
