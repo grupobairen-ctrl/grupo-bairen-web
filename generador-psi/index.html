@@ -192,9 +192,10 @@
   .proscons li{font-size:.82rem;color:#3A4459;padding:4px 0 4px 16px;position:relative;line-height:1.5;overflow-wrap:break-word;}
   .proscons li::before{content:"";position:absolute;left:0;top:11px;width:6px;height:6px;border:1px solid var(--gold);transform:rotate(45deg);}
 
-  .mapbox{position:relative;aspect-ratio:16/7;border:1px solid var(--line);margin-bottom:12px;overflow:hidden;background:#E9E4D8;}
-  .mapbox iframe{width:100%;height:100%;border:0;display:block;pointer-events:none;}
-  .mapbox a.cover{position:absolute;inset:0;z-index:2;}
+  .mapbox{position:relative;aspect-ratio:16/7;border:1px solid var(--line);margin-bottom:12px;overflow:hidden;background:#EDEAE0;}
+  .mapbox img{width:100%;height:100%;object-fit:cover;display:block;}
+  .mapbox a.cover{display:block;width:100%;height:100%;}
+  .maploading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--faint);font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;}
   .maplink{font-size:.78rem;color:var(--gold-dark);letter-spacing:.05em;text-decoration:none;border-bottom:1px solid var(--gold-light);}
 
   .numbers{background:var(--navy-deep);color:var(--white);padding:26px 44px;}
@@ -224,7 +225,6 @@
     .preview-wrap{padding:0;display:block;background:none;}
     .ficha{width:100%;max-width:100%;box-shadow:none;}
     *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-    .mapbox a.cover{display:none;}
     .pg{page-break-after:auto;page-break-inside:auto;}
   }
 </style>
@@ -393,7 +393,7 @@
       price:"Precio",pricem2:"Precio por m²",yield:"Rentab. est.",area:"Superficie",
       prop:"La propiedad",features:"Características",amenities:"Amenities",
       view:"La mirada del asesor",pros:"A favor",cons:"A tener en cuenta",
-      gallery:"Galería",location:"Ubicación",mapLink:"Ver en Google Maps",
+      gallery:"Galería",location:"Ubicación",mapLink:"Ver en Google Maps",mapLoading:"Generando mapa",
       numbers:"Los números de la inversión",
       rooms:"Ambientes",beds:"Dormitorios",baths:"Baños",parking:"Cochera",
       condition:"Estado",fees:"Expensas",delivery:"Entrega",rent:"Renta mensual est.",
@@ -407,7 +407,7 @@
       price:"Preço",pricem2:"Preço por m²",yield:"Rentab. est.",area:"Área",
       prop:"O imóvel",features:"Características",amenities:"Amenities",
       view:"A visão do assessor",pros:"A favor",cons:"A considerar",
-      gallery:"Galeria",location:"Localização",mapLink:"Ver no Google Maps",
+      gallery:"Galeria",location:"Localização",mapLink:"Ver no Google Maps",mapLoading:"Gerando mapa",
       numbers:"Os números do investimento",
       rooms:"Ambientes",beds:"Quartos",baths:"Banheiros",parking:"Garagem",
       condition:"Estado",fees:"Condomínio",delivery:"Entrega",rent:"Aluguel mensal est.",
@@ -421,7 +421,7 @@
       price:"Price",pricem2:"Price per m²",yield:"Est. yield",area:"Area",
       prop:"The property",features:"Features",amenities:"Amenities",
       view:"The advisor's view",pros:"Pros",cons:"To consider",
-      gallery:"Gallery",location:"Location",mapLink:"View on Google Maps",
+      gallery:"Gallery",location:"Location",mapLink:"View on Google Maps",mapLoading:"Generating map",
       numbers:"The investment numbers",
       rooms:"Rooms",beds:"Bedrooms",baths:"Bathrooms",parking:"Parking",
       condition:"Condition",fees:"HOA fees",delivery:"Delivery",rent:"Est. monthly rent",
@@ -439,7 +439,7 @@
     ambientes:"",dormitorios:"",banos:"",m2cub:"",m2tot:"",cochera:false,
     precio:"",expensas:"",renta:"",
     amenSel:[], amenCustom:[],
-    fotos:[],
+    fotos:[], mapImg:"", mapKey:"", mapLoading:false,
     descripcion:"",tesis:"",pros:"",contras:"", desarrolladora:"",trayectoria:"",
     asesor:"Alejandro",fecha:"",tel:"",mail:"contacto@bairengroup.com"
   };
@@ -452,10 +452,11 @@
   /* ============ BINDINGS ============ */
   var FIELDS=["dir","unidad","barrio","ciudad","estado","entrega","ambientes","dormitorios","banos","m2cub","m2tot",
     "precio","expensas","renta","descripcion","tesis","pros","contras","desarrolladora","trayectoria","asesor","fecha","tel","mail"];
+  var ADDR_FIELDS={dir:1,barrio:1,ciudad:1};
   FIELDS.forEach(function(k){
     var el=$(k); if(!el) return;
-    el.addEventListener("input", function(){ S[k]=el.value; render(); });
-    el.addEventListener("change", function(){ S[k]=el.value; render(); });
+    el.addEventListener("input", function(){ S[k]=el.value; render(); if(ADDR_FIELDS[k]) scheduleMap(); });
+    el.addEventListener("change", function(){ S[k]=el.value; render(); if(ADDR_FIELDS[k]) scheduleMap(); });
   });
   $("cochera").addEventListener("change", function(){ S.cochera=this.checked; render(); });
 
@@ -562,19 +563,25 @@
 
   /* ============ ACCIONES ============ */
   $("btnPdf").addEventListener("click", function(){
-    /* pagina unica: el PDF mide exactamente lo que mide la ficha en la vista previa */
-    var f=$("ficha");
-    var MM=0.2645833; /* px a mm (96 dpi) */
-    var w=Math.ceil(f.offsetWidth*MM), h=Math.ceil(f.scrollHeight*MM)+3; /* holgura anti-desborde */
-    $("pagesize").textContent="@page{size:"+w+"mm "+h+"mm;margin:0;}";
-    var prev=document.title;
-    document.title=(S.dir?S.dir+(S.unidad?" "+S.unidad:"")+" · ":"")+"Ficha PSI · Grupo Bairen";
-    window.print();
-    document.title=prev;
+    if(S.dir && !S.mapImg && S.mapLoading){ toast("Generando el mapa, probá de nuevo en un segundo"); return; }
+    function go(){
+      /* pagina unica: el PDF mide exactamente lo que mide la ficha en la vista previa */
+      var f=$("ficha");
+      var MM=0.2645833; /* px a mm (96 dpi) */
+      var w=Math.ceil(f.offsetWidth*MM), h=Math.ceil(f.scrollHeight*MM)+4; /* holgura anti-desborde */
+      $("pagesize").textContent="@page{size:"+w+"mm "+h+"mm;margin:0;}";
+      var prev=document.title;
+      document.title=(S.dir?S.dir+(S.unidad?" "+S.unidad:"")+" · ":"")+"Ficha PSI · Grupo Bairen";
+      window.print();
+      document.title=prev;
+    }
+    /* medir recien cuando las fuentes cargaron: evita reflow y garantiza una sola pagina */
+    if(document.fonts && document.fonts.ready && document.fonts.ready.then){ document.fonts.ready.then(go); } else { go(); }
   });
   $("btnSave").addEventListener("click", function(){
     try{
-      var copy={}; Object.keys(S).forEach(function(k){ if(k!=="fotos") copy[k]=S[k]; });
+      var skip={fotos:1,mapImg:1,mapKey:1,mapLoading:1};
+      var copy={}; Object.keys(S).forEach(function(k){ if(!skip[k]) copy[k]=S[k]; });
       localStorage.setItem("psi_ficha_v2", JSON.stringify(copy));
       toast("Borrador guardado");
     }catch(e){ toast("No se pudo guardar"); }
@@ -591,6 +598,38 @@
       $("cochera").checked=!!S.cochera;
       document.querySelectorAll("#langpick .flagbtn").forEach(function(x){ x.classList.toggle("on", x.dataset.l===S.lang); });
     }catch(e){}
+  }
+
+  /* ============ MAPA ESTATICO (Geoapify: imagen fija, imprime perfecto) ============ */
+  var GEOAPIFY_KEY="77aeb1a30a6c486aa052850313d6c5df";
+  function staticMapURL(lat,lon){
+    return "https://maps.geoapify.com/v1/staticmap"+
+      "?style=osm-bright-grey&width=800&height=360&scaleFactor=2"+
+      "&center=lonlat:"+lon+","+lat+"&zoom=16"+
+      "&marker=lonlat:"+lon+","+lat+";type:material;color:%232a3a52;size:large;icon:home;iconsize:small;whitecircle:no"+
+      "&apiKey="+GEOAPIFY_KEY;
+  }
+  var mapTimer=null;
+  function scheduleMap(){ clearTimeout(mapTimer); mapTimer=setTimeout(updateMap,700); }
+  function updateMap(){
+    var addr=[S.dir,S.barrio,S.ciudad,"Argentina"].filter(Boolean).join(", ");
+    if(!S.dir){ if(S.mapImg||S.mapKey){ S.mapImg=""; S.mapKey=""; S.mapLoading=false; render(); } return; }
+    if(S.mapKey===addr && S.mapImg) return;          /* ya generado para esta direccion */
+    if(!GEOAPIFY_KEY || GEOAPIFY_KEY.indexOf("__")===0) return; /* sin key aun */
+    S.mapKey=addr; S.mapLoading=true; S.mapImg=""; render();
+    var mine=addr;
+    fetch("https://api.geoapify.com/v1/geocode/search?text="+encodeURIComponent(addr)+"&format=json&limit=1&apiKey="+GEOAPIFY_KEY)
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if(mine!==S.mapKey) return;
+        var g=d&&d.results&&d.results[0];
+        if(!g){ S.mapLoading=false; S.mapImg=""; render(); return; }
+        return fetch(staticMapURL(g.lat,g.lon))
+          .then(function(r){ if(!r.ok) throw new Error("map"); return r.blob(); })
+          .then(function(b){ return new Promise(function(res,rej){ var fr=new FileReader(); fr.onload=function(){res(fr.result);}; fr.onerror=rej; fr.readAsDataURL(b); }); })
+          .then(function(dataUrl){ if(mine!==S.mapKey) return; S.mapImg=dataUrl; S.mapLoading=false; render(); });
+      })
+      .catch(function(){ if(mine===S.mapKey){ S.mapLoading=false; render(); } });
   }
 
   /* ============ RENDER DE LA FICHA ============ */
@@ -648,7 +687,7 @@
     var mapAddr=[S.dir,S.barrio,S.ciudad,"Argentina"].filter(Boolean).join(", ");
     var mapURL="https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(mapAddr);
     var loc=S.dir?'<div class="sec"><div class="sec-t">'+t.location+'</div>'+
-      '<div class="mapbox" id="fMapBox"></div>'+
+      '<div class="mapbox" id="fMapBox">'+((!S.mapImg&&S.mapLoading)?'<div class="maploading">'+t.mapLoading+'</div>':'')+'</div>'+
       '<p style="margin-bottom:7px">'+esc(mapAddr)+'</p>'+
       '<a class="maplink" href="'+mapURL+'" target="_blank" rel="noopener">'+t.mapLink+' →</a>'+
       '</div>':"";
@@ -716,24 +755,19 @@
         g.appendChild(im);
       }
     });
-    /* mapa automatico desde la direccion (mismo embed que la web) */
-    if(S.dir){
+    /* mapa estatico embebido (imagen, imprime perfecto y es clickeable) */
+    if(S.mapImg){
       var mb=document.getElementById("fMapBox");
       if(mb){
-        var hl={es:"es",pt:"pt",en:"en"}[S.lang]||"es";
-        var ifr=document.createElement("iframe");
-        ifr.src="https://www.google.com/maps?q="+encodeURIComponent(mapAddr)+"&z=16&iwloc=&output=embed&hl="+hl;
-        ifr.referrerPolicy="no-referrer-when-downgrade";
-        mb.appendChild(ifr);
-        var cov=document.createElement("a");
-        cov.className="cover"; cov.href=mapURL; cov.target="_blank"; cov.rel="noopener";
-        cov.setAttribute("aria-label", t.mapLink);
-        mb.appendChild(cov);
+        var a=document.createElement("a");
+        a.className="cover"; a.href=mapURL; a.target="_blank"; a.rel="noopener"; a.setAttribute("aria-label",t.mapLink);
+        var im=document.createElement("img"); im.src=S.mapImg; im.alt="";
+        a.appendChild(im); mb.appendChild(a);
       }
     }
   }
 
-  loadDraft(); buildAmenGrid(); renderChips(); renderThumbs(); render();
+  loadDraft(); buildAmenGrid(); renderChips(); renderThumbs(); render(); updateMap();
 })();
 </script>
 
