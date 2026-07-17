@@ -37,8 +37,6 @@
   .btn{border:1px solid rgba(194,169,104,.5);background:transparent;color:var(--gold-light);font-size:.62rem;font-weight:600;
     letter-spacing:.14em;text-transform:uppercase;padding:10px 16px;cursor:pointer;transition:background .25s,color .25s,transform .25s;white-space:nowrap;}
   .btn:hover{background:var(--white);color:var(--navy);}
-  .btn.primary{background:var(--gold);color:var(--navy-deep);border-color:var(--gold);}
-  .btn.primary:hover{background:var(--gold-light);transform:translateY(-1px);}
   @media(max-width:760px){.app-title{display:none;}}
 
   .controls{background:var(--paper);border-bottom:1px solid var(--line);padding:18px 20px;}
@@ -47,7 +45,7 @@
   .fld label{font-size:.6rem;font-weight:600;letter-spacing:.14em;color:var(--gold-dark);text-transform:uppercase;}
   .fld select,.fld input{border:1px solid var(--line);background:var(--paper);padding:9px 11px;font-size:.85rem;font-weight:300;min-width:150px;}
   .fld select:focus,.fld input:focus{outline:none;border-color:var(--gold);}
-  .seed{flex:1 1 220px;}
+  .seed{flex:1 1 260px;}
   .seed input{width:100%;min-width:0;}
   .actions2{display:flex;gap:9px;flex-wrap:wrap;}
   .gen{border:1px solid var(--navy);background:var(--navy);color:#fff;padding:11px 22px;cursor:pointer;
@@ -55,11 +53,11 @@
   .gen:hover{background:var(--navy-dark);transform:translateY(-1px);}
   .gen.week{background:transparent;color:var(--navy);border-color:var(--gold-dark);}
   .gen.week:hover{background:var(--gold-pale);}
+  .bankinfo{font-size:.66rem;color:var(--faint);letter-spacing:.06em;width:100%;}
 
   .main{max-width:1100px;margin:0 auto;padding:28px 20px 100px;}
-  .hint{text-align:center;color:var(--faint);font-size:.85rem;padding:60px 20px;max-width:52ch;margin:0 auto;}
+  .hint{text-align:center;color:var(--faint);font-size:.85rem;padding:60px 20px;max-width:54ch;margin:0 auto;}
   .hint b{font-family:var(--disp);display:block;font-size:1.4rem;color:var(--navy);font-weight:500;margin-bottom:10px;}
-
   .weekttl{font-family:var(--disp);font-weight:500;font-size:1.3rem;color:var(--navy);margin:6px 0 4px;}
   .weeksub{font-size:.8rem;color:var(--mid);margin-bottom:18px;}
 
@@ -70,7 +68,10 @@
   .tag{font-size:.56rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;border:1px solid var(--line);color:var(--mid);}
   .tag.f{background:var(--navy);border-color:var(--navy);color:#fff;}
   .tag.p{background:var(--gold-pale);border-color:var(--line);color:var(--gold-dark);}
+  .tag.mata{background:var(--gold-pale);border-color:var(--gold);color:var(--gold-dark);}
+  .tag.day{background:var(--gold);border-color:var(--gold);color:var(--navy-deep);}
   .card h3{font-family:var(--disp);font-weight:500;font-size:1.14rem;line-height:1.25;color:var(--navy-dark);}
+  .unidad-l{font-size:.72rem;color:var(--gold-dark);letter-spacing:.06em;font-weight:500;}
   .hook{border-left:2px solid var(--gold);padding:2px 0 2px 14px;}
   .hook .hl{font-size:.56rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-dark);font-weight:600;display:block;margin-bottom:3px;}
   .hook q{font-family:var(--disp);font-style:italic;font-size:.98rem;color:var(--ink);quotes:none;line-height:1.4;}
@@ -119,20 +120,21 @@
     <div class="fld"><label for="fAud">Audiencia</label>
       <select id="fAud"><option value="">Todas</option><option value="inquilino">Inquilino</option><option value="propietario">Propietario</option><option value="inversor">Inversor</option><option value="padres">Padres del interior</option></select></div>
     <div class="fld"><label for="fPilar">Pilar</label>
-      <select id="fPilar"><option value="">Todos</option><option value="unidad">Unidad</option><option value="confianza">Confianza</option><option value="educativo">Educativo</option><option value="barrio">Barrio</option><option value="detras">Detrás de escena</option></select></div>
-    <div class="fld seed"><label for="seedUnidad">Unidad de la semana (opcional: dirección, barrio, feature)</label>
-      <input id="seedUnidad" placeholder="Gallo 1210, Recoleta, patio propio techado"></div>
+      <select id="fPilar"><option value="">Todos</option><option value="unidad">Unidad</option><option value="confianza">Confianza</option><option value="educativo">Educativo</option><option value="barrio">Barrio</option><option value="detras">Detrás de escena</option><option value="marca">Marca</option></select></div>
+    <div class="fld seed"><label for="seedUnidad">Unidad de la semana (dirección, barrio, feature)</label>
+      <input id="seedUnidad" placeholder="Austria 1938, Recoleta, terraza propia"></div>
     <div class="actions2">
       <button class="gen" id="btnGen" type="button">Generar 3 ideas</button>
       <button class="gen week" id="btnWeek" type="button">Armar semana completa</button>
     </div>
+    <div class="bankinfo" id="bankinfo"></div>
   </div>
 </div>
 
 <main class="main">
   <div id="weekhead"></div>
   <div class="grid" id="grid"></div>
-  <div class="hint" id="hint"><b>Ideas listas para producir</b>Elegí filtros o directamente tocá Generar. Cada idea sale con hook, estructura, CTA y el porqué. Con Copiar brief la pegás directo en la card de Notion.</div>
+  <div class="hint" id="hint"><b>Ideas listas para producir</b>Elegí filtros o directamente tocá Generar. Cada idea sale con hook, estructura, CTA y el porqué. Cargá la unidad de la semana y las ideas se arman con ella. Con Copiar brief la pegás directo en la card de Notion.</div>
   <div id="savedwrap"></div>
 </main>
 
@@ -155,71 +157,152 @@
     todos:["Comentá INFO y te paso todo por privado."]
   };
   var FNAME={reel:"Reel recorrido",camara:"Tomás a cámara",carrusel:"Carrusel",post:"Post informativo",historia:"Historia"};
-  var PNAME={unidad:"Unidad",confianza:"Confianza",educativo:"Educativo",barrio:"Barrio",detras:"Detrás de escena"};
+  var PNAME={unidad:"Unidad",confianza:"Confianza",educativo:"Educativo",barrio:"Barrio",detras:"Detrás de escena",marca:"Marca"};
   var ANAME={inquilino:"Inquilino",propietario:"Propietario",inversor:"Inversor",padres:"Padres del interior",todos:"General"};
 
-  /* ================= MOTOR DE IDEAS =================
-     Cada plantilla: f formato, a audiencia, p pilar,
-     t titulo, h hook (0-3s), b beats, w por que funciona. */
+  /* ================= BANCO DE IDEAS =================
+     f formato · a audiencia · p pilar · t titulo · h hook 0-3s · b beats · w por que funciona.
+     Camara = Metodo Mata: el hook es el Gancho; beats = Promesa, Autoridad, Valor, CTA visual. */
   var T=[
-    /* ---- REEL RECORRIDO · UNIDAD ---- */
-    {f:"reel",a:"inquilino",p:"unidad",t:"Speed tour: la unidad en 5 cortes",h:"{feature} en {barrio}. El resto del departamento sigue así.",b:["Abrir con el mejor ambiente, 2 segundos, sin intro","5 a 7 cortes de 2 segundos, cada uno un ambiente","Sobreimpresos cortos: ambiente y un dato (m², luz, piso)","Cierre en el segundo mejor plano, no en la puerta"],w:"El mejor plano primero compra los 3 segundos que deciden la distribución."},
-    {f:"reel",a:"inquilino",p:"unidad",t:"Price reveal: qué alquila {precio} en {barrio}",h:"Esto es lo que {precio} por mes alquila en {barrio}.",b:["Placa de apertura con el precio, 1.5 segundos","Recorrido rápido con sobreimpresos de lo que incluye","En temporal: remarcar todo incluido (expensas, servicios, muebles)","Placa final con el precio de nuevo y el CTA"],w:"El anclaje de precio genera debate en comentarios y el algoritmo premia la conversación."},
-    {f:"reel",a:"inquilino",p:"unidad",t:"POV: entrar por primera vez",h:"POV: llegás con las valijas y el departamento ya está listo.",b:["Cámara en primera persona desde la puerta","Recorrido continuo sin cortes bruscos, ritmo de caminata","Detalles al pasar: llaves, luz, la cama hecha, la vista","Texto final: sin garantía, sin caución, todo incluido"],w:"El POV mete al espectador adentro: no mira un departamento, se muda."},
-    {f:"reel",a:"inquilino",p:"unidad",t:"El detalle que nadie nota",h:"Casi nadie nota este detalle cuando entra a esta unidad.",b:["Abrir con un plano cerrado del detalle sin revelarlo entero","Recorrer la unidad normal, 3 o 4 cortes","Volver al detalle y revelarlo con sobreimpreso","Cerrar con el dato de la unidad y CTA"],w:"Bucle abierto: la promesa del comienzo obliga a quedarse hasta el final."},
-    {f:"reel",a:"inquilino",p:"unidad",t:"3 razones para esta unidad",h:"Tres razones por las que esta unidad no llega a fin de mes libre.",b:["Razón 1: la zona (qué hay a dos cuadras)","Razón 2: el edificio (amenities, seguridad)","Razón 3: la unidad (el feature estrella)","Urgencia real: día de visitas de esta semana"],w:"La lista numerada estructura la retención: el que ve la 1 quiere ver la 3."},
-    {f:"reel",a:"todos",p:"unidad",t:"Un día viviendo acá",h:"Así se ve un martes cualquiera viviendo en {barrio}.",b:["Mañana: luz del living, café en el balcón","Mediodía: lo que queda a 5 minutos caminando","Tarde: amenities (pileta, gym, sum)","Noche: la vista. Placa de cierre con la unidad"],w:"No vende metros: vende el estilo de vida, que es lo que se comparte."},
-    {f:"reel",a:"inversor",p:"unidad",t:"La cuenta del inversor",h:"Este departamento paga {precio} por mes de renta. La cuenta, abajo.",b:["Plano del ambiente principal con placa del precio de compra","Sobreimpresos: renta mensual, rentabilidad anual estimada","2 cortes de la unidad y 1 de la zona","Cierre: representamos al comprador, no al vendedor"],w:"Los números concretos frenan el scroll del que piensa en invertir."},
+  /* ============ REEL · UNIDAD ============ */
+  {f:"reel",a:"inquilino",p:"unidad",t:"Speed tour en 5 cortes",h:"{feature} en {barrio}. El resto sigue así.",b:["Abrir con el mejor ambiente, 2 segundos, sin intro","5 a 7 cortes de 2 segundos, uno por ambiente","Sobreimpresos: ambiente y un dato (m², luz, piso)","Cerrar en el segundo mejor plano, nunca en la puerta"],w:"El mejor plano primero compra los 3 segundos que deciden la distribución."},
+  {f:"reel",a:"inquilino",p:"unidad",t:"Price reveal: qué alquila {precio}",h:"Esto alquila {precio} por mes en {barrio}.",b:["Placa de apertura con el precio, 1.5 segundos","Recorrido con sobreimpresos de lo que incluye","En temporal: remarcar el todo incluido","Placa final con el precio de nuevo y CTA"],w:"El anclaje de precio genera debate y el algoritmo premia la conversación."},
+  {f:"reel",a:"inquilino",p:"unidad",t:"POV: entrar por primera vez",h:"POV: llegás con las valijas y ya está todo listo.",b:["Cámara en primera persona desde la puerta","Recorrido continuo a ritmo de caminata","Detalles al pasar: llaves, luz, la cama hecha, la vista","Texto final: sin garantía, sin caución, todo incluido"],w:"El POV mete al espectador adentro: no mira un departamento, se muda."},
+  {f:"reel",a:"inquilino",p:"unidad",t:"El detalle que nadie nota",h:"Casi nadie nota este detalle al entrar.",b:["Plano cerrado del detalle sin revelarlo entero","Recorrer la unidad normal, 3 o 4 cortes","Volver al detalle y revelarlo con sobreimpreso","Cerrar con el dato de la unidad y CTA"],w:"Bucle abierto: la promesa del comienzo obliga a quedarse al final."},
+  {f:"reel",a:"inquilino",p:"unidad",t:"3 razones para esta unidad",h:"Tres razones por las que esta unidad no dura publicada.",b:["Razón 1: la zona, qué hay a dos cuadras","Razón 2: el edificio, amenities y seguridad","Razón 3: la unidad, el feature estrella","Urgencia real: día de visitas de esta semana"],w:"La lista numerada estructura la retención: el que ve la 1 quiere la 3."},
+  {f:"reel",a:"todos",p:"unidad",t:"Un martes viviendo acá",h:"Así se ve un martes cualquiera en {barrio}.",b:["Mañana: luz del living, café en el balcón","Mediodía: lo que queda a 5 minutos caminando","Tarde: amenities","Noche: la vista, placa de cierre con la unidad"],w:"No vende metros: vende el estilo de vida, que es lo que se comparte."},
+  {f:"reel",a:"inquilino",p:"unidad",t:"Diez planos, quince segundos",h:"Diez planos. Quince segundos. No hace falta más.",b:["Un plano por ambiente, ritmo de un corte por segundo y medio","Sin texto salvo la placa final","Música instrumental que no compita","Placa final: dirección, modalidad, CTA"],w:"La velocidad extrema es un patrón de retención en sí misma: nadie corta un video que ya termina."},
+  {f:"reel",a:"inquilino",p:"unidad",t:"Sonido real, sin música",h:"Así suena un piso alto en {barrio}. Sin música.",b:["Tour corto con sonido ambiente real: pasos, calle lejana, silencio","Sobreimpreso único: el silencio también se alquila","2 o 3 ambientes, planos quietos","Cierre con la ventana abierta y CTA"],w:"El patrón interrumpido: todos ponen música, el silencio frena el scroll."},
+  {f:"reel",a:"inquilino",p:"unidad",t:"La vista primero",h:"La vista desde el living. Ahora, el resto.",b:["Abrir 3 segundos clavados en la vista","Recorrer hacia atrás: living, cocina, suite","Sobreimpresos mínimos","Volver a la vista para cerrar"],w:"Abrir con lo irrepetible: la vista es lo único que otro departamento no puede copiar."},
+  {f:"reel",a:"inquilino",p:"unidad",t:"Qué incluye el todo incluido",h:"Todo lo que incluye este precio, marcado en el video.",b:["Tour con sobreimpresos sobre cada cosa incluida: expensas, wifi, muebles, servicios","Contador visual de lo que suma","Placa final: un solo precio, cero sorpresas","CTA"],w:"Materializa el diferencial todo incluido en imágenes, no en promesas."},
+  {f:"reel",a:"inquilino",p:"unidad",t:"Luz de las 8.40",h:"{barrio}, 8.40 de la mañana. Esta luz no se actúa.",b:["Filmar la unidad temprano con luz natural real","Planos quietos, dejar que la luz trabaje","Un solo sobreimpreso con la orientación","Cierre: día de visitas"],w:"La luz real es el atributo que más se pregunta y menos se muestra."},
+  {f:"reel",a:"inquilino",p:"unidad",t:"Plano secuencia sin cortes",h:"De la puerta al balcón sin un solo corte.",b:["Un único take caminando la unidad completa","Ritmo estable, sin apuro","Texto solo al final con los datos","Si el take sale mal, se repite: la gracia es la honestidad"],w:"El plano secuencia es prueba de que no hay trampa de edición: transparencia hecha formato."},
+  {f:"reel",a:"inquilino",p:"unidad",t:"Lo que las fotos no muestran",h:"Tres cosas de esta unidad que las fotos no muestran.",b:["Cosa 1: sonido o silencio del ambiente","Cosa 2: la escala real caminando el espacio","Cosa 3: un detalle de materiales al tacto","CTA a verla en persona: día de visitas"],w:"Admitir el límite de las fotos da credibilidad y empuja la visita."},
+  {f:"reel",a:"inquilino",p:"unidad",t:"Amoblado listo: abrir todo",h:"Llegás con dos valijas. Todo lo demás ya está.",b:["Abrir placares, cajones, la cocina equipada","Mostrar vajilla, blanquería, electrodomésticos","Sobreimpresos con lo que incluye","Placa: temporal todo incluido, CTA"],w:"Mostrar el interior de los muebles es voyeurismo útil: retención alta y cero producción extra."},
+  {f:"reel",a:"padres",p:"unidad",t:"El depto que un padre aprueba",h:"Si tu hijo va a vivir solo en Buenos Aires, mirá esto primero.",b:["Empezar por la seguridad: puerta, portería, cámaras","La distancia real a la facultad, cronometrada","Recién después, la unidad","CTA: escribinos y contanos para qué fechas"],w:"Invierte el orden del tour según lo que el padre mira primero: seguridad antes que estética."},
+  {f:"reel",a:"padres",p:"unidad",t:"De la facultad al depto",h:"De la facultad a la puerta: siete minutos caminando.",b:["Timelapse del recorrido real a pie","Sobreimpresos: cuadras, avenidas, paradas","Llegada al edificio y un plano de la unidad","CTA padres"],w:"Responde con evidencia la pregunta exacta que se hace el padre a distancia."},
+  {f:"reel",a:"inversor",p:"unidad",t:"La cuenta del inversor",h:"Este departamento paga {precio} por mes de renta.",b:["Plano del ambiente principal con placa del precio","Sobreimpresos: renta mensual, rentabilidad anual estimada","2 cortes de unidad y 1 de la zona","Cierre: representamos al comprador, no al vendedor"],w:"Los números concretos frenan el scroll del que piensa en invertir."},
+  {f:"reel",a:"inversor",p:"unidad",t:"Recorrido con métricas",h:"Un tour donde cada ambiente muestra su número.",b:["Tour normal con sobreimpresos de datos por ambiente: m², orientación, estado","Cierre con la ficha resumida: precio, renta estimada, rentabilidad","Estética sobria, cero adornos","CTA inversor"],w:"Convierte un tour común en análisis: el inversor lo guarda para comparar."},
+  {f:"reel",a:"inversor",p:"unidad",t:"Terminaciones que pagan",h:"Esta mesada explica parte de la renta.",b:["Macro de materiales: mármol, roble, herrajes","Una línea por material: por qué sostiene el precio","Cierre con el ambiente completo","CTA inversor"],w:"Educa el ojo del inversor mientras muestra el activo: doble valor en una pieza."},
 
-    /* ---- TOMÁS A CÁMARA (Método Mata: gancho + promesa + autoridad + valor + CTA visual) ---- */
-    {f:"camara",a:"inquilino",p:"educativo",t:"Mito vs realidad: {mito}",h:"Dicen que {mito}. Falso.",b:["Promesa: en 40 segundos te muestro cómo funciona de verdad, con un caso real","Autoridad: gestionamos hogares premium en los mejores barrios de BA y firmamos contratos así todas las semanas","Valor: desarmar el mito con el caso concreto y nombrar al elefante (dónde estaría la trampa y por qué no la hay)","CTA visual: mostrar el screen del posteo y decir dónde comentar INFO y qué le llega por privado"],w:"Lo contraintuitivo retiene y la promesa explícita le da una razón para quedarse hasta el final."},
-    {f:"camara",a:"inquilino",p:"educativo",t:"La pregunta que todos hacen: {pregunta}",h:"La pregunta que más nos hacen: {pregunta}.",b:["Promesa: la respuesta completa en menos de un minuto, sin vueltas","Autoridad: la respondemos todas las semanas en visitas reales, esto es lo que pasa de verdad","Valor: la respuesta directa más un ejemplo real (sin nombres) que la aterrice","CTA visual: mostrar la caja de comentarios y pedir la próxima pregunta ahí"],w:"Responder preguntas reales es demanda garantizada y el CTA visual siembra la próxima pieza."},
-    {f:"camara",a:"propietario",p:"educativo",t:"El error del propietario",h:"El error más caro que comete un propietario en Buenos Aires.",b:["Promesa: te muestro cuánto cuesta y cómo evitarlo en un minuto","Autoridad: lo vemos todos los meses administrando hogares premium, este es el patrón que se repite","Valor: el error (elegir rápido en vez de elegir bien), su costo real en meses de vacancia, y el filtro que lo evita (perfil, historial crediticio, ingresos)","CTA visual: mostrar el screen del perfil y decir dónde escribir para saber cuánto puede rentar su propiedad"],w:"Aversión a la pérdida más autoridad de casos reales: el dueño evaluador se queda."},
-    {f:"camara",a:"propietario",p:"confianza",t:"Cuánto rinde un premium, sin humo",h:"Cuánto rinde de verdad un departamento premium en Buenos Aires.",b:["Promesa: el número real y de dónde sale, sin promesas infladas","Autoridad: es el número que pagamos todos los meses a los dueños que administramos","Valor: 7 a 8 por ciento anual, qué lo hace posible (ocupación, gestión, precio bien puesto) y qué NO prometemos","CTA visual: screen del perfil mostrando dónde escribir para la estimación de renta sin costo"],w:"El número concreto más la honestidad de lo que no se promete construye autoridad real."},
-    {f:"camara",a:"todos",p:"confianza",t:"Por qué no publicamos cualquier depto",h:"Hay departamentos que preferimos no publicar.",b:["Promesa: te cuento el criterio con un ejemplo de algo que quedó afuera","Autoridad: por ese filtro nuestras reseñas dicen lo que dicen (leer una real)","Valor: la regla (solo lo que dejaríamos a nuestra propia familia), el ejemplo concreto, y qué gana cada lado con ese filtro","CTA visual: mostrar el catálogo en la web y decir dónde ver lo que sí pasó el filtro"],w:"Decir que no a negocio propio es la señal de confianza más fuerte que existe."},
-    {f:"camara",a:"padres",p:"educativo",t:"Para padres: instalar a un hijo en BA",h:"Tu hijo se viene a estudiar a Buenos Aires y vos estás a mil kilómetros.",b:["Promesa: las 3 cosas que tenés que mirar antes de elegir departamento, en un minuto","Autoridad: instalamos hijos de familias del interior todos los meses, esto es lo que los padres nos agradecen","Valor: zona segura según la facultad, edificio con seguridad, contrato claro a distancia (con videos y asesoría)","CTA visual: screen del WhatsApp mostrando dónde escribir y qué contarnos (fechas y facultad)"],w:"Habla al que paga (el padre), una audiencia que casi nadie atiende, con promesa concreta."},
-    {f:"camara",a:"inversor",p:"educativo",t:"Por qué Buenos Aires, hoy",h:"Los que tienen dólares están mirando Buenos Aires. Por esto.",b:["Promesa: la tesis completa en un minuto, con el número que la sostiene","Autoridad: trabajamos con inversores que compran y rentan acá, esto es lo que vemos en las operaciones","Valor: precio por m² en dólares versus la región, qué compra ese precio, y el riesgo honesto con cómo se maneja","CTA visual: screen del perfil mostrando el link para agendar la consulta sin costo y qué incluye"],w:"Tesis contraintuitiva con datos y un CTA visual que baja la fricción de agendar."},
+  /* ============ REEL · BARRIO ============ */
+  {f:"reel",a:"todos",p:"barrio",t:"{barrio} en 40 segundos",h:"{barrio} en menos de un minuto.",b:["6 a 8 cortes: esquinas, cafés, parques, arquitectura","Sobreimpresos con nombres reales","Cerrar con una unidad disponible en la zona","Serie: un barrio por semana"],w:"El contenido de barrio agranda la marca más allá del que busca depto hoy."},
+  {f:"reel",a:"todos",p:"barrio",t:"Tres cafés de {barrio}",h:"Tres cafés que explican por qué la gente elige {barrio}.",b:["Un plano por café con su nombre","Un dato de cada uno: el clásico, el nuevo, el de barrio","Cierre: así se vive a dos cuadras de la unidad","CTA suave"],w:"Contenido compartible entre vecinos y futuros vecinos: alcance orgánico fuera del nicho."},
+  {f:"reel",a:"todos",p:"barrio",t:"Todo a cinco minutos",h:"Todo esto queda a cinco minutos caminando de la unidad.",b:["Cortes rápidos: supermercado, gimnasio, parque, café, subte","Contador de minutos sobreimpreso","Terminar en la puerta del edificio","CTA"],w:"El radio caminable es el dato de decisión que ningún aviso muestra bien."},
+  {f:"reel",a:"todos",p:"barrio",t:"{barrio} de noche",h:"Así se ve {barrio} un jueves a las nueve.",b:["Planos nocturnos: luces, restaurantes, movimiento tranquilo","Sin voz, música baja","Sobreimpreso único con el barrio","Cierre con la unidad iluminada"],w:"La noche responde la pregunta de seguridad sin nombrarla: se muestra, no se argumenta."},
+  {f:"reel",a:"todos",p:"barrio",t:"El clásico y el secreto",h:"En {barrio} hay un clásico que todos conocen y un secreto que casi nadie.",b:["Primero el clásico, dos planos","Después el secreto de vecinos, sin dar la dirección exacta hasta el final","Revelarlo con sobreimpreso","Cierre: los vecinos de esta unidad lo tienen a tres cuadras"],w:"El secreto retenido hasta el final es un bucle abierto de manual."},
+  {f:"reel",a:"todos",p:"barrio",t:"Dos cuadras, dos mundos",h:"Acá la avenida. Dos cuadras adentro, esto.",b:["Contraste: plano de avenida con tráfico, corte a pasaje arbolado en silencio","Un sobreimpreso por mundo","Cerrar en la cuadra de la unidad","CTA"],w:"El contraste visual es retención pura y vende el microclima del barrio."},
+  {f:"reel",a:"todos",p:"barrio",t:"Ruta del brunch en {barrio}",h:"La ruta del brunch de {barrio}, probada por nosotros.",b:["3 paradas con un plato estrella cada una","Precio aproximado sobreimpreso de cada parada","Cierre: a esto se camina desde la unidad","Serie repetible por barrio"],w:"El contenido gastronómico es el más compartido de la categoría lifestyle."},
 
-    /* ---- CARRUSEL ---- */
-    {f:"carrusel",a:"inquilino",p:"unidad",t:"Ficha de la unidad en 6 placas",h:"Placa 1: la mejor foto y el titular en mayúsculas entre puntos.",b:["Placa 1: foto hero + titular estilo Bairen","Placas 2 a 5: un ambiente por placa, un dato por placa","Placa 6: precio o modalidad + CTA comentá INFO","Estética: fotos embellecidas con IA, fieles a la realidad"],w:"El formato ficha ya probó viralizar en la cuenta: es el patrón ganador propio."},
-    {f:"carrusel",a:"todos",p:"barrio",t:"{barrio} en 8 placas",h:"Placa 1: {barrio}, la guía corta.",b:["Placas: 2 cafés, 1 parque, 1 clásico gastronómico, 1 secreto de vecinos","Una foto real por placa, texto de una línea","Anteúltima placa: cómo se vive (perfil del barrio)","Última: las unidades disponibles en la zona"],w:"Contenido guardable: los carruseles de barrio se guardan y el guardado pesa más que el like."},
-    {f:"carrusel",a:"inquilino",p:"educativo",t:"Checklist antes de alquilar en BA",h:"Placa 1: leé esto antes de alquilar en Buenos Aires.",b:["5 placas: un chequeo por placa (contrato, expensas, estado, garantía, zona)","Concreto y accionable, sin relleno","Anteúltima: cómo lo resuelve un temporal todo incluido","Última: CTA"],w:"El contenido de utilidad se guarda y se comparte con el que está buscando."},
-    {f:"carrusel",a:"propietario",p:"educativo",t:"Qué mira Bairen antes de aceptar un inquilino",h:"Placa 1: a tu departamento no entra cualquiera.",b:["Placa por criterio: perfil, historial crediticio, totalidad de ingresos","Una placa con el caso: qué pasa cuando el filtro funciona","Placa de cierre: vos cobrás tranquilo","CTA propietarios"],w:"Mostrar el proceso desactiva el miedo número uno del dueño."},
-    {f:"carrusel",a:"todos",p:"confianza",t:"Chat real de un cliente",h:"Placa 1: el mensaje que nos llegó un martes a la noche.",b:["Captura real del chat (con permiso), sin edición linda","Placa 2: el contexto en dos líneas","Placa 3: qué hicimos, en bullets","Última placa: trato, respuesta a toda hora, confianza"],w:"La captura cruda es más creíble que cualquier placa diseñada."},
-    {f:"carrusel",a:"inversor",p:"educativo",t:"Comparativa: mismo precio, dos barrios",h:"Placa 1: {precio} por mes. Dos departamentos, dos barrios.",b:["3 placas por unidad: foto, datos, qué la hace única","Placa de cierre: no hay mejor, hay perfil","CTA: te ayudamos a elegir con criterio"],w:"La comparación activa la opinión: los comentarios eligen bando y el post despega."},
+  /* ============ REEL · EDUCATIVO / CONFIANZA ============ */
+  {f:"reel",a:"inquilino",p:"educativo",t:"Sin garantía, dónde está la trampa",h:"Sin garantía y sin caución. La trampa, dónde está.",b:["Abrir con la objeción tal cual la piensa la gente","Recorrer una unidad mientras se responde en off","Respuesta: en ningún lado, elegimos bien y gestionamos nosotros","Placa final: todo incluido, llegás y vivís"],w:"Nombrar al elefante de frente frena el scroll del escéptico."},
+  {f:"reel",a:"inquilino",p:"educativo",t:"Qué mirar en una visita",h:"Cinco cosas para mirar en una visita, mostradas en una unidad real.",b:["Un chequeo por corte: presión de agua, luz real, ruido, estado, ventilación","Filmado haciendo el chequeo, no contándolo","Sobreimpreso por chequeo","CTA: guardalo para tu próxima visita"],w:"Utilidad accionable que se guarda: el guardado pesa más que el like."},
+  {f:"reel",a:"inquilino",p:"educativo",t:"Temporal vs tradicional en 30 segundos",h:"Temporal o tradicional. La diferencia, en 30 segundos.",b:["Pantalla dividida o cortes alternados entre dos unidades","Sobreimpresos espejados: plazo, muebles, garantía, expensas","Cierre: cuál va con tu momento","CTA"],w:"Resuelve la duda más buscada del rubro en el idioma del formato corto."},
+  {f:"reel",a:"inquilino",p:"educativo",t:"Cómo detectar un aviso trucho",h:"Este aviso es falso. Te muestro cómo darte cuenta.",b:["3 señales sobre un aviso recreado: precio fuera de mercado, fotos robadas, apuro por seña","Cómo verificar cada una en 10 segundos","Cierre: qué hacemos distinto nosotros, sin sermonear","CTA suave"],w:"Proteger al usuario da autoridad instantánea y es contenido que se comparte por cuidado."},
+  {f:"reel",a:"inquilino",p:"educativo",t:"Los costos ocultos de mudarse mal",h:"Mudarse mal cuesta más que el alquiler.",b:["Sumar en pantalla los costos que nadie calcula: mudanza doble, depósito perdido, meses solapados","Contador de plata acumulándose","Cómo lo evita un temporal todo incluido","CTA"],w:"La aversión a la pérdida con contador visual es retención y argumento a la vez."},
+  {f:"reel",a:"propietario",p:"confianza",t:"Qué hacemos por un dueño, en 30 segundos",h:"Todo lo que pasa para que un dueño cobre sin ocuparse de nada.",b:["Cortes rápidos: producción, filtro, contrato, cobro, mantenimiento","Un sobreimpreso por tarea, ritmo alto","Cierre: vos cobrás tranquilo","CTA propietarios"],w:"Comprimir el servicio completo en 30 segundos lo hace tangible y compartible."},
+  {f:"reel",a:"todos",p:"confianza",t:"El mismo depto, dos formas de mostrarlo",h:"El mismo departamento. Dos formas de mostrarlo.",b:["Primero: fotos de celular mal sacadas, 3 segundos","Después: la producción Bairen del mismo espacio","Sin burlarse: dejar que el contraste hable","Cierre: así trabajamos cada unidad"],w:"El antes y después de producción es el argumento de captación más visual que existe."},
+  {f:"reel",a:"todos",p:"confianza",t:"Reseña sobre recorrido",h:"Esto nos escribió un inquilino después de mudarse.",b:["La reseña real leída en off, sobria","De fondo, el recorrido de una unidad","La frase clave sobreimpresa una sola vez","Cierre sin vender"],w:"La prueba social sobre producto: dos señales de confianza en una sola pieza."},
+  {f:"reel",a:"todos",p:"detras",t:"El momento de las llaves",h:"El momento favorito de este trabajo.",b:["La entrega de llaves real (con permiso), manos y sonrisas, sin caras si no quieren","Un solo texto: bienvenidos a casa","10 a 15 segundos, no más","Sin CTA de venta: pieza de marca"],w:"La emoción genuina y breve es lo que el algoritmo y la gente premian a la vez."},
+  {f:"reel",a:"todos",p:"detras",t:"Día de visitas en 20 segundos",h:"Hoy esta unidad se muestra. Así se ve un día de visitas.",b:["Llegadas, la puerta abriéndose, planos sin caras","El asesor preparando la unidad","Texto: se muestra hoy y mañana","CTA a coordinar la próxima"],w:"La demanda real filmada es la única urgencia que usamos, y es la más creíble."},
 
-    /* ---- POST INFORMATIVO ---- */
-    {f:"post",a:"inquilino",p:"educativo",t:"Temporal vs tradicional, en una imagen",h:"Una tabla simple: qué incluye cada modalidad, lado a lado.",b:["Tabla de dos columnas: plazo, muebles, garantía, expensas, servicios","Estética sobria navy y oro, tipografía grande","Caption corto que amplía un solo punto","CTA comentá INFO"],w:"Resuelve en 5 segundos la duda más común: contenido de referencia que se guarda."},
-    {f:"post",a:"propietario",p:"educativo",t:"La cuenta de la vacancia",h:"Un mes vacío cuesta más que una buena gestión.",b:["Gráfica simple: qué pierde un dueño por mes vacío","Comparar con el costo de gestión profesional","Caption: reducción de vacancia como servicio","CTA propietarios"],w:"Encuadre de pérdida con números: el dueño evaluador reacciona a la cuenta."},
-    {f:"post",a:"todos",p:"marca",t:"Manifiesto en una placa",h:"Buenos Aires no se alquila. Se elige.",b:["Una sola placa tipográfica con la frase de marca","Fondo navy, tipografía serif, cero adorno","Caption de 3 líneas sobre el criterio Bairen","Sin CTA de venta: es pieza de marca"],w:"Las piezas de identidad no convierten hoy: construyen el precio de mañana."},
+  /* ============ TOMÁS A CÁMARA (Método Mata) ============ */
+  {f:"camara",a:"inquilino",p:"educativo",t:"Mito vs realidad: {mito}",h:"Dicen que {mito}. Falso.",b:["Promesa: en 40 segundos te muestro cómo funciona de verdad, con un caso real","Autoridad: gestionamos hogares premium en los mejores barrios de BA y firmamos contratos así todas las semanas","Valor: desarmar el mito con el caso concreto y nombrar al elefante (dónde estaría la trampa y por qué no la hay)","CTA visual: mostrar el screen del posteo y decir dónde comentar INFO y qué le llega por privado"],w:"Lo contraintuitivo retiene y la promesa explícita da una razón para quedarse."},
+  {f:"camara",a:"inquilino",p:"educativo",t:"La pregunta que todos hacen: {pregunta}",h:"La pregunta que más nos hacen: {pregunta}.",b:["Promesa: la respuesta completa en menos de un minuto, sin vueltas","Autoridad: la respondemos todas las semanas en visitas reales","Valor: la respuesta directa más un ejemplo real sin nombres","CTA visual: mostrar la caja de comentarios y pedir la próxima pregunta ahí"],w:"Responder preguntas reales es demanda garantizada y el CTA siembra la próxima pieza."},
+  {f:"camara",a:"inquilino",p:"educativo",t:"Los 3 errores del que busca depto",h:"Tres errores que vemos todas las semanas en los que buscan departamento.",b:["Promesa: los tres errores y cómo evitarlos, en un minuto","Autoridad: los vemos en cada visita que hacemos, esto no es teoría","Valor: error por error con el ejemplo real y la corrección práctica","CTA visual: screen del perfil mostrando dónde escribir para buscar con ayuda"],w:"El formato error ajeno activa la autocomprobación: nadie quiere ser el del video."},
+  {f:"camara",a:"inquilino",p:"educativo",t:"El seguro de caución, explicado",h:"Seguro de caución: qué es y cuándo NO lo necesitás.",b:["Promesa: en un minuto entendés qué es, cuánto cuesta y cuándo evitarlo","Autoridad: trabajamos con caución y sin caución, conocemos los dos caminos","Valor: la explicación simple, el costo real aproximado, y el caso donde el temporal lo hace innecesario","CTA visual: screen del catálogo mostrando dónde ver las unidades sin caución"],w:"El término técnico explicado simple posiciona autoridad y captura búsqueda real."},
+  {f:"camara",a:"inquilino",p:"educativo",t:"Cómo es alquilar con nosotros, paso a paso",h:"De ver el video a tener las llaves: el proceso completo.",b:["Promesa: los pasos exactos y cuánto tarda cada uno","Autoridad: es el proceso que hacemos todas las semanas, contado sin adornos","Valor: paso a paso con tiempos reales, desde el INFO hasta la firma","CTA visual: mostrar el screen del comentario INFO y qué llega después"],w:"Bajar la incertidumbre del proceso es bajar la fricción de escribir."},
+  {f:"camara",a:"inquilino",p:"confianza",t:"Leyendo reseñas en cámara",h:"Voy a leer lo que nuestros clientes escribieron. Textual.",b:["Promesa: reseñas reales leídas tal cual, las lindas y las exigentes","Autoridad: son públicas, cualquiera puede verificarlas","Valor: leer 2 o 3 con contexto de cada caso, sin editar frases","CTA visual: mostrar dónde ver todas las reseñas"],w:"Leer prueba social textual en cámara es doble verificación: voz más documento."},
+  {f:"camara",a:"propietario",p:"educativo",t:"El error del propietario",h:"El error más caro que comete un propietario en Buenos Aires.",b:["Promesa: te muestro cuánto cuesta y cómo evitarlo en un minuto","Autoridad: lo vemos todos los meses administrando hogares premium","Valor: el error (elegir rápido en vez de elegir bien), su costo real en vacancia, y el filtro que lo evita","CTA visual: screen del perfil mostrando dónde escribir para saber cuánto puede rentar"],w:"Aversión a la pérdida más autoridad de casos reales: el dueño evaluador se queda."},
+  {f:"camara",a:"propietario",p:"confianza",t:"Cuánto rinde un premium, sin humo",h:"Cuánto rinde de verdad un departamento premium en Buenos Aires.",b:["Promesa: el número real y de dónde sale, sin promesas infladas","Autoridad: es el número que pagamos todos los meses a los dueños que administramos","Valor: 7 a 8 por ciento anual, qué lo hace posible y qué NO prometemos","CTA visual: screen del perfil mostrando dónde pedir la estimación sin costo"],w:"El número concreto más la honestidad de lo que no se promete construye autoridad real."},
+  {f:"camara",a:"propietario",p:"educativo",t:"Temporal o tradicional para tu depto",h:"Tu departamento rinde distinto según cómo lo alquiles.",b:["Promesa: cuál conviene para cada tipo de unidad, con la cuenta","Autoridad: administramos de los dos y vemos los números de los dos","Valor: perfil de unidad por modalidad, la diferencia de renta y de desgaste","CTA visual: screen mostrando dónde escribir para evaluar el suyo"],w:"La decisión con números es exactamente lo que el dueño está googleando."},
+  {f:"camara",a:"propietario",p:"educativo",t:"Cómo filtramos a un inquilino",h:"A tu departamento no entra cualquiera. Este es el filtro.",b:["Promesa: el proceso de selección completo, paso por paso","Autoridad: este filtro es la razón de que no tengamos casos de impago","Valor: perfil, historial crediticio, totalidad de ingresos, y qué pasa cuando algo no cierra","CTA visual: screen del perfil y dónde escribir para hablar de su propiedad"],w:"Mostrar el proceso desactiva el miedo número uno del dueño."},
+  {f:"camara",a:"propietario",p:"educativo",t:"Por qué un premium no se alquila",h:"Hay departamentos premium que no se alquilan. Casi siempre por lo mismo.",b:["Promesa: las tres causas y cómo se corrigen","Autoridad: nos llegan seguido unidades que llevaban meses paradas","Valor: precio mal calibrado, presentación pobre, filtro mal puesto, con el antes y después de un caso","CTA visual: screen de contacto para revisar su publicación"],w:"Habla directo al dueño frustrado con la unidad parada: dolor máximo, oferta clara."},
+  {f:"camara",a:"propietario",p:"confianza",t:"De vacío a alquilado: un caso",h:"Esta unidad estaba vacía hace meses. Así se alquiló.",b:["Promesa: el caso completo, qué se cambió y qué pasó","Autoridad: caso propio, con la unidad en pantalla","Valor: los dos o tres cambios concretos (precio, producción, filtro) y el resultado","CTA visual: screen mostrando dónde escribir si su unidad está parada"],w:"El caso con resultado es la prueba que ningún argumento reemplaza."},
+  {f:"camara",a:"inversor",p:"educativo",t:"Por qué Buenos Aires, hoy",h:"Los que tienen dólares están mirando Buenos Aires. Por esto.",b:["Promesa: la tesis completa en un minuto, con el número que la sostiene","Autoridad: trabajamos con inversores que compran y rentan acá","Valor: precio por m² versus la región, qué compra ese precio, y el riesgo honesto","CTA visual: screen del perfil mostrando el link para agendar la consulta sin costo"],w:"Tesis contraintuitiva con datos y un CTA visual que baja la fricción de agendar."},
+  {f:"camara",a:"inversor",p:"educativo",t:"Renta en dólares, explicada",h:"Renta en dólares en Argentina. Sí, existe, y funciona así.",b:["Promesa: cómo funciona, qué rinde y qué mirar antes de entrar","Autoridad: administramos las rentas de los inversores que ya lo hacen","Valor: el mecanismo simple, el rango real de rentabilidad y el error típico del que entra mal","CTA visual: screen del link para la consulta inicial"],w:"El concepto que suena imposible explicado con casos es imán del capital escéptico."},
+  {f:"camara",a:"inversor",p:"educativo",t:"Pozo o usado para invertir",h:"Pozo o usado. La respuesta depende de una sola cosa.",b:["Promesa: el criterio para decidir en un minuto","Autoridad: vemos las dos puntas en operaciones reales","Valor: horizonte, ticket y tolerancia, con un ejemplo de cada camino","CTA visual: screen de contacto para armar la primera selección"],w:"El dilema clásico resuelto con un criterio simple: se guarda y se consulta."},
+  {f:"camara",a:"inversor",p:"educativo",t:"El error del que compra por foto",h:"Comprar por foto desde el exterior sale caro. Esto es lo que no se ve.",b:["Promesa: las tres cosas que una foto nunca muestra","Autoridad: revisamos personalmente cada unidad que recomendamos","Valor: estado real, entorno del edificio, papeles, y cómo lo verificamos por el comprador","CTA visual: screen del servicio PSI y dónde agendar"],w:"El miedo real del comprador a distancia, nombrado de frente y resuelto."},
+  {f:"camara",a:"padres",p:"educativo",t:"Para padres: instalar a un hijo en BA",h:"Tu hijo se viene a estudiar a Buenos Aires y vos estás a mil kilómetros.",b:["Promesa: las 3 cosas que tenés que mirar antes de elegir departamento","Autoridad: instalamos hijos de familias del interior todos los meses","Valor: zona segura según la facultad, edificio con seguridad, contrato claro a distancia","CTA visual: screen del WhatsApp mostrando dónde escribir y qué contarnos"],w:"Habla al que paga (el padre), una audiencia que casi nadie atiende."},
+  {f:"camara",a:"padres",p:"educativo",t:"Las zonas que eligen los padres",h:"Estas son las zonas que más eligen los padres, y por qué.",b:["Promesa: el mapa mental por facultad en un minuto","Autoridad: es el patrón real de las familias que instalamos","Valor: 3 zonas con su porqué (seguridad, distancia, vida de estudiante sana)","CTA visual: screen del WhatsApp para contar facultad y fechas"],w:"Segmenta por facultad: el padre siente que le hablan de SU caso."},
+  {f:"camara",a:"padres",p:"confianza",t:"Cómo acompañamos durante el año",h:"Instalarlo es el principio. Esto pasa el resto del año.",b:["Promesa: qué cubre el acompañamiento después de la mudanza","Autoridad: los padres nos escriben durante todo el año, no solo al firmar","Valor: mantenimiento, respuesta a cualquier hora, renovación, y el canal directo con la familia","CTA visual: screen del WhatsApp de contacto"],w:"Vende la tranquilidad anual, no la transacción: el diferencial real con cualquier aviso."},
+  {f:"camara",a:"todos",p:"confianza",t:"Por qué no publicamos cualquier depto",h:"Hay departamentos que preferimos no publicar.",b:["Promesa: te cuento el criterio con un ejemplo de algo que quedó afuera","Autoridad: por ese filtro nuestras reseñas dicen lo que dicen","Valor: la regla (solo lo que dejaríamos a nuestra familia), el ejemplo, y qué gana cada lado","CTA visual: mostrar el catálogo en la web y decir dónde ver lo que sí pasó el filtro"],w:"Decir que no a negocio propio es la señal de confianza más fuerte que existe."},
+  {f:"camara",a:"todos",p:"confianza",t:"Respondemos a cualquier hora, en serio",h:"Un cliente nos escribió un domingo a las once de la noche. Esto pasó.",b:["Promesa: te cuento el final de la historia y qué dice de cómo trabajamos","Autoridad: la reseña real que quedó de ese caso, leída textual","Valor: el caso corto sin nombres y el punto (el trato es la otra mitad del producto)","CTA visual: mostrar el perfil y decir dónde escribirnos a la hora que sea"],w:"La microhistoria con final real es el formato de confianza que más se recuerda."},
+  {f:"camara",a:"todos",p:"educativo",t:"Respondiendo un comentario real",h:"Alguien comentó esto en el último video. Merece respuesta completa.",b:["Promesa: la respuesta seria a la duda del comentario","Autoridad: mostrar el comentario real en pantalla","Valor: responder de verdad con ejemplo, sin humo","CTA visual: mostrar la caja de comentarios y pedir la próxima duda"],w:"Responder comentarios crea comunidad y fabrica una serie infinita de contenido."},
+  {f:"camara",a:"todos",p:"marca",t:"Qué significa el máximo esplendor",h:"Buenos Aires, en su máximo esplendor. Qué quiere decir eso.",b:["Promesa: qué hay detrás de la frase de la marca","Autoridad: la frase nace de cómo elegimos cada unidad y cada barrio","Valor: el criterio de curación contado con dos ejemplos concretos","CTA visual: screen del perfil, seguinos para ver la ciudad así"],w:"La pieza de identidad convierte seguidores en audiencia de marca, no de avisos."},
 
-    /* ---- HISTORIA ---- */
-    {f:"historia",a:"inquilino",p:"detras",t:"Día de visitas en vivo",h:"Historia 1: hoy se muestra esta unidad. Así se ve en persona.",b:["3 a 4 historias: llegada, el ambiente estrella, un detalle","Texto en pantalla, sin música de urgencia","Mostrar movimiento real sin inventar presión","Última historia: link o responder para coordinar"],w:"La urgencia real y honesta: hay gente viéndola hoy, y se nota sin gritarlo."},
-    {f:"historia",a:"todos",p:"detras",t:"Encuesta: elegí la próxima unidad",h:"Historia con encuesta: cuál mostramos mañana, A o B.",b:["Dos fotos, sticker de encuesta","Al día siguiente: historia con el resultado y el recorrido ganador","Cadena de 2 días que trae a la gente de vuelta"],w:"La encuesta es interacción barata que entrena al algoritmo y crea cita de retorno."},
-    {f:"historia",a:"todos",p:"detras",t:"Detrás de la producción",h:"Historia: así se produce una unidad antes de publicarse.",b:["Time-lapse o cortes del rodaje de fotos y video","Un antes y después de una toma (fiel, sin trampa)","Texto: por qué producimos cada unidad como una revista"],w:"El detrás de escena humaniza y justifica el posicionamiento premium."},
-    {f:"historia",a:"inquilino",p:"unidad",t:"Teaser de la unidad de la semana",h:"Historia: un solo plano del mejor detalle, sin mostrar todo.",b:["Un plano de 3 segundos del feature estrella","Texto: mañana se publica completa","Sticker de pregunta: qué querés ver de esta unidad"],w:"El teaser fabrica la audiencia del posteo de mañana."},
+  /* ============ CARRUSEL ============ */
+  {f:"carrusel",a:"inquilino",p:"unidad",t:"Ficha de la unidad en 6 placas",h:"Placa 1: la mejor foto y el titular en mayúsculas entre puntos.",b:["Placa 1: foto hero más titular estilo Bairen","Placas 2 a 5: un ambiente por placa, un dato por placa","Placa 6: precio o modalidad más CTA comentá INFO","Fotos embellecidas con IA, fieles a la realidad"],w:"El formato ficha ya probó viralizar en la cuenta: es el patrón ganador propio."},
+  {f:"carrusel",a:"inquilino",p:"unidad",t:"5 detalles que no entran en el tour",h:"Placa 1: los detalles que el video no llega a mostrar.",b:["5 placas macro: herrajes, materiales, texturas, luz","Una línea por placa, sin adjetivos vacíos","Placa final con la unidad completa y CTA","Serie por unidad"],w:"El detalle macro comunica premium mejor que cualquier palabra."},
+  {f:"carrusel",a:"inquilino",p:"unidad",t:"La unidad en números",h:"Placa 1: esta unidad, contada solo con números.",b:["Placas: m², piso, orientación, año, expensas, minutos al subte","Un número grande por placa, estética sobria","Placa final: la foto hero y el CTA","Formato replicable para cada unidad"],w:"Los números sin adjetivos son la versión premium de la honestidad."},
+  {f:"carrusel",a:"todos",p:"barrio",t:"{barrio} en 8 placas",h:"Placa 1: {barrio}, la guía corta.",b:["Placas: 2 cafés, 1 parque, 1 clásico gastronómico, 1 secreto de vecinos","Una foto real por placa, texto de una línea","Anteúltima placa: cómo se vive","Última: las unidades disponibles en la zona"],w:"Los carruseles de barrio se guardan, y el guardado pesa más que el like."},
+  {f:"carrusel",a:"todos",p:"barrio",t:"Mapa de cafés de {barrio}",h:"Placa 1: el mapa de cafés que usamos nosotros.",b:["Placa 2: el mapa visual simple con pins","Placas 3 a 6: un café por placa con su especialidad","Última placa: a cuántas cuadras queda cada uno de la unidad","CTA suave"],w:"El mapa guardable es de lo más compartido del contenido local."},
+  {f:"carrusel",a:"todos",p:"barrio",t:"Dónde entrenar en {barrio}",h:"Placa 1: correr, entrenar y nadar en {barrio}.",b:["Placas: el parque para correr, 2 gimnasios, la pileta","Distancias reales desde la zona de las unidades","Última placa: las unidades cerca","CTA"],w:"Habla al estilo de vida ABC1 real: el que entrena elige barrio por esto."},
+  {f:"carrusel",a:"inquilino",p:"educativo",t:"Checklist antes de alquilar en BA",h:"Placa 1: leé esto antes de alquilar en Buenos Aires.",b:["5 placas: un chequeo por placa (contrato, expensas, estado, garantía, zona)","Concreto y accionable, sin relleno","Anteúltima: cómo lo resuelve un temporal todo incluido","Última: CTA"],w:"El contenido de utilidad se guarda y se comparte con el que está buscando."},
+  {f:"carrusel",a:"inquilino",p:"educativo",t:"Diccionario del alquiler porteño",h:"Placa 1: seis términos que tenés que entender antes de firmar.",b:["Una placa por término: caución, expensas, temporal, ajuste, inventario, depósito","Definición de dos líneas, ejemplo de una","Última placa: cualquier duda, comentala","CTA"],w:"El glosario es contenido de referencia: se guarda y posiciona autoridad."},
+  {f:"carrusel",a:"inquilino",p:"educativo",t:"Qué preguntar en una visita",h:"Placa 1: las 5 preguntas que casi nadie hace en una visita.",b:["Una pregunta por placa con el porqué","La respuesta que deberías esperar","Última placa: guardalo para tu próxima visita","CTA"],w:"Empodera al usuario: el contenido que te hace quedar bien se comparte."},
+  {f:"carrusel",a:"inquilino",p:"educativo",t:"Los 4 costos de mudarse",h:"Placa 1: mudarse cuesta más que el alquiler. La cuenta.",b:["Una placa por costo: mudanza, depósito, solapamiento, equipamiento","El número aproximado de cada uno","Placa: cuáles elimina un temporal todo incluido","CTA"],w:"La cuenta completa que nadie hace: valor real más argumento propio."},
+  {f:"carrusel",a:"inquilino",p:"educativo",t:"6 señales de alerta en un aviso",h:"Placa 1: si el aviso tiene esto, dudá.",b:["Una señal por placa: precio irreal, fotos genéricas, apuro por seña, sin dirección, contacto raro, cero papeles","Cómo verificar cada una","Última placa: compartilo con quien está buscando","CTA suave"],w:"El contenido de protección se comparte por cariño: alcance orgánico garantizado."},
+  {f:"carrusel",a:"propietario",p:"educativo",t:"Qué mira Bairen antes de aceptar un inquilino",h:"Placa 1: a tu departamento no entra cualquiera.",b:["Placa por criterio: perfil, historial crediticio, totalidad de ingresos","Una placa con el caso: qué pasa cuando el filtro funciona","Placa de cierre: vos cobrás tranquilo","CTA propietarios"],w:"Mostrar el proceso desactiva el miedo número uno del dueño."},
+  {f:"carrusel",a:"propietario",p:"educativo",t:"4 señales de que tu depto está mal publicado",h:"Placa 1: tu departamento puede estar espantando inquilinos.",b:["Una señal por placa: fotos oscuras, precio desalineado, descripción genérica, sin video","El fix de cada una en una línea","Placa final: cómo lo publicamos nosotros","CTA propietarios"],w:"El dueño con la unidad parada se autodiagnostica placa por placa."},
+  {f:"carrusel",a:"propietario",p:"educativo",t:"La vacancia en números",h:"Placa 1: cuánto cuesta cada mes que tu depto está vacío.",b:["Placas con la cuenta simple: renta perdida, expensas pagadas, deterioro","El total anual si se repite","Placa: qué hace la gestión para reducirla","CTA propietarios"],w:"Encuadre de pérdida con números concretos: el evaluador reacciona a la cuenta."},
+  {f:"carrusel",a:"propietario",p:"educativo",t:"Qué cubre la gestión integral",h:"Placa 1: todo lo que dejás de hacer cuando gestionamos nosotros.",b:["Una placa por servicio: filtro, contrato, cobranza, mantenimiento, limpieza","Una línea concreta por placa, sin promesas vagas","Cierre: invertís en tu tranquilidad","CTA propietarios"],w:"La lista visual convierte un servicio abstracto en algo contable."},
+  {f:"carrusel",a:"inversor",p:"educativo",t:"Mismo precio, dos barrios",h:"Placa 1: {precio} por mes. Dos departamentos, dos barrios.",b:["3 placas por unidad: foto, datos, qué la hace única","Placa de cierre: no hay mejor, hay perfil","CTA: te ayudamos a elegir con criterio"],w:"La comparación activa la opinión: los comentarios eligen bando y el post despega."},
+  {f:"carrusel",a:"inversor",p:"educativo",t:"5 datos del mercado este trimestre",h:"Placa 1: cinco números del mercado que importan este trimestre.",b:["Un dato por placa con su fuente","Una línea de lectura por dato: qué significa para el que compra","Serie trimestral, mismo formato","CTA inversor"],w:"La serie de datos crea hábito de consumo y autoridad compuesta."},
+  {f:"carrusel",a:"inversor",p:"educativo",t:"Cómo leer una ficha de inversión",h:"Placa 1: aprendé a leer una ficha de inversión en 6 placas.",b:["Una placa por métrica: precio por m², renta estimada, rentabilidad, expensas","Qué es un buen número y qué es una alerta en cada una","Última placa: pedinos una ficha real","CTA inversor"],w:"Enseñar a leer tus propias fichas: educación que alimenta directo el embudo PSI."},
+  {f:"carrusel",a:"padres",p:"educativo",t:"Guía para instalar a un hijo en BA",h:"Placa 1: tu hijo estudia en Buenos Aires. La guía para instalarlo.",b:["Placas: zona según facultad, seguridad, presupuesto, contrato a distancia","Una placa con el proceso Bairen para padres","CTA: contanos para qué fechas"],w:"Contenido guardable para el momento exacto de decisión familiar."},
+  {f:"carrusel",a:"padres",p:"educativo",t:"El presupuesto del estudiante",h:"Placa 1: cuánto cuesta de verdad instalar un hijo en BA.",b:["Una placa por línea: alquiler, expensas y servicios, comida, transporte","Rango realista por línea, sin endulzar","Placa: qué simplifica un temporal todo incluido","CTA padres"],w:"El presupuesto honesto es la búsqueda número uno del padre que planifica."},
+  {f:"carrusel",a:"padres",p:"confianza",t:"Mensajes de padres, reales",h:"Placa 1: los mensajes que nos mandan los padres.",b:["Capturas reales de WhatsApp con permiso, datos tapados","Una captura por placa, contexto de una línea","Cierre: somos su gente de confianza en la ciudad","CTA padres"],w:"La captura cruda de otro padre vale más que cualquier promesa de la marca."},
+  {f:"carrusel",a:"todos",p:"confianza",t:"Chat real de un cliente",h:"Placa 1: el mensaje que nos llegó un martes a la noche.",b:["Captura real del chat con permiso, sin edición linda","Placa 2: el contexto en dos líneas","Placa 3: qué hicimos, en bullets","Última placa: trato, respuesta a toda hora, confianza"],w:"La captura cruda es más creíble que cualquier placa diseñada."},
+  {f:"carrusel",a:"todos",p:"detras",t:"Antes y después de la producción",h:"Placa 1: la misma unidad, antes y después de producirla.",b:["Pares de placas: foto de llegada vs foto producida","Fiel a la realidad: mismo espacio, mejor contado","Placa: por qué producimos cada unidad como una revista","CTA suave"],w:"El antes y después es el formato de más deslizamiento que existe en carrusel."},
+  {f:"carrusel",a:"todos",p:"educativo",t:"Un contrato, paso a paso",h:"Placa 1: qué pasa entre la seña y las llaves.",b:["Una placa por paso con su tiempo real","Qué papeles pide cada parte","Última placa: todo esto lo coordinamos nosotros","CTA"],w:"Desmitificar el papelerío baja la ansiedad y la fricción de arrancar."},
+  {f:"carrusel",a:"todos",p:"marca",t:"El manifiesto en placas",h:"Placa 1: Buenos Aires no se alquila. Se elige.",b:["Una frase de marca por placa, tipografía serif sobre navy","Sin fotos: solo texto y aire","Última placa: el logo y nada más","Sin CTA de venta"],w:"Las piezas de identidad no convierten hoy: construyen el precio de mañana."},
 
-    /* ---- EXTRAS DE ALTO IMPACTO ---- */
-    {f:"reel",a:"inquilino",p:"educativo",t:"Sin garantía, dónde está la trampa",h:"Sin garantía y sin caución. La trampa, dónde está.",b:["Abrir con la objeción tal cual la piensa la gente","Recorrer una unidad mientras se responde en off","Respuesta: en ningún lado, elegimos bien y gestionamos nosotros","Placa final: todo incluido, llegás y vivís"],w:"Nombrar al elefante de frente: la transparencia frena el scroll del escéptico."},
-    {f:"reel",a:"todos",p:"barrio",t:"{barrio} en 40 segundos",h:"{barrio} en menos de un minuto.",b:["6 a 8 cortes: esquinas, cafés, parques, arquitectura","Sobreimpresos con nombres reales de lugares","Cerrar con una unidad disponible en la zona","Serie: un barrio por semana"],w:"El contenido de barrio agranda la marca más allá del que busca depto hoy."},
-    {f:"reel",a:"propietario",p:"confianza",t:"Qué hacemos por un dueño, en 30 segundos",h:"Todo lo que pasa para que un dueño cobre sin ocuparse de nada.",b:["Cortes rápidos: producción, filtro, contrato, cobro, mantenimiento","Un sobreimpreso por tarea, ritmo alto","Cierre: vos cobrás tranquilo","CTA propietarios"],w:"Comprimir el servicio completo en 30 segundos lo hace tangible y compartible."},
-    {f:"camara",a:"todos",p:"confianza",t:"Respondemos a cualquier hora, en serio",h:"Un cliente nos escribió un domingo a las once de la noche. Esto pasó.",b:["Promesa: te cuento el final de la historia y qué dice de cómo trabajamos","Autoridad: la reseña real que quedó de ese caso, leída textual","Valor: el caso corto sin nombres y el punto que enseña (el trato es la otra mitad del producto)","CTA visual: mostrar el perfil y decir dónde escribirnos a la hora que sea"],w:"La microhistoria con final real es el formato de confianza que más se recuerda."},
-    {f:"carrusel",a:"padres",p:"educativo",t:"Guía para instalar a un hijo en BA",h:"Placa 1: tu hijo estudia en Buenos Aires. La guía para instalarlo.",b:["Placas: zona según facultad, seguridad, presupuesto, contrato a distancia","Una placa con el proceso Bairen para padres","CTA: contanos para qué fechas"],w:"Contenido guardable para el momento exacto de decisión familiar."},
-    {f:"post",a:"inversor",p:"educativo",t:"El dato del mes del mercado",h:"Un solo número del mercado inmobiliario que importa este mes.",b:["Placa con el dato grande (precio m², brecha, rentabilidad)","Dos líneas de lectura: qué significa para el que compra","Serie mensual, mismo formato siempre","CTA inversor"],w:"La serie de datos posiciona autoridad y crea hábito de consumo mensual."}
+  /* ============ POST INFORMATIVO ============ */
+  {f:"post",a:"inquilino",p:"educativo",t:"Temporal vs tradicional, en una imagen",h:"Una tabla simple: qué incluye cada modalidad, lado a lado.",b:["Tabla de dos columnas: plazo, muebles, garantía, expensas, servicios","Estética sobria navy y oro, tipografía grande","Caption corto que amplía un solo punto","CTA comentá INFO"],w:"Resuelve en 5 segundos la duda más común: contenido de referencia que se guarda."},
+  {f:"post",a:"inquilino",p:"educativo",t:"Qué incluye el todo incluido",h:"Una placa: todo lo que entra en un solo precio.",b:["Lista visual: alquiler, expensas, servicios, wifi, muebles, blanquería","Tilde por ítem, cero texto de más","Caption: la cuenta de lo que te ahorrás","CTA"],w:"La lista con tildes es escaneable en 3 segundos: perfecta para el feed."},
+  {f:"post",a:"inquilino",p:"educativo",t:"Requisitos: temporal vs tradicional",h:"Una placa: qué te piden en cada modalidad.",b:["Dos columnas de requisitos reales","Resaltar lo que el temporal NO pide","Caption honesto sobre para quién es cada una","CTA"],w:"El contenido de requisitos captura al que está por decidir, el lead más caliente."},
+  {f:"post",a:"propietario",p:"educativo",t:"La cuenta de la vacancia",h:"Un mes vacío cuesta más que una buena gestión.",b:["Gráfica simple: qué pierde un dueño por mes vacío","Comparar con el costo de gestión profesional","Caption: reducción de vacancia como servicio","CTA propietarios"],w:"Encuadre de pérdida con números: el dueño evaluador reacciona a la cuenta."},
+  {f:"post",a:"propietario",p:"educativo",t:"Gestión integral en una placa",h:"Una placa: todo lo que hace la gestión por un dueño.",b:["Lista de servicios con íconos sobrios","Cierre de placa: vos cobrás tranquilo","Caption con un caso de una línea","CTA propietarios"],w:"El resumen visual del servicio es la pieza que el dueño le reenvía a su pareja."},
+  {f:"post",a:"inversor",p:"educativo",t:"El dato del mes",h:"Un solo número del mercado que importa este mes.",b:["Placa con el dato grande (precio m², brecha, rentabilidad)","Dos líneas de lectura: qué significa para el que compra","Serie mensual, mismo formato siempre","CTA inversor"],w:"La serie de datos posiciona autoridad y crea hábito de consumo mensual."},
+  {f:"post",a:"inversor",p:"educativo",t:"Precio por m²: BA vs la región",h:"Una placa: cuánto cuesta el m² en BA contra la región.",b:["Gráfico de barras simple con 4 o 5 ciudades","Fuente citada abajo en chico","Caption con la lectura para el inversor","CTA inversor"],w:"La comparación regional es el argumento visual más fuerte de la tesis BA."},
+  {f:"post",a:"padres",p:"educativo",t:"Checklist del padre a distancia",h:"Una placa: qué revisar antes de instalar a tu hijo en BA.",b:["Checklist de 6 puntos con tildes","Zona, seguridad, contrato, presupuesto, acompañamiento, salida","Caption: guardalo para cuando llegue el momento","CTA padres"],w:"El checklist guardable llega justo en el momento de planificación familiar."},
+  {f:"post",a:"todos",p:"barrio",t:"El dato de {barrio}",h:"Una placa: el dato de {barrio} que casi nadie conoce.",b:["Un dato histórico o urbano real y verificable","Foto del lugar de fondo, texto grande","Caption que amplía en 3 líneas","Serie coleccionable por barrio"],w:"La curiosidad local es el contenido más compartido entre vecinos."},
+  {f:"post",a:"todos",p:"confianza",t:"La reseña de la semana",h:"Una placa sobria con la reseña textual de la semana.",b:["La cita real entre comillas, nombre e inicial","Fondo navy, tipografía serif, cero adorno","Caption con el contexto del caso en 2 líneas","Serie semanal fija"],w:"La constancia de la serie construye la prueba social como hábito visual."},
+  {f:"post",a:"todos",p:"marca",t:"Manifiesto en una placa",h:"Buenos Aires no se alquila. Se elige.",b:["Una sola placa tipográfica con la frase de marca","Fondo navy, tipografía serif, cero adorno","Caption de 3 líneas sobre el criterio Bairen","Sin CTA de venta: es pieza de marca"],w:"Las piezas de identidad no convierten hoy: construyen el precio de mañana."},
+  {f:"post",a:"todos",p:"educativo",t:"Expensas, explicadas en una placa",h:"Una placa: qué son las expensas y qué pagan.",b:["Definición de dos líneas más desglose visual simple","Qué es ordinaria y qué extraordinaria","Caption: cómo lo simplifica el todo incluido","CTA"],w:"El término que todo extranjero y estudiante googlea, resuelto en una imagen."},
+
+  /* ============ HISTORIA ============ */
+  {f:"historia",a:"inquilino",p:"detras",t:"Día de visitas en vivo",h:"Historia 1: hoy se muestra esta unidad. Así se ve en persona.",b:["3 a 4 historias: llegada, el ambiente estrella, un detalle","Texto en pantalla, sin música de urgencia","Movimiento real sin inventar presión","Última historia: responder para coordinar"],w:"La urgencia real y honesta: hay gente viéndola hoy, y se nota sin gritarlo."},
+  {f:"historia",a:"todos",p:"detras",t:"Encuesta: elegí la próxima unidad",h:"Historia con encuesta: cuál mostramos mañana, A o B.",b:["Dos fotos, sticker de encuesta","Al día siguiente: el resultado y el recorrido ganador","Cadena de 2 días que trae a la gente de vuelta"],w:"La encuesta es interacción barata que entrena al algoritmo y crea cita de retorno."},
+  {f:"historia",a:"todos",p:"detras",t:"Detrás de la producción",h:"Historia: así se produce una unidad antes de publicarse.",b:["Time-lapse o cortes del rodaje de fotos y video","Un antes y después de una toma, fiel","Texto: por qué producimos cada unidad como una revista"],w:"El detrás de escena humaniza y justifica el posicionamiento premium."},
+  {f:"historia",a:"inquilino",p:"unidad",t:"Teaser de la unidad de la semana",h:"Historia: un solo plano del mejor detalle, sin mostrar todo.",b:["Un plano de 3 segundos del feature estrella","Texto: mañana se publica completa","Sticker de pregunta: qué querés ver de esta unidad"],w:"El teaser fabrica la audiencia del posteo de mañana."},
+  {f:"historia",a:"todos",p:"educativo",t:"Caja de preguntas abierta",h:"Historia: qué querés saber de alquilar en Buenos Aires.",b:["Sticker de preguntas abierto 24 horas","Responder las 3 mejores en historias al día siguiente","Guardar las preguntas: cada una es una pieza futura"],w:"La caja de preguntas es investigación de contenido gratis con forma de interacción."},
+  {f:"historia",a:"todos",p:"educativo",t:"Quiz: verdadero o falso",h:"Historia: verdadero o falso, {mito}.",b:["Sticker de quiz con el mito","Siguiente historia: la respuesta con explicación de 2 líneas","Serie semanal de mitos"],w:"El quiz obliga al tap, y el tap es la señal de interacción más barata de conseguir."},
+  {f:"historia",a:"todos",p:"confianza",t:"Se reservó",h:"Historia: placa sobria, esta unidad se reservó.",b:["Foto de la unidad con la palabra Reservado","Texto: gracias a los que la visitaron","Siguiente historia: las que siguen disponibles"],w:"Cada reservado es prueba social real y siembra urgencia honesta para el resto."},
+  {f:"historia",a:"inquilino",p:"detras",t:"Agenda de visitas de la semana",h:"Historia: esta semana se muestran estas tres.",b:["Una historia por unidad con día de visita","Foto más dato clave de cada una","Última: responder esta historia para anotarse"],w:"Convierte la agenda operativa real en contenido con CTA natural."},
+  {f:"historia",a:"todos",p:"detras",t:"Un día del equipo",h:"Historia: un día nuestro, sin guion.",b:["3 a 5 historias cortas: visita, producción, llamada, mate de por medio","Espontáneo pero cuidado, sin caras que no quieran salir","Texto mínimo, dejar que se vea el oficio"],w:"El equipo visible construye la confianza que ningún aviso puede comprar."},
+  {f:"historia",a:"todos",p:"educativo",t:"Encuesta: temporal o tradicional",h:"Historia: para tu momento, cuál va. Temporal o tradicional.",b:["Sticker de encuesta con las dos opciones","Siguiente historia: qué eligió la mayoría y qué dice eso","Cierre con el link a la explicación completa"],w:"La encuesta segmenta a la audiencia sola: te dice qué contenido pide."},
+  {f:"historia",a:"todos",p:"unidad",t:"Cuenta regresiva del posteo",h:"Historia: mañana a las 19 se publica la unidad nueva.",b:["Sticker de cuenta regresiva al horario del posteo","Un plano teaser de fondo","Al publicar: historia con el link al posteo"],w:"La cuenta regresiva convierte un posteo en un pequeño evento."},
+  {f:"historia",a:"todos",p:"confianza",t:"Reseña repost con contexto",h:"Historia: nos llegó esto y hay que compartirlo.",b:["Captura de la reseña o mensaje real","Dos líneas de contexto del caso","Sticker de mención si el cliente quiere"],w:"El repost espontáneo se siente ganado, no producido: máxima credibilidad."}
   ];
 
   /* ================= UTILIDADES ================= */
   var $=function(id){return document.getElementById(id);};
   function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];});}
   function pick(a){return a[Math.floor(Math.random()*a.length)];}
-  function toast(m){var t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(toast._h);toast._h=setTimeout(function(){t.classList.remove("show");},1600);}
+  function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t;}return a;}
+  function toast(m){var t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(toast._h);toast._h=setTimeout(function(){t.classList.remove("show");},1800);}
+
+  /* dar id estable a cada plantilla */
+  T.forEach(function(x,i){x.id=i;});
+  $("bankinfo").textContent=T.length+" ideas en el banco · no se repiten hasta agotar las de tu filtro";
 
   function seedParts(){
     var v=($("seedUnidad").value||"").split(",").map(function(x){return x.trim();}).filter(Boolean);
     return {dir:v[0]||"", barrio:v[1]||"", feature:v.slice(2).join(", ")||""};
   }
-  function fill(s){
-    var sd=seedParts();
+  function fill(s,sd){
     return s.replace(/\{barrio\}/g, sd.barrio||pick(BARRIOS))
             .replace(/\{feature\}/g, sd.feature||pick(FEATURES))
             .replace(/\{precio\}/g, pick(PRECIOS))
@@ -228,23 +311,48 @@
   }
   function inst(tpl){
     var sd=seedParts();
+    var title=fill(tpl.t,sd);
+    /* la unidad sembrada se estampa en el titulo de toda idea de unidad */
+    if(sd.dir && (tpl.p==="unidad" || tpl.p==="detras")) title=title+" · "+sd.dir;
     return {
-      f:tpl.f,a:tpl.a,p:tpl.p,
-      t:fill(tpl.t), h:fill(tpl.h),
-      b:tpl.b.map(fill),
+      id:tpl.id, f:tpl.f,a:tpl.a,p:tpl.p,
+      t:title, h:fill(tpl.h,sd),
+      b:tpl.b.map(function(x){return fill(x,sd);}),
       cta:pick(CTA[tpl.a]||CTA.todos),
       w:tpl.w,
-      unidad:sd.dir?sd.dir+(sd.barrio?", "+sd.barrio:""):""
+      unidad:sd.dir?(sd.dir+(sd.barrio?", "+sd.barrio:"")+(sd.feature?" · "+sd.feature:"")):""
     };
+  }
+
+  /* ================= SELECCION (sin repetir, con completado inteligente) ================= */
+  var recent=[]; /* ids ya mostrados en la sesion */
+  function markRecent(ids){ ids.forEach(function(i){ if(recent.indexOf(i)<0) recent.push(i); }); }
+  function takeFrom(pool,n,exclude){
+    var fresh=pool.filter(function(x){return recent.indexOf(x.id)<0 && exclude.indexOf(x.id)<0;});
+    var src=fresh.length?fresh:pool.filter(function(x){return exclude.indexOf(x.id)<0;});
+    return shuffle(src).slice(0,n);
+  }
+  function selectTemplates(ff,fa,fp,n){
+    var out=[], ids=[];
+    function add(list){ list.forEach(function(x){ if(ids.indexOf(x.id)<0){ out.push(x); ids.push(x.id); } }); }
+    var exact=T.filter(function(x){return (!ff||x.f===ff)&&(!fa||x.a===fa||x.a==="todos")&&(!fp||x.p===fp);});
+    add(takeFrom(exact,n,ids));
+    /* completar relajando de a un filtro, priorizando mantener el formato */
+    if(out.length<n && fp) add(takeFrom(T.filter(function(x){return (!ff||x.f===ff)&&(!fa||x.a===fa||x.a==="todos");}),n-out.length,ids));
+    if(out.length<n && fa) add(takeFrom(T.filter(function(x){return (!ff||x.f===ff);}),n-out.length,ids));
+    if(out.length<n) add(takeFrom(T,n-out.length,ids));
+    markRecent(ids);
+    return out.slice(0,n);
   }
 
   /* ================= RENDER ================= */
   function cardHTML(it,idx,saved){
     return '<article class="card" data-i="'+idx+'">'+
-      '<div class="k"><span class="tag f">'+esc(FNAME[it.f])+'</span><span class="tag p">'+esc(PNAME[it.p])+'</span><span class="tag">'+esc(ANAME[it.a])+'</span>'+(it.f==="camara"?'<span class="tag" style="background:var(--gold-pale);border-color:var(--gold);color:var(--gold-dark)">Método Mata</span>':'')+'</div>'+
+      '<div class="k"><span class="tag f">'+esc(FNAME[it.f])+'</span><span class="tag p">'+esc(PNAME[it.p])+'</span><span class="tag">'+esc(ANAME[it.a])+'</span>'+
+      (it.f==="camara"?'<span class="tag mata">Método Mata</span>':'')+'</div>'+
       '<h3>'+esc(it.t)+'</h3>'+
-      (it.unidad?'<div class="why">Unidad: '+esc(it.unidad)+'</div>':'')+
-      '<div class="hook"><span class="hl">Hook · 0 a 3 segundos</span><q>'+esc(it.h)+'</q></div>'+
+      (it.unidad?'<div class="unidad-l">Unidad: '+esc(it.unidad)+'</div>':'')+
+      '<div class="hook"><span class="hl">'+(it.f==="camara"?"Gancho · 0 a 3 segundos":"Hook · 0 a 3 segundos")+'</span><q>'+esc(it.h)+'</q></div>'+
       '<ul class="beats">'+it.b.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul>'+
       '<div class="cta-l"><b>CTA:</b> '+esc(it.cta)+'</div>'+
       '<div class="why">Por qué funciona: '+esc(it.w)+'</div>'+
@@ -256,7 +364,7 @@
     return "PIEZA: "+it.t+"\n"+
       "FORMATO: "+FNAME[it.f]+" · AUDIENCIA: "+ANAME[it.a]+" · PILAR: "+PNAME[it.p]+"\n"+
       (it.unidad?"UNIDAD: "+it.unidad+"\n":"")+
-      "\nHOOK (0 a 3s):\n"+it.h+"\n"+
+      "\n"+(it.f==="camara"?"GANCHO":"HOOK")+" (0 a 3s):\n"+it.h+"\n"+
       "\nESTRUCTURA:\n"+it.b.map(function(x){return "- "+x;}).join("\n")+"\n"+
       "\nCTA: "+it.cta+"\n"+
       "POR QUE FUNCIONA: "+it.w+"\n"+
@@ -267,7 +375,6 @@
   var current=[];
   var saved=[];
   try{ saved=JSON.parse(localStorage.getItem("ideas_bairen")||"[]"); }catch(e){ saved=[]; }
-
   function isSaved(it){ return saved.some(function(s){return s.t===it.t&&s.h===it.h;}); }
   function persist(){ try{ localStorage.setItem("ideas_bairen", JSON.stringify(saved)); }catch(e){} }
 
@@ -276,9 +383,9 @@
       var it=list[parseInt(c.getAttribute("data-i"),10)];
       c.querySelector(".copy").addEventListener("click",function(){
         var txt=brief(it);
+        function fallback(t){ var ta=document.createElement("textarea"); ta.value=t; document.body.appendChild(ta); ta.select(); try{document.execCommand("copy");toast("Brief copiado");}catch(e){toast("No se pudo copiar");} document.body.removeChild(ta); }
         if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(function(){toast("Brief copiado");},function(){fallback(txt);}); }
         else fallback(txt);
-        function fallback(t){ var ta=document.createElement("textarea"); ta.value=t; document.body.appendChild(ta); ta.select(); try{document.execCommand("copy");toast("Brief copiado");}catch(e){toast("No se pudo copiar");} document.body.removeChild(ta); }
       });
       var sb=c.querySelector(".save");
       sb.addEventListener("click",function(){
@@ -291,38 +398,35 @@
 
   function generate(){
     var ff=$("fFormato").value, fa=$("fAud").value, fp=$("fPilar").value;
-    var pool=T.filter(function(x){
-      return (!ff||x.f===ff)&&(!fa||x.a===fa||x.a==="todos")&&(!fp||x.p===fp);
-    });
-    if(!pool.length){ toast("No hay ideas con esos filtros, probá aflojar uno"); return; }
-    var picked=[], used={};
-    var guard=0;
-    while(picked.length<Math.min(3,pool.length)&&guard<60){
-      guard++;
-      var tpl=pick(pool);
-      if(used[tpl.t]) continue;
-      used[tpl.t]=1; picked.push(inst(tpl));
-    }
-    current=picked;
+    var tpls=selectTemplates(ff,fa,fp,3);
+    if(!tpls.length){ toast("Sin ideas para ese cruce"); return; }
+    current=tpls.map(inst);
     $("weekhead").innerHTML="";
     $("hint").style.display="none";
-    $("grid").innerHTML=picked.map(function(it,i){return cardHTML(it,i,isSaved(it));}).join("");
-    bindCards($("grid"),picked);
+    $("grid").innerHTML=current.map(function(it,i){return cardHTML(it,i,isSaved(it));}).join("");
+    bindCards($("grid"),current);
   }
 
   function week(){
-    var pickBy=function(f,p){ var pool=T.filter(function(x){return x.f===f&&(!p||x.p===p);}); return inst(pick(pool)); };
-    var lun=pickBy("reel","unidad");
-    var mie=pickBy("carrusel",null);
-    var vie=pick([pickBy("camara","confianza"),pickBy("camara","educativo")]);
-    var h1=pickBy("historia","detras");
-    var h2=pickBy("historia",null);
+    function one(f,p){
+      var pool=T.filter(function(x){return x.f===f&&(!p||x.p===p);});
+      if(!pool.length) pool=T.filter(function(x){return x.f===f;});
+      var sel=takeFrom(pool,1,[]);
+      var tpl=sel.length?sel[0]:pick(pool);
+      markRecent([tpl.id]);
+      return inst(tpl);
+    }
+    var lun=one("reel","unidad");
+    var mie=one("carrusel",null);
+    var vie=one("camara",Math.random()<0.5?"confianza":"educativo");
+    var h1=one("historia","detras");
+    var h2=one("historia",null);
     current=[lun,mie,vie,h1,h2];
     var labels=["LUNES · Feed","MIÉRCOLES · Feed","VIERNES · Feed","HISTORIAS · Lun/Mar","HISTORIAS · Jue"];
     $("hint").style.display="none";
-    $("weekhead").innerHTML='<div class="weekttl">Semana completa Bairen</div><div class="weeksub">Cadencia real del plan: lunes reel de unidad, miércoles carrusel, viernes pieza de confianza, más historias. Volvé a tocar el botón para otra combinación.</div>';
+    $("weekhead").innerHTML='<div class="weekttl">Semana completa Bairen</div><div class="weeksub">Cadencia real del plan: lunes reel de unidad, miércoles carrusel, viernes pieza de confianza o educativa, más historias. Volvé a tocar el botón para otra combinación.</div>';
     $("grid").innerHTML=current.map(function(it,i){
-      return cardHTML(it,i,isSaved(it)).replace('<div class="k">','<div class="k"><span class="tag" style="background:var(--gold);border-color:var(--gold);color:var(--navy-deep)">'+labels[i]+'</span>');
+      return cardHTML(it,i,isSaved(it)).replace('<div class="k">','<div class="k"><span class="tag day">'+labels[i]+'</span>');
     }).join("");
     bindCards($("grid"),current);
   }
