@@ -216,17 +216,16 @@
   .empty{color:#B9AF97;font-style:italic;}
 
   /* ============ PRINT ============ */
+  /* ============ PRINT: una sola pagina continua, identica a la vista previa ============ */
   @media print{
-    @page{size:A4;margin:0;}
-    body{background:#fff;}
+    html,body{background:var(--navy-deep) !important;}
     .topbar,.panel,.pv-lbl,.toast{display:none !important;}
     .workspace{display:block;min-height:0;}
-    .preview-wrap{overflow:visible;max-height:none;padding:0;display:block;background:none;}
+    .preview-wrap{padding:0;display:block;background:none;}
     .ficha{width:100%;max-width:100%;box-shadow:none;}
     *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-    html,body{background:var(--navy-deep) !important;}
     .mapbox a.cover{display:none;}
-    .gal img,.specs .s,.view,.numbers,.ffoot,.amn,.mapbox{page-break-inside:avoid;break-inside:avoid;}
+    .pg{page-break-after:auto;page-break-inside:auto;}
   }
 </style>
 </head>
@@ -336,6 +335,7 @@
 </div>
 
 <div class="toast" id="toast"></div>
+<style id="pagesize"></style>
 
 <script>
 (function(){
@@ -562,6 +562,11 @@
 
   /* ============ ACCIONES ============ */
   $("btnPdf").addEventListener("click", function(){
+    /* pagina unica: el PDF mide exactamente lo que mide la ficha en la vista previa */
+    var f=$("ficha");
+    var MM=0.2645833; /* px a mm (96 dpi) */
+    var w=Math.ceil(f.offsetWidth*MM), h=Math.ceil(f.scrollHeight*MM)+3; /* holgura anti-desborde */
+    $("pagesize").textContent="@page{size:"+w+"mm "+h+"mm;margin:0;}";
     var prev=document.title;
     document.title=(S.dir?S.dir+(S.unidad?" "+S.unidad:"")+" · ":"")+"Ficha PSI · Grupo Bairen";
     window.print();
@@ -656,8 +661,7 @@
     if(S.expensas) nrows+=numrow(t.fees, money(S.expensas)+" "+t.perMonth);
     var nums=nrows?'<div class="numbers"><div class="nt">'+t.numbers+'</div><div class="ng">'+nrows+'</div></div>':"";
 
-    var galCount=Math.max(0,S.fotos.length-1);
-    var gal=galCount?'<div class="sec"><div class="sec-t">'+t.gallery+'</div><div class="gal" id="fGal"></div></div>':"";
+    var galImgs=S.fotos.slice(1);
 
     var adv='<span class="pb">'+t.preparedBy+'</span><br><b>'+esc(S.asesor||"")+'</b>'+
       (S.tel?'<br>'+esc(S.tel):'')+(S.mail?'<br>'+esc(S.mail):'')+(S.fecha?'<br>'+esc(S.fecha):'');
@@ -667,16 +671,34 @@
       metric(t.yield,rentab!=null?rentab.toFixed(1)+"<small> %</small>":"—")+
       metric(t.area,m2?m2+"<small> m²</small>":"—");
 
-    $("ficha").innerHTML=
+    /* ===== composicion en paginas deterministicas ===== */
+    var pgs=[];
+    /* pagina 1: portada */
+    pgs.push('<section class="pg pg-cover">'+
       '<div class="fh"><div class="r"><div class="logo" id="fLogo"></div>'+
       '<div class="kick">'+t.kick+'<small>'+t.opp+'</small></div></div>'+
       '<h2>'+title+'</h2>'+(locline?'<div class="loc">'+locline+'</div>':'')+'</div>'+
       '<div class="hero-img" id="fHero"><span class="ph">'+t.photos+'</span></div>'+
       '<div class="metrics">'+metrics+'</div>'+
-      '<div class="fbody">'+descr+specsSec+amn+view+gal+loc+'</div>'+
+      '</section>');
+    /* pagina 2: detalle (solo si hay contenido) */
+    var detail=descr+specsSec+amn+view;
+    if(detail) pgs.push('<section class="pg"><div class="fbody">'+detail+'</div></section>');
+    /* galeria: titulo + hasta 6 fotos por pagina, siempre juntos */
+    for(var gi=0; gi<galImgs.length; gi+=6){
+      pgs.push('<section class="pg"><div class="fbody"><div class="sec">'+
+        '<div class="sec-t">'+t.gallery+'</div>'+
+        '<div class="gal" data-from="'+(gi+1)+'" data-to="'+Math.min(gi+6,galImgs.length)+'"></div>'+
+        '</div></div></section>');
+    }
+    /* pagina final: ubicacion + numeros + footer, siempre juntos y cerrando en navy */
+    pgs.push('<section class="pg">'+
+      (loc?'<div class="fbody">'+loc+'</div>':'')+
       nums+
       '<div class="ffoot"><div class="tag">'+t.tag+'</div><div class="adv">'+adv+'</div></div>'+
-      '<div class="disc">'+t.disc+'</div>';
+      '<div class="disc">'+t.disc+'</div>'+
+      '</section>');
+    $("ficha").innerHTML=pgs.join("");
 
     /* imagenes por DOM (nunca por string: es la garantía anti-bug) */
     document.getElementById("fLogo").innerHTML=logoBlock(36,23);
@@ -686,13 +708,14 @@
       var hi=document.createElement("img"); hi.src=S.fotos[0]; hi.alt="";
       h.appendChild(hi);
     }
-    if(galCount){
-      var g=document.getElementById("fGal");
-      S.fotos.slice(1).forEach(function(src){
-        var im=document.createElement("img"); im.src=src; im.alt="";
+    document.querySelectorAll("#ficha .gal").forEach(function(g){
+      var from=parseInt(g.getAttribute("data-from"),10), to=parseInt(g.getAttribute("data-to"),10);
+      for(var i=from;i<=to;i++){
+        if(!S.fotos[i]) continue;
+        var im=document.createElement("img"); im.src=S.fotos[i]; im.alt="";
         g.appendChild(im);
-      });
-    }
+      }
+    });
     /* mapa automatico desde la direccion (mismo embed que la web) */
     if(S.dir){
       var mb=document.getElementById("fMapBox");
