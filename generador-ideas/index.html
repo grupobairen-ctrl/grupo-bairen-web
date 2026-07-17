@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<meta name="theme-color" content="#131D2D" />
+<link rel="icon" href="/bairen_logo.png?v=3">
+<title>Generador de Ideas · Grupo Bairen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --navy:#2A3A52; --navy-dark:#1E2A3F; --navy-deep:#131D2D;
+    --gold:#C2A968; --gold-dark:#8A7547; --gold-light:#DECDA0; --gold-pale:#F3EBD6;
+    --white:#FBFAF6; --paper:#FFFFFF; --off:#EEE5D0;
+    --ink:#1A2538; --mid:#6B7589; --faint:#9AA2B2; --line:#E4DBC8;
+    --disp:'Playfair Display',Georgia,serif;
+    --body:'Jost','Avenir Next',system-ui,sans-serif;
+    --ease:cubic-bezier(0.22,1,0.36,1);
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:var(--body);font-weight:300;color:var(--ink);background:var(--white);-webkit-font-smoothing:antialiased;line-height:1.55;}
+  button,input,select{font-family:inherit;color:inherit;font-size:inherit;}
+
+  .topbar{position:sticky;top:0;z-index:100;background:var(--navy-deep);color:var(--white);
+    display:flex;align-items:center;flex-wrap:wrap;gap:12px 18px;padding:12px 20px;border-bottom:1px solid var(--gold);}
+  .logo{display:flex;align-items:center;gap:11px;}
+  .logo .wm{display:flex;flex-direction:column;line-height:1;}
+  .logo .wm b{font-family:var(--disp);font-weight:500;font-size:.78rem;letter-spacing:.3em;color:#F2ECDD;}
+  .logo .wm b+b{font-size:1.05rem;font-weight:600;letter-spacing:.2em;margin-top:3px;}
+  .logo .wm span{font-size:.44rem;letter-spacing:.4em;text-transform:uppercase;color:var(--gold-light);margin-top:4px;}
+  .app-title h1{font-family:var(--disp);font-weight:500;font-size:.95rem;color:rgba(255,255,255,.85);}
+  .app-title small{display:block;font-size:.54rem;letter-spacing:.24em;text-transform:uppercase;color:rgba(255,255,255,.4);}
+  .grow{flex:1;}
+  .btn{border:1px solid rgba(194,169,104,.5);background:transparent;color:var(--gold-light);font-size:.62rem;font-weight:600;
+    letter-spacing:.14em;text-transform:uppercase;padding:10px 16px;cursor:pointer;transition:background .25s,color .25s,transform .25s;white-space:nowrap;}
+  .btn:hover{background:var(--white);color:var(--navy);}
+  .btn.primary{background:var(--gold);color:var(--navy-deep);border-color:var(--gold);}
+  .btn.primary:hover{background:var(--gold-light);transform:translateY(-1px);}
+  @media(max-width:760px){.app-title{display:none;}}
+
+  .controls{background:var(--paper);border-bottom:1px solid var(--line);padding:18px 20px;}
+  .ctr-in{max-width:1100px;margin:0 auto;display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;}
+  .fld{display:flex;flex-direction:column;gap:5px;min-width:0;}
+  .fld label{font-size:.6rem;font-weight:600;letter-spacing:.14em;color:var(--gold-dark);text-transform:uppercase;}
+  .fld select,.fld input{border:1px solid var(--line);background:var(--paper);padding:9px 11px;font-size:.85rem;font-weight:300;min-width:150px;}
+  .fld select:focus,.fld input:focus{outline:none;border-color:var(--gold);}
+  .seed{flex:1 1 220px;}
+  .seed input{width:100%;min-width:0;}
+  .actions2{display:flex;gap:9px;flex-wrap:wrap;}
+  .gen{border:1px solid var(--navy);background:var(--navy);color:#fff;padding:11px 22px;cursor:pointer;
+    font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;font-weight:600;transition:background .2s,transform .2s;}
+  .gen:hover{background:var(--navy-dark);transform:translateY(-1px);}
+  .gen.week{background:transparent;color:var(--navy);border-color:var(--gold-dark);}
+  .gen.week:hover{background:var(--gold-pale);}
+
+  .main{max-width:1100px;margin:0 auto;padding:28px 20px 100px;}
+  .hint{text-align:center;color:var(--faint);font-size:.85rem;padding:60px 20px;max-width:52ch;margin:0 auto;}
+  .hint b{font-family:var(--disp);display:block;font-size:1.4rem;color:var(--navy);font-weight:500;margin-bottom:10px;}
+
+  .weekttl{font-family:var(--disp);font-weight:500;font-size:1.3rem;color:var(--navy);margin:6px 0 4px;}
+  .weeksub{font-size:.8rem;color:var(--mid);margin-bottom:18px;}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;}
+  .card{background:var(--paper);border:1px solid var(--line);border-top:3px solid var(--gold);padding:20px 22px;
+    display:flex;flex-direction:column;gap:12px;box-shadow:0 14px 34px -22px rgba(19,29,45,.35);}
+  .card .k{display:flex;gap:6px;flex-wrap:wrap;}
+  .tag{font-size:.56rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;border:1px solid var(--line);color:var(--mid);}
+  .tag.f{background:var(--navy);border-color:var(--navy);color:#fff;}
+  .tag.p{background:var(--gold-pale);border-color:var(--line);color:var(--gold-dark);}
+  .card h3{font-family:var(--disp);font-weight:500;font-size:1.14rem;line-height:1.25;color:var(--navy-dark);}
+  .hook{border-left:2px solid var(--gold);padding:2px 0 2px 14px;}
+  .hook .hl{font-size:.56rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-dark);font-weight:600;display:block;margin-bottom:3px;}
+  .hook q{font-family:var(--disp);font-style:italic;font-size:.98rem;color:var(--ink);quotes:none;line-height:1.4;}
+  .beats{font-size:.84rem;color:#3A4459;}
+  .beats li{list-style:none;padding:4px 0 4px 18px;position:relative;line-height:1.5;}
+  .beats li::before{content:"";position:absolute;left:2px;top:12px;width:6px;height:6px;border:1px solid var(--gold);transform:rotate(45deg);}
+  .cta-l{font-size:.8rem;color:var(--navy);background:var(--off);padding:8px 12px;}
+  .cta-l b{font-weight:500;}
+  .why{font-size:.76rem;color:var(--mid);font-style:italic;}
+  .cardbtns{display:flex;gap:8px;margin-top:auto;}
+  .cb{flex:1;border:1px solid var(--line);background:var(--paper);padding:8px;font-size:.62rem;letter-spacing:.1em;
+    text-transform:uppercase;font-weight:600;color:var(--navy);cursor:pointer;transition:background .2s;}
+  .cb:hover{background:var(--gold-pale);}
+  .cb.saved{background:var(--navy);color:#fff;border-color:var(--navy);}
+
+  .savedttl{display:flex;align-items:baseline;gap:12px;margin:40px 0 14px;}
+  .savedttl h2{font-family:var(--disp);font-weight:500;font-size:1.25rem;color:var(--navy);}
+  .savedttl span{font-size:.72rem;color:var(--faint);}
+
+  .toast{position:fixed;bottom:22px;left:50%;transform:translate(-50%,80px);background:var(--navy-deep);color:var(--gold-light);
+    border:1px solid var(--gold);padding:11px 22px;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;z-index:200;
+    transition:transform .45s var(--ease);pointer-events:none;}
+  .toast.show{transform:translate(-50%,0);}
+  *:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="logo">
+    <svg width="36" height="36" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22" fill="none" stroke="#C2A968" stroke-width="1.6"/><path d="M24 9l2.6 4.4L28 34h-8l1.4-20.6L24 9z" fill="#C2A968"/><path d="M15 38h18" stroke="#C2A968" stroke-width="1.4"/></svg>
+    <div class="wm"><b>GRUPO</b><b>BAIREN</b><span>Buenos Aires</span></div>
+  </div>
+  <div class="app-title">
+    <small>Herramienta interna</small>
+    <h1>Generador de Ideas de Contenido</h1>
+  </div>
+  <div class="grow"></div>
+  <button class="btn" id="btnClear" type="button">Limpiar guardadas</button>
+</header>
+
+<div class="controls">
+  <div class="ctr-in">
+    <div class="fld"><label for="fFormato">Formato</label>
+      <select id="fFormato"><option value="">Todos</option><option value="reel">Reel recorrido</option><option value="camara">Tomás a cámara</option><option value="carrusel">Carrusel</option><option value="post">Post informativo</option><option value="historia">Historia</option></select></div>
+    <div class="fld"><label for="fAud">Audiencia</label>
+      <select id="fAud"><option value="">Todas</option><option value="inquilino">Inquilino</option><option value="propietario">Propietario</option><option value="inversor">Inversor</option><option value="padres">Padres del interior</option></select></div>
+    <div class="fld"><label for="fPilar">Pilar</label>
+      <select id="fPilar"><option value="">Todos</option><option value="unidad">Unidad</option><option value="confianza">Confianza</option><option value="educativo">Educativo</option><option value="barrio">Barrio</option><option value="detras">Detrás de escena</option></select></div>
+    <div class="fld seed"><label for="seedUnidad">Unidad de la semana (opcional: dirección, barrio, feature)</label>
+      <input id="seedUnidad" placeholder="Gallo 1210, Recoleta, patio propio techado"></div>
+    <div class="actions2">
+      <button class="gen" id="btnGen" type="button">Generar 3 ideas</button>
+      <button class="gen week" id="btnWeek" type="button">Armar semana completa</button>
+    </div>
+  </div>
+</div>
+
+<main class="main">
+  <div id="weekhead"></div>
+  <div class="grid" id="grid"></div>
+  <div class="hint" id="hint"><b>Ideas listas para producir</b>Elegí filtros o directamente tocá Generar. Cada idea sale con hook, estructura, CTA y el porqué. Con Copiar brief la pegás directo en la card de Notion.</div>
+  <div id="savedwrap"></div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+  /* ================= DATOS BAIREN ================= */
+  var BARRIOS=["Belgrano","Núñez","Palermo","Palermo Hollywood","Recoleta","Retiro","Las Cañitas","Colegiales","San Isidro"];
+  var FEATURES=["terraza propia con parrilla","mesada de mármol travertino","piso alto con vista abierta","doble altura","piscina con vista panorámica","hogar a leña","dormitorio en suite con vestidor","balcón aterrazado","jardín propio con piscina","cocina con isla"];
+  var PRECIOS=["USD 950","USD 1.200","USD 1.800","USD 2.500","USD 3.500"];
+  var MITOS=["alquilar sin garantía es imposible","el seguro de caución es la única opción","temporal es solo para turistas","un departamento premium se alquila solo","todas las inmobiliarias filtran igual"];
+  var PREGUNTAS=["qué pasa si el inquilino no paga","cómo elegimos a quién entra","qué incluye el precio de un temporal","cuánto rinde un departamento premium","temporal o tradicional, cuál conviene"];
+  var CTA={
+    inquilino:["Comentá INFO y te paso todo por privado.","Coordinemos una visita a través de nuestro sitio web. Link en bio.","Escribinos y te mostramos las unidades disponibles."],
+    propietario:["Escribinos y te decimos cuánto puede rentar tu propiedad.","Contanos sobre tu unidad y coordinamos."],
+    inversor:["Agendá una consulta sin costo. Link en bio.","Escribinos y te armamos una primera selección."],
+    padres:["Escribinos y contanos para qué fechas."],
+    todos:["Comentá INFO y te paso todo por privado."]
+  };
+  var FNAME={reel:"Reel recorrido",camara:"Tomás a cámara",carrusel:"Carrusel",post:"Post informativo",historia:"Historia"};
+  var PNAME={unidad:"Unidad",confianza:"Confianza",educativo:"Educativo",barrio:"Barrio",detras:"Detrás de escena"};
+  var ANAME={inquilino:"Inquilino",propietario:"Propietario",inversor:"Inversor",padres:"Padres del interior",todos:"General"};
+
+  /* ================= MOTOR DE IDEAS =================
+     Cada plantilla: f formato, a audiencia, p pilar,
+     t titulo, h hook (0-3s), b beats, w por que funciona. */
+  var T=[
+    /* ---- REEL RECORRIDO · UNIDAD ---- */
+    {f:"reel",a:"inquilino",p:"unidad",t:"Speed tour: la unidad en 5 cortes",h:"{feature} en {barrio}. El resto del departamento sigue así.",b:["Abrir con el mejor ambiente, 2 segundos, sin intro","5 a 7 cortes de 2 segundos, cada uno un ambiente","Sobreimpresos cortos: ambiente y un dato (m², luz, piso)","Cierre en el segundo mejor plano, no en la puerta"],w:"El mejor plano primero compra los 3 segundos que deciden la distribución."},
+    {f:"reel",a:"inquilino",p:"unidad",t:"Price reveal: qué alquila {precio} en {barrio}",h:"Esto es lo que {precio} por mes alquila en {barrio}.",b:["Placa de apertura con el precio, 1.5 segundos","Recorrido rápido con sobreimpresos de lo que incluye","En temporal: remarcar todo incluido (expensas, servicios, muebles)","Placa final con el precio de nuevo y el CTA"],w:"El anclaje de precio genera debate en comentarios y el algoritmo premia la conversación."},
+    {f:"reel",a:"inquilino",p:"unidad",t:"POV: entrar por primera vez",h:"POV: llegás con las valijas y el departamento ya está listo.",b:["Cámara en primera persona desde la puerta","Recorrido continuo sin cortes bruscos, ritmo de caminata","Detalles al pasar: llaves, luz, la cama hecha, la vista","Texto final: sin garantía, sin caución, todo incluido"],w:"El POV mete al espectador adentro: no mira un departamento, se muda."},
+    {f:"reel",a:"inquilino",p:"unidad",t:"El detalle que nadie nota",h:"Casi nadie nota este detalle cuando entra a esta unidad.",b:["Abrir con un plano cerrado del detalle sin revelarlo entero","Recorrer la unidad normal, 3 o 4 cortes","Volver al detalle y revelarlo con sobreimpreso","Cerrar con el dato de la unidad y CTA"],w:"Bucle abierto: la promesa del comienzo obliga a quedarse hasta el final."},
+    {f:"reel",a:"inquilino",p:"unidad",t:"3 razones para esta unidad",h:"Tres razones por las que esta unidad no llega a fin de mes libre.",b:["Razón 1: la zona (qué hay a dos cuadras)","Razón 2: el edificio (amenities, seguridad)","Razón 3: la unidad (el feature estrella)","Urgencia real: día de visitas de esta semana"],w:"La lista numerada estructura la retención: el que ve la 1 quiere ver la 3."},
+    {f:"reel",a:"todos",p:"unidad",t:"Un día viviendo acá",h:"Así se ve un martes cualquiera viviendo en {barrio}.",b:["Mañana: luz del living, café en el balcón","Mediodía: lo que queda a 5 minutos caminando","Tarde: amenities (pileta, gym, sum)","Noche: la vista. Placa de cierre con la unidad"],w:"No vende metros: vende el estilo de vida, que es lo que se comparte."},
+    {f:"reel",a:"inversor",p:"unidad",t:"La cuenta del inversor",h:"Este departamento paga {precio} por mes de renta. La cuenta, abajo.",b:["Plano del ambiente principal con placa del precio de compra","Sobreimpresos: renta mensual, rentabilidad anual estimada","2 cortes de la unidad y 1 de la zona","Cierre: representamos al comprador, no al vendedor"],w:"Los números concretos frenan el scroll del que piensa en invertir."},
+
+    /* ---- TOMÁS A CÁMARA (Método Mata: gancho + promesa + autoridad + valor + CTA visual) ---- */
+    {f:"camara",a:"inquilino",p:"educativo",t:"Mito vs realidad: {mito}",h:"Dicen que {mito}. Falso.",b:["Promesa: en 40 segundos te muestro cómo funciona de verdad, con un caso real","Autoridad: gestionamos hogares premium en los mejores barrios de BA y firmamos contratos así todas las semanas","Valor: desarmar el mito con el caso concreto y nombrar al elefante (dónde estaría la trampa y por qué no la hay)","CTA visual: mostrar el screen del posteo y decir dónde comentar INFO y qué le llega por privado"],w:"Lo contraintuitivo retiene y la promesa explícita le da una razón para quedarse hasta el final."},
+    {f:"camara",a:"inquilino",p:"educativo",t:"La pregunta que todos hacen: {pregunta}",h:"La pregunta que más nos hacen: {pregunta}.",b:["Promesa: la respuesta completa en menos de un minuto, sin vueltas","Autoridad: la respondemos todas las semanas en visitas reales, esto es lo que pasa de verdad","Valor: la respuesta directa más un ejemplo real (sin nombres) que la aterrice","CTA visual: mostrar la caja de comentarios y pedir la próxima pregunta ahí"],w:"Responder preguntas reales es demanda garantizada y el CTA visual siembra la próxima pieza."},
+    {f:"camara",a:"propietario",p:"educativo",t:"El error del propietario",h:"El error más caro que comete un propietario en Buenos Aires.",b:["Promesa: te muestro cuánto cuesta y cómo evitarlo en un minuto","Autoridad: lo vemos todos los meses administrando hogares premium, este es el patrón que se repite","Valor: el error (elegir rápido en vez de elegir bien), su costo real en meses de vacancia, y el filtro que lo evita (perfil, historial crediticio, ingresos)","CTA visual: mostrar el screen del perfil y decir dónde escribir para saber cuánto puede rentar su propiedad"],w:"Aversión a la pérdida más autoridad de casos reales: el dueño evaluador se queda."},
+    {f:"camara",a:"propietario",p:"confianza",t:"Cuánto rinde un premium, sin humo",h:"Cuánto rinde de verdad un departamento premium en Buenos Aires.",b:["Promesa: el número real y de dónde sale, sin promesas infladas","Autoridad: es el número que pagamos todos los meses a los dueños que administramos","Valor: 7 a 8 por ciento anual, qué lo hace posible (ocupación, gestión, precio bien puesto) y qué NO prometemos","CTA visual: screen del perfil mostrando dónde escribir para la estimación de renta sin costo"],w:"El número concreto más la honestidad de lo que no se promete construye autoridad real."},
+    {f:"camara",a:"todos",p:"confianza",t:"Por qué no publicamos cualquier depto",h:"Hay departamentos que preferimos no publicar.",b:["Promesa: te cuento el criterio con un ejemplo de algo que quedó afuera","Autoridad: por ese filtro nuestras reseñas dicen lo que dicen (leer una real)","Valor: la regla (solo lo que dejaríamos a nuestra propia familia), el ejemplo concreto, y qué gana cada lado con ese filtro","CTA visual: mostrar el catálogo en la web y decir dónde ver lo que sí pasó el filtro"],w:"Decir que no a negocio propio es la señal de confianza más fuerte que existe."},
+    {f:"camara",a:"padres",p:"educativo",t:"Para padres: instalar a un hijo en BA",h:"Tu hijo se viene a estudiar a Buenos Aires y vos estás a mil kilómetros.",b:["Promesa: las 3 cosas que tenés que mirar antes de elegir departamento, en un minuto","Autoridad: instalamos hijos de familias del interior todos los meses, esto es lo que los padres nos agradecen","Valor: zona segura según la facultad, edificio con seguridad, contrato claro a distancia (con videos y asesoría)","CTA visual: screen del WhatsApp mostrando dónde escribir y qué contarnos (fechas y facultad)"],w:"Habla al que paga (el padre), una audiencia que casi nadie atiende, con promesa concreta."},
+    {f:"camara",a:"inversor",p:"educativo",t:"Por qué Buenos Aires, hoy",h:"Los que tienen dólares están mirando Buenos Aires. Por esto.",b:["Promesa: la tesis completa en un minuto, con el número que la sostiene","Autoridad: trabajamos con inversores que compran y rentan acá, esto es lo que vemos en las operaciones","Valor: precio por m² en dólares versus la región, qué compra ese precio, y el riesgo honesto con cómo se maneja","CTA visual: screen del perfil mostrando el link para agendar la consulta sin costo y qué incluye"],w:"Tesis contraintuitiva con datos y un CTA visual que baja la fricción de agendar."},
+
+    /* ---- CARRUSEL ---- */
+    {f:"carrusel",a:"inquilino",p:"unidad",t:"Ficha de la unidad en 6 placas",h:"Placa 1: la mejor foto y el titular en mayúsculas entre puntos.",b:["Placa 1: foto hero + titular estilo Bairen","Placas 2 a 5: un ambiente por placa, un dato por placa","Placa 6: precio o modalidad + CTA comentá INFO","Estética: fotos embellecidas con IA, fieles a la realidad"],w:"El formato ficha ya probó viralizar en la cuenta: es el patrón ganador propio."},
+    {f:"carrusel",a:"todos",p:"barrio",t:"{barrio} en 8 placas",h:"Placa 1: {barrio}, la guía corta.",b:["Placas: 2 cafés, 1 parque, 1 clásico gastronómico, 1 secreto de vecinos","Una foto real por placa, texto de una línea","Anteúltima placa: cómo se vive (perfil del barrio)","Última: las unidades disponibles en la zona"],w:"Contenido guardable: los carruseles de barrio se guardan y el guardado pesa más que el like."},
+    {f:"carrusel",a:"inquilino",p:"educativo",t:"Checklist antes de alquilar en BA",h:"Placa 1: leé esto antes de alquilar en Buenos Aires.",b:["5 placas: un chequeo por placa (contrato, expensas, estado, garantía, zona)","Concreto y accionable, sin relleno","Anteúltima: cómo lo resuelve un temporal todo incluido","Última: CTA"],w:"El contenido de utilidad se guarda y se comparte con el que está buscando."},
+    {f:"carrusel",a:"propietario",p:"educativo",t:"Qué mira Bairen antes de aceptar un inquilino",h:"Placa 1: a tu departamento no entra cualquiera.",b:["Placa por criterio: perfil, historial crediticio, totalidad de ingresos","Una placa con el caso: qué pasa cuando el filtro funciona","Placa de cierre: vos cobrás tranquilo","CTA propietarios"],w:"Mostrar el proceso desactiva el miedo número uno del dueño."},
+    {f:"carrusel",a:"todos",p:"confianza",t:"Chat real de un cliente",h:"Placa 1: el mensaje que nos llegó un martes a la noche.",b:["Captura real del chat (con permiso), sin edición linda","Placa 2: el contexto en dos líneas","Placa 3: qué hicimos, en bullets","Última placa: trato, respuesta a toda hora, confianza"],w:"La captura cruda es más creíble que cualquier placa diseñada."},
+    {f:"carrusel",a:"inversor",p:"educativo",t:"Comparativa: mismo precio, dos barrios",h:"Placa 1: {precio} por mes. Dos departamentos, dos barrios.",b:["3 placas por unidad: foto, datos, qué la hace única","Placa de cierre: no hay mejor, hay perfil","CTA: te ayudamos a elegir con criterio"],w:"La comparación activa la opinión: los comentarios eligen bando y el post despega."},
+
+    /* ---- POST INFORMATIVO ---- */
+    {f:"post",a:"inquilino",p:"educativo",t:"Temporal vs tradicional, en una imagen",h:"Una tabla simple: qué incluye cada modalidad, lado a lado.",b:["Tabla de dos columnas: plazo, muebles, garantía, expensas, servicios","Estética sobria navy y oro, tipografía grande","Caption corto que amplía un solo punto","CTA comentá INFO"],w:"Resuelve en 5 segundos la duda más común: contenido de referencia que se guarda."},
+    {f:"post",a:"propietario",p:"educativo",t:"La cuenta de la vacancia",h:"Un mes vacío cuesta más que una buena gestión.",b:["Gráfica simple: qué pierde un dueño por mes vacío","Comparar con el costo de gestión profesional","Caption: reducción de vacancia como servicio","CTA propietarios"],w:"Encuadre de pérdida con números: el dueño evaluador reacciona a la cuenta."},
+    {f:"post",a:"todos",p:"marca",t:"Manifiesto en una placa",h:"Buenos Aires no se alquila. Se elige.",b:["Una sola placa tipográfica con la frase de marca","Fondo navy, tipografía serif, cero adorno","Caption de 3 líneas sobre el criterio Bairen","Sin CTA de venta: es pieza de marca"],w:"Las piezas de identidad no convierten hoy: construyen el precio de mañana."},
+
+    /* ---- HISTORIA ---- */
+    {f:"historia",a:"inquilino",p:"detras",t:"Día de visitas en vivo",h:"Historia 1: hoy se muestra esta unidad. Así se ve en persona.",b:["3 a 4 historias: llegada, el ambiente estrella, un detalle","Texto en pantalla, sin música de urgencia","Mostrar movimiento real sin inventar presión","Última historia: link o responder para coordinar"],w:"La urgencia real y honesta: hay gente viéndola hoy, y se nota sin gritarlo."},
+    {f:"historia",a:"todos",p:"detras",t:"Encuesta: elegí la próxima unidad",h:"Historia con encuesta: cuál mostramos mañana, A o B.",b:["Dos fotos, sticker de encuesta","Al día siguiente: historia con el resultado y el recorrido ganador","Cadena de 2 días que trae a la gente de vuelta"],w:"La encuesta es interacción barata que entrena al algoritmo y crea cita de retorno."},
+    {f:"historia",a:"todos",p:"detras",t:"Detrás de la producción",h:"Historia: así se produce una unidad antes de publicarse.",b:["Time-lapse o cortes del rodaje de fotos y video","Un antes y después de una toma (fiel, sin trampa)","Texto: por qué producimos cada unidad como una revista"],w:"El detrás de escena humaniza y justifica el posicionamiento premium."},
+    {f:"historia",a:"inquilino",p:"unidad",t:"Teaser de la unidad de la semana",h:"Historia: un solo plano del mejor detalle, sin mostrar todo.",b:["Un plano de 3 segundos del feature estrella","Texto: mañana se publica completa","Sticker de pregunta: qué querés ver de esta unidad"],w:"El teaser fabrica la audiencia del posteo de mañana."},
+
+    /* ---- EXTRAS DE ALTO IMPACTO ---- */
+    {f:"reel",a:"inquilino",p:"educativo",t:"Sin garantía, dónde está la trampa",h:"Sin garantía y sin caución. La trampa, dónde está.",b:["Abrir con la objeción tal cual la piensa la gente","Recorrer una unidad mientras se responde en off","Respuesta: en ningún lado, elegimos bien y gestionamos nosotros","Placa final: todo incluido, llegás y vivís"],w:"Nombrar al elefante de frente: la transparencia frena el scroll del escéptico."},
+    {f:"reel",a:"todos",p:"barrio",t:"{barrio} en 40 segundos",h:"{barrio} en menos de un minuto.",b:["6 a 8 cortes: esquinas, cafés, parques, arquitectura","Sobreimpresos con nombres reales de lugares","Cerrar con una unidad disponible en la zona","Serie: un barrio por semana"],w:"El contenido de barrio agranda la marca más allá del que busca depto hoy."},
+    {f:"reel",a:"propietario",p:"confianza",t:"Qué hacemos por un dueño, en 30 segundos",h:"Todo lo que pasa para que un dueño cobre sin ocuparse de nada.",b:["Cortes rápidos: producción, filtro, contrato, cobro, mantenimiento","Un sobreimpreso por tarea, ritmo alto","Cierre: vos cobrás tranquilo","CTA propietarios"],w:"Comprimir el servicio completo en 30 segundos lo hace tangible y compartible."},
+    {f:"camara",a:"todos",p:"confianza",t:"Respondemos a cualquier hora, en serio",h:"Un cliente nos escribió un domingo a las once de la noche. Esto pasó.",b:["Promesa: te cuento el final de la historia y qué dice de cómo trabajamos","Autoridad: la reseña real que quedó de ese caso, leída textual","Valor: el caso corto sin nombres y el punto que enseña (el trato es la otra mitad del producto)","CTA visual: mostrar el perfil y decir dónde escribirnos a la hora que sea"],w:"La microhistoria con final real es el formato de confianza que más se recuerda."},
+    {f:"carrusel",a:"padres",p:"educativo",t:"Guía para instalar a un hijo en BA",h:"Placa 1: tu hijo estudia en Buenos Aires. La guía para instalarlo.",b:["Placas: zona según facultad, seguridad, presupuesto, contrato a distancia","Una placa con el proceso Bairen para padres","CTA: contanos para qué fechas"],w:"Contenido guardable para el momento exacto de decisión familiar."},
+    {f:"post",a:"inversor",p:"educativo",t:"El dato del mes del mercado",h:"Un solo número del mercado inmobiliario que importa este mes.",b:["Placa con el dato grande (precio m², brecha, rentabilidad)","Dos líneas de lectura: qué significa para el que compra","Serie mensual, mismo formato siempre","CTA inversor"],w:"La serie de datos posiciona autoridad y crea hábito de consumo mensual."}
+  ];
+
+  /* ================= UTILIDADES ================= */
+  var $=function(id){return document.getElementById(id);};
+  function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];});}
+  function pick(a){return a[Math.floor(Math.random()*a.length)];}
+  function toast(m){var t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(toast._h);toast._h=setTimeout(function(){t.classList.remove("show");},1600);}
+
+  function seedParts(){
+    var v=($("seedUnidad").value||"").split(",").map(function(x){return x.trim();}).filter(Boolean);
+    return {dir:v[0]||"", barrio:v[1]||"", feature:v.slice(2).join(", ")||""};
+  }
+  function fill(s){
+    var sd=seedParts();
+    return s.replace(/\{barrio\}/g, sd.barrio||pick(BARRIOS))
+            .replace(/\{feature\}/g, sd.feature||pick(FEATURES))
+            .replace(/\{precio\}/g, pick(PRECIOS))
+            .replace(/\{mito\}/g, pick(MITOS))
+            .replace(/\{pregunta\}/g, pick(PREGUNTAS));
+  }
+  function inst(tpl){
+    var sd=seedParts();
+    return {
+      f:tpl.f,a:tpl.a,p:tpl.p,
+      t:fill(tpl.t), h:fill(tpl.h),
+      b:tpl.b.map(fill),
+      cta:pick(CTA[tpl.a]||CTA.todos),
+      w:tpl.w,
+      unidad:sd.dir?sd.dir+(sd.barrio?", "+sd.barrio:""):""
+    };
+  }
+
+  /* ================= RENDER ================= */
+  function cardHTML(it,idx,saved){
+    return '<article class="card" data-i="'+idx+'">'+
+      '<div class="k"><span class="tag f">'+esc(FNAME[it.f])+'</span><span class="tag p">'+esc(PNAME[it.p])+'</span><span class="tag">'+esc(ANAME[it.a])+'</span>'+(it.f==="camara"?'<span class="tag" style="background:var(--gold-pale);border-color:var(--gold);color:var(--gold-dark)">Método Mata</span>':'')+'</div>'+
+      '<h3>'+esc(it.t)+'</h3>'+
+      (it.unidad?'<div class="why">Unidad: '+esc(it.unidad)+'</div>':'')+
+      '<div class="hook"><span class="hl">Hook · 0 a 3 segundos</span><q>'+esc(it.h)+'</q></div>'+
+      '<ul class="beats">'+it.b.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul>'+
+      '<div class="cta-l"><b>CTA:</b> '+esc(it.cta)+'</div>'+
+      '<div class="why">Por qué funciona: '+esc(it.w)+'</div>'+
+      '<div class="cardbtns"><button type="button" class="cb copy">Copiar brief</button>'+
+      '<button type="button" class="cb save'+(saved?' saved':'')+'">'+(saved?'Guardada':'Guardar')+'</button></div>'+
+      '</article>';
+  }
+  function brief(it){
+    return "PIEZA: "+it.t+"\n"+
+      "FORMATO: "+FNAME[it.f]+" · AUDIENCIA: "+ANAME[it.a]+" · PILAR: "+PNAME[it.p]+"\n"+
+      (it.unidad?"UNIDAD: "+it.unidad+"\n":"")+
+      "\nHOOK (0 a 3s):\n"+it.h+"\n"+
+      "\nESTRUCTURA:\n"+it.b.map(function(x){return "- "+x;}).join("\n")+"\n"+
+      "\nCTA: "+it.cta+"\n"+
+      "POR QUE FUNCIONA: "+it.w+"\n"+
+      "\nREGLAS: sin signos de exclamacion, sin guiones largos, mostrar no vender, formato 9:16, gancho en 3 segundos."+
+      (it.f==="camara"?" Video hablado: estructura Mata (gancho, promesa, autoridad, valor, CTA visual).":"");
+  }
+
+  var current=[];
+  var saved=[];
+  try{ saved=JSON.parse(localStorage.getItem("ideas_bairen")||"[]"); }catch(e){ saved=[]; }
+
+  function isSaved(it){ return saved.some(function(s){return s.t===it.t&&s.h===it.h;}); }
+  function persist(){ try{ localStorage.setItem("ideas_bairen", JSON.stringify(saved)); }catch(e){} }
+
+  function bindCards(container, list){
+    container.querySelectorAll(".card").forEach(function(c){
+      var it=list[parseInt(c.getAttribute("data-i"),10)];
+      c.querySelector(".copy").addEventListener("click",function(){
+        var txt=brief(it);
+        if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(function(){toast("Brief copiado");},function(){fallback(txt);}); }
+        else fallback(txt);
+        function fallback(t){ var ta=document.createElement("textarea"); ta.value=t; document.body.appendChild(ta); ta.select(); try{document.execCommand("copy");toast("Brief copiado");}catch(e){toast("No se pudo copiar");} document.body.removeChild(ta); }
+      });
+      var sb=c.querySelector(".save");
+      sb.addEventListener("click",function(){
+        if(isSaved(it)){ saved=saved.filter(function(s){return !(s.t===it.t&&s.h===it.h);}); sb.classList.remove("saved"); sb.textContent="Guardar"; }
+        else { saved.push(it); sb.classList.add("saved"); sb.textContent="Guardada"; }
+        persist(); renderSaved();
+      });
+    });
+  }
+
+  function generate(){
+    var ff=$("fFormato").value, fa=$("fAud").value, fp=$("fPilar").value;
+    var pool=T.filter(function(x){
+      return (!ff||x.f===ff)&&(!fa||x.a===fa||x.a==="todos")&&(!fp||x.p===fp);
+    });
+    if(!pool.length){ toast("No hay ideas con esos filtros, probá aflojar uno"); return; }
+    var picked=[], used={};
+    var guard=0;
+    while(picked.length<Math.min(3,pool.length)&&guard<60){
+      guard++;
+      var tpl=pick(pool);
+      if(used[tpl.t]) continue;
+      used[tpl.t]=1; picked.push(inst(tpl));
+    }
+    current=picked;
+    $("weekhead").innerHTML="";
+    $("hint").style.display="none";
+    $("grid").innerHTML=picked.map(function(it,i){return cardHTML(it,i,isSaved(it));}).join("");
+    bindCards($("grid"),picked);
+  }
+
+  function week(){
+    var pickBy=function(f,p){ var pool=T.filter(function(x){return x.f===f&&(!p||x.p===p);}); return inst(pick(pool)); };
+    var lun=pickBy("reel","unidad");
+    var mie=pickBy("carrusel",null);
+    var vie=pick([pickBy("camara","confianza"),pickBy("camara","educativo")]);
+    var h1=pickBy("historia","detras");
+    var h2=pickBy("historia",null);
+    current=[lun,mie,vie,h1,h2];
+    var labels=["LUNES · Feed","MIÉRCOLES · Feed","VIERNES · Feed","HISTORIAS · Lun/Mar","HISTORIAS · Jue"];
+    $("hint").style.display="none";
+    $("weekhead").innerHTML='<div class="weekttl">Semana completa Bairen</div><div class="weeksub">Cadencia real del plan: lunes reel de unidad, miércoles carrusel, viernes pieza de confianza, más historias. Volvé a tocar el botón para otra combinación.</div>';
+    $("grid").innerHTML=current.map(function(it,i){
+      return cardHTML(it,i,isSaved(it)).replace('<div class="k">','<div class="k"><span class="tag" style="background:var(--gold);border-color:var(--gold);color:var(--navy-deep)">'+labels[i]+'</span>');
+    }).join("");
+    bindCards($("grid"),current);
+  }
+
+  function renderSaved(){
+    var w=$("savedwrap");
+    if(!saved.length){ w.innerHTML=""; return; }
+    w.innerHTML='<div class="savedttl"><h2>Guardadas</h2><span>'+saved.length+' ideas · quedan en este navegador</span></div>'+
+      '<div class="grid" id="savedgrid">'+saved.map(function(it,i){return cardHTML(it,i,true);}).join("")+'</div>';
+    bindCards($("savedgrid"),saved);
+  }
+
+  $("btnGen").addEventListener("click",generate);
+  $("btnWeek").addEventListener("click",week);
+  $("btnClear").addEventListener("click",function(){
+    if(!saved.length){ toast("No hay guardadas"); return; }
+    if(!confirm("Borrar todas las ideas guardadas?")) return;
+    saved=[]; persist(); renderSaved(); toast("Guardadas borradas");
+  });
+
+  renderSaved();
+})();
+</script>
+
+</body>
+</html>
