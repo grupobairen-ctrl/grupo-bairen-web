@@ -605,9 +605,13 @@
       var prev=document.title;
       document.title=(S.dir?S.dir+(S.unidad?" "+S.unidad:"")+" · ":"")+"Ficha PSI · Grupo Bairen";
       window.print();
-      /* segundo documento: la propuesta de servicio, en A4 */
+      /* segundo documento: la propuesta de servicio, en pagina unica continua */
       document.body.classList.add("pp");
-      $("pagesize").textContent="@page{size:A4;margin:0;}";
+      var pr=$("propuesta");
+      pr.style.display="flex"; pr.style.position="absolute"; pr.style.left="-9999px"; pr.style.top="0";
+      var w2=Math.ceil(pr.offsetWidth*MM), h2=Math.ceil(pr.scrollHeight*MM)+3;
+      pr.style.display=""; pr.style.position=""; pr.style.left=""; pr.style.top="";
+      $("pagesize").textContent="@page{size:"+w2+"mm "+h2+"mm;margin:0;}";
       document.title="Propuesta PSI"+(S.interesado?" · "+S.interesado:"")+" · Grupo Bairen";
       window.print();
       document.body.classList.remove("pp");
@@ -832,7 +836,7 @@
       '<div class="pb2">'+
       '<p class="intro">Por la presente enviamos nuestra propuesta de representación de inversión. Bairen representa y defiende los intereses del comprador en cada etapa del proceso.</p>'+
       '<ol>'+
-      '<li><b>Definición del perfil de la inversión</b><p>Análisis conjunto del tipo de propiedad a buscar, a partir del formulario que completa el inversor y el intercambio de información entre las partes.</p></li>'+
+      '<li><b>Definición del perfil de la inversión</b><p>Análisis conjunto del tipo de propiedad a buscar, con intercambio de información entre las partes.</p></li>'+
       '<li><b>Búsqueda</b><p>Relevamiento por diversos canales: no solo lo publicado en el mercado, sino también propiedades que todavía no salieron al mismo.</p></li>'+
       '<li><b>Presentación de opciones</b><p>En un plazo razonable a convenir entre las partes, Bairen presenta las que considera mejores opciones disponibles, con su análisis económico y los pros y contras de cada propiedad.</p></li>'+
       '<li><b>Negociación</b><p>De la opción que elija el inversor, buscando las mejores condiciones para el cierre de la operación.</p></li>'+
