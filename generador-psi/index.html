@@ -147,6 +147,7 @@
   .fh .kick small{display:block;color:rgba(255,255,255,.5);letter-spacing:.2em;margin-top:5px;font-weight:400;}
   .fh h2{font-family:var(--disp);font-weight:500;font-size:clamp(1.3rem,3.4vw,1.9rem);line-height:1.12;margin-top:26px;color:#F7F2E6;position:relative;overflow-wrap:break-word;}
   .fh .loc{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-light);margin-top:9px;position:relative;}
+  .fh .prep{font-size:.74rem;color:rgba(255,255,255,.72);margin-top:12px;position:relative;font-style:italic;font-family:var(--disp);}
 
   .hero-img{width:100%;aspect-ratio:16/9;background:#22304a;display:flex;align-items:center;justify-content:center;overflow:hidden;}
   .hero-img img{width:100%;height:100%;object-fit:cover;display:block;}
@@ -217,6 +218,31 @@
   .empty{color:#B9AF97;font-style:italic;}
 
   /* ============ PRINT ============ */
+  /* ============ PROPUESTA DE SERVICIO (documento A4, se imprime a continuacion) ============ */
+  .propuesta{display:none;background:var(--paper);width:210mm;min-height:296mm;margin:0 auto;flex-direction:column;}
+  .propuesta .ph2{background:var(--navy-deep);color:var(--white);padding:16mm 18mm 12mm;position:relative;overflow:hidden;}
+  .propuesta .ph2::before{content:"";position:absolute;top:-60%;right:-8%;width:420px;height:420px;background:radial-gradient(circle,rgba(194,169,104,.16),transparent 60%);}
+  .propuesta .ph2 .r{position:relative;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;}
+  .propuesta .ph2 .kick{font-size:.56rem;font-weight:600;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);text-align:right;}
+  .propuesta .ph2 .kick small{display:block;color:rgba(255,255,255,.5);letter-spacing:.18em;margin-top:5px;font-weight:400;}
+  .propuesta .ph2 h2{font-family:var(--disp);font-weight:500;font-size:1.5rem;line-height:1.2;margin-top:9mm;color:#F7F2E6;position:relative;max-width:34ch;}
+  .propuesta .ph2 .prep{font-family:var(--disp);font-style:italic;font-size:.82rem;color:rgba(255,255,255,.72);margin-top:4mm;position:relative;}
+  .propuesta .pb2{padding:12mm 18mm 8mm;flex:1;}
+  .propuesta .intro{font-size:.92rem;color:#3A4459;margin-bottom:8mm;max-width:70ch;}
+  .propuesta ol{list-style:none;counter-reset:ps;margin:0 0 8mm;}
+  .propuesta ol li{counter-increment:ps;display:grid;grid-template-columns:11mm 1fr;gap:2mm 4mm;padding:4mm 0;border-bottom:1px solid var(--line);}
+  .propuesta ol li::before{content:counter(ps,decimal-leading-zero);grid-row:span 2;font-family:var(--disp);font-size:1.05rem;color:var(--gold);line-height:1.2;}
+  .propuesta ol li b{font-family:var(--disp);font-weight:500;font-size:.98rem;color:var(--navy-dark);}
+  .propuesta ol li p{font-size:.85rem;color:#3A4459;line-height:1.55;}
+  .propuesta .hono{background:var(--gold-pale);border-left:3px solid var(--gold);padding:6mm 7mm;margin-bottom:6mm;}
+  .propuesta .hono .ht{font-size:.58rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-dark);margin-bottom:3mm;}
+  .propuesta .hono p{font-size:.88rem;color:var(--ink);line-height:1.65;margin-bottom:2mm;}
+  .propuesta .hono p b{font-family:var(--disp);font-weight:600;color:var(--navy-dark);}
+  .propuesta .hono .fine{font-size:.76rem;color:var(--mid);font-style:italic;margin-top:2mm;}
+  .propuesta .pf2{background:var(--navy);color:var(--white);padding:8mm 18mm;display:flex;justify-content:space-between;align-items:center;gap:10mm;flex-wrap:wrap;}
+  .propuesta .pf2 .tg{font-family:var(--disp);font-style:italic;color:var(--gold-light);font-size:.95rem;}
+  .propuesta .pf2 .ct{font-size:.76rem;color:rgba(255,255,255,.78);text-align:right;line-height:1.7;}
+
   /* ============ PRINT: una sola pagina continua, identica a la vista previa ============ */
   @media print{
     html,body{background:var(--navy-deep) !important;}
@@ -226,6 +252,9 @@
     .ficha{width:100%;max-width:100%;box-shadow:none;}
     *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
     .pg{page-break-after:auto;page-break-inside:auto;}
+    body.pp .ficha{display:none !important;}
+    body.pp .propuesta{display:flex !important;}
+    body.pp{background:#fff !important;}
   }
 </style>
 </head>
@@ -321,8 +350,10 @@
     </div>
 
     <div class="grp">
-      <div class="gt"><span class="n">09</span><span class="t">Asesor y contacto</span></div>
-      <div class="row"><div class="fld"><label for="asesor">Asesor</label><input id="asesor" value="Alejandro"></div><div class="fld"><label for="fecha">Fecha</label><input id="fecha" placeholder="Julio 2026"></div></div>
+      <div class="gt"><span class="n">09</span><span class="t">Interesado, asesor y fecha</span></div>
+      <div class="row"><div class="fld"><label for="interesado">Nombre del interesado / inversor</label><input id="interesado" placeholder="Juan Pérez"></div><div class="fld"><label for="servicio">Precio del servicio PSI (USD)</label><input id="servicio" type="number" min="0" placeholder="4500"></div></div>
+      <div class="row"><div class="fld"><label for="pctini">Porcentaje al inicio (%)</label><input id="pctini" type="number" min="0" max="100" placeholder="30"></div><div class="fld"><label>&nbsp;</label><span class="hint" style="padding-top:10px">El saldo se abona al cierre. Los montos se calculan solos en la propuesta.</span></div></div>
+      <div class="row"><div class="fld"><label for="asesor">Asesor</label><input id="asesor" value="Alejandro"></div><div class="fld"><label for="fecha">Fecha (automática, editable)</label><input id="fecha"></div></div>
       <div class="row"><div class="fld"><label for="tel">Teléfono / WhatsApp</label><input id="tel" placeholder="+54 11 2310 6629"></div><div class="fld"><label for="mail">Email</label><input id="mail" value="contacto@bairengroup.com"></div></div>
     </div>
 
@@ -331,6 +362,7 @@
   <div class="preview-wrap">
     <span class="pv-lbl">Vista previa · se actualiza en vivo</span>
     <article class="ficha" id="ficha"></article>
+    <article class="propuesta" id="propuesta" aria-hidden="true"></article>
   </div>
 </div>
 
@@ -399,7 +431,7 @@
       condition:"Estado",fees:"Expensas",delivery:"Entrega",rent:"Renta mensual est.",
       developer:"Desarrolladora",yes:"Sí",
       st_estrenar:"A estrenar",st_pozo:"En pozo",st_usado:"Usado",st_reciclado:"Reciclado",
-      perMonth:"/mes",perYear:"anual",preparedBy:"Preparado por",
+      perMonth:"/mes",perYear:"anual",preparedBy:"Preparado por",preparedFor:"Preparado para",servicio:"Servicio PSI (honorarios)",
       tag:"Comprá en Buenos Aires, representado.",
       disc:"Valores estimados, a título informativo y sujetos a verificación. No constituyen una oferta.",
       untitled:"Completá la dirección para empezar",photos:"Las fotos aparecen acá"},
@@ -413,7 +445,7 @@
       condition:"Estado",fees:"Condomínio",delivery:"Entrega",rent:"Aluguel mensal est.",
       developer:"Incorporadora",yes:"Sim",
       st_estrenar:"Novo",st_pozo:"Na planta",st_usado:"Usado",st_reciclado:"Reformado",
-      perMonth:"/mês",perYear:"ao ano",preparedBy:"Preparado por",
+      perMonth:"/mês",perYear:"ao ano",preparedBy:"Preparado por",preparedFor:"Preparado para",servicio:"Serviço PSI (honorários)",
       tag:"Compre em Buenos Aires, representado.",
       disc:"Valores estimados, a título informativo e sujeitos a verificação. Não constituem uma oferta.",
       untitled:"Preencha o endereço para começar",photos:"As fotos aparecem aqui"},
@@ -427,7 +459,7 @@
       condition:"Condition",fees:"HOA fees",delivery:"Delivery",rent:"Est. monthly rent",
       developer:"Developer",yes:"Yes",
       st_estrenar:"Brand new",st_pozo:"Off-plan",st_usado:"Resale",st_reciclado:"Renovated",
-      perMonth:"/mo",perYear:"per year",preparedBy:"Prepared by",
+      perMonth:"/mo",perYear:"per year",preparedBy:"Prepared by",preparedFor:"Prepared for",servicio:"PSI service fee",
       tag:"Buy in Buenos Aires, represented.",
       disc:"Estimated figures, for information only and subject to verification. Not an offer.",
       untitled:"Fill in the address to start",photos:"Photos will appear here"}
@@ -441,7 +473,7 @@
     amenSel:[], amenCustom:[],
     fotos:[], mapImg:"", mapKey:"", mapLoading:false,
     descripcion:"",tesis:"",pros:"",contras:"", desarrolladora:"",trayectoria:"",
-    asesor:"Alejandro",fecha:"",tel:"",mail:"contacto@bairengroup.com"
+    asesor:"Alejandro",fecha:"",tel:"",mail:"contacto@bairengroup.com",interesado:"",servicio:"",pctini:""
   };
   var $ = function(id){ return document.getElementById(id); };
   function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];}); }
@@ -451,7 +483,7 @@
 
   /* ============ BINDINGS ============ */
   var FIELDS=["dir","unidad","barrio","ciudad","estado","entrega","ambientes","dormitorios","banos","m2cub","m2tot",
-    "precio","expensas","renta","descripcion","tesis","pros","contras","desarrolladora","trayectoria","asesor","fecha","tel","mail"];
+    "precio","expensas","renta","descripcion","tesis","pros","contras","desarrolladora","trayectoria","asesor","fecha","tel","mail","interesado","servicio","pctini"];
   var ADDR_FIELDS={dir:1,barrio:1,ciudad:1};
   FIELDS.forEach(function(k){
     var el=$(k); if(!el) return;
@@ -573,7 +605,14 @@
       var prev=document.title;
       document.title=(S.dir?S.dir+(S.unidad?" "+S.unidad:"")+" · ":"")+"Ficha PSI · Grupo Bairen";
       window.print();
+      /* segundo documento: la propuesta de servicio, en A4 */
+      document.body.classList.add("pp");
+      $("pagesize").textContent="@page{size:A4;margin:0;}";
+      document.title="Propuesta PSI"+(S.interesado?" · "+S.interesado:"")+" · Grupo Bairen";
+      window.print();
+      document.body.classList.remove("pp");
       document.title=prev;
+      toast("Dos PDF: la ficha y la propuesta de servicio");
     }
     /* medir recien cuando las fuentes cargaron: evita reflow y garantiza una sola pagina */
     if(document.fonts && document.fonts.ready && document.fonts.ready.then){ document.fonts.ready.then(go); } else { go(); }
@@ -698,25 +737,30 @@
     if(renta) nrows+=numrow(t.rent, money(renta)+" "+t.perMonth);
     if(rentab!=null) nrows+=numrow(t.yield+" "+t.perYear, rentab.toFixed(1)+" %");
     if(S.expensas) nrows+=numrow(t.fees, money(S.expensas)+" "+t.perMonth);
+    if(S.servicio) nrows+=numrow(t.servicio, money(S.servicio));
     var nums=nrows?'<div class="numbers"><div class="nt">'+t.numbers+'</div><div class="ng">'+nrows+'</div></div>':"";
 
     var galImgs=S.fotos.slice(1);
 
     var adv='<span class="pb">'+t.preparedBy+'</span><br><b>'+esc(S.asesor||"")+'</b>'+
-      (S.tel?'<br>'+esc(S.tel):'')+(S.mail?'<br>'+esc(S.mail):'')+(S.fecha?'<br>'+esc(S.fecha):'');
+      (S.tel?'<br>'+esc(S.tel):'')+(S.mail?'<br>'+esc(S.mail):'')+('<br>'+esc(fechaFicha));
 
     var metrics=metric(t.price,precio?money(precio):"—")+
       metric(t.pricem2,precioM2?money(precioM2):"—")+
       metric(t.yield,rentab!=null?rentab.toFixed(1)+"<small> %</small>":"—")+
       metric(t.area,m2?m2+"<small> m²</small>":"—");
 
+    var LOCALE={es:"es-AR",pt:"pt-BR",en:"en-US"}[S.lang]||"es-AR";
+    var hoy=new Date().toLocaleDateString(LOCALE,{day:"numeric",month:"long",year:"numeric"});
+    var fechaFicha=S.fecha||hoy;
+    var prepLine=(S.interesado?'<div class="prep">'+t.preparedFor+' '+esc(S.interesado)+' · '+esc(fechaFicha)+'</div>':'<div class="prep">'+esc(fechaFicha)+'</div>');
     /* ===== composicion en paginas deterministicas ===== */
     var pgs=[];
     /* pagina 1: portada */
     pgs.push('<section class="pg pg-cover">'+
       '<div class="fh"><div class="r"><div class="logo" id="fLogo"></div>'+
       '<div class="kick">'+t.kick+'<small>'+t.opp+'</small></div></div>'+
-      '<h2>'+title+'</h2>'+(locline?'<div class="loc">'+locline+'</div>':'')+'</div>'+
+      '<h2>'+title+'</h2>'+(locline?'<div class="loc">'+locline+'</div>':'')+prepLine+'</div>'+
       '<div class="hero-img" id="fHero"><span class="ph">'+t.photos+'</span></div>'+
       '<div class="metrics">'+metrics+'</div>'+
       '</section>');
@@ -755,6 +799,7 @@
         g.appendChild(im);
       }
     });
+    renderPropuesta();
     /* mapa estatico embebido (imagen, imprime perfecto y es clickeable) */
     if(S.mapImg){
       var mb=document.getElementById("fMapBox");
@@ -767,7 +812,47 @@
     }
   }
 
-  loadDraft(); buildAmenGrid(); renderChips(); renderThumbs(); render(); updateMap();
+  function renderPropuesta(){
+    var hoy=new Date().toLocaleDateString("es-AR",{day:"numeric",month:"long",year:"numeric"});
+    var fechaDoc=S.fecha||hoy;
+    var serv=Number(S.servicio)||0, pct=Number(S.pctini)||0;
+    var inicial=serv&&pct?Math.round(serv*pct/100):0;
+    var saldo=serv&&pct?serv-inicial:0;
+    var costoLinea = serv
+      ? 'El servicio tiene un costo de <b>'+money(serv)+'</b>.'
+      : 'El costo del servicio se conviene entre las partes.';
+    var pagoLinea = (serv&&pct)
+      ? 'El <b>'+pct+' por ciento</b> se abona al inicio ('+money(inicial)+'). El saldo ('+money(saldo)+') se abona al cierre de la compra.'
+      : 'El esquema de pago (porcentaje inicial y saldo al cierre) se conviene entre las partes.';
+    $("propuesta").innerHTML=
+      '<div class="ph2"><div class="r"><div class="logo">'+logoBlock(36,23)+'</div>'+
+      '<div class="kick">PSI · Personal Shopper Investment<small>Propuesta de servicio</small></div></div>'+
+      '<h2>Servicio de asesoramiento y representación de inversión</h2>'+
+      '<div class="prep">'+(S.interesado?'Preparado para '+esc(S.interesado)+' · ':'')+esc(fechaDoc)+(S.asesor?' · '+esc(S.asesor):'')+'</div></div>'+
+      '<div class="pb2">'+
+      '<p class="intro">Por la presente enviamos nuestra propuesta de representación de inversión. Bairen representa y defiende los intereses del comprador en cada etapa del proceso.</p>'+
+      '<ol>'+
+      '<li><b>Definición del perfil de la inversión</b><p>Análisis conjunto del tipo de propiedad a buscar, a partir del formulario que completa el inversor y el intercambio de información entre las partes.</p></li>'+
+      '<li><b>Búsqueda</b><p>Relevamiento por diversos canales: no solo lo publicado en el mercado, sino también propiedades que todavía no salieron al mismo.</p></li>'+
+      '<li><b>Presentación de opciones</b><p>En un plazo razonable a convenir entre las partes, Bairen presenta las que considera mejores opciones disponibles, con su análisis económico y los pros y contras de cada propiedad.</p></li>'+
+      '<li><b>Negociación</b><p>De la opción que elija el inversor, buscando las mejores condiciones para el cierre de la operación.</p></li>'+
+      '<li><b>Acompañamiento</b><p>Hasta la posesión de la propiedad.</p></li>'+
+      '</ol>'+
+      '<div class="hono"><div class="ht">Honorarios</div>'+
+      '<p>'+costoLinea+'</p>'+
+      '<p>'+pagoLinea+'</p>'+
+      '<p class="fine">Si el inversor no optara por ninguna propiedad o desistiera de la compra, el pago inicial de la contratación no se reintegra y no se abona el saldo final de esta propuesta.</p>'+
+      '</div></div>'+
+      '<div class="pf2"><div class="tg">Comprá en Buenos Aires, representado.</div>'+
+      '<div class="ct">Grupo Bairen'+(S.tel?'<br>'+esc(S.tel):'')+(S.mail?'<br>'+esc(S.mail):'')+'</div></div>';
+  }
+  loadDraft();
+  (function(){ var f=document.getElementById("fecha");
+    var hoy=new Date().toLocaleDateString("es-AR",{day:"numeric",month:"long",year:"numeric"});
+    f.value=hoy; S.fecha=""; f.placeholder=hoy;
+    f.addEventListener("input",function(){ S.fecha=f.value; render(); });
+  })();
+  buildAmenGrid(); renderChips(); renderThumbs(); render(); updateMap();
 })();
 </script>
 
