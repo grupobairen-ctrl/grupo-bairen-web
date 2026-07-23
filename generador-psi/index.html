@@ -351,7 +351,7 @@
 
     <div class="grp">
       <div class="gt"><span class="n">09</span><span class="t">Interesado, asesor y fecha</span></div>
-      <div class="row"><div class="fld"><label for="interesado">Nombre del interesado / inversor</label><input id="interesado" placeholder="Juan Pérez"></div><div class="fld"><label for="servicio">Precio del servicio PSI (USD)</label><input id="servicio" type="number" min="0" placeholder="4500"></div></div>
+      <div class="row"><div class="fld"><label for="interesado">Nombre del interesado / inversor</label><input id="interesado" placeholder="Juan Pérez"></div><div class="fld"><label for="servicio">Precio del servicio PSI</label><div style="display:flex;gap:8px"><select id="monedaServ" style="border:1px solid var(--line);background:var(--paper);padding:9px 8px;font-size:.85rem;width:86px;flex:none"><option value="USD">USD</option><option value="ARS">ARS</option></select><input id="servicio" type="number" min="0" placeholder="4500" style="flex:1;min-width:0"></div></div></div>
       <div class="row"><div class="fld"><label for="pctini">Porcentaje al inicio (%)</label><input id="pctini" type="number" min="0" max="100" placeholder="30"></div><div class="fld"><label>&nbsp;</label><span class="hint" style="padding-top:10px">El saldo se abona al cierre. Los montos se calculan solos en la propuesta.</span></div></div>
       <div class="row"><div class="fld"><label for="asesor">Asesor</label><input id="asesor" value="Alejandro"></div><div class="fld"><label for="fecha">Fecha (automática, editable)</label><input id="fecha"></div></div>
       <div class="row"><div class="fld"><label for="tel">Teléfono / WhatsApp</label><input id="tel" placeholder="+54 11 2310 6629"></div><div class="fld"><label for="mail">Email</label><input id="mail" value="contacto@bairengroup.com"></div></div>
@@ -473,17 +473,19 @@
     amenSel:[], amenCustom:[],
     fotos:[], mapImg:"", mapKey:"", mapLoading:false,
     descripcion:"",tesis:"",pros:"",contras:"", desarrolladora:"",trayectoria:"",
-    asesor:"Alejandro",fecha:"",tel:"",mail:"contacto@bairengroup.com",interesado:"",servicio:"",pctini:""
+    asesor:"Alejandro",fecha:"",tel:"",mail:"contacto@bairengroup.com",interesado:"",servicio:"",pctini:"",monedaServ:"USD"
   };
   var $ = function(id){ return document.getElementById(id); };
   function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];}); }
   function money(n){ if(n===""||n==null||isNaN(n)) return ""; return "USD "+Number(n).toLocaleString("en-US"); }
+  function moneyServ(n){ if(n===""||n==null||isNaN(n)) return "";
+    return S.monedaServ==="ARS" ? "ARS "+Number(n).toLocaleString("es-AR") : "USD "+Number(n).toLocaleString("en-US"); }
   function nl2(s){ return String(s||"").split(/\n+/).map(function(x){return x.trim();}).filter(Boolean); }
   function toast(msg){ var t=$("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toast._h); toast._h=setTimeout(function(){t.classList.remove("show");},1600); }
 
   /* ============ BINDINGS ============ */
   var FIELDS=["dir","unidad","barrio","ciudad","estado","entrega","ambientes","dormitorios","banos","m2cub","m2tot",
-    "precio","expensas","renta","descripcion","tesis","pros","contras","desarrolladora","trayectoria","asesor","fecha","tel","mail","interesado","servicio","pctini"];
+    "precio","expensas","renta","descripcion","tesis","pros","contras","desarrolladora","trayectoria","asesor","fecha","tel","mail","interesado","servicio","pctini","monedaServ"];
   var ADDR_FIELDS={dir:1,barrio:1,ciudad:1};
   FIELDS.forEach(function(k){
     var el=$(k); if(!el) return;
@@ -639,6 +641,7 @@
       Object.keys(d).forEach(function(k){ if(k in S) S[k]=d[k]; });
       FIELDS.forEach(function(k){ if($(k)) $(k).value=S[k]; });
       $("cochera").checked=!!S.cochera;
+      if($("monedaServ")) $("monedaServ").value=S.monedaServ||"USD";
       document.querySelectorAll("#langpick .flagbtn").forEach(function(x){ x.classList.toggle("on", x.dataset.l===S.lang); });
     }catch(e){}
   }
@@ -741,7 +744,7 @@
     if(renta) nrows+=numrow(t.rent, money(renta)+" "+t.perMonth);
     if(rentab!=null) nrows+=numrow(t.yield+" "+t.perYear, rentab.toFixed(1)+" %");
     if(S.expensas) nrows+=numrow(t.fees, money(S.expensas)+" "+t.perMonth);
-    if(S.servicio) nrows+=numrow(t.servicio, money(S.servicio));
+    if(S.servicio) nrows+=numrow(t.servicio, moneyServ(S.servicio));
     var nums=nrows?'<div class="numbers"><div class="nt">'+t.numbers+'</div><div class="ng">'+nrows+'</div></div>':"";
 
     var galImgs=S.fotos.slice(1);
@@ -823,10 +826,10 @@
     var inicial=serv&&pct?Math.round(serv*pct/100):0;
     var saldo=serv&&pct?serv-inicial:0;
     var costoLinea = serv
-      ? 'El servicio tiene un costo de <b>'+money(serv)+'</b>.'
+      ? 'El servicio tiene un costo de <b>'+moneyServ(serv)+'</b>.'
       : 'El costo del servicio se conviene entre las partes.';
     var pagoLinea = (serv&&pct)
-      ? 'El <b>'+pct+' por ciento</b> se abona al inicio ('+money(inicial)+'). El saldo ('+money(saldo)+') se abona al cierre de la compra.'
+      ? 'El <b>'+pct+' por ciento</b> se abona al inicio ('+moneyServ(inicial)+'). El saldo ('+moneyServ(saldo)+') se abona al cierre de la compra.'
       : 'El esquema de pago (porcentaje inicial y saldo al cierre) se conviene entre las partes.';
     $("propuesta").innerHTML=
       '<div class="ph2"><div class="r"><div class="logo">'+logoBlock(36,23)+'</div>'+
