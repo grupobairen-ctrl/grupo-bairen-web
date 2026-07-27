@@ -27,6 +27,14 @@ nav{height:64px;background:var(--navy-deeper);border-bottom:2px solid var(--gold
 .nav-back{font-size:.68rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);opacity:.8;transition:opacity .2s;}
 .nav-back:hover{opacity:1;}
 
+/* LANG SWITCH */
+.lang-switch{position:absolute;top:80px;right:22px;z-index:6;display:flex;gap:9px;}
+.flag{width:28px;height:19px;padding:0;border:1px solid rgba(255,255,255,.4);background:none;cursor:pointer;overflow:hidden;opacity:.55;transition:opacity .25s,border-color .25s,transform .2s;display:block;line-height:0;}
+.flag svg{width:100%;height:100%;display:block;}
+.flag:hover{opacity:.9;}
+.flag.active{opacity:1;border-color:#C2A968;}
+@media(max-width:700px){.lang-switch{top:74px;right:16px;gap:7px;}.flag{width:25px;height:17px;}}
+
 /* AMBIENT */
 .ambient{position:fixed;inset:0;pointer-events:none;z-index:0;}
 .ambient::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(194,169,104,.04) 0%,transparent 65%);}
@@ -128,46 +136,52 @@ footer{background:var(--navy-deeper);border-top:2px solid var(--gold);padding:32
 <!-- NAV -->
 <nav>
   <a class="nav-logo" href="index.html"><img src="bairen_logo.png?v=3" alt="Grupo Bairen" style="height:46px;width:auto;"></a>
-  <a class="nav-back" href="javascript:history.back()">← Volver</a>
+  <a class="nav-back" href="javascript:history.back()" data-i18n="nav_volver">← Volver</a>
   <div class="burger" id="burger"><span></span><span></span><span></span></div>
 </nav>
 
 <div class="mobile-menu" id="mobileMenu">
-  <a href="index.html" class="mm-link">Inicio</a>
-  <a href="catalogo.html" class="mm-link">Propiedades</a>
-  <a href="index.html#contacto" class="mm-link">Contacto</a>
+  <a href="index.html" class="mm-link" data-i18n="mm_inicio">Inicio</a>
+  <a href="catalogo.html" class="mm-link" data-i18n="mm_props">Propiedades</a>
+  <a href="index.html#contacto" class="mm-link" data-i18n="mm_contacto">Contacto</a>
+</div>
+
+<div class="lang-switch">
+  <button class="flag active" data-lang="es" aria-label="Español" title="Español"><svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#fff"/><rect width="30" height="6.7" fill="#75AADB"/><rect width="30" height="6.7" y="13.3" fill="#75AADB"/><circle cx="15" cy="10" r="2" fill="#F6B40E"/></svg></button>
+  <button class="flag" data-lang="pt" aria-label="Português" title="Português"><svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#009B3A"/><polygon points="15,2.5 27.2,10 15,17.5 2.8,10" fill="#FEDF00"/><circle cx="15" cy="10" r="3.2" fill="#002776"/></svg></button>
+  <button class="flag" data-lang="en" aria-label="English" title="English"><svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#fff"/><rect width="30" height="1.54" fill="#B22234"/><rect width="30" height="1.54" y="3.08" fill="#B22234"/><rect width="30" height="1.54" y="6.15" fill="#B22234"/><rect width="30" height="1.54" y="9.23" fill="#B22234"/><rect width="30" height="1.54" y="12.31" fill="#B22234"/><rect width="30" height="1.54" y="15.38" fill="#B22234"/><rect width="30" height="1.54" y="18.46" fill="#B22234"/><rect width="13" height="10.77" fill="#3C3B6E"/></svg></button>
 </div>
 
 <div class="page">
 
-  <h1 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">Confirmá tu visita — Grupo Bairen</h1>
+  <h1 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;" data-i18n="sr_title">Confirmá tu visita — Grupo Bairen</h1>
 
   <!-- HEADER -->
   <div style="text-align:center;margin-bottom:20px;">
-    <div class="prop-pill">Coordinando visita para · <span id="propPillText">Grupo Bairen</span></div>
+    <div class="prop-pill"><span data-i18n="pill_lead">Coordinando visita para ·</span> <span id="propPillText">Grupo Bairen</span></div>
   </div>
 
   <div class="confirm-header">
-    <div class="confirm-eyebrow">Último paso</div>
-    <div class="confirm-title">Elegí el día y horario<br>que mejor <em>te quede</em></div>
-    <div class="confirm-sub">Una vez confirmado, recibís un WhatsApp con toda la info de la unidad para que llegues preparado el día de la visita.</div>
+    <div class="confirm-eyebrow" data-i18n="eyebrow">Último paso</div>
+    <div class="confirm-title"><span data-i18n="title_1">Elegí el día y horario</span><br><span data-i18n="title_2">que mejor</span> <em data-i18n="title_3">te quede</em></div>
+    <div class="confirm-sub" data-i18n="sub">Una vez confirmado, recibís un WhatsApp con toda la info de la unidad para que llegues preparado el día de la visita.</div>
   </div>
 
   <!-- PASOS MINI -->
   <div class="steps-mini">
     <div class="step-mini done">
       <div class="step-mini-dot"></div>
-      <span>Elegiste la unidad</span>
+      <span data-i18n="step1">Elegiste la unidad</span>
     </div>
     <div class="step-mini-line"></div>
     <div class="step-mini done">
       <div class="step-mini-dot"></div>
-      <span>Perfil calificado</span>
+      <span data-i18n="step2">Perfil calificado</span>
     </div>
     <div class="step-mini-line"></div>
     <div class="step-mini current">
       <div class="step-mini-dot">3</div>
-      <span>Confirmá la visita</span>
+      <span data-i18n="step3">Confirmá la visita</span>
     </div>
   </div>
 
@@ -187,8 +201,8 @@ footer{background:var(--navy-deeper);border-top:2px solid var(--gold);padding:32
         <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 6.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012.18 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.09a16 16 0 006 6l.56-.56a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg>
       </div>
       <div>
-        <div class="info-text-title">Te contactamos antes</div>
-        <div class="info-text-sub">Julián te llama 24hs antes para confirmar y resolver cualquier duda.</div>
+        <div class="info-text-title" data-i18n="info1_t">Te contactamos antes</div>
+        <div class="info-text-sub" data-i18n="info1_s">Julián te llama 24hs antes para confirmar y resolver cualquier duda.</div>
       </div>
     </div>
     <div class="info-card">
@@ -196,8 +210,8 @@ footer{background:var(--navy-deeper);border-top:2px solid var(--gold);padding:32
         <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
       </div>
       <div>
-        <div class="info-text-title">Video de la unidad</div>
-        <div class="info-text-sub">Recibís un video de 3 a 5 min por WhatsApp con toda la info antes de la visita.</div>
+        <div class="info-text-title" data-i18n="info2_t">Video de la unidad</div>
+        <div class="info-text-sub" data-i18n="info2_s">Recibís un video de 3 a 5 min por WhatsApp con toda la info antes de la visita.</div>
       </div>
     </div>
     <div class="info-card">
@@ -205,8 +219,8 @@ footer{background:var(--navy-deeper);border-top:2px solid var(--gold);padding:32
         <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
       </div>
       <div>
-        <div class="info-text-title">Sin compromiso</div>
-        <div class="info-text-sub">La visita es gratis y sin obligación. Cancelá o reprogramá cuando quieras.</div>
+        <div class="info-text-title" data-i18n="info3_t">Sin compromiso</div>
+        <div class="info-text-sub" data-i18n="info3_s">La visita es gratis y sin obligación. Cancelá o reprogramá cuando quieras.</div>
       </div>
     </div>
   </div>
@@ -216,7 +230,7 @@ footer{background:var(--navy-deeper);border-top:2px solid var(--gold);padding:32
 <!-- FOOTER -->
 <footer>
   <div class="ft-logo"><img src="bairen_logo.png?v=3" alt="Grupo Bairen" style="height:40px;width:auto;opacity:.85;"></div>
-  <div class="ft-copy">© 2026 Grupo Bairen · Todos los derechos reservados</div>
+  <div class="ft-copy" data-i18n="ft_copy">© 2026 Grupo Bairen · Todos los derechos reservados</div>
 </footer>
 
 <!-- WA -->
@@ -292,6 +306,68 @@ document.getElementById('burger').addEventListener('click', function() {
     }
   });
 })();
+</script>
+
+<script>
+  // ── i18n ES / PT / EN (self-contained, patrón index.html) ──────
+  (function(){
+    const T = {
+      pt:{
+        nav_volver:"← Voltar",
+        mm_inicio:"Início",mm_props:"Propriedades",mm_contacto:"Contato",
+        sr_title:"Confirme sua visita — Grupo Bairen",
+        pill_lead:"Agendando visita para ·",
+        eyebrow:"Última etapa",
+        title_1:"Escolha o dia e o horário",title_2:"que melhor",title_3:"combina com você",
+        sub:"Assim que confirmar, você recebe um WhatsApp com todas as informações da unidade para chegar preparado no dia da visita.",
+        step1:"Unidade escolhida",step2:"Perfil qualificado",step3:"Confirme a visita",
+        info1_t:"Entramos em contato antes",
+        info1_s:"Julián liga para você 24h antes para confirmar e esclarecer qualquer dúvida.",
+        info2_t:"Vídeo da unidade",
+        info2_s:"Você recebe um vídeo de 3 a 5 minutos pelo WhatsApp com todas as informações antes da visita.",
+        info3_t:"Sem compromisso",
+        info3_s:"A visita é gratuita e sem obrigação. Cancele ou reagende quando quiser.",
+        ft_copy:"© 2026 Grupo Bairen · Todos os direitos reservados"
+      },
+      en:{
+        nav_volver:"← Back",
+        mm_inicio:"Home",mm_props:"Properties",mm_contacto:"Contact",
+        sr_title:"Confirm your visit — Grupo Bairen",
+        pill_lead:"Scheduling a visit for ·",
+        eyebrow:"Final step",
+        title_1:"Choose the day and time",title_2:"that suits",title_3:"you best",
+        sub:"Once confirmed, you receive a WhatsApp message with all the details of the unit so you arrive prepared on the day of your visit.",
+        step1:"Unit selected",step2:"Profile qualified",step3:"Confirm your visit",
+        info1_t:"We contact you beforehand",
+        info1_s:"Julián calls you 24 hours in advance to confirm and answer any questions.",
+        info2_t:"Video of the unit",
+        info2_s:"You receive a 3 to 5 minute video via WhatsApp with all the details before your visit.",
+        info3_t:"No commitment",
+        info3_s:"The visit is free and without obligation. Cancel or reschedule at any time.",
+        ft_copy:"© 2026 Grupo Bairen · All rights reserved"
+      }
+    };
+    const nodes = document.querySelectorAll('[data-i18n]');
+    nodes.forEach(n => n.dataset.es = n.textContent);
+    const phs = document.querySelectorAll('[data-i18n-ph]');
+    phs.forEach(n => n.dataset.esPh = n.getAttribute('placeholder') || '');
+    function apply(lang){
+      nodes.forEach(n => {
+        const k = n.getAttribute('data-i18n');
+        n.textContent = (lang !== 'es' && T[lang] && T[lang][k] != null) ? T[lang][k] : n.dataset.es;
+      });
+      phs.forEach(n => {
+        const k = n.getAttribute('data-i18n-ph');
+        n.setAttribute('placeholder', (lang !== 'es' && T[lang] && T[lang][k] != null) ? T[lang][k] : n.dataset.esPh);
+      });
+      document.documentElement.lang = lang === 'pt' ? 'pt-BR' : lang === 'en' ? 'en' : 'es-AR';
+      document.querySelectorAll('.flag').forEach(f => f.classList.toggle('active', f.dataset.lang === lang));
+      try { localStorage.setItem('bairen_lang', lang); } catch(e){}
+    }
+    document.querySelectorAll('.flag').forEach(f => f.addEventListener('click', () => apply(f.dataset.lang)));
+    let saved = 'es'; try { saved = localStorage.getItem('bairen_lang') || 'es'; } catch(e){}
+    if (saved !== 'es') apply(saved);
+  })();
 </script>
 </body>
 </html>

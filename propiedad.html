@@ -58,6 +58,15 @@ nav{position:fixed;inset:0 0 auto 0;z-index:1000;height:64px;background:var(--na
 .mobile-menu a:hover{color:var(--gold);}
 @media(max-width:700px){.nav-links{display:none;}.nav-back{display:none;}.burger{display:flex;}nav{padding:0 18px;}}
 
+/* LANG SWITCH */
+.lang-switch{position:absolute;top:80px;right:22px;z-index:6;display:flex;gap:9px;}
+.flag{width:28px;height:19px;padding:0;border:1px solid rgba(255,255,255,.4);background:none;cursor:pointer;overflow:hidden;opacity:.55;transition:opacity .25s var(--ease),border-color .25s,transform .2s;display:block;line-height:0;}
+.flag svg{width:100%;height:100%;display:block;}
+.flag:hover{opacity:.9;transform:translateY(-1px);}
+.flag.active{opacity:1;border-color:var(--gold-light);}
+.flag:active{transform:scale(.92);}
+@media(max-width:700px){.lang-switch{top:74px;right:16px;gap:7px;}.flag{width:25px;height:17px;}}
+
 /* LOADING */
 .loading-screen{margin-top:64px;min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;}
 .spinner{width:32px;height:32px;border:3px solid rgba(42,58,82,.12);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;}
@@ -261,24 +270,31 @@ footer{background:var(--navy-dark);border-top:1px solid var(--gold);padding:40px
 <nav>
   <a class="nav-logo" href="index.html"><img src="bairen_logo.png?v=3" alt="Grupo Bairen"/></a>
   <div class="nav-links">
-    <a href="catalogo.html">Propiedades</a>
-    <a href="index.html#nosotros">Por qué Bairen</a>
-    <a href="index.html#contacto">Contacto</a>
+    <a href="catalogo.html" data-i18n="prop_nav_props">Propiedades</a>
+    <a href="index.html#nosotros" data-i18n="prop_nav_why">Por qué Bairen</a>
+    <a href="index.html#contacto" data-i18n="prop_nav_contact">Contacto</a>
   </div>
-  <a class="nav-back" href="catalogo.html">← Catálogo</a>
+  <a class="nav-back" href="catalogo.html" data-i18n="prop_back">← Catálogo</a>
   <button class="burger" id="burger" aria-label="Menú"><span></span><span></span><span></span></button>
 </nav>
 <div class="mobile-menu" id="mobileMenu">
-  <a href="catalogo.html">Propiedades</a>
-  <a href="index.html#nosotros">Por qué Bairen</a>
-  <a href="index.html#contacto">Contacto</a>
-  <a href="catalogo.html">← Volver al catálogo</a>
+  <a href="catalogo.html" data-i18n="prop_nav_props">Propiedades</a>
+  <a href="index.html#nosotros" data-i18n="prop_nav_why">Por qué Bairen</a>
+  <a href="index.html#contacto" data-i18n="prop_nav_contact">Contacto</a>
+  <a href="catalogo.html" data-i18n="prop_back_full">← Volver al catálogo</a>
+</div>
+
+<!-- LANG SWITCH -->
+<div class="lang-switch">
+  <button class="flag active" data-lang="es" aria-label="Español" title="Español"><svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#fff"/><rect width="30" height="6.7" fill="#75AADB"/><rect width="30" height="6.7" y="13.3" fill="#75AADB"/><circle cx="15" cy="10" r="2" fill="#F6B40E"/></svg></button>
+  <button class="flag" data-lang="pt" aria-label="Português" title="Português"><svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#009B3A"/><polygon points="15,2.5 27.2,10 15,17.5 2.8,10" fill="#FEDF00"/><circle cx="15" cy="10" r="3.2" fill="#002776"/></svg></button>
+  <button class="flag" data-lang="en" aria-label="English" title="English"><svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#fff"/><rect width="30" height="1.54" fill="#B22234"/><rect width="30" height="1.54" y="3.08" fill="#B22234"/><rect width="30" height="1.54" y="6.15" fill="#B22234"/><rect width="30" height="1.54" y="9.23" fill="#B22234"/><rect width="30" height="1.54" y="12.31" fill="#B22234"/><rect width="30" height="1.54" y="15.38" fill="#B22234"/><rect width="30" height="1.54" y="18.46" fill="#B22234"/><rect width="13" height="10.77" fill="#3C3B6E"/></svg></button>
 </div>
 
 <!-- LOADING -->
 <div class="loading-screen" id="loadingScreen">
   <div class="spinner"></div>
-  <div class="loading-txt">Cargando propiedad...</div>
+  <div class="loading-txt" data-i18n="prop_loading">Cargando propiedad...</div>
 </div>
 
 <!-- CONTENT -->
@@ -296,7 +312,7 @@ footer{background:var(--navy-dark);border-top:1px solid var(--gold);padding:40px
         <div class="hero-sub" id="heroSub">—</div>
       </div>
       <div class="hero-price-box">
-        <div class="hero-price-lbl">Precio mensual</div>
+        <div class="hero-price-lbl" data-i18n="prop_price_m">Precio mensual</div>
         <div class="hero-price" id="heroPrice">—</div>
         <div class="hero-price-mo" id="heroPriceMo"></div>
       </div>
@@ -309,11 +325,11 @@ footer{background:var(--navy-dark);border-top:1px solid var(--gold);padding:40px
   <!-- BODY -->
   <div class="prop-body">
     <div class="prop-left">
-      <div class="sec-label reveal">La unidad</div>
+      <div class="sec-label reveal" data-i18n="prop_secl_unidad">La unidad</div>
       <div class="stats-row reveal" id="statsRow"></div>
       <p class="prop-desc reveal" id="propDesc"></p>
       <div id="amenitiesBlock"></div>
-      <div class="sec-label reveal">Ubicación</div>
+      <div class="sec-label reveal" data-i18n="prop_secl_ubic">Ubicación</div>
       <div class="map-wrap reveal"><iframe id="mapFrame" src="" allowfullscreen loading="lazy" title="Mapa de la ubicación de la propiedad"></iframe></div>
     </div>
 
@@ -330,28 +346,28 @@ footer{background:var(--navy-dark);border-top:1px solid var(--gold);padding:40px
 
     <div class="action-card reveal">
       <div class="ac-header">
-        <div class="ac-price-lbl">Precio mensual</div>
+        <div class="ac-price-lbl" data-i18n="prop_price_m">Precio mensual</div>
         <div class="ac-price" id="acPrice">—</div>
         <div class="ac-price-secondary" id="acPriceSecondary" style="display:none"></div>
         <div class="ac-price-mo" id="acPriceMo"></div>
       </div>
       <div class="ac-body" id="acBody"></div>
-      <div class="ac-footer"><div class="ac-footer-txt">Sin cargo por consulta · Respuesta en menos de 2 hs</div></div>
+      <div class="ac-footer"><div class="ac-footer-txt" data-i18n="prop_ac_footer">Sin cargo por consulta · Respuesta en menos de 2 hs</div></div>
     </div>
   </div>
 </main>
 
 <!-- NOT FOUND -->
 <div class="notfound" id="notFoundScreen" style="display:none">
-  <h1>Propiedad no encontrada</h1>
-  <p>El link puede haber cambiado, la unidad ya fue alquilada o el slug es incorrecto.</p>
-  <a href="catalogo.html">← Volver al catálogo</a>
+  <h1 data-i18n="prop_nf_h">Propiedad no encontrada</h1>
+  <p data-i18n="prop_nf_p">El link puede haber cambiado, la unidad ya fue alquilada o el slug es incorrecto.</p>
+  <a href="catalogo.html" data-i18n="prop_back_full">← Volver al catálogo</a>
 </div>
 
 <!-- FOOTER -->
 <footer>
   <div class="ft-logo"><img src="bairen_logo.png?v=3" alt="Grupo Bairen"/></div>
-  <div class="ft-copy">© 2026 Grupo Bairen · Todos los derechos reservados</div>
+  <div class="ft-copy" data-i18n="cat_copy">© 2026 Grupo Bairen · Todos los derechos reservados</div>
 </footer>
 
 <!-- WHATSAPP -->
@@ -369,8 +385,88 @@ footer{background:var(--navy-dark);border-top:1px solid var(--gold);padding:40px
 </div>
 
 <script src="supabase-config.js"></script>
+<script src="i18n.js"></script>
 <script>
 'use strict';
+
+// ─── i18n de contenido dinámico (el estático lo maneja i18n.js) ───
+const PROP_T = {
+  es: {
+    tag_ambos:'Alquiler temporal y tradicional', tag_temporal:'Alquiler Temporal', tag_tradicional:'Alquiler Tradicional',
+    temporal_allin:'temporal · all in', pm_allin:'por mes · all in', pm_todo:'por mes · todo incluido', pm:'por mes',
+    trad_lbl:'Tradicional',
+    stat_unidad:'Unidad', stat_amb:'Ambientes', stat_meses:'Meses', stat_anios:'Años',
+    amenities:'Amenities del edificio',
+    video_lbl:'Ver video de la unidad',
+    r_dir:'Dirección', r_barrio:'Barrio', r_sup:'Superficie', r_amb:'Ambientes', r_plazo:'Plazo', r_serv:'Servicios', r_gar:'Garantía', r_estado:'Estado',
+    amb_sing:'ambiente', amb_pl:'ambientes',
+    v_serv_all:'Todos incluidos', v_serv_inq:'A cargo del inquilino',
+    v_gar_trad:'Gtía CABA / Seguro de Caución', v_gar_no:'No requerida',
+    est_Disponible:'Disponible', est_Reservado:'Reservado', est_Ocupado:'Ocupado',
+    plazo_default:'3 a 24 meses',
+    urg_res:'Esta unidad ya está reservada. Te mostramos opciones similares.',
+    urg_ok:'Seleccionada y verificada por el equipo de Bairen.',
+    btn_similares:'VER OPCIONES SIMILARES', btn_visita:'COORDINAR VISITA', btn_reservar:'RESERVAR LA UNIDAD',
+    wa_similar:'Muy buenas! ¿Cuentan con propiedades similares a {p}? Me encuentro interesado/a. Gracias!',
+    wa_reservar:'Muy buenas! Estoy interesado/a en reservar la unidad de {p}. ¿Cómo seguimos? Gracias!',
+    default_desc:'{t} — unidad disponible en {b}, Buenos Aires. Listo para vivir desde el primer día.',
+    lib_hoy:'Se libera hoy', lib_manana:'Se libera mañana', lib_dias:'Se libera en {d} días', lib_fecha:'Se libera: {f}',
+    locale:'es-AR'
+  },
+  pt: {
+    tag_ambos:'Aluguel temporada e tradicional', tag_temporal:'Aluguel Temporada', tag_tradicional:'Aluguel Tradicional',
+    temporal_allin:'temporada · tudo incluído', pm_allin:'por mês · tudo incluído', pm_todo:'por mês · tudo incluído', pm:'por mês',
+    trad_lbl:'Tradicional',
+    stat_unidad:'Unidade', stat_amb:'Ambientes', stat_meses:'Meses', stat_anios:'Anos',
+    amenities:'Comodidades do edifício',
+    video_lbl:'Ver vídeo da unidade',
+    r_dir:'Endereço', r_barrio:'Bairro', r_sup:'Área', r_amb:'Ambientes', r_plazo:'Prazo', r_serv:'Serviços', r_gar:'Garantia', r_estado:'Status',
+    amb_sing:'ambiente', amb_pl:'ambientes',
+    v_serv_all:'Todos incluídos', v_serv_inq:'Por conta do inquilino',
+    v_gar_trad:'Garantia CABA / Seguro fiança', v_gar_no:'Não exigida',
+    est_Disponible:'Disponível', est_Reservado:'Reservado', est_Ocupado:'Ocupado',
+    plazo_default:'3 a 24 meses',
+    urg_res:'Esta unidade já está reservada. Mostramos opções semelhantes.',
+    urg_ok:'Selecionada e verificada pela equipe Bairen.',
+    btn_similares:'VER OPÇÕES SEMELHANTES', btn_visita:'AGENDAR VISITA', btn_reservar:'RESERVAR A UNIDADE',
+    wa_similar:'Olá, vocês têm imóveis semelhantes a {p}? Tenho interesse. Obrigado!',
+    wa_reservar:'Olá, tenho interesse em reservar a unidade de {p}. Como seguimos? Obrigado!',
+    default_desc:'{t} — unidade disponível em {b}, Buenos Aires. Pronta para morar desde o primeiro dia.',
+    lib_hoy:'Libera hoje', lib_manana:'Libera amanhã', lib_dias:'Libera em {d} dias', lib_fecha:'Libera em: {f}',
+    locale:'pt-BR',
+    amen:{'Pileta':'Piscina','Gimnasio':'Academia','Spa / Sauna':'Spa / Sauna','SUM':'Salão de festas','Cochera':'Garagem','Ascensor':'Elevador','Aire acond.':'Ar-condicionado','Jardín / Terraza':'Jardim / Terraço','Parrilla':'Churrasqueira','Laundry':'Lavanderia','Seguridad 24hs':'Segurança 24h','Conserje 24hs':'Portaria 24h','Bicicletero':'Bicicletário','Pet friendly':'Aceita pets','Calefacción central':'Aquecimento central','Baulera':'Depósito','Amoblado':'Mobiliado','All in':'Tudo incluído'}
+  },
+  en: {
+    tag_ambos:'Short & long-term rental', tag_temporal:'Short-term Rental', tag_tradicional:'Long-term Rental',
+    temporal_allin:'short-term · all in', pm_allin:'per month · all in', pm_todo:'per month · all inclusive', pm:'per month',
+    trad_lbl:'Long-term',
+    stat_unidad:'Unit', stat_amb:'Rooms', stat_meses:'Months', stat_anios:'Years',
+    amenities:'Building amenities',
+    video_lbl:'Watch unit video',
+    r_dir:'Address', r_barrio:'Neighbourhood', r_sup:'Area', r_amb:'Rooms', r_plazo:'Term', r_serv:'Utilities', r_gar:'Guarantee', r_estado:'Status',
+    amb_sing:'room', amb_pl:'rooms',
+    v_serv_all:'All included', v_serv_inq:'Paid by tenant',
+    v_gar_trad:'CABA guarantee / Surety bond', v_gar_no:'Not required',
+    est_Disponible:'Available', est_Reservado:'Reserved', est_Ocupado:'Occupied',
+    plazo_default:'3 to 24 months',
+    urg_res:'This unit is already reserved. We can show you similar options.',
+    urg_ok:'Selected and verified by the Bairen team.',
+    btn_similares:'SEE SIMILAR OPTIONS', btn_visita:'SCHEDULE A VISIT', btn_reservar:'RESERVE THIS UNIT',
+    wa_similar:'Hi! Do you have properties similar to {p}? I am interested. Thank you!',
+    wa_reservar:'Hi! I would like to reserve the unit at {p}. What are the next steps? Thank you!',
+    default_desc:'{t} — unit available in {b}, Buenos Aires. Move-in ready from day one.',
+    lib_hoy:'Available today', lib_manana:'Available tomorrow', lib_dias:'Available in {d} days', lib_fecha:'Available: {f}',
+    locale:'en-US',
+    amen:{'Pileta':'Pool','Gimnasio':'Gym','Spa / Sauna':'Spa / Sauna','SUM':'Common room','Cochera':'Parking','Ascensor':'Elevator','Aire acond.':'Air conditioning','Jardín / Terraza':'Garden / Terrace','Parrilla':'BBQ area','Laundry':'Laundry','Seguridad 24hs':'24h security','Conserje 24hs':'24h concierge','Bicicletero':'Bike storage','Pet friendly':'Pet friendly','Calefacción central':'Central heating','Baulera':'Storage room','Amoblado':'Furnished','All in':'All in'}
+  }
+};
+function LT() {
+  const l = window.BAIREN_LANG || 'es';
+  return PROP_T[l] || PROP_T.es;
+}
+let LAST_P = null;
+let REVEALS_WIRED = false;
+document.addEventListener('bairen:lang', () => { if (LAST_P) renderDynamicTexts(LAST_P); });
 
 // SVGs minimalistas line-style (premium feel, no emojis)
 const SVG = {
@@ -546,14 +642,7 @@ function renderProperty(p) {
   $('metaTwImage').content  = ogImg;
   injectJSONLD(p, pageUrl, ogImg);
 
-  // ─── HERO ───
-  if (reservado && p.fecha_liberacion) {
-    $('heroTag').textContent = formatFechaLiberacion(p.fecha_liberacion);
-    $('heroTag').classList.add('hero-tag--liberacion');
-  } else {
-    $('heroTag').textContent = isAmbos ? 'Alquiler temporal y tradicional' : `Alquiler ${tipo}`;
-    $('heroTag').classList.remove('hero-tag--liberacion');
-  }
+  // ─── HERO ─── (el tag/precios/stats se setean en renderDynamicTexts)
   $('heroAddress').textContent = p.dir;
   $('heroSub').textContent     = `${p.barrio} · Buenos Aires`;
   $('heroSlides').innerHTML = PHOTOS.map((ph, i) =>
@@ -566,36 +655,12 @@ function renderProperty(p) {
     lbHTML += `<div class="lightbox-slide lightbox-slide--video" data-idx="${PHOTOS.length}" data-type="video">
       <div class="lb-video-placeholder" role="button" tabindex="0" aria-label="Reproducir video de la unidad">
         <div class="lb-play-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></div>
-        <div class="lb-play-label">Ver video de la unidad</div>
+        <div class="lb-play-label">${LT().video_lbl}</div>
       </div>
     </div>`;
   }
   $('lbTrack').innerHTML = lbHTML;
   currentPhotoIdx = 0;
-
-  // ─── PRECIOS ───
-  const priceTempStr = fmtUSD(p.precio_temporal);
-  const priceTradStr = fmtUSD(p.precio_tradicional);
-  if (isAmbos) {
-    $('heroPrice').textContent = priceTempStr;
-    $('heroPriceMo').textContent = 'temporal · all in';
-    $('acPrice').textContent = priceTempStr;
-    $('acPriceMo').textContent = 'temporal · all in';
-    if (p.precio_tradicional) {
-      $('acPriceSecondary').style.display = '';
-      $('acPriceSecondary').innerHTML = `<span>Tradicional</span>${priceTradStr}`;
-    }
-  } else if (isTemp) {
-    $('heroPrice').textContent = priceTempStr;
-    $('heroPriceMo').textContent = 'por mes · all in';
-    $('acPrice').textContent = priceTempStr;
-    $('acPriceMo').textContent = 'por mes · todo incluido';
-  } else if (isTrad) {
-    $('heroPrice').textContent = priceTradStr;
-    $('heroPriceMo').textContent = 'por mes';
-    $('acPrice').textContent = priceTradStr;
-    $('acPriceMo').textContent = 'por mes';
-  }
 
   // ─── GALLERY STRIP ───
   const stripHTML = PHOTOS.map((ph, i) =>
@@ -605,42 +670,13 @@ function renderProperty(p) {
   ).join('') + (VIDEO ? `<div class="thumb" data-type="video">▶ VIDEO<span class="vid-dot"></span></div>` : '');
   $('galleryStrip').innerHTML = stripHTML;
 
-  // ─── STATS ───
-  const ambStr   = p.ambientes ? `${p.ambientes}` : '—';
-  const m2Str    = p.m2 ? `${p.m2}` : '—';
-  const unidStr  = p.unidad || '—';
-  const { val: plazoSt, lbl: plazoLbl } = formatPlazoStat(p.plazo, isTemp, isTrad);
-  $('statsRow').innerHTML = `
-    <div class="stat"><div class="stat-val">${escapeHTML(m2Str)}</div><div class="stat-lbl">M²</div></div>
-    <div class="stat"><div class="stat-val">${escapeHTML(unidStr)}</div><div class="stat-lbl">Unidad</div></div>
-    <div class="stat"><div class="stat-val">${escapeHTML(ambStr)}</div><div class="stat-lbl">Ambientes</div></div>
-    <div class="stat"><div class="stat-val">${escapeHTML(plazoSt)}</div><div class="stat-lbl">${escapeHTML(plazoLbl)}</div></div>
-  `;
-
-  // ─── DESCRIPCIÓN ───
-  const defaultDesc = `${titleFull} — unidad disponible en ${p.barrio}, Buenos Aires. Listo para vivir desde el primer día.`;
-  $('propDesc').textContent = p.descripcion || defaultDesc;
-
-  // ─── AMENITIES ───
-  const ams = (p.amenities || []).map(a => a.nombre).filter(Boolean);
-  if (ams.length) {
-    const chips = ams.map(a => {
-      const path = AMENITY_ICONS[a];
-      const ico = path ? svgIcon(path, 22) : svgIcon(SVG.check, 22);
-      return `<div class="amenity"><span class="amenity-icon">${ico}</span><div class="amenity-name">${escapeHTML(a)}</div></div>`;
-    }).join('');
-    $('amenitiesBlock').innerHTML = `
-      <div class="sec-label reveal">Amenities del edificio</div>
-      <div class="amenities-grid reveal">${chips}</div>
-    `;
-  }
-
   // ─── MAP ───
   const mapsQ = encodeURIComponent(`${p.dir}${p.unidad ? ' ' + p.unidad : ''}, ${p.barrio}, Buenos Aires, Argentina`);
   $('mapFrame').src = `https://www.google.com/maps?q=${mapsQ}&output=embed&z=16&hl=es`;
 
-  // ─── ACTION CARD BODY ───
-  renderActionCard(p, titleFull, unidadLbl, reservado, isTemp, isTrad);
+  // ─── TEXTOS TRADUCIBLES (tag, precios, stats, desc, amenities, action card) ───
+  LAST_P = p;
+  renderDynamicTexts(p);
 
   // ─── MOSTRAR CONTENIDO ───
   $('loadingScreen').style.display = 'none';
@@ -652,45 +688,125 @@ function renderProperty(p) {
   wireReveals();
 }
 
+function renderDynamicTexts(p) {
+  const t = LT();
+  const titleFull = p.dir + (p.unidad ? ' ' + p.unidad : '');
+  const unidadLbl = p.unidad ? ', ' + p.unidad : '';
+  const tipo      = p.tipo;
+  const isAmbos   = tipo === 'Ambos';
+  const isTemp    = tipo === 'Temporal';
+  const isTrad    = tipo === 'Tradicional';
+  const reservado = p.estado === 'Reservado';
+
+  // ─── HERO TAG ───
+  if (reservado && p.fecha_liberacion) {
+    $('heroTag').textContent = formatFechaLiberacion(p.fecha_liberacion);
+    $('heroTag').classList.add('hero-tag--liberacion');
+  } else {
+    $('heroTag').textContent = isAmbos ? t.tag_ambos : (isTemp ? t.tag_temporal : t.tag_tradicional);
+    $('heroTag').classList.remove('hero-tag--liberacion');
+  }
+
+  // ─── PRECIOS ───
+  const priceTempStr = fmtUSD(p.precio_temporal);
+  const priceTradStr = fmtUSD(p.precio_tradicional);
+  if (isAmbos) {
+    $('heroPrice').textContent = priceTempStr;
+    $('heroPriceMo').textContent = t.temporal_allin;
+    $('acPrice').textContent = priceTempStr;
+    $('acPriceMo').textContent = t.temporal_allin;
+    if (p.precio_tradicional) {
+      $('acPriceSecondary').style.display = '';
+      $('acPriceSecondary').innerHTML = `<span>${t.trad_lbl}</span>${priceTradStr}`;
+    }
+  } else if (isTemp) {
+    $('heroPrice').textContent = priceTempStr;
+    $('heroPriceMo').textContent = t.pm_allin;
+    $('acPrice').textContent = priceTempStr;
+    $('acPriceMo').textContent = t.pm_todo;
+  } else if (isTrad) {
+    $('heroPrice').textContent = priceTradStr;
+    $('heroPriceMo').textContent = t.pm;
+    $('acPrice').textContent = priceTradStr;
+    $('acPriceMo').textContent = t.pm;
+  }
+
+  // ─── STATS ───
+  const ambStr   = p.ambientes ? `${p.ambientes}` : '—';
+  const m2Str    = p.m2 ? `${p.m2}` : '—';
+  const unidStr  = p.unidad || '—';
+  const { val: plazoSt, lbl: plazoLbl } = formatPlazoStat(p.plazo, isTemp, isTrad);
+  const plazoLblTr = plazoLbl === 'Años' ? t.stat_anios : t.stat_meses;
+  $('statsRow').innerHTML = `
+    <div class="stat"><div class="stat-val">${escapeHTML(m2Str)}</div><div class="stat-lbl">M²</div></div>
+    <div class="stat"><div class="stat-val">${escapeHTML(unidStr)}</div><div class="stat-lbl">${t.stat_unidad}</div></div>
+    <div class="stat"><div class="stat-val">${escapeHTML(ambStr)}</div><div class="stat-lbl">${t.stat_amb}</div></div>
+    <div class="stat"><div class="stat-val">${escapeHTML(plazoSt)}</div><div class="stat-lbl">${escapeHTML(plazoLblTr)}</div></div>
+  `;
+
+  // ─── DESCRIPCIÓN ───
+  const defaultDesc = t.default_desc.replace('{t}', titleFull).replace('{b}', p.barrio);
+  $('propDesc').textContent = p.descripcion || defaultDesc;
+
+  // ─── AMENITIES ───
+  const ams = (p.amenities || []).map(a => a.nombre).filter(Boolean);
+  if (ams.length) {
+    const chips = ams.map(a => {
+      const path = AMENITY_ICONS[a];
+      const ico = path ? svgIcon(path, 22) : svgIcon(SVG.check, 22);
+      const nameTr = (t.amen && t.amen[a]) || a;
+      return `<div class="amenity"><span class="amenity-icon">${ico}</span><div class="amenity-name">${escapeHTML(nameTr)}</div></div>`;
+    }).join('');
+    $('amenitiesBlock').innerHTML = `
+      <div class="sec-label reveal${REVEALS_WIRED ? ' visible' : ''}">${t.amenities}</div>
+      <div class="amenities-grid reveal${REVEALS_WIRED ? ' visible' : ''}">${chips}</div>
+    `;
+  }
+
+  renderActionCard(p, titleFull, unidadLbl, reservado, isTemp, isTrad);
+}
+
 function renderActionCard(p, titleFull, unidadLbl, reservado, isTemp, isTrad) {
+  const t = LT();
   const acBody = $('acBody');
   const rows = [];
-  rows.push({ l:'Dirección', v: p.dir + unidadLbl });
-  rows.push({ l:'Barrio',    v: p.barrio });
-  if (p.m2)        rows.push({ l:'Superficie', v: `${p.m2} m²` });
-  if (p.ambientes) rows.push({ l:'Ambientes',  v: `${p.ambientes} ambiente${p.ambientes !== 1 ? 's' : ''}` });
-  rows.push({ l:'Plazo',     v: p.plazo || '3 a 24 meses' });
-  if (isTemp || p.tipo === 'Ambos') rows.push({ l:'Servicios', v: 'Todos incluidos' });
-  else if (isTrad) rows.push({ l:'Servicios', v: 'A cargo del inquilino' });
-  rows.push({ l:'Garantía',  v: isTrad ? 'Gtía CABA / Seguro de Caución' : 'No requerida' });
-  rows.push({ l:'Estado',    v: p.estado, color: reservado ? '#b94a4a' : '#2a7a4b' });
+  rows.push({ l:t.r_dir,    v: p.dir + unidadLbl });
+  rows.push({ l:t.r_barrio, v: p.barrio });
+  if (p.m2)        rows.push({ l:t.r_sup, v: `${p.m2} m²` });
+  if (p.ambientes) rows.push({ l:t.r_amb, v: `${p.ambientes} ${p.ambientes !== 1 ? t.amb_pl : t.amb_sing}` });
+  rows.push({ l:t.r_plazo,  v: p.plazo || t.plazo_default });
+  if (isTemp || p.tipo === 'Ambos') rows.push({ l:t.r_serv, v: t.v_serv_all });
+  else if (isTrad) rows.push({ l:t.r_serv, v: t.v_serv_inq });
+  rows.push({ l:t.r_gar,    v: isTrad ? t.v_gar_trad : t.v_gar_no });
+  rows.push({ l:t.r_estado, v: t['est_' + p.estado] || p.estado, color: reservado ? '#b94a4a' : '#2a7a4b' });
 
   let html = rows.map(r =>
     `<div class="ac-row"><span class="ac-lbl">${escapeHTML(r.l)}</span><span class="ac-val" ${r.color?`style="color:${r.color}"`:''}>${escapeHTML(r.v)}</span></div>`
   ).join('');
 
+  const propRef = `${p.dir}${p.barrio ? ', ' + p.barrio : ''}`;
   if (reservado) {
-    const wa = encodeURIComponent(`Muy buenas! ¿Cuentan con propiedades similares a ${p.dir}${p.barrio ? ', ' + p.barrio : ''}? Me encuentro interesado/a. Gracias!`);
+    const wa = encodeURIComponent(t.wa_similar.replace('{p}', propRef));
     html += `
       <div class="urgency" style="background:rgba(185,74,74,.05);border-color:rgba(185,74,74,.2);">
         <div class="urgency-dot" style="background:#b94a4a;animation:none"></div>
-        <div class="urgency-txt">Esta unidad ya está reservada. Te mostramos opciones similares.</div>
+        <div class="urgency-txt">${t.urg_res}</div>
       </div>
-      <a class="btn-primary" href="https://wa.me/${WHATSAPP_NUM}?text=${wa}" target="_blank" rel="noopener noreferrer">VER OPCIONES SIMILARES</a>
+      <a class="btn-primary" href="https://wa.me/${WHATSAPP_NUM}?text=${wa}" target="_blank" rel="noopener noreferrer">${t.btn_similares}</a>
     `;
   } else {
     // Si tipo='Ambos', mandamos Temporal como default al filtro (modalidad más común)
     const ctaTipo   = p.tipo === 'Ambos' ? 'Temporal' : p.tipo;
     const ctaPrecio = ctaTipo === 'Tradicional' ? p.precio_tradicional : p.precio_temporal;
     const filtro = `filtro.html?prop=${encodeURIComponent(p.dir)}&barrio=${encodeURIComponent(p.barrio)}&tipo=${encodeURIComponent(ctaTipo)}&amb=${p.ambientes || 0}&precio=${ctaPrecio || 0}`;
-    const waReservar = encodeURIComponent(`Muy buenas! Estoy interesado/a en reservar la unidad de ${p.dir}${p.barrio ? ', ' + p.barrio : ''}. ¿Cómo seguimos? Gracias!`);
+    const waReservar = encodeURIComponent(t.wa_reservar.replace('{p}', propRef));
     html += `
       <div class="urgency">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8A7547" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5"/></svg>
-        <div class="urgency-txt">Seleccionada y verificada por el equipo de Bairen.</div>
+        <div class="urgency-txt">${t.urg_ok}</div>
       </div>
-      <a class="btn-primary" href="${filtro}">COORDINAR VISITA</a>
-      <a class="btn-secondary" href="https://wa.me/${WHATSAPP_NUM}?text=${waReservar}" target="_blank" rel="noopener noreferrer">RESERVAR LA UNIDAD</a>
+      <a class="btn-primary" href="${filtro}">${t.btn_visita}</a>
+      <a class="btn-secondary" href="https://wa.me/${WHATSAPP_NUM}?text=${waReservar}" target="_blank" rel="noopener noreferrer">${t.btn_reservar}</a>
     `;
   }
 
@@ -1011,6 +1127,7 @@ function wireLightbox() {
 }
 
 function wireReveals() {
+  REVEALS_WIRED = true;
   const io = new IntersectionObserver(entries => {
     entries.forEach(e => {
       if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
@@ -1040,13 +1157,14 @@ function formatFechaLiberacion(fechaStr) {
   const diffMs = fecha - hoy;
   const diffDias = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
 
-  if (diffDias === 0) return "Se libera hoy";
-  if (diffDias === 1) return "Se libera mañana";
-  if (diffDias > 1 && diffDias <= 7) return `Se libera en ${diffDias} días`;
+  const t = LT();
+  if (diffDias === 0) return t.lib_hoy;
+  if (diffDias === 1) return t.lib_manana;
+  if (diffDias > 1 && diffDias <= 7) return t.lib_dias.replace('{d}', diffDias);
 
   const opciones = { month: 'long', day: 'numeric', year: 'numeric' };
-  const formatted = fecha.toLocaleDateString('es-AR', opciones);
-  return `Se libera: ${formatted}`;
+  const formatted = fecha.toLocaleDateString(t.locale, opciones);
+  return t.lib_fecha.replace('{f}', formatted);
 }
 
 // ════════════════════════════════════════════════════════════════════

@@ -796,7 +796,8 @@ const CT = {
     loading:'Cargando propiedades...', err_t:'No pudimos cargar las propiedades', err_s:'Revisá la conexión a internet. Si el problema persiste, contactanos por WhatsApp.',
     per_month:'por mes', per_month_all:'por mes · all in', consult:'Consultar precio', ver_mas:'Ver más →',
     disponible:'Disponible', reservado:'Reservado', serv_allin:'All in', serv_sin:'Sin incl.', serv_lbl:'Servicios',
-    amb:'Amb.', sup:'Sup.', foto_ph:'Fotografía de la unidad', tipo_temporal:'Temporal', tipo_tradicional:'Tradicional'
+    amb:'Amb.', sup:'Sup.', foto_ph:'Fotografía de la unidad', tipo_temporal:'Temporal', tipo_tradicional:'Tradicional',
+    lib_hoy:'Se libera hoy', lib_manana:'Se libera mañana', lib_dias:'Se libera en {d} días', lib_fecha:'Se libera: {f}', lib_locale:'es-AR'
   },
   pt: {
     title_todos:'Todos os imóveis', sub_todos:'Aluguéis por temporada e tradicionais em CABA e GBA Norte', tag_todos:'DISPONÍVEIS AGORA', text_todos:'Temporada com tudo incluído desde o primeiro dia, e tradicionais anuais sem mobília. Filtre por tipo ou busque por endereço para encontrar seu próximo imóvel.',
@@ -806,7 +807,8 @@ const CT = {
     loading:'Carregando imóveis...', err_t:'Não foi possível carregar os imóveis', err_s:'Verifique sua conexão. Se o problema persistir, fale conosco pelo WhatsApp.',
     per_month:'por mês', per_month_all:'por mês · tudo incluído', consult:'Consultar preço', ver_mas:'Ver mais →',
     disponible:'Disponível', reservado:'Reservado', serv_allin:'Tudo incl.', serv_sin:'Não incl.', serv_lbl:'Serviços',
-    amb:'Amb.', sup:'Sup.', foto_ph:'Foto do imóvel', tipo_temporal:'Temporada', tipo_tradicional:'Tradicional'
+    amb:'Amb.', sup:'Sup.', foto_ph:'Foto do imóvel', tipo_temporal:'Temporada', tipo_tradicional:'Tradicional',
+    lib_hoy:'Libera hoje', lib_manana:'Libera amanhã', lib_dias:'Libera em {d} dias', lib_fecha:'Libera em: {f}', lib_locale:'pt-BR'
   },
   en: {
     title_todos:'All properties', sub_todos:'Short and long-term rentals in CABA and GBA Norte', tag_todos:'AVAILABLE NOW', text_todos:'Short-term with everything included from day one, and traditional yearly rentals unfurnished. Filter by type or search by address to find your next property.',
@@ -816,7 +818,8 @@ const CT = {
     loading:'Loading properties...', err_t:'We could not load the properties', err_s:'Check your internet connection. If the problem persists, contact us on WhatsApp.',
     per_month:'per month', per_month_all:'per month · all in', consult:'Ask for price', ver_mas:'See more →',
     disponible:'Available', reservado:'Reserved', serv_allin:'All in', serv_sin:'Not incl.', serv_lbl:'Services',
-    amb:'Rooms', sup:'Area', foto_ph:'Unit photo', tipo_temporal:'Short-term', tipo_tradicional:'Long-term'
+    amb:'Rooms', sup:'Area', foto_ph:'Unit photo', tipo_temporal:'Short-term', tipo_tradicional:'Long-term',
+    lib_hoy:'Available today', lib_manana:'Available tomorrow', lib_dias:'Available in {d} days', lib_fecha:'Available: {f}', lib_locale:'en-US'
   }
 };
 const L = () => (window.BAIREN_LANG || 'es');
@@ -1022,13 +1025,13 @@ function formatFechaLiberacion(fechaStr) {
   const diffMs = fecha - hoy;
   const diffDias = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
 
-  if (diffDias === 0) return "Se libera hoy";
-  if (diffDias === 1) return "Se libera mañana";
-  if (diffDias > 1 && diffDias <= 7) return `Se libera en ${diffDias} días`;
+  if (diffDias === 0) return ct('lib_hoy');
+  if (diffDias === 1) return ct('lib_manana');
+  if (diffDias > 1 && diffDias <= 7) return ct('lib_dias').replace('{d}', diffDias);
 
   const opciones = { month: 'long', day: 'numeric', year: 'numeric' };
-  const formatted = fecha.toLocaleDateString('es-AR', opciones);
-  return `Se libera: ${formatted}`;
+  const formatted = fecha.toLocaleDateString(ct('lib_locale'), opciones);
+  return ct('lib_fecha').replace('{f}', formatted);
 }
 
 /* ═══════════════════════════════════════════════════════════════

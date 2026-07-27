@@ -805,6 +805,8 @@
       document.documentElement.lang = lang === 'pt' ? 'pt-BR' : lang === 'en' ? 'en' : 'es-AR';
       document.querySelectorAll('.flag').forEach(f => f.classList.toggle('active', f.dataset.lang === lang));
       try { localStorage.setItem('bairen_lang', lang); } catch(e){}
+      window.BAIREN_LANG = lang;
+      document.dispatchEvent(new Event('bairen:lang'));
     }
     document.querySelectorAll('.flag').forEach(f => f.addEventListener('click', () => apply(f.dataset.lang)));
     let saved = 'es'; try { saved = localStorage.getItem('bairen_lang') || 'es'; } catch(e){}
@@ -881,39 +883,9 @@
       });
 
       // Destacadas: las 3 más recientes
-      const top3 = props.slice(0, 3);
-      if (top3.length) {
-        const grid = document.getElementById('destacadasGrid');
-        grid.innerHTML = top3.map(p => {
-          const portada = (p.imagenes || []).sort((a,b) => a.orden - b.orden)[0];
-          const fotoStyle = portada ? "background-image:url('" + portada.url + "')" : '';
-          const reservado = p.estado === 'Reservado';
-          const precio = (p.tipo === 'Tradicional' ? p.precio_tradicional : p.precio_temporal) || 0;
-          const precioStr = precio > 0 ? 'USD ' + Number(precio).toLocaleString('es-AR') : 'Consultar';
-          const tipoTag = p.tipo === 'Ambos' ? 'Temporal · Tradic.' : p.tipo;
-          const slugHref = 'propiedad.html?slug=' + encodeURIComponent(p.slug);
-          return (
-            '<a class="dest-card" href="' + slugHref + '" aria-label="Ver ' + escapeHTML(p.dir) + (p.unidad ? ' ' + escapeHTML(p.unidad) : '') + '">' +
-              '<div class="dest-img" style="' + fotoStyle + '">' +
-                '<span class="dest-tag">' + escapeHTML(tipoTag) + '</span>' +
-                '<span class="dest-status' + (reservado ? ' res' : '') + '">' + (reservado ? 'Reservado' : 'Disponible') + '</span>' +
-                (reservado && p.fecha_liberacion ? '<div class="badge-liberacion"><span>' + formatFechaLiberacion(p.fecha_liberacion) + '</span></div>' : '') +
-              '</div>' +
-              '<div class="dest-body">' +
-                '<div class="dest-addr">' + escapeHTML(p.dir) + (p.unidad ? ' ' + escapeHTML(p.unidad) : '') + '</div>' +
-                '<div class="dest-barrio">' + escapeHTML(p.barrio || '') + '</div>' +
-                '<div class="dest-meta">' +
-                  (p.ambientes ? '<span>' + p.ambientes + ' amb</span>' : '') +
-                  (p.m2 ? '<span>' + p.m2 + ' m²</span>' : '') +
-                '</div>' +
-                '<div class="dest-bottom-row">' +
-                  '<span class="dest-price">' + precioStr + '</span>' +
-                  '<span class="dest-cta-txt">Ver más →</span>' +
-                '</div>' +
-              '</div>' +
-            '</a>'
-          );
-        }).join('');
+      DEST_TOP3 = props.slice(0, 3);
+      if (DEST_TOP3.length) {
+        renderDestacadas();
         document.getElementById('destacadas').style.display = '';
         document.querySelectorAll('#destacadas .reveal').forEach(el => io.observe(el));
       }
@@ -921,6 +893,57 @@
       console.error('[index] Error cargando destacadas:', err);
     }
   })();
+
+// ─── i18n de las tarjetas destacadas (se re-renderizan al cambiar idioma) ───
+const DEST_T = {
+  es: { reservado:'Reservado', disponible:'Disponible', consultar:'Consultar', ver_mas:'Ver más →', amb:'amb', tipo_ambos:'Temporal · Tradic.', tipo_temporal:'Temporal', tipo_tradicional:'Tradicional',
+        lib_hoy:'Se libera hoy', lib_manana:'Se libera mañana', lib_dias:'Se libera en {d} días', lib_fecha:'Se libera: {f}', lib_locale:'es-AR' },
+  pt: { reservado:'Reservado', disponible:'Disponível', consultar:'Consultar', ver_mas:'Ver mais →', amb:'amb', tipo_ambos:'Temporada · Tradic.', tipo_temporal:'Temporada', tipo_tradicional:'Tradicional',
+        lib_hoy:'Libera hoje', lib_manana:'Libera amanhã', lib_dias:'Libera em {d} dias', lib_fecha:'Libera em: {f}', lib_locale:'pt-BR' },
+  en: { reservado:'Reserved', disponible:'Available', consultar:'Ask us', ver_mas:'See more →', amb:'rooms', tipo_ambos:'Short · Long-term', tipo_temporal:'Short-term', tipo_tradicional:'Long-term',
+        lib_hoy:'Available today', lib_manana:'Available tomorrow', lib_dias:'Available in {d} days', lib_fecha:'Available: {f}', lib_locale:'en-US' }
+};
+let DEST_TOP3 = [];
+function destT() { return DEST_T[window.BAIREN_LANG || 'es'] || DEST_T.es; }
+document.addEventListener('bairen:lang', () => { if (DEST_TOP3.length) renderDestacadas(); });
+
+function renderDestacadas() {
+  const d = destT();
+  function escapeHTML(s) {
+    return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  const grid = document.getElementById('destacadasGrid');
+  grid.innerHTML = DEST_TOP3.map(p => {
+    const portada = (p.imagenes || []).sort((a,b) => a.orden - b.orden)[0];
+    const fotoStyle = portada ? "background-image:url('" + portada.url + "')" : '';
+    const reservado = p.estado === 'Reservado';
+    const precio = (p.tipo === 'Tradicional' ? p.precio_tradicional : p.precio_temporal) || 0;
+    const precioStr = precio > 0 ? 'USD ' + Number(precio).toLocaleString('es-AR') : d.consultar;
+    const tipoTag = p.tipo === 'Ambos' ? d.tipo_ambos : (p.tipo === 'Temporal' ? d.tipo_temporal : d.tipo_tradicional);
+    const slugHref = 'propiedad.html?slug=' + encodeURIComponent(p.slug);
+    return (
+      '<a class="dest-card" href="' + slugHref + '" aria-label="Ver ' + escapeHTML(p.dir) + (p.unidad ? ' ' + escapeHTML(p.unidad) : '') + '">' +
+        '<div class="dest-img" style="' + fotoStyle + '">' +
+          '<span class="dest-tag">' + escapeHTML(tipoTag) + '</span>' +
+          '<span class="dest-status' + (reservado ? ' res' : '') + '">' + (reservado ? d.reservado : d.disponible) + '</span>' +
+          (reservado && p.fecha_liberacion ? '<div class="badge-liberacion"><span>' + formatFechaLiberacion(p.fecha_liberacion) + '</span></div>' : '') +
+        '</div>' +
+        '<div class="dest-body">' +
+          '<div class="dest-addr">' + escapeHTML(p.dir) + (p.unidad ? ' ' + escapeHTML(p.unidad) : '') + '</div>' +
+          '<div class="dest-barrio">' + escapeHTML(p.barrio || '') + '</div>' +
+          '<div class="dest-meta">' +
+            (p.ambientes ? '<span>' + p.ambientes + ' ' + d.amb + '</span>' : '') +
+            (p.m2 ? '<span>' + p.m2 + ' m²</span>' : '') +
+          '</div>' +
+          '<div class="dest-bottom-row">' +
+            '<span class="dest-price">' + precioStr + '</span>' +
+            '<span class="dest-cta-txt">' + d.ver_mas + '</span>' +
+          '</div>' +
+        '</div>' +
+      '</a>'
+    );
+  }).join('');
+}
 
 // Función para calcular texto dinámico de liberación
 function formatFechaLiberacion(fechaStr) {
@@ -934,13 +957,14 @@ function formatFechaLiberacion(fechaStr) {
   const diffMs = fecha - hoy;
   const diffDias = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
 
-  if (diffDias === 0) return "Se libera hoy";
-  if (diffDias === 1) return "Se libera mañana";
-  if (diffDias > 1 && diffDias <= 7) return `Se libera en ${diffDias} días`;
+  const d = destT();
+  if (diffDias === 0) return d.lib_hoy;
+  if (diffDias === 1) return d.lib_manana;
+  if (diffDias > 1 && diffDias <= 7) return d.lib_dias.replace('{d}', diffDias);
 
   const opciones = { month: 'long', day: 'numeric', year: 'numeric' };
-  const formatted = fecha.toLocaleDateString('es-AR', opciones);
-  return `Se libera: ${formatted}`;
+  const formatted = fecha.toLocaleDateString(d.lib_locale, opciones);
+  return d.lib_fecha.replace('{f}', formatted);
 }
 </script>
 </body>

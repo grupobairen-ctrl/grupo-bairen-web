@@ -28,6 +28,14 @@ nav{height:64px;background:var(--navy-deeper);border-bottom:2px solid var(--gold
 .nav-back{font-size:.68rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);opacity:.8;transition:opacity .2s;}
 .nav-back:hover{opacity:1;}
 
+/* LANG SWITCH */
+.lang-switch{position:absolute;top:80px;right:22px;z-index:6;display:flex;gap:9px;}
+.flag{width:28px;height:19px;padding:0;border:1px solid rgba(255,255,255,.4);background:none;cursor:pointer;overflow:hidden;opacity:.55;transition:opacity .25s,border-color .25s,transform .2s;display:block;line-height:0;}
+.flag svg{width:100%;height:100%;display:block;}
+.flag:hover{opacity:.9;}
+.flag.active{opacity:1;border-color:#C2A968;}
+@media(max-width:700px){.lang-switch{top:74px;right:16px;gap:7px;}.flag{width:25px;height:17px;}}
+
 /* AMBIENT */
 .ambient{position:fixed;inset:0;pointer-events:none;z-index:0;}
 .ambient::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 0%,rgba(194,169,104,.04) 0%,transparent 65%);}
@@ -172,22 +180,28 @@ nav{height:64px;background:var(--navy-deeper);border-bottom:2px solid var(--gold
 
 <nav>
   <a class="nav-logo" href="index.html"><img src="bairen_logo.png?v=3" alt="Grupo Bairen"></a>
-  <a class="nav-back" href="javascript:history.back()">← Volver</a>
+  <a class="nav-back" href="javascript:history.back()" data-i18n="nav_volver">← Volver</a>
   <div class="burger" id="burger"><span></span><span></span><span></span></div>
 </nav>
 
 <div class="mobile-menu" id="mobileMenu">
-  <a href="index.html" class="mm-link">Inicio</a>
-  <a href="catalogo.html" class="mm-link">Propiedades</a>
-  <a href="index.html#contacto" class="mm-link">Contacto</a>
+  <a href="index.html" class="mm-link" data-i18n="mm_inicio">Inicio</a>
+  <a href="catalogo.html" class="mm-link" data-i18n="mm_props">Propiedades</a>
+  <a href="index.html#contacto" class="mm-link" data-i18n="mm_contacto">Contacto</a>
+</div>
+
+<div class="lang-switch">
+  <button class="flag active" data-lang="es" aria-label="Español" title="Español"><svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#fff"/><rect width="30" height="6.7" fill="#75AADB"/><rect width="30" height="6.7" y="13.3" fill="#75AADB"/><circle cx="15" cy="10" r="2" fill="#F6B40E"/></svg></button>
+  <button class="flag" data-lang="pt" aria-label="Português" title="Português"><svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#009B3A"/><polygon points="15,2.5 27.2,10 15,17.5 2.8,10" fill="#FEDF00"/><circle cx="15" cy="10" r="3.2" fill="#002776"/></svg></button>
+  <button class="flag" data-lang="en" aria-label="English" title="English"><svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#fff"/><rect width="30" height="1.54" fill="#B22234"/><rect width="30" height="1.54" y="3.08" fill="#B22234"/><rect width="30" height="1.54" y="6.15" fill="#B22234"/><rect width="30" height="1.54" y="9.23" fill="#B22234"/><rect width="30" height="1.54" y="12.31" fill="#B22234"/><rect width="30" height="1.54" y="15.38" fill="#B22234"/><rect width="30" height="1.54" y="18.46" fill="#B22234"/><rect width="13" height="10.77" fill="#3C3B6E"/></svg></button>
 </div>
 
 <div class="page">
 
-  <h1 class="sr-only">Coordiná tu visita — Grupo Bairen</h1>
+  <h1 class="sr-only" data-i18n="sr_title">Coordiná tu visita — Grupo Bairen</h1>
 
   <!-- Pill de propiedad -->
-  <div class="prop-pill">Consultando para · <span id="propPillText">Grupo Bairen</span></div>
+  <div class="prop-pill"><span data-i18n="pill_pre">Consultando para</span>&nbsp;· <span id="propPillText">Grupo Bairen</span></div>
 
   <!-- PROGRESO -->
   <div class="progress-wrap" id="progressWrap">
@@ -200,143 +214,143 @@ nav{height:64px;background:var(--navy-deeper);border-bottom:2px solid var(--gold
 
   <!-- ── PASO 1 ── -->
   <div class="step active" id="step1">
-    <div class="step-eyebrow">Pregunta 1 de 5</div>
-    <div class="step-q">¿Cuándo necesitás mudarte?</div>
+    <div class="step-eyebrow" data-i18n="s1_eye">Pregunta 1 de 5</div>
+    <div class="step-q" data-i18n="s1_q">¿Cuándo necesitás mudarte?</div>
     <fieldset class="options">
-      <legend class="sr-only">¿Cuándo necesitás mudarte?</legend>
+      <legend class="sr-only" data-i18n="s1_q">¿Cuándo necesitás mudarte?</legend>
       <label class="opt">
         <input type="radio" name="step1" value="urgente" class="opt-input">
-        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text">Antes de 2 semanas</span></span>
-        <span class="opt-tag">Urgente</span>
+        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text" data-i18n="s1_o1">Antes de 2 semanas</span></span>
+        <span class="opt-tag" data-i18n="s1_t1">Urgente</span>
       </label>
       <label class="opt">
         <input type="radio" name="step1" value="este-mes" class="opt-input">
-        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text">Este mes</span></span>
+        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text" data-i18n="s1_o2">Este mes</span></span>
         <span class="opt-tag"></span>
       </label>
       <label class="opt">
         <input type="radio" name="step1" value="3-meses" class="opt-input">
-        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text">En los próximos 3 meses</span></span>
+        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text" data-i18n="s1_o3">En los próximos 3 meses</span></span>
         <span class="opt-tag"></span>
       </label>
     </fieldset>
     <div class="step-nav">
       <span></span>
-      <button class="btn-next" id="next1" disabled onclick="goNext(1)">Continuar →</button>
+      <button class="btn-next" id="next1" disabled onclick="goNext(1)" data-i18n="btn_next">Continuar →</button>
     </div>
   </div>
 
   <!-- ── PASO 2 ── -->
   <div class="step" id="step2">
-    <div class="step-eyebrow">Pregunta 2 de 5</div>
-    <div class="step-q">¿Por cuánto tiempo necesitás la propiedad?</div>
+    <div class="step-eyebrow" data-i18n="s2_eye">Pregunta 2 de 5</div>
+    <div class="step-q" data-i18n="s2_q">¿Por cuánto tiempo necesitás la propiedad?</div>
     <fieldset class="options" id="step2Options">
-      <legend class="sr-only">¿Por cuánto tiempo necesitás la propiedad?</legend>
+      <legend class="sr-only" data-i18n="s2_q">¿Por cuánto tiempo necesitás la propiedad?</legend>
       <!-- opciones renderizadas por JS según tipo de propiedad -->
     </fieldset>
     <div class="step-nav">
-      <button class="btn-prev" onclick="goPrev(2)">← Anterior</button>
-      <button class="btn-next" id="next2" disabled onclick="goNext(2)">Continuar →</button>
+      <button class="btn-prev" onclick="goPrev(2)" data-i18n="btn_prev">← Anterior</button>
+      <button class="btn-next" id="next2" disabled onclick="goNext(2)" data-i18n="btn_next">Continuar →</button>
     </div>
   </div>
 
   <!-- ── PASO 3 ── -->
   <div class="step" id="step3">
-    <div class="step-eyebrow">Pregunta 3 de 5</div>
-    <div class="step-q">¿Cuántas personas van a habitar la unidad?</div>
+    <div class="step-eyebrow" data-i18n="s3_eye">Pregunta 3 de 5</div>
+    <div class="step-q" data-i18n="s3_q">¿Cuántas personas van a habitar la unidad?</div>
     <fieldset class="options">
-      <legend class="sr-only">¿Cuántas personas van a habitar la unidad?</legend>
+      <legend class="sr-only" data-i18n="s3_q">¿Cuántas personas van a habitar la unidad?</legend>
       <label class="opt">
         <input type="radio" name="step3" value="1" class="opt-input">
-        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text">Solo yo</span></span>
+        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text" data-i18n="s3_o1">Solo yo</span></span>
         <span class="opt-tag"></span>
       </label>
       <label class="opt">
         <input type="radio" name="step3" value="2" class="opt-input">
-        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text">2 personas</span></span>
+        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text" data-i18n="s3_o2">2 personas</span></span>
         <span class="opt-tag"></span>
       </label>
       <label class="opt">
         <input type="radio" name="step3" value="3+" class="opt-input">
-        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text">3 o más</span></span>
+        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text" data-i18n="s3_o3">3 o más</span></span>
         <span class="opt-tag"></span>
       </label>
     </fieldset>
     <div class="step-nav">
-      <button class="btn-prev" onclick="goPrev(3)">← Anterior</button>
-      <button class="btn-next" id="next3" disabled onclick="goNext(3)">Continuar →</button>
+      <button class="btn-prev" onclick="goPrev(3)" data-i18n="btn_prev">← Anterior</button>
+      <button class="btn-next" id="next3" disabled onclick="goNext(3)" data-i18n="btn_next">Continuar →</button>
     </div>
   </div>
 
   <!-- ── PASO 4 ── -->
   <div class="step" id="step4">
-    <div class="step-eyebrow">Pregunta 4 de 5</div>
-    <div class="step-q">¿Tenés mascotas?</div>
+    <div class="step-eyebrow" data-i18n="s4_eye">Pregunta 4 de 5</div>
+    <div class="step-q" data-i18n="s4_q">¿Tenés mascotas?</div>
     <fieldset class="options">
-      <legend class="sr-only">¿Tenés mascotas?</legend>
+      <legend class="sr-only" data-i18n="s4_q">¿Tenés mascotas?</legend>
       <label class="opt">
         <input type="radio" name="step4" value="no" class="opt-input">
-        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text">No</span></span>
+        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text" data-i18n="s4_o1">No</span></span>
         <span class="opt-tag"></span>
       </label>
       <label class="opt">
         <input type="radio" name="step4" value="pequeña" class="opt-input">
-        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text">Sí, una pequeña</span></span>
+        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text" data-i18n="s4_o2">Sí, una pequeña</span></span>
         <span class="opt-tag"></span>
       </label>
       <label class="opt">
         <input type="radio" name="step4" value="grande" class="opt-input">
-        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text">Sí, una grande</span></span>
+        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text" data-i18n="s4_o3">Sí, una grande</span></span>
         <span class="opt-tag"></span>
       </label>
       <label class="opt">
         <input type="radio" name="step4" value="varias" class="opt-input">
-        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text">Sí, más de una</span></span>
+        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text" data-i18n="s4_o4">Sí, más de una</span></span>
         <span class="opt-tag"></span>
       </label>
     </fieldset>
     <div class="step-nav">
-      <button class="btn-prev" onclick="goPrev(4)">← Anterior</button>
-      <button class="btn-next" id="next4" disabled onclick="goNext(4)">Continuar →</button>
+      <button class="btn-prev" onclick="goPrev(4)" data-i18n="btn_prev">← Anterior</button>
+      <button class="btn-next" id="next4" disabled onclick="goNext(4)" data-i18n="btn_next">Continuar →</button>
     </div>
   </div>
 
   <!-- ── PASO 5 ── -->
   <div class="step" id="step5">
-    <div class="step-eyebrow">Pregunta 5 de 5</div>
-    <div class="step-q">¿Con qué presupuesto mensual contás?</div>
-    <div class="step-sub" id="step5Sub">Incluyendo expensas y servicios</div>
+    <div class="step-eyebrow" data-i18n="s5_eye">Pregunta 5 de 5</div>
+    <div class="step-q" data-i18n="s5_q">¿Con qué presupuesto mensual contás?</div>
+    <div class="step-sub" id="step5Sub" data-i18n="s5_sub">Incluyendo expensas y servicios</div>
     <fieldset class="options">
-      <legend class="sr-only">¿Con qué presupuesto mensual contás?</legend>
+      <legend class="sr-only" data-i18n="s5_q">¿Con qué presupuesto mensual contás?</legend>
       <label class="opt">
         <input type="radio" name="step5" value="menos700" data-qualify="no" class="opt-input">
-        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text">Menos de 700</span></span>
+        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text" data-i18n="s5_o1">Menos de 700</span></span>
         <span class="opt-tag"></span>
       </label>
       <label class="opt">
         <input type="radio" name="step5" value="700-800" data-qualify="yes" class="opt-input">
-        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text">700 a 800</span></span>
+        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text" data-i18n="s5_o2">700 a 800</span></span>
         <span class="opt-tag"></span>
       </label>
       <label class="opt">
         <input type="radio" name="step5" value="800-1200" data-qualify="yes" class="opt-input">
-        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text">800 a 1.200</span></span>
+        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text" data-i18n="s5_o3">800 a 1.200</span></span>
         <span class="opt-tag"></span>
       </label>
       <label class="opt">
         <input type="radio" name="step5" value="1200-2000" data-qualify="yes" class="opt-input">
-        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text">1.200 a 2.000</span></span>
+        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text" data-i18n="s5_o4">1.200 a 2.000</span></span>
         <span class="opt-tag"></span>
       </label>
       <label class="opt">
         <input type="radio" name="step5" value="mas2000" data-qualify="yes" class="opt-input">
-        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text">Más de 2.000</span></span>
+        <span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text" data-i18n="s5_o5">Más de 2.000</span></span>
         <span class="opt-tag"></span>
       </label>
     </fieldset>
     <div class="step-nav">
-      <button class="btn-prev" onclick="goPrev(5)">← Anterior</button>
-      <button class="btn-next" id="next5" disabled onclick="submitForm()">Ver resultado →</button>
+      <button class="btn-prev" onclick="goPrev(5)" data-i18n="btn_prev">← Anterior</button>
+      <button class="btn-next" id="next5" disabled onclick="submitForm()" data-i18n="btn_result">Ver resultado →</button>
     </div>
   </div>
 
@@ -347,8 +361,8 @@ nav{height:64px;background:var(--navy-deeper);border-bottom:2px solid var(--gold
       <div class="ring ring-2"></div>
       <div class="ring ring-3"></div>
     </div>
-    <div class="review-title">Revisando tu perfil...</div>
-    <div class="review-sub">Un momento</div>
+    <div class="review-title" data-i18n="rev_title">Revisando tu perfil...</div>
+    <div class="review-sub" data-i18n="rev_sub">Un momento</div>
   </div>
 
   <!-- ── CALIFICA ── -->
@@ -356,26 +370,26 @@ nav{height:64px;background:var(--navy-deeper);border-bottom:2px solid var(--gold
     <div class="ok-icon">
       <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
     </div>
-    <div class="ok-title">¡Tu perfil <em>califica</em>!</div>
-    <div class="ok-sub">Esta propiedad se ajusta a lo que buscás. Dejanos tus datos para coordinar la visita.</div>
+    <div class="ok-title"><span data-i18n="ok_t1">¡Tu perfil </span><em data-i18n="ok_t2">califica</em><span data-i18n="ok_t3">!</span></div>
+    <div class="ok-sub" data-i18n="ok_sub">Esta propiedad se ajusta a lo que buscás. Dejanos tus datos para coordinar la visita.</div>
     <form class="contact-form" id="contactForm" autocomplete="on" novalidate>
       <div class="cf-row">
         <div class="cf-field">
-          <label class="cf-lbl" for="cfNombre">Nombre</label>
-          <input class="cf-input" id="cfNombre" name="given-name" type="text" required autocomplete="given-name" placeholder="Tu nombre" minlength="2">
+          <label class="cf-lbl" for="cfNombre" data-i18n="f_nombre">Nombre</label>
+          <input class="cf-input" id="cfNombre" name="given-name" type="text" required autocomplete="given-name" placeholder="Tu nombre" data-i18n-ph="ph_nombre" minlength="2">
         </div>
         <div class="cf-field">
-          <label class="cf-lbl" for="cfApellido">Apellido</label>
-          <input class="cf-input" id="cfApellido" name="family-name" type="text" required autocomplete="family-name" placeholder="Tu apellido" minlength="2">
+          <label class="cf-lbl" for="cfApellido" data-i18n="f_apellido">Apellido</label>
+          <input class="cf-input" id="cfApellido" name="family-name" type="text" required autocomplete="family-name" placeholder="Tu apellido" data-i18n-ph="ph_apellido" minlength="2">
         </div>
       </div>
       <div class="cf-field">
-        <label class="cf-lbl" for="cfTelefono">Teléfono / WhatsApp</label>
-        <input class="cf-input" id="cfTelefono" name="tel" type="tel" required autocomplete="tel" placeholder="+54 11 1234-5678" inputmode="tel" pattern="[0-9+\-\s()]{7,}">
-        <span class="cf-hint">Solo lo usamos para coordinar la visita.</span>
+        <label class="cf-lbl" for="cfTelefono" data-i18n="f_tel">Teléfono / WhatsApp</label>
+        <input class="cf-input" id="cfTelefono" name="tel" type="tel" required autocomplete="tel" placeholder="+54 11 1234-5678" inputmode="tel" pattern="[0-9+\-\s\(\)]{7,}">
+        <span class="cf-hint" data-i18n="cf_hint">Solo lo usamos para coordinar la visita.</span>
       </div>
       <button type="submit" class="btn-calendly" id="btnGoConfirm" disabled>
-        Elegir día y horario
+        <span data-i18n="ok_btn">Elegir día y horario</span>
         <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
       </button>
     </form>
@@ -386,9 +400,9 @@ nav{height:64px;background:var(--navy-deeper);border-bottom:2px solid var(--gold
     <div class="no-icon">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
     </div>
-    <div class="no-title">Esta unidad no es la indicada para vos</div>
-    <div class="no-sub">Pero puede haber otra que sí lo sea. Contanos qué buscás y te ayudamos a encontrarla.</div>
-    <button class="btn-wa" onclick="window.open('https://wa.me/5491123106629','_blank')">
+    <div class="no-title" data-i18n="no_title">Esta unidad no es la indicada para vos</div>
+    <div class="no-sub" data-i18n="no_sub">Pero puede haber otra que sí lo sea. Contanos qué buscás y te ayudamos a encontrarla.</div>
+    <button class="btn-wa" onclick="window.open('https://wa.me/5491123106629','_blank')" data-i18n="no_btn">
       Hablar con un asesor
     </button>
   </div>
@@ -397,7 +411,50 @@ nav{height:64px;background:var(--navy-deeper);border-bottom:2px solid var(--gold
 
 <script>
 const answers = {};
-const labels  = ['','¿Cuándo te mudás?','¿Cuánto tiempo?','¿Cuántas personas?','¿Tenés mascotas?','¿Presupuesto?'];
+let LANG = 'es';
+try { LANG = localStorage.getItem('bairen_lang') || 'es'; } catch(e){}
+if (LANG !== 'pt' && LANG !== 'en') LANG = 'es';
+let curStep = 1;
+
+// Textos generados por JS, por idioma
+const DYN = {
+  es: {
+    paso: function(n){ return 'Paso ' + n + ' de 5'; },
+    labels: ['','¿Cuándo te mudás?','¿Cuánto tiempo?','¿Cuántas personas?','¿Tenés mascotas?','¿Presupuesto?'],
+    plazos: { '3-6':'3 a 6 meses', '6-12':'6 a 12 meses', '12':'12 meses', '12-24':'12 a 24 meses', '24+':'Más de 24 meses' },
+    tagSolicitado: 'Más solicitado',
+    precioSub: function(p){ return 'Esta unidad cuesta USD ' + p + ' por mes'; },
+    locale: 'es-AR',
+    fueraRango: 'Fuera de rango',
+    entraPresu: '✓ Entra en presupuesto',
+    conMargen: '✓ Con margen',
+    excedeCap: 'Excede capacidad'
+  },
+  pt: {
+    paso: function(n){ return 'Etapa ' + n + ' de 5'; },
+    labels: ['','Quando você se muda?','Por quanto tempo?','Quantas pessoas?','Tem animais?','Orçamento?'],
+    plazos: { '3-6':'3 a 6 meses', '6-12':'6 a 12 meses', '12':'12 meses', '12-24':'12 a 24 meses', '24+':'Mais de 24 meses' },
+    tagSolicitado: 'Mais procurado',
+    precioSub: function(p){ return 'Esta unidade custa USD ' + p + ' por mês'; },
+    locale: 'pt-BR',
+    fueraRango: 'Fora da faixa',
+    entraPresu: '✓ Dentro do orçamento',
+    conMargen: '✓ Com folga',
+    excedeCap: 'Excede a capacidade'
+  },
+  en: {
+    paso: function(n){ return 'Step ' + n + ' of 5'; },
+    labels: ['','When are you moving?','How long?','How many people?','Any pets?','Budget?'],
+    plazos: { '3-6':'3 to 6 months', '6-12':'6 to 12 months', '12':'12 months', '12-24':'12 to 24 months', '24+':'More than 24 months' },
+    tagSolicitado: 'Most requested',
+    precioSub: function(p){ return 'This unit costs USD ' + p + ' per month'; },
+    locale: 'en-US',
+    fueraRango: 'Out of range',
+    entraPresu: '✓ Within budget',
+    conMargen: '✓ With room to spare',
+    excedeCap: 'Exceeds capacity'
+  }
+};
 
 // Burger
 document.getElementById('burger').addEventListener('click', function() {
@@ -406,10 +463,11 @@ document.getElementById('burger').addEventListener('click', function() {
 });
 
 function updateProgress(step) {
+  curStep = step;
   const pct = step / 5;
   document.getElementById('progressFill').style.transform = 'scaleX(' + pct + ')';
-  document.getElementById('progressLabel').textContent = 'Paso ' + step + ' de 5';
-  document.getElementById('progressCount').textContent = labels[step] || '';
+  document.getElementById('progressLabel').textContent = DYN[LANG].paso(step);
+  document.getElementById('progressCount').textContent = DYN[LANG].labels[step] || '';
 }
 
 // Option selection (radios reales)
@@ -531,40 +589,49 @@ document.getElementById('propPillText').textContent = pillText;
 updateProgress(1);
 
 // ── Paso 2: opciones de plazo según tipo de propiedad ──────────
-(function buildStep2Options() {
+// Re-ejecutable: se vuelve a renderizar al cambiar de idioma (conserva la selección)
+function renderStep2() {
   var esTemp = /temporal/i.test(propTipo);
+  var d = DYN[LANG];
 
   // Temporal: plazos cortos. Tradicional / sin tipo: plazos largos.
   var opciones = esTemp
     ? [
-        { val: '3-6',  txt: '3 a 6 meses',   tag: 'Más solicitado', qualify: 'yes' },
-        { val: '6-12', txt: '6 a 12 meses',  tag: '',               qualify: 'yes' }
+        { val: '3-6',  tag: true,  qualify: 'yes' },
+        { val: '6-12', tag: false, qualify: 'yes' }
       ]
     : [
-        { val: '12',    txt: '12 meses',       tag: '',               qualify: 'yes' },
-        { val: '12-24', txt: '12 a 24 meses',  tag: 'Más solicitado', qualify: 'yes' },
-        { val: '24+',   txt: 'Más de 24 meses',tag: '',               qualify: 'yes' }
+        { val: '12',    tag: false, qualify: 'yes' },
+        { val: '12-24', tag: true,  qualify: 'yes' },
+        { val: '24+',   tag: false, qualify: 'yes' }
       ];
 
   var container = document.getElementById('step2Options');
+  var selected = answers['2'] ? answers['2'].val : null;
+  container.querySelectorAll('label.opt').forEach(function(l){ l.remove(); });
   opciones.forEach(function(op) {
     var label = document.createElement('label');
     label.className = 'opt';
     label.innerHTML =
       '<input type="radio" name="step2" value="' + op.val + '" data-qualify="' + op.qualify + '" class="opt-input">' +
-      '<span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text">' + op.txt + '</span></span>' +
-      '<span class="opt-tag">' + op.tag + '</span>';
+      '<span class="opt-left"><span class="opt-dot" aria-hidden="true"></span><span class="opt-text">' + d.plazos[op.val] + '</span></span>' +
+      '<span class="opt-tag">' + (op.tag ? d.tagSolicitado : '') + '</span>';
     container.appendChild(label);
+    if (selected === op.val) label.querySelector('input').checked = true;
   });
 
   wireStepRadios(2);
-})();
+}
 
 // ── Personalización por precio ───────────────────────────────────
 // Si se pasa ?precio=X, ajusta qué rangos califican y muestra el precio como referencia
-if (propPrecio > 0) {
+// Re-ejecutable: se vuelve a aplicar al cambiar de idioma
+function applyStep5Personalization() {
+  if (!(propPrecio > 0)) return;
+  const d = DYN[LANG];
+
   const sub5 = document.getElementById('step5Sub');
-  if (sub5) sub5.textContent = 'Esta unidad cuesta USD ' + propPrecio.toLocaleString('es-AR') + ' por mes';
+  if (sub5) sub5.textContent = d.precioSub(propPrecio.toLocaleString(d.locale));
 
   const qualifyMap = {
     'menos700':  propPrecio <= 700,
@@ -585,7 +652,7 @@ if (propPrecio > 0) {
     if (!tag) return;
 
     if (!qualifica) {
-      tag.textContent = 'Fuera de rango';
+      tag.textContent = d.fueraRango;
       tag.style.color  = 'rgba(220,100,100,.7)';
     } else {
       const esRangoCubierto =
@@ -596,10 +663,10 @@ if (propPrecio > 0) {
         (val === 'mas2000'   && propPrecio > 2000);
 
       if (esRangoCubierto) {
-        tag.textContent = '✓ Entra en presupuesto';
+        tag.textContent = d.entraPresu;
         tag.style.color  = 'var(--gold-light)';
       } else {
-        tag.textContent = '✓ Con margen';
+        tag.textContent = d.conMargen;
         tag.style.color  = 'rgba(255,255,255,.45)';
       }
     }
@@ -608,18 +675,106 @@ if (propPrecio > 0) {
 
 // ── Personalización por ambientes ────────────────────────────────
 // Para monoambientes (1 amb), "3 o más personas" no califica
-if (propAmb === 1) {
+// Re-ejecutable: se vuelve a aplicar al cambiar de idioma
+function applyStep3Personalization() {
+  if (propAmb !== 1) return;
   document.querySelectorAll('#step3 input.opt-input').forEach(function(input) {
     if (input.value === '3+') {
       input.dataset.qualify = 'no';
       const tag = input.closest('.opt').querySelector('.opt-tag');
       if (tag) {
-        tag.textContent = 'Excede capacidad';
+        tag.textContent = DYN[LANG].excedeCap;
         tag.style.color  = 'rgba(220,100,100,.7)';
       }
     }
   });
 }
+
+// ── i18n ES / PT / EN ────────────────────────────────────────────
+const T = {
+  pt: {
+    nav_volver: "← Voltar",
+    mm_inicio: "Início", mm_props: "Imóveis", mm_contacto: "Contato",
+    sr_title: "Agende sua visita — Grupo Bairen",
+    pill_pre: "Consulta sobre",
+    s1_eye: "Pergunta 1 de 5", s1_q: "Quando você precisa se mudar?",
+    s1_o1: "Em menos de 2 semanas", s1_t1: "Urgente", s1_o2: "Este mês", s1_o3: "Nos próximos 3 meses",
+    s2_eye: "Pergunta 2 de 5", s2_q: "Por quanto tempo você precisa do imóvel?",
+    s3_eye: "Pergunta 3 de 5", s3_q: "Quantas pessoas vão morar na unidade?",
+    s3_o1: "Somente eu", s3_o2: "2 pessoas", s3_o3: "3 ou mais",
+    s4_eye: "Pergunta 4 de 5", s4_q: "Você tem animais de estimação?",
+    s4_o1: "Não", s4_o2: "Sim, um de porte pequeno", s4_o3: "Sim, um de porte grande", s4_o4: "Sim, mais de um",
+    s5_eye: "Pergunta 5 de 5", s5_q: "Qual é o seu orçamento mensal?",
+    s5_sub: "Incluindo condomínio e serviços",
+    s5_o1: "Menos de 700", s5_o2: "700 a 800", s5_o3: "800 a 1.200", s5_o4: "1.200 a 2.000", s5_o5: "Mais de 2.000",
+    btn_next: "Continuar →", btn_prev: "← Anterior", btn_result: "Ver resultado →",
+    rev_title: "Analisando seu perfil...", rev_sub: "Um momento",
+    ok_t1: "Seu perfil ", ok_t2: "se qualifica", ok_t3: ".",
+    ok_sub: "Este imóvel se ajusta ao que você procura. Deixe seus dados para agendarmos a visita.",
+    f_nombre: "Nome", f_apellido: "Sobrenome", f_tel: "Telefone / WhatsApp",
+    ph_nombre: "Seu nome", ph_apellido: "Seu sobrenome",
+    cf_hint: "Usamos seus dados apenas para agendar a visita.",
+    ok_btn: "Escolher dia e horário",
+    no_title: "Esta unidade não é a ideal para você",
+    no_sub: "Mas pode haver outra que seja. Conte o que você procura e nós ajudamos a encontrá-la.",
+    no_btn: "Falar com um consultor"
+  },
+  en: {
+    nav_volver: "← Back",
+    mm_inicio: "Home", mm_props: "Properties", mm_contacto: "Contact",
+    sr_title: "Schedule your visit — Grupo Bairen",
+    pill_pre: "Inquiring about",
+    s1_eye: "Question 1 of 5", s1_q: "When do you need to move in?",
+    s1_o1: "Within 2 weeks", s1_t1: "Urgent", s1_o2: "This month", s1_o3: "Within the next 3 months",
+    s2_eye: "Question 2 of 5", s2_q: "How long will you need the property?",
+    s3_eye: "Question 3 of 5", s3_q: "How many people will be living in the unit?",
+    s3_o1: "Just me", s3_o2: "2 people", s3_o3: "3 or more",
+    s4_eye: "Question 4 of 5", s4_q: "Do you have pets?",
+    s4_o1: "No", s4_o2: "Yes, a small one", s4_o3: "Yes, a large one", s4_o4: "Yes, more than one",
+    s5_eye: "Question 5 of 5", s5_q: "What is your monthly budget?",
+    s5_sub: "Including building fees and utilities",
+    s5_o1: "Under 700", s5_o2: "700 to 800", s5_o3: "800 to 1,200", s5_o4: "1,200 to 2,000", s5_o5: "Over 2,000",
+    btn_next: "Continue →", btn_prev: "← Previous", btn_result: "See result →",
+    rev_title: "Reviewing your profile...", rev_sub: "One moment",
+    ok_t1: "Your profile ", ok_t2: "qualifies", ok_t3: ".",
+    ok_sub: "This property matches what you are looking for. Leave your details and we will arrange the visit.",
+    f_nombre: "First name", f_apellido: "Last name", f_tel: "Phone / WhatsApp",
+    ph_nombre: "Your first name", ph_apellido: "Your last name",
+    cf_hint: "We only use it to arrange the visit.",
+    ok_btn: "Choose a day and time",
+    no_title: "This unit is not the right fit for you",
+    no_sub: "But another one may be. Tell us what you are looking for and we will help you find it.",
+    no_btn: "Talk to an advisor"
+  }
+};
+
+const i18nNodes = document.querySelectorAll('[data-i18n]');
+i18nNodes.forEach(n => n.dataset.es = n.textContent);
+const i18nPhs = document.querySelectorAll('[data-i18n-ph]');
+i18nPhs.forEach(n => n.dataset.esPh = n.getAttribute('placeholder') || '');
+
+function applyLang(lang) {
+  if (lang !== 'pt' && lang !== 'en') lang = 'es';
+  LANG = lang;
+  i18nNodes.forEach(n => {
+    const k = n.getAttribute('data-i18n');
+    n.textContent = (lang !== 'es' && T[lang] && T[lang][k] != null) ? T[lang][k] : n.dataset.es;
+  });
+  i18nPhs.forEach(n => {
+    const k = n.getAttribute('data-i18n-ph');
+    n.setAttribute('placeholder', (lang !== 'es' && T[lang] && T[lang][k] != null) ? T[lang][k] : n.dataset.esPh);
+  });
+  document.documentElement.lang = lang === 'pt' ? 'pt-BR' : lang === 'en' ? 'en' : 'es-AR';
+  document.querySelectorAll('.flag').forEach(f => f.classList.toggle('active', f.dataset.lang === lang));
+  try { localStorage.setItem('bairen_lang', lang); } catch(e){}
+  // Re-render de textos generados por JS
+  updateProgress(curStep);
+  renderStep2();
+  applyStep5Personalization();
+  applyStep3Personalization();
+}
+document.querySelectorAll('.flag').forEach(f => f.addEventListener('click', () => applyLang(f.dataset.lang)));
+applyLang(LANG);
 </script>
 </body>
 </html>

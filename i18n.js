@@ -40,7 +40,16 @@
       cat_barrio_head: "Selecione um bairro", cat_barrio_clear: "Limpar filtro",
       cat_sort_default: "Ordem padrão", cat_sort_pasc: "Preço: do menor ao maior",
       cat_sort_pdesc: "Preço: do maior ao menor", cat_sort_m2: "Maior área",
-      cat_copy: "© 2026 Grupo Bairen · Todos os direitos reservados"
+      cat_copy: "© 2026 Grupo Bairen · Todos os direitos reservados",
+      // Propiedad
+      prop_nav_props: "Imóveis", prop_nav_why: "Por que Bairen", prop_nav_contact: "Contato",
+      prop_back: "← Catálogo", prop_back_full: "← Voltar ao catálogo",
+      prop_loading: "Carregando imóvel...",
+      prop_price_m: "Preço mensal",
+      prop_secl_unidad: "A unidade", prop_secl_ubic: "Localização",
+      prop_ac_footer: "Consulta sem custo · Resposta em menos de 2 h",
+      prop_nf_h: "Imóvel não encontrado",
+      prop_nf_p: "O link pode ter mudado, a unidade já foi alugada ou o endereço está incorreto."
     },
     en: {
       // Nav
@@ -77,7 +86,16 @@
       cat_barrio_head: "Select a neighbourhood", cat_barrio_clear: "Clear filter",
       cat_sort_default: "Default order", cat_sort_pasc: "Price: low to high",
       cat_sort_pdesc: "Price: high to low", cat_sort_m2: "Largest area",
-      cat_copy: "© 2026 Grupo Bairen · All rights reserved"
+      cat_copy: "© 2026 Grupo Bairen · All rights reserved",
+      // Propiedad
+      prop_nav_props: "Properties", prop_nav_why: "Why Bairen", prop_nav_contact: "Contact",
+      prop_back: "← Catalogue", prop_back_full: "← Back to catalogue",
+      prop_loading: "Loading property...",
+      prop_price_m: "Monthly price",
+      prop_secl_unidad: "The unit", prop_secl_ubic: "Location",
+      prop_ac_footer: "Free inquiry · Reply within 2 hours",
+      prop_nf_h: "Property not found",
+      prop_nf_p: "The link may have changed, the unit may already be rented, or the address is incorrect."
     }
   };
 
