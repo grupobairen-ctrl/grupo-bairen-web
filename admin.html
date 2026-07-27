@@ -391,6 +391,14 @@ textarea.fi{resize:vertical;min-height:96px;line-height:1.6;}
               <textarea class="fi" id="fDesc" maxlength="1000" placeholder="Describí la propiedad: ubicación, puntos fuertes, estilo de vida..."></textarea>
               <div class="char-count"><span id="descCount">0</span> / 1000</div>
             </div>
+            <div class="fg">
+              <label class="fl">Descripción en portugués (opcional — si queda vacía, la web muestra el español)</label>
+              <textarea class="fi" id="fDescPt" maxlength="1500" placeholder="Tradução em português (opcional)"></textarea>
+            </div>
+            <div class="fg">
+              <label class="fl">Descripción en inglés (opcional — si queda vacía, la web muestra el español)</label>
+              <textarea class="fi" id="fDescEn" maxlength="1500" placeholder="English translation (optional)"></textarea>
+            </div>
           </div>
         </div>
       </div>
@@ -796,7 +804,7 @@ function openForm(prop) {
   state.vType = 'bunny';
 
   // reset campos
-  ['fDir','fUnidad','fBarrio','fPrecioTemp','fPrecioTrad','fPrecioVenta','fAmb','fM2','fPlazo','fDesc','fVideo'].forEach(id => $(id).value = '');
+  ['fDir','fUnidad','fBarrio','fPrecioTemp','fPrecioTrad','fPrecioVenta','fAmb','fM2','fPlazo','fDesc','fDescPt','fDescEn','fVideo'].forEach(id => $(id).value = '');
   $('fTipo').value = 'Temporal';
   $('fEstado').value = 'Disponible';
   $('fPlazo').value = defaultPlazoForTipo('Temporal');
@@ -816,6 +824,8 @@ function openForm(prop) {
     $('fEstado').value      = prop.estado || 'Disponible';
     $('fPlazo').value       = prop.plazo || defaultPlazoForTipo(prop.tipo || 'Temporal');
     $('fDesc').value        = prop.descripcion || '';
+    $('fDescPt').value      = prop.descripcion_pt || '';
+    $('fDescEn').value      = prop.descripcion_en || '';
     $('fVideo').value       = prop.video_url || '';
     state.vType             = prop.video_tipo || 'bunny';
 
@@ -1104,6 +1114,8 @@ function collectFormData() {
     plazo:        (tipo === 'Venta') ? null : ($('fPlazo').value.trim() || defaultPlazoForTipo(tipo)),
     estado:       $('fEstado').value,
     descripcion:  $('fDesc').value.trim() || null,
+    descripcion_pt: $('fDescPt').value.trim() || null,
+    descripcion_en: $('fDescEn').value.trim() || null,
     video_url:    processVideoUrl($('fVideo').value, state.vType),
     video_tipo:   $('fVideo').value.trim() ? state.vType : null,
   };
@@ -1346,6 +1358,8 @@ function snapshotForm() {
       estado:     $('fEstado').value,
       plazo:      $('fPlazo').value,
       desc:       $('fDesc').value,
+      descPt:     $('fDescPt').value,
+      descEn:     $('fDescEn').value,
       video:      $('fVideo').value,
     },
     amenities:       [...state.selAmenities.entries()],
@@ -1403,6 +1417,8 @@ async function restoreDraftIntoForm(draft) {
   $('fEstado').value      = f.estado || 'Disponible';
   $('fPlazo').value       = f.plazo || defaultPlazoForTipo(f.tipo || 'Temporal');
   $('fDesc').value        = f.desc || '';
+  $('fDescPt').value      = f.descPt || '';
+  $('fDescEn').value      = f.descEn || '';
   $('fVideo').value       = f.video || '';
   state.selAmenities    = new Map(draft.amenities || []);
   state.customAmenities = new Set(draft.customAmenities || []);
@@ -1495,7 +1511,7 @@ function showDraftBanner(draft) {
 
 function wireAutosave() {
   const ids = ['fDir','fUnidad','fBarrio','fTipo','fPrecioTemp','fPrecioTrad','fPrecioVenta',
-               'fAmb','fM2','fEstado','fPlazo','fDesc','fVideo'];
+               'fAmb','fM2','fEstado','fPlazo','fDesc','fDescPt','fDescEn','fVideo'];
   ids.forEach(id => {
     const el = $(id);
     if (!el) return;
