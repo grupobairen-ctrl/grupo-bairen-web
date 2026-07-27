@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Bairen · Manual de Marca</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --navy:#2A3A52; --navy-dark:#1E2A3F; --navy-deeper:#131D2D;
+  --gold:#C2A968; --gold-dark:#8A7547; --gold-light:#DECDA0; --gold-pale:#F7F1E2;
+  --white:#FBFAF6; --off-white:#EEE5D0; --silver:#BFBAB0; --silver-light:#DDD8CE;
+  --wheat:#D9C9A8; --gray-light:#D6D2C8;
+  --text-dark:#1A2538; --text-mid:#6B7589;
+  --ok:#2a7a4b; --err:#b94a4a;
+  --font-display:'Playfair Display',Georgia,serif;
+  --font-body:'Jost',system-ui,sans-serif;
+  --ease:cubic-bezier(0.22,1,0.36,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{ -webkit-text-size-adjust:100%; }
+body{
+  font-family:var(--font-body); font-weight:300; color:var(--text-dark);
+  background:#cfcabf; line-height:1.6;
+  -webkit-font-smoothing:antialiased; -webkit-print-color-adjust:exact; print-color-adjust:exact;
+}
+img{ display:block; max-width:100%; }
+em{ font-style:italic; }
+
+/* ── PAGE MODEL ─────────────────────────────────────────── */
+.page{
+  position:relative; width:210mm; min-height:297mm; margin:0 auto 10mm;
+  background:var(--white); overflow:hidden;
+  padding:22mm 20mm 20mm;
+  box-shadow:0 6px 30px rgba(0,0,0,.18);
+}
+.page--dark{ background:var(--navy-deeper); color:var(--white); }
+.page--tint{ background:var(--gold-pale); }
+.page--flush{ padding:0; }
+
+@media print{
+  @page{ size:A4; margin:0; }
+  body{ background:none; }
+  .page{ margin:0; box-shadow:none; break-after:page; page-break-after:always; }
+  .page:last-child{ break-after:auto; page-break-after:auto; }
+}
+
+/* running foot */
+.foot{
+  position:absolute; left:20mm; right:20mm; bottom:11mm;
+  display:flex; justify-content:space-between; align-items:center;
+  font-size:7.2pt; letter-spacing:.16em; text-transform:uppercase; color:var(--text-mid);
+  border-top:1px solid rgba(42,58,82,.14); padding-top:5px;
+}
+.page--dark .foot{ color:rgba(255,255,255,.45); border-color:rgba(194,169,104,.28); }
+.foot .pg{ color:var(--gold-dark); font-weight:600; }
+.page--dark .foot .pg{ color:var(--gold-light); }
+
+/* ── TYPE PRIMITIVES ────────────────────────────────────── */
+.eyebrow{ font-family:var(--font-body); font-size:8pt; font-weight:600; letter-spacing:.34em; text-transform:uppercase; color:var(--gold-dark); display:inline-flex; align-items:center; gap:12px; }
+.page--dark .eyebrow{ color:var(--gold-light); }
+.eyebrow::before{ content:''; width:26px; height:1px; background:var(--gold); display:inline-block; }
+.eyebrow.solo::before{ display:none; }
+
+h1,h2,h3,h4{ font-family:var(--font-display); font-weight:500; line-height:1.16; color:var(--navy); }
+.page--dark h1,.page--dark h2,.page--dark h3,.page--dark h4{ color:var(--white); }
+
+.sec-num{ font-family:var(--font-display); font-style:italic; font-weight:400; color:var(--gold-dark); font-size:13pt; }
+.h-sec{ font-size:27pt; font-weight:500; letter-spacing:-.01em; line-height:1.08; margin:6px 0 0; }
+.h-block{ font-size:16pt; font-weight:600; color:var(--navy); margin-bottom:7px; letter-spacing:-.005em; }
+.h-sub{ font-size:11pt; font-weight:600; color:var(--navy); letter-spacing:.01em; }
+.lead{ font-family:var(--font-display); font-weight:400; font-size:13.5pt; line-height:1.5; color:var(--navy); letter-spacing:-.003em; }
+.page--dark .lead{ color:rgba(255,255,255,.9); }
+.ital{ font-family:var(--font-display); font-style:italic; color:var(--gold-dark); }
+.page--dark .ital{ color:var(--gold-light); }
+
+p{ font-size:9.6pt; line-height:1.72; color:var(--text-dark); }
+p.muted{ color:var(--text-mid); }
+.page--dark p{ color:rgba(255,255,255,.72); }
+.small{ font-size:8.4pt; line-height:1.6; color:var(--text-mid); }
+.rule{ width:48px; height:1px; background:var(--gold); margin:14px 0; }
+.maxw{ max-width:150mm; }
+
+.section-head{ margin-bottom:16mm; }
+.section-head .h-sec{ max-width:150mm; }
+.section-head .lead{ margin-top:14px; max-width:150mm; }
+
+/* layout helpers */
+.grid2{ display:grid; grid-template-columns:1fr 1fr; gap:9mm; }
+.grid3{ display:grid; grid-template-columns:repeat(3,1fr); gap:6mm; }
+.stack-lg > * + *{ margin-top:11mm; }
+.stack > * + *{ margin-top:6mm; }
+.flow > * + *{ margin-top:9px; }
+
+/* cards / panels (full borders, no side-stripes) */
+.panel{ border:1px solid rgba(42,58,82,.14); padding:8mm 8mm; background:#fff; }
+.panel--tint{ background:var(--gold-pale); border-color:rgba(194,169,104,.3); }
+.panel--ink{ background:var(--navy-deeper); border-color:rgba(194,169,104,.25); color:#fff; }
+.panel--ink p{ color:rgba(255,255,255,.74); }
+.panel .k{ font-size:7.6pt; letter-spacing:.26em; text-transform:uppercase; font-weight:600; color:var(--gold-dark); display:block; margin-bottom:8px; }
+.panel--ink .k{ color:var(--gold-light); }
+
+/* value rows */
+.vrow{ display:grid; grid-template-columns:30mm 1fr; gap:8mm; padding:7mm 0; border-bottom:1px solid rgba(42,58,82,.12); align-items:baseline; }
+.vrow:last-child{ border-bottom:none; }
+.tight .vrow{ padding:4.6mm 0; }
+.idx-grid{ display:grid; grid-template-columns:1fr 1fr; gap:0 12mm; margin-top:9mm; }
+.idx-it{ display:grid; grid-template-columns:13mm 1fr; gap:4mm; padding:4.4mm 0; border-top:1px solid rgba(42,58,82,.13); align-items:baseline; }
+.idx-n{ font-family:var(--font-display); font-style:italic; color:var(--gold-dark); font-size:13pt; }
+.idx-it b{ font-family:var(--font-display); font-weight:500; color:var(--navy); font-size:12pt; display:block; margin-bottom:1px; }
+.idx-it .small{ font-size:8pt; }
+.vrow .vk{ font-family:var(--font-display); font-size:14pt; font-weight:500; color:var(--navy); }
+.vrow .vk .vn{ font-style:italic; color:var(--gold-dark); font-size:11pt; display:block; margin-bottom:2px; }
+
+/* tables */
+table{ width:100%; border-collapse:collapse; font-size:8.6pt; }
+th,td{ text-align:left; padding:6px 9px; border-bottom:1px solid rgba(42,58,82,.12); vertical-align:top; line-height:1.5; }
+th{ font-weight:600; font-size:7.4pt; letter-spacing:.16em; text-transform:uppercase; color:var(--gold-dark); border-bottom:1px solid rgba(194,169,104,.4); }
+td.t-strong{ font-weight:500; color:var(--navy); }
+.page--dark th{ color:var(--gold-light); border-color:rgba(194,169,104,.3); }
+.page--dark td{ color:rgba(255,255,255,.74); border-color:rgba(255,255,255,.1); }
+
+/* swatches */
+.swatches{ display:grid; grid-template-columns:repeat(4,1fr); gap:5mm; }
+.sw{ border:1px solid rgba(42,58,82,.12); }
+.sw .chip{ height:24mm; position:relative; }
+.sw .meta{ padding:6px 8px 9px; }
+.sw .nm{ font-size:8.2pt; font-weight:500; color:var(--navy); }
+.sw .hex{ font-size:7.6pt; letter-spacing:.08em; color:var(--text-mid); font-variant-numeric:tabular-nums; }
+.sw .role{ font-size:7pt; color:var(--text-mid); margin-top:3px; line-height:1.4; }
+
+/* code token block */
+.code{ font-family:'Jost',monospace; background:var(--navy-deeper); color:#cfe0d6; font-size:8pt; line-height:1.65; padding:7mm; white-space:pre-wrap; letter-spacing:.01em; }
+.code .c{ color:var(--gold-light); }
+.code .v{ color:#9fb6c9; }
+.code .h{ color:#e7d9ad; }
+
+/* type specimens */
+.spec{ border-bottom:1px solid rgba(42,58,82,.1); padding:6mm 0; display:grid; grid-template-columns:1fr 52mm; gap:8mm; align-items:center; }
+.spec:last-child{ border-bottom:none; }
+.spec .demo{ overflow:hidden; }
+.spec .info{ font-size:7.6pt; line-height:1.65; color:var(--text-mid); }
+.spec .info b{ color:var(--navy); font-weight:600; }
+
+/* do / dont */
+.dd{ display:grid; grid-template-columns:1fr 1fr; gap:6mm; }
+.dd .col{ border:1px solid rgba(42,58,82,.14); padding:6mm; }
+.dd .do{ border-color:rgba(42,122,75,.4); background:rgba(42,122,75,.04); }
+.dd .dont{ border-color:rgba(185,74,74,.35); background:rgba(185,74,74,.04); }
+.dd .tag{ font-size:7.6pt; letter-spacing:.2em; text-transform:uppercase; font-weight:600; margin-bottom:8px; display:flex; align-items:center; gap:7px; }
+.dd .do .tag{ color:var(--ok); }
+.dd .dont .tag{ color:var(--err); }
+.dd ul{ list-style:none; }
+.dd li{ font-size:8.6pt; line-height:1.5; padding:4px 0 4px 14px; position:relative; color:var(--text-dark); }
+.dd li::before{ content:''; position:absolute; left:0; top:9px; width:5px; height:5px; }
+.dd .do li::before{ background:var(--ok); }
+.dd .dont li::before{ background:var(--err); }
+
+/* before / after copy */
+.ba{ border:1px solid rgba(42,58,82,.14); display:grid; grid-template-columns:1fr 1fr; }
+.ba + .ba{ margin-top:5mm; }
+.ba .cell{ padding:6mm 6mm; }
+.ba .before{ background:rgba(185,74,74,.05); border-right:1px solid rgba(42,58,82,.12); }
+.ba .after{ background:#fff; }
+.ba .lab{ font-size:7pt; letter-spacing:.22em; text-transform:uppercase; font-weight:600; margin-bottom:8px; }
+.ba .before .lab{ color:var(--err); }
+.ba .after .lab{ color:var(--ok); }
+.ba .t-before{ font-size:9pt; color:#7d5b5b; line-height:1.5; }
+.ba .t-after{ font-family:var(--font-display); font-size:11pt; color:var(--navy); line-height:1.4; font-weight:500; }
+
+/* lexicon */
+.lex{ display:grid; grid-template-columns:1fr 1fr; gap:6mm; }
+.lex .box{ border:1px solid rgba(42,58,82,.14); padding:6mm; }
+.lex .box.use{ background:rgba(42,122,75,.04); border-color:rgba(42,122,75,.35); }
+.lex .box.ban{ background:rgba(185,74,74,.04); border-color:rgba(185,74,74,.32); }
+.lex h4{ font-size:8pt; letter-spacing:.2em; text-transform:uppercase; margin-bottom:9px; font-family:var(--font-body); }
+.lex .use h4{ color:var(--ok); } .lex .ban h4{ color:var(--err); }
+.chips{ display:flex; flex-wrap:wrap; gap:5px; }
+.chips span{ font-size:8pt; padding:4px 9px; border:1px solid rgba(42,58,82,.16); color:var(--navy); background:#fff; }
+.lex .ban .chips span{ color:#8a5a5a; text-decoration:line-through; text-decoration-color:rgba(185,74,74,.5); }
+
+/* mockups */
+.mock{ border:1px solid rgba(42,58,82,.16); background:#fff; overflow:hidden; }
+.mock .bar{ background:var(--navy-deeper); height:8mm; display:flex; align-items:center; justify-content:space-between; padding:0 5mm; }
+.mock .bar .bw{ font-family:var(--font-display); color:#fff; font-size:9pt; letter-spacing:.18em; }
+.mock .bar .bn{ font-size:6.6pt; letter-spacing:.2em; text-transform:uppercase; color:rgba(255,255,255,.6); }
+.btn-ink{ display:inline-flex; align-items:center; gap:8px; background:var(--navy); color:#fff; font-size:7.4pt; font-weight:600; letter-spacing:.2em; text-transform:uppercase; padding:8px 16px; }
+.btn-ink .ar{ color:var(--gold-light); }
+.btn-ghost{ display:inline-flex; align-items:center; gap:8px; border:1px solid var(--navy); color:var(--navy); font-size:7.4pt; font-weight:600; letter-spacing:.2em; text-transform:uppercase; padding:7px 15px; }
+
+/* photo treatments */
+.ph{ position:relative; overflow:hidden; border:1px solid rgba(42,58,82,.1); }
+.ph img{ width:100%; height:100%; object-fit:cover; }
+.ph .cap{ position:absolute; left:0; bottom:0; right:0; padding:14px 12px 9px; background:linear-gradient(180deg,transparent,rgba(19,29,45,.82)); color:#fff; font-size:7.6pt; letter-spacing:.04em; }
+.ph .verdict{ position:absolute; top:8px; left:8px; font-size:6.8pt; letter-spacing:.16em; text-transform:uppercase; font-weight:600; padding:3px 8px; color:#fff; }
+.v-ok{ background:rgba(42,122,75,.92); } .v-mid{ background:rgba(138,117,71,.92); } .v-no{ background:rgba(185,74,74,.92); }
+
+.tag-pill{ display:inline-block; font-size:7.4pt; letter-spacing:.18em; text-transform:uppercase; font-weight:600; color:var(--gold-dark); border:1px solid rgba(194,169,104,.5); padding:4px 10px; }
+
+ul.clean{ list-style:none; }
+ul.clean li{ font-size:9.2pt; line-height:1.6; padding:4px 0 4px 16px; position:relative; }
+ul.clean li::before{ content:''; position:absolute; left:0; top:9px; width:5px; height:5px; background:var(--gold-dark); }
+.page--dark ul.clean li{ color:rgba(255,255,255,.78); }
+.page--dark ul.clean li::before{ background:var(--gold); }
+
+.checklist{ counter-reset:ck; }
+.checklist .ck{ display:grid; grid-template-columns:11mm 1fr; gap:6mm; padding:5mm 0; border-bottom:1px solid rgba(255,255,255,.1); align-items:baseline; }
+.checklist .ck:last-child{ border-bottom:none; }
+.checklist .ck .n{ font-family:var(--font-display); font-style:italic; color:var(--gold-light); font-size:15pt; }
+.checklist .ck p{ color:rgba(255,255,255,.86); font-size:9.6pt; }
+
+.risk{ border:1px solid rgba(185,74,74,.4); background:rgba(185,74,74,.05); padding:6mm; }
+.risk .k{ color:var(--err); font-size:7.6pt; letter-spacing:.2em; text-transform:uppercase; font-weight:600; display:block; margin-bottom:5px; }
+.risk p{ font-size:8.8pt; }
+
+/* quadrant map */
+.map{ position:relative; border:1px solid rgba(42,58,82,.18); height:96mm; background:
+  linear-gradient(rgba(42,58,82,.06),rgba(42,58,82,.06)) center/100% 1px no-repeat,
+  linear-gradient(rgba(42,58,82,.06),rgba(42,58,82,.06)) center/1px 100% no-repeat,
+  var(--gold-pale); }
+.map .axl{ position:absolute; font-size:7.2pt; letter-spacing:.18em; text-transform:uppercase; color:var(--text-mid); font-weight:600; }
+.map .dot{ position:absolute; transform:translate(-50%,-50%); text-align:center; }
+.map .dot b{ font-family:var(--font-display); font-size:9.5pt; color:var(--navy); display:block; font-weight:600; }
+.map .dot span{ font-size:6.8pt; color:var(--text-mid); }
+.map .dot .pt{ width:9px; height:9px; background:var(--gold); margin:0 auto 5px; }
+.map .dot.you .pt{ width:13px; height:13px; background:var(--navy); box-shadow:0 0 0 4px rgba(194,169,104,.35); }
+.map .dot.you b{ color:var(--navy-deeper); }
+
+.cover-mark{ width:38mm; height:38mm; }
+.divider-num{ font-family:var(--font-display); font-style:italic; font-size:120pt; line-height:.8; color:rgba(194,169,104,.16); }
+
+.callout{ font-family:var(--font-display); font-style:italic; font-size:13pt; line-height:1.45; color:var(--navy); border-top:1px solid var(--gold); border-bottom:1px solid var(--gold); padding:7mm 0; }
+.page--dark .callout{ color:var(--gold-light); }
+</style>
+</head>
+<body>
+
+<!-- ════════════════ 01 · COVER ════════════════ -->
+<section class="page page--dark page--flush">
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse 70% 55% at 50% 12%,rgba(194,169,104,.10),transparent 60%);"></div>
+  <div style="position:absolute;inset:0;display:flex;flex-direction:column;padding:30mm 24mm;">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+      <span class="eyebrow solo">Buenos Aires · Edición 2026</span>
+      <span class="eyebrow solo" style="text-transform:none;letter-spacing:.2em;">bairengroup.com</span>
+    </div>
+
+    <div style="margin:auto 0;display:flex;flex-direction:column;align-items:center;text-align:center;">
+      <img class="cover-mark" src="bairen_logo.png" alt="Bairen" />
+      <div style="font-family:var(--font-display);letter-spacing:.5em;font-size:21pt;color:#fff;margin:14mm 0 0;padding-left:.5em;">BAIREN</div>
+      <div class="rule" style="margin:9mm auto;width:60px;opacity:.8;"></div>
+      <div style="font-family:var(--font-body);font-size:9pt;letter-spacing:.42em;text-transform:uppercase;color:var(--gold-light);">Manual de Marca</div>
+    </div>
+
+    <div style="text-align:center;">
+      <p style="font-family:var(--font-display);font-style:italic;font-size:17pt;color:#fff;line-height:1.3;max-width:120mm;margin:0 auto;">
+        Buenos Aires no se alquila.<br><span style="color:var(--gold-light);">Se elige.</span>
+      </p>
+      <p class="small" style="color:rgba(255,255,255,.4);letter-spacing:.2em;text-transform:uppercase;margin-top:12mm;">Casa de curaduría residencial</p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 02 · ÍNDICE ════════════════ -->
+<section class="page">
+  <span class="eyebrow">El documento</span>
+  <h2 class="h-sec" style="margin-top:8px;">Cómo leer este manual</h2>
+  <p class="lead maxw" style="margin-top:12px;font-size:12.5pt;">
+    Es el documento maestro de Bairen. Un diseñador, un redactor, un fotógrafo o un sistema de IA deberían poder leerlo solo a él y producir piezas <span class="ital">indistinguibles</span> de las que haría el equipo interno.
+  </p>
+  <p class="small maxw" style="margin-top:9px;">La regla que ordena todo: si una pieza, tapándole el logo, se lee como casa de lujo lifestyle y no como inmobiliaria, está bien. Si podría aparecer tal cual en un portal, se reescribe.</p>
+
+  <div class="idx-grid">
+    <div class="idx-it"><span class="idx-n">00</span><div><b>Esencia</b><p class="small muted">La categoría que reclamamos, el propósito, los valores y la promesa.</p></div></div>
+    <div class="idx-it"><span class="idx-n">01</span><div><b>Posicionamiento</b><p class="small muted">Público, mapa competitivo y los resortes psicológicos que activamos.</p></div></div>
+    <div class="idx-it"><span class="idx-n">02</span><div><b>Voz</b><p class="small muted">Arquetipo, atributos, tono por canal, manifiesto, taglines y léxico.</p></div></div>
+    <div class="idx-it"><span class="idx-n">03</span><div><b>Sistema visual</b><p class="small muted">Tokens reales, sistema actual y evolucionado, logo, tipografía, grilla.</p></div></div>
+    <div class="idx-it"><span class="idx-n">04</span><div><b>Dirección de arte</b><p class="small muted">Fotografía, video y las referencias que nos fijan el techo.</p></div></div>
+    <div class="idx-it"><span class="idx-n">05</span><div><b>Aplicaciones</b><p class="small muted">Web, redes, ficha, mensajería y pitch a propietarios e inversores.</p></div></div>
+    <div class="idx-it"><span class="idx-n">06</span><div><b>Arquitectura</b><p class="small muted">Bairen, Bairen OS y los módulos a futuro sin diluir la marca.</p></div></div>
+    <div class="idx-it"><span class="idx-n">07</span><div><b>Auditoría</b><p class="small muted">Diez preguntas de control y los riesgos que todavía corremos.</p></div></div>
+  </div>
+  <div class="foot"><span>Bairen · Manual de Marca</span><span class="pg">02</span></div>
+</section>
+
+<!-- ════════════════ 03 · MANIFIESTO ════════════════ -->
+<section class="page page--dark">
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse 60% 70% at 50% 110%,rgba(194,169,104,.09),transparent 60%);"></div>
+  <div style="position:relative;height:100%;display:flex;flex-direction:column;justify-content:center;">
+    <span class="eyebrow">Manifiesto</span>
+    <h2 style="font-size:23pt;font-weight:400;line-height:1.22;margin:10mm 0;max-width:150mm;">
+      Hay ciudades que se ocupan y ciudades que se eligen.<br>
+      <span style="color:var(--gold-light);font-style:italic;">Buenos Aires es de las segundas.</span>
+    </h2>
+    <div style="max-width:140mm;" class="flow">
+      <p style="font-size:10.5pt;">Cada cuadra tiene su luz, su hora, su manera de recibir. Elegir dónde vivir no es leer una lista interminable: es reconocer el lugar cuando aparece.</p>
+      <p style="font-size:10.5pt;">Por eso no listamos propiedades. Las curamos. Visitamos, medimos, fotografiamos y verificamos cada hogar antes de mostrarlo. Lo que ves es lo que vas a vivir.</p>
+      <p style="font-size:10.5pt;">Sin garantía. Sin caución. Sin letra chica. Un contrato digital, en dólares, listo en menos de 48 horas.</p>
+      <p style="font-size:10.5pt;color:rgba(255,255,255,.92);">Una casa, no una inmobiliaria. La forma contemporánea de encontrar dónde vivir en Buenos Aires.</p>
+    </div>
+    <div class="rule" style="margin-top:12mm;width:64px;"></div>
+    <p style="font-family:var(--font-display);font-style:italic;font-size:15pt;color:#fff;">Buenos Aires no se alquila. <span style="color:var(--gold-light);">Se elige.</span></p>
+  </div>
+  <div class="foot"><span>Bairen · Manual de Marca</span><span class="pg">03</span></div>
+</section>
+
+<!-- ════════════════ 04 · DIVISOR 00 ════════════════ -->
+<section class="page page--tint">
+  <div style="height:100%;display:flex;flex-direction:column;justify-content:center;">
+    <div class="divider-num">00</div>
+    <span class="eyebrow" style="margin-top:6mm;">Fundamento</span>
+    <h2 class="h-sec" style="margin-top:8px;font-size:34pt;">Esencia de marca</h2>
+    <p class="lead maxw" style="margin-top:16px;">Lo que somos antes de decir una palabra o mostrar una imagen. Todo lo demás en este manual deriva de acá.</p>
+  </div>
+  <div class="foot"><span>00 · Esencia</span><span class="pg">04</span></div>
+</section>
+
+<!-- ════════════════ 05 · 00 ESENCIA — CATEGORÍA ════════════════ -->
+<section class="page">
+  <div class="section-head" style="margin-bottom:11mm;">
+    <span class="eyebrow"><span class="sec-num">00</span> &nbsp;La categoría que reclamamos</span>
+    <h2 class="h-sec" style="margin-top:10px;">No somos una inmobiliaria.<br>Somos una <span class="ital">casa de curaduría residencial.</span></h2>
+  </div>
+
+  <div class="grid2 stack" style="align-items:start;">
+    <div class="flow">
+      <p>Una inmobiliaria <b>lista</b> propiedades: cuantas más, mejor. Una casa de curaduría <b>elige</b>: cada unidad entra porque pasó un criterio. La palabra <span class="ital">casa</span> se usa como en la moda o la perfumería, una <i>maison</i>, no como sinónimo de agencia.</p>
+      <p>El capital cultural no lo aporta el arte, como en una galería, sino el <b>diseño y la tecnología</b>, con la misma gravedad institucional. Eso nos habilita a hablar como una marca de lujo lifestyle y a salir por completo del lenguaje del portal.</p>
+      <p class="muted">En la práctica: la palabra "inmobiliaria" vive solo en la capa funcional y de buscadores (meta tags, datos estructurados, texto alternativo de imágenes). Nunca encabeza un hero, una bio ni un posteo.</p>
+    </div>
+    <div class="panel panel--tint flow">
+      <span class="k">La distinción en una línea</span>
+      <p style="font-family:var(--font-display);font-size:12.5pt;color:var(--navy);line-height:1.4;font-weight:500;">Donde otros listan propiedades, Bairen cura hogares.</p>
+      <div class="rule"></div>
+      <table style="font-size:8pt;">
+        <tr><th>Inmobiliaria</th><th>Casa Bairen</th></tr>
+        <tr><td>Lista</td><td class="t-strong">Cura</td></tr>
+        <tr><td>Volumen</td><td class="t-strong">Criterio</td></tr>
+        <tr><td>Publica</td><td class="t-strong">Verifica</td></tr>
+        <tr><td>Vende m²</td><td class="t-strong">Entrega un lugar</td></tr>
+        <tr><td>Cliente</td><td class="t-strong">Círculo</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="callout" style="margin-top:12mm;">
+    Categoría de marca: <span style="font-style:normal;color:var(--navy);font-weight:600;">Casa de curaduría residencial.</span> &nbsp; Uso corto: <span style="font-style:normal;color:var(--navy);font-weight:600;">Curaduría residencial · Buenos Aires.</span>
+  </div>
+  <div class="foot"><span>00 · Esencia</span><span class="pg">05</span></div>
+</section>
+
+<!-- ════════════════ 06 · 00 ESENCIA — PROPÓSITO/VALORES ════════════════ -->
+<section class="page page--tint tight">
+  <span class="eyebrow"><span class="sec-num">00</span> &nbsp;Propósito · Visión · Misión</span>
+  <div class="grid3" style="margin-top:6mm;gap:5mm;">
+    <div class="panel flow"><span class="k">Propósito · por qué existimos</span><p style="font-family:var(--font-display);font-size:11.5pt;color:var(--navy);line-height:1.4;">Devolverle el criterio a la búsqueda de un hogar.</p></div>
+    <div class="panel flow"><span class="k">Visión · a dónde vamos</span><p style="font-family:var(--font-display);font-size:11.5pt;color:var(--navy);line-height:1.4;">Ser la primera casa residencial enteramente digital de Argentina, y la infraestructura sobre la que se elige dónde vivir.</p></div>
+    <div class="panel flow"><span class="k">Misión · qué hacemos hoy</span><p style="font-family:var(--font-display);font-size:11.5pt;color:var(--navy);line-height:1.4;">Curar, verificar y entregar cada hogar con la precisión de una firma premium y la velocidad de un producto digital.</p></div>
+  </div>
+
+  <span class="eyebrow" style="margin-top:9mm;">Posición de marca, en una frase</span>
+  <p class="lead" style="margin-top:8px;max-width:165mm;font-size:12.5pt;">Bairen es la casa que cura los hogares de Buenos Aires: <span class="ital">no listamos propiedades, elegimos lugares para vivir.</span></p>
+
+  <span class="eyebrow" style="margin-top:9mm;">Valores · las cuatro C</span>
+  <div style="margin-top:4mm;">
+    <div class="vrow"><div class="vk"><span class="vn">01</span>Criterio</div><div><p>Curaduría antes que volumen. Si una unidad no cumple el estándar, no entra. Preferimos diez lugares bien elegidos a cien publicados.</p></div></div>
+    <div class="vrow"><div class="vk"><span class="vn">02</span>Claridad</div><div><p>Sin letra chica ni sorpresas. El precio es el precio, el contrato es digital y lo que se ve es lo que se vive.</p></div></div>
+    <div class="vrow"><div class="vk"><span class="vn">03</span>Cuidado</div><div><p>Cada hogar visitado, medido, fotografiado y verificado por el equipo. El cuidado es la forma del respeto, hacia el inquilino y hacia el propietario.</p></div></div>
+    <div class="vrow"><div class="vk"><span class="vn">04</span>Contemporaneidad</div><div><p>Digital de raíz. En dólares, sin caución, cerrado en horas. La sofisticación de lo clásico con la velocidad de lo nuevo.</p></div></div>
+  </div>
+
+  <div class="callout" style="margin-top:7mm;padding:5mm 0;">Promesa de marca: <span style="font-style:normal;color:var(--navy);font-weight:600;">Lo que ves es lo que vivís. Verificado, sin garantía, en menos de 48 horas.</span></div>
+  <div class="foot"><span>00 · Esencia</span><span class="pg">06</span></div>
+</section>
+
+<!-- ════════════════ 07 · DIVISOR 01 ════════════════ -->
+<section class="page page--dark page--flush">
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse 60% 60% at 80% 30%,rgba(194,169,104,.10),transparent 60%);"></div>
+  <div style="position:absolute;inset:0;padding:30mm 24mm;display:flex;flex-direction:column;justify-content:center;">
+    <div class="divider-num" style="color:rgba(194,169,104,.22);">01</div>
+    <span class="eyebrow" style="margin-top:6mm;">Estrategia</span>
+    <h2 style="font-size:34pt;font-weight:400;margin-top:8px;">Posicionamiento<br>y público</h2>
+    <p class="lead" style="margin-top:16px;max-width:150mm;color:rgba(255,255,255,.82);">A quién le hablamos, contra quién competimos y qué resortes movemos. <span style="color:var(--gold-light);font-style:italic;">Apoyado en marketing-psychology.</span></p>
+  </div>
+  <div class="foot"><span>01 · Posicionamiento</span><span class="pg">07</span></div>
+</section>
+
+<!-- ════════════════ 08 · 01 PÚBLICO ════════════════ -->
+<section class="page">
+  <span class="eyebrow"><span class="sec-num">01</span> &nbsp;A quién le hablamos</span>
+  <h3 class="h-block" style="margin-top:9px;font-size:14pt;">Tres personas, un mismo nivel de exigencia</h3>
+  <p class="muted maxw" style="margin-bottom:9mm;">No segmentamos por edad ni por metros cuadrados, sino por criterio. Quien elige Bairen valora su tiempo, su tranquilidad y su gusto, y está dispuesto a pagar por que las tres cosas estén cuidadas.</p>
+
+  <div class="grid3" style="gap:5mm;">
+    <div class="panel flow"><span class="tag-pill">Perfil A</span><p class="h-sub" style="margin-top:8px;">El profesional que se reubica</p><p class="small">28 a 45. Ejecutivo, fundador o relocado. Local o extranjero. Llega con poco tiempo y mucha exigencia. Quiere resolver bien y rápido.</p></div>
+    <div class="panel flow"><span class="tag-pill">Perfil B</span><p class="h-sub" style="margin-top:8px;">La familia en transición</p><p class="small">35 a 55. Cambia de etapa: hijos, separación, regreso al país. El hogar es decisión de fondo. Prioriza seguridad, barrio y previsibilidad.</p></div>
+    <div class="panel flow"><span class="tag-pill">Perfil C</span><p class="h-sub" style="margin-top:8px;">El propietario exigente</p><p class="small">Dueño de un activo que quiere rentar sin fricción ni riesgo. Le importa quién entra a su casa y que se la cuiden. Valora la gestión.</p></div>
+  </div>
+
+  <span class="eyebrow" style="margin-top:12mm;">Qué busca, qué señala, qué teme</span>
+  <table style="margin-top:6mm;">
+    <tr><th style="width:24%;"></th><th>Qué busca</th><th>Qué señala al elegirnos</th><th>Qué teme</th></tr>
+    <tr><td class="t-strong">Profesional</td><td>Certeza y velocidad. Cero burocracia.</td><td>Que tiene criterio y no pierde el tiempo.</td><td>Que la propiedad no sea como las fotos.</td></tr>
+    <tr><td class="t-strong">Familia</td><td>Seguridad, barrio, estabilidad.</td><td>Que cuida a los suyos y elige bien.</td><td>La estafa, la letra chica, equivocarse.</td></tr>
+    <tr><td class="t-strong">Propietario</td><td>Renta sin riesgo ni gestión.</td><td>Que confía su activo a una casa seria.</td><td>El mal inquilino, el daño, el vacío.</td></tr>
+  </table>
+
+  <div class="panel panel--ink" style="margin-top:11mm;">
+    <span class="k">El insight que une a los tres</span>
+    <p style="font-family:var(--font-display);font-size:12pt;color:#fff;line-height:1.4;">Nadie quiere "alquilar un departamento". Quieren <span style="color:var(--gold-light);font-style:italic;">resolver dónde van a vivir</span> sin miedo a equivocarse. Vendemos certeza y criterio, no metros.</p>
+  </div>
+  <div class="foot"><span>01 · Posicionamiento</span><span class="pg">08</span></div>
+</section>
+
+<!-- ════════════════ 09 · 01 MAPA COMPETITIVO ════════════════ -->
+<section class="page page--tint">
+  <span class="eyebrow"><span class="sec-num">01</span> &nbsp;Mapa competitivo</span>
+  <h3 class="h-block" style="margin-top:9px;font-size:14pt;">Un cuadrante propio: curaduría digital</h3>
+  <p class="muted maxw" style="margin-bottom:7mm;">Dos ejes. Horizontal: del trámite transaccional a la curaduría. Vertical: de la marca-persona al sistema. Pinus y Bosch dominan la mitad superior izquierda. Los portales, la inferior izquierda. La esquina de curaduría hecha sistema digital está vacía. Esa es nuestra.</p>
+
+  <div class="map">
+    <span class="axl" style="top:3mm;left:50%;transform:translateX(-50%);">Sistema · Marca como héroe</span>
+    <span class="axl" style="bottom:3mm;left:50%;transform:translateX(-50%);">Persona · Fundador como héroe</span>
+    <span class="axl" style="left:3mm;top:50%;transform:translateY(-50%) rotate(-90deg);transform-origin:left;">Transaccional · Volumen</span>
+    <span class="axl" style="right:3mm;top:50%;transform:translateY(-50%) rotate(90deg);transform-origin:right;">Curatorial · Criterio</span>
+
+    <div class="dot" style="left:22%;top:78%;"><div class="pt"></div><b>Portales</b><span>Zonaprop · Argenprop</span></div>
+    <div class="dot" style="left:62%;top:30%;"><div class="pt"></div><b>Pinus</b><span>Aspiracional · video · persona</span></div>
+    <div class="dot" style="left:74%;top:52%;"><div class="pt"></div><b>Bosch</b><span>Institución clásica · arte</span></div>
+    <div class="dot you" style="left:80%;top:20%;"><div class="pt"></div><b>Bairen</b><span>Curaduría digital</span></div>
+  </div>
+
+  <div class="grid3" style="margin-top:8mm;gap:5mm;">
+    <div class="flow"><p class="h-sub">vs. Portales</p><p class="small">Ellos publican todo y no verifican nada. Nosotros curamos y verificamos. Ganamos en confianza y estética, no en cantidad.</p></div>
+    <div class="flow"><p class="h-sub">vs. Pinus</p><p class="small">Tomamos su fuerza audiovisual y su energía aspiracional. Descartamos el culto al fundador: acá la marca es el héroe, no una cara.</p></div>
+    <div class="flow"><p class="h-sub">vs. Bosch</p><p class="small">Tomamos su gravedad y su lógica de curaduría. Descartamos el peso clásico y la dependencia del arte: somos contemporáneos y digitales.</p></div>
+  </div>
+  <div class="foot"><span>01 · Posicionamiento</span><span class="pg">09</span></div>
+</section>
+
+<!-- ════════════════ 10 · 01 DISPARADORES PSICO ════════════════ -->
+<section class="page">
+  <span class="eyebrow"><span class="sec-num">01</span> &nbsp;Resortes psicológicos</span>
+  <h3 class="h-block" style="margin-top:9px;font-size:14pt;">Deseo sin venta dura</h3>
+  <p class="muted maxw" style="margin-bottom:8mm;">Activamos seis resortes de decisión, todos de forma ética: ninguno fabrica urgencia. La escasez es real (curado, no listado), nunca inventada. Entre paréntesis, el modelo de marketing-psychology que opera.</p>
+
+  <table>
+    <tr><th style="width:26%;">Resorte</th><th style="width:37%;">Cómo lo activamos</th><th>Señal concreta en la marca</th></tr>
+    <tr><td class="t-strong">Pertenencia y estatus<br><span class="small">(Mimetic Desire · Unity)</span></td><td>Bairen es un círculo de barrios y de gente con criterio. Entrar es pertenecer.</td><td>Palermo, Recoleta, Belgrano, Núñez, San Isidro. "Tu lugar", no "una unidad".</td></tr>
+    <tr><td class="t-strong">Prueba social<br><span class="small">(Bandwagon)</span></td><td>Mostramos tracción real, sin inflar.</td><td>120 propiedades alquiladas · 4,9★ sobre 47 reseñas · testimonios reales.</td></tr>
+    <tr><td class="t-strong">Autoridad<br><span class="small">(Authority Bias)</span></td><td>El ritual de curaduría es la credencial.</td><td>"Seleccionado, fotografiado y verificado por el equipo de Bairen."</td></tr>
+    <tr><td class="t-strong">Escasez genuina<br><span class="small">(Scarcity, ética)</span></td><td>El inventario es chico por definición de curaduría. No inventamos cuentas regresivas.</td><td>"Curado, no listado." La escasez se nombra, no se grita.</td></tr>
+    <tr><td class="t-strong">Aversión al arrepentimiento<br><span class="small">(Regret Aversion · Loss Aversion)</span></td><td>Quitamos el miedo a equivocarse y la fricción de entrada.</td><td>Sin garantía. Sin caución. "Lo que ves es lo que vivís."</td></tr>
+    <tr><td class="t-strong">Pico memorable<br><span class="small">(Peak-End Rule · Anchoring)</span></td><td>El estándar premium ancla el valor; la entrega es el pico.</td><td>Contrato digital firmado en menos de 48 horas.</td></tr>
+  </table>
+
+  <div class="dd" style="margin-top:10mm;">
+    <div class="col do"><div class="tag">▲ &nbsp;Así sí</div><ul>
+      <li>"Curado, no listado." La escasez es un hecho.</li>
+      <li>Mostrar el lugar y dejar que hable.</li>
+      <li>Datos reales: 120 propiedades, 4,9★.</li>
+      <li>Reducir fricción: sin caución, todo digital.</li>
+    </ul></div>
+    <div class="col dont"><div class="tag">▼ &nbsp;Así no</div><ul>
+      <li>"Mientras mirás Zonaprop, alguien ya lo reservó."</li>
+      <li>Cuentas regresivas y "última unidad".</li>
+      <li>Métricas infladas o testimonios inventados.</li>
+      <li>Urgencia fabricada de cualquier tipo.</li>
+    </ul></div>
+  </div>
+  <div class="foot"><span>01 · Posicionamiento</span><span class="pg">10</span></div>
+</section>
+
+<!-- ════════════════ 11 · DIVISOR 02 ════════════════ -->
+<section class="page page--tint">
+  <div style="height:100%;display:flex;flex-direction:column;justify-content:center;">
+    <div class="divider-num">02</div>
+    <span class="eyebrow" style="margin-top:6mm;">Lenguaje</span>
+    <h2 class="h-sec" style="margin-top:8px;font-size:34pt;">Identidad verbal</h2>
+    <p class="lead maxw" style="margin-top:16px;">Cómo suena Bairen cuando habla. Perfume de lujo, reloj suizo: frases cortas, lenguaje llano, cero jerga, nada salesy. <span class="ital">Apoyado en copywriting.</span></p>
+  </div>
+  <div class="foot"><span>02 · Voz</span><span class="pg">11</span></div>
+</section>
+
+<!-- ════════════════ 12 · 02 ARQUETIPO + VOZ ════════════════ -->
+<section class="page">
+  <span class="eyebrow"><span class="sec-num">02</span> &nbsp;Personalidad y arquetipo</span>
+  <div class="grid2" style="margin-top:9px;align-items:start;">
+    <div class="flow">
+      <h3 class="h-block" style="font-size:14pt;">El Curador</h3>
+      <p>Bairen es <b>el Curador</b>: el cruce entre el Sabio (conoce) y el Creador (compone), con la gravedad serena del Soberano. La imagen mental es la de un anfitrión culto que conoce cada cuadra de la ciudad y elige, por vos, los pocos lugares que valen la pena.</p>
+      <p class="muted">No es vendedor ni influencer. No grita, no apura, no adula. Muestra, ordena y acompaña. Su autoridad viene del criterio, no del entusiasmo.</p>
+    </div>
+    <div class="panel panel--tint flow">
+      <span class="k">Una frase para calibrar</span>
+      <p style="font-family:var(--font-display);font-style:italic;font-size:12.5pt;color:var(--navy);line-height:1.45;">"No te muestro todo lo que hay. Te muestro lo que elegiría para mí."</p>
+      <div class="rule"></div>
+      <p class="small">Si una pieza podría decir esa frase sin sonar falsa, está en voz. Si suena a vendedor, no lo está.</p>
+    </div>
+  </div>
+
+  <span class="eyebrow" style="margin-top:12mm;">Cuatro atributos de voz</span>
+  <table style="margin-top:6mm;">
+    <tr><th style="width:20%;">Atributo</th><th style="width:40%;">Qué significa</th><th>Suena así / no así</th></tr>
+    <tr><td class="t-strong">Sobrio</td><td>Dice lo justo. Una idea por frase. El silencio y el espacio también comunican.</td><td><span style="color:var(--ok);">"Dos ambientes en Palermo. Luz de tarde."</span> &nbsp;/&nbsp; <span style="color:var(--err);">"¡Hermoso y luminoso 2 amb!"</span></td></tr>
+    <tr><td class="t-strong">Preciso</td><td>Específico, nunca vago. Datos concretos en vez de adjetivos.</td><td><span style="color:var(--ok);">"A tres cuadras de Plaza Las Cañitas."</span> &nbsp;/&nbsp; <span style="color:var(--err);">"Excelente ubicación."</span></td></tr>
+    <tr><td class="t-strong">Cálido, contenido</td><td>Humano y cercano, sin efusividad. Trata de usted al lector cuidándolo, no halagándolo.</td><td><span style="color:var(--ok);">"Coordinás la visita cuando quieras."</span> &nbsp;/&nbsp; <span style="color:var(--err);">"¡No te lo pierdas, escribinos YA!"</span></td></tr>
+    <tr><td class="t-strong">Seguro</td><td>Afirma sin alardear. No necesita superlativos porque confía en el lugar.</td><td><span style="color:var(--ok);">"Verificado por el equipo."</span> &nbsp;/&nbsp; <span style="color:var(--err);">"La mejor propiedad del mercado."</span></td></tr>
+  </table>
+
+  <div class="panel panel--ink" style="margin-top:10mm;">
+    <span class="k">Regla de oro del redactor</span>
+    <p style="color:#fff;font-size:10pt;">Claridad antes que ingenio. Específico antes que vago. Mostrar antes que decir. Si una frase lleva signo de exclamación, sobra el signo o sobra la frase.</p>
+  </div>
+  <div class="foot"><span>02 · Voz</span><span class="pg">12</span></div>
+</section>
+
+<!-- ════════════════ 13 · 02 TONO POR CANAL + MANIFIESTO ════════════════ -->
+<section class="page page--tint">
+  <span class="eyebrow"><span class="sec-num">02</span> &nbsp;Espectro de tono por canal</span>
+  <p class="muted maxw" style="margin:7px 0 6mm;">La voz no cambia. El tono se ajusta. Misma persona, distinto registro según dónde habla.</p>
+  <table>
+    <tr><th style="width:18%;">Canal</th><th style="width:30%;">Registro</th><th>Ejemplo en voz</th></tr>
+    <tr><td class="t-strong">Web</td><td>Editorial, sereno, con aire. Titula con Playfair, respira.</td><td>"El departamento que querés. Sin garantía. Sin caución."</td></tr>
+    <tr><td class="t-strong">Instagram / TikTok</td><td>Cinematográfico y aspiracional, pero sobrio. Una idea por pieza.</td><td>"Palermo, seis de la tarde. La luz entra por el ventanal."</td></tr>
+    <tr><td class="t-strong">WhatsApp</td><td>Cálido, directo, humano. Primera persona del equipo. Cero plantilla fría.</td><td>"Hola, soy Julián de Bairen. Te preparo tres opciones que encajan."</td></tr>
+    <tr><td class="t-strong">Ficha</td><td>Descriptivo y sensorial. Sustantivos concretos, no adjetivos vacíos.</td><td>"Cocina abierta, dos dormitorios, un palier que recibe bien."</td></tr>
+    <tr><td class="t-strong">Contrato</td><td>Claro, llano, tranquilizador. Cada cláusula se entiende a la primera.</td><td>"Firmás desde tu casa. El depósito se devuelve al cierre."</td></tr>
+    <tr><td class="t-strong">Mail</td><td>Pausado, de cortesía. Asunto concreto, sin gancho.</td><td>"Tres lugares en Belgrano para tu mudanza."</td></tr>
+  </table>
+
+  <span class="eyebrow" style="margin-top:12mm;">Manifiesto · versión corta y larga</span>
+  <div class="grid2" style="margin-top:7mm;align-items:start;">
+    <div class="panel panel--ink" style="display:flex;flex-direction:column;justify-content:center;">
+      <p class="small" style="color:var(--gold-light);letter-spacing:.2em;text-transform:uppercase;margin-bottom:10px;">Versión corta · firma maestra</p>
+      <p style="font-family:var(--font-display);font-size:17pt;color:#fff;line-height:1.3;">Buenos Aires no se alquila.<br><span style="color:var(--gold-light);font-style:italic;">Se elige.</span></p>
+    </div>
+    <div class="flow">
+      <p class="small">Versión larga (resumen). El texto completo vive en la página de Manifiesto:</p>
+      <p style="font-size:8.8pt;line-height:1.7;">"Hay ciudades que se ocupan y ciudades que se eligen. Buenos Aires es de las segundas. Por eso no listamos propiedades: las curamos. Visitamos, medimos, fotografiamos y verificamos cada hogar antes de mostrarlo. Lo que ves es lo que vas a vivir. Sin garantía, sin caución, sin letra chica. Una casa, no una inmobiliaria."</p>
+    </div>
+  </div>
+  <div class="foot"><span>02 · Voz</span><span class="pg">13</span></div>
+</section>
+
+<!-- ════════════════ 14 · 02 TAGLINES + LÉXICO ════════════════ -->
+<section class="page">
+  <span class="eyebrow"><span class="sec-num">02</span> &nbsp;Biblioteca de taglines</span>
+  <div class="grid2" style="margin-top:8mm;align-items:start;gap:8mm;">
+    <div>
+      <p class="small muted" style="margin-bottom:5mm;">La firma maestra es intocable. El resto rota según pieza y canal. Ninguna lleva signo de exclamación.</p>
+      <div class="flow">
+        <div class="panel" style="padding:5mm 6mm;"><span class="tag-pill">Firma maestra</span><p style="font-family:var(--font-display);font-size:12.5pt;color:var(--navy);margin-top:7px;line-height:1.3;">Buenos Aires no se alquila. <span class="ital">Se elige.</span></p></div>
+        <ul class="clean">
+          <li><b>Curado, no listado.</b> &nbsp;<span class="small">— sello de método</span></li>
+          <li><b>Lo que ves es lo que vivís.</b> &nbsp;<span class="small">— promesa</span></li>
+          <li><b>El departamento que querés. Sin garantía. Sin caución.</b> &nbsp;<span class="small">— performance / hero actual</span></li>
+          <li><b>Una casa, no una inmobiliaria.</b> &nbsp;<span class="small">— categoría</span></li>
+          <li><b>Elegí tu lugar en Buenos Aires.</b> &nbsp;<span class="small">— invitación</span></li>
+          <li><b>Cada hogar, verificado.</b> &nbsp;<span class="small">— confianza</span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="panel panel--tint flow">
+      <span class="k">Cómo se construye una tagline Bairen</span>
+      <ul class="clean" style="margin-top:2px;">
+        <li>Dos frases cortas, ritmo de péndulo.</li>
+        <li>Un sustantivo fuerte, ningún adjetivo de relleno.</li>
+        <li>Verbo de elección: elegir, curar, vivir, reconocer.</li>
+        <li>Punto final, nunca exclamación.</li>
+      </ul>
+      <div class="rule"></div>
+      <p class="small">Test: leéla en voz baja. Si suena a confidencia de alguien con criterio, sirve. Si suena a megáfono, no.</p>
+    </div>
+  </div>
+
+  <span class="eyebrow" style="margin-top:11mm;">Léxico · lo que usamos y lo que está prohibido</span>
+  <div class="lex" style="margin-top:6mm;">
+    <div class="box use">
+      <h4>▲ Vocabulario Bairen</h4>
+      <div class="chips">
+        <span>curar</span><span>curaduría</span><span>hogar</span><span>lugar</span><span>elegir</span><span>vivir</span><span>verificado</span><span>seleccionado</span><span>contrato digital</span><span>en dólares</span><span>sin garantía</span><span>sin caución</span><span>en menos de 48 h</span><span>barrio</span><span>luz</span><span>recibir</span>
+      </div>
+    </div>
+    <div class="box ban">
+      <h4>▼ Palabras prohibidas</h4>
+      <div class="chips">
+        <span>oportunidad</span><span>imperdible</span><span>soñado</span><span>ideal</span><span>no te lo pierdas</span><span>última unidad</span><span>excelente inversión</span><span>m² imbatibles</span><span>aprovechá</span><span>consultá ya</span><span>a estrenar!!!</span><span>el mejor precio</span><span>100% recomendable</span>
+      </div>
+      <p class="small" style="margin-top:9px;color:#8a5a5a;">Cero emojis comerciales (🔥🏠💰), cero exclamaciones de vendedor, cero "m²" como gancho de titular.</p>
+    </div>
+  </div>
+  <div class="foot"><span>02 · Voz</span><span class="pg">14</span></div>
+</section>
+
+<!-- ════════════════ 15 · 02 ANTES / DESPUÉS ════════════════ -->
+<section class="page page--tint">
+  <span class="eyebrow"><span class="sec-num">02</span> &nbsp;Antes / después</span>
+  <h3 class="h-block" style="margin-top:9px;font-size:14pt;">De copy de portal a copy Bairen</h3>
+  <p class="muted maxw" style="margin-bottom:7mm;">El mismo dato, dos mundos. A la izquierda, el lenguaje que evitamos. A la derecha, cómo lo diría Bairen.</p>
+
+  <div class="ba"><div class="cell before"><div class="lab">Inmobiliaria típica</div><p class="t-before">¡OPORTUNIDAD ÚNICA! Hermoso 2 amb a estrenar 🔥 No te lo pierdas</p></div><div class="cell after"><div class="lab">Bairen</div><p class="t-after">Dos ambientes en Palermo. Luz de tarde, balcón al frente.</p></div></div>
+  <div class="ba"><div class="cell before"><div class="lab">Inmobiliaria típica</div><p class="t-before">Imperdible. Ideal inversión o vivienda. Excelente ubicación!!!</p></div><div class="cell after"><div class="lab">Bairen</div><p class="t-after">Para vivir o para rentar. A tres cuadras de Plaza Las Cañitas.</p></div></div>
+  <div class="ba"><div class="cell before"><div class="lab">Inmobiliaria típica</div><p class="t-before">Departamento soñado con todas las comodidades del mercado</p></div><div class="cell after"><div class="lab">Bairen</div><p class="t-after">Cocina abierta, dos dormitorios, un palier que recibe bien.</p></div></div>
+  <div class="ba"><div class="cell before"><div class="lab">Inmobiliaria típica</div><p class="t-before">Consultá YA, última unidad disponible, se vuela 🏃</p></div><div class="cell after"><div class="lab">Bairen</div><p class="t-after">Disponible ahora. Coordinás la visita cuando quieras.</p></div></div>
+  <div class="ba"><div class="cell before"><div class="lab">Inmobiliaria típica</div><p class="t-before">Alquiler SIN garantía, súper accesible, el mejor precio</p></div><div class="cell after"><div class="lab">Bairen</div><p class="t-after">Sin garantía. Sin caución. Contrato digital en menos de 48 horas.</p></div></div>
+  <div class="ba"><div class="cell before"><div class="lab">Inmobiliaria típica</div><p class="t-before">Hermosa propiedad con fotos reales, 100% recomendable</p></div><div class="cell after"><div class="lab">Bairen</div><p class="t-after">Fotografiado y verificado por el equipo de Bairen.</p></div></div>
+
+  <div class="foot"><span>02 · Voz</span><span class="pg">15</span></div>
+</section>
+
+<!-- ════════════════ 16 · DIVISOR 03 ════════════════ -->
+<section class="page page--dark page--flush">
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse 55% 60% at 25% 75%,rgba(194,169,104,.10),transparent 60%);"></div>
+  <div style="position:absolute;inset:0;padding:30mm 24mm;display:flex;flex-direction:column;justify-content:center;">
+    <div class="divider-num" style="color:rgba(194,169,104,.22);">03</div>
+    <span class="eyebrow" style="margin-top:6mm;">Diseño</span>
+    <h2 style="font-size:34pt;font-weight:400;margin-top:8px;">Sistema visual</h2>
+    <p class="lead" style="margin-top:16px;max-width:150mm;color:rgba(255,255,255,.82);">Los tokens reales de bairengroup.com, documentados y re-pesados hacia un <span style="color:var(--gold-light);font-style:italic;">digital-luxe</span> light-dominante. No se inventan colores: se reorganizan.</p>
+  </div>
+  <div class="foot"><span>03 · Sistema visual</span><span class="pg">16</span></div>
+</section>
+
+<!-- ════════════════ 17 · 03 PALETA / SWATCHES ════════════════ -->
+<section class="page">
+  <span class="eyebrow"><span class="sec-num">03</span> &nbsp;Paleta · tokens reales</span>
+  <p class="muted maxw" style="margin:7px 0 7mm;">Estos son los valores vigentes del sitio. Son la única fuente de verdad de color. No se agregan HEX nuevos: el sistema evoluciona cambiando los pesos, no la paleta.</p>
+
+  <p class="h-sub" style="margin-bottom:5mm;">Navy · estructura y momentos premium</p>
+  <div class="swatches">
+    <div class="sw"><div class="chip" style="background:#2A3A52;"></div><div class="meta"><div class="nm">Navy</div><div class="hex">#2A3A52</div><div class="role">Principal · texto sobre claro</div></div></div>
+    <div class="sw"><div class="chip" style="background:#1E2A3F;"></div><div class="meta"><div class="nm">Navy Dark</div><div class="hex">#1E2A3F</div><div class="role">Hovers · profundidad</div></div></div>
+    <div class="sw"><div class="chip" style="background:#131D2D;"></div><div class="meta"><div class="nm">Navy Deeper</div><div class="hex">#131D2D</div><div class="role">Hero · footer · premium</div></div></div>
+    <div class="sw"><div class="chip" style="background:#1A2538;"></div><div class="meta"><div class="nm">Text Dark</div><div class="hex">#1A2538</div><div class="role">Tinta de lectura</div></div></div>
+  </div>
+
+  <p class="h-sub" style="margin:8mm 0 5mm;">Oro · acento (de relleno a susurro)</p>
+  <div class="swatches">
+    <div class="sw"><div class="chip" style="background:#C2A968;"></div><div class="meta"><div class="nm">Gold</div><div class="hex">#C2A968</div><div class="role">Hairlines · eyebrows · flecha</div></div></div>
+    <div class="sw"><div class="chip" style="background:#8A7547;"></div><div class="meta"><div class="nm">Gold Dark</div><div class="hex">#8A7547</div><div class="role">Precios · eyebrows sobre claro</div></div></div>
+    <div class="sw"><div class="chip" style="background:#DECDA0;"></div><div class="meta"><div class="nm">Gold Light</div><div class="hex">#DECDA0</div><div class="role">Cursivas sobre oscuro</div></div></div>
+    <div class="sw"><div class="chip" style="background:#F7F1E2;border-bottom:1px solid rgba(42,58,82,.1);"></div><div class="meta"><div class="nm">Gold Pale</div><div class="hex">#F7F1E2</div><div class="role">Tints muy sutiles</div></div></div>
+  </div>
+
+  <p class="h-sub" style="margin:8mm 0 5mm;">Neutros cálidos · la superficie del sistema evolucionado</p>
+  <div class="swatches">
+    <div class="sw"><div class="chip" style="background:#FBFAF6;border-bottom:1px solid rgba(42,58,82,.1);"></div><div class="meta"><div class="nm">White</div><div class="hex">#FBFAF6</div><div class="role">Canvas dominante</div></div></div>
+    <div class="sw"><div class="chip" style="background:#EEE5D0;"></div><div class="meta"><div class="nm">Off-White</div><div class="hex">#EEE5D0</div><div class="role">Secciones alternas</div></div></div>
+    <div class="sw"><div class="chip" style="background:#D9C9A8;"></div><div class="meta"><div class="nm">Wheat</div><div class="hex">#D9C9A8</div><div class="role">Detalle cálido</div></div></div>
+    <div class="sw"><div class="chip" style="background:#6B7589;"></div><div class="meta"><div class="nm">Text Mid</div><div class="hex">#6B7589</div><div class="role">Texto secundario</div></div></div>
+  </div>
+
+  <p class="small muted" style="margin-top:7mm;">Neutros de soporte: Silver #BFBAB0 · Silver Light #DDD8CE · Gray Light #D6D2C8. &nbsp; Funcionales: OK #2A7A4B · Error #B94A4A (solo estados de sistema, nunca decorativos).</p>
+  <div class="foot"><span>03 · Sistema visual</span><span class="pg">17</span></div>
+</section>
+
+<!-- ════════════════ 18 · 03 DOS SISTEMAS ════════════════ -->
+<section class="page page--tint">
+  <span class="eyebrow"><span class="sec-num">03</span> &nbsp;Dos sistemas semánticos</span>
+  <h3 class="h-block" style="margin-top:9px;font-size:14pt;">Mismos HEX, distinto peso</h3>
+  <p class="muted maxw" style="margin-bottom:7mm;">El sistema actual es navy-dominante con oro de relleno: lee a lujo tradicional. El evolucionado invierte la dominancia hacia la luz y baja el oro a susurro: lee a digital-luxe. <b>El evolucionado es el recomendado.</b></p>
+
+  <div class="grid2" style="gap:6mm;align-items:start;">
+    <div>
+      <p class="small" style="letter-spacing:.2em;text-transform:uppercase;color:var(--text-mid);font-weight:600;margin-bottom:5mm;">Sistema actual</p>
+      <div class="code"><span class="c">/* roles · navy-dominante */</span>
+<span class="v">--bg-canvas</span>: <span class="h">navy / off-white</span>;
+<span class="v">--bg-premium</span>: <span class="h">navy-deeper</span>;
+<span class="v">--ink</span>: <span class="h">text-dark</span>;
+<span class="v">--cta-fill</span>: <span class="h">gold</span>;
+<span class="v">--cta-text</span>: <span class="h">navy</span>;
+<span class="v">--cta-hover</span>: <span class="h">gold-dark</span>;
+<span class="v">--accent</span>: <span class="h">gold (relleno)</span>;
+<span class="v">--emotion</span>: <span class="h">playfair italic + gold</span>;</div>
+      <div class="mock" style="margin-top:5mm;">
+        <div class="bar"><span class="bw" style="letter-spacing:.4em;">BAIREN</span><span class="bn">Navy · oro de relleno</span></div>
+        <div style="background:var(--navy-deeper);padding:7mm 6mm;">
+          <p style="font-family:var(--font-display);color:#fff;font-size:13pt;line-height:1.2;">El departamento<br>que querés.</p>
+          <span style="display:inline-block;margin-top:6mm;background:var(--gold);color:var(--navy);font-size:7.4pt;font-weight:700;letter-spacing:.2em;text-transform:uppercase;padding:8px 16px;">Ver propiedades →</span>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <p class="small" style="letter-spacing:.2em;text-transform:uppercase;color:var(--gold-dark);font-weight:600;margin-bottom:5mm;">Sistema evolucionado ★ recomendado</p>
+      <div class="code"><span class="c">/* roles · light-dominante */</span>
+<span class="v">--bg-canvas</span>: <span class="h">white (mayoría)</span>;
+<span class="v">--bg-alt</span>: <span class="h">off-white / gold-pale</span>;
+<span class="v">--bg-premium</span>: <span class="h">navy-deeper (reservado)</span>;
+<span class="v">--ink</span>: <span class="h">navy / text-dark</span>;
+<span class="v">--cta-fill</span>: <span class="h">navy (tinta)</span>;
+<span class="v">--cta-text</span>: <span class="h">white</span>;
+<span class="v">--accent-line</span>: <span class="h">gold (hairline/flecha)</span>;
+<span class="v">--emotion</span>: <span class="h">playfair italic + gold</span>;</div>
+      <div class="mock" style="margin-top:5mm;">
+        <div class="bar"><span class="bw" style="letter-spacing:.4em;">BAIREN</span><span class="bn" style="color:var(--gold-light);">Light · oro susurro</span></div>
+        <div style="background:var(--white);padding:7mm 6mm;">
+          <p style="font-family:var(--font-display);color:var(--navy);font-size:13pt;line-height:1.2;">El departamento<br>que querés.</p>
+          <span class="btn-ink" style="margin-top:6mm;">Ver propiedades <span class="ar">→</span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:8mm;background:#fff;">
+    <span class="k" style="color:var(--gold-dark);">Las tres reglas de la evolución</span>
+    <div class="grid3" style="gap:6mm;margin-top:3mm;">
+      <p class="small"><b>1. Invertir la dominancia.</b> White y off-white cargan la mayoría de la superficie. Navy-deeper queda para hero, footer y momentos premium, no para el 70% de la página.</p>
+      <p class="small"><b>2. Oro a susurro.</b> Solo hairlines, eyebrows y la flecha. Los CTA pasan a tinta navy. Se elimina el oro como relleno de botón.</p>
+      <p class="small"><b>3. Conservar intacto.</b> Playfair + Jost, la geometría angular sin border-radius, la curva de movimiento y el sistema de espaciado. Ya son sofisticados.</p>
+    </div>
+  </div>
+  <div class="foot"><span>03 · Sistema visual</span><span class="pg">18</span></div>
+</section>
+
+<!-- ════════════════ 19 · 03 LOGO ════════════════ -->
+<section class="page">
+  <span class="eyebrow"><span class="sec-num">03</span> &nbsp;Logo</span>
+  <h3 class="h-block" style="margin-top:9px;font-size:14pt;">El Obelisco, en oro, dentro del círculo</h3>
+  <div class="grid2" style="margin-top:6mm;align-items:start;gap:8mm;">
+    <div>
+      <div style="background:var(--navy-deeper);display:flex;align-items:center;justify-content:center;padding:14mm;border:1px solid rgba(194,169,104,.25);">
+        <img src="bairen_logo.png" alt="Bairen" style="width:46mm;" />
+      </div>
+      <p class="small muted" style="margin-top:5px;text-align:center;">Marca principal sobre fondo oscuro</p>
+    </div>
+    <div class="flow">
+      <p>El isotipo es el Obelisco porteño trazado en línea fina dorada, contenido en un doble anillo. Es la síntesis de la marca: <b>Buenos Aires</b> (el monumento) dentro de un <b>círculo de pertenencia</b> (la curaduría). Nunca se rediseña el trazo ni se rellena.</p>
+      <ul class="clean">
+        <li><b>Área de seguridad:</b> margen libre igual al radio del anillo interior en todo el contorno.</li>
+        <li><b>Altura en nav:</b> 46px. <b>En footer:</b> 40px a opacidad .85, sin tagline.</li>
+        <li><b>Tamaño mínimo:</b> 28px de alto en pantalla, 12mm en impresión, para que el doble anillo no se cierre.</li>
+        <li><b>Versiones:</b> full color oro sobre oscuro · oro sobre claro · monocromo navy · monocromo blanco (calado).</li>
+      </ul>
+    </div>
+  </div>
+
+  <span class="eyebrow" style="margin-top:11mm;">Usos correctos e incorrectos</span>
+  <div class="dd" style="margin-top:5mm;">
+    <div class="col do"><div class="tag">▲ &nbsp;Correcto</div><ul>
+      <li>Oro sobre navy-deeper o sobre foto oscurecida.</li>
+      <li>Monocromo navy sobre fondos claros.</li>
+      <li>Respetando el área de seguridad y el mínimo.</li>
+      <li>Centrado y a escala, el anillo siempre cerrado.</li>
+    </ul></div>
+    <div class="col dont"><div class="tag">▼ &nbsp;Incorrecto</div><ul>
+      <li>Rellenar el Obelisco o engrosar el trazo.</li>
+      <li>Deformar, rotar o inclinar la marca.</li>
+      <li>Oro sobre fondos claros de bajo contraste.</li>
+      <li>Sombras, degradados ajenos o bordes redondeados alrededor.</li>
+    </ul></div>
+  </div>
+  <div class="foot"><span>03 · Sistema visual</span><span class="pg">19</span></div>
+</section>
+
+<!-- ════════════════ 20 · 03 TIPOGRAFÍA ════════════════ -->
+<section class="page page--tint">
+  <span class="eyebrow"><span class="sec-num">03</span> &nbsp;Tipografía · escala canónica</span>
+  <div class="grid2" style="margin-top:7px;gap:8mm;align-items:start;margin-bottom:7mm;">
+    <p class="small"><b style="font-family:var(--font-display);font-size:11pt;color:var(--navy);">Playfair Display</b> — la voz emocional. Titula, abre y cierra. Cursiva + oro para las frases con alma. Pesos 400 / 500 / 600 / 700 e itálicas.</p>
+    <p class="small"><b style="font-size:11pt;color:var(--navy);">Jost</b> — la voz funcional. Cuerpo, etiquetas, navegación, datos. Default 300, sube a 500/600 para eyebrows y botones. Mayúsculas con tracking alto.</p>
+  </div>
+
+  <div class="spec"><div class="demo"><span style="font-family:var(--font-display);font-weight:400;font-size:26pt;color:var(--navy);letter-spacing:-.012em;line-height:1;">El departamento que querés</span></div><div class="info"><b>Hero / H1</b><br>Playfair 400 · clamp(2.4–4.4rem)<br>tracking -.012em · lh 1.04<br>navy sobre claro / white sobre oscuro</div></div>
+  <div class="spec"><div class="demo"><span style="font-family:var(--font-display);font-weight:500;font-size:18pt;color:var(--navy);letter-spacing:-.008em;">Propiedades curadas</span></div><div class="info"><b>Título de sección / H2</b><br>Playfair 500 · clamp(1.85–2.8rem)<br>tracking -.008em · lh 1.18 · navy</div></div>
+  <div class="spec"><div class="demo"><span style="font-family:var(--font-display);font-style:italic;font-weight:400;font-size:15pt;color:var(--gold-dark);">Se elige</span></div><div class="info"><b>Frase emocional</b><br>Playfair italic 400 · oro<br>gold-dark sobre claro / gold-light sobre oscuro</div></div>
+  <div class="spec"><div class="demo"><span style="font-family:var(--font-body);font-weight:600;font-size:8pt;letter-spacing:.38em;text-transform:uppercase;color:var(--gold-dark);">Disponibles ahora</span></div><div class="info"><b>Eyebrow</b><br>Jost 600 · .6rem · tracking .38em<br>uppercase · gold-dark / gold-light</div></div>
+  <div class="spec"><div class="demo"><span style="font-family:var(--font-body);font-weight:300;font-size:10pt;color:var(--text-dark);">Cada hogar es seleccionado, fotografiado y verificado por el equipo antes de mostrarse.</span></div><div class="info"><b>Cuerpo</b><br>Jost 300 · .95–1rem · lh 1.7–1.8<br>máx. 65 caracteres por línea</div></div>
+  <div class="spec"><div class="demo"><span style="font-family:var(--font-display);font-weight:700;font-size:13pt;color:var(--gold-dark);">USD 1.400</span></div><div class="info"><b>Precio</b><br>Playfair 700 · gold-dark<br>cifras tabulares (lnum)</div></div>
+  <div class="spec"><div class="demo"><span class="btn-ink">Ver propiedades <span class="ar">→</span></span></div><div class="info"><b>Botón / nav</b><br>Jost 600/700 · .7rem<br>tracking .18–.22em · uppercase</div></div>
+
+  <div class="foot"><span>03 · Sistema visual</span><span class="pg">20</span></div>
+</section>
+
+<!-- ════════════════ 21 · 03 MOVIMIENTO + GRILLA + ICONO ════════════════ -->
+<section class="page">
+  <span class="eyebrow"><span class="sec-num">03</span> &nbsp;Movimiento, grilla e iconografía</span>
+
+  <div class="grid2" style="margin-top:8mm;gap:8mm;align-items:start;">
+    <div class="flow">
+      <p class="h-sub">Movimiento</p>
+      <p class="small">Una sola curva para todo el sistema: <b>cubic-bezier(0.22, 1, 0.36, 1)</b>. Sale rápido y desacelera, nunca rebota.</p>
+      <ul class="clean">
+        <li><b>Reveal on scroll:</b> opacity 0→1 + translateY 30px→0, 0.55 s, en cascada (.08 / .18 / .28 / .38 s).</li>
+        <li><b>Hero fade-up:</b> entrada escalonada, retardos .35 a 1.05 s.</li>
+        <li><b>Hover de card:</b> translateY -4px + sombra suave, 0.25 s.</li>
+        <li><b>Hover de botón:</b> -2px y la flecha se desplaza 4px.</li>
+        <li><b>Reduce-motion:</b> todo colapsa a un fundido de 0.2 s.</li>
+      </ul>
+    </div>
+    <div class="flow">
+      <p class="h-sub">Grilla y aire</p>
+      <ul class="clean">
+        <li><b>Anchos máximos:</b> 1180 (full) · 920 (medio) · 680 (lectura) · 560 (foco).</li>
+        <li><b>Padding de sección:</b> 120px desktop · 64–80px mobile.</li>
+        <li><b>Filete de oro</b> de 40–64px como divisor entre bloques.</li>
+        <li><b>Respirar:</b> cuanto más premium el momento, más vacío alrededor. El aire es lujo.</li>
+        <li><b>Sin border-radius</b> en cards ni botones. Geometría angular siempre.</li>
+      </ul>
+    </div>
+  </div>
+
+  <span class="eyebrow" style="margin-top:11mm;">Iconografía y elementos gráficos</span>
+  <div class="grid2" style="margin-top:5mm;gap:8mm;align-items:start;">
+    <div class="panel flow">
+      <span class="k">Iconos</span>
+      <p class="small">Línea fina, trazo 1.6, extremos redondeados, viewBox 24. Monocromos: gold-dark sobre claro, gold-light o blanco sobre oscuro. Nunca rellenos, nunca multicolor. Contenedor circular de 76px para pasos numerados.</p>
+      <div style="display:flex;gap:7mm;margin-top:4mm;align-items:center;">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#8A7547" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5M9 11h4M11 9v4"/></svg>
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#8A7547" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="0"/><path d="M9 4V3h6v1M8.5 13.5l2 2 4-4"/></svg>
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#8A7547" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4l4 4-10 10H4v-4zM13 5l3 3M3 21h18"/></svg>
+      </div>
+    </div>
+    <div class="panel flow">
+      <span class="k">Elementos gráficos firma</span>
+      <ul class="clean" style="margin-top:0;">
+        <li>El <b>filete de oro</b> corto (rule) como respiración entre ideas.</li>
+        <li>La <b>flecha →</b> como único gesto direccional, en oro o tinta.</li>
+        <li>El <b>punto · medio</b> como separador, nunca la barra ni el guion largo.</li>
+        <li><b>Gradientes radiales</b> sutiles para dar atmósfera; nunca planos chillones.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot"><span>03 · Sistema visual</span><span class="pg">21</span></div>
+</section>
+
+<!-- ════════════════ 22 · DIVISOR 04 ════════════════ -->
+<section class="page page--flush" style="background:var(--navy-deeper);">
+  <div style="position:absolute;inset:0;">
+    <img src="211.png" alt="" style="width:100%;height:100%;object-fit:cover;opacity:.4;filter:saturate(.85) contrast(1.05);" />
+    <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(19,29,45,.55),rgba(19,29,45,.35) 40%,rgba(19,29,45,.92));"></div>
+  </div>
+  <div style="position:absolute;inset:0;padding:30mm 24mm;display:flex;flex-direction:column;justify-content:flex-end;color:#fff;">
+    <div class="divider-num" style="color:rgba(255,255,255,.16);">04</div>
+    <span class="eyebrow" style="margin-top:4mm;color:var(--gold-light);">Imagen</span>
+    <h2 style="font-size:34pt;font-weight:400;margin-top:8px;color:#fff;">Dirección de arte<br>y fotografía</h2>
+    <p class="lead" style="margin-top:14px;max-width:150mm;color:rgba(255,255,255,.85);">La luz, el encuadre y el ritmo. El techo lo fijan Aesop y Aman, no el portal de al lado.</p>
+  </div>
+  <div class="foot" style="color:rgba(255,255,255,.5);border-color:rgba(255,255,255,.2);"><span>04 · Dirección de arte</span><span class="pg" style="color:var(--gold-light);">22</span></div>
+</section>
+
+<!-- ════════════════ 23 · 04 FOTOGRAFÍA ════════════════ -->
+<section class="page">
+  <span class="eyebrow"><span class="sec-num">04</span> &nbsp;Estilo fotográfico</span>
+  <h3 class="h-block" style="margin-top:9px;font-size:14pt;">Editorial habitable, nunca foto de portal</h3>
+  <p class="muted maxw" style="margin-bottom:6mm;">La foto Bairen muestra cómo se vive un lugar, no lo inventaría. Luz natural cálida, encuadre arquitectónico con verticales corregidas, balance de blancos consistente. Sin HDR, sin gran angular que deforme, sin saturación de aviso clasificado.</p>
+
+  <div class="grid2" style="gap:6mm;align-items:start;">
+    <div class="dd" style="grid-template-columns:1fr;gap:5mm;">
+      <div class="col do"><div class="tag">▲ &nbsp;Buscamos</div><ul>
+        <li>Luz natural, hora dorada para las tomas estrella.</li>
+        <li>El barrio como personaje: la cuadra, el cielo, la vista.</li>
+        <li>Materialidad: madera, piedra, el grano de la luz.</li>
+        <li>Un gesto de vida: una taza, un libro, una cortina al viento.</li>
+        <li>Verticales rectas, encuadre a una o dos fugas.</li>
+      </ul></div>
+      <div class="col dont"><div class="tag">▼ &nbsp;Evitamos</div><ul>
+        <li>Unidad vacía y clínica, sin alma ni escala.</li>
+        <li>Flash directo, HDR cargado, cielos quemados.</li>
+        <li>Gran angular que curva las paredes.</li>
+        <li>Desorden, cables, reflejos del fotógrafo.</li>
+        <li>Marca de agua grande y opaca encima de la imagen.</li>
+      </ul></div>
+    </div>
+    <div class="stack" style="gap:5mm;">
+      <div class="ph" style="aspect-ratio:4/3;"><img src="211.png" alt="Terraza con pileta y skyline al atardecer"><span class="verdict v-ok">Estándar Bairen</span><span class="cap">Rooftop · cielo y ciudad. Aspiracional y real. Así sí.</span></div>
+      <div class="grid2" style="gap:5mm;">
+        <div class="ph" style="aspect-ratio:1/1;"><img src="226.png" alt="Loft de doble altura con luz natural"><span class="verdict v-ok">Sí</span></div>
+        <div class="ph" style="aspect-ratio:1/1;"><img src="220.png" alt="Dormitorio vacío con ventanal"><span class="verdict v-mid">Estilar</span></div>
+      </div>
+      <p class="small muted">A la izquierda, materialidad y luz: en voz. A la derecha, correcta pero vacía: pide un gesto de vida para no leerse como listing.</p>
+    </div>
+  </div>
+
+  <div class="panel panel--ink" style="margin-top:7mm;">
+    <span class="k">Marca de agua</span>
+    <p style="color:#fff;font-size:9pt;">La firma "GRUPO BAIREN" sobre la foto va sutil: tipografía display, centrada al pie, en blanco al 70% con dos filetes finos a los lados. Nunca grande, nunca opaca, nunca tapando el sujeto. La foto se sostiene sola; la firma solo la acompaña.</p>
+  </div>
+  <div class="foot"><span>04 · Dirección de arte</span><span class="pg">23</span></div>
+</section>
+
+<!-- ════════════════ 24 · 04 VIDEO + REFERENCIAS ════════════════ -->
+<section class="page page--tint">
+  <span class="eyebrow"><span class="sec-num">04</span> &nbsp;Video · el ADN Pinus, sobrio</span>
+  <div class="grid2" style="margin-top:7px;gap:8mm;align-items:start;margin-bottom:9mm;">
+    <div class="flow">
+      <p class="small">Tomamos de Martín Pinus la fuerza del video y la energía aspiracional. Le quitamos el culto al fundador y la épica vendedora. El resultado es contemplativo, no publicitario.</p>
+      <ul class="clean">
+        <li>Planos largos, cámara lenta, paneos suaves.</li>
+        <li>Luz natural y hora dorada; nada de filtros saturados.</li>
+        <li>Una idea por pieza: una luz, un ambiente, una vista.</li>
+        <li>Sonido ambiente o música mínima; jamás voz en off vendedora.</li>
+        <li>Cierre con el Obelisco en oro y la firma corta.</li>
+      </ul>
+    </div>
+    <div class="panel flow" style="background:#fff;">
+      <span class="k">Ritmo de referencia</span>
+      <p class="small">Corte medio de 3 a 5 segundos por plano. El reel respira: prefiere tres planos buenos a diez apurados. La cámara observa, no persigue. Si el video tuviera que justificarse con texto en pantalla gritando, está mal montado.</p>
+    </div>
+  </div>
+
+  <span class="eyebrow">Referencia → directiva accionable</span>
+  <table style="margin-top:5mm;">
+    <tr><th style="width:22%;">Referencia</th><th style="width:40%;">Qué tomar</th><th>Qué descartar</th></tr>
+    <tr><td class="t-strong">Martín Pinus<br><span class="small">@martinpinus_realestate</span></td><td>Ritmo cinematográfico, fuerza del video, energía aspiracional, presencia nativa en redes.</td><td>El fundador como cara. La marca es el héroe, no una persona.</td></tr>
+    <tr><td class="t-strong">Miranda Bosch<br><span class="small">Real Estate &amp; Art</span></td><td>Gravedad institucional, lógica de curaduría, sensación de círculo y pertenencia.</td><td>El arte como muleta y el peso clásico. Somos contemporáneos y digitales.</td></tr>
+    <tr><td class="t-strong">Aesop · Le Labo</td><td>Espacio en blanco generoso, copy sobrio y descriptivo, sistema obsesivo.</td><td>Lo apotecario y lo retro. Tomamos el método, no la estética de farmacia.</td></tr>
+    <tr><td class="t-strong">Aman · Loro Piana</td><td>Lujo callado, materialidad, fotografía editorial, cero urgencia comercial.</td><td>El exotismo de resort. Bairen es urbano y porteño.</td></tr>
+  </table>
+  <p class="small muted" style="margin-top:6mm;">Nota de método: estas directivas se basan en la identidad pública de cada marca (perfiles, web y prensa), recogida en investigación abierta, no en capturas privadas. La identidad de Pinus y Bosch se estudió de sus canales reales.</p>
+  <div class="foot"><span>04 · Dirección de arte</span><span class="pg">24</span></div>
+</section>
+
+<!-- ════════════════ 25 · DIVISOR 05 ════════════════ -->
+<section class="page page--tint">
+  <div style="height:100%;display:flex;flex-direction:column;justify-content:center;">
+    <div class="divider-num">05</div>
+    <span class="eyebrow" style="margin-top:6mm;">En el mundo real</span>
+    <h2 class="h-sec" style="margin-top:8px;font-size:34pt;">Aplicaciones</h2>
+    <p class="lead maxw" style="margin-top:16px;">El sistema puesto a trabajar: web, redes, ficha, mensajería y la sala donde se convence a un propietario.</p>
+  </div>
+  <div class="foot"><span>05 · Aplicaciones</span><span class="pg">25</span></div>
+</section>
+
+<!-- ════════════════ 26 · 05 WEB + REDES ════════════════ -->
+<section class="page">
+  <span class="eyebrow"><span class="sec-num">05</span> &nbsp;Web e Instagram</span>
+  <div class="grid2" style="margin-top:8mm;gap:8mm;align-items:start;">
+    <div class="flow">
+      <p class="h-sub">Web</p>
+      <p class="small">Aplica el sistema evolucionado: superficie light, navy reservado a hero y footer, oro en hairlines y flechas, CTA en tinta. Playfair titula, Jost sostiene, todo respira con paddings de 120px.</p>
+      <div class="mock">
+        <div class="bar"><span class="bw" style="letter-spacing:.4em;font-size:8pt;">BAIREN</span><span class="bn" style="color:var(--gold-light);">Propiedades · Cómo funciona</span></div>
+        <div style="padding:8mm 7mm;background:#fff;">
+          <span style="font-family:var(--font-body);font-size:6.6pt;letter-spacing:.34em;text-transform:uppercase;color:var(--gold-dark);font-weight:600;">Curaduría residencial · Buenos Aires</span>
+          <p style="font-family:var(--font-display);color:var(--navy);font-size:15pt;line-height:1.1;margin:5mm 0;">El departamento que querés.<br><span style="font-style:italic;color:var(--gold-dark);font-size:11pt;">Sin garantía. Sin caución.</span></p>
+          <span class="btn-ink">Ver propiedades <span class="ar">→</span></span>
+        </div>
+      </div>
+    </div>
+    <div class="flow">
+      <p class="h-sub">Instagram / TikTok</p>
+      <p class="small">Grilla coherente, no collage. Alterna foto editorial, video contemplativo y placas tipográficas navy con una frase. La bio deja de decir "marketing inmobiliario".</p>
+      <div class="panel" style="padding:5mm;background:#fff;">
+        <span class="k" style="color:var(--gold-dark);">Bio nueva</span>
+        <p class="small" style="color:var(--navy);">Curaduría residencial en Buenos Aires.<br>Hogares verificados · contrato digital en USD.<br>↓ bairengroup.com</p>
+      </div>
+      <div class="ba" style="margin-top:0;"><div class="cell before"><div class="lab">Post actual</div><p class="t-before">"Mientras mirás Zonaprop, alguien ya lo reservó."</p></div><div class="cell after"><div class="lab">Bairen</div><p class="t-after">"Curado, no listado. Tres lugares nuevos en Belgrano."</p></div></div>
+      <p class="small muted">Placas tipográficas: navy-deeper, Playfair en blanco, una sola idea, filete de oro. La grilla debe verse como un editorial, no como un clasificado.</p>
+    </div>
+  </div>
+  <div class="foot"><span>05 · Aplicaciones</span><span class="pg">26</span></div>
+</section>
+
+<!-- ════════════════ 27 · 05 FICHA + MENSAJERÍA + PITCH ════════════════ -->
+<section class="page page--tint">
+  <span class="eyebrow"><span class="sec-num">05</span> &nbsp;Ficha, mensajería y pitch</span>
+
+  <div class="grid3" style="margin-top:8mm;gap:5mm;align-items:start;">
+    <div class="panel flow" style="background:#fff;">
+      <span class="k" style="color:var(--gold-dark);">Ficha de propiedad</span>
+      <p class="small">Dirección en Playfair, barrio como subtítulo, precio en oro-dark tabular. Descripción sensorial de tres líneas, datos en chips angulares. Una foto estrella manda; el resto, galería ordenada. CTA en tinta: "Coordinar visita".</p>
+    </div>
+    <div class="panel flow" style="background:#fff;">
+      <span class="k" style="color:var(--gold-dark);">WhatsApp y mail</span>
+      <p class="small">WhatsApp: humano y firmado por una persona del equipo, sin plantilla fría. Mail: asunto concreto sin gancho, una idea, firma con logo a 40px y la línea "Curaduría residencial · Buenos Aires".</p>
+    </div>
+    <div class="panel flow" style="background:#fff;">
+      <span class="k" style="color:var(--gold-dark);">Contrato digital</span>
+      <p class="small">Cada cláusula en lenguaje llano, una idea por párrafo. El tono tranquiliza: "Firmás desde tu casa". La experiencia de firma es un pico de marca, no un trámite.</p>
+    </div>
+  </div>
+
+  <span class="eyebrow" style="margin-top:12mm;">Firma de mail</span>
+  <div class="mock" style="margin-top:5mm;max-width:120mm;">
+    <div style="padding:6mm 7mm;background:#fff;display:flex;gap:7mm;align-items:center;">
+      <div style="background:var(--navy-deeper);padding:5mm;display:flex;align-items:center;justify-content:center;"><img src="bairen_logo.png" style="width:16mm;" alt="Bairen"></div>
+      <div>
+        <p style="font-family:var(--font-display);font-size:11pt;color:var(--navy);">Julián · Equipo Bairen</p>
+        <p class="small" style="color:var(--gold-dark);letter-spacing:.16em;text-transform:uppercase;font-size:6.8pt;margin:2px 0 6px;">Curaduría residencial · Buenos Aires</p>
+        <p class="small" style="font-size:7.6pt;">+54 11 2310 6629 · contacto@bairengroup.com · bairengroup.com</p>
+      </div>
+    </div>
+  </div>
+
+  <span class="eyebrow" style="margin-top:11mm;">Pitch a propietarios e inversores</span>
+  <div class="grid2" style="margin-top:5mm;gap:8mm;align-items:start;">
+    <p class="small"><b>Al propietario</b> se le habla de cuidado y previsibilidad: "Su propiedad, curada y verificada, frente a inquilinos calificados. Sin garantía que trabe, contrato en horas." El activo está en buenas manos.</p>
+    <p class="small"><b>Al inversor</b> se le muestra la tesis: el portfolio curado es la prueba de concepto de algo más grande, la infraestructura digital del mercado. Bairen hoy, Bairen OS mañana.</p>
+  </div>
+  <div class="foot"><span>05 · Aplicaciones</span><span class="pg">27</span></div>
+</section>
+
+<!-- ════════════════ 28 · DIVISOR 06 ════════════════ -->
+<section class="page page--dark page--flush">
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse 60% 60% at 30% 40%,rgba(194,169,104,.10),transparent 60%);"></div>
+  <div style="position:absolute;inset:0;padding:30mm 24mm;display:flex;flex-direction:column;justify-content:center;">
+    <div class="divider-num" style="color:rgba(194,169,104,.22);">06</div>
+    <span class="eyebrow" style="margin-top:6mm;">A futuro</span>
+    <h2 style="font-size:34pt;font-weight:400;margin-top:8px;">Marca y<br>arquitectura</h2>
+    <p class="lead" style="margin-top:16px;max-width:150mm;color:rgba(255,255,255,.82);">Cómo crece Bairen sin diluirse: la marca madre, la capa de infraestructura y los módulos. <span style="color:var(--gold-light);font-style:italic;">Visión, todavía no producto.</span></p>
+  </div>
+  <div class="foot"><span>06 · Arquitectura</span><span class="pg">28</span></div>
+</section>
+
+<!-- ════════════════ 29 · 06 ARQUITECTURA ════════════════ -->
+<section class="page">
+  <span class="eyebrow"><span class="sec-num">06</span> &nbsp;Arquitectura de marca</span>
+  <h3 class="h-block" style="margin-top:9px;font-size:14pt;">Una casa madre, capas a futuro</h3>
+  <p class="muted maxw" style="margin-bottom:8mm;">Bairen es hoy la casa de curaduría y su portfolio. Sobre esa prueba de concepto se construyen, a futuro, una capa de infraestructura y módulos especializados. El nombre madre nunca se diluye: las extensiones se nombran <i>desde</i> Bairen.</p>
+
+  <div class="grid3" style="gap:5mm;align-items:stretch;">
+    <div class="panel flow"><span class="tag-pill">Hoy</span><p class="h-sub" style="margin-top:8px;">Bairen</p><p class="small">La marca madre. Casa de curaduría residencial y su portfolio propio. Es el rostro, la voz y el estándar. Todo lo demás hereda de acá.</p></div>
+    <div class="panel flow"><span class="tag-pill">Visión</span><p class="h-sub" style="margin-top:8px;">Bairen OS</p><p class="small">La capa de infraestructura del mercado: el sistema que digitaliza curaduría, verificación y contrato. Marca-sistema, sobria, técnica, sin protagonismo sobre la madre.</p></div>
+    <div class="panel flow"><span class="tag-pill">Visión</span><p class="h-sub" style="margin-top:8px;">Módulos · Prop-Pro</p><p class="small">Herramientas para actores del mercado (ej. Prop-Pro para profesionales). Nombre funcional, siempre con el sello "by Bairen". Nunca compiten en jerarquía con la madre.</p></div>
+  </div>
+
+  <div class="grid2" style="margin-top:11mm;gap:8mm;align-items:start;">
+    <div class="flow">
+      <p class="h-sub">Reglas de extensión</p>
+      <ul class="clean">
+        <li>El logo madre y el Obelisco no se modifican para submarcas; cambia el lockup, no el símbolo.</li>
+        <li>Los nombres de módulo son funcionales y descriptivos, jamás más aspiracionales que Bairen.</li>
+        <li>Toda submarca usa el mismo sistema visual: Playfair + Jost, paleta, geometría angular.</li>
+        <li>Una submarca nunca habla más fuerte que la casa madre.</li>
+      </ul>
+    </div>
+    <div class="flow">
+      <p class="h-sub">Expansión LATAM</p>
+      <ul class="clean">
+        <li>El manifiesto se adapta a la ciudad: "Santiago no se alquila. Se elige." La estructura se conserva, el lugar cambia.</li>
+        <li>El isotipo puede alojar el monumento local solo si mantiene el doble anillo y el trazo en oro.</li>
+        <li>Idéntico sistema verbal y visual; cambia el inventario y el barrio, no la voz.</li>
+        <li>Bairen es la casa; cada ciudad, una sede de la misma casa.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot"><span>06 · Arquitectura</span><span class="pg">29</span></div>
+</section>
+
+<!-- ════════════════ 30 · DIVISOR 07 ════════════════ -->
+<section class="page page--tint">
+  <div style="height:100%;display:flex;flex-direction:column;justify-content:center;">
+    <div class="divider-num">07</div>
+    <span class="eyebrow" style="margin-top:6mm;">Sin complacencia</span>
+    <h2 class="h-sec" style="margin-top:8px;font-size:34pt;">Auto-auditoría</h2>
+    <p class="lead maxw" style="margin-top:16px;">Diez preguntas de control y, sin filtro, los puntos donde la marca todavía corre riesgo de sonar a inmobiliaria.</p>
+  </div>
+  <div class="foot"><span>07 · Auditoría</span><span class="pg">30</span></div>
+</section>
+
+<!-- ════════════════ 31 · 07 CHECKLIST ════════════════ -->
+<section class="page page--dark">
+  <span class="eyebrow"><span class="sec-num" style="color:var(--gold-light);">07</span> &nbsp;Las diez preguntas Bairen</span>
+  <p style="color:rgba(255,255,255,.7);font-size:9.4pt;margin:7px 0 6mm;max-width:150mm;">Antes de publicar cualquier pieza, pasa por estas diez. Si alguna respuesta es "no", se reescribe o se rehace.</p>
+  <div class="checklist">
+    <div class="ck"><span class="n">01</span><p>Tapándole el logo, ¿se lee como una casa de lujo lifestyle y no como una inmobiliaria?</p></div>
+    <div class="ck"><span class="n">02</span><p>¿Está libre de urgencia fabricada, exclamaciones de vendedor y emojis comerciales?</p></div>
+    <div class="ck"><span class="n">03</span><p>¿Muestra el lugar en vez de adjetivarlo? ¿Hay datos concretos en vez de vaguedades?</p></div>
+    <div class="ck"><span class="n">04</span><p>¿Ninguna frase podría aparecer tal cual en Zonaprop o Argenprop?</p></div>
+    <div class="ck"><span class="n">05</span><p>¿La marca es el héroe, sin culto a una persona o fundador?</p></div>
+    <div class="ck"><span class="n">06</span><p>¿La superficie es light-dominante, con navy reservado y oro en susurro?</p></div>
+    <div class="ck"><span class="n">07</span><p>¿Tipografía Playfair + Jost, geometría angular, sin border-radius?</p></div>
+    <div class="ck"><span class="n">08</span><p>¿La foto es editorial y habitada, sin HDR, sin gran angular, sin look de portal?</p></div>
+    <div class="ck"><span class="n">09</span><p>¿La escasez es real ("curado, no listado") y la prueba social, verdadera?</p></div>
+    <div class="ck"><span class="n">10</span><p>¿Suena a alguien con criterio hablando bajo, no a un megáfono?</p></div>
+  </div>
+  <div class="foot"><span>07 · Auditoría</span><span class="pg">31</span></div>
+</section>
+
+<!-- ════════════════ 32 · 07 RIESGOS HONESTOS ════════════════ -->
+<section class="page">
+  <span class="eyebrow"><span class="sec-num">07</span> &nbsp;Donde todavía corremos riesgo</span>
+  <h3 class="h-block" style="margin-top:9px;font-size:14pt;">La parte incómoda, sin filtro</h3>
+  <p class="muted maxw" style="margin-bottom:7mm;">El manual describe el estándar. Hoy, varios activos vivos todavía no lo cumplen. Estos son los focos reales de fuga hacia "inmobiliaria".</p>
+
+  <div class="stack" style="gap:5mm;">
+    <div class="risk"><span class="k">1 · El sitio aún se autodenomina inmobiliaria</span><p>El home dice "Inmobiliaria boutique" y el footer "La inmobiliaria digital premium". Choca de frente con la categoría de casa de curaduría. Mover esos términos a la capa SEO y reescribir el copy visible.</p></div>
+    <div class="risk"><span class="k">2 · La bio de Instagram dice "Marketing inmobiliario"</span><p>Es el lenguaje exacto que el manual prohíbe en la capa de marca. Reemplazar por "Curaduría residencial en Buenos Aires" y depurar la grilla, hoy despareja.</p></div>
+    <div class="risk"><span class="k">3 · Hay urgencia fabricada en redes</span><p>El post "Mientras mirás Zonaprop, alguien ya lo reservó" es venta dura pura. Es eficaz a corto plazo y tóxico para el posicionamiento. Retirarlo y no repetir el patrón.</p></div>
+    <div class="risk"><span class="k">4 · La fotografía es despareja</span><p>Conviven tomas estándar Bairen (rooftop, loft) con fotos de unidad vacía y balance de blancos frío. Sin una dirección de arte firme, el promedio lee a listing, no a editorial.</p></div>
+    <div class="risk"><span class="k">5 · El oro todavía rellena botones</span><p>En el sitio vivo los CTA siguen en oro pleno: lee a lujo tradicional. La migración a CTA en tinta (sistema evolucionado) está pendiente.</p></div>
+    <div class="risk"><span class="k">6 · Riesgo latente de culto a la persona</span><p>Los testimonios giran alrededor de "Julián". Es cálido y humano, pero si se vuelve la cara de la marca, contradice el "la marca es el héroe". Equilibrar lo humano con lo sistémico.</p></div>
+  </div>
+  <div class="foot"><span>07 · Auditoría</span><span class="pg">32</span></div>
+</section>
+
+<!-- ════════════════ 33 · CIERRE ════════════════ -->
+<section class="page page--dark page--flush">
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse 60% 70% at 50% 100%,rgba(194,169,104,.10),transparent 60%);"></div>
+  <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30mm;">
+    <img src="bairen_logo.png" alt="Bairen" style="width:26mm;opacity:.95;" />
+    <div class="rule" style="margin:9mm auto;width:50px;"></div>
+    <p style="font-family:var(--font-display);font-style:italic;font-size:18pt;color:#fff;line-height:1.35;max-width:120mm;">Buenos Aires no se alquila.<br><span style="color:var(--gold-light);">Se elige.</span></p>
+    <p class="small" style="color:rgba(255,255,255,.45);letter-spacing:.26em;text-transform:uppercase;margin-top:12mm;">Bairen · Manual de Marca · 2026</p>
+    <p class="small" style="color:rgba(255,255,255,.32);margin-top:4mm;">Curaduría residencial · Buenos Aires · bairengroup.com</p>
+  </div>
+</section>
+
+</body>
+</html>

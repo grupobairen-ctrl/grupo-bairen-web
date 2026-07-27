@@ -1,0 +1,222 @@
+{
+  "name": "Bairen — Envío de Fotos",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "slug"
+            },
+            {
+              "name": "remoteJid"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -600,
+        320
+      ],
+      "id": "fotos-trigger-0001",
+      "name": "Inicio"
+    },
+    {
+      "parameters": {
+        "url": "https://nmrjyyrhwjroonrppnka.supabase.co/rest/v1/propiedades",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "slug",
+              "value": "=eq.{{ $json.slug }}"
+            },
+            {
+              "name": "select",
+              "value": "imagenes(url,orden)"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "sb_publishable_D0YwiSL5Hm3GyOSx2r1lug_ZV7v46_n"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer sb_publishable_D0YwiSL5Hm3GyOSx2r1lug_ZV7v46_n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -360,
+        320
+      ],
+      "id": "fotos-get-0001",
+      "name": "Traer fotos de Supabase"
+    },
+    {
+      "parameters": {
+        "jsCode": "const res = $input.all();\nlet imgs = [];\nfor (const it of res) {\n  const j = it.json;\n  if (Array.isArray(j)) { for (const p of j) imgs.push(...(p.imagenes || [])); }\n  else if (j.imagenes) { imgs.push(...j.imagenes); }\n  else if (j.url) { imgs.push(j); }\n}\nimgs.sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0));\nconst jid = String($('Inicio').first().json.remoteJid || '');\nconst number = jid.split('@')[0];\nreturn imgs.map((im) => ({ json: { url: im.url, number } }));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -120,
+        320
+      ],
+      "id": "fotos-prep-0001",
+      "name": "Preparar URLs"
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        120,
+        320
+      ],
+      "id": "fotos-loop-0001",
+      "name": "Una por una"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://evolution:8080/message/sendMedia/bairen",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "bairen-evolution-key-cambiala"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"number\": \"{{ $json.number }}\",\n  \"mediatype\": \"image\",\n  \"media\": \"{{ $json.url }}\",\n  \"caption\": \"\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        360,
+        420
+      ],
+      "id": "fotos-send-0001",
+      "name": "Enviar por WhatsApp"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ok-0001",
+              "name": "Mensaje",
+              "value": "Fotos enviadas.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        360,
+        200
+      ],
+      "id": "fotos-done-0001",
+      "name": "Listo"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Inicio": {
+      "main": [
+        [
+          {
+            "node": "Traer fotos de Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Traer fotos de Supabase": {
+      "main": [
+        [
+          {
+            "node": "Preparar URLs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar URLs": {
+      "main": [
+        [
+          {
+            "node": "Una por una",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Una por una": {
+      "main": [
+        [
+          {
+            "node": "Listo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Enviar por WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar por WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "Una por una",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "",
+  "meta": {
+    "instanceId": "bairen"
+  },
+  "tags": []
+}

@@ -1,0 +1,16 @@
+# Config de Netlify para el chatbot Bairen
+[build]
+  publish = "public"
+  functions = "netlify/functions"
+
+# El frontend llama a /api/chat; lo redirigimos a la función serverless.
+[[redirects]]
+  from = "/api/chat"
+  to = "/.netlify/functions/chat"
+  status = 200
+
+# Webhook de WhatsApp (lo que se le da a Meta como Callback URL).
+[[redirects]]
+  from = "/webhook"
+  to = "/.netlify/functions/whatsapp"
+  status = 200
