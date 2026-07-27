@@ -101,6 +101,11 @@ nav {
   transition:color .2s;
 }
 .m-link:hover{color:var(--gold);}
+.lang-switch{display:flex;gap:8px;align-items:center;}
+.flag{width:26px;height:18px;padding:0;border:1px solid rgba(255,255,255,.35);background:none;cursor:pointer;overflow:hidden;opacity:.55;transition:opacity .25s cubic-bezier(0.22,1,0.36,1),border-color .25s,transform .2s;display:block;line-height:0;}
+.flag svg{width:100%;height:100%;display:block;}
+.flag:hover{opacity:.9;transform:translateY(-1px);}
+.flag.active{opacity:1;border-color:#DECDA0;}
 
 /* ─── HERO ────────────────────────────────────────────────────────────── */
 .cat-hero {
@@ -469,6 +474,39 @@ footer{
   *{animation-duration:.01ms!important;}
 }
 *:focus-visible{outline:2px solid var(--gold);outline-offset:3px;}
+
+/* ─── BADGE LIBERACIÓN ─────────────────────────────────────── */
+.badge-liberacion {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(185, 74, 74, 0.15);
+  border: 1px solid rgba(185, 74, 74, 0.3);
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-family: var(--font-body);
+  font-weight: 500;
+  color: #b94a4a;
+  letter-spacing: 0.3px;
+  z-index: 10;
+  animation: badge-pulse 3s ease-in-out infinite;
+  backdrop-filter: blur(4px);
+}
+
+@keyframes badge-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@media (max-width: 640px) {
+  .badge-liberacion {
+    top: 8px;
+    right: 8px;
+    font-size: 11px;
+    padding: 5px 10px;
+  }
+}
 </style>
 </head>
 <body>
@@ -479,19 +517,25 @@ footer{
     <img src="bairen_logo.png?v=3" alt="Grupo Bairen" style="height:46px;width:auto;">
   </a>
   <div class="nav-links">
-    <a href="index.html#nosotros">Por qué Bairen</a>
-    <a href="index.html#pasos">Cómo funciona</a>
-    <a href="index.html#contacto">Contacto</a>
+    <a href="comprar.html" data-i18n="nav_comprar">Comprar</a>
+    <a href="catalogo.html" class="active" data-i18n="nav_alquilar">Alquilar</a>
+    <a href="psi.html">Personal Shopper</a>
+    <a href="index.html#contacto" data-i18n="nav_contacto">Contacto</a>
   </div>
-  <a class="nav-back" href="index.html">← Inicio</a>
+  <div class="lang-switch">
+    <button class="flag" data-lang="es" aria-label="Español" title="Español"><svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#fff"/><rect width="30" height="6.7" fill="#75AADB"/><rect width="30" height="6.7" y="13.3" fill="#75AADB"/><circle cx="15" cy="10" r="2" fill="#F6B40E"/></svg></button>
+    <button class="flag" data-lang="pt" aria-label="Português" title="Português"><svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#009B3A"/><polygon points="15,2.5 27.2,10 15,17.5 2.8,10" fill="#FEDF00"/><circle cx="15" cy="10" r="3.2" fill="#002776"/></svg></button>
+    <button class="flag" data-lang="en" aria-label="English" title="English"><svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#fff"/><rect width="30" height="1.54" fill="#B22234"/><rect width="30" height="1.54" y="3.08" fill="#B22234"/><rect width="30" height="1.54" y="6.15" fill="#B22234"/><rect width="30" height="1.54" y="9.23" fill="#B22234"/><rect width="30" height="1.54" y="12.31" fill="#B22234"/><rect width="30" height="1.54" y="15.38" fill="#B22234"/><rect width="30" height="1.54" y="18.46" fill="#B22234"/><rect width="13" height="10.77" fill="#3C3B6E"/></svg></button>
+  </div>
+  <a class="nav-back" href="index.html" data-i18n="cat_back">← Inicio</a>
   <button class="burger" id="burger" type="button" aria-label="Menú" aria-expanded="false" aria-controls="mobileMenu"><span></span><span></span><span></span></button>
 </nav>
 
 <div class="mobile-menu" id="mobileMenu">
-  <a href="index.html" class="m-link">Inicio</a>
-  <a href="index.html#nosotros" class="m-link">Por qué Bairen</a>
-  <a href="index.html#pasos" class="m-link">Cómo funciona</a>
-  <a href="index.html#contacto" class="m-link">Contacto</a>
+  <a href="comprar.html" class="m-link" data-i18n="nav_comprar">Comprar</a>
+  <a href="catalogo.html" class="m-link" data-i18n="nav_alquilar">Alquilar</a>
+  <a href="psi.html" class="m-link">Personal Shopper</a>
+  <a href="index.html#contacto" class="m-link" data-i18n="nav_contacto">Contacto</a>
 </div>
 
 <!-- HERO -->
@@ -516,7 +560,7 @@ footer{
 
   <!-- BARRIO DROPDOWN TRIGGER -->
   <button class="barrio-trigger" id="barrioTrigger" aria-haspopup="listbox" aria-expanded="false">
-    <span class="bt-label">Barrios</span>
+    <span class="bt-label" data-i18n="cat_barrios">Barrios</span>
     <span class="bt-badge" id="btBadge">1</span>
     <span class="bt-arrow"></span>
   </button>
@@ -525,26 +569,26 @@ footer{
 
   <!-- TIPO PILLS -->
   <div class="tipo-pills">
-    <button class="pill-tipo active" data-tipo="todos">Todos</button>
-    <button class="pill-tipo" data-tipo="Temporal">Temporal</button>
-    <button class="pill-tipo" data-tipo="Tradicional">Tradicional</button>
+    <button class="pill-tipo active" data-tipo="todos" data-i18n="cat_todos">Todos</button>
+    <button class="pill-tipo" data-tipo="Temporal" data-i18n="cat_temporal">Temporal</button>
+    <button class="pill-tipo" data-tipo="Tradicional" data-i18n="cat_tradicional">Tradicional</button>
   </div>
 
   <!-- SEARCH -->
   <div class="search-wrap">
     <label class="sr-only" for="searchInput">Buscar propiedad</label>
-    <input class="search-input" type="search" id="searchInput" placeholder="Buscar dirección o barrio…" autocomplete="off" aria-label="Buscar dirección o barrio"/>
+    <input class="search-input" type="search" id="searchInput" placeholder="Buscar dirección o barrio…" data-i18n-ph="cat_search_ph" autocomplete="off" aria-label="Buscar dirección o barrio"/>
   </div>
 
 </div>
 
 <!-- BARRIO DROPDOWN PANEL (outside sticky bar so it overflows correctly) -->
 <div class="barrio-dropdown" id="barrioDropdown" role="listbox" aria-label="Filtrar por barrio">
-  <p class="bd-head">Seleccioná un barrio</p>
+  <p class="bd-head" data-i18n="cat_barrio_head">Seleccioná un barrio</p>
   <div class="bd-grid" id="bdGrid">
     <!-- pills rendered by JS -->
   </div>
-  <button class="bd-clear" id="bdClear">Limpiar filtro</button>
+  <button class="bd-clear" id="bdClear" data-i18n="cat_barrio_clear">Limpiar filtro</button>
 </div>
 
 <!-- RESULTADOS -->
@@ -552,10 +596,10 @@ footer{
   <span class="results-count" id="resultsCount">0 propiedades</span>
   <label class="sr-only" for="sortSelect">Ordenar propiedades</label>
   <select class="sort-select" id="sortSelect" aria-label="Ordenar propiedades">
-    <option value="default">Ordenar por defecto</option>
-    <option value="precio-asc">Precio: menor a mayor</option>
-    <option value="precio-desc">Precio: mayor a menor</option>
-    <option value="m2-desc">Mayor superficie</option>
+    <option value="default" data-i18n="cat_sort_default">Ordenar por defecto</option>
+    <option value="precio-asc" data-i18n="cat_sort_pasc">Precio: menor a mayor</option>
+    <option value="precio-desc" data-i18n="cat_sort_pdesc">Precio: mayor a menor</option>
+    <option value="m2-desc" data-i18n="cat_sort_m2">Mayor superficie</option>
   </select>
 </div>
 
@@ -570,9 +614,10 @@ footer{
 <!-- FOOTER -->
 <footer>
   <img src="bairen_logo.png?v=3" alt="Grupo Bairen" style="height:40px;width:auto;opacity:.85;">
-  <span class="ft-copy">© 2026 Grupo Bairen · Todos los derechos reservados</span>
+  <span class="ft-copy" data-i18n="cat_copy">© 2026 Grupo Bairen · Todos los derechos reservados</span>
 </footer>
 
+<script src="i18n.js"></script>
 <script src="supabase-config.js"></script>
 <script>
 /* ═══════════════════════════════════════════════════════════════
@@ -724,13 +769,50 @@ function sorted(arr) {
   return a;
 }
 
+/* Textos dinámicos del catálogo por idioma (lee window.BAIREN_LANG de i18n.js) */
+const CT = {
+  es: {
+    title_todos:'Todas las propiedades', sub_todos:'Alquileres temporales y tradicionales en CABA y GBA Norte', tag_todos:'DISPONIBLES AHORA', text_todos:'Temporales con todo incluido desde el día uno, y tradicionales anuales sin amoblar. Filtrá por tipo o buscá por dirección para encontrar tu próxima propiedad.',
+    title_temp:'Alquileres temporales', sub_temp:'Estadías de 3 a 12 meses · Amoblados · Todo incluido', tag_temp:'PRECIO FINAL', text_temp:'Los precios publicados son finales e incluyen garantía inmobiliaria, mobiliario completo y todos los servicios (luz, gas, agua, wifi, expensas).',
+    title_trad:'Alquileres tradicionales', sub_trad:'Contratos anuales · Sin amoblar · Servicios no incluídos', tag_trad:'ALQUILER TRADICIONAL', text_trad:'Contratos a 12 meses sin amoblar. La propiedad es tuya para decorar y habitar a tu manera.',
+    count_one:'propiedad', count_many:'propiedades', empty_t:'Sin resultados', empty_s:'Probá con otro barrio o tipo de alquiler.',
+    loading:'Cargando propiedades...', err_t:'No pudimos cargar las propiedades', err_s:'Revisá la conexión a internet. Si el problema persiste, contactanos por WhatsApp.',
+    per_month:'por mes', per_month_all:'por mes · all in', consult:'Consultar precio', ver_mas:'Ver más →',
+    disponible:'Disponible', reservado:'Reservado', serv_allin:'All in', serv_sin:'Sin incl.', serv_lbl:'Servicios',
+    amb:'Amb.', sup:'Sup.', foto_ph:'Fotografía de la unidad', tipo_temporal:'Temporal', tipo_tradicional:'Tradicional'
+  },
+  pt: {
+    title_todos:'Todos os imóveis', sub_todos:'Aluguéis por temporada e tradicionais em CABA e GBA Norte', tag_todos:'DISPONÍVEIS AGORA', text_todos:'Temporada com tudo incluído desde o primeiro dia, e tradicionais anuais sem mobília. Filtre por tipo ou busque por endereço para encontrar seu próximo imóvel.',
+    title_temp:'Aluguéis por temporada', sub_temp:'Estadias de 3 a 12 meses · Mobiliados · Tudo incluído', tag_temp:'PREÇO FINAL', text_temp:'Os preços publicados são finais e incluem garantia imobiliária, mobília completa e todos os serviços (luz, gás, água, wifi, condomínio).',
+    title_trad:'Aluguéis tradicionais', sub_trad:'Contratos anuais · Sem mobília · Serviços não incluídos', tag_trad:'ALUGUEL TRADICIONAL', text_trad:'Contratos de 12 meses sem mobília. O imóvel é seu para decorar e morar do seu jeito.',
+    count_one:'imóvel', count_many:'imóveis', empty_t:'Sem resultados', empty_s:'Tente outro bairro ou tipo de aluguel.',
+    loading:'Carregando imóveis...', err_t:'Não foi possível carregar os imóveis', err_s:'Verifique sua conexão. Se o problema persistir, fale conosco pelo WhatsApp.',
+    per_month:'por mês', per_month_all:'por mês · tudo incluído', consult:'Consultar preço', ver_mas:'Ver mais →',
+    disponible:'Disponível', reservado:'Reservado', serv_allin:'Tudo incl.', serv_sin:'Não incl.', serv_lbl:'Serviços',
+    amb:'Amb.', sup:'Sup.', foto_ph:'Foto do imóvel', tipo_temporal:'Temporada', tipo_tradicional:'Tradicional'
+  },
+  en: {
+    title_todos:'All properties', sub_todos:'Short and long-term rentals in CABA and GBA Norte', tag_todos:'AVAILABLE NOW', text_todos:'Short-term with everything included from day one, and traditional yearly rentals unfurnished. Filter by type or search by address to find your next property.',
+    title_temp:'Short-term rentals', sub_temp:'Stays from 3 to 12 months · Furnished · All inclusive', tag_temp:'FINAL PRICE', text_temp:'Published prices are final and include rental guarantee, full furnishing and all utilities (electricity, gas, water, wifi, building fees).',
+    title_trad:'Long-term rentals', sub_trad:'Yearly contracts · Unfurnished · Utilities not included', tag_trad:'LONG-TERM RENTAL', text_trad:'12-month unfurnished contracts. The property is yours to decorate and live in your way.',
+    count_one:'property', count_many:'properties', empty_t:'No results', empty_s:'Try another neighbourhood or rental type.',
+    loading:'Loading properties...', err_t:'We could not load the properties', err_s:'Check your internet connection. If the problem persists, contact us on WhatsApp.',
+    per_month:'per month', per_month_all:'per month · all in', consult:'Ask for price', ver_mas:'See more →',
+    disponible:'Available', reservado:'Reserved', serv_allin:'All in', serv_sin:'Not incl.', serv_lbl:'Services',
+    amb:'Rooms', sup:'Area', foto_ph:'Unit photo', tipo_temporal:'Short-term', tipo_tradicional:'Long-term'
+  }
+};
+const L = () => (window.BAIREN_LANG || 'es');
+const ct = (k) => { const d = CT[L()] || CT.es; return d[k] != null ? d[k] : CT.es[k]; };
+const tipoLabel = (t) => t === 'Temporal' ? ct('tipo_temporal') : ct('tipo_tradicional');
+
 function priceHTML(p) {
   if (p.precio > 0) {
     const fmt = p.precio.toLocaleString('es-AR').replace(/\./g,'.'); // punto como miles
-    const period = p.tipo === 'Temporal' ? 'por mes · all in' : 'por mes';
+    const period = p.tipo === 'Temporal' ? ct('per_month_all') : ct('per_month');
     return `<div class="card-price"><span class="price-amount">USD ${fmt}</span><br><span class="price-period">${period}</span></div>`;
   }
-  return `<div class="card-price"><span class="price-consult">Consultar precio</span></div>`;
+  return `<div class="card-price"><span class="price-consult">${ct('consult')}</span></div>`;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -744,23 +826,23 @@ function updateCatalogHero() {
   const bText  = document.getElementById('typeBannerText');
 
   if (activeTipo === 'Temporal') {
-    title.textContent = 'Alquileres temporales';
-    sub.textContent   = 'Estadías de 3 a 12 meses · Amoblados · Todo incluido';
+    title.textContent = ct('title_temp');
+    sub.textContent   = ct('sub_temp');
     banner.style.display = 'block';
-    bTag.textContent  = 'PRECIO FINAL';
-    bText.textContent = 'Los precios publicados son finales e incluyen garantía inmobiliaria, mobiliario completo y todos los servicios (luz, gas, agua, wifi, expensas).';
+    bTag.textContent  = ct('tag_temp');
+    bText.textContent = ct('text_temp');
   } else if (activeTipo === 'Tradicional') {
-    title.textContent = 'Alquileres tradicionales';
-    sub.textContent   = 'Contratos anuales · Sin amoblar · Servicios no incluídos';
+    title.textContent = ct('title_trad');
+    sub.textContent   = ct('sub_trad');
     banner.style.display = 'block';
-    bTag.textContent  = 'ALQUILER TRADICIONAL';
-    bText.textContent = 'Contratos a 12 meses sin amoblar. La propiedad es tuya para decorar y habitar a tu manera.';
+    bTag.textContent  = ct('tag_trad');
+    bText.textContent = ct('text_trad');
   } else {
-    title.textContent = 'Todas las propiedades';
-    sub.textContent   = 'Alquileres temporales y tradicionales en CABA y GBA Norte';
+    title.textContent = ct('title_todos');
+    sub.textContent   = ct('sub_todos');
     banner.style.display = 'block';
-    bTag.textContent  = 'DISPONIBLES AHORA';
-    bText.textContent = 'Temporales con todo incluido desde el día uno, y tradicionales anuales sin amoblar. Filtrá por tipo o buscá por dirección para encontrar tu próxima propiedad.';
+    bTag.textContent  = ct('tag_todos');
+    bText.textContent = ct('text_todos');
   }
 }
 
@@ -771,10 +853,10 @@ function render() {
   const grid = document.getElementById('catalogGrid');
   const list = sorted(filtered());
   updateCatalogHero();
-  document.getElementById('resultsCount').textContent = `${list.length} propiedad${list.length !== 1 ? 'es' : ''}`;
+  document.getElementById('resultsCount').textContent = `${list.length} ${list.length !== 1 ? ct('count_many') : ct('count_one')}`;
 
   if (!list.length) {
-    grid.innerHTML = `<div class="empty-state"><div class="empty-title">Sin resultados</div><div class="empty-sub">Probá con otro barrio o tipo de alquiler.</div></div>`;
+    grid.innerHTML = `<div class="empty-state"><div class="empty-title">${ct('empty_t')}</div><div class="empty-sub">${ct('empty_s')}</div></div>`;
     return;
   }
 
@@ -784,30 +866,31 @@ function render() {
     const chips    = p.amenities.slice(0,4).map(a => `<span class="chip">${a}</span>`).join('');
     const reservado= p.estado === 'Ocupado' || p.estado === 'Reservado';
     const statCls  = reservado ? 'status-reservado' : 'status-disponible';
-    const statTxt  = reservado ? 'Reservado' : 'Disponible';
+    const statTxt  = reservado ? ct('reservado') : ct('disponible');
     const destino  = p.slug ? `propiedad.html?slug=${encodeURIComponent(p.slug)}` : '#';
-    const ctaTxt   = 'Ver más →';
+    const ctaTxt   = ct('ver_mas');
     const serviciosSpec = p.tipo === 'Temporal'
-      ? `<div class="spec"><span class="spec-val">All in</span><span class="spec-lbl">Servicios</span></div>`
-      : `<div class="spec"><span class="spec-val">Sin incl.</span><span class="spec-lbl">Servicios</span></div>`;
+      ? `<div class="spec"><span class="spec-val">${ct('serv_allin')}</span><span class="spec-lbl">${ct('serv_lbl')}</span></div>`
+      : `<div class="spec"><span class="spec-val">${ct('serv_sin')}</span><span class="spec-lbl">${ct('serv_lbl')}</span></div>`;
     const imgHTML = p.foto
       ? `<img src="${p.foto}" alt="${p.dir} — foto principal" loading="lazy">`
-      : `<span class="card-img-placeholder">Fotografía de la unidad</span>`;
+      : `<span class="card-img-placeholder">${ct('foto_ph')}</span>`;
 
     const aria = `Ver ${p.dir}${unidad} en ${p.barrio}`;
     return `
     <a class="prop-card" href="${destino}" aria-label="${aria.replace(/"/g,'&quot;')}">
       <div class="card-img">
         ${imgHTML}
-        <span class="card-tag tag-${p.tipo.toLowerCase()}">${p.tipo}</span>
+        <span class="card-tag tag-${p.tipo.toLowerCase()}">${tipoLabel(p.tipo)}</span>
         <span class="card-status ${statCls}">${statTxt}</span>
+        ${p.estado === 'Reservado' && p.fecha_liberacion ? `<div class="badge-liberacion"><span>${formatFechaLiberacion(p.fecha_liberacion)}</span></div>` : ''}
       </div>
       <div class="card-body">
         <div class="card-address">${p.dir}${unidad}</div>
         <div class="card-barrio">${p.barrio}</div>
         <div class="card-specs">
-          <div class="spec"><span class="spec-val">${p.amb}</span><span class="spec-lbl">Amb.</span></div>
-          <div class="spec"><span class="spec-val">${m2txt}</span><span class="spec-lbl">Sup.</span></div>
+          <div class="spec"><span class="spec-val">${p.amb}</span><span class="spec-lbl">${ct('amb')}</span></div>
+          <div class="spec"><span class="spec-val">${m2txt}</span><span class="spec-lbl">${ct('sup')}</span></div>
           ${serviciosSpec}
         </div>
         ${chips ? `<div class="card-amenities">${chips}</div>` : ''}
@@ -904,8 +987,31 @@ async function loadFromSupabase() {
     console.error('[catalogo] Error cargando propiedades:', err);
     props = [];
     const grid = document.getElementById('catalogGrid');
-    grid.innerHTML = '<div class="empty-state"><div class="empty-title">No pudimos cargar las propiedades</div><div class="empty-sub">Revisá la conexión a internet. Si el problema persiste, contactanos por WhatsApp.</div></div>';
+    grid.innerHTML = `<div class="empty-state"><div class="empty-title">${ct('err_t')}</div><div class="empty-sub">${ct('err_s')}</div></div>`;
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FECHA LIBERACIÓN
+═══════════════════════════════════════════════════════════════ */
+function formatFechaLiberacion(fechaStr) {
+  if (!fechaStr) return null;
+
+  const fecha = new Date(fechaStr);
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+  fecha.setHours(0, 0, 0, 0);
+
+  const diffMs = fecha - hoy;
+  const diffDias = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffDias === 0) return "Se libera hoy";
+  if (diffDias === 1) return "Se libera mañana";
+  if (diffDias > 1 && diffDias <= 7) return `Se libera en ${diffDias} días`;
+
+  const opciones = { month: 'long', day: 'numeric', year: 'numeric' };
+  const formatted = fecha.toLocaleDateString('es-AR', opciones);
+  return `Se libera: ${formatted}`;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -915,10 +1021,11 @@ buildBarrioPills();
 readURLParams();
 
 // Loading state inicial
-document.getElementById('catalogGrid').innerHTML = '<div class="empty-state"><div class="empty-title">Cargando propiedades...</div></div>';
+document.getElementById('catalogGrid').innerHTML = `<div class="empty-state"><div class="empty-title">${ct('loading')}</div></div>`;
 document.getElementById('resultsCount').textContent = '';
 
 loadFromSupabase().then(() => render());
+document.addEventListener('bairen:lang', () => { if (Array.isArray(props) && props.length) render(); });
 </script>
 </body>
 </html>

@@ -313,17 +313,19 @@ textarea.fi{resize:vertical;min-height:96px;line-height:1.6;}
                   <option value="San Isidro"><option value="Vicente López"><option value="Olivos">
                 </datalist>
               </div>
-              <div class="fg"><label class="lbl" for="fTipo">Tipo de alquiler<span class="req">*</span></label>
+              <div class="fg"><label class="lbl" for="fTipo">Tipo de operación<span class="req">*</span></label>
                 <select class="fi" id="fTipo">
                   <option value="Temporal">Temporal</option>
                   <option value="Tradicional">Tradicional</option>
                   <option value="Ambos">Ambos (Temporal y Tradicional)</option>
+                  <option value="Venta">Venta</option>
                 </select>
               </div>
             </div>
             <div class="row2">
               <div class="fg" id="fgPrecioTemp"><label class="lbl" for="fPrecioTemp">Precio temporal (USD/mes)</label><input class="fi" id="fPrecioTemp" type="number" min="0" placeholder="0 = consultar"></div>
               <div class="fg" id="fgPrecioTrad"><label class="lbl" for="fPrecioTrad">Precio tradicional (USD/mes)</label><input class="fi" id="fPrecioTrad" type="number" min="0" placeholder="0 = consultar"></div>
+              <div class="fg" id="fgPrecioVenta"><label class="lbl" for="fPrecioVenta">Precio de venta (USD)</label><input class="fi" id="fPrecioVenta" type="number" min="0" placeholder="0 = consultar"></div>
             </div>
             <div class="row3">
               <div class="fg"><label class="lbl" for="fAmb">Ambientes</label><input class="fi" id="fAmb" type="number" min="1" max="10" placeholder="2"></div>
@@ -336,7 +338,7 @@ textarea.fi{resize:vertical;min-height:96px;line-height:1.6;}
               </div>
             </div>
             <div class="row2">
-              <div class="fg"><label class="lbl" for="fPlazo">Plazo</label><input class="fi" id="fPlazo" type="text" placeholder="3-12 meses"></div>
+              <div class="fg" id="fgPlazo"><label class="lbl" for="fPlazo">Plazo</label><input class="fi" id="fPlazo" type="text" placeholder="3-12 meses"></div>
               <div></div>
             </div>
           </div>
@@ -563,6 +565,7 @@ function priceForCard(p) {
   }
   if (p.tipo === 'Temporal')    return fmtUSD(p.precio_temporal);
   if (p.tipo === 'Tradicional') return fmtUSD(p.precio_tradicional);
+  if (p.tipo === 'Venta')       return fmtUSD(p.precio_venta);
   return '—';
 }
 
@@ -793,7 +796,7 @@ function openForm(prop) {
   state.vType = 'bunny';
 
   // reset campos
-  ['fDir','fUnidad','fBarrio','fPrecioTemp','fPrecioTrad','fAmb','fM2','fPlazo','fDesc','fVideo'].forEach(id => $(id).value = '');
+  ['fDir','fUnidad','fBarrio','fPrecioTemp','fPrecioTrad','fPrecioVenta','fAmb','fM2','fPlazo','fDesc','fVideo'].forEach(id => $(id).value = '');
   $('fTipo').value = 'Temporal';
   $('fEstado').value = 'Disponible';
   $('fPlazo').value = defaultPlazoForTipo('Temporal');
@@ -807,6 +810,7 @@ function openForm(prop) {
     $('fTipo').value        = prop.tipo || 'Temporal';
     $('fPrecioTemp').value  = prop.precio_temporal || '';
     $('fPrecioTrad').value  = prop.precio_tradicional || '';
+    $('fPrecioVenta').value = prop.precio_venta || '';
     $('fAmb').value         = prop.ambientes || '';
     $('fM2').value          = prop.m2 || '';
     $('fEstado').value      = prop.estado || 'Disponible';
@@ -1068,9 +1072,12 @@ function togglePricesByTipo() {
   const t = $('fTipo').value;
   $('fgPrecioTemp').style.display = (t === 'Temporal' || t === 'Ambos') ? '' : 'none';
   $('fgPrecioTrad').style.display = (t === 'Tradicional' || t === 'Ambos') ? '' : 'none';
+  $('fgPrecioVenta').style.display = (t === 'Venta') ? '' : 'none';
+  // El plazo no aplica a una venta.
+  $('fgPlazo').style.display = (t === 'Venta') ? 'none' : '';
   // Si el plazo está en un valor default, actualizarlo al default del nuevo tipo.
   const curPlazo = $('fPlazo').value.trim();
-  if (DEFAULT_PLAZO_VALUES.has(curPlazo)) {
+  if (t !== 'Venta' && DEFAULT_PLAZO_VALUES.has(curPlazo)) {
     $('fPlazo').value = defaultPlazoForTipo(t);
   }
 }
@@ -1085,14 +1092,16 @@ function collectFormData() {
   const tipo = $('fTipo').value;
   const precioTemp = parseFloat($('fPrecioTemp').value) || null;
   const precioTrad = parseFloat($('fPrecioTrad').value) || null;
+  const precioVenta = parseFloat($('fPrecioVenta').value) || null;
   return {
     slug: makeSlug(dir, unidad),
     dir, unidad: unidad || null, barrio, tipo,
     precio_temporal:    (tipo === 'Temporal' || tipo === 'Ambos') ? precioTemp : null,
     precio_tradicional: (tipo === 'Tradicional' || tipo === 'Ambos') ? precioTrad : null,
+    precio_venta:       (tipo === 'Venta') ? precioVenta : null,
     ambientes:    parseInt($('fAmb').value) || null,
     m2:           parseInt($('fM2').value) || null,
-    plazo:        $('fPlazo').value.trim() || defaultPlazoForTipo(tipo),
+    plazo:        (tipo === 'Venta') ? null : ($('fPlazo').value.trim() || defaultPlazoForTipo(tipo)),
     estado:       $('fEstado').value,
     descripcion:  $('fDesc').value.trim() || null,
     video_url:    processVideoUrl($('fVideo').value, state.vType),
@@ -1103,13 +1112,15 @@ function collectFormData() {
 function validate(d) {
   if (!d.dir)    return 'Falta la dirección.';
   if (!d.barrio) return 'Falta el barrio.';
-  if (!d.tipo)   return 'Falta el tipo de alquiler.';
+  if (!d.tipo)   return 'Falta el tipo de operación.';
   if (d.tipo === 'Temporal' && !d.precio_temporal)
     return 'Falta el precio temporal (o poné 0 si es "consultar").';
   if (d.tipo === 'Tradicional' && !d.precio_tradicional)
     return 'Falta el precio tradicional.';
   if (d.tipo === 'Ambos' && (!d.precio_temporal || !d.precio_tradicional))
     return 'Si el tipo es "Ambos", necesitás los dos precios.';
+  if (d.tipo === 'Venta' && !d.precio_venta)
+    return 'Falta el precio de venta (o poné 0 si es "consultar").';
   if (state.photos.length === 0)
     return 'Subí al menos una foto (será la portada).';
   return null;
@@ -1329,6 +1340,7 @@ function snapshotForm() {
       tipo:       $('fTipo').value,
       precioTemp: $('fPrecioTemp').value,
       precioTrad: $('fPrecioTrad').value,
+      precioVenta: $('fPrecioVenta').value,
       amb:        $('fAmb').value,
       m2:         $('fM2').value,
       estado:     $('fEstado').value,
@@ -1385,6 +1397,7 @@ async function restoreDraftIntoForm(draft) {
   $('fTipo').value        = f.tipo || 'Temporal';
   $('fPrecioTemp').value  = f.precioTemp || '';
   $('fPrecioTrad').value  = f.precioTrad || '';
+  $('fPrecioVenta').value = f.precioVenta || '';
   $('fAmb').value         = f.amb || '';
   $('fM2').value          = f.m2 || '';
   $('fEstado').value      = f.estado || 'Disponible';
@@ -1481,7 +1494,7 @@ function showDraftBanner(draft) {
 }
 
 function wireAutosave() {
-  const ids = ['fDir','fUnidad','fBarrio','fTipo','fPrecioTemp','fPrecioTrad',
+  const ids = ['fDir','fUnidad','fBarrio','fTipo','fPrecioTemp','fPrecioTrad','fPrecioVenta',
                'fAmb','fM2','fEstado','fPlazo','fDesc','fVideo'];
   ids.forEach(id => {
     const el = $(id);

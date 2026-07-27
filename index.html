@@ -39,7 +39,7 @@
     "image": "https://bairengroup.com/og-card.jpg",
     "description": "Inmobiliaria boutique en Buenos Aires. Alquileres temporales y tradicionales sin garantía propietaria, en CABA y GBA Norte. Contratos digitales en USD.",
     "telephone": "+54 11 2310 6629",
-    "email": "grupobairen@gmail.com",
+    "email": "contacto@bairengroup.com",
     "priceRange": "USD 700 - USD 5000",
     "areaServed": [
       { "@type": "City", "name": "Ciudad Autónoma de Buenos Aires" },
@@ -196,75 +196,60 @@
     }
     .btn-gold:active{transform:scale(0.97);}
     @media(max-width:700px){.btn-gold{padding:20px 32px;width:100%;justify-content:center;}}
-    /* CTA sobre superficie oscura (hero): relleno crema, texto navy, flecha oro */
-    .hero .btn-gold{background:var(--white);color:var(--navy);}
-    .hero .btn-gold svg{stroke:var(--gold-dark);}
-    @media(hover:hover) and (pointer:fine){.hero .btn-gold:hover{background:var(--off-white);box-shadow:0 12px 40px rgba(0,0,0,.32);}}
-
-    .hero{min-height:100svh;display:flex;align-items:flex-end;position:relative;background:var(--navy-deeper);overflow:hidden;isolation:isolate;}
+    .hero{min-height:100svh;display:flex;align-items:center;justify-content:center;text-align:center;position:relative;background:var(--navy-deeper);overflow:hidden;isolation:isolate;}
     .hero-bg{position:absolute;inset:0;overflow:hidden;background:var(--navy-deeper);}
     .hero-bg video,.hero-bg img{
       position:absolute;inset:0;width:100%;height:100%;
       object-fit:cover;object-position:center 42%;
       opacity:0;animation:heroFadeIn 1.6s var(--ease) .2s forwards;
-      filter:saturate(.88) contrast(1.06) brightness(.95);
+      filter:saturate(.9) contrast(1.06) brightness(.92);
     }
-    /* Vignette radial: oscurece las esquinas, enmarca la escena como una pantalla de cine */
+    /* Vignette radial suave para enmarcar la escena */
     .hero-bg::before{
       content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
-      background:radial-gradient(ellipse 95% 85% at center 42%, transparent 28%, rgba(11,17,28,.45) 75%, rgba(11,17,28,.78) 100%);
+      background:radial-gradient(ellipse 100% 92% at center 45%, transparent 30%, rgba(11,17,28,.5) 82%, rgba(11,17,28,.8) 100%);
     }
-    /* Gradient inferior fuerte para legibilidad + atmósfera arriba */
+    /* Velo parejo para legibilidad del texto centrado */
     .hero-bg::after{
       content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
-      background:
-        linear-gradient(180deg,rgba(19,29,45,.55) 0%,rgba(19,29,45,.08) 14%,transparent 30%,transparent 50%,rgba(19,29,45,.72) 84%,rgba(19,29,45,.96) 100%),
-        linear-gradient(95deg,rgba(11,17,28,.45) 0%,rgba(11,17,28,.1) 30%,transparent 55%);
+      background:linear-gradient(180deg,rgba(19,29,45,.58) 0%,rgba(19,29,45,.4) 42%,rgba(19,29,45,.4) 60%,rgba(19,29,45,.72) 100%);
     }
     @keyframes heroFadeIn{to{opacity:1;}}
 
-    .hero-content{position:relative;z-index:2;max-width:680px;padding:140px 80px 88px;width:100%;}
+    .hero-content{position:relative;z-index:2;max-width:940px;margin:0 auto;padding:96px 24px;width:100%;display:flex;flex-direction:column;align-items:center;}
 
-    .hero-eyebrow{
-      display:inline-flex;align-items:center;gap:14px;
-      font-size:.62rem;letter-spacing:.42em;text-transform:uppercase;
-      color:var(--gold-light);margin-bottom:36px;font-weight:500;
-      opacity:0;animation:fadeUp .9s var(--ease) .35s forwards;
+    /* Selector de idioma (banderas) sobre el video, bajo la barra */
+    .lang-switch{position:absolute;top:80px;right:22px;z-index:6;display:flex;gap:9px;}
+    .flag{width:28px;height:19px;padding:0;border:1px solid rgba(255,255,255,.4);background:none;cursor:pointer;overflow:hidden;opacity:.55;transition:opacity .25s var(--ease),border-color .25s,transform .2s;display:block;line-height:0;}
+    .flag svg{width:100%;height:100%;display:block;}
+    .flag:hover{opacity:.9;transform:translateY(-1px);}
+    .flag.active{opacity:1;border-color:var(--gold-light);}
+    @media(max-width:700px){.lang-switch{top:74px;right:16px;gap:7px;}.flag{width:25px;height:17px;}}
+
+    .hero-title{font-family:var(--font-display);font-weight:500;font-style:normal;color:var(--white);display:flex;flex-direction:column;align-items:center;font-size:clamp(2rem,4.6vw,3.5rem);line-height:1.16;letter-spacing:-.01em;text-align:center;text-shadow:0 2px 26px rgba(0,0,0,.45);opacity:0;animation:fadeUp 1s var(--ease) .4s forwards;}
+    .hero-sig{font-family:var(--font-display);font-style:italic;font-weight:400;font-size:clamp(1.05rem,1.9vw,1.4rem);letter-spacing:.02em;color:var(--gold-light);margin:18px 0 34px;text-shadow:0 1px 14px rgba(0,0,0,.4);opacity:0;animation:fadeUp .9s var(--ease) .62s forwards;}
+    .hero-actions{display:flex;flex-direction:row;justify-content:center;flex-wrap:wrap;gap:14px;opacity:0;animation:fadeUp .9s var(--ease) .82s forwards;}
+    .hbtn{display:inline-flex;align-items:center;justify-content:center;font-family:var(--font-body);font-size:.64rem;font-weight:500;letter-spacing:.26em;text-transform:uppercase;padding:16px 42px;border:1px solid transparent;cursor:pointer;transition:background .35s var(--ease),color .3s var(--ease),border-color .35s var(--ease),transform .3s var(--ease),box-shadow .35s var(--ease);min-width:168px;}
+    /* Primario: marfil champagne sólido sobre el fondo oscuro. Visible y sobrio. */
+    .hbtn-solid{background:var(--off-white);color:var(--navy-deeper);border-color:var(--off-white);}
+    /* Secundario: línea fina marfil, sin relleno. Elegante. */
+    .hbtn-line{background:transparent;color:var(--white);border-color:rgba(238,229,208,.5);}
+    @media(hover:hover) and (pointer:fine){
+      .hbtn-solid:hover{background:#fff;border-color:#fff;transform:translateY(-2px);box-shadow:0 14px 38px rgba(0,0,0,.26);}
+      .hbtn-line:hover{background:rgba(238,229,208,.12);border-color:var(--off-white);transform:translateY(-2px);}
     }
-    .hero-eyebrow::before{content:'';display:block;width:36px;height:1px;background:var(--gold);}
-    .hero-title{
-      font-family:var(--font-display);font-weight:400;
-      font-size:clamp(2.4rem,5.2vw,4.4rem);
-      line-height:1.04;color:var(--white);letter-spacing:-.012em;
-      text-shadow:0 2px 32px rgba(0,0,0,.42);
-      opacity:0;animation:fadeUp 1s var(--ease) .55s forwards;
-      max-width:11ch;
-    }
-    .hero-tag{
-      display:block;font-family:var(--font-display);font-style:italic;font-weight:400;
-      font-size:clamp(1rem,1.6vw,1.35rem);color:var(--gold-light);
-      letter-spacing:.01em;margin-top:18px;
-      text-shadow:0 1px 16px rgba(0,0,0,.45);
-      opacity:0;animation:fadeUp .9s var(--ease) .75s forwards;
-    }
-    .hero-rule{width:56px;height:1px;background:var(--gold);margin:40px 0 32px;opacity:0;animation:fadeUp .7s var(--ease) .92s forwards;}
-    .hero-actions{display:flex;flex-direction:column;gap:18px;opacity:0;animation:fadeUp .9s var(--ease) 1.05s forwards;}
-    .hero-trad-link{font-size:.74rem;font-weight:400;letter-spacing:.04em;color:rgba(255,255,255,.62);transition:color .25s;align-self:flex-start;border-bottom:1px solid rgba(255,255,255,.22);padding-bottom:2px;}
-    .hero-trad-link:hover{color:var(--white);border-color:rgba(255,255,255,.55);}
-    @keyframes fadeUp{from{opacity:0;transform:translateY(22px);}to{opacity:1;transform:none;}}
+    .hero-psi{margin-top:28px;font-size:.9rem;color:rgba(251,250,246,.88);max-width:48ch;opacity:0;animation:fadeUp .9s var(--ease) 1s forwards;}
+    .hero-psi a{color:var(--gold-light);border-bottom:1px solid var(--gold-light);padding-bottom:2px;transition:color .2s,border-color .2s;}
+    .hero-psi a:hover{color:var(--white);border-color:var(--white);}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:none;}}
 
     @media(max-width:700px){
-      .hero{align-items:flex-end;min-height:100svh;}
-      .hero-bg video,.hero-bg img{object-position:center 32%;filter:saturate(.92) contrast(1.05) brightness(.92);}
-      .hero-bg::before{background:radial-gradient(ellipse 110% 90% at center 35%, transparent 18%, rgba(11,17,28,.5) 80%, rgba(11,17,28,.85) 100%);}
-      .hero-bg::after{background:linear-gradient(180deg,rgba(19,29,45,.4) 0%,rgba(19,29,45,.12) 15%,transparent 35%,rgba(19,29,45,.78) 76%,rgba(19,29,45,1) 100%);}
-      .hero-content{padding:0 24px 64px;max-width:100%;}
-      .hero-title{font-size:clamp(2.2rem,9vw,3.1rem);max-width:13ch;line-height:1.02;}
-      .hero-eyebrow{font-size:.6rem;letter-spacing:.32em;margin-bottom:22px;}
-      .hero-eyebrow::before{width:24px;}
-      .hero-tag{font-size:1.04rem;margin-top:14px;}
-      .hero-rule{margin:28px 0 22px;width:44px;}
-      .hero-trad-link{align-self:flex-start;color:rgba(255,255,255,.7);}
+      .hero-bg video,.hero-bg img{object-position:center 38%;filter:saturate(.92) contrast(1.05) brightness(.9);}
+      .hero-content{padding:84px 22px;}
+      .hero-title{font-size:clamp(1.9rem,8.5vw,2.7rem);}
+      .hero-sig{font-size:clamp(1rem,4.2vw,1.2rem);letter-spacing:.02em;margin:16px 0 28px;}
+      .hbtn{min-width:0;flex:1 1 42%;padding:15px 18px;}
+      .hero-psi{margin-top:24px;}
     }
 
     .sec-eyebrow{display:block;font-size:.6rem;font-weight:600;letter-spacing:.38em;text-transform:uppercase;margin-bottom:14px;}
@@ -483,6 +468,99 @@
       .pillars-hd{margin-bottom:40px;}
       .t-card{padding:28px 24px;}
     }
+  /* ─── TRES CAMINOS ─────────────────────────────────────── */
+  .caminos{padding:clamp(72px,10vw,120px) 24px;background:var(--off-white);}
+  .caminos-in{max-width:1180px;margin:0 auto;}
+  .caminos-hd{text-align:center;max-width:640px;margin:0 auto clamp(44px,6vw,66px);}
+  .caminos-hd h2{font-family:var(--font-display);font-weight:500;font-size:clamp(1.6rem,3.2vw,2.3rem);color:var(--navy);line-height:1.18;letter-spacing:-.01em;}
+  .caminos-hd h2 em{font-style:italic;color:var(--gold-dark);}
+  .caminos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:980px;margin:0 auto;}
+  .camino{background:var(--white);border:1px solid rgba(42,58,82,.1);padding:40px 32px 32px;display:flex;flex-direction:column;position:relative;transition:transform .3s var(--ease),box-shadow .3s var(--ease),opacity .6s var(--ease);}
+  .camino::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--gold);transform:scaleX(0);transform-origin:left;transition:transform .45s var(--ease);}
+  .camino:hover{transform:translateY(-5px);box-shadow:0 26px 60px rgba(19,29,45,.15);}
+  .camino:hover::before{transform:scaleX(1);}
+  .camino-no{font-family:var(--font-display);font-style:italic;font-size:1.4rem;color:var(--gold-dark);font-feature-settings:"lnum" 1;}
+  .camino-name{font-family:var(--font-display);font-weight:500;font-size:1.5rem;color:var(--navy);margin:0 0 6px;line-height:1.12;}
+  .camino-kicker{font-size:.62rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-dark);margin-bottom:16px;}
+  .camino p{color:var(--text-mid);font-size:.96rem;line-height:1.66;margin-bottom:22px;}
+  .camino ul{list-style:none;display:flex;flex-direction:column;gap:9px;margin-bottom:28px;}
+  .camino li{font-size:.87rem;color:var(--text-dark);padding-left:18px;position:relative;line-height:1.4;}
+  .camino li::before{content:'';position:absolute;left:0;top:8px;width:5px;height:5px;background:var(--gold);}
+  .camino .go{margin-top:auto;font-size:.64rem;letter-spacing:.2em;text-transform:uppercase;font-weight:700;color:var(--navy);display:inline-flex;align-items:center;gap:8px;transition:gap .25s var(--ease);}
+  .camino .go::after{content:'→';}
+  .camino:hover .go{gap:13px;}
+  @media(max-width:880px){.caminos-grid{gap:12px;}.camino{padding:26px 16px 22px;}.camino-no{font-size:1.1rem;}.camino-name{font-size:1.05rem;}.camino-kicker{font-size:.55rem;letter-spacing:.14em;margin-bottom:12px;}.camino .go{font-size:.56rem;letter-spacing:.14em;}}
+
+  /* ─── CONTACTO ─────────────────────────────────────────── */
+  .contacto{padding:clamp(72px,10vw,120px) 24px;background:var(--navy-deeper);color:var(--white);position:relative;overflow:hidden;}
+  .contacto::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 70% at 82% 8%,rgba(194,169,104,.09),transparent 60%);pointer-events:none;}
+  .contacto-in{max-width:1080px;margin:0 auto;position:relative;display:grid;grid-template-columns:1fr;gap:48px;}
+  @media(min-width:860px){.contacto-in{grid-template-columns:5fr 7fr;gap:72px;align-items:start;}}
+  .contacto-hd h2{font-family:var(--font-display);font-weight:500;font-size:clamp(1.7rem,3.2vw,2.4rem);color:var(--white);max-width:16ch;margin:14px 0 30px;line-height:1.14;letter-spacing:-.01em;}
+  .contacto-hd h2 em{font-style:italic;color:var(--gold-light);}
+  .contacto-info{display:flex;flex-direction:column;gap:16px;}
+  .ci-row{display:flex;gap:13px;align-items:center;}
+  .ci-row svg{width:17px;height:17px;stroke:var(--gold);fill:none;stroke-width:1.5;flex-shrink:0;}
+  .ci-row a,.ci-row span{color:rgba(255,255,255,.82);font-size:.98rem;transition:color .2s;}
+  .ci-row a:hover{color:var(--gold-light);}
+  .cform{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-content:start;}
+  .cfield{display:flex;flex-direction:column;gap:8px;}
+  .cfield.full{grid-column:1 / -1;}
+  .cfield label{font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.62);font-weight:600;}
+  .cfield input,.cfield select,.cfield textarea{font-family:var(--font-body);font-size:1rem;padding:14px 16px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.16);color:var(--white);}
+  .cfield input::placeholder,.cfield textarea::placeholder{color:rgba(255,255,255,.4);}
+  .cfield input:focus,.cfield select:focus,.cfield textarea:focus{outline:none;border-color:var(--gold);background:rgba(255,255,255,.08);}
+  .cfield select{appearance:none;-webkit-appearance:none;}
+  .cfield select option{color:#1A2538;}
+  .cfield textarea{resize:vertical;min-height:96px;}
+  .btn-submit{grid-column:1 / -1;justify-self:start;background:var(--gold);color:var(--navy-deeper);border:none;font-family:var(--font-body);font-weight:700;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;padding:17px 46px;cursor:pointer;transition:background .25s,transform .25s;}
+  .btn-submit:hover{background:var(--gold-light);transform:translateY(-2px);}
+  @media(max-width:560px){.cform{grid-template-columns:1fr;}}
+
+  /* Feedback de presión: todo lo clickeable "responde" al tacto (efecto premium) */
+  .hbtn:active,.btn-submit:active{transform:scale(.97);}
+  .flag:active{transform:scale(.92);}
+  .camino:active{transform:scale(.99);}
+
+  .contacto-sub{margin:-16px 0 30px;color:rgba(255,255,255,.72);font-size:1.05rem;line-height:1.55;max-width:38ch;}
+  .footer-dev{max-width:1180px;margin:22px auto 0;padding-top:22px;border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;}
+  .footer-dev span{font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.4);}
+  .footer-dev img{height:46px;width:auto;opacity:.85;transition:opacity .25s var(--ease);}
+  .footer-dev:hover img{opacity:1;}
+
+  /* ─── BADGE LIBERACIÓN ─────────────────────────────────────── */
+  .badge-liberacion {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(185, 74, 74, 0.15);
+    border: 1px solid rgba(185, 74, 74, 0.3);
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-family: var(--font-body);
+    font-weight: 500;
+    color: #b94a4a;
+    letter-spacing: 0.3px;
+    z-index: 10;
+    animation: badge-pulse 3s ease-in-out infinite;
+    backdrop-filter: blur(4px);
+  }
+
+  @keyframes badge-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+
+  @media (max-width: 640px) {
+    .badge-liberacion {
+      top: 8px;
+      right: 8px;
+      font-size: 11px;
+      padding: 5px 10px;
+    }
+  }
+
   *:focus-visible{outline:2px solid var(--gold);outline-offset:3px;}
 </style>
 </head>
@@ -493,16 +571,20 @@
     <img src="bairen_logo.png?v=3" alt="Grupo Bairen" style="height:46px;width:auto;">
   </a>
   <div class="nav-links">
-    <a href="catalogo.html">Propiedades</a>
-    <a href="#pasos">Cómo funciona</a>
+    <a href="comprar.html" data-i18n="nav_comprar">Comprar</a>
+    <a href="catalogo.html" data-i18n="nav_alquilar">Alquilar</a>
+    <a href="psi.html">Personal Shopper</a>
+    <a href="#contacto" data-i18n="nav_contacto">Contacto</a>
   </div>
-  <a class="nav-cta-desk" href="catalogo.html">Ver propiedades</a>
+  <a class="nav-cta-desk" href="comprar.html" data-i18n="nav_comprar">Comprar</a>
   <button class="burger" id="burger" type="button" aria-label="Menú" aria-expanded="false" aria-controls="mobileMenu"><span></span><span></span><span></span></button>
 </nav>
 
 <div class="mobile-menu" id="mobileMenu">
-  <a href="catalogo.html" class="m-link">Propiedades</a>
-  <a href="#pasos" class="m-link">Cómo funciona</a>
+  <a href="comprar.html" class="m-link" data-i18n="nav_comprar">Comprar</a>
+  <a href="catalogo.html" class="m-link" data-i18n="nav_alquilar">Alquilar</a>
+  <a href="psi.html" class="m-link">Personal Shopper</a>
+  <a href="#contacto" class="m-link" data-i18n="nav_contacto">Contacto</a>
 </div>
 
 <section class="hero" id="inicio">
@@ -512,130 +594,78 @@
       <img src="hero-poster.jpg" alt="Obelisco de Buenos Aires desde el cielo — Grupo Bairen">
     </video>
   </div>
+  <div class="lang-switch">
+    <button class="flag active" data-lang="es" aria-label="Español" title="Español"><svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#fff"/><rect width="30" height="6.7" fill="#75AADB"/><rect width="30" height="6.7" y="13.3" fill="#75AADB"/><circle cx="15" cy="10" r="2" fill="#F6B40E"/></svg></button>
+    <button class="flag" data-lang="pt" aria-label="Português" title="Português"><svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#009B3A"/><polygon points="15,2.5 27.2,10 15,17.5 2.8,10" fill="#FEDF00"/><circle cx="15" cy="10" r="3.2" fill="#002776"/></svg></button>
+    <button class="flag" data-lang="en" aria-label="English" title="English"><svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#fff"/><rect width="30" height="1.54" fill="#B22234"/><rect width="30" height="1.54" y="3.08" fill="#B22234"/><rect width="30" height="1.54" y="6.15" fill="#B22234"/><rect width="30" height="1.54" y="9.23" fill="#B22234"/><rect width="30" height="1.54" y="12.31" fill="#B22234"/><rect width="30" height="1.54" y="15.38" fill="#B22234"/><rect width="30" height="1.54" y="18.46" fill="#B22234"/><rect width="13" height="10.77" fill="#3C3B6E"/></svg></button>
+  </div>
   <div class="hero-content">
-    <span class="hero-eyebrow">Buenos Aires · Curaduría residencial</span>
-    <h1 class="hero-title">El departamento que querés.</h1>
-    <span class="hero-tag">Sin garantía. Sin caución.</span>
-    <div class="hero-rule"></div>
+    <h1 class="hero-title">
+      <span data-i18n="hero_t1">Buenos Aires,</span>
+      <span data-i18n="hero_t2">en su</span>
+      <span data-i18n="hero_t3">máximo esplendor.</span>
+    </h1>
+    <p class="hero-sig">Buy. Sell. Rent.</p>
     <div class="hero-actions">
-      <a class="btn-gold" href="catalogo.html?tipo=temporal">
-        Ver propiedades
-        <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      <a class="hbtn hbtn-solid" href="comprar.html" data-i18n="btn_comprar">Comprar</a>
+      <a class="hbtn hbtn-line" href="catalogo.html" data-i18n="btn_alquilar">Alquilar</a>
+    </div>
+    <p class="hero-psi"><span data-i18n="psi_q">¿Necesita asesoramiento para comprar en Buenos Aires?</span><br><a href="psi.html" data-i18n="psi_link">Conozca nuestro servicio de Personal Shopper.</a></p>
+  </div>
+</section>
+
+<section class="caminos" id="caminos">
+  <div class="caminos-in">
+    <div class="caminos-hd reveal">
+      <h2 data-i18n="caminos_h">Lo que ofrecemos:</h2>
+    </div>
+    <div class="caminos-grid">
+
+      <a class="camino reveal d1" href="comprar.html">
+        <div class="camino-name" data-i18n="c1_name">Compra</div>
+        <div class="camino-kicker" data-i18n="c1_kicker">Unidades en venta</div>
+        <span class="go" data-i18n="c1_go">Ver más</span>
       </a>
-      <a class="hero-trad-link" href="catalogo.html?tipo=tradicional">
-        Buscás alquiler tradicional →
+
+      <a class="camino reveal d2" href="catalogo.html">
+        <div class="camino-name" data-i18n="c2_name">Alquiler</div>
+        <div class="camino-kicker" data-i18n="c2_kicker">Temporal y tradicional</div>
+        <span class="go" data-i18n="c2_go">Ver más</span>
       </a>
+
+      <a class="camino reveal d3" href="psi.html">
+        <div class="camino-name" data-i18n="c3_name">Inversión</div>
+        <div class="camino-kicker" data-i18n="c3_kicker">Asesoramiento · Personal Shopper</div>
+        <span class="go" data-i18n="c3_go">Conocer PSI</span>
+      </a>
+
     </div>
   </div>
 </section>
 
-<section class="social-proof">
-  <div class="social-inner">
-    <p class="proof-line reveal">
-      Más de <strong>120 propiedades</strong> alquiladas en CABA y GBA Norte,<br>
-      <strong>4.9<span class="proof-star">★</span></strong> en Google sobre 47 reseñas,<br>
-      contrato listo en <strong>menos de 48 horas</strong>.
-    </p>
-    <div class="testimonials">
-      <article class="t-card t-card--light reveal d1" role="article">
-        <div class="t-quote">"</div>
-        <p class="t-body">Hasta la fecha son los que mejor trato me han dado. Más que sorprendido y agradecido. Estamos en contacto, Julián.</p>
-        <div class="t-sep"></div>
-        <div class="t-foot">
-          <div class="t-avatar">T</div>
-          <div>
-            <div class="t-name">Tadeo T.</div>
-            <div class="t-role">Inquilino · Alquiler Temporal</div>
-          </div>
-        </div>
-      </article>
-      <article class="t-card t-card--dark reveal d2" role="article">
-        <div class="t-quote">"</div>
-        <p class="t-body">Julián, la verdad nos solucionaste todo. Respondiste todas las dudas sin importar la hora. Nos diste la confianza que necesitábamos. Son unos genios.</p>
-        <div class="t-sep"></div>
-        <div class="t-foot">
-          <div class="t-avatar">M</div>
-          <div>
-            <div class="t-name">Marcela R.</div>
-            <div class="t-role">Propietaria</div>
-          </div>
-        </div>
-      </article>
-    </div>
-  </div>
-</section>
 
-<section class="destacadas" id="destacadas" style="display:none">
-  <div class="destacadas-inner">
-    <div class="destacadas-hd reveal">
-      <span class="sec-eyebrow eyebrow-goldlt">Disponibles ahora</span>
-      <h2 class="sec-title">Propiedades destacadas</h2>
-      <p class="destacadas-sub">Las últimas unidades publicadas, listas para visitar.</p>
-    </div>
-    <div class="destacadas-grid reveal d2" id="destacadasGrid"></div>
-    <div class="destacadas-footer reveal d3">
-      <a class="btn-gold" href="catalogo.html">
-        Ver todas las propiedades
-        <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-      </a>
-    </div>
-  </div>
-</section>
-
-<section class="steps" id="pasos">
-  <div class="steps-hd reveal">
-    <span class="sec-eyebrow eyebrow-gold">El proceso</span>
-    <h2 class="sec-title">Cómo funciona Bairen</h2>
-  </div>
-  <div class="steps-wrap">
-    <div class="step reveal d1">
-      <div class="step-icon-wrap">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="11" cy="11" r="7"/>
-          <path d="M20 20l-3.5-3.5"/>
-          <path d="M9 11h4M11 9v4"/>
-        </svg>
-        <span class="step-num-tag">01</span>
+<section class="contacto" id="contacto">
+  <div class="contacto-in">
+    <div class="contacto-hd reveal">
+      <span class="sec-eyebrow eyebrow-goldlt" data-i18n="contacto_eyebrow">Contacto</span>
+      <h2 data-i18n="contacto_h">Hablemos.</h2>
+      <p class="contacto-sub" data-i18n="contacto_sub">Contanos qué buscás y te armamos una propuesta.</p>
+      <div class="contacto-info">
+        <div class="ci-row"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 6.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012.18 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.09a16 16 0 006 6l.56-.56a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg><a href="tel:+541123106629">+54 11 2310 6629</a></div>
+        <div class="ci-row"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><a href="mailto:contacto@bairengroup.com">contacto@bairengroup.com</a></div>
+        <div class="ci-row"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg><a href="https://wa.me/5491123106629" target="_blank" rel="noopener" data-i18n="ci_wa">WhatsApp directo</a></div>
+        <div class="ci-row"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg><span>CABA · GBA Norte, Buenos Aires</span></div>
       </div>
-      <h3 class="step-title">Elegís la propiedad</h3>
-      <p class="step-desc">Catálogo con fotos HD y recorridos en video. Filtrás por barrio, tipo y precio.</p>
     </div>
-    <div class="step reveal d2">
-      <div class="step-icon-wrap">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <rect x="5" y="4" width="14" height="17" rx="1.5"/>
-          <path d="M9 4V3a1 1 0 011-1h4a1 1 0 011 1v1"/>
-          <path d="M8.5 13.5l2 2 4-4"/>
-        </svg>
-        <span class="step-num-tag">02</span>
+    <form class="cform reveal d1" onsubmit="return false">
+      <div class="cfield"><label data-i18n="f_nombre">Nombre</label><input type="text" placeholder="Tu nombre" data-i18n-ph="ph_nombre"></div>
+      <div class="cfield"><label data-i18n="f_contacto">Teléfono o email</label><input type="text" placeholder="Cómo te contactamos" data-i18n-ph="ph_contacto"></div>
+      <div class="cfield full"><label data-i18n="f_interes">Me interesa</label>
+        <select><option data-i18n="opt_comprar">Comprar</option><option data-i18n="opt_alquilar">Alquilar</option><option data-i18n="opt_invertir">Invertir · Personal Shopper</option><option data-i18n="opt_vender">Vender mi propiedad</option></select>
       </div>
-      <h3 class="step-title">Calificás tu perfil</h3>
-      <p class="step-desc">Formulario breve para mostrarte solo las opciones que encajan con vos.</p>
-    </div>
-    <div class="step reveal d3">
-      <div class="step-icon-wrap">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <rect x="3.5" y="5" width="17" height="15" rx="1.5"/>
-          <path d="M3.5 10h17M8 3v4M16 3v4"/>
-          <path d="M9 15l2 2 4-4"/>
-        </svg>
-        <span class="step-num-tag">03</span>
-      </div>
-      <h3 class="step-title">Coordinamos la visita</h3>
-      <p class="step-desc">Agendás online en el horario que te quede mejor. Te llega el video previo.</p>
-    </div>
-    <div class="step reveal d4">
-      <div class="step-icon-wrap">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M14 4l4 4-10 10H4v-4z"/>
-          <path d="M13 5l3 3"/>
-          <path d="M3 21h18"/>
-        </svg>
-        <span class="step-num-tag">04</span>
-      </div>
-      <h3 class="step-title">Firmás el contrato</h3>
-      <p class="step-desc">100% digital. Sin filas, sin papeles, sin caución. Listo en horas desde la visita.</p>
-    </div>
+      <div class="cfield full"><label data-i18n="f_mensaje">Mensaje</label><textarea placeholder="Contanos qué estás buscando" data-i18n-ph="ph_mensaje"></textarea></div>
+      <button class="btn-submit" type="submit" data-i18n="f_submit">Enviar consulta</button>
+    </form>
   </div>
 </section>
 
@@ -644,32 +674,34 @@
     <div>
       <div><img src="bairen_logo.png?v=3" alt="Grupo Bairen" style="height:40px;width:auto;opacity:.85;margin-bottom:8px;"></div>
       <div class="ft-brand-rule"></div>
-      <p class="ft-brand-tag">Curaduría residencial en Buenos Aires. Alquileres en CABA y GBA Norte.</p>
+      <p class="ft-brand-tag" data-i18n="ft_tag">Departamentos premium en Buenos Aires. Comprar, vender y alquilar en CABA y GBA Norte.</p>
     </div>
     <div class="ft-col">
-      <div class="ft-col-ttl">Alquileres</div>
+      <div class="ft-col-ttl" data-i18n="ft_ops">Operaciones</div>
       <ul>
-        <li><a href="catalogo.html?tipo=temporal">Alquiler Temporal</a></li>
-        <li><a href="catalogo.html?tipo=tradicional">Alquiler Tradicional</a></li>
-        <li><a href="catalogo.html">Ver propiedades</a></li>
+        <li><a href="comprar.html" data-i18n="ft_comprar">Comprar</a></li>
+        <li><a href="catalogo.html?tipo=temporal" data-i18n="ft_temporal">Alquiler Temporal</a></li>
+        <li><a href="catalogo.html?tipo=tradicional" data-i18n="ft_tradicional">Alquiler Tradicional</a></li>
+        <li><a href="psi.html">PSI · Personal Shopper</a></li>
       </ul>
     </div>
     <div class="ft-col">
-      <div class="ft-col-ttl">Empresa</div>
+      <div class="ft-col-ttl" data-i18n="ft_empresa">Empresa</div>
       <ul>
-        <li><a href="#pasos">Cómo funciona</a></li>
-        <li><a href="mailto:grupobairen@gmail.com?subject=Soy propietario">Para propietarios</a></li>
+        <li><a href="#pasos" data-i18n="ft_como">Cómo funciona</a></li>
+        <li><a href="mailto:contacto@bairengroup.com?subject=Quiero vender mi propiedad" data-i18n="ft_vende">Vendé con nosotros</a></li>
+        <li><a href="mailto:contacto@bairengroup.com?subject=Soy propietario" data-i18n="ft_prop">Para propietarios</a></li>
       </ul>
     </div>
     <div class="ft-col">
-      <div class="ft-col-ttl">Contacto</div>
+      <div class="ft-col-ttl" data-i18n="contacto_eyebrow">Contacto</div>
       <div class="ft-contact-row">
         <svg class="ft-icon" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 6.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012.18 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.09a16 16 0 006 6l.56-.56a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg>
         <span class="ft-contact-txt">+54 11 2310 6629</span>
       </div>
       <div class="ft-contact-row">
         <svg class="ft-icon" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-        <span class="ft-contact-txt">grupobairen@gmail.com</span>
+        <span class="ft-contact-txt">contacto@bairengroup.com</span>
       </div>
       <div class="ft-contact-row">
         <svg class="ft-icon" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
@@ -678,11 +710,15 @@
     </div>
   </div>
   <div class="footer-bottom">
-    <span class="footer-copy">© 2026 Grupo Bairen. Todos los derechos reservados.</span>
+    <span class="footer-copy" data-i18n="ft_copy">© 2026 Grupo Bairen. Todos los derechos reservados.</span>
     <div class="footer-legal">
-      <span title="Próximamente">Términos y condiciones</span>
-      <span title="Próximamente">Política de privacidad</span>
+      <span title="Próximamente" data-i18n="ft_terms">Términos y condiciones</span>
+      <span title="Próximamente" data-i18n="ft_privacy">Política de privacidad</span>
     </div>
+  </div>
+  <div class="footer-dev">
+    <span data-i18n="ft_dev">Desarrollado por</span>
+    <img src="grupo-bairen-blanco.png" alt="Grupo Bairen">
   </div>
 </footer>
 
@@ -690,6 +726,74 @@
   <svg viewBox="0 0 32 32"><path d="M16 0C7.163 0 0 7.163 0 16c0 2.83.736 5.487 2.023 7.793L0 32l8.438-2.01A15.93 15.93 0 0016 32c8.837 0 16-7.163 16-16S24.837 0 16 0zm0 29.333a13.278 13.278 0 01-6.77-1.848l-.484-.287-5.013 1.195 1.228-4.88-.317-.502A13.278 13.278 0 012.667 16C2.667 8.636 8.636 2.667 16 2.667S29.333 8.636 29.333 16 23.364 29.333 16 29.333zm7.3-9.96c-.4-.2-2.363-1.166-2.728-1.3-.366-.133-.633-.2-.9.2-.266.4-1.033 1.3-1.266 1.566-.233.267-.466.3-.866.1-2.367-1.183-3.917-2.117-5.475-4.8-.413-.712.413-.663 1.183-2.202.133-.267.067-.5-.033-.7-.1-.2-.9-2.163-1.233-2.963-.324-.778-.653-.672-.9-.685l-.767-.013a1.47 1.47 0 00-1.067.5c-.366.4-1.4 1.367-1.4 3.33s1.434 3.863 1.634 4.13c.2.267 2.823 4.312 6.837 6.05 2.54 1.097 3.534 1.19 4.804.999.773-.115 2.363-.966 2.696-1.9.333-.933.333-1.733.233-1.9-.1-.166-.366-.266-.766-.466z"/></svg>
 </a>
 
+<script>
+  (function(){
+    const T = {
+      pt:{
+        nav_comprar:"Comprar",nav_alquilar:"Alugar",nav_contacto:"Contato",
+        hero_t2:"no seu",hero_t3:"máximo esplendor.",
+        btn_comprar:"Comprar",btn_alquilar:"Alugar",
+        psi_q:"Precisa de assessoria para comprar em Buenos Aires?",psi_link:"Conheça nosso serviço de Personal Shopper.",
+        caminos_h:"O que oferecemos:",
+        c1_name:"Compra",c1_kicker:"Unidades à venda",c1_desc:"Apartamentos premium à venda nos melhores bairros, apresentados como merecem.",
+        c1_li1:"Bairros premium de Buenos Aires",c1_li2:"Fotos, vídeo e dados reais de cada unidade",c1_li3:"Com corretor matriculado em cada operação",c1_go:"Ver mais",
+        c2_name:"Aluguel",c2_kicker:"Temporada e tradicional",c2_desc:"Mobiliado e tudo incluído, ou tradicional de longo prazo. Chave na mão.",
+        c2_li1:"Sem garantia nem caução na temporada",c2_li2:"Contratos digitais em dólares",c2_li3:"Estadias de 3 a 24 meses",c2_go:"Ver mais",
+        c3_name:"Investimento",c3_kicker:"Assessoria · Personal Shopper",c3_desc:"Representamos você, o comprador ou investidor. Buscamos, avaliamos e negociamos do seu lado.",
+        c3_li1:"Do lado de quem compra, nunca do vendedor",c3_li2:"Oportunidades dentro e fora do mercado",c3_li3:"Ideal para investidores e compradores do exterior",c3_go:"Conhecer PSI",
+        contacto_eyebrow:"Contato",contacto_h:"Vamos conversar.",contacto_sub:"Conte o que procura e preparamos uma proposta.",ci_wa:"WhatsApp direto",
+        f_nombre:"Nome",f_contacto:"Telefone ou e-mail",f_interes:"Tenho interesse em",
+        opt_comprar:"Comprar",opt_alquilar:"Alugar",opt_invertir:"Investir · Personal Shopper",opt_vender:"Vender meu imóvel",
+        f_mensaje:"Mensagem",f_submit:"Enviar consulta",ph_nombre:"Seu nome",ph_contacto:"Como falamos com você",ph_mensaje:"Conte o que você procura",
+        ft_tag:"Apartamentos premium em Buenos Aires. Comprar, vender e alugar.",
+        ft_ops:"Operações",ft_comprar:"Comprar",ft_temporal:"Aluguel por Temporada",ft_tradicional:"Aluguel Tradicional",
+        ft_empresa:"Empresa",ft_como:"Como funciona",ft_vende:"Venda com a gente",ft_prop:"Para proprietários",
+        ft_dev:"Desenvolvido por",ft_copy:"© 2026 Grupo Bairen. Todos os direitos reservados.",ft_terms:"Termos e condições",ft_privacy:"Política de privacidade"
+      },
+      en:{
+        nav_comprar:"Buy",nav_alquilar:"Rent",nav_contacto:"Contact",
+        hero_t2:"at its",hero_t3:"finest.",
+        btn_comprar:"Buy",btn_alquilar:"Rent",
+        psi_q:"Need advice to buy in Buenos Aires?",psi_link:"Discover our Personal Shopper service.",
+        caminos_h:"What we offer:",
+        c1_name:"Buy",c1_kicker:"Units for sale",c1_desc:"Premium apartments for sale in the best neighbourhoods, shown as they deserve.",
+        c1_li1:"Premium Buenos Aires neighbourhoods",c1_li2:"Photos, video and real data for each unit",c1_li3:"With a licensed broker on every deal",c1_go:"See more",
+        c2_name:"Rent",c2_kicker:"Short and long term",c2_desc:"Furnished and all inclusive, or traditional long term. Move-in ready.",
+        c2_li1:"No guarantor or deposit for short term",c2_li2:"Digital contracts in dollars",c2_li3:"Stays from 3 to 24 months",c2_go:"See more",
+        c3_name:"Investment",c3_kicker:"Advisory · Personal Shopper",c3_desc:"We represent you, the buyer or investor. We search, evaluate and negotiate on your side.",
+        c3_li1:"On the buyer's side, never the seller's",c3_li2:"On and off-market opportunities",c3_li3:"Ideal for investors and buyers from abroad",c3_go:"Discover PSI",
+        contacto_eyebrow:"Contact",contacto_h:"Let's talk.",contacto_sub:"Tell us what you're looking for and we'll prepare a proposal.",ci_wa:"Direct WhatsApp",
+        f_nombre:"Name",f_contacto:"Phone or email",f_interes:"I'm interested in",
+        opt_comprar:"Buy",opt_alquilar:"Rent",opt_invertir:"Invest · Personal Shopper",opt_vender:"Sell my property",
+        f_mensaje:"Message",f_submit:"Send inquiry",ph_nombre:"Your name",ph_contacto:"How we reach you",ph_mensaje:"Tell us what you're looking for",
+        ft_tag:"Premium apartments in Buenos Aires. Buy, sell and rent.",
+        ft_ops:"Services",ft_comprar:"Buy",ft_temporal:"Short-term Rental",ft_tradicional:"Long-term Rental",
+        ft_empresa:"Company",ft_como:"How it works",ft_vende:"Sell with us",ft_prop:"For owners",
+        ft_dev:"Developed by",ft_copy:"© 2026 Grupo Bairen. All rights reserved.",ft_terms:"Terms and conditions",ft_privacy:"Privacy policy"
+      }
+    };
+    const nodes = document.querySelectorAll('[data-i18n]');
+    nodes.forEach(n => n.dataset.es = n.textContent);
+    const phs = document.querySelectorAll('[data-i18n-ph]');
+    phs.forEach(n => n.dataset.esPh = n.getAttribute('placeholder') || '');
+    function apply(lang){
+      nodes.forEach(n => {
+        const k = n.getAttribute('data-i18n');
+        n.textContent = (lang !== 'es' && T[lang] && T[lang][k] != null) ? T[lang][k] : n.dataset.es;
+      });
+      phs.forEach(n => {
+        const k = n.getAttribute('data-i18n-ph');
+        n.setAttribute('placeholder', (lang !== 'es' && T[lang] && T[lang][k] != null) ? T[lang][k] : n.dataset.esPh);
+      });
+      document.documentElement.lang = lang === 'pt' ? 'pt-BR' : lang === 'en' ? 'en' : 'es-AR';
+      document.querySelectorAll('.flag').forEach(f => f.classList.toggle('active', f.dataset.lang === lang));
+      try { localStorage.setItem('bairen_lang', lang); } catch(e){}
+    }
+    document.querySelectorAll('.flag').forEach(f => f.addEventListener('click', () => apply(f.dataset.lang)));
+    let saved = 'es'; try { saved = localStorage.getItem('bairen_lang') || 'es'; } catch(e){}
+    if (saved !== 'es') apply(saved);
+  })();
+</script>
 <script src="supabase-config.js"></script>
 <script>
   const burger = document.getElementById('burger');
@@ -776,6 +880,7 @@
               '<div class="dest-img" style="' + fotoStyle + '">' +
                 '<span class="dest-tag">' + escapeHTML(tipoTag) + '</span>' +
                 '<span class="dest-status' + (reservado ? ' res' : '') + '">' + (reservado ? 'Reservado' : 'Disponible') + '</span>' +
+                (reservado && p.fecha_liberacion ? '<div class="badge-liberacion"><span>' + formatFechaLiberacion(p.fecha_liberacion) + '</span></div>' : '') +
               '</div>' +
               '<div class="dest-body">' +
                 '<div class="dest-addr">' + escapeHTML(p.dir) + (p.unidad ? ' ' + escapeHTML(p.unidad) : '') + '</div>' +
@@ -799,6 +904,27 @@
       console.error('[index] Error cargando destacadas:', err);
     }
   })();
+
+// Función para calcular texto dinámico de liberación
+function formatFechaLiberacion(fechaStr) {
+  if (!fechaStr) return null;
+
+  const fecha = new Date(fechaStr);
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+  fecha.setHours(0, 0, 0, 0);
+
+  const diffMs = fecha - hoy;
+  const diffDias = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffDias === 0) return "Se libera hoy";
+  if (diffDias === 1) return "Se libera mañana";
+  if (diffDias > 1 && diffDias <= 7) return `Se libera en ${diffDias} días`;
+
+  const opciones = { month: 'long', day: 'numeric', year: 'numeric' };
+  const formatted = fecha.toLocaleDateString('es-AR', opciones);
+  return `Se libera: ${formatted}`;
+}
 </script>
 </body>
 </html>
