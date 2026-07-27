@@ -73,8 +73,12 @@ nav{position:fixed;inset:0 0 auto 0;z-index:1000;height:64px;background:var(--na
 
 /* HERO */
 .property-hero{margin-top:64px;height:68vh;min-height:420px;position:relative;overflow:hidden;display:flex;align-items:flex-end;transition:height .5s var(--ease);}
-.hero-badge{position:absolute;top:20px;right:20px;z-index:20;}
-.hero-badge .badge-liberacion{position:static;}
+.hero-badge{display:none;}
+.hero-badge-content{margin-bottom:12px;}
+.hero-badge-content .badge-liberacion{position:static;background:rgba(185,74,74,0.12);border:1px solid rgba(185,74,74,0.4);color:#b94a4a;font-family:var(--font-body);font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:none;padding:8px 12px;border-radius:4px;box-shadow:none;transition:all 0.4s cubic-bezier(0.22,1,0.36,1);animation:badge-titileo-util 2.5s ease-in-out infinite;}
+.hero-badge-content .badge-liberacion::before{content:'→ ';font-weight:400;}
+.hero-badge-content .badge-liberacion:hover{background:rgba(185,74,74,0.18);border-color:rgba(185,74,74,0.6);}
+@keyframes badge-titileo-util{0%,100%{opacity:1;box-shadow:0 0 0 rgba(185,74,74,0);}50%{opacity:0.75;box-shadow:0 0 12px rgba(185,74,74,0.25);}}
 .property-hero.video-mode{height:calc(100vh - 64px);}
 .hero-slides{position:absolute;inset:0;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-behavior:smooth;background:var(--navy-deeper);transition:opacity .5s var(--ease);scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;}
 .hero-slides::-webkit-scrollbar{display:none;}
@@ -310,11 +314,11 @@ footer{background:var(--navy-dark);border-top:1px solid var(--gold);padding:40px
   <!-- HERO -->
   <div class="property-hero" id="heroWrap">
     <div class="hero-slides" id="heroSlides"></div>
-    <div class="hero-badge" id="heroBadgeContainer"></div>
     <div class="hero-video" id="heroVideo"></div>
     <div class="hero-grad" id="heroGrad"></div>
     <div class="hero-content" id="heroContent">
       <div>
+        <div class="hero-badge-content" id="heroBadgeContent"></div>
         <div class="hero-tag" id="heroTag">—</div>
         <div class="hero-address" id="heroAddress">—</div>
         <div class="hero-sub" id="heroSub">—</div>
@@ -720,15 +724,15 @@ function renderActionCard(p, titleFull, unidadLbl, reservado, isTemp, isTrad) {
   if (p.estado === 'Reservado' && p.fecha_liberacion) {
     const textoLiberacion = formatFechaLiberacion(p.fecha_liberacion);
 
-    // Badge en hero
+    // Badge en heroContent (debajo del hero, arriba de la dirección)
     const badgeHTML = `<div class="badge-liberacion"><span>${textoLiberacion}</span></div>`;
-    $('heroBadgeContainer').innerHTML = badgeHTML;
+    $('heroBadgeContent').innerHTML = badgeHTML;
 
-    // Alert abajo
+    // Alert abajo en action card
     $('alertLiberacionTexto').textContent = textoLiberacion;
     $('alertLiberacion').style.display = '';
   } else {
-    $('heroBadgeContainer').innerHTML = '';
+    $('heroBadgeContent').innerHTML = '';
     $('alertLiberacion').style.display = 'none';
   }
 
