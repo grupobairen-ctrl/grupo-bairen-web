@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Departamentos premium en venta en Buenos Aires. Comprá en los mejores barrios de CABA con Grupo Bairen." />
+<meta name="robots" content="index, follow" />
+<link rel="canonical" href="https://bairengroup.com/comprar.html" />
+<meta property="og:title" content="Comprar en Buenos Aires — Grupo Bairen" />
+<meta name="theme-color" content="#131D2D" />
+<title>Comprar en Buenos Aires — Grupo Bairen</title>
+<link rel="icon" href="bairen_logo.png?v=3">
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --navy:#2A3A52; --navy-dark:#1E2A3F; --navy-deeper:#131D2D;
+    --gold:#C2A968; --gold-dark:#8A7547; --gold-light:#DECDA0;
+    --white:#FBFAF6; --off-white:#EEE5D0;
+    --text-dark:#1A2538; --text-mid:#6B7589;
+    --font-display:'Playfair Display',Georgia,serif;
+    --font-body:'Jost',sans-serif;
+    --ease:cubic-bezier(0.22,1,0.36,1);
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{font-family:var(--font-body);font-weight:300;color:var(--text-dark);background:var(--white);-webkit-font-smoothing:antialiased;overflow-x:hidden;line-height:1.6;}
+  a{text-decoration:none;color:inherit;}
+  ul{list-style:none;}
+  .wrap{max-width:1240px;margin:0 auto;padding:0 24px;}
+  h1,h2,h3{font-family:var(--font-display);font-weight:500;line-height:1.14;letter-spacing:-.01em;}
+  .eyebrow{display:block;font-size:.6rem;font-weight:600;letter-spacing:.38em;text-transform:uppercase;color:var(--gold-light);margin-bottom:16px;}
+
+  .navbar{position:sticky;top:0;z-index:1000;height:64px;background:var(--navy-deeper);border-bottom:1px solid var(--gold);display:flex;align-items:center;justify-content:space-between;padding:0 24px;gap:16px;}
+  .nav-logo img{height:44px;width:auto;display:block;}
+  .nav-links{display:none;align-items:center;gap:28px;}
+  .nav-links a{font-size:.7rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.65);transition:color .25s;}
+  .nav-links a:hover,.nav-links a.active{color:var(--gold);}
+  .nav-cta-desk{display:none;font-size:.68rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-light);background:transparent;border:1px solid rgba(194,169,104,.5);padding:8px 21px;white-space:nowrap;}
+  .nav-cta-desk:hover{background:var(--white);color:var(--navy);}
+  .burger{display:flex;flex-direction:column;gap:5px;cursor:pointer;padding:5px;background:none;border:none;}
+  .burger span{display:block;width:23px;height:1.5px;background:var(--white);transition:transform .3s,opacity .3s;}
+  .burger.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg);}
+  .burger.open span:nth-child(2){opacity:0;}
+  .burger.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg);}
+  .mobile-menu{position:fixed;top:64px;left:0;right:0;z-index:999;background:var(--navy-deeper);padding:28px 24px;transform:translateY(-115%);visibility:hidden;transition:transform .38s var(--ease),visibility 0s .38s;}
+  .mobile-menu.open{transform:none;visibility:visible;transition:transform .38s var(--ease),visibility 0s 0s;}
+  .mobile-menu a{display:block;font-family:var(--font-display);font-size:1.1rem;color:rgba(255,255,255,.8);padding:13px 0;border-bottom:1px solid rgba(255,255,255,.06);}
+  @media(min-width:701px){.burger{display:none;}.nav-links{display:flex;}.nav-cta-desk{display:block;}}
+  .lang-switch{display:flex;gap:8px;align-items:center;}
+  .flag{width:26px;height:18px;padding:0;border:1px solid rgba(255,255,255,.35);background:none;cursor:pointer;overflow:hidden;opacity:.55;transition:opacity .25s var(--ease),border-color .25s,transform .2s;display:block;line-height:0;}
+  .flag svg{width:100%;height:100%;display:block;}
+  .flag:hover{opacity:.9;transform:translateY(-1px);}
+  .flag.active{opacity:1;border-color:var(--gold-light);}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:11px;font-family:var(--font-body);font-size:.7rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;padding:15px 30px;border:1px solid transparent;cursor:pointer;transition:background .25s,transform .25s;}
+  .btn-gold{background:var(--gold);color:var(--navy-deeper);}
+  .btn-gold:hover{background:var(--gold-light);transform:translateY(-2px);}
+
+  .phero{background:var(--navy-deeper);color:var(--white);position:relative;overflow:hidden;text-align:center;}
+  .phero::before{content:'';position:absolute;top:-40%;left:50%;transform:translateX(-50%);width:900px;height:900px;background:radial-gradient(circle,rgba(194,169,104,.14),transparent 60%);}
+  .phero .in{position:relative;padding:88px 24px 76px;max-width:760px;margin:0 auto;}
+  .phero h1{font-size:clamp(2.2rem,4.6vw,3.5rem);color:var(--white);}
+
+  .listing{padding:64px 0 90px;min-height:40vh;}
+  .grid-prop{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;}
+  @media(max-width:900px){.grid-prop{grid-template-columns:1fr 1fr;}}
+  @media(max-width:600px){.grid-prop{grid-template-columns:1fr;}}
+  .dest-card{background:#fff;border:1px solid rgba(42,58,82,.08);display:flex;flex-direction:column;overflow:hidden;transition:transform .25s var(--ease),box-shadow .25s var(--ease);}
+  .dest-card:hover{transform:translateY(-4px);box-shadow:0 22px 48px rgba(19,29,45,.22);}
+  .dest-img{aspect-ratio:4/3;background:linear-gradient(135deg,#31435f 0%,var(--navy-deeper) 78%);position:relative;display:flex;align-items:flex-end;padding:18px;overflow:hidden;background-size:cover;background-position:center;}
+  .dest-tag{position:absolute;top:14px;left:14px;background:var(--gold);color:var(--navy-deeper);font-size:.55rem;letter-spacing:.16em;font-weight:700;padding:5px 11px;text-transform:uppercase;z-index:2;}
+  .dest-ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.24);font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;}
+  .dest-barrio-img{font-family:var(--font-display);color:#fff;font-size:1.4rem;position:relative;z-index:2;text-shadow:0 1px 10px rgba(0,0,0,.4);}
+  .dest-body{padding:20px 22px;flex:1;display:flex;flex-direction:column;}
+  .dest-addr{font-family:var(--font-display);font-size:1.16rem;font-weight:500;color:var(--navy);margin-bottom:12px;}
+  .dest-meta{display:flex;gap:8px;font-size:.62rem;color:var(--text-mid);letter-spacing:.05em;margin-bottom:16px;flex-wrap:wrap;}
+  .dest-meta span{background:var(--off-white);padding:4px 9px;border:1px solid rgba(42,58,82,.06);}
+  .dest-bottom{margin-top:auto;display:flex;justify-content:space-between;align-items:center;padding-top:14px;border-top:1px solid rgba(42,58,82,.06);}
+  .dest-price{font-family:var(--font-display);font-size:1.3rem;font-weight:700;color:var(--gold-dark);}
+  .dest-price small{display:block;font-family:var(--font-body);font-size:.56rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text-mid);font-weight:400;}
+  .dest-cta{font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:var(--navy);}
+
+  /* Sin unidades en venta: solo "Próximamente" */
+  .venta-empty{display:flex;justify-content:center;align-items:center;padding:70px 24px 90px;}
+  .ve-label{display:block;font-size:1rem;font-weight:600;letter-spacing:.4em;text-transform:uppercase;color:var(--gold-dark);}
+
+  .psicta{background:var(--off-white);padding:76px 0;}
+  .psicta .in{max-width:1180px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;gap:34px;flex-wrap:wrap;}
+  .psicta .txt{max-width:52ch;}
+  .psicta .eyebrow{color:var(--gold-dark);}
+  .psicta h2{font-size:clamp(1.6rem,3vw,2.3rem);margin-bottom:10px;color:var(--navy);}
+  .psicta p{color:var(--text-mid);font-size:1.06rem;}
+
+  .footer{background:var(--navy-deeper);color:var(--white);border-top:1px solid rgba(194,169,104,.25);padding:60px 24px 32px;}
+  .footer-grid{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1fr;gap:34px;padding-bottom:36px;border-bottom:1px solid rgba(255,255,255,.06);}
+  @media(min-width:780px){.footer-grid{grid-template-columns:1.6fr 1fr 1.4fr;}}
+  .ft-brand-rule{width:40px;height:1px;background:var(--gold);margin:16px 0;opacity:.6;}
+  .ft-brand-tag{font-family:var(--font-display);font-size:.96rem;color:rgba(255,255,255,.6);font-style:italic;max-width:280px;line-height:1.55;}
+  .ft-col-ttl{font-size:.58rem;font-weight:600;letter-spacing:.36em;text-transform:uppercase;color:var(--gold-light);margin-bottom:20px;}
+  .ft-col ul li{margin-bottom:11px;}
+  .ft-col ul li a{font-size:.86rem;color:rgba(255,255,255,.55);}
+  .ft-col ul li a:hover{color:var(--gold-light);}
+  .ft-contact-txt{font-size:.84rem;color:rgba(255,255,255,.55);line-height:1.7;}
+  .footer-bottom{max-width:1180px;margin:24px auto 0;display:flex;flex-direction:column;gap:8px;text-align:center;}
+  .footer-copy{font-size:.7rem;color:rgba(255,255,255,.42);}
+  .footer-dev{max-width:1180px;margin:20px auto 0;padding-top:20px;border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;gap:14px;}
+  .footer-dev span{font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.4);}
+  .footer-dev img{height:44px;width:auto;opacity:.85;transition:opacity .25s var(--ease);}
+  .footer-dev:hover img{opacity:1;}
+  @media(min-width:780px){.footer-bottom{flex-direction:row;justify-content:space-between;text-align:left;}}
+
+  .wa-btn{position:fixed;bottom:22px;right:20px;z-index:800;width:54px;height:54px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(37,211,102,.32);transition:transform .25s;}
+  .wa-btn:hover{transform:scale(1.06);}
+  .wa-btn svg{width:27px;height:27px;fill:#fff;}
+  *:focus-visible{outline:2px solid var(--gold);outline-offset:3px;}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a class="nav-logo" href="index.html"><img src="bairen_logo.png?v=3" alt="Grupo Bairen"></a>
+  <div class="nav-links">
+    <a href="comprar.html" class="active" data-i18n="nav_comprar">Comprar</a>
+    <a href="catalogo.html" data-i18n="nav_alquilar">Alquilar</a>
+    <a href="psi.html">Personal Shopper</a>
+    <a href="index.html#contacto" data-i18n="nav_contacto">Contacto</a>
+  </div>
+  <div class="lang-switch">
+    <button class="flag" data-lang="es" aria-label="Español" title="Español"><svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#fff"/><rect width="30" height="6.7" fill="#75AADB"/><rect width="30" height="6.7" y="13.3" fill="#75AADB"/><circle cx="15" cy="10" r="2" fill="#F6B40E"/></svg></button>
+    <button class="flag" data-lang="pt" aria-label="Português" title="Português"><svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#009B3A"/><polygon points="15,2.5 27.2,10 15,17.5 2.8,10" fill="#FEDF00"/><circle cx="15" cy="10" r="3.2" fill="#002776"/></svg></button>
+    <button class="flag" data-lang="en" aria-label="English" title="English"><svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#fff"/><rect width="30" height="1.54" fill="#B22234"/><rect width="30" height="1.54" y="3.08" fill="#B22234"/><rect width="30" height="1.54" y="6.15" fill="#B22234"/><rect width="30" height="1.54" y="9.23" fill="#B22234"/><rect width="30" height="1.54" y="12.31" fill="#B22234"/><rect width="30" height="1.54" y="15.38" fill="#B22234"/><rect width="30" height="1.54" y="18.46" fill="#B22234"/><rect width="13" height="10.77" fill="#3C3B6E"/></svg></button>
+  </div>
+  <a class="nav-cta-desk" href="psi.html" data-i18n="nav_cta_rep">Comprar representado</a>
+  <button class="burger" id="burger" type="button" aria-label="Menú" aria-expanded="false"><span></span><span></span><span></span></button>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="comprar.html" class="m-link" data-i18n="nav_comprar">Comprar</a>
+  <a href="catalogo.html" class="m-link" data-i18n="nav_alquilar">Alquilar</a>
+  <a href="psi.html" class="m-link">Personal Shopper</a>
+  <a href="index.html#contacto" class="m-link" data-i18n="nav_contacto">Contacto</a>
+</div>
+
+<header class="phero">
+  <div class="in">
+    <span class="eyebrow" data-i18n="cmp_eyebrow">Comprar</span>
+    <h1 data-i18n="cmp_h1">Unidades en venta en Buenos Aires</h1>
+  </div>
+</header>
+
+<section class="listing">
+  <div class="wrap">
+    <div class="grid-prop" id="ventaGrid"></div>
+    <div class="venta-empty" id="ventaEmpty" hidden>
+      <span class="ve-label" data-i18n="cmp_pronto">Próximamente</span>
+    </div>
+  </div>
+</section>
+
+<section class="psicta">
+  <div class="in">
+    <div class="txt">
+      <span class="eyebrow">Personal Shopper Investment</span>
+      <h2 data-i18n="cmp_psi_h2">Comprar sin buscar, visitar ni negociar.</h2>
+      <p data-i18n="cmp_psi_p">Usted nos dice qué departamento quiere. Nosotros lo buscamos, revisamos, negociamos y compramos por usted.</p>
+    </div>
+    <a class="btn btn-gold" href="psi.html" data-i18n="cmp_psi_btn">Conocer Personal Shopper</a>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-grid">
+    <div>
+      <img src="bairen_logo.png?v=3" alt="Grupo Bairen" style="height:40px;width:auto;opacity:.85;">
+      <div class="ft-brand-rule"></div>
+      <p class="ft-brand-tag" data-i18n="ft_tag">Departamentos premium en Buenos Aires. Comprar, vender y alquilar.</p>
+    </div>
+    <div class="ft-col">
+      <div class="ft-col-ttl" data-i18n="ft_ops">Operaciones</div>
+      <ul>
+        <li><a href="comprar.html" data-i18n="ft_comprar">Comprar</a></li>
+        <li><a href="catalogo.html" data-i18n="ft_alquilar">Alquilar</a></li>
+        <li><a href="psi.html">Personal Shopper</a></li>
+      </ul>
+    </div>
+    <div class="ft-col">
+      <div class="ft-col-ttl" data-i18n="ft_contacto">Contacto</div>
+      <p class="ft-contact-txt">+54 11 2310 6629<br>contacto@bairengroup.com<br>CABA · GBA Norte, Buenos Aires</p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span class="footer-copy" data-i18n="ft_copy">© 2026 Grupo Bairen. Todos los derechos reservados.</span>
+  </div>
+  <div class="footer-dev">
+    <span data-i18n="ft_dev">Desarrollado por</span>
+    <img src="grupo-bairen-blanco.png" alt="Grupo Bairen">
+  </div>
+</footer>
+
+<a class="wa-btn" href="https://wa.me/5491123106629" target="_blank" rel="noopener" aria-label="Contactar por WhatsApp">
+  <svg viewBox="0 0 32 32"><path d="M16 0C7.163 0 0 7.163 0 16c0 2.83.736 5.487 2.023 7.793L0 32l8.438-2.01A15.93 15.93 0 0016 32c8.837 0 16-7.163 16-16S24.837 0 16 0zm0 29.333a13.278 13.278 0 01-6.77-1.848l-.484-.287-5.013 1.195 1.228-4.88-.317-.502A13.278 13.278 0 012.667 16C2.667 8.636 8.636 2.667 16 2.667S29.333 8.636 29.333 16 23.364 29.333 16 29.333zm7.3-9.96c-.4-.2-2.363-1.166-2.728-1.3-.366-.133-.633-.2-.9.2-.266.4-1.033 1.3-1.266 1.566-.233.267-.466.3-.866.1-2.367-1.183-3.917-2.117-5.475-4.8-.413-.712.413-.663 1.183-2.202.133-.267.067-.5-.033-.7-.1-.2-.9-2.163-1.233-2.963-.324-.778-.653-.672-.9-.685l-.767-.013a1.47 1.47 0 00-1.067.5c-.366.4-1.4 1.367-1.4 3.33s1.434 3.863 1.634 4.13c.2.267 2.823 4.312 6.837 6.05 2.54 1.097 3.534 1.19 4.804.999.773-.115 2.363-.966 2.696-1.9.333-.933.333-1.733.233-1.9-.1-.166-.366-.266-.766-.466z"/></svg>
+</a>
+
+<script src="i18n.js"></script>
+<script src="supabase-config.js"></script>
+<script>
+  const burger = document.getElementById('burger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  burger.addEventListener('click', () => {
+    const open = burger.classList.toggle('open');
+    mobileMenu.classList.toggle('open');
+    burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  document.querySelectorAll('.m-link').forEach(l =>
+    l.addEventListener('click', () => { burger.classList.remove('open'); mobileMenu.classList.remove('open'); })
+  );
+
+  // Unidades en venta desde Supabase (tipo = 'Venta'). Si no hay, se muestra "Próximamente".
+  (async () => {
+    function esc(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    const grid  = document.getElementById('ventaGrid');
+    const empty = document.getElementById('ventaEmpty');
+    const showEmpty = () => { grid.style.display = 'none'; empty.hidden = false; };
+    try {
+      const sb = await window.bairenReady;
+      const { data, error } = await sb
+        .from('propiedades')
+        .select('*, imagenes(url, orden)')
+        .eq('publicada', true)
+        .eq('tipo', 'Venta')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      const props = data || [];
+      if (!props.length) { showEmpty(); return; }
+      grid.innerHTML = props.map(p => {
+        const portada = (p.imagenes || []).sort((a,b) => a.orden - b.orden)[0];
+        const fotoStyle = portada ? "style=\"background-image:url('" + portada.url + "')\"" : '';
+        const precio = p.precio_venta > 0 ? 'USD ' + Number(p.precio_venta).toLocaleString('es-AR') : 'Consultar';
+        const slug = 'propiedad.html?slug=' + encodeURIComponent(p.slug);
+        const dir = esc(p.dir) + (p.unidad ? ' ' + esc(p.unidad) : '');
+        return (
+          '<a class="dest-card" href="' + slug + '" aria-label="Ver ' + dir + '">' +
+            '<div class="dest-img" ' + fotoStyle + '>' +
+              '<span class="dest-tag">En venta</span>' +
+              (portada ? '' : '<span class="dest-ph">Foto de la unidad</span>') +
+              '<span class="dest-barrio-img">' + esc(p.barrio || '') + '</span>' +
+            '</div>' +
+            '<div class="dest-body">' +
+              '<div class="dest-addr">' + dir + '</div>' +
+              '<div class="dest-meta">' +
+                (p.ambientes ? '<span>' + p.ambientes + ' amb</span>' : '') +
+                (p.m2 ? '<span>' + p.m2 + ' m²</span>' : '') +
+              '</div>' +
+              '<div class="dest-bottom"><span class="dest-price"><small>Precio</small>' + precio + '</span><span class="dest-cta">Ver más →</span></div>' +
+            '</div>' +
+          '</a>'
+        );
+      }).join('');
+    } catch (err) {
+      console.error('[comprar] error cargando ventas:', err);
+      showEmpty();
+    }
+  })();
+</script>
+</body>
+</html>
