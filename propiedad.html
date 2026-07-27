@@ -744,9 +744,11 @@ function renderDynamicTexts(p) {
     <div class="stat"><div class="stat-val">${escapeHTML(plazoSt)}</div><div class="stat-lbl">${escapeHTML(plazoLblTr)}</div></div>
   `;
 
-  // ─── DESCRIPCIÓN ───
+  // ─── DESCRIPCIÓN ─── (usa la traducción guardada si existe; si no, español)
+  const lang = window.BAIREN_LANG || 'es';
+  const descTraducida = lang === 'pt' ? p.descripcion_pt : (lang === 'en' ? p.descripcion_en : null);
   const defaultDesc = t.default_desc.replace('{t}', titleFull).replace('{b}', p.barrio);
-  $('propDesc').textContent = p.descripcion || defaultDesc;
+  $('propDesc').textContent = descTraducida || p.descripcion || defaultDesc;
 
   // ─── AMENITIES ───
   const ams = (p.amenities || []).map(a => a.nombre).filter(Boolean);
