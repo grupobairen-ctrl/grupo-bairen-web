@@ -528,65 +528,53 @@
   .footer-dev img{height:46px;width:auto;opacity:.85;transition:opacity .25s var(--ease);}
   .footer-dev:hover img{opacity:1;}
 
-  /* ─── BADGE LIBERACIÓN (ÉPICO) ─────────────────────────────────────── */
+  /* ─── BADGE LIBERACIÓN (EDITORIAL LUXURY) ─────────────────────────────────────── */
   .badge-liberacion {
     position: absolute;
     top: 12px;
     right: 12px;
-    background: linear-gradient(135deg, rgba(19, 29, 45, 0.95) 0%, rgba(19, 29, 45, 0.92) 100%);
-    border: 1.5px solid var(--gold);
-    border-radius: 10px;
+    background: rgba(251, 250, 246, 0.93);
+    border: 1px solid var(--gold-dark);
+    border-radius: 1px;
     padding: 10px 14px;
-    font-size: 11px;
-    font-family: var(--font-body);
-    font-weight: 700;
-    color: #fff;
-    letter-spacing: 0.5px;
+    font-size: 10px;
+    font-family: var(--font-display);
+    font-weight: 500;
+    color: var(--gold-dark);
+    letter-spacing: 0.15em;
     text-transform: uppercase;
     z-index: 15;
-    animation: badge-glow-titilante 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
-    backdrop-filter: blur(12px);
-    box-shadow: 0 0 0 1px rgba(194, 169, 104, 0.5) inset;
+    backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
     gap: 6px;
     white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .badge-liberacion::before {
-    content: '⏰';
-    font-size: 13px;
+    content: '→';
+    font-size: 12px;
     display: inline-block;
-    animation: icon-pulse 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+    font-weight: 300;
   }
 
-  @keyframes badge-glow-titilante {
-    0%, 100% {
-      opacity: 1;
-      box-shadow: 0 0 20px rgba(194, 169, 104, 0.4), 0 0 0 1px rgba(194, 169, 104, 0.5) inset;
-      transform: scale(1);
-    }
-    50% {
-      opacity: 0.85;
-      box-shadow: 0 0 32px rgba(194, 169, 104, 0.6), 0 0 0 1px rgba(194, 169, 104, 0.5) inset;
-      transform: scale(1.02);
-    }
-  }
-
-  @keyframes icon-pulse {
-    0%, 100% { transform: scale(1) rotate(0deg); }
-    50% { transform: scale(1.15) rotate(8deg); }
+  .badge-liberacion:hover {
+    background: rgba(251, 250, 246, 0.98);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
   }
 
   @media (max-width: 640px) {
     .badge-liberacion {
       top: 8px;
       right: 8px;
-      font-size: 10px;
-      padding: 8px 12px;
+      font-size: 9px;
+      padding: 8px 11px;
     }
     .badge-liberacion::before {
-      font-size: 12px;
+      font-size: 11px;
     }
   }
 
