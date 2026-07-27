@@ -73,6 +73,8 @@ nav{position:fixed;inset:0 0 auto 0;z-index:1000;height:64px;background:var(--na
 
 /* HERO */
 .property-hero{margin-top:64px;height:68vh;min-height:420px;position:relative;overflow:hidden;display:flex;align-items:flex-end;transition:height .5s var(--ease);}
+.hero-badge{position:absolute;top:20px;right:20px;z-index:20;}
+.hero-badge .badge-liberacion{position:static;}
 .property-hero.video-mode{height:calc(100vh - 64px);}
 .hero-slides{position:absolute;inset:0;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-behavior:smooth;background:var(--navy-deeper);transition:opacity .5s var(--ease);scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;}
 .hero-slides::-webkit-scrollbar{display:none;}
@@ -290,6 +292,7 @@ footer{background:var(--navy-dark);border-top:1px solid var(--gold);padding:40px
   <!-- HERO -->
   <div class="property-hero" id="heroWrap">
     <div class="hero-slides" id="heroSlides"></div>
+    <div class="hero-badge" id="heroBadgeContainer"></div>
     <div class="hero-video" id="heroVideo"></div>
     <div class="hero-grad" id="heroGrad"></div>
     <div class="hero-content" id="heroContent">
@@ -691,12 +694,19 @@ function renderActionCard(p, titleFull, unidadLbl, reservado, isTemp, isTrad) {
     `;
   }
 
-  // Mostrar/ocultar alert de liberación
+  // Mostrar/ocultar badge + alert de liberación
   if (p.estado === 'Reservado' && p.fecha_liberacion) {
     const textoLiberacion = formatFechaLiberacion(p.fecha_liberacion);
+
+    // Badge en hero
+    const badgeHTML = `<div class="badge-liberacion"><span>${textoLiberacion}</span></div>`;
+    $('heroBadgeContainer').innerHTML = badgeHTML;
+
+    // Alert abajo
     $('alertLiberacionTexto').textContent = textoLiberacion;
     $('alertLiberacion').style.display = '';
   } else {
+    $('heroBadgeContainer').innerHTML = '';
     $('alertLiberacion').style.display = 'none';
   }
 
