@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<meta name="theme-color" content="#131D2D" />
+<link rel="icon" href="/bairen_logo.png?v=3">
+<title>Perfil de búsqueda · PSI · Grupo Bairen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --navy:#2A3A52; --navy-dark:#1E2A3F; --navy-deep:#131D2D;
+    --gold:#C2A968; --gold-dark:#8A7547; --gold-light:#DECDA0; --gold-pale:#F3EBD6;
+    --white:#FBFAF6; --paper:#FFFFFF; --off:#EEE5D0;
+    --ink:#1A2538; --mid:#6B7589; --faint:#9AA2B2; --line:#E4DBC8;
+    --disp:'Playfair Display',Georgia,serif;
+    --body:'Jost','Avenir Next',system-ui,sans-serif;
+    --ease:cubic-bezier(0.22,1,0.36,1);
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:var(--body);font-weight:300;color:var(--ink);background:var(--white);-webkit-font-smoothing:antialiased;line-height:1.6;}
+  button,input,select,textarea{font-family:inherit;color:inherit;font-size:inherit;}
+
+  .hero{background:linear-gradient(165deg,#22314A 0%, #10192A 82%);color:#EFE9DB;padding:56px 22px 48px;position:relative;overflow:hidden;text-align:center;}
+  .hero::before{content:"";position:absolute;inset:0;background:radial-gradient(110% 80% at 50% 0%, rgba(194,169,104,.15), transparent 60%);}
+  .hero .in{position:relative;max-width:640px;margin:0 auto;}
+  .logo{display:flex;align-items:center;justify-content:center;gap:11px;margin-bottom:26px;}
+  .logo .wm{display:flex;flex-direction:column;line-height:1;text-align:left;}
+  .logo .wm b{font-family:var(--disp);font-weight:500;font-size:.72rem;letter-spacing:.3em;color:#F2ECDD;}
+  .logo .wm b+b{font-size:.98rem;font-weight:600;letter-spacing:.2em;margin-top:3px;}
+  .logo .wm span{font-size:.42rem;letter-spacing:.4em;text-transform:uppercase;color:var(--gold-light);margin-top:4px;}
+  .kick{font-size:.6rem;font-weight:600;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);margin-bottom:18px;}
+  .hero h1{font-family:var(--disp);font-weight:500;font-size:clamp(1.7rem,5.5vw,2.5rem);line-height:1.15;color:#F7F2E6;text-wrap:balance;}
+  .hero p{color:#C4CBD8;font-size:.95rem;max-width:46ch;margin:16px auto 0;}
+
+  .wrap{max-width:640px;margin:0 auto;padding:34px 18px 90px;}
+  .q{background:var(--paper);border:1px solid var(--line);border-top:3px solid var(--gold);padding:22px 22px 24px;margin-bottom:16px;box-shadow:0 12px 30px -22px rgba(19,29,45,.3);}
+  .q .n{font-family:var(--disp);font-size:.85rem;color:var(--gold);font-weight:500;letter-spacing:.06em;margin-bottom:6px;}
+  .q h2{font-family:var(--disp);font-weight:500;font-size:1.12rem;line-height:1.35;color:var(--navy-dark);margin-bottom:14px;}
+  .q .sub{font-size:.8rem;color:var(--mid);margin:-8px 0 14px;}
+
+  .opts{display:flex;flex-direction:column;gap:8px;}
+  .opt{display:flex;align-items:center;gap:12px;border:1px solid var(--line);background:var(--paper);padding:12px 14px;cursor:pointer;transition:border-color .2s,background .2s;}
+  .opt:hover{border-color:var(--gold);}
+  .opt input{position:absolute;opacity:0;pointer-events:none;}
+  .opt .mark{flex:none;width:18px;height:18px;border:1.5px solid var(--gold-dark);transform:rotate(45deg);transition:background .2s;}
+  .opt.radio .mark{border-radius:50%;transform:none;}
+  .opt span.lbl{font-size:.92rem;color:var(--ink);}
+  .opt.on{background:var(--gold-pale);border-color:var(--gold);}
+  .opt.on .mark{background:var(--gold);}
+
+  .fld{margin-top:12px;}
+  .fld label{display:block;font-size:.66rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-dark);margin-bottom:6px;}
+  .fld input,.fld textarea,.fld select{width:100%;border:1px solid var(--line);background:var(--paper);padding:12px 13px;font-size:.95rem;font-weight:300;}
+  .fld input:focus,.fld textarea:focus,.fld select:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(194,169,104,.15);}
+  .fld textarea{resize:vertical;min-height:100px;line-height:1.55;}
+  .cond{display:none;margin-top:12px;}
+  .cond.show{display:block;}
+  .moneyrow{display:flex;gap:8px;}
+  .moneyrow select{width:96px;flex:none;}
+  .moneyrow input{flex:1;min-width:0;}
+
+  .send{display:block;width:100%;border:1px solid var(--gold);background:var(--gold);color:var(--navy-deep);
+    font-size:.78rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;padding:17px;cursor:pointer;
+    transition:background .25s,transform .25s;margin-top:26px;}
+  .send:hover{background:var(--gold-light);transform:translateY(-1px);}
+  .send-note{text-align:center;font-size:.74rem;color:var(--faint);margin-top:12px;}
+  .err{border-color:#A8503E !important;}
+  .errmsg{color:#A8503E;font-size:.78rem;margin-top:6px;display:none;}
+  .errmsg.show{display:block;}
+
+  .foot{background:var(--navy-deep);color:rgba(255,255,255,.55);text-align:center;padding:26px 18px;font-size:.72rem;}
+  .foot .tg{font-family:var(--disp);font-style:italic;color:var(--gold-light);font-size:.95rem;margin-bottom:6px;}
+
+  .toast{position:fixed;bottom:22px;left:50%;transform:translate(-50%,90px);background:var(--navy-deep);color:var(--gold-light);
+    border:1px solid var(--gold);padding:12px 22px;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;z-index:200;
+    transition:transform .45s var(--ease);pointer-events:none;max-width:90vw;text-align:center;}
+  .toast.show{transform:translate(-50%,0);}
+  *:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="in">
+    <div class="logo">
+      <svg width="40" height="40" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22" fill="none" stroke="#C2A968" stroke-width="1.6"/><path d="M24 9l2.6 4.4L28 34h-8l1.4-20.6L24 9z" fill="#C2A968"/><path d="M15 38h18" stroke="#C2A968" stroke-width="1.4"/></svg>
+      <div class="wm"><b>GRUPO</b><b>BAIREN</b><span>Buenos Aires</span></div>
+    </div>
+    <div class="kick">PSI · Personal Shopper Investment</div>
+    <h1>Definamos el perfil de tu inversión</h1>
+    <p>Bienvenido. Para buscar con criterio necesitamos conocer qué buscás. Contestá lo que puedas: cuanto más sepamos, mejor va a ser la selección que te presentemos.</p>
+  </div>
+</header>
+
+<main class="wrap">
+  <form id="form" onsubmit="return false" autocomplete="off">
+
+    <div class="q" id="qNombre">
+      <div class="n">Para empezar</div>
+      <h2>Tu nombre y apellido</h2>
+      <div class="fld"><input id="nombre" placeholder="Nombre y apellido"><div class="errmsg" id="errNombre">Necesitamos tu nombre para identificar tus respuestas.</div></div>
+    </div>
+
+    <div class="q">
+      <div class="n">01</div>
+      <h2>¿Qué tipo de propiedad buscás?</h2>
+      <div class="opts" data-q="tipo">
+        <label class="opt radio"><input type="radio" name="tipo" value="Departamento"><span class="mark"></span><span class="lbl">Departamento</span></label>
+        <label class="opt radio"><input type="radio" name="tipo" value="Casa"><span class="mark"></span><span class="lbl">Casa</span></label>
+        <label class="opt radio"><input type="radio" name="tipo" value="PH"><span class="mark"></span><span class="lbl">PH</span></label>
+        <label class="opt radio"><input type="radio" name="tipo" value="Estoy abierto a ver opciones"><span class="mark"></span><span class="lbl">Estoy abierto a ver opciones</span></label>
+      </div>
+    </div>
+
+    <div class="q">
+      <div class="n">02</div>
+      <h2>¿Quiénes van a habitar la propiedad?</h2>
+      <div class="opts" data-q="habitantes">
+        <label class="opt radio"><input type="radio" name="habitantes" value="Una persona"><span class="mark"></span><span class="lbl">Una persona</span></label>
+        <label class="opt radio"><input type="radio" name="habitantes" value="Dos personas"><span class="mark"></span><span class="lbl">Dos personas</span></label>
+        <label class="opt radio" data-cond="condFam"><input type="radio" name="habitantes" value="Una familia"><span class="mark"></span><span class="lbl">Una familia</span></label>
+        <label class="opt radio"><input type="radio" name="habitantes" value="Es solo inversión, no la voy a habitar"><span class="mark"></span><span class="lbl">Es solo inversión, no la voy a habitar</span></label>
+      </div>
+      <div class="cond" id="condFam"><div class="fld"><label>Cuántos integrantes</label><input id="integrantes" type="number" min="1" placeholder="4"></div></div>
+    </div>
+
+    <div class="q">
+      <div class="n">03</div>
+      <h2>¿Qué antigüedad debería tener?</h2>
+      <div class="opts" data-q="antiguedad">
+        <label class="opt radio"><input type="radio" name="antiguedad" value="A estrenar"><span class="mark"></span><span class="lbl">A estrenar</span></label>
+        <label class="opt radio"><input type="radio" name="antiguedad" value="Hasta 10 años"><span class="mark"></span><span class="lbl">Hasta 10 años</span></label>
+        <label class="opt radio"><input type="radio" name="antiguedad" value="Más de 10 años no es un problema"><span class="mark"></span><span class="lbl">Más de 10 años no es un problema</span></label>
+        <label class="opt radio"><input type="radio" name="antiguedad" value="Indistinto, mientras la propiedad valga la pena"><span class="mark"></span><span class="lbl">Indistinto, mientras la propiedad valga la pena</span></label>
+      </div>
+    </div>
+
+    <div class="q">
+      <div class="n">04</div>
+      <h2>¿Tenés un barrio o una zona decidida?</h2>
+      <div class="opts" data-q="zona">
+        <label class="opt radio" data-cond="condZona"><input type="radio" name="zona" value="Sí, tengo una zona decidida"><span class="mark"></span><span class="lbl">Sí, tengo una zona decidida</span></label>
+        <label class="opt radio"><input type="radio" name="zona" value="Estoy abierto según mis preferencias"><span class="mark"></span><span class="lbl">Estoy abierto, que la definan mis preferencias</span></label>
+      </div>
+      <div class="cond" id="condZona"><div class="fld"><label>Cuál</label><input id="zonaCual" placeholder="Recoleta, Palermo, zona norte..."></div></div>
+    </div>
+
+    <div class="q">
+      <div class="n">05</div>
+      <h2>¿Cuál es el fin de la inversión?</h2>
+      <div class="opts" data-q="fin">
+        <label class="opt radio"><input type="radio" name="fin" value="Turístico (renta temporal)"><span class="mark"></span><span class="lbl">Turístico (renta temporal)</span></label>
+        <label class="opt radio"><input type="radio" name="fin" value="Residencial"><span class="mark"></span><span class="lbl">Residencial</span></label>
+        <label class="opt radio"><input type="radio" name="fin" value="Ambos fines"><span class="mark"></span><span class="lbl">Ambos fines</span></label>
+      </div>
+    </div>
+
+    <div class="q">
+      <div class="n">06</div>
+      <h2>¿Qué tan importante es la cercanía al transporte público?</h2>
+      <div class="opts" data-q="transporte">
+        <label class="opt radio"><input type="radio" name="transporte" value="Que esté muy próximo"><span class="mark"></span><span class="lbl">Que esté muy próximo</span></label>
+        <label class="opt radio"><input type="radio" name="transporte" value="Cerca está bien"><span class="mark"></span><span class="lbl">Cerca está bien</span></label>
+        <label class="opt radio"><input type="radio" name="transporte" value="No es determinante"><span class="mark"></span><span class="lbl">No es determinante</span></label>
+      </div>
+    </div>
+
+    <div class="q">
+      <div class="n">07</div>
+      <h2>¿Qué servicios comunes debería tener el edificio?</h2>
+      <div class="sub">Marcá los esenciales para vos. Si no los necesitás, dejalo sin marcar.</div>
+      <div class="opts" data-q="amenities" data-multi="1">
+        <label class="opt"><input type="checkbox" name="amenities" value="Pileta"><span class="mark"></span><span class="lbl">Pileta</span></label>
+        <label class="opt"><input type="checkbox" name="amenities" value="Gimnasio"><span class="mark"></span><span class="lbl">Gimnasio</span></label>
+        <label class="opt"><input type="checkbox" name="amenities" value="SUM"><span class="mark"></span><span class="lbl">SUM</span></label>
+        <label class="opt"><input type="checkbox" name="amenities" value="Seguridad"><span class="mark"></span><span class="lbl">Seguridad</span></label>
+        <label class="opt"><input type="checkbox" name="amenities" value="Cochera"><span class="mark"></span><span class="lbl">Cochera</span></label>
+        <label class="opt"><input type="checkbox" name="amenities" value="Bicicletero"><span class="mark"></span><span class="lbl">Bicicletero</span></label>
+      </div>
+      <div class="fld"><label>Algún otro en particular</label><input id="amenOtro" placeholder="Laundry, spa, coworking..."></div>
+    </div>
+
+    <div class="q">
+      <div class="n">08</div>
+      <h2>¿Qué tan importante es la oferta gastronómica de la zona?</h2>
+      <div class="opts" data-q="gastro">
+        <label class="opt radio"><input type="radio" name="gastro" value="Que sea extensa"><span class="mark"></span><span class="lbl">Que sea extensa</span></label>
+        <label class="opt radio"><input type="radio" name="gastro" value="Media está bien"><span class="mark"></span><span class="lbl">Media está bien</span></label>
+        <label class="opt radio"><input type="radio" name="gastro" value="No es importante"><span class="mark"></span><span class="lbl">No es importante</span></label>
+      </div>
+    </div>
+
+    <div class="q">
+      <div class="n">09</div>
+      <h2>¿Y la vida nocturna de la zona?</h2>
+      <div class="opts" data-q="nocturna">
+        <label class="opt radio"><input type="radio" name="nocturna" value="La quiero animada"><span class="mark"></span><span class="lbl">La quiero animada</span></label>
+        <label class="opt radio"><input type="radio" name="nocturna" value="Me es indiferente"><span class="mark"></span><span class="lbl">Me es indiferente</span></label>
+        <label class="opt radio"><input type="radio" name="nocturna" value="Prefiero una zona tranquila"><span class="mark"></span><span class="lbl">Prefiero una zona tranquila</span></label>
+      </div>
+    </div>
+
+    <div class="q">
+      <div class="n">10</div>
+      <h2>¿Cuál es el presupuesto máximo con el que contamos?</h2>
+      <div class="moneyrow fld">
+        <select id="monedaPresu"><option value="USD">USD</option><option value="ARS">ARS</option></select>
+        <input id="presupuesto" type="number" min="0" placeholder="250000">
+      </div>
+    </div>
+
+    <div class="q">
+      <div class="n">11</div>
+      <h2>¿Necesitás financiación para una parte de la compra?</h2>
+      <div class="opts" data-q="financiacion">
+        <label class="opt radio"><input type="radio" name="financiacion" value="Sí"><span class="mark"></span><span class="lbl">Sí</span></label>
+        <label class="opt radio"><input type="radio" name="financiacion" value="No"><span class="mark"></span><span class="lbl">No</span></label>
+        <label class="opt radio"><input type="radio" name="financiacion" value="Lo quiero conversar"><span class="mark"></span><span class="lbl">Lo quiero conversar</span></label>
+      </div>
+    </div>
+
+    <div class="q">
+      <div class="n">12</div>
+      <h2>Observaciones</h2>
+      <div class="sub">Todo lo que quieras agregar: preferencias, dudas, algo que no hayamos preguntado.</div>
+      <div class="fld"><textarea id="obs" placeholder="Escribí acá lo que quieras que sepamos"></textarea></div>
+    </div>
+
+    <button type="button" class="send" id="btnEnviar">Enviar mis respuestas</button>
+    <p class="send-note">Al tocar Enviar se abre WhatsApp con tus respuestas listas para mandarle a tu asesor de Bairen.</p>
+  </form>
+</main>
+
+<footer class="foot">
+  <div class="tg">Comprá en Buenos Aires, representado.</div>
+  Grupo Bairen · Buenos Aires
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+  var WA="5491124759930";
+  function $(id){return document.getElementById(id);}
+  function toast(m){var t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(toast._h);toast._h=setTimeout(function(){t.classList.remove("show");},2200);}
+
+  /* estados visuales de radios y checkboxes + condicionales */
+  document.querySelectorAll(".opts").forEach(function(g){
+    g.querySelectorAll(".opt").forEach(function(o){
+      var inp=o.querySelector("input");
+      inp.addEventListener("change",function(){
+        if(inp.type==="radio"){
+          g.querySelectorAll(".opt").forEach(function(x){x.classList.remove("on");});
+          o.classList.add("on");
+          /* condicionales del grupo */
+          g.querySelectorAll(".opt[data-cond]").forEach(function(x){
+            var c=$(x.getAttribute("data-cond"));
+            if(c) c.classList.toggle("show", x===o);
+          });
+        } else {
+          o.classList.toggle("on", inp.checked);
+        }
+      });
+    });
+  });
+
+  function radioVal(name){
+    var el=document.querySelector('input[name="'+name+'"]:checked');
+    return el?el.value:"";
+  }
+  function money(){
+    var v=$("presupuesto").value;
+    if(!v) return "";
+    var n=Number(v);
+    return ($("monedaPresu").value==="ARS"?"ARS ":"USD ")+(isNaN(n)?v:n.toLocaleString($("monedaPresu").value==="ARS"?"es-AR":"en-US"));
+  }
+
+  $("btnEnviar").addEventListener("click",function(){
+    var nombre=$("nombre").value.trim();
+    if(!nombre){
+      $("nombre").classList.add("err"); $("errNombre").classList.add("show");
+      $("qNombre").scrollIntoView({behavior:"smooth",block:"center"});
+      toast("Completá tu nombre para enviar");
+      return;
+    }
+    $("nombre").classList.remove("err"); $("errNombre").classList.remove("show");
+
+    var L=[];
+    L.push("Hola Alejandro, soy "+nombre+". Estas son mis respuestas del perfil de busqueda PSI:");
+    L.push("");
+    function add(q,a){ if(a) L.push(q+": "+a); }
+    add("1. Tipo de propiedad", radioVal("tipo"));
+    var hab=radioVal("habitantes");
+    if(hab==="Una familia" && $("integrantes").value) hab+=" ("+$("integrantes").value+" integrantes)";
+    add("2. Quienes la van a habitar", hab);
+    add("3. Antiguedad", radioVal("antiguedad"));
+    var zona=radioVal("zona");
+    if(zona==="Sí, tengo una zona decidida" && $("zonaCual").value.trim()) zona="Decidida: "+$("zonaCual").value.trim();
+    add("4. Barrio o zona", zona);
+    add("5. Fin de la inversion", radioVal("fin"));
+    add("6. Transporte publico", radioVal("transporte"));
+    var am=[].map.call(document.querySelectorAll('input[name="amenities"]:checked'),function(x){return x.value;});
+    if($("amenOtro").value.trim()) am.push($("amenOtro").value.trim());
+    add("7. Servicios comunes", am.length?am.join(", "):"No son necesarios");
+    add("8. Oferta gastronomica", radioVal("gastro"));
+    add("9. Vida nocturna", radioVal("nocturna"));
+    add("10. Presupuesto maximo", money());
+    add("11. Financiacion", radioVal("financiacion"));
+    if($("obs").value.trim()){ L.push(""); L.push("Observaciones: "+$("obs").value.trim()); }
+
+    var url="https://wa.me/"+WA+"?text="+encodeURIComponent(L.join("\n"));
+    window.open(url,"_blank","noopener");
+    toast("Se abre WhatsApp con tus respuestas listas");
+  });
+})();
+</script>
+</body>
+</html>
