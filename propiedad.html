@@ -582,7 +582,11 @@ function renderProperty(p) {
   injectJSONLD(p, pageUrl, ogImg);
 
   // ─── HERO ───
-  $('heroTag').textContent     = isAmbos ? 'Alquiler temporal y tradicional' : `Alquiler ${tipo}`;
+  if (reservado && p.fecha_liberacion) {
+    $('heroTag').textContent = formatFechaLiberacion(p.fecha_liberacion);
+  } else {
+    $('heroTag').textContent = isAmbos ? 'Alquiler temporal y tradicional' : `Alquiler ${tipo}`;
+  }
   $('heroAddress').textContent = p.dir;
   $('heroSub').textContent     = `${p.barrio} · Buenos Aires`;
   $('heroSlides').innerHTML = PHOTOS.map((ph, i) =>
