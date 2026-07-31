@@ -76,12 +76,7 @@ nav{height:64px;background:var(--navy-deeper);border-bottom:2px solid var(--gold
 }
 
 /* INFO CARDS */
-.info-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:2px;animation:fadeUp .7s var(--ease) .3s both;}
-.info-card{background:rgba(255,255,255,.03);border:1px solid rgba(194,169,104,.08);padding:24px 22px;display:flex;align-items:flex-start;gap:14px;}
-.info-icon{width:36px;height:36px;border:1px solid rgba(194,169,104,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.info-icon svg{width:16px;height:16px;stroke:var(--gold);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
-.info-text-title{font-size:.7rem;font-weight:600;letter-spacing:.08em;color:var(--white);margin-bottom:4px;}
-.info-text-sub{font-size:.72rem;color:rgba(255,255,255,.3);line-height:1.6;}
+.visit-note{text-align:center;font-size:.78rem;color:rgba(255,255,255,.38);line-height:1.7;margin-top:22px;animation:fadeUp .7s var(--ease) .3s both;}
 
 /* FOOTER */
 footer{background:var(--navy-deeper);border-top:2px solid var(--gold);padding:32px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-top:60px;}
@@ -134,7 +129,6 @@ footer{background:var(--navy-deeper);border-top:2px solid var(--gold);padding:32
   .page{padding:88px 16px 60px;}
   .steps-mini{gap:0;flex-wrap:wrap;justify-content:center;}
   .step-mini-line{width:16px;}
-  .info-cards{grid-template-columns:1fr;}
   footer{padding:24px 20px;flex-direction:column;text-align:center;}
 }
 *:focus-visible{outline:2px solid var(--gold);outline-offset:3px;}
@@ -216,36 +210,8 @@ footer{background:var(--navy-deeper);border-top:2px solid var(--gold);padding:32
     </a>
   </div>
 
-  <!-- INFO CARDS -->
-  <div class="info-cards">
-    <div class="info-card">
-      <div class="info-icon">
-        <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 6.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012.18 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.09a16 16 0 006 6l.56-.56a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg>
-      </div>
-      <div>
-        <div class="info-text-title" data-i18n="info1_t">Te contactamos antes</div>
-        <div class="info-text-sub" data-i18n="info1_s">Julián te llama 24hs antes para confirmar y resolver cualquier duda.</div>
-      </div>
-    </div>
-    <div class="info-card">
-      <div class="info-icon">
-        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-      </div>
-      <div>
-        <div class="info-text-title" data-i18n="info2_t">Video de la unidad</div>
-        <div class="info-text-sub" data-i18n="info2_s">Recibís un video de 3 a 5 min por WhatsApp con toda la info antes de la visita.</div>
-      </div>
-    </div>
-    <div class="info-card">
-      <div class="info-icon">
-        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-      </div>
-      <div>
-        <div class="info-text-title" data-i18n="info3_t">Sin compromiso</div>
-        <div class="info-text-sub" data-i18n="info3_s">La visita es gratis y sin obligación. Cancelá o reprogramá cuando quieras.</div>
-      </div>
-    </div>
-  </div>
+  <!-- NOTA SIN COMPROMISO -->
+  <div class="visit-note" data-i18n="info3_s">La visita es gratis y sin obligación. Cancelá o reprogramá cuando quieras.</div>
 
 </div>
 
@@ -363,11 +329,6 @@ document.getElementById('burger').addEventListener('click', function() {
         title_1:"Escolha o dia e o horário",title_2:"que melhor",title_3:"combina com você",
         sub:"Assim que confirmar, você recebe um WhatsApp com todas as informações da unidade para chegar preparado no dia da visita.",
         step1:"Unidade escolhida",step2:"Perfil qualificado",step3:"Confirme a visita",
-        info1_t:"Entramos em contato antes",
-        info1_s:"Julián liga para você 24h antes para confirmar e esclarecer qualquer dúvida.",
-        info2_t:"Vídeo da unidade",
-        info2_s:"Você recebe um vídeo de 3 a 5 minutos pelo WhatsApp com todas as informações antes da visita.",
-        info3_t:"Sem compromisso",
         info3_s:"A visita é gratuita e sem obrigação. Cancele ou reagende quando quiser.",
         wa_t:"Visita agendada",
         wa_s:"Última etapa: envie seus dados pelo WhatsApp para que seu assessor chegue com tudo pronto no dia da visita.",
@@ -383,11 +344,6 @@ document.getElementById('burger').addEventListener('click', function() {
         title_1:"Choose the day and time",title_2:"that suits",title_3:"you best",
         sub:"Once confirmed, you receive a WhatsApp message with all the details of the unit so you arrive prepared on the day of your visit.",
         step1:"Unit selected",step2:"Profile qualified",step3:"Confirm your visit",
-        info1_t:"We contact you beforehand",
-        info1_s:"Julián calls you 24 hours in advance to confirm and answer any questions.",
-        info2_t:"Video of the unit",
-        info2_s:"You receive a 3 to 5 minute video via WhatsApp with all the details before your visit.",
-        info3_t:"No commitment",
         info3_s:"The visit is free and without obligation. Cancel or reschedule at any time.",
         wa_t:"Visit scheduled",
         wa_s:"One last step: send us your details via WhatsApp so your advisor arrives fully prepared on the day of your visit.",
