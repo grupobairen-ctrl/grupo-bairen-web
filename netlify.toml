@@ -16,6 +16,13 @@
   status = 200
   force = false
 
+# ─── /julian: página interna de carga de propiedades (Juli) ────────────
+[[redirects]]
+  from = "/julian"
+  to = "/julian.html"
+  status = 200
+  force = false
+
 # ─── Headers de seguridad básicos para todo el sitio ───────────────────
 [[headers]]
   for = "/*"
@@ -30,6 +37,13 @@
   for = "/admin.html"
   [headers.values]
     X-Frame-Options = "DENY"
+    Cache-Control = "no-store, no-cache, must-revalidate, max-age=0"
+
+# ─── /julian: sin caché y fuera de los buscadores ──────────────────────
+[[headers]]
+  for = "/julian*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
     Cache-Control = "no-store, no-cache, must-revalidate, max-age=0"
 
 # ─── Assets estáticos: caché largo ─────────────────────────────────────

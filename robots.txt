@@ -2,6 +2,8 @@ User-agent: *
 Allow: /
 
 Disallow: /admin.html
+Disallow: /julian
+Disallow: /julian.html
 Disallow: /confirmar.html
 Disallow: /filtro.html
 Disallow: /propiedad.html

@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#2A3A52">
+<title>Cargas · Grupo Bairen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,300;0,400;0,500;0,600&family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#2A3A52;--navy-dark:#1E2A3F;--navy-deeper:#131D2D;
+  --gold:#C2A968;--gold-dark:#8A7547;--gold-light:#DECDA0;
+  --white:#FBFAF6;--off:#EEE5D0;--mid:#6B7589;--border:rgba(42,58,82,.12);
+  --ok:#2a7a4b;--ok-bg:#eef6f0;--err:#b94a4a;
+  --fd:'Playfair Display',Georgia,serif;
+  --fb:'Jost',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--fb);background:var(--off);color:var(--navy);-webkit-font-smoothing:antialiased;min-height:100vh;}
+button{font-family:var(--fb);cursor:pointer;}
+textarea{font-family:var(--fb);}
+
+/* ─── NAV ───────────────────────────────────────────────── */
+nav{position:sticky;top:0;z-index:100;background:var(--navy);border-bottom:2px solid var(--gold);display:flex;align-items:center;justify-content:center;padding:14px 20px;padding-top:max(14px, env(safe-area-inset-top));}
+.nav-brand{font-family:var(--fd);font-size:.9rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--white);text-align:center;}
+.nav-brand b{color:var(--gold);font-weight:700;}
+.nav-sub{display:block;font-family:var(--fb);font-size:.6rem;font-weight:400;letter-spacing:.3em;color:var(--gold-light);margin-top:3px;}
+
+/* ─── LAYOUT ────────────────────────────────────────────── */
+.wrap{max-width:680px;margin:0 auto;padding:20px 16px 60px;}
+
+/* ─── CARD DE CARGA ─────────────────────────────────────── */
+.up-card{background:var(--white);border:1px solid var(--border);padding:22px 18px;}
+.up-ttl{font-family:var(--fd);font-size:1.25rem;font-weight:500;margin-bottom:4px;}
+.up-sub{font-size:.78rem;color:var(--mid);margin-bottom:18px;}
+.pick{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;width:100%;padding:26px 16px;background:transparent;border:1.5px dashed var(--gold-dark);color:var(--gold-dark);transition:background .15s;}
+.pick:active{background:rgba(194,169,104,.1);}
+.pick-ico{font-size:1.6rem;line-height:1;}
+.pick-txt{font-size:.8rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;}
+.pick-hint{font-size:.68rem;color:var(--mid);letter-spacing:.02em;}
+#fileInput{display:none;}
+
+.prev-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px;margin-top:14px;}
+.prev{position:relative;aspect-ratio:1;background:var(--navy-deeper);overflow:hidden;}
+.prev img,.prev video{width:100%;height:100%;object-fit:cover;display:block;}
+.prev-x{position:absolute;top:4px;right:4px;width:24px;height:24px;border:none;border-radius:50%;background:rgba(19,29,45,.75);color:#fff;font-size:.85rem;line-height:1;display:flex;align-items:center;justify-content:center;}
+.prev-vid::after{content:'▶';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.2rem;text-shadow:0 1px 6px rgba(0,0,0,.6);pointer-events:none;}
+
+.lbl{font-size:.66rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--mid);display:block;margin:18px 0 6px;}
+textarea#desc{width:100%;min-height:110px;padding:12px;font-size:16px;line-height:1.5;color:var(--navy);background:#fff;border:1px solid var(--border);resize:vertical;}
+textarea#desc:focus{outline:none;border-color:var(--gold);}
+
+.btn-save{width:100%;margin-top:16px;padding:16px;background:var(--navy);color:var(--white);border:none;font-size:.85rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;transition:opacity .15s;}
+.btn-save:disabled{opacity:.55;}
+.up-msg{margin-top:12px;font-size:.8rem;padding:10px 12px;display:none;}
+.up-msg.show{display:block;}
+.up-msg.ok{color:var(--ok);background:var(--ok-bg);border-left:3px solid var(--ok);}
+.up-msg.err{color:var(--err);background:rgba(185,74,74,.08);border-left:3px solid var(--err);}
+.bar-wrap{margin-top:12px;display:none;}
+.bar-wrap.show{display:block;}
+.bar-txt{font-size:.74rem;color:var(--mid);margin-bottom:6px;}
+.bar{height:4px;background:var(--border);}
+.bar-fill{height:100%;width:0;background:var(--gold);transition:width .25s;}
+
+/* ─── LISTA ─────────────────────────────────────────────── */
+.sec-ttl{font-family:var(--fd);font-size:1.05rem;font-weight:500;margin:30px 0 12px;display:flex;align-items:center;gap:8px;}
+.sec-ttl .count{font-family:var(--fb);font-size:.68rem;font-weight:600;color:var(--mid);background:var(--white);border:1px solid var(--border);padding:2px 8px;border-radius:20px;}
+.card{background:var(--white);border:1px solid var(--border);padding:16px;margin-bottom:12px;}
+.card.done{background:var(--ok-bg);border-color:rgba(42,122,75,.3);}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;}
+.card-date{font-size:.7rem;color:var(--mid);letter-spacing:.05em;}
+.badge-done{font-size:.64rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#fff;background:var(--ok);padding:4px 10px;border-radius:20px;}
+.media-strip{display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:10px;padding-bottom:4px;}
+.thumb{position:relative;flex:0 0 auto;width:92px;height:92px;background:var(--navy-deeper);overflow:hidden;border:none;padding:0;}
+.thumb img,.thumb video{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;}
+.thumb.vid::after{content:'▶';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.15rem;text-shadow:0 1px 6px rgba(0,0,0,.6);}
+.card-desc{font-size:.88rem;line-height:1.55;white-space:pre-wrap;word-break:break-word;}
+.card-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px;}
+.btn-check{flex:1;padding:12px;font-size:.74rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;background:transparent;color:var(--ok);border:1.5px solid var(--ok);transition:all .15s;}
+.btn-check:active{background:var(--ok);color:#fff;}
+.btn-uncheck{background:transparent;border:none;font-size:.7rem;color:var(--mid);text-decoration:underline;padding:8px 0;}
+.btn-del{background:transparent;border:none;font-size:.7rem;color:var(--err);opacity:.7;text-decoration:underline;padding:8px 0;white-space:nowrap;}
+.empty{text-align:center;color:var(--mid);font-size:.85rem;padding:40px 20px;}
+.loading{text-align:center;color:var(--mid);font-size:.8rem;padding:40px 20px;letter-spacing:.1em;}
+
+/* ─── LIGHTBOX ──────────────────────────────────────────── */
+.lb{position:fixed;inset:0;z-index:200;background:rgba(19,29,45,.96);display:none;align-items:center;justify-content:center;padding:16px;}
+.lb.show{display:flex;}
+.lb img,.lb video{max-width:100%;max-height:88vh;object-fit:contain;}
+.lb-x{position:absolute;top:max(14px, env(safe-area-inset-top));right:16px;width:40px;height:40px;border:none;border-radius:50%;background:rgba(255,255,255,.12);color:#fff;font-size:1.1rem;}
+.lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:42px;height:42px;border:none;border-radius:50%;background:rgba(255,255,255,.12);color:#fff;font-size:1.1rem;}
+.lb-prev{left:10px;}
+.lb-next{right:10px;}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">Grupo <b>Bairen</b>
+    <span class="nav-sub">CARGA DE PROPIEDADES</span>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <!-- ─── BOX DE CARGA ─────────────────────────────────── -->
+  <section class="up-card">
+    <h1 class="up-ttl">Nueva propiedad</h1>
+    <p class="up-sub">Subí las fotos y videos desde tu galería y agregá los datos.</p>
+
+    <button type="button" class="pick" id="pickBtn">
+      <span class="pick-ico">＋</span>
+      <span class="pick-txt">Agregar fotos y videos</span>
+      <span class="pick-hint">Podés seleccionar varias a la vez</span>
+    </button>
+    <input type="file" id="fileInput" accept="image/*,video/*" multiple>
+
+    <div class="prev-grid" id="prevGrid"></div>
+
+    <label class="lbl" for="desc">Descripción y datos</label>
+    <textarea id="desc" placeholder="Dirección, barrio, ambientes, m², precio, datos del propietario, y todo lo que haga falta…"></textarea>
+
+    <button type="button" class="btn-save" id="saveBtn">Guardar propiedad</button>
+
+    <div class="bar-wrap" id="barWrap">
+      <div class="bar-txt" id="barTxt">Subiendo…</div>
+      <div class="bar"><div class="bar-fill" id="barFill"></div></div>
+    </div>
+    <div class="up-msg" id="upMsg"></div>
+  </section>
+
+  <!-- ─── LISTA ────────────────────────────────────────── -->
+  <div id="lista"><div class="loading">CARGANDO…</div></div>
+
+</div>
+
+<!-- ─── LIGHTBOX ───────────────────────────────────────── -->
+<div class="lb" id="lb">
+  <button class="lb-x" id="lbX" aria-label="Cerrar">✕</button>
+  <button class="lb-nav lb-prev" id="lbPrev" aria-label="Anterior">‹</button>
+  <div id="lbContent"></div>
+  <button class="lb-nav lb-next" id="lbNext" aria-label="Siguiente">›</button>
+</div>
+
+<script src="supabase-config.js"></script>
+<script>
+(async function(){
+  const $ = id => document.getElementById(id);
+  const MAX_MB = 50; // límite de Supabase por archivo
+
+  let sb;
+  try { sb = await window.bairenReady; }
+  catch(e){
+    $('lista').innerHTML = '<div class="empty">No se pudo conectar a la base. Revisá la conexión a internet y recargá.</div>';
+    return;
+  }
+
+  // ═══ ESTADO DEL FORMULARIO ═══
+  let pending = []; // [{file, objUrl, tipo}]
+
+  $('pickBtn').addEventListener('click', () => $('fileInput').click());
+
+  $('fileInput').addEventListener('change', () => {
+    const files = Array.from($('fileInput').files || []);
+    const rejected = [];
+    for (const f of files){
+      if (f.size > MAX_MB * 1024 * 1024){ rejected.push(f.name); continue; }
+      const tipo = (f.type || '').startsWith('video') ? 'video' : 'foto';
+      pending.push({ file: f, objUrl: URL.createObjectURL(f), tipo });
+    }
+    $('fileInput').value = '';
+    renderPrev();
+    if (rejected.length){
+      showMsg('err', 'Estos archivos pesan más de ' + MAX_MB + ' MB y no se pueden subir: ' + rejected.join(', ') + '. Probá con un video más corto o exportalo en menor calidad.');
+    }
+  });
+
+  function renderPrev(){
+    const g = $('prevGrid');
+    g.innerHTML = '';
+    pending.forEach((p, i) => {
+      const d = document.createElement('div');
+      d.className = 'prev' + (p.tipo === 'video' ? ' prev-vid' : '');
+      d.innerHTML = (p.tipo === 'video'
+        ? '<video src="' + p.objUrl + '" preload="metadata" muted playsinline></video>'
+        : '<img src="' + p.objUrl + '" alt="">')
+        + '<button type="button" class="prev-x" data-i="' + i + '" aria-label="Quitar">✕</button>';
+      g.appendChild(d);
+    });
+    g.querySelectorAll('.prev-x').forEach(b => b.addEventListener('click', e => {
+      const i = +e.currentTarget.dataset.i;
+      URL.revokeObjectURL(pending[i].objUrl);
+      pending.splice(i, 1);
+      renderPrev();
+    }));
+  }
+
+  function showMsg(kind, txt){
+    const m = $('upMsg');
+    m.className = 'up-msg show ' + kind;
+    m.textContent = txt;
+  }
+  function hideMsg(){ $('upMsg').className = 'up-msg'; }
+
+  // ═══ GUARDAR ═══
+  $('saveBtn').addEventListener('click', async () => {
+    hideMsg();
+    const desc = $('desc').value.trim();
+    if (!desc){ showMsg('err', 'Escribí la descripción con los datos de la propiedad.'); return; }
+    if (!pending.length){ showMsg('err', 'Agregá al menos una foto o video.'); return; }
+
+    const btn = $('saveBtn');
+    btn.disabled = true;
+    $('barWrap').className = 'bar-wrap show';
+
+    try {
+      // 1. crear la carga
+      const { data: carga, error: cErr } = await sb.from('cargas_julian')
+        .insert({ descripcion: desc }).select('id').single();
+      if (cErr) throw cErr;
+
+      // 2. subir archivos uno por uno
+      const fails = [];
+      for (let i = 0; i < pending.length; i++){
+        const p = pending[i];
+        $('barTxt').textContent = 'Subiendo archivo ' + (i+1) + ' de ' + pending.length + '…';
+        $('barFill').style.width = Math.round((i / pending.length) * 100) + '%';
+
+        const ext = (p.file.name.split('.').pop() || 'bin').toLowerCase();
+        const path = carga.id + '/' + Date.now() + '-' + i + '.' + ext;
+        const { error: upErr } = await sb.storage.from('cargas-julian')
+          .upload(path, p.file, { contentType: p.file.type || undefined });
+        if (upErr){ fails.push(p.file.name); continue; }
+
+        const { data: pub } = sb.storage.from('cargas-julian').getPublicUrl(path);
+        const { error: mErr } = await sb.from('cargas_julian_media')
+          .insert({ carga_id: carga.id, url: pub.publicUrl, storage_path: path, tipo: p.tipo, orden: i });
+        if (mErr) fails.push(p.file.name);
+      }
+      $('barFill').style.width = '100%';
+
+      if (fails.length === pending.length){
+        // no subió nada: borrar la carga vacía
+        await sb.from('cargas_julian').delete().eq('id', carga.id);
+        throw new Error('No se pudo subir ningún archivo. Revisá la conexión y probá de nuevo.');
+      }
+
+      pending.forEach(p => URL.revokeObjectURL(p.objUrl));
+      pending = [];
+      renderPrev();
+      $('desc').value = '';
+      showMsg('ok', fails.length
+        ? 'Propiedad guardada, pero estos archivos fallaron: ' + fails.join(', ') + '. Podés subirlos en una carga nueva.'
+        : 'Propiedad guardada. Gracias, Juli.');
+      await cargarLista();
+    } catch(err){
+      showMsg('err', 'Error al guardar: ' + (err.message || err));
+    } finally {
+      btn.disabled = false;
+      $('barWrap').className = 'bar-wrap';
+      $('barFill').style.width = '0';
+    }
+  });
+
+  // ═══ LISTA ═══
+  let cargas = [];
+  let lbItems = [], lbIdx = 0;
+
+  async function cargarLista(){
+    const { data, error } = await sb.from('cargas_julian')
+      .select('*, cargas_julian_media(id, url, storage_path, tipo, orden)')
+      .order('created_at', { ascending: false });
+    if (error){
+      $('lista').innerHTML = '<div class="empty">No se pudo cargar la lista. Si es la primera vez, falta correr <b>julian-schema.sql</b> en Supabase.<br><small>' + (error.message || '') + '</small></div>';
+      return;
+    }
+    cargas = data || [];
+    renderLista();
+  }
+
+  function fmtFecha(iso){
+    const d = new Date(iso);
+    return d.toLocaleDateString('es-AR', { day: 'numeric', month: 'long' }) +
+      ' · ' + d.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }) + ' hs';
+  }
+
+  function mediaHTML(c){
+    const medias = (c.cargas_julian_media || []).sort((a,b) => a.orden - b.orden);
+    return medias.map(m =>
+      '<button type="button" class="thumb' + (m.tipo === 'video' ? ' vid' : '') + '" data-carga="' + c.id + '" data-media="' + m.id + '">' +
+      (m.tipo === 'video'
+        ? '<video src="' + m.url + '#t=0.1" preload="metadata" muted playsinline></video>'
+        : '<img src="' + m.url + '" loading="lazy" alt="">') +
+      '</button>'
+    ).join('');
+  }
+
+  function cardHTML(c){
+    const done = !!c.subida;
+    return '<article class="card' + (done ? ' done' : '') + '" data-id="' + c.id + '">' +
+      '<div class="card-head">' +
+        '<span class="card-date">' + fmtFecha(c.created_at) + '</span>' +
+        (done ? '<span class="badge-done">✓ Subida</span>' : '') +
+      '</div>' +
+      '<div class="media-strip">' + mediaHTML(c) + '</div>' +
+      '<p class="card-desc">' + escapeHTML(c.descripcion) + '</p>' +
+      '<div class="card-foot">' +
+        (done
+          ? '<button type="button" class="btn-uncheck" data-act="uncheck">Volver a pendiente</button>'
+          : '<button type="button" class="btn-check" data-act="check">✓ Marcar como subida</button>') +
+        '<button type="button" class="btn-del" data-act="del">Eliminar</button>' +
+      '</div>' +
+    '</article>';
+  }
+
+  function escapeHTML(s){
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function renderLista(){
+    const pend = cargas.filter(c => !c.subida);
+    const done = cargas.filter(c => c.subida);
+    let html = '';
+    if (!cargas.length){
+      html = '<div class="empty">Todavía no hay propiedades cargadas.</div>';
+    } else {
+      if (pend.length){
+        html += '<h2 class="sec-ttl">Pendientes <span class="count">' + pend.length + '</span></h2>';
+        html += pend.map(cardHTML).join('');
+      }
+      if (done.length){
+        html += '<h2 class="sec-ttl">Subidas <span class="count">' + done.length + '</span></h2>';
+        html += done.map(cardHTML).join('');
+      }
+    }
+    $('lista').innerHTML = html;
+
+    // acciones
+    $('lista').querySelectorAll('[data-act]').forEach(b => b.addEventListener('click', async e => {
+      const card = e.currentTarget.closest('.card');
+      const id = card.dataset.id;
+      const act = e.currentTarget.dataset.act;
+      const c = cargas.find(x => x.id === id);
+      if (!c) return;
+
+      if (act === 'check' || act === 'uncheck'){
+        const nuevo = act === 'check';
+        e.currentTarget.disabled = true;
+        const { error } = await sb.from('cargas_julian').update({ subida: nuevo }).eq('id', id);
+        if (error){ alert('No se pudo actualizar: ' + error.message); e.currentTarget.disabled = false; return; }
+        c.subida = nuevo;
+        renderLista();
+      }
+
+      if (act === 'del'){
+        if (!confirm('¿Eliminar esta propiedad con todas sus fotos y videos? No se puede deshacer.')) return;
+        const paths = (c.cargas_julian_media || []).map(m => m.storage_path).filter(Boolean);
+        if (paths.length) await sb.storage.from('cargas-julian').remove(paths);
+        const { error } = await sb.from('cargas_julian').delete().eq('id', id);
+        if (error){ alert('No se pudo eliminar: ' + error.message); return; }
+        cargas = cargas.filter(x => x.id !== id);
+        renderLista();
+      }
+    }));
+
+    // lightbox
+    $('lista').querySelectorAll('.thumb').forEach(t => t.addEventListener('click', e => {
+      const cargaId = e.currentTarget.dataset.carga;
+      const mediaId = e.currentTarget.dataset.media;
+      const c = cargas.find(x => x.id === cargaId);
+      if (!c) return;
+      lbItems = (c.cargas_julian_media || []).slice().sort((a,b) => a.orden - b.orden);
+      lbIdx = Math.max(0, lbItems.findIndex(m => m.id === mediaId));
+      openLB();
+    }));
+  }
+
+  // ═══ LIGHTBOX ═══
+  function openLB(){
+    renderLB();
+    $('lb').classList.add('show');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLB(){
+    $('lb').classList.remove('show');
+    $('lbContent').innerHTML = '';
+    document.body.style.overflow = '';
+  }
+  function renderLB(){
+    const m = lbItems[lbIdx];
+    if (!m) return;
+    $('lbContent').innerHTML = m.tipo === 'video'
+      ? '<video src="' + m.url + '" controls autoplay playsinline></video>'
+      : '<img src="' + m.url + '" alt="">';
+    const multi = lbItems.length > 1;
+    $('lbPrev').style.display = multi ? '' : 'none';
+    $('lbNext').style.display = multi ? '' : 'none';
+  }
+  $('lbX').addEventListener('click', closeLB);
+  $('lb').addEventListener('click', e => { if (e.target === $('lb')) closeLB(); });
+  $('lbPrev').addEventListener('click', () => { lbIdx = (lbIdx - 1 + lbItems.length) % lbItems.length; renderLB(); });
+  $('lbNext').addEventListener('click', () => { lbIdx = (lbIdx + 1) % lbItems.length; renderLB(); });
+  document.addEventListener('keydown', e => {
+    if (!$('lb').classList.contains('show')) return;
+    if (e.key === 'Escape') closeLB();
+    if (e.key === 'ArrowLeft') $('lbPrev').click();
+    if (e.key === 'ArrowRight') $('lbNext').click();
+  });
+
+  await cargarLista();
+})();
+</script>
+</body>
+</html>
