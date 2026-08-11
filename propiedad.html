@@ -393,7 +393,7 @@ footer{background:var(--navy-dark);border-top:1px solid var(--gold);padding:40px
 // ─── i18n de contenido dinámico (el estático lo maneja i18n.js) ───
 const PROP_T = {
   es: {
-    tag_ambos:'Alquiler temporal y tradicional', tag_temporal:'Alquiler Temporal', tag_tradicional:'Alquiler Tradicional',
+    tag_ambos:'Alquiler temporal y tradicional', tag_temporal:'Alquiler Temporal', tag_tradicional:'Alquiler Tradicional', tag_venta:'En Venta',
     temporal_allin:'temporal · all in', pm_allin:'por mes · all in', pm_todo:'por mes · todo incluido', pm:'por mes',
     trad_lbl:'Tradicional',
     stat_unidad:'Unidad', stat_amb:'Ambientes', stat_meses:'Meses', stat_anios:'Años',
@@ -415,7 +415,7 @@ const PROP_T = {
     locale:'es-AR'
   },
   pt: {
-    tag_ambos:'Aluguel temporada e tradicional', tag_temporal:'Aluguel Temporada', tag_tradicional:'Aluguel Tradicional',
+    tag_ambos:'Aluguel temporada e tradicional', tag_temporal:'Aluguel Temporada', tag_tradicional:'Aluguel Tradicional', tag_venta:'À Venda',
     temporal_allin:'temporada · tudo incluído', pm_allin:'por mês · tudo incluído', pm_todo:'por mês · tudo incluído', pm:'por mês',
     trad_lbl:'Tradicional',
     stat_unidad:'Unidade', stat_amb:'Ambientes', stat_meses:'Meses', stat_anios:'Anos',
@@ -438,7 +438,7 @@ const PROP_T = {
     amen:{'Pileta':'Piscina','Gimnasio':'Academia','Spa / Sauna':'Spa / Sauna','SUM':'Salão de festas','Cochera':'Garagem','Ascensor':'Elevador','Aire acond.':'Ar-condicionado','Jardín / Terraza':'Jardim / Terraço','Parrilla':'Churrasqueira','Laundry':'Lavanderia','Seguridad 24hs':'Segurança 24h','Conserje 24hs':'Portaria 24h','Bicicletero':'Bicicletário','Pet friendly':'Aceita pets','Calefacción central':'Aquecimento central','Baulera':'Depósito','Amoblado':'Mobiliado','All in':'Tudo incluído'}
   },
   en: {
-    tag_ambos:'Short & long-term rental', tag_temporal:'Short-term Rental', tag_tradicional:'Long-term Rental',
+    tag_ambos:'Short & long-term rental', tag_temporal:'Short-term Rental', tag_tradicional:'Long-term Rental', tag_venta:'For Sale',
     temporal_allin:'short-term · all in', pm_allin:'per month · all in', pm_todo:'per month · all inclusive', pm:'per month',
     trad_lbl:'Long-term',
     stat_unidad:'Unit', stat_amb:'Rooms', stat_meses:'Months', stat_anios:'Years',
@@ -617,6 +617,7 @@ function renderProperty(p) {
   const isAmbos   = tipo === 'Ambos';
   const isTemp    = tipo === 'Temporal';
   const isTrad    = tipo === 'Tradicional';
+  const isVenta   = tipo === 'Venta';
   const reservado = p.estado === 'Reservado';
 
   PHOTOS = (p.imagenes || []).sort((a,b) => a.orden - b.orden);
@@ -628,7 +629,7 @@ function renderProperty(p) {
   const tipoLabel = isAmbos ? 'temporal o tradicional' : tipo.toLowerCase();
   const descSEO = (p.descripcion && p.descripcion.length > 30)
     ? p.descripcion.slice(0, 160).replace(/\s+\S*$/, '') + '…'
-    : `${titleFull} en ${p.barrio}, Buenos Aires. Alquiler ${tipoLabel} — Grupo Bairen.`;
+    : `${titleFull} en ${p.barrio}, Buenos Aires. ${isVenta ? 'Venta' : 'Alquiler ' + tipoLabel} — Grupo Bairen.`;
 
   document.title = `${titleFull} — ${p.barrio} — Grupo Bairen`;
   document.querySelector('meta[name="robots"]').setAttribute('content', 'index, follow');
@@ -697,6 +698,7 @@ function renderDynamicTexts(p) {
   const isAmbos   = tipo === 'Ambos';
   const isTemp    = tipo === 'Temporal';
   const isTrad    = tipo === 'Tradicional';
+  const isVenta   = tipo === 'Venta';
   const reservado = p.estado === 'Reservado';
 
   // ─── HERO TAG ───
@@ -704,7 +706,7 @@ function renderDynamicTexts(p) {
     $('heroTag').textContent = formatFechaLiberacion(p.fecha_liberacion);
     $('heroTag').classList.add('hero-tag--liberacion');
   } else {
-    $('heroTag').textContent = isAmbos ? t.tag_ambos : (isTemp ? t.tag_temporal : t.tag_tradicional);
+    $('heroTag').textContent = isAmbos ? t.tag_ambos : (isVenta ? t.tag_venta : (isTemp ? t.tag_temporal : t.tag_tradicional));
     $('heroTag').classList.remove('hero-tag--liberacion');
   }
 
@@ -730,6 +732,18 @@ function renderDynamicTexts(p) {
     $('heroPriceMo').textContent = t.pm;
     $('acPrice').textContent = priceTradStr;
     $('acPriceMo').textContent = t.pm;
+  } else if (isVenta) {
+    const priceVentaStr = fmtUSD(p.precio_venta);
+    $('heroPrice').textContent = priceVentaStr;
+    $('heroPriceMo').textContent = '';
+    $('acPrice').textContent = priceVentaStr;
+    $('acPriceMo').textContent = '';
+    // Etiqueta "Valor" en lugar de "Precio mensual" (con soporte i18n)
+    document.querySelectorAll('[data-i18n="prop_price_m"]').forEach(el => {
+      el.setAttribute('data-i18n', 'prop_price_v');
+      el.dataset.es = 'Valor';
+      el.textContent = (window.BAIREN_LANG === 'en') ? 'Price' : 'Valor';
+    });
   }
 
   // ─── STATS ───
@@ -738,11 +752,13 @@ function renderDynamicTexts(p) {
   const unidStr  = p.unidad || '—';
   const { val: plazoSt, lbl: plazoLbl } = formatPlazoStat(p.plazo, isTemp, isTrad);
   const plazoLblTr = plazoLbl === 'Años' ? t.stat_anios : t.stat_meses;
+  const plazoStatHTML = isVenta ? '' :
+    `<div class="stat"><div class="stat-val">${escapeHTML(plazoSt)}</div><div class="stat-lbl">${escapeHTML(plazoLblTr)}</div></div>`;
   $('statsRow').innerHTML = `
     <div class="stat"><div class="stat-val">${escapeHTML(m2Str)}</div><div class="stat-lbl">M²</div></div>
     <div class="stat"><div class="stat-val">${escapeHTML(unidStr)}</div><div class="stat-lbl">${t.stat_unidad}</div></div>
     <div class="stat"><div class="stat-val">${escapeHTML(ambStr)}</div><div class="stat-lbl">${t.stat_amb}</div></div>
-    <div class="stat"><div class="stat-val">${escapeHTML(plazoSt)}</div><div class="stat-lbl">${escapeHTML(plazoLblTr)}</div></div>
+    ${plazoStatHTML}
   `;
 
   // ─── DESCRIPCIÓN ─── (usa la traducción guardada si existe; si no, español)
@@ -771,16 +787,17 @@ function renderDynamicTexts(p) {
 
 function renderActionCard(p, titleFull, unidadLbl, reservado, isTemp, isTrad) {
   const t = LT();
+  const isVenta = p.tipo === 'Venta';
   const acBody = $('acBody');
   const rows = [];
   rows.push({ l:t.r_dir,    v: p.dir + unidadLbl });
   rows.push({ l:t.r_barrio, v: p.barrio });
   if (p.m2)        rows.push({ l:t.r_sup, v: `${p.m2} m²` });
   if (p.ambientes) rows.push({ l:t.r_amb, v: `${p.ambientes} ${p.ambientes !== 1 ? t.amb_pl : t.amb_sing}` });
-  rows.push({ l:t.r_plazo,  v: p.plazo || t.plazo_default });
+  if (!isVenta) rows.push({ l:t.r_plazo,  v: p.plazo || t.plazo_default });
   if (isTemp || p.tipo === 'Ambos') rows.push({ l:t.r_serv, v: t.v_serv_all });
   else if (isTrad) rows.push({ l:t.r_serv, v: t.v_serv_inq });
-  rows.push({ l:t.r_gar,    v: isTrad ? t.v_gar_trad : t.v_gar_no });
+  if (!isVenta) rows.push({ l:t.r_gar,    v: isTrad ? t.v_gar_trad : t.v_gar_no });
   rows.push({ l:t.r_estado, v: t['est_' + p.estado] || p.estado, color: reservado ? '#b94a4a' : '#2a7a4b' });
 
   let html = rows.map(r =>
@@ -800,7 +817,8 @@ function renderActionCard(p, titleFull, unidadLbl, reservado, isTemp, isTrad) {
   } else {
     // Si tipo='Ambos', mandamos Temporal como default al filtro (modalidad más común)
     const ctaTipo   = p.tipo === 'Ambos' ? 'Temporal' : p.tipo;
-    const ctaPrecio = ctaTipo === 'Tradicional' ? p.precio_tradicional : p.precio_temporal;
+    const ctaPrecio = ctaTipo === 'Tradicional' ? p.precio_tradicional
+                    : (ctaTipo === 'Venta' ? p.precio_venta : p.precio_temporal);
     const filtro = `filtro.html?prop=${encodeURIComponent(p.dir)}&barrio=${encodeURIComponent(p.barrio)}&tipo=${encodeURIComponent(ctaTipo)}&amb=${p.ambientes || 0}&precio=${ctaPrecio || 0}`;
     const waReservar = encodeURIComponent(t.wa_reservar.replace('{p}', propRef));
     html += `
@@ -836,10 +854,11 @@ function injectJSONLD(p, pageUrl, ogImg) {
   // Limpiar JSON-LD previo
   document.querySelectorAll('script[type="application/ld+json"][data-injected]').forEach(s => s.remove());
 
-  const offerType = p.tipo === 'Tradicional'
-    ? 'LongTermRental'
+  const offerType = p.tipo === 'Venta'
+    ? 'Sell'
     : (p.tipo === 'Temporal' ? 'ShortTermRental' : 'LongTermRental');
-  const price = p.tipo === 'Tradicional' ? p.precio_tradicional : p.precio_temporal;
+  const price = p.tipo === 'Venta' ? p.precio_venta
+              : (p.tipo === 'Tradicional' ? p.precio_tradicional : p.precio_temporal);
 
   const realEstate = {
     "@context": "https://schema.org",

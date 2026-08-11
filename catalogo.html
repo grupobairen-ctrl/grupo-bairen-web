@@ -976,6 +976,8 @@ async function loadFromSupabase() {
     if (error) throw error;
 
     props = (data || []).flatMap(p => {
+      // Las unidades en venta viven en comprar.html, no en el catálogo de alquileres
+      if (p.tipo === 'Venta') return [];
       const portada = (p.imagenes || []).sort((a, b) => a.orden - b.orden)[0];
       const foto    = portada ? portada.url : null;
       const amList  = (p.amenities || []).map(a => a.nombre);
