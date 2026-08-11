@@ -410,6 +410,7 @@ const PROP_T = {
     btn_similares:'VER OPCIONES SIMILARES', btn_visita:'COORDINAR VISITA', btn_reservar:'RESERVAR LA UNIDAD',
     wa_similar:'Muy buenas! ¿Cuentan con propiedades similares a {p}? Me encuentro interesado/a. Gracias!',
     wa_reservar:'Muy buenas! Estoy interesado/a en reservar la unidad de {p}. ¿Cómo seguimos? Gracias!',
+    wa_venta:'Hola muy buenas, me interesa la propiedad en venta en {p}. Me gustaría coordinar una visita. Gracias!',
     default_desc:'{t} — unidad disponible en {b}, Buenos Aires. Listo para vivir desde el primer día.',
     lib_hoy:'Se libera hoy', lib_manana:'Se libera mañana', lib_dias:'Se libera en {d} días', lib_fecha:'Se libera: {f}',
     locale:'es-AR'
@@ -432,6 +433,7 @@ const PROP_T = {
     btn_similares:'VER OPÇÕES SEMELHANTES', btn_visita:'AGENDAR VISITA', btn_reservar:'RESERVAR A UNIDADE',
     wa_similar:'Olá, vocês têm imóveis semelhantes a {p}? Tenho interesse. Obrigado!',
     wa_reservar:'Olá, tenho interesse em reservar a unidade de {p}. Como seguimos? Obrigado!',
+    wa_venta:'Olá, tenho interesse no imóvel à venda em {p}. Gostaria de agendar uma visita. Obrigado!',
     default_desc:'{t} — unidade disponível em {b}, Buenos Aires. Pronta para morar desde o primeiro dia.',
     lib_hoy:'Libera hoje', lib_manana:'Libera amanhã', lib_dias:'Libera em {d} dias', lib_fecha:'Libera em: {f}',
     locale:'pt-BR',
@@ -455,6 +457,7 @@ const PROP_T = {
     btn_similares:'SEE SIMILAR OPTIONS', btn_visita:'SCHEDULE A VISIT', btn_reservar:'RESERVE THIS UNIT',
     wa_similar:'Hi! Do you have properties similar to {p}? I am interested. Thank you!',
     wa_reservar:'Hi! I would like to reserve the unit at {p}. What are the next steps? Thank you!',
+    wa_venta:'Hello, I am interested in the property for sale at {p}. I would like to schedule a visit. Thank you!',
     default_desc:'{t} — unit available in {b}, Buenos Aires. Move-in ready from day one.',
     lib_hoy:'Available today', lib_manana:'Available tomorrow', lib_dias:'Available in {d} days', lib_fecha:'Available: {f}',
     locale:'en-US',
@@ -813,6 +816,12 @@ function renderActionCard(p, titleFull, unidadLbl, reservado, isTemp, isTrad) {
         <div class="urgency-txt">${t.urg_res}</div>
       </div>
       <a class="btn-primary" href="https://wa.me/${WHATSAPP_NUM}?text=${wa}" target="_blank" rel="noopener noreferrer">${t.btn_similares}</a>
+    `;
+  } else if (isVenta) {
+    // Venta: un solo CTA directo a WhatsApp para coordinar la visita
+    const waVenta = encodeURIComponent(t.wa_venta.replace('{p}', propRef));
+    html += `
+      <a class="btn-primary" href="https://wa.me/${WHATSAPP_NUM}?text=${waVenta}" target="_blank" rel="noopener noreferrer">${t.btn_visita}</a>
     `;
   } else {
     // Si tipo='Ambos', mandamos Temporal como default al filtro (modalidad más común)
