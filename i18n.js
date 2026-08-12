@@ -18,7 +18,7 @@
       ps_h1: "Comprar em Buenos Aires",
       ps_not1: "Sem buscar", ps_not2: "Sem visitar", ps_not3: "Sem negociar",
       ps_sub1: "Cuidamos", ps_sub_em: "de tudo",
-      ps_lead1: "Você nos diz qual apartamento quer. Nós o buscamos, revisamos, negociamos e",
+      ps_lead1: "Você nos diz qual apartamento quer. Nós o revisamos, negociamos e",
       ps_lead_b: "compramos por você.",
       ps_pdf: "Conheça mais sobre nosso serviço",
       ps_form_h: "Solicitar informação",
@@ -29,9 +29,8 @@
       ps_thanks: "Obrigado. Recebemos sua consulta e entraremos em contato em breve.",
       // Comprar
       cmp_eyebrow: "Comprar", cmp_h1: "Unidades à venda em Buenos Aires",
-      cmp_pronto: "Em breve",
       cmp_psi_h2: "Comprar sem buscar, visitar nem negociar.",
-      cmp_psi_p: "Você nos diz qual apartamento quer. Nós o buscamos, revisamos, negociamos e compramos por você.",
+      cmp_psi_p: "Você nos diz qual apartamento quer. Nós o revisamos, negociamos e compramos por você.",
       cmp_psi_btn: "Conhecer Personal Shopper",
       // Catálogo (aluguel)
       cat_back: "← Início", cat_barrios: "Bairros",
@@ -65,7 +64,7 @@
       ps_h1: "Buy in Buenos Aires",
       ps_not1: "No searching", ps_not2: "No visiting", ps_not3: "No negotiating",
       ps_sub1: "We handle", ps_sub_em: "everything",
-      ps_lead1: "You tell us which apartment you want. We search, review, negotiate and",
+      ps_lead1: "You tell us which apartment you want. We review, negotiate and",
       ps_lead_b: "buy it for you.",
       ps_pdf: "Learn more about our service",
       ps_form_h: "Request information",
@@ -76,9 +75,8 @@
       ps_thanks: "Thank you. We received your inquiry and will contact you shortly.",
       // Comprar
       cmp_eyebrow: "Buy", cmp_h1: "Units for sale in Buenos Aires",
-      cmp_pronto: "Coming soon",
       cmp_psi_h2: "Buy without searching, visiting or negotiating.",
-      cmp_psi_p: "You tell us which apartment you want. We search, review, negotiate and buy it for you.",
+      cmp_psi_p: "You tell us which apartment you want. We review, negotiate and buy it for you.",
       cmp_psi_btn: "Discover Personal Shopper",
       // Catalogue (rentals)
       cat_back: "← Home", cat_barrios: "Neighbourhoods",
