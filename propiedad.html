@@ -21,7 +21,7 @@
 <meta id="metaTwDesc"   name="twitter:description" content="Alquileres temporales y tradicionales en Buenos Aires."/>
 <meta id="metaTwImage"  name="twitter:image"      content="https://bairengroup.com/og-logo.jpg"/>
 
-<link rel="icon" href="bairen_logo.png?v=3"/>
+<link rel="icon" href="/bairen_logo.png?v=3"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
@@ -268,20 +268,20 @@ footer{background:var(--navy-dark);border-top:1px solid var(--gold);padding:40px
 
 <!-- NAV -->
 <nav>
-  <a class="nav-logo" href="index.html"><img src="bairen_logo.png?v=3" alt="Grupo Bairen"/></a>
+  <a class="nav-logo" href="/index.html"><img src="/bairen_logo.png?v=3" alt="Grupo Bairen"/></a>
   <div class="nav-links">
-    <a href="catalogo.html" data-i18n="prop_nav_props">Propiedades</a>
-    <a href="index.html#nosotros" data-i18n="prop_nav_why">Por qué Bairen</a>
-    <a href="index.html#contacto" data-i18n="prop_nav_contact">Contacto</a>
+    <a href="/catalogo.html" data-i18n="prop_nav_props">Propiedades</a>
+    <a href="/index.html#nosotros" data-i18n="prop_nav_why">Por qué Bairen</a>
+    <a href="/index.html#contacto" data-i18n="prop_nav_contact">Contacto</a>
   </div>
-  <a class="nav-back" href="catalogo.html" data-i18n="prop_back">← Catálogo</a>
+  <a class="nav-back" href="/catalogo.html" data-i18n="prop_back">← Catálogo</a>
   <button class="burger" id="burger" aria-label="Menú"><span></span><span></span><span></span></button>
 </nav>
 <div class="mobile-menu" id="mobileMenu">
-  <a href="catalogo.html" data-i18n="prop_nav_props">Propiedades</a>
-  <a href="index.html#nosotros" data-i18n="prop_nav_why">Por qué Bairen</a>
-  <a href="index.html#contacto" data-i18n="prop_nav_contact">Contacto</a>
-  <a href="catalogo.html" data-i18n="prop_back_full">← Volver al catálogo</a>
+  <a href="/catalogo.html" data-i18n="prop_nav_props">Propiedades</a>
+  <a href="/index.html#nosotros" data-i18n="prop_nav_why">Por qué Bairen</a>
+  <a href="/index.html#contacto" data-i18n="prop_nav_contact">Contacto</a>
+  <a href="/catalogo.html" data-i18n="prop_back_full">← Volver al catálogo</a>
 </div>
 
 <!-- LANG SWITCH -->
@@ -361,12 +361,12 @@ footer{background:var(--navy-dark);border-top:1px solid var(--gold);padding:40px
 <div class="notfound" id="notFoundScreen" style="display:none">
   <h1 data-i18n="prop_nf_h">Propiedad no encontrada</h1>
   <p data-i18n="prop_nf_p">El link puede haber cambiado, la unidad ya fue alquilada o el slug es incorrecto.</p>
-  <a href="catalogo.html" data-i18n="prop_back_full">← Volver al catálogo</a>
+  <a href="/catalogo.html" data-i18n="prop_back_full">← Volver al catálogo</a>
 </div>
 
 <!-- FOOTER -->
 <footer>
-  <div class="ft-logo"><img src="bairen_logo.png?v=3" alt="Grupo Bairen"/></div>
+  <div class="ft-logo"><img src="/bairen_logo.png?v=3" alt="Grupo Bairen"/></div>
   <div class="ft-copy" data-i18n="cat_copy">© 2026 Grupo Bairen · Todos los derechos reservados</div>
 </footer>
 
@@ -384,8 +384,8 @@ footer{background:var(--navy-dark);border-top:1px solid var(--gold);padding:40px
   <span class="lightbox-counter" id="lbCounter"></span>
 </div>
 
-<script src="supabase-config.js"></script>
-<script src="i18n.js"></script>
+<script src="/supabase-config.js"></script>
+<script src="/i18n.js"></script>
 <script>
 'use strict';
 
@@ -579,7 +579,11 @@ function buildVideoEmbed(url, type) {
 // CARGA Y RENDER
 // ════════════════════════════════════════════════════════════════════
 async function loadProperty() {
-  const slug = new URLSearchParams(window.location.search).get('slug');
+  // La URL canónica es /propiedades/<slug> (el slug viaja en el path, no en
+  // la query); ?slug= se mantiene por links viejos que no pasen por el redirect
+  const pathSlug = (window.location.pathname.match(/\/propiedades\/([^\/?#]+)/) || [])[1];
+  const slug = new URLSearchParams(window.location.search).get('slug')
+    || (pathSlug ? decodeURIComponent(pathSlug) : null);
   if (!slug) return showNotFound();
 
   try {
@@ -827,7 +831,7 @@ function renderActionCard(p, titleFull, unidadLbl, reservado, isTemp, isTrad) {
     const ctaTipo   = p.tipo === 'Ambos' ? 'Temporal' : p.tipo;
     const ctaPrecio = ctaTipo === 'Tradicional' ? p.precio_tradicional
                     : (ctaTipo === 'Venta' ? p.precio_venta : p.precio_temporal);
-    const filtro = `filtro.html?prop=${encodeURIComponent(p.dir)}&barrio=${encodeURIComponent(p.barrio)}&tipo=${encodeURIComponent(ctaTipo)}&amb=${p.ambientes || 0}&precio=${ctaPrecio || 0}`;
+    const filtro = `/filtro.html?prop=${encodeURIComponent(p.dir)}&barrio=${encodeURIComponent(p.barrio)}&tipo=${encodeURIComponent(ctaTipo)}&amb=${p.ambientes || 0}&precio=${ctaPrecio || 0}`;
     const waReservar = encodeURIComponent(t.wa_reservar.replace('{p}', propRef));
     html += `
       <div class="urgency">
