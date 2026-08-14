@@ -23,13 +23,12 @@
 const SUPABASE_URL = 'https://nmrjyyrhwjroonrppnka.supabase.co';
 // Anon key pública por diseño (los datos los protege RLS) — ver supabase-config.js
 const SUPABASE_ANON_KEY = 'sb_publishable_D0YwiSL5Hm3GyOSx2r1lug_ZV7v46_n';
-const SITE_ROOT = 'https://bairengroup.com';
-const WWW_ROOT = 'https://www.bairengroup.com';
+const SITE_ROOT = 'https://www.bairengroup.com';
 
 module.exports = async (req, res) => {
   let html;
   try {
-    const r = await fetch(`${WWW_ROOT}/propiedad.html`);
+    const r = await fetch(`${SITE_ROOT}/propiedad.html`);
     if (!r.ok) throw new Error(`propiedad.html ${r.status}`);
     html = await r.text();
   } catch (err) {

@@ -256,7 +256,7 @@ const etiquetaUnidad = (p) => (p.unidad ? `${p.dir} ${p.unidad}` : p.dir).slice(
 // En temporales: precio en *negrita* + "Todo incluido". Saco la descripción para que no quede un choclo
 // (la foto y el link ya cuentan el lugar; el detalle completo está en la web).
 function mostrarUnidad(p) {
-  const web = `https://www.bairengroup.com/propiedad.html?slug=${p.slug}`;
+  const web = `https://www.bairengroup.com/propiedades/${p.slug}`;
   const fotos = (p.imagenes || []).slice().sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0));
   const amb = `${p.ambientes ?? '?'} ${p.ambientes === 1 ? 'ambiente' : 'ambientes'}`;
   const esTemporal = p.precio_temporal != null;

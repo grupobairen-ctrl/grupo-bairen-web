@@ -583,7 +583,7 @@ const propAmb    = parseInt(urlP.get('amb'))    || 0;
 const propTipo   = urlP.get('tipo') || '';
 
 const pillText = propName
-  ? decodeURIComponent(propName) + ' · ' + decodeURIComponent(propBarrio)
+  ? propName + ' · ' + propBarrio  // URLSearchParams ya decodifica; un segundo decode tira URIError con "%"
   : 'Grupo Bairen';
 document.getElementById('propPillText').textContent = pillText;
 updateProgress(1);

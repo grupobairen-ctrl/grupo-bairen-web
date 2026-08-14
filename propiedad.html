@@ -6,20 +6,20 @@
 <meta name="robots" content="noindex, nofollow"/>
 <title>Cargando propiedad — Grupo Bairen</title>
 <meta name="description" content="Propiedad en alquiler — Grupo Bairen"/>
-<link id="metaCanonical" rel="canonical" href="https://bairengroup.com/"/>
+<link id="metaCanonical" rel="canonical" href="https://www.bairengroup.com/"/>
 
 <!-- OG / Twitter (se actualizan via JS cuando carga la propiedad) -->
 <meta id="metaOgTitle"  property="og:title"       content="Grupo Bairen"/>
 <meta id="metaOgDesc"   property="og:description" content="Alquileres temporales y tradicionales en Buenos Aires."/>
-<meta id="metaOgImage"  property="og:image"       content="https://bairengroup.com/og-logo.jpg"/>
-<meta id="metaOgUrl"    property="og:url"         content="https://bairengroup.com/"/>
+<meta id="metaOgImage"  property="og:image"       content="https://www.bairengroup.com/og-logo.jpg"/>
+<meta id="metaOgUrl"    property="og:url"         content="https://www.bairengroup.com/"/>
 <meta                   property="og:type"        content="website"/>
 <meta                   property="og:locale"      content="es_AR"/>
 <meta                   property="og:site_name"   content="Grupo Bairen"/>
 <meta name="twitter:card"  content="summary_large_image"/>
 <meta id="metaTwTitle"  name="twitter:title"      content="Grupo Bairen"/>
 <meta id="metaTwDesc"   name="twitter:description" content="Alquileres temporales y tradicionales en Buenos Aires."/>
-<meta id="metaTwImage"  name="twitter:image"      content="https://bairengroup.com/og-logo.jpg"/>
+<meta id="metaTwImage"  name="twitter:image"      content="https://www.bairengroup.com/og-logo.jpg"/>
 
 <link rel="icon" href="/bairen_logo.png?v=3"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -505,7 +505,7 @@ const AMENITY_ICONS = {
 };
 
 const WHATSAPP_NUM = '5491123106629';
-const SITE_ROOT    = 'https://bairengroup.com';
+const SITE_ROOT    = 'https://www.bairengroup.com';
 
 // estado simple
 let PHOTOS = [];           // [{url, orden}]
@@ -582,9 +582,18 @@ async function loadProperty() {
   // La URL canónica es /propiedades/<slug> (el slug viaja en el path, no en
   // la query); ?slug= se mantiene por links viejos que no pasen por el redirect
   const pathSlug = (window.location.pathname.match(/\/propiedades\/([^\/?#]+)/) || [])[1];
-  const slug = new URLSearchParams(window.location.search).get('slug')
-    || (pathSlug ? decodeURIComponent(pathSlug) : null);
+  let slug = new URLSearchParams(window.location.search).get('slug');
+  if (!slug && pathSlug) {
+    // un link truncado (ej. %C3 cortado a la mitad) haría tirar URIError
+    try { slug = decodeURIComponent(pathSlug); } catch (_) { slug = pathSlug; }
+  }
   if (!slug) return showNotFound();
+
+  // El redirect de links viejos deja ?slug= redundante en la URL: se limpia
+  // para que la barra de direcciones muestre siempre la URL canónica
+  if (pathSlug && window.location.search) {
+    history.replaceState(null, '', window.location.pathname);
+  }
 
   try {
     const sb = await window.bairenReady;

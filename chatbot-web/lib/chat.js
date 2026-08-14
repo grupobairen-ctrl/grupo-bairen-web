@@ -132,7 +132,7 @@ function formatPropiedades(props) {
     const fotos = (p.imagenes || []).slice().sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0)).slice(0, 4).map((i) => i.url);
     const amen = (p.amenities || []).map((a) => a.nombre).join(', ');
     const calle = p.unidad ? `${p.dir} (${p.unidad})` : p.dir;
-    const web = `https://www.bairengroup.com/propiedad.html?slug=${p.slug}`;
+    const web = `https://www.bairengroup.com/propiedades/${p.slug}`;
     // Aplastamos los saltos de línea de la descripción para que cada ficha sea un bloque cerrado.
     const desc = (p.descripcion || '').replace(/\s*\n+\s*/g, ' ').trim();
 

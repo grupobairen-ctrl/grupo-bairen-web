@@ -61,7 +61,7 @@ async function agendarVisita({ nombre, telefono, propiedad_slug, fecha, hora }) 
   const prop = props.find((p) => p.slug === propiedad_slug);
   const dir = prop ? (prop.unidad ? `${prop.dir} (${prop.unidad})` : prop.dir) : propiedad_slug;
   const barrio = prop ? prop.barrio : '';
-  const ficha = `https://www.bairengroup.com/propiedad.html?slug=${propiedad_slug}`;
+  const ficha = `https://www.bairengroup.com/propiedades/${propiedad_slug}`;
   const cuando = `${fecha} ${hora}:00`;
 
   // 1) Evento en el calendar de Bairen

@@ -4,7 +4,7 @@
       "source": "/propiedad.html",
       "has": [{ "type": "query", "key": "slug", "value": "(?<slug>.+)" }],
       "destination": "/propiedades/:slug",
-      "permanent": false
+      "permanent": true
     }
   ],
   "rewrites": [

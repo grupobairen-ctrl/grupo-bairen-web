@@ -10,4 +10,4 @@ Disallow: /propiedad.html
 Disallow: /migrate.html
 Disallow: /fix-plazos.html
 
-Sitemap: https://bairengroup.com/sitemap.xml
+Sitemap: https://www.bairengroup.com/sitemap.xml
