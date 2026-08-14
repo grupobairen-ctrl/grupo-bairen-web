@@ -13,14 +13,14 @@
 <meta property="og:locale" content="es_AR">
 <meta property="og:site_name" content="Grupo Bairen">
 <meta property="og:url" content="https://bairengroup.com/catalogo.html">
-<meta property="og:image" content="https://bairengroup.com/og-card.jpg">
+<meta property="og:image" content="https://bairengroup.com/og-logo.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Grupo Bairen — Alquileres premium en Buenos Aires">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Propiedades — Grupo Bairen">
 <meta name="twitter:description" content="Catálogo de alquileres premium en CABA y GBA Norte. Temporales y tradicionales sin garantía.">
-<meta name="twitter:image" content="https://bairengroup.com/og-card.jpg">
+<meta name="twitter:image" content="https://bairengroup.com/og-logo.jpg">
 <meta name="theme-color" content="#131D2D">
 <link rel="icon" href="bairen_logo.png?v=3">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -315,9 +315,7 @@ nav {
   .card-address{font-size:1.18rem;}
   .card-barrio{font-size:.7rem;}
   .card-cta{padding:11px 16px;font-size:.66rem;min-height:44px;display:inline-flex;align-items:center;}
-  .spec-val{font-size:1rem;}
-  .spec-lbl{font-size:.6rem;}
-  .chip{font-size:.6rem;padding:4px 10px;}
+  .card-meta{font-size:.74rem;}
 }
 
 /* ─── RESULTADOS BAR ──────────────────────────────────────────────────── */
@@ -399,7 +397,6 @@ nav {
   backdrop-filter:blur(8px);
   -webkit-backdrop-filter:blur(8px);
 }
-.status-disponible{background:rgba(255,255,255,.85);color:var(--gold-dark);}
 .status-reservado{background:rgba(42,58,82,.7);color:rgba(255,255,255,.85);}
 
 .card-body{padding:22px 22px 18px;flex:1;display:flex;flex-direction:column;}
@@ -413,10 +410,7 @@ nav {
   text-transform:uppercase;color:var(--gold-dark);
   margin-bottom:16px;font-weight:500;
 }
-.card-specs{display:flex;gap:18px;margin-bottom:16px;}
-.spec{display:flex;flex-direction:column;gap:2px;}
-.spec-val{font-size:.95rem;font-weight:600;color:var(--navy);}
-.spec-lbl{font-size:.56rem;letter-spacing:.15em;text-transform:uppercase;color:var(--text-mid);}
+.card-meta{font-size:.76rem;color:var(--text-mid);letter-spacing:.03em;margin-bottom:16px;}
 .card-divider{height:1px;background:rgba(42,58,82,.07);margin-bottom:16px;}
 .card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:auto;}
 .card-price{font-family:var(--font-display);}
@@ -431,15 +425,6 @@ nav {
   background:transparent;
 }
 .card-cta:hover{background:var(--navy);color:var(--white);border-color:var(--navy);}
-
-/* Amenity chips */
-.card-amenities{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;}
-.chip{
-  font-size:.56rem;letter-spacing:.08em;
-  text-transform:uppercase;padding:4px 10px;
-  background:#ECE9E1;color:var(--text-mid);
-  border:1px solid rgba(42,58,82,.04);
-}
 
 /* ─── EMPTY STATE ─────────────────────────────────────────────────────── */
 .empty-state{grid-column:1/-1;text-align:center;padding:80px 24px;}
@@ -789,9 +774,9 @@ function sorted(arr) {
 /* Textos dinámicos del catálogo por idioma (lee window.BAIREN_LANG de i18n.js) */
 const CT = {
   es: {
-    title_todos:'Todas las propiedades', sub_todos:'Alquileres temporales y tradicionales en CABA y GBA Norte', tag_todos:'DISPONIBLES AHORA', text_todos:'Temporales con todo incluido desde el día uno, y tradicionales anuales sin amoblar. Filtrá por tipo o buscá por dirección para encontrar tu próxima propiedad.',
-    title_temp:'Alquileres temporales', sub_temp:'Estadías de 3 a 12 meses · Amoblados · Todo incluido', tag_temp:'PRECIO FINAL', text_temp:'Los precios publicados son finales e incluyen garantía inmobiliaria, mobiliario completo y todos los servicios (luz, gas, agua, wifi, expensas).',
-    title_trad:'Alquileres tradicionales', sub_trad:'Contratos anuales · Sin amoblar · Servicios no incluídos', tag_trad:'ALQUILER TRADICIONAL', text_trad:'Contratos a 12 meses sin amoblar. La propiedad es tuya para decorar y habitar a tu manera.',
+    title_todos:'Todas las propiedades', sub_todos:'Alquileres temporales y tradicionales en CABA y GBA Norte',
+    title_temp:'Alquileres temporales', sub_temp:'Estadías de 3 a 12 meses · Amoblados · Todo incluido', tag_temp:'PRECIO FINAL', text_temp:'El precio publicado es final: mobiliario, servicios y garantía incluidos.',
+    title_trad:'Alquileres tradicionales', sub_trad:'Contratos anuales · Sin amoblar · Servicios no incluídos',
     count_one:'propiedad', count_many:'propiedades', empty_t:'Sin resultados', empty_s:'Probá con otro barrio o tipo de alquiler.',
     loading:'Cargando propiedades...', err_t:'No pudimos cargar las propiedades', err_s:'Revisá la conexión a internet. Si el problema persiste, contactanos por WhatsApp.',
     per_month:'por mes', per_month_all:'por mes · all in', consult:'Consultar precio', ver_mas:'Ver más →',
@@ -800,9 +785,9 @@ const CT = {
     lib_hoy:'Se libera hoy', lib_manana:'Se libera mañana', lib_dias:'Se libera en {d} días', lib_fecha:'Se libera: {f}', lib_locale:'es-AR'
   },
   pt: {
-    title_todos:'Todos os imóveis', sub_todos:'Aluguéis por temporada e tradicionais em CABA e GBA Norte', tag_todos:'DISPONÍVEIS AGORA', text_todos:'Temporada com tudo incluído desde o primeiro dia, e tradicionais anuais sem mobília. Filtre por tipo ou busque por endereço para encontrar seu próximo imóvel.',
-    title_temp:'Aluguéis por temporada', sub_temp:'Estadias de 3 a 12 meses · Mobiliados · Tudo incluído', tag_temp:'PREÇO FINAL', text_temp:'Os preços publicados são finais e incluem garantia imobiliária, mobília completa e todos os serviços (luz, gás, água, wifi, condomínio).',
-    title_trad:'Aluguéis tradicionais', sub_trad:'Contratos anuais · Sem mobília · Serviços não incluídos', tag_trad:'ALUGUEL TRADICIONAL', text_trad:'Contratos de 12 meses sem mobília. O imóvel é seu para decorar e morar do seu jeito.',
+    title_todos:'Todos os imóveis', sub_todos:'Aluguéis por temporada e tradicionais em CABA e GBA Norte',
+    title_temp:'Aluguéis por temporada', sub_temp:'Estadias de 3 a 12 meses · Mobiliados · Tudo incluído', tag_temp:'PREÇO FINAL', text_temp:'O preço publicado é final: mobília, serviços e garantia incluídos.',
+    title_trad:'Aluguéis tradicionais', sub_trad:'Contratos anuais · Sem mobília · Serviços não incluídos',
     count_one:'imóvel', count_many:'imóveis', empty_t:'Sem resultados', empty_s:'Tente outro bairro ou tipo de aluguel.',
     loading:'Carregando imóveis...', err_t:'Não foi possível carregar os imóveis', err_s:'Verifique sua conexão. Se o problema persistir, fale conosco pelo WhatsApp.',
     per_month:'por mês', per_month_all:'por mês · tudo incluído', consult:'Consultar preço', ver_mas:'Ver mais →',
@@ -811,9 +796,9 @@ const CT = {
     lib_hoy:'Libera hoje', lib_manana:'Libera amanhã', lib_dias:'Libera em {d} dias', lib_fecha:'Libera em: {f}', lib_locale:'pt-BR'
   },
   en: {
-    title_todos:'All properties', sub_todos:'Short and long-term rentals in CABA and GBA Norte', tag_todos:'AVAILABLE NOW', text_todos:'Short-term with everything included from day one, and traditional yearly rentals unfurnished. Filter by type or search by address to find your next property.',
-    title_temp:'Short-term rentals', sub_temp:'Stays from 3 to 12 months · Furnished · All inclusive', tag_temp:'FINAL PRICE', text_temp:'Published prices are final and include rental guarantee, full furnishing and all utilities (electricity, gas, water, wifi, building fees).',
-    title_trad:'Long-term rentals', sub_trad:'Yearly contracts · Unfurnished · Utilities not included', tag_trad:'LONG-TERM RENTAL', text_trad:'12-month unfurnished contracts. The property is yours to decorate and live in your way.',
+    title_todos:'All properties', sub_todos:'Short and long-term rentals in CABA and GBA Norte',
+    title_temp:'Short-term rentals', sub_temp:'Stays from 3 to 12 months · Furnished · All inclusive', tag_temp:'FINAL PRICE', text_temp:'The published price is final: furniture, utilities and guarantee included.',
+    title_trad:'Long-term rentals', sub_trad:'Yearly contracts · Unfurnished · Utilities not included',
     count_one:'property', count_many:'properties', empty_t:'No results', empty_s:'Try another neighbourhood or rental type.',
     loading:'Loading properties...', err_t:'We could not load the properties', err_s:'Check your internet connection. If the problem persists, contact us on WhatsApp.',
     per_month:'per month', per_month_all:'per month · all in', consult:'Ask for price', ver_mas:'See more →',
@@ -845,6 +830,8 @@ function updateCatalogHero() {
   const bTag   = document.getElementById('typeBannerTag');
   const bText  = document.getElementById('typeBannerText');
 
+  // La franja solo aparece en Temporal: ahí dice algo material (precio final).
+  // En Todos y Tradicional duplicaba el subtítulo — el lujo no explica su propia interfaz.
   if (activeTipo === 'Temporal') {
     title.textContent = ct('title_temp');
     sub.textContent   = ct('sub_temp');
@@ -854,15 +841,11 @@ function updateCatalogHero() {
   } else if (activeTipo === 'Tradicional') {
     title.textContent = ct('title_trad');
     sub.textContent   = ct('sub_trad');
-    banner.style.display = 'block';
-    bTag.textContent  = ct('tag_trad');
-    bText.textContent = ct('text_trad');
+    banner.style.display = 'none';
   } else {
     title.textContent = ct('title_todos');
     sub.textContent   = ct('sub_todos');
-    banner.style.display = 'block';
-    bTag.textContent  = ct('tag_todos');
-    bText.textContent = ct('text_todos');
+    banner.style.display = 'none';
   }
 }
 
@@ -883,15 +866,15 @@ function render() {
   grid.innerHTML = list.map(p => {
     const unidad   = p.unidad && p.unidad !== '-' ? ` · ${p.unidad}` : '';
     const m2txt    = p.m2 ? `${p.m2} m²` : '—';
-    const chips    = p.amenities.slice(0,4).map(a => `<span class="chip">${a}</span>`).join('');
     const reservado= p.estado === 'Ocupado' || p.estado === 'Reservado';
-    const statCls  = reservado ? 'status-reservado' : 'status-disponible';
-    const statTxt  = reservado ? ct('reservado') : ct('disponible');
     const destino  = p.slug ? `propiedad.html?slug=${encodeURIComponent(p.slug)}` : '#';
     const ctaTxt   = ct('ver_mas');
-    const serviciosSpec = p.tipo === 'Temporal'
-      ? `<div class="spec"><span class="spec-val">${ct('serv_allin')}</span><span class="spec-lbl">${ct('serv_lbl')}</span></div>`
-      : `<div class="spec"><span class="spec-val">${ct('serv_sin')}</span><span class="spec-lbl">${ct('serv_lbl')}</span></div>`;
+    // Una sola línea muda: lo excepcional se etiqueta, lo normal no.
+    const metaLine = [
+      p.amb ? `${p.amb} ${ct('amb').toLowerCase()}` : null,
+      p.m2 ? m2txt : null,
+      p.tipo === 'Temporal' ? ct('serv_allin') : null,
+    ].filter(Boolean).join(' · ');
     const imgHTML = p.foto
       ? `<img src="${p.foto}" alt="${p.dir} — foto principal" loading="lazy">`
       : `<span class="card-img-placeholder">${ct('foto_ph')}</span>`;
@@ -902,18 +885,13 @@ function render() {
       <div class="card-img">
         ${imgHTML}
         <span class="card-tag tag-${p.tipo.toLowerCase()}">${tipoLabel(p.tipo)}</span>
-        <span class="card-status ${statCls}">${statTxt}</span>
+        ${reservado ? `<span class="card-status status-reservado">${ct('reservado')}</span>` : ''}
         ${p.estado === 'Reservado' && p.fecha_liberacion ? `<div class="badge-liberacion"><span>${formatFechaLiberacion(p.fecha_liberacion)}</span></div>` : ''}
       </div>
       <div class="card-body">
         <div class="card-address">${p.dir}${unidad}</div>
         <div class="card-barrio">${p.barrio}</div>
-        <div class="card-specs">
-          <div class="spec"><span class="spec-val">${p.amb}</span><span class="spec-lbl">${ct('amb')}</span></div>
-          <div class="spec"><span class="spec-val">${m2txt}</span><span class="spec-lbl">${ct('sup')}</span></div>
-          ${serviciosSpec}
-        </div>
-        ${chips ? `<div class="card-amenities">${chips}</div>` : ''}
+        <div class="card-meta">${metaLine}</div>
         <div class="card-divider"></div>
         <div class="card-footer">
           ${priceHTML(p)}
