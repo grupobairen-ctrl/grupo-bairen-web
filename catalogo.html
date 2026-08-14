@@ -867,7 +867,7 @@ function render() {
     const unidad   = p.unidad && p.unidad !== '-' ? ` · ${p.unidad}` : '';
     const m2txt    = p.m2 ? `${p.m2} m²` : '—';
     const reservado= p.estado === 'Ocupado' || p.estado === 'Reservado';
-    const destino  = p.slug ? `propiedad.html?slug=${encodeURIComponent(p.slug)}` : '#';
+    const destino  = p.slug ? `/propiedades/${encodeURIComponent(p.slug)}` : '#';
     const ctaTxt   = ct('ver_mas');
     // Una sola línea muda: lo excepcional se etiqueta, lo normal no.
     const metaLine = [

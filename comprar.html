@@ -242,7 +242,7 @@
         const portada = (p.imagenes || []).sort((a,b) => a.orden - b.orden)[0];
         const fotoStyle = portada ? "style=\"background-image:url('" + portada.url + "')\"" : '';
         const precio = p.precio_venta > 0 ? 'USD ' + Number(p.precio_venta).toLocaleString('es-AR') : 'Consultar';
-        const slug = 'propiedad.html?slug=' + encodeURIComponent(p.slug);
+        const slug = '/propiedades/' + encodeURIComponent(p.slug);
         const dir = esc(p.dir) + (p.unidad ? ' ' + esc(p.unidad) : '');
         return (
           '<a class="dest-card" href="' + slug + '" aria-label="Ver ' + dir + '">' +

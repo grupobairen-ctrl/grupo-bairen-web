@@ -919,7 +919,7 @@ function renderDestacadas() {
     const precio = (p.tipo === 'Tradicional' ? p.precio_tradicional : p.precio_temporal) || 0;
     const precioStr = precio > 0 ? 'USD ' + Number(precio).toLocaleString('es-AR') : d.consultar;
     const tipoTag = p.tipo === 'Ambos' ? d.tipo_ambos : (p.tipo === 'Temporal' ? d.tipo_temporal : d.tipo_tradicional);
-    const slugHref = 'propiedad.html?slug=' + encodeURIComponent(p.slug);
+    const slugHref = '/propiedades/' + encodeURIComponent(p.slug);
     return (
       '<a class="dest-card" href="' + slugHref + '" aria-label="Ver ' + escapeHTML(p.dir) + (p.unidad ? ' ' + escapeHTML(p.unidad) : '') + '">' +
         '<div class="dest-img" style="' + fotoStyle + '">' +
