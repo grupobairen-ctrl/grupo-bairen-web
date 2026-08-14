@@ -1,5 +1,11 @@
 {
   "rewrites": [
-    { "source": "/julian", "destination": "/julian.html" }
+    { "source": "/julian", "destination": "/julian.html" },
+    { "source": "/propiedades/:slug", "destination": "/api/og-propiedad?slug=:slug" },
+    {
+      "source": "/propiedad.html",
+      "has": [{ "type": "query", "key": "slug" }],
+      "destination": "/api/og-propiedad"
+    }
   ]
 }

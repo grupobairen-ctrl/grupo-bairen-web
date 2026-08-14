@@ -1,15 +1,20 @@
 /**
- * Edge Function — OG tags por propiedad
+ * Vercel Function — OG tags por propiedad
  *
- * WhatsApp/Facebook/Google no ejecutan JavaScript: cuando piden
- * /propiedades/<slug> ven el HTML crudo de propiedad.html, que trae los
- * meta tags genéricos (placa con logo). Esta función intercepta el request,
- * busca la propiedad en Supabase y reescribe los meta tags en el HTML antes
- * de responder, para que la preview del link muestre la foto de portada y
- * la descripción de ESA propiedad.
+ * WhatsApp/Facebook/Google no ejecutan JavaScript: cuando piden la ficha de
+ * una propiedad ven el HTML crudo de propiedad.html con los meta tags
+ * genéricos (placa con logo). Esta función sirve propiedad.html con los meta
+ * tags reescritos con la foto de portada, título y descripción de ESA
+ * propiedad, leídos de Supabase.
+ *
+ * Llega acá vía los rewrites de vercel.json:
+ *   /propiedades/<slug>        → /api/og-propiedad?slug=<slug>
+ *   /propiedad.html?slug=<x>   → /api/og-propiedad?slug=<x>
+ * (propiedad.html SIN query no se reescribe — eso evita un loop cuando esta
+ * función lo fetchea para usarlo de plantilla)
  *
  * Si algo falla (slug inexistente, Supabase caído), devuelve el HTML sin
- * tocar: la página sigue funcionando igual que hoy, con la placa de logo.
+ * tocar: la página funciona igual, con la placa de logo como preview.
  *
  * Mantener la lógica de título/descripción espejada con renderProperty()
  * en propiedad.html.
@@ -19,41 +24,46 @@ const SUPABASE_URL = 'https://nmrjyyrhwjroonrppnka.supabase.co';
 // Anon key pública por diseño (los datos los protege RLS) — ver supabase-config.js
 const SUPABASE_ANON_KEY = 'sb_publishable_D0YwiSL5Hm3GyOSx2r1lug_ZV7v46_n';
 const SITE_ROOT = 'https://bairengroup.com';
+const WWW_ROOT = 'https://www.bairengroup.com';
 
-export default async function handler(request, context) {
-  const response = await context.next();
-
-  const contentType = response.headers.get('content-type') || '';
-  if (!contentType.includes('text/html')) return response;
-
-  const slug = new URL(request.url).pathname.split('/').filter(Boolean).pop();
-  if (!slug || slug === 'propiedades') return response;
-
-  let p = null;
+module.exports = async (req, res) => {
+  let html;
   try {
-    const q = new URLSearchParams({
-      slug: `eq.${slug}`,
-      publicada: 'eq.true',
-      select: 'slug,dir,unidad,barrio,tipo,descripcion,imagenes(url,orden)',
-      limit: '1',
-    });
-    const r = await fetch(`${SUPABASE_URL}/rest/v1/propiedades?${q}`, {
-      headers: { apikey: SUPABASE_ANON_KEY },
-      signal: AbortSignal.timeout(4000),
-    });
-    if (r.ok) p = (await r.json())[0] || null;
-  } catch (_) {
-    // Sin datos → respondemos el HTML genérico tal cual
+    const r = await fetch(`${WWW_ROOT}/propiedad.html`);
+    if (!r.ok) throw new Error(`propiedad.html ${r.status}`);
+    html = await r.text();
+  } catch (err) {
+    res.statusCode = 302;
+    res.setHeader('Location', '/catalogo.html');
+    return res.end();
   }
-  if (!p) return response;
 
-  const html = await response.text();
-  const headers = new Headers(response.headers);
-  headers.delete('content-length');
-  return new Response(injectMeta(html, p), { status: response.status, headers });
-}
+  const slug = String(req.query.slug || '');
+  let p = null;
+  if (slug) {
+    try {
+      const q = new URLSearchParams({
+        slug: `eq.${slug}`,
+        publicada: 'eq.true',
+        select: 'slug,dir,unidad,barrio,tipo,descripcion,imagenes(url,orden)',
+        limit: '1',
+      });
+      const r = await fetch(`${SUPABASE_URL}/rest/v1/propiedades?${q}`, {
+        headers: { apikey: SUPABASE_ANON_KEY },
+        signal: AbortSignal.timeout(4000),
+      });
+      if (r.ok) p = (await r.json())[0] || null;
+    } catch (_) {
+      // Sin datos → servimos el HTML genérico tal cual
+    }
+  }
 
-export function injectMeta(html, p) {
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600');
+  res.end(p ? injectMeta(html, p) : html);
+};
+
+function injectMeta(html, p) {
   const titleFull = p.dir + (p.unidad ? ' ' + p.unidad : '');
   const pageUrl = `${SITE_ROOT}/propiedades/${p.slug}`;
   const fotos = (p.imagenes || []).slice().sort((a, b) => a.orden - b.orden);
@@ -96,4 +106,4 @@ function setAttrById(html, id, value) {
   return html.replace(re, `$1${esc(value)}$2`);
 }
 
-export const config = { path: '/propiedades/*' };
+module.exports.injectMeta = injectMeta;
