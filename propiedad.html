@@ -11,7 +11,7 @@
 <!-- OG / Twitter (se actualizan via JS cuando carga la propiedad) -->
 <meta id="metaOgTitle"  property="og:title"       content="Grupo Bairen"/>
 <meta id="metaOgDesc"   property="og:description" content="Alquileres temporales y tradicionales en Buenos Aires."/>
-<meta id="metaOgImage"  property="og:image"       content="https://bairengroup.com/og-card.jpg"/>
+<meta id="metaOgImage"  property="og:image"       content="https://bairengroup.com/og-logo.jpg"/>
 <meta id="metaOgUrl"    property="og:url"         content="https://bairengroup.com/"/>
 <meta                   property="og:type"        content="website"/>
 <meta                   property="og:locale"      content="es_AR"/>
@@ -19,7 +19,7 @@
 <meta name="twitter:card"  content="summary_large_image"/>
 <meta id="metaTwTitle"  name="twitter:title"      content="Grupo Bairen"/>
 <meta id="metaTwDesc"   name="twitter:description" content="Alquileres temporales y tradicionales en Buenos Aires."/>
-<meta id="metaTwImage"  name="twitter:image"      content="https://bairengroup.com/og-card.jpg"/>
+<meta id="metaTwImage"  name="twitter:image"      content="https://bairengroup.com/og-logo.jpg"/>
 
 <link rel="icon" href="bairen_logo.png?v=3"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -627,7 +627,7 @@ function renderProperty(p) {
 
   // ─── META TAGS / SEO ───
   const pageUrl = `${SITE_ROOT}/propiedades/${p.slug}`;
-  const ogImg   = PHOTOS[0]?.url || `${SITE_ROOT}/og-card.jpg`;
+  const ogImg   = PHOTOS[0]?.url || `${SITE_ROOT}/og-logo.jpg`;
   const tipoLabel = isAmbos ? 'temporal o tradicional' : tipo.toLowerCase();
   const descSEO = (p.descripcion && p.descripcion.length > 30)
     ? p.descripcion.slice(0, 160).replace(/\s+\S*$/, '') + '…'
