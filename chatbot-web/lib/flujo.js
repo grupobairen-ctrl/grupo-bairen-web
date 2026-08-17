@@ -315,7 +315,7 @@ function derivarHumano() {
 function cierreVenta() {
   return [
     { tipo: 'texto', texto:
-      'Gracias por escribir. Por ahora en Bairen nos dedicamos a los alquileres, temporales y tradicionales; todavía no tenemos propiedades en venta.\n\n' +
+      'Gracias por escribir. Por ahora en Bairen nos dedicamos a los alquileres, a mediano y largo plazo; todavía no tenemos propiedades en venta.\n\n' +
       'Muy pronto vamos a sumar venta. Si querés, seguinos en Instagram y te enterás apenas lancemos.' },
     { tipo: 'cta', texto: 'Te dejo acá nuestro Instagram.', cta: 'Seguir en Instagram', url: INSTAGRAM },
   ];

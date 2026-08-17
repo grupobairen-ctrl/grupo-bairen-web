@@ -69,7 +69,7 @@ function injectMeta(html, p) {
   const ogImg = fotos[0]?.url || `${SITE_ROOT}/og-logo.jpg`;
 
   const isVenta = p.tipo === 'Venta';
-  const tipoLabel = p.tipo === 'Ambos' ? 'temporal o tradicional' : p.tipo.toLowerCase();
+  const tipoLabel = p.tipo === 'Ambos' ? 'a mediano o largo plazo' : (p.tipo === 'Temporal' ? 'a mediano plazo' : p.tipo === 'Tradicional' ? 'a largo plazo' : p.tipo.toLowerCase());
   const descSEO = (p.descripcion && p.descripcion.length > 30)
     ? p.descripcion.slice(0, 160).replace(/\s+\S*$/, '') + '…'
     : `${titleFull} en ${p.barrio}, Buenos Aires. ${isVenta ? 'Venta' : 'Alquiler ' + tipoLabel} — Grupo Bairen.`;

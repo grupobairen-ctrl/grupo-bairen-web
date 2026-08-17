@@ -10,7 +10,7 @@
 
 <!-- OG / Twitter (se actualizan via JS cuando carga la propiedad) -->
 <meta id="metaOgTitle"  property="og:title"       content="Grupo Bairen"/>
-<meta id="metaOgDesc"   property="og:description" content="Alquileres temporales y tradicionales en Buenos Aires."/>
+<meta id="metaOgDesc"   property="og:description" content="Alquileres a mediano y largo plazo en Buenos Aires."/>
 <meta id="metaOgImage"  property="og:image"       content="https://www.bairengroup.com/og-logo.jpg"/>
 <meta id="metaOgUrl"    property="og:url"         content="https://www.bairengroup.com/"/>
 <meta                   property="og:type"        content="website"/>
@@ -18,7 +18,7 @@
 <meta                   property="og:site_name"   content="Grupo Bairen"/>
 <meta name="twitter:card"  content="summary_large_image"/>
 <meta id="metaTwTitle"  name="twitter:title"      content="Grupo Bairen"/>
-<meta id="metaTwDesc"   name="twitter:description" content="Alquileres temporales y tradicionales en Buenos Aires."/>
+<meta id="metaTwDesc"   name="twitter:description" content="Alquileres a mediano y largo plazo en Buenos Aires."/>
 <meta id="metaTwImage"  name="twitter:image"      content="https://www.bairengroup.com/og-logo.jpg"/>
 
 <link rel="icon" href="/bairen_logo.png?v=3"/>
@@ -392,9 +392,9 @@ footer{background:var(--navy-dark);border-top:1px solid var(--gold);padding:40px
 // ─── i18n de contenido dinámico (el estático lo maneja i18n.js) ───
 const PROP_T = {
   es: {
-    tag_ambos:'Alquiler temporal y tradicional', tag_temporal:'Alquiler Temporal', tag_tradicional:'Alquiler Tradicional', tag_venta:'En Venta',
-    temporal_allin:'temporal · all in', pm_allin:'por mes · all in', pm_todo:'por mes · todo incluido', pm:'por mes',
-    trad_lbl:'Tradicional',
+    tag_ambos:'Alquiler a mediano y largo plazo', tag_temporal:'Alquiler a Mediano Plazo', tag_tradicional:'Alquiler a Largo Plazo', tag_venta:'En Venta',
+    temporal_allin:'mediano plazo · all in', pm_allin:'por mes · all in', pm_todo:'por mes · todo incluido', pm:'por mes',
+    trad_lbl:'Largo plazo',
     stat_unidad:'Unidad', stat_amb:'Ambientes', stat_meses:'Meses', stat_anios:'Años',
     amenities:'Amenities del edificio',
     video_lbl:'Ver video de la unidad',
@@ -415,9 +415,9 @@ const PROP_T = {
     locale:'es-AR'
   },
   pt: {
-    tag_ambos:'Aluguel temporada e tradicional', tag_temporal:'Aluguel Temporada', tag_tradicional:'Aluguel Tradicional', tag_venta:'À Venda',
-    temporal_allin:'temporada · tudo incluído', pm_allin:'por mês · tudo incluído', pm_todo:'por mês · tudo incluído', pm:'por mês',
-    trad_lbl:'Tradicional',
+    tag_ambos:'Aluguel de médio e longo prazo', tag_temporal:'Aluguel de Médio Prazo', tag_tradicional:'Aluguel de Longo Prazo', tag_venta:'À Venda',
+    temporal_allin:'médio prazo · tudo incluído', pm_allin:'por mês · tudo incluído', pm_todo:'por mês · tudo incluído', pm:'por mês',
+    trad_lbl:'Longo prazo',
     stat_unidad:'Unidade', stat_amb:'Ambientes', stat_meses:'Meses', stat_anios:'Anos',
     amenities:'Comodidades do edifício',
     video_lbl:'Ver vídeo da unidade',
@@ -439,8 +439,8 @@ const PROP_T = {
     amen:{'Pileta':'Piscina','Gimnasio':'Academia','Spa / Sauna':'Spa / Sauna','SUM':'Salão de festas','Cochera':'Garagem','Ascensor':'Elevador','Aire acond.':'Ar-condicionado','Jardín / Terraza':'Jardim / Terraço','Parrilla':'Churrasqueira','Laundry':'Lavanderia','Seguridad 24hs':'Segurança 24h','Conserje 24hs':'Portaria 24h','Bicicletero':'Bicicletário','Pet friendly':'Aceita pets','Calefacción central':'Aquecimento central','Baulera':'Depósito','Amoblado':'Mobiliado','All in':'Tudo incluído'}
   },
   en: {
-    tag_ambos:'Short & long-term rental', tag_temporal:'Short-term Rental', tag_tradicional:'Long-term Rental', tag_venta:'For Sale',
-    temporal_allin:'short-term · all in', pm_allin:'per month · all in', pm_todo:'per month · all inclusive', pm:'per month',
+    tag_ambos:'Medium & long-term rental', tag_temporal:'Medium-term Rental', tag_tradicional:'Long-term Rental', tag_venta:'For Sale',
+    temporal_allin:'medium-term · all in', pm_allin:'per month · all in', pm_todo:'per month · all inclusive', pm:'per month',
     trad_lbl:'Long-term',
     stat_unidad:'Unit', stat_amb:'Rooms', stat_meses:'Months', stat_anios:'Years',
     amenities:'Building amenities',
@@ -641,7 +641,7 @@ function renderProperty(p) {
   // ─── META TAGS / SEO ───
   const pageUrl = `${SITE_ROOT}/propiedades/${p.slug}`;
   const ogImg   = PHOTOS[0]?.url || `${SITE_ROOT}/og-logo.jpg`;
-  const tipoLabel = isAmbos ? 'temporal o tradicional' : tipo.toLowerCase();
+  const tipoLabel = isAmbos ? 'a mediano o largo plazo' : (tipo === 'Temporal' ? 'a mediano plazo' : tipo === 'Tradicional' ? 'a largo plazo' : tipo.toLowerCase());
   const descSEO = (p.descripcion && p.descripcion.length > 30)
     ? p.descripcion.slice(0, 160).replace(/\s+\S*$/, '') + '…'
     : `${titleFull} en ${p.barrio}, Buenos Aires. ${isVenta ? 'Venta' : 'Alquiler ' + tipoLabel} — Grupo Bairen.`;

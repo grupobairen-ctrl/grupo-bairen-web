@@ -34,7 +34,7 @@
       cmp_psi_btn: "Conhecer Personal Shopper",
       // Catálogo (aluguel)
       cat_back: "← Início", cat_barrios: "Bairros",
-      cat_todos: "Todos", cat_temporal: "Temporada", cat_tradicional: "Tradicional",
+      cat_todos: "Todos", cat_temporal: "Médio prazo", cat_tradicional: "Longo prazo",
       cat_search_ph: "Buscar endereço ou bairro…",
       cat_barrio_head: "Selecione um bairro", cat_barrio_clear: "Limpar filtro",
       cat_sort_default: "Ordem padrão", cat_sort_pasc: "Preço: do menor ao maior",
@@ -80,7 +80,7 @@
       cmp_psi_btn: "Discover Personal Shopper",
       // Catalogue (rentals)
       cat_back: "← Home", cat_barrios: "Neighbourhoods",
-      cat_todos: "All", cat_temporal: "Short-term", cat_tradicional: "Long-term",
+      cat_todos: "All", cat_temporal: "Medium-term", cat_tradicional: "Long-term",
       cat_search_ph: "Search address or neighbourhood…",
       cat_barrio_head: "Select a neighbourhood", cat_barrio_clear: "Clear filter",
       cat_sort_default: "Default order", cat_sort_pasc: "Price: low to high",

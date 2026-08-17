@@ -125,8 +125,8 @@ function formatPropiedades(props) {
 
   return props.map((p) => {
     const precios = [];
-    if (p.tipo === 'Tradicional' || p.tipo === 'Ambos') precios.push(`alquiler tradicional ${money(p.precio_tradicional)}/mes`);
-    if (p.tipo === 'Temporal'    || p.tipo === 'Ambos') precios.push(`temporal ${money(p.precio_temporal)}/mes`);
+    if (p.tipo === 'Tradicional' || p.tipo === 'Ambos') precios.push(`alquiler a largo plazo ${money(p.precio_tradicional)}/mes`);
+    if (p.tipo === 'Temporal'    || p.tipo === 'Ambos') precios.push(`alquiler a mediano plazo ${money(p.precio_temporal)}/mes`);
 
     // Hasta 4 fotos por ficha (el bot manda estas; para más, comparte el link de la web).
     const fotos = (p.imagenes || []).slice().sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0)).slice(0, 4).map((i) => i.url);
