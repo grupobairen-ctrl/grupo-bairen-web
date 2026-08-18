@@ -7,6 +7,7 @@
 <meta name="theme-color" content="#131D2D" />
 <link rel="icon" href="/bairen_logo.png?v=3">
 <title>Perfil de búsqueda · PSI · Grupo Bairen</title>
+<script src="/supabase-config.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -101,6 +102,7 @@
       <div class="n">Para empezar</div>
       <h2>Tu nombre y apellido</h2>
       <div class="fld"><input id="nombre" placeholder="Nombre y apellido"><div class="errmsg" id="errNombre">Necesitamos tu nombre para identificar tus respuestas.</div></div>
+      <div class="fld" style="margin-top:10px;"><label>Tu WhatsApp, para que tu asesor te contacte</label><input id="telefono" type="tel" placeholder="+54 9 11 2345 6789"><div class="errmsg" id="errTelefono">Necesitamos tu WhatsApp para que tu asesor pueda contactarte.</div></div>
     </div>
 
     <div class="q">
@@ -229,8 +231,14 @@
     </div>
 
     <button type="button" class="send" id="btnEnviar">Enviar mis respuestas</button>
-    <p class="send-note">Al tocar Enviar se abre WhatsApp con tus respuestas listas para mandarle a tu asesor de Bairen.</p>
+    <p class="send-note">Al tocar Enviar, tus respuestas nos llegan al instante y tu asesor de Bairen te contacta por WhatsApp.</p>
   </form>
+
+  <div id="exito" style="display:none;text-align:center;padding:48px 20px;">
+    <h2 style="margin-bottom:14px;">Recibimos tu perfil de búsqueda.</h2>
+    <p style="font-weight:300;margin-bottom:26px;" id="exitoTxt">Alejandro, tu asesor de Bairen, te va a escribir por WhatsApp dentro de las próximas 24 horas.</p>
+    <a id="exitoWa" class="send" style="display:inline-block;text-decoration:none;max-width:340px;" target="_blank" rel="noopener">Prefiero escribirle yo ahora</a>
+  </div>
 </main>
 
 <footer class="foot">
@@ -288,6 +296,15 @@
     }
     $("nombre").classList.remove("err"); $("errNombre").classList.remove("show");
 
+    var telefono=$("telefono").value.trim();
+    if(!telefono || telefono.replace(/\D/g,"").length<8){
+      $("telefono").classList.add("err"); $("errTelefono").classList.add("show");
+      $("qNombre").scrollIntoView({behavior:"smooth",block:"center"});
+      toast("Completá tu WhatsApp para que podamos contactarte");
+      return;
+    }
+    $("telefono").classList.remove("err"); $("errTelefono").classList.remove("show");
+
     var L=[];
     L.push("Hola Alejandro, soy "+nombre+". Estas son mis respuestas del perfil de busqueda PSI:");
     L.push("");
@@ -311,9 +328,41 @@
     add("11. Financiacion", radioVal("financiacion"));
     if($("obs").value.trim()){ L.push(""); L.push("Observaciones: "+$("obs").value.trim()); }
 
-    var url="https://wa.me/"+WA+"?text="+encodeURIComponent(L.join("\n"));
-    window.open(url,"_blank","noopener");
-    toast("Se abre WhatsApp con tus respuestas listas");
+    var resumen=L.join("\n");
+    var waUrl="https://wa.me/"+WA+"?text="+encodeURIComponent(resumen);
+    var respuestas={
+      tipo:radioVal("tipo"), habitantes:hab, antiguedad:radioVal("antiguedad"), zona:zona,
+      fin:radioVal("fin"), transporte:radioVal("transporte"),
+      amenities:(am.length?am.join(", "):"No son necesarios"),
+      gastro:radioVal("gastro"), nocturna:radioVal("nocturna"),
+      presupuesto:money(), financiacion:radioVal("financiacion"),
+      observaciones:$("obs").value.trim()
+    };
+
+    /* La captura manda: primero guardamos el lead, el WhatsApp es opcional.
+       Si el guardado falla (tabla no creada, sin conexión), cae al flujo viejo de wa.me. */
+    var btn=$("btnEnviar"); btn.disabled=true; btn.textContent="Enviando...";
+    function exito(){
+      $("form").style.display="none";
+      $("exitoWa").href=waUrl;
+      $("exito").style.display="block";
+      window.scrollTo({top:0,behavior:"smooth"});
+    }
+    function fallback(){
+      btn.disabled=false; btn.textContent="Enviar mis respuestas";
+      window.open(waUrl,"_blank","noopener");
+      toast("Se abre WhatsApp con tus respuestas listas");
+    }
+    function avisar(){ /* aviso a Bairen (WhatsApp/mail del lado servidor); fire-and-forget */
+      try{ fetch("/api/encuesta-aviso",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({nombre:nombre,telefono:telefono,resumen:resumen})}); }catch(e){}
+    }
+    if(window.bairenReady){
+      window.bairenReady.then(function(sb){
+        return sb.from("leads_psi").insert({nombre:nombre,telefono:telefono,respuestas:respuestas,resumen:resumen});
+      }).then(function(r){
+        if(r && r.error){ fallback(); } else { avisar(); exito(); }
+      }).catch(function(){ fallback(); });
+    } else { fallback(); }
   });
 })();
 </script>
