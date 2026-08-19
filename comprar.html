@@ -66,15 +66,20 @@
   .flag.active{opacity:1;border-color:var(--gold-light);}
 
   .btn{display:inline-flex;align-items:center;justify-content:center;gap:11px;font-family:var(--font-body);font-size:.7rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;padding:15px 30px;border:1px solid transparent;cursor:pointer;transition:background .25s,transform .25s;}
-  .btn-gold{background:var(--gold);color:var(--navy-deeper);}
-  .btn-gold:hover{background:var(--gold-light);transform:translateY(-2px);}
+  /* CTA en tinta (manual de marca): el oro queda para acentos, no para rellenos */
+  .btn-gold{background:var(--navy-deeper);color:#F3EBD6;border:1px solid rgba(194,169,104,.5);}
+  .btn-gold:hover{background:var(--navy-dark);border-color:var(--gold);transform:translateY(-2px);}
 
   .phero{background:var(--navy-deeper);color:var(--white);position:relative;overflow:hidden;text-align:center;}
   .phero::before{content:'';position:absolute;top:-40%;left:50%;transform:translateX(-50%);width:900px;height:900px;background:radial-gradient(circle,rgba(194,169,104,.14),transparent 60%);}
   .phero .in{position:relative;padding:88px 24px 76px;max-width:760px;margin:0 auto;}
   .phero h1{font-size:clamp(2.2rem,4.6vw,3.5rem);color:var(--white);}
 
-  .listing{padding:64px 0 90px;min-height:40vh;}
+  .listing{padding:64px 0 72px;}
+  .venta-empty{grid-column:1/-1;text-align:center;padding:26px 0 6px;}
+  .venta-empty .eyebrow{color:var(--gold-dark);}
+  .venta-empty h2{font-size:clamp(1.4rem,3vw,2rem);color:var(--navy);margin-bottom:12px;}
+  .venta-empty p{font-size:.92rem;color:var(--text-mid);}
   .grid-prop{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;}
   @media(max-width:900px){.grid-prop{grid-template-columns:1fr 1fr;}}
   @media(max-width:600px){.grid-prop{grid-template-columns:1fr;}}
@@ -124,6 +129,7 @@
   .wa-btn svg{width:27px;height:27px;fill:#fff;}
   *:focus-visible{outline:2px solid var(--gold);outline-offset:3px;}
 </style>
+<link rel="stylesheet" href="/premium.css">
 </head>
 <body>
 
@@ -136,11 +142,10 @@
     <a href="index.html#contacto" data-i18n="nav_contacto">Contacto</a>
   </div>
   <div class="lang-switch">
-    <button class="flag" data-lang="es" aria-label="Español" title="Español"><svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#fff"/><rect width="30" height="6.7" fill="#75AADB"/><rect width="30" height="6.7" y="13.3" fill="#75AADB"/><circle cx="15" cy="10" r="2" fill="#F6B40E"/></svg></button>
-    <button class="flag" data-lang="pt" aria-label="Português" title="Português"><svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#009B3A"/><polygon points="15,2.5 27.2,10 15,17.5 2.8,10" fill="#FEDF00"/><circle cx="15" cy="10" r="3.2" fill="#002776"/></svg></button>
-    <button class="flag" data-lang="en" aria-label="English" title="English"><svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#fff"/><rect width="30" height="1.54" fill="#B22234"/><rect width="30" height="1.54" y="3.08" fill="#B22234"/><rect width="30" height="1.54" y="6.15" fill="#B22234"/><rect width="30" height="1.54" y="9.23" fill="#B22234"/><rect width="30" height="1.54" y="12.31" fill="#B22234"/><rect width="30" height="1.54" y="15.38" fill="#B22234"/><rect width="30" height="1.54" y="18.46" fill="#B22234"/><rect width="13" height="10.77" fill="#3C3B6E"/></svg></button>
+    <button class="flag" data-lang="es" aria-label="Español" title="Español">ES</button>
+    <button class="flag" data-lang="pt" aria-label="Português" title="Português">PT</button>
+    <button class="flag" data-lang="en" aria-label="English" title="English">EN</button>
   </div>
-  <a class="nav-cta-desk" href="psi.html" data-i18n="nav_cta_rep">Comprar representado</a>
   <button class="burger" id="burger" type="button" aria-label="Menú" aria-expanded="false"><span></span><span></span><span></span></button>
 </nav>
 
@@ -188,6 +193,7 @@
         <li><a href="comprar.html" data-i18n="ft_comprar">Comprar</a></li>
         <li><a href="catalogo.html" data-i18n="ft_alquilar">Alquilar</a></li>
         <li><a href="psi.html">Personal Shopper</a></li>
+        <li><a href="index.html#contacto" data-i18n="ft_vender">Vender mi propiedad</a></li>
       </ul>
     </div>
     <div class="ft-col">
@@ -208,7 +214,7 @@
   <svg viewBox="0 0 32 32"><path d="M16 0C7.163 0 0 7.163 0 16c0 2.83.736 5.487 2.023 7.793L0 32l8.438-2.01A15.93 15.93 0 0016 32c8.837 0 16-7.163 16-16S24.837 0 16 0zm0 29.333a13.278 13.278 0 01-6.77-1.848l-.484-.287-5.013 1.195 1.228-4.88-.317-.502A13.278 13.278 0 012.667 16C2.667 8.636 8.636 2.667 16 2.667S29.333 8.636 29.333 16 23.364 29.333 16 29.333zm7.3-9.96c-.4-.2-2.363-1.166-2.728-1.3-.366-.133-.633-.2-.9.2-.266.4-1.033 1.3-1.266 1.566-.233.267-.466.3-.866.1-2.367-1.183-3.917-2.117-5.475-4.8-.413-.712.413-.663 1.183-2.202.133-.267.067-.5-.033-.7-.1-.2-.9-2.163-1.233-2.963-.324-.778-.653-.672-.9-.685l-.767-.013a1.47 1.47 0 00-1.067.5c-.366.4-1.4 1.367-1.4 3.33s1.434 3.863 1.634 4.13c.2.267 2.823 4.312 6.837 6.05 2.54 1.097 3.534 1.19 4.804.999.773-.115 2.363-.966 2.696-1.9.333-.933.333-1.733.233-1.9-.1-.166-.366-.266-.766-.466z"/></svg>
 </a>
 
-<script src="i18n.js"></script>
+<script src="i18n.js?v=2"></script>
 <script src="supabase-config.js"></script>
 <script>
   const burger = document.getElementById('burger');
@@ -226,7 +232,16 @@
   (async () => {
     function esc(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
     const grid  = document.getElementById('ventaGrid');
-    const showEmpty = () => { grid.style.display = 'none'; };
+    const showEmpty = () => {
+      const L = window.BAIREN_LANG || 'es';
+      const T = ({
+        es:{e:'Próximamente',h:'Las primeras unidades en venta están en preparación.',p:'Mientras tanto, nuestra representación del comprador ya está operativa.'},
+        pt:{e:'Em breve',h:'As primeiras unidades à venda estão em preparação.',p:'Enquanto isso, nossa representação do comprador já está operando.'},
+        en:{e:'Coming soon',h:'The first units for sale are in preparation.',p:'Meanwhile, our buyer representation is already at work.'}
+      })[L];
+      grid.innerHTML = '<div class="venta-empty"><span class="eyebrow">'+T.e+'</span><h2>'+T.h+'</h2><p>'+T.p+'</p></div>';
+    };
+    document.addEventListener('bairen:lang', function(){ if (document.querySelector('.venta-empty')) showEmpty(); });
     try {
       const sb = await window.bairenReady;
       const { data, error } = await sb
@@ -268,5 +283,6 @@
     }
   })();
 </script>
+<script src="/premium.js" defer></script>
 </body>
 </html>

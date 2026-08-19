@@ -52,20 +52,20 @@ nav{position:fixed;inset:0 0 auto 0;z-index:1000;height:64px;background:var(--na
 .nav-back:hover{background:var(--white);color:var(--navy);border-color:var(--white);}
 .burger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px;background:none;border:none;}
 .burger span{width:22px;height:2px;background:var(--white);display:block;transition:all .3s;}
-.mobile-menu{display:none;position:fixed;inset:64px 0 0 0;background:var(--navy);z-index:999;padding:32px 24px;flex-direction:column;}
+.mobile-menu{display:none;position:fixed;inset:64px 0 auto 0;background:var(--navy-deeper);border-bottom:1px solid rgba(194,169,104,.18);z-index:999;padding:28px 24px;flex-direction:column;}
 .mobile-menu.open{display:flex;}
-.mobile-menu a{display:block;font-size:.8rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.75);padding:18px 0;border-bottom:1px solid rgba(194,169,104,.1);transition:color .2s;}
+.mobile-menu a{display:block;font-family:var(--font-display);font-size:1.1rem;color:rgba(255,255,255,.8);padding:13px 0;border-bottom:1px solid rgba(255,255,255,.06);transition:color .2s;}
 .mobile-menu a:hover{color:var(--gold);}
 @media(max-width:700px){.nav-links{display:none;}.nav-back{display:none;}.burger{display:flex;}nav{padding:0 18px;}}
 
 /* LANG SWITCH */
-.lang-switch{position:absolute;top:80px;right:22px;z-index:6;display:flex;gap:9px;}
+.lang-switch{display:flex;gap:12px;align-items:center;}
 .flag{width:28px;height:19px;padding:0;border:1px solid rgba(255,255,255,.4);background:none;cursor:pointer;overflow:hidden;opacity:.55;transition:opacity .25s var(--ease),border-color .25s,transform .2s;display:block;line-height:0;}
 .flag svg{width:100%;height:100%;display:block;}
 .flag:hover{opacity:.9;transform:translateY(-1px);}
 .flag.active{opacity:1;border-color:var(--gold-light);}
 .flag:active{transform:scale(.92);}
-@media(max-width:700px){.lang-switch{top:74px;right:16px;gap:7px;}.flag{width:25px;height:17px;}}
+@media(max-width:700px){.lang-switch{gap:9px;}}
 
 /* LOADING */
 .loading-screen{margin-top:64px;min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;}
@@ -263,6 +263,7 @@ footer{background:var(--navy-dark);border-top:1px solid var(--gold);padding:40px
 
 *:focus-visible{outline:2px solid var(--gold);outline-offset:3px;}
 </style>
+<link rel="stylesheet" href="/premium.css">
 </head>
 <body>
 
@@ -270,26 +271,25 @@ footer{background:var(--navy-dark);border-top:1px solid var(--gold);padding:40px
 <nav>
   <a class="nav-logo" href="/index.html"><img src="/bairen_logo.png?v=3" alt="Grupo Bairen"/></a>
   <div class="nav-links">
-    <a href="/catalogo.html" data-i18n="prop_nav_props">Propiedades</a>
-    <a href="/index.html#nosotros" data-i18n="prop_nav_why">Por qué Bairen</a>
+    <a href="/comprar.html" data-i18n="nav_comprar">Comprar</a>
+    <a href="/catalogo.html" data-i18n="nav_alquilar">Alquilar</a>
+    <a href="/psi.html">Personal Shopper</a>
     <a href="/index.html#contacto" data-i18n="prop_nav_contact">Contacto</a>
   </div>
-  <a class="nav-back" href="/catalogo.html" data-i18n="prop_back">← Catálogo</a>
+  <div class="lang-switch">
+    <button class="flag active" data-lang="es" aria-label="Español" title="Español">ES</button>
+    <button class="flag" data-lang="pt" aria-label="Português" title="Português">PT</button>
+    <button class="flag" data-lang="en" aria-label="English" title="English">EN</button>
+  </div>
   <button class="burger" id="burger" aria-label="Menú"><span></span><span></span><span></span></button>
 </nav>
 <div class="mobile-menu" id="mobileMenu">
-  <a href="/catalogo.html" data-i18n="prop_nav_props">Propiedades</a>
-  <a href="/index.html#nosotros" data-i18n="prop_nav_why">Por qué Bairen</a>
+  <a href="/comprar.html" data-i18n="nav_comprar">Comprar</a>
+  <a href="/catalogo.html" data-i18n="nav_alquilar">Alquilar</a>
+  <a href="/psi.html">Personal Shopper</a>
   <a href="/index.html#contacto" data-i18n="prop_nav_contact">Contacto</a>
-  <a href="/catalogo.html" data-i18n="prop_back_full">← Volver al catálogo</a>
 </div>
 
-<!-- LANG SWITCH -->
-<div class="lang-switch">
-  <button class="flag active" data-lang="es" aria-label="Español" title="Español"><svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#fff"/><rect width="30" height="6.7" fill="#75AADB"/><rect width="30" height="6.7" y="13.3" fill="#75AADB"/><circle cx="15" cy="10" r="2" fill="#F6B40E"/></svg></button>
-  <button class="flag" data-lang="pt" aria-label="Português" title="Português"><svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#009B3A"/><polygon points="15,2.5 27.2,10 15,17.5 2.8,10" fill="#FEDF00"/><circle cx="15" cy="10" r="3.2" fill="#002776"/></svg></button>
-  <button class="flag" data-lang="en" aria-label="English" title="English"><svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#fff"/><rect width="30" height="1.54" fill="#B22234"/><rect width="30" height="1.54" y="3.08" fill="#B22234"/><rect width="30" height="1.54" y="6.15" fill="#B22234"/><rect width="30" height="1.54" y="9.23" fill="#B22234"/><rect width="30" height="1.54" y="12.31" fill="#B22234"/><rect width="30" height="1.54" y="15.38" fill="#B22234"/><rect width="30" height="1.54" y="18.46" fill="#B22234"/><rect width="13" height="10.77" fill="#3C3B6E"/></svg></button>
-</div>
 
 <!-- LOADING -->
 <div class="loading-screen" id="loadingScreen">
@@ -385,20 +385,21 @@ footer{background:var(--navy-dark);border-top:1px solid var(--gold);padding:40px
 </div>
 
 <script src="/supabase-config.js"></script>
-<script src="/i18n.js"></script>
+<script src="/i18n.js?v=2"></script>
 <script>
 'use strict';
 
 // ─── i18n de contenido dinámico (el estático lo maneja i18n.js) ───
 const PROP_T = {
   es: {
+    nav_comprar:'Comprar', nav_alquilar:'Alquilar',
     tag_ambos:'Alquiler a mediano y largo plazo', tag_temporal:'Alquiler a Mediano Plazo', tag_tradicional:'Alquiler a Largo Plazo', tag_venta:'En Venta',
     temporal_allin:'mediano plazo · all in', pm_allin:'por mes · all in', pm_todo:'por mes · todo incluido', pm:'por mes',
     trad_lbl:'Largo plazo',
     stat_unidad:'Unidad', stat_amb:'Ambientes', stat_meses:'Meses', stat_anios:'Años',
     amenities:'Amenities del edificio',
     video_lbl:'Ver video de la unidad',
-    r_dir:'Dirección', r_barrio:'Barrio', r_sup:'Superficie', r_amb:'Ambientes', r_plazo:'Plazo', r_serv:'Servicios', r_gar:'Garantía', r_estado:'Estado',
+    r_dir:'Dirección', r_barrio:'Barrio', r_sup:'Superficie', r_amb:'Ambientes', r_plazo:'Plazo', r_serv:'Servicios', r_serv_temp:'Expensas y serv.', r_gar:'Garantía', r_estado:'Estado',
     amb_sing:'ambiente', amb_pl:'ambientes',
     v_serv_all:'Todos incluidos', v_serv_inq:'A cargo del inquilino',
     v_gar_trad:'Gtía CABA / Seguro de Caución', v_gar_no:'No requerida',
@@ -415,13 +416,14 @@ const PROP_T = {
     locale:'es-AR'
   },
   pt: {
+    nav_comprar:'Comprar', nav_alquilar:'Alugar',
     tag_ambos:'Aluguel de médio e longo prazo', tag_temporal:'Aluguel de Médio Prazo', tag_tradicional:'Aluguel de Longo Prazo', tag_venta:'À Venda',
     temporal_allin:'médio prazo · tudo incluído', pm_allin:'por mês · tudo incluído', pm_todo:'por mês · tudo incluído', pm:'por mês',
     trad_lbl:'Longo prazo',
     stat_unidad:'Unidade', stat_amb:'Ambientes', stat_meses:'Meses', stat_anios:'Anos',
     amenities:'Comodidades do edifício',
     video_lbl:'Ver vídeo da unidade',
-    r_dir:'Endereço', r_barrio:'Bairro', r_sup:'Área', r_amb:'Ambientes', r_plazo:'Prazo', r_serv:'Serviços', r_gar:'Garantia', r_estado:'Status',
+    r_dir:'Endereço', r_barrio:'Bairro', r_sup:'Área', r_amb:'Ambientes', r_plazo:'Prazo', r_serv:'Serviços', r_serv_temp:'Condomínio e serv.', r_gar:'Garantia', r_estado:'Status',
     amb_sing:'ambiente', amb_pl:'ambientes',
     v_serv_all:'Todos incluídos', v_serv_inq:'Por conta do inquilino',
     v_gar_trad:'Garantia CABA / Seguro fiança', v_gar_no:'Não exigida',
@@ -439,13 +441,14 @@ const PROP_T = {
     amen:{'Pileta':'Piscina','Gimnasio':'Academia','Spa / Sauna':'Spa / Sauna','SUM':'Salão de festas','Cochera':'Garagem','Ascensor':'Elevador','Aire acond.':'Ar-condicionado','Jardín / Terraza':'Jardim / Terraço','Parrilla':'Churrasqueira','Laundry':'Lavanderia','Seguridad 24hs':'Segurança 24h','Conserje 24hs':'Portaria 24h','Bicicletero':'Bicicletário','Pet friendly':'Aceita pets','Calefacción central':'Aquecimento central','Baulera':'Depósito','Amoblado':'Mobiliado','All in':'Tudo incluído'}
   },
   en: {
+    nav_comprar:'Buy', nav_alquilar:'Rent',
     tag_ambos:'Medium & long-term rental', tag_temporal:'Medium-term Rental', tag_tradicional:'Long-term Rental', tag_venta:'For Sale',
     temporal_allin:'medium-term · all in', pm_allin:'per month · all in', pm_todo:'per month · all inclusive', pm:'per month',
     trad_lbl:'Long-term',
     stat_unidad:'Unit', stat_amb:'Rooms', stat_meses:'Months', stat_anios:'Years',
     amenities:'Building amenities',
     video_lbl:'Watch unit video',
-    r_dir:'Address', r_barrio:'Neighbourhood', r_sup:'Area', r_amb:'Rooms', r_plazo:'Term', r_serv:'Utilities', r_gar:'Guarantee', r_estado:'Status',
+    r_dir:'Address', r_barrio:'Neighbourhood', r_sup:'Area', r_amb:'Rooms', r_plazo:'Term', r_serv:'Utilities', r_serv_temp:'Fees and utilities', r_gar:'Guarantee', r_estado:'Status',
     amb_sing:'room', amb_pl:'rooms',
     v_serv_all:'All included', v_serv_inq:'Paid by tenant',
     v_gar_trad:'CABA guarantee / Surety bond', v_gar_no:'Not required',
@@ -810,7 +813,8 @@ function renderActionCard(p, titleFull, unidadLbl, reservado, isTemp, isTrad) {
   if (p.m2)        rows.push({ l:t.r_sup, v: `${p.m2} m²` });
   if (p.ambientes) rows.push({ l:t.r_amb, v: `${p.ambientes} ${p.ambientes !== 1 ? t.amb_pl : t.amb_sing}` });
   if (!isVenta) rows.push({ l:t.r_plazo,  v: p.plazo || t.plazo_default });
-  if (isTemp || p.tipo === 'Ambos') rows.push({ l:t.r_serv, v: t.v_serv_all });
+  /* En mediano plazo el label es "Expensas y serv." (pedido de Tomás, 19/08) */
+  if (isTemp || p.tipo === 'Ambos') rows.push({ l:t.r_serv_temp, v: t.v_serv_all });
   else if (isTrad) rows.push({ l:t.r_serv, v: t.v_serv_inq });
   if (!isVenta) rows.push({ l:t.r_gar,    v: isTrad ? t.v_gar_trad : t.v_gar_no });
   rows.push({ l:t.r_estado, v: t['est_' + p.estado] || p.estado, color: reservado ? '#b94a4a' : '#2a7a4b' });
@@ -1215,5 +1219,6 @@ function formatFechaLiberacion(fechaStr) {
 // ════════════════════════════════════════════════════════════════════
 loadProperty();
 </script>
+<script src="/premium.js" defer></script>
 </body>
 </html>

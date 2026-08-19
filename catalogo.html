@@ -87,17 +87,18 @@ nav {
 
 .mobile-menu{
   position:fixed;top:var(--nav-h);left:0;right:0;
-  background:var(--navy-dark);border-bottom:1px solid rgba(194,169,104,.15);
-  z-index:999;padding:16px 0;
+  background:var(--navy-deeper);border-bottom:1px solid rgba(194,169,104,.18);
+  z-index:999;padding:28px 24px;
   transform:translateY(-110%);
   visibility:hidden;
   transition:transform .38s var(--ease), visibility 0s .38s;
 }
 .mobile-menu.open{transform:none;visibility:visible;transition:transform .38s var(--ease), visibility 0s 0s;}
 .m-link{
-  display:block;padding:13px 28px;
-  font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;
-  color:rgba(255,255,255,.65);font-weight:500;
+  display:block;padding:13px 0;
+  font-family:var(--font-display);font-size:1.1rem;
+  color:rgba(255,255,255,.8);
+  border-bottom:1px solid rgba(255,255,255,.06);
   transition:color .2s;
 }
 .m-link:hover{color:var(--gold);}
@@ -110,7 +111,7 @@ nav {
 /* ─── HERO ────────────────────────────────────────────────────────────── */
 .cat-hero {
   margin-top:var(--nav-h);
-  background:var(--navy);
+  background:var(--navy-deeper); /* mismo navy que el nav: un solo azul en pantalla */
   padding:52px 28px 44px;
   position:relative;overflow:hidden;
   text-align:center;
@@ -164,15 +165,28 @@ nav {
   .type-banner-inner{flex-direction:column;align-items:flex-start;gap:6px;}
 }
 
-/* ─── FILTER BAR (SLIM STICKY) ───────────────────────────────────────── */
+/* ─── FILTER BAR (una sola familia visual: todo cuadrado, mismo alto,
+       misma tipografía que las pills; NO sticky: los filtros no persiguen) ── */
 .filters-bar {
-  position:sticky;top:var(--nav-h);z-index:200;
   background:#FFFFFF;
   border-bottom:1px solid rgba(42,58,82,.1);
-  height:var(--filter-h);
-  display:flex;align-items:center;
-  padding:0 28px;gap:10px;
+  min-height:var(--filter-h);
+  display:flex;align-items:center;flex-wrap:wrap;
+  padding:8px 28px;gap:8px;row-gap:8px;
 }
+.filter-select{
+  -webkit-appearance:none;appearance:none;border-radius:0;
+  font-size:.66rem;font-weight:500;letter-spacing:.1em;
+  text-transform:uppercase;height:34px;padding:0 30px 0 14px;
+  border:1px solid rgba(42,58,82,.18);
+  color:var(--navy);background:transparent;
+  font-family:var(--font-body);cursor:pointer;transition:all .22s;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='5' viewBox='0 0 8 5'><path d='M0 0l4 5 4-5z' fill='%232A3A52'/></svg>");
+  background-repeat:no-repeat;background-position:right 12px center;
+}
+.filter-select:hover{border-color:var(--navy);}
+.filter-select:focus{outline:none;border-color:var(--navy);}
+@media(max-width:900px){.filter-select{font-size:.6rem;padding:0 26px 0 10px;}}
 
 /* Barrio dropdown trigger */
 .barrio-trigger {
@@ -510,6 +524,7 @@ footer{
   }
 }
 </style>
+<link rel="stylesheet" href="/premium.css">
 </head>
 <body>
 
@@ -525,11 +540,10 @@ footer{
     <a href="index.html#contacto" data-i18n="nav_contacto">Contacto</a>
   </div>
   <div class="lang-switch">
-    <button class="flag" data-lang="es" aria-label="Español" title="Español"><svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#fff"/><rect width="30" height="6.7" fill="#75AADB"/><rect width="30" height="6.7" y="13.3" fill="#75AADB"/><circle cx="15" cy="10" r="2" fill="#F6B40E"/></svg></button>
-    <button class="flag" data-lang="pt" aria-label="Português" title="Português"><svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#009B3A"/><polygon points="15,2.5 27.2,10 15,17.5 2.8,10" fill="#FEDF00"/><circle cx="15" cy="10" r="3.2" fill="#002776"/></svg></button>
-    <button class="flag" data-lang="en" aria-label="English" title="English"><svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#fff"/><rect width="30" height="1.54" fill="#B22234"/><rect width="30" height="1.54" y="3.08" fill="#B22234"/><rect width="30" height="1.54" y="6.15" fill="#B22234"/><rect width="30" height="1.54" y="9.23" fill="#B22234"/><rect width="30" height="1.54" y="12.31" fill="#B22234"/><rect width="30" height="1.54" y="15.38" fill="#B22234"/><rect width="30" height="1.54" y="18.46" fill="#B22234"/><rect width="13" height="10.77" fill="#3C3B6E"/></svg></button>
+    <button class="flag" data-lang="es" aria-label="Español" title="Español">ES</button>
+    <button class="flag" data-lang="pt" aria-label="Português" title="Português">PT</button>
+    <button class="flag" data-lang="en" aria-label="English" title="English">EN</button>
   </div>
-  <a class="nav-back" href="index.html" data-i18n="cat_back">← Inicio</a>
   <button class="burger" id="burger" type="button" aria-label="Menú" aria-expanded="false" aria-controls="mobileMenu"><span></span><span></span><span></span></button>
 </nav>
 
@@ -548,6 +562,17 @@ footer{
     <p class="cat-sub" id="catSub">Alquileres a mediano y largo plazo en CABA y GBA Norte</p>
   </div>
 </div>
+<script>
+/* Título correcto ANTES del primer paint: sin esto, el h1 por defecto
+   parpadea un instante hasta que el JS de abajo lee ?tipo= de la URL. */
+(function(){
+  var t=document.getElementById('catTitle'),s=document.getElementById('catSub');
+  var q=new URLSearchParams(location.search).get('tipo');
+  if(q==='temporal'){t.textContent='Alquileres a mediano plazo';s.textContent='Estadías de 3 a 12 meses · Amoblados · Todo incluido';}
+  else if(q==='tradicional'){t.textContent='Alquileres a largo plazo';s.textContent='Contratos anuales · Sin amoblar · Servicios no incluídos';}
+  else{t.textContent='Todas las propiedades';}
+})();
+</script>
 
 <!-- TYPE BANNER -->
 <div class="type-banner" id="typeBanner">
@@ -575,6 +600,26 @@ footer{
     <button class="pill-tipo" data-tipo="Temporal" data-i18n="cat_temporal">Mediano plazo</button>
     <button class="pill-tipo" data-tipo="Tradicional" data-i18n="cat_tradicional">Largo plazo</button>
   </div>
+
+  <div class="filter-sep"></div>
+
+  <!-- PRECIO Y AMBIENTES (los dos filtros más usados; inventario boutique = pocos y claros) -->
+  <label class="sr-only" for="precioSelect">Filtrar por precio</label>
+  <select class="filter-select" id="precioSelect" aria-label="Filtrar por precio">
+    <option value="todos" data-i18n="cat_p_todos">Precio: todos</option>
+    <option value="0-1000" data-i18n="cat_p_1">Hasta USD 1.000</option>
+    <option value="1000-1500" data-i18n="cat_p_2">USD 1.000 a 1.500</option>
+    <option value="1500-2500" data-i18n="cat_p_3">USD 1.500 a 2.500</option>
+    <option value="2500+" data-i18n="cat_p_4">USD 2.500 o más</option>
+  </select>
+  <label class="sr-only" for="ambSelect">Filtrar por ambientes</label>
+  <select class="filter-select" id="ambSelect" aria-label="Filtrar por ambientes">
+    <option value="todos" data-i18n="cat_a_todos">Ambientes: todos</option>
+    <option value="1" data-i18n="cat_a_1">1 ambiente</option>
+    <option value="2" data-i18n="cat_a_2">2 ambientes</option>
+    <option value="3" data-i18n="cat_a_3">3 ambientes</option>
+    <option value="4" data-i18n="cat_a_4">4 o más</option>
+  </select>
 
   <!-- SEARCH -->
   <div class="search-wrap">
@@ -619,7 +664,7 @@ footer{
   <span class="ft-copy" data-i18n="cat_copy">© 2026 Grupo Bairen · Todos los derechos reservados</span>
 </footer>
 
-<script src="i18n.js"></script>
+<script src="i18n.js?v=2"></script>
 <script src="supabase-config.js"></script>
 <script>
 /* ═══════════════════════════════════════════════════════════════
@@ -639,6 +684,8 @@ let props = [];
 ═══════════════════════════════════════════════════════════════ */
 let activeBarrio = 'todos';
 let activeTipo   = 'todos';
+let activePrecio = 'todos';
+let activeAmb    = 'todos';
 let sortMode     = 'default';
 let searchQ      = '';
 let dropdownOpen = false;
@@ -744,6 +791,8 @@ document.querySelectorAll('[data-tipo]').forEach(btn => {
 ═══════════════════════════════════════════════════════════════ */
 document.getElementById('sortSelect').addEventListener('change', e => { sortMode = e.target.value; render(); });
 document.getElementById('searchInput').addEventListener('input', e => { searchQ = e.target.value; render(); });
+document.getElementById('precioSelect').addEventListener('change', e => { activePrecio = e.target.value; render(); });
+document.getElementById('ambSelect').addEventListener('change', e => { activeAmb = e.target.value; render(); });
 
 /* ═══════════════════════════════════════════════════════════════
    FILTER + SORT LOGIC
@@ -759,7 +808,17 @@ function filtered() {
     const tMatch = activeTipo  === 'todos' || p.tipo === activeTipo;
     const q = searchQ.toLowerCase();
     const sMatch = !q || p.dir.toLowerCase().includes(q) || p.barrio.toLowerCase().includes(q);
-    return bMatch && tMatch && sMatch;
+    let pMatch = true;
+    if (activePrecio !== 'todos') {
+      if (!p.precio) pMatch = false;                       // precio a consultar: no entra en rangos
+      else if (activePrecio === '2500+') pMatch = p.precio >= 2500;
+      else {
+        const [min, max] = activePrecio.split('-').map(Number);
+        pMatch = p.precio >= min && p.precio <= max;
+      }
+    }
+    const aMatch = activeAmb === 'todos' || (activeAmb === '4' ? (p.amb || 0) >= 4 : p.amb === Number(activeAmb));
+    return bMatch && tMatch && sMatch && pMatch && aMatch;
   });
 }
 
@@ -830,22 +889,19 @@ function updateCatalogHero() {
   const bTag   = document.getElementById('typeBannerTag');
   const bText  = document.getElementById('typeBannerText');
 
-  // La franja solo aparece en Temporal: ahí dice algo material (precio final).
-  // En Todos y Tradicional duplicaba el subtítulo — el lujo no explica su propia interfaz.
+  // La franja "precio final" se eliminó (19/08): agrandaba la banda al cambiar
+  // de pestaña y empujaba las tarjetas. El subtítulo ya dice "Todo incluido" y
+  // cada tarjeta muestra "por mes · all in": la info vive integrada, sin saltos.
+  banner.style.display = 'none';
   if (activeTipo === 'Temporal') {
     title.textContent = ct('title_temp');
     sub.textContent   = ct('sub_temp');
-    banner.style.display = 'block';
-    bTag.textContent  = ct('tag_temp');
-    bText.textContent = ct('text_temp');
   } else if (activeTipo === 'Tradicional') {
     title.textContent = ct('title_trad');
     sub.textContent   = ct('sub_trad');
-    banner.style.display = 'none';
   } else {
     title.textContent = ct('title_todos');
     sub.textContent   = ct('sub_todos');
-    banner.style.display = 'none';
   }
 }
 
@@ -1027,5 +1083,6 @@ document.getElementById('resultsCount').textContent = '';
 loadFromSupabase().then(() => render());
 document.addEventListener('bairen:lang', () => { if (Array.isArray(props) && props.length) render(); });
 </script>
+<script src="/premium.js" defer></script>
 </body>
 </html>

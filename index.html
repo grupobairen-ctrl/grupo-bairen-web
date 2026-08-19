@@ -26,8 +26,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
-  <link rel="preload" as="image" href="hero-poster.jpg" fetchpriority="high" />
-  <link rel="preload" as="video" href="hero.mp4" type="video/mp4" />
+  <link rel="preload" as="image" href="hero-poster.jpg?v=2" fetchpriority="high" />
+  <link rel="preload" as="video" href="hero.mp4?v=2" type="video/mp4" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <script type="application/ld+json">
   {
@@ -219,15 +219,33 @@
     .hero-content{position:relative;z-index:2;max-width:940px;margin:0 auto;padding:96px 24px;width:100%;display:flex;flex-direction:column;align-items:center;}
 
     /* Selector de idioma (banderas) sobre el video, bajo la barra */
-    .lang-switch{position:absolute;top:80px;right:22px;z-index:6;display:flex;gap:9px;}
+    .lang-switch{display:flex;gap:12px;align-items:center;}
     .flag{width:28px;height:19px;padding:0;border:1px solid rgba(255,255,255,.4);background:none;cursor:pointer;overflow:hidden;opacity:.55;transition:opacity .25s var(--ease),border-color .25s,transform .2s;display:block;line-height:0;}
     .flag svg{width:100%;height:100%;display:block;}
     .flag:hover{opacity:.9;transform:translateY(-1px);}
     .flag.active{opacity:1;border-color:var(--gold-light);}
-    @media(max-width:700px){.lang-switch{top:74px;right:16px;gap:7px;}.flag{width:25px;height:17px;}}
+    @media(max-width:700px){.lang-switch{gap:9px;}}
 
-    .hero-h1-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
-    .hero-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;opacity:0;animation:fadeUp .9s var(--ease) .45s forwards;}
+    /* ── Hero editorial: una sola idea (el titular) y las tres puertas del negocio ── */
+    .hero-h1{font-family:var(--font-display);font-weight:500;color:#F7F2E6;font-size:clamp(2.3rem,5.4vw,4.2rem);line-height:1.1;text-align:center;margin:0 0 40px;text-shadow:0 2px 34px rgba(0,0,0,.38);}
+    .hero-h1 .hline{display:block;overflow:hidden;padding-bottom:.08em;}
+    .hero-h1 .hline>span{display:inline-block;}
+    @media (prefers-reduced-motion: no-preference){
+      .hero-h1 .hline>span{transform:translateY(112%);animation:heroLine .95s var(--ease) forwards;}
+      .hero-h1 .hline:nth-child(1)>span{animation-delay:.2s;}
+      .hero-h1 .hline:nth-child(2)>span{animation-delay:.32s;}
+    }
+    @keyframes heroLine{to{transform:translateY(0);}}
+    /* Las tres puertas del negocio como línea tipográfica (Tomás, 19/08):
+       Comprar = unidades en venta · Alquilar = catálogo · Invertir = PSI.
+       Sin cajas: tipografía con subrayado dorado, el gesto de las casas de lujo. */
+    .hero-doors{display:flex;align-items:center;justify-content:center;gap:26px;opacity:0;animation:fadeUp .9s var(--ease) .7s forwards;}
+    .hero-doors .sep{color:var(--gold);font-size:.85rem;line-height:1;opacity:.85;}
+    .hero-doors a{position:relative;font-size:.72rem;font-weight:600;letter-spacing:.3em;text-indent:.3em;text-transform:uppercase;color:rgba(247,242,230,.92);padding:6px 2px;transition:color .35s var(--ease);text-shadow:0 1px 12px rgba(0,0,0,.45);}
+    .hero-doors a::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--gold);transform:scaleX(0);transform-origin:left;transition:transform .45s var(--ease);}
+    .hero-doors a:hover{color:var(--gold-light);}
+    .hero-doors a:hover::after{transform:scaleX(1);}
+    @media(max-width:520px){.hero-doors{gap:14px;}.hero-doors a{font-size:.64rem;letter-spacing:.22em;text-indent:.22em;}}
     .hbtn{display:inline-flex;align-items:center;justify-content:center;font-family:var(--font-body);font-size:.6rem;font-weight:500;letter-spacing:.28em;text-indent:.28em;text-transform:uppercase;padding:14px 34px;border:1px solid transparent;cursor:pointer;transition:background .25s ease,color .2s ease,border-color .25s ease,transform 160ms cubic-bezier(0.23,1,0.32,1);min-width:150px;}
     .hbtn:active{transform:scale(.97);}
     /* Primario: marfil champagne sólido sobre el fondo oscuro. Visible y sobrio. */
@@ -492,6 +510,29 @@
   @media(max-width:880px){.caminos-grid{gap:12px;}.camino{padding:26px 16px 22px;}.camino-no{font-size:1.1rem;}.camino-name{font-size:1.05rem;}.camino-kicker{font-size:.55rem;letter-spacing:.14em;margin-bottom:12px;}.camino .go{font-size:.56rem;letter-spacing:.14em;}}
 
   /* ─── CONTACTO ─────────────────────────────────────────── */
+  /* ── El mercado, en números ── */
+  .mercado{background:var(--navy-deeper);padding:clamp(64px,8vw,100px) 24px;border-top:1px solid rgba(194,169,104,.14);}
+  .mercado-in{max-width:1100px;margin:0 auto;text-align:center;}
+  .mkt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:44px;}
+  .mkt-item{padding:0 40px;}
+  .mkt-item + .mkt-item{border-left:1px solid rgba(194,169,104,.22);}
+  @media(max-width:760px){.mkt-item{padding:0;}.mkt-item + .mkt-item{border-left:none;border-top:1px solid rgba(194,169,104,.22);padding-top:32px;}}
+  .mkt-num{font-family:var(--font-display);font-weight:500;font-size:clamp(2rem,3.6vw,3rem);color:var(--gold-light);line-height:1;margin-bottom:14px;}
+  .mkt-lbl{font-size:.88rem;color:rgba(255,255,255,.6);line-height:1.6;font-weight:300;max-width:30ch;margin:0 auto 10px;}
+  .mkt-src{font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-dark);}
+  @media(max-width:760px){.mkt-grid{grid-template-columns:1fr;gap:36px;margin-top:32px;}}
+  /* ── Testimonio real ── */
+  .cita{background:var(--white);padding:clamp(72px,9vw,110px) 24px;text-align:center;}
+  .cita blockquote{max-width:760px;margin:0 auto;min-height:190px;display:flex;flex-direction:column;justify-content:center;transition:opacity .38s var(--ease);}
+  .cita blockquote.cita-out{opacity:0;}
+  .cita p{font-family:var(--font-display);font-style:italic;font-weight:400;font-size:clamp(1.2rem,2.4vw,1.6rem);line-height:1.5;color:var(--navy-dark);margin-bottom:18px;text-wrap:balance;}
+  .cita cite{font-style:normal;font-size:.64rem;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--gold-dark);}
+  .cita-more{background:none;border:none;cursor:pointer;font-family:var(--font-body);font-size:.62rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-dark);margin:-6px auto 16px;padding:4px 8px;border-bottom:1px solid rgba(138,117,71,.4);transition:color .2s;}
+  .cita-more:hover{color:var(--navy);}
+  .cita-dots{display:flex;gap:12px;justify-content:center;margin-top:26px;}
+  .cita-dot{width:8px;height:8px;padding:0;background:none;border:1.5px solid var(--gold-dark);transform:rotate(45deg);cursor:pointer;transition:background .25s;}
+  .cita-dot.on{background:var(--gold);border-color:var(--gold);}
+  @media(max-width:700px){.cita blockquote{min-height:260px;}}
   .contacto{padding:clamp(72px,10vw,120px) 24px;background:var(--navy-deeper);color:var(--white);position:relative;overflow:hidden;}
   .contacto::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 70% at 82% 8%,rgba(194,169,104,.09),transparent 60%);pointer-events:none;}
   .contacto-in{max-width:1080px;margin:0 auto;position:relative;display:grid;grid-template-columns:1fr;gap:48px;}
@@ -510,7 +551,9 @@
   .cfield input,.cfield select,.cfield textarea{font-family:var(--font-body);font-size:1rem;padding:14px 16px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.16);color:var(--white);}
   .cfield input::placeholder,.cfield textarea::placeholder{color:rgba(255,255,255,.4);}
   .cfield input:focus,.cfield select:focus,.cfield textarea:focus{outline:none;border-color:var(--gold);background:rgba(255,255,255,.08);}
-  .cfield select{appearance:none;-webkit-appearance:none;}
+  .cfield select{appearance:none;-webkit-appearance:none;cursor:pointer;padding-right:44px;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M0 0l5 6 5-6z' fill='%23C2A968'/></svg>");
+    background-repeat:no-repeat;background-position:right 16px center;}
   .cfield select option{color:#1A2538;}
   .cfield textarea{resize:vertical;min-height:96px;}
   .btn-submit{grid-column:1 / -1;justify-self:start;background:var(--gold);color:var(--navy-deeper);border:none;font-family:var(--font-body);font-weight:700;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;padding:17px 46px;cursor:pointer;transition:background .25s,transform .25s;}
@@ -580,6 +623,7 @@
 
   *:focus-visible{outline:2px solid var(--gold);outline-offset:3px;}
 </style>
+<link rel="stylesheet" href="/premium.css">
 </head>
 <body>
 
@@ -593,7 +637,11 @@
     <a href="psi.html">Personal Shopper</a>
     <a href="#contacto" data-i18n="nav_contacto">Contacto</a>
   </div>
-  <a class="nav-cta-desk" href="comprar.html" data-i18n="nav_comprar">Comprar</a>
+  <div class="lang-switch">
+    <button class="flag active" data-lang="es" aria-label="Español" title="Español">ES</button>
+    <button class="flag" data-lang="pt" aria-label="Português" title="Português">PT</button>
+    <button class="flag" data-lang="en" aria-label="English" title="English">EN</button>
+  </div>
   <button class="burger" id="burger" type="button" aria-label="Menú" aria-expanded="false" aria-controls="mobileMenu"><span></span><span></span><span></span></button>
 </nav>
 
@@ -606,27 +654,21 @@
 
 <section class="hero" id="inicio">
   <div class="hero-bg">
-    <video autoplay muted loop playsinline preload="metadata" poster="hero-poster.jpg" aria-hidden="true">
-      <source src="hero.mp4" type="video/mp4">
-      <img src="hero-poster.jpg" alt="Obelisco de Buenos Aires desde el cielo — Grupo Bairen">
+    <video autoplay muted loop playsinline preload="metadata" poster="hero-poster.jpg?v=2" aria-hidden="true">
+      <source src="hero.mp4?v=2" type="video/mp4">
+      <img src="hero-poster.jpg?v=2" alt="Obelisco de Buenos Aires desde el cielo — Grupo Bairen">
     </video>
   </div>
-  <div class="lang-switch">
-    <button class="flag active" data-lang="es" aria-label="Español" title="Español"><svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#fff"/><rect width="30" height="6.7" fill="#75AADB"/><rect width="30" height="6.7" y="13.3" fill="#75AADB"/><circle cx="15" cy="10" r="2" fill="#F6B40E"/></svg></button>
-    <button class="flag" data-lang="pt" aria-label="Português" title="Português"><svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#009B3A"/><polygon points="15,2.5 27.2,10 15,17.5 2.8,10" fill="#FEDF00"/><circle cx="15" cy="10" r="3.2" fill="#002776"/></svg></button>
-    <button class="flag" data-lang="en" aria-label="English" title="English"><svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#fff"/><rect width="30" height="1.54" fill="#B22234"/><rect width="30" height="1.54" y="3.08" fill="#B22234"/><rect width="30" height="1.54" y="6.15" fill="#B22234"/><rect width="30" height="1.54" y="9.23" fill="#B22234"/><rect width="30" height="1.54" y="12.31" fill="#B22234"/><rect width="30" height="1.54" y="15.38" fill="#B22234"/><rect width="30" height="1.54" y="18.46" fill="#B22234"/><rect width="13" height="10.77" fill="#3C3B6E"/></svg></button>
-  </div>
   <div class="hero-content">
-    <h1 class="hero-h1-sr">
-      <span data-i18n="hero_t1">Buenos Aires,</span>
-      <span data-i18n="hero_t2">en su</span>
-      <span data-i18n="hero_t3">máximo esplendor.</span>
+    <h1 class="hero-h1">
+      <span class="hline"><span data-i18n="hero_t1">Buenos Aires</span></span>
+      <span class="hline"><span data-i18n="hero_t2">en su</span> <span data-i18n="hero_t3">máximo esplendor.</span></span>
     </h1>
-    <div class="hero-actions">
-      <a class="hbtn hbtn-solid" href="comprar.html" data-i18n="btn_comprar">Comprar</a>
-      <a class="hbtn hbtn-line" href="catalogo.html" data-i18n="btn_alquilar">Alquilar</a>
-    </div>
-    <p class="hero-psi"><span data-i18n="psi_q">¿Necesita asesoramiento para comprar en Buenos Aires?</span><br><a href="psi.html" data-i18n="psi_link">Conozca nuestro servicio de Personal Shopper.</a></p>
+    <nav class="hero-doors" aria-label="Operaciones">
+      <a href="comprar.html" data-i18n="btn_comprar">Comprar</a><span class="sep" aria-hidden="true">·</span>
+      <a href="catalogo.html" data-i18n="btn_alquilar">Alquilar</a><span class="sep" aria-hidden="true">·</span>
+      <a href="psi.html" data-i18n="btn_invertir">Invertir</a>
+    </nav>
   </div>
 </section>
 
@@ -659,6 +701,110 @@
   </div>
 </section>
 
+
+<!-- EL MERCADO, EN NÚMEROS · el ángulo analista de Bairen (datos con fuente; los mantiene el Analista) -->
+<section class="mercado" id="mercado">
+  <div class="mercado-in">
+    <span class="sec-eyebrow eyebrow-goldlt" data-i18n="mkt_eyebrow">El mercado, en números</span>
+    <div class="mkt-grid">
+      <div class="mkt-item reveal">
+        <div class="mkt-num" data-countup>69.461</div>
+        <div class="mkt-lbl" data-i18n="mkt_l1">escrituras en Buenos Aires en 2025, el mejor año en dos décadas</div>
+        <div class="mkt-src">Colegio de Escribanos CABA</div>
+      </div>
+      <!-- mkt-auto: el valor del m² y el mes los actualiza la rutina mensual "mercado". No tocar a mano. -->
+      <div class="mkt-item reveal d1">
+        <div class="mkt-num" id="mktM2">USD 2.467</div>
+        <div class="mkt-lbl" data-i18n="mkt_l2">el metro cuadrado promedio porteño; en Madrid ronda los USD 6.000 y en Miami los USD 9.100</div>
+        <div class="mkt-src" id="mktM2Src">jun 2026</div>
+      </div>
+      <div class="mkt-item reveal d2">
+        <div class="mkt-num">3 a 12</div>
+        <div class="mkt-lbl" data-i18n="mkt_l3">meses de estadía, amoblado, todo incluido y sin garantía</div>
+        <div class="mkt-src">Grupo Bairen</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIOS REALES (del vault; nunca inventados). Carrusel: rota cada 5s,
+     pausa en hover o al expandir un "Ver más". Se muestran en su idioma original. -->
+<section class="cita" id="testimonios">
+  <blockquote class="reveal" id="citaBox">
+    <p id="citaTxt"></p>
+    <button class="cita-more" id="citaMore" type="button" hidden>Ver más</button>
+    <cite id="citaAut"></cite>
+  </blockquote>
+  <div class="cita-dots" id="citaDots" role="tablist" aria-label="Testimonios"></div>
+</section>
+<script>
+(function(){
+  /* Testimonios reales (vault: Testimonios Reales). Traducciones fieles PT/EN. */
+  var DATA={
+   es:{more:'Ver más',less:'Ver menos',q:[
+    {t:"Julián, la verdad nos solucionaste todo. Respondiste todas las dudas sin importar la hora. Nos diste la confianza que necesitábamos. Son unos genios.",a:"Marcela R. · Propietaria"},
+    {t:"Hasta la fecha son los que mejor trato me han dado. Más que sorprendido y agradecido.",a:"Tadeo T. · Inquilino"},
+    {t:"Muy satisfecho con la atención y el trabajo. Nunca tuve ningún problema, y los recomendaría sin dudar.",a:"Oscar · Propietario"},
+    {t:"Mi experiencia ha sido excelente. Estuvieron pendientes de todo el proceso: desde la coordinación para ver el departamento, mostrarnos varias veces, hasta el proceso de reserva, súper sencillo. Ahora que ya estamos en el departamento también han sido un apoyo cuando tuvimos dudas.",a:"Catalina · Inquilina"},
+    {t:"Quiero compartir mi excelente experiencia con Grupo Bairen durante el alquiler de la primera vivienda de mi hija. Desde el primer momento recibimos una atención profesional, clara y cercana. Quiero destacar especialmente el trabajo de Julián y de todo su equipo, que estuvieron siempre disponibles para responder nuevas consultas, acompañarnos en cada etapa del proceso y hacer que todo fuera ágil, simple y transparente. Una vez iniciado el contrato, el acompañamiento continuó: se preocuparon por hacer un seguimiento para saber si estaba todo bien en la vivienda y si mi hija necesitaba algo, un gesto que demuestra un verdadero compromiso con las personas y no solo con la operación. Saber que la primera experiencia de mi hija alquilando su propio hogar estuvo acompañada por un equipo tan comprometido nos dio mucha tranquilidad. Sin dudas recomiendo a Grupo Bairen a quienes busquen una inmobiliaria seria, confiable y con una atención de excelencia.",a:"María Eugenia · Inquilina"}
+   ]},
+   pt:{more:'Ver mais',less:'Ver menos',q:[
+    {t:"Julián, você resolveu tudo para nós, de verdade. Respondeu todas as dúvidas a qualquer hora. Nos deu a confiança que precisávamos. Vocês são geniais.",a:"Marcela R. · Proprietária"},
+    {t:"Até hoje são os que melhor atendimento me deram. Mais que surpreendido e agradecido.",a:"Tadeo T. · Inquilino"},
+    {t:"Muito satisfeito com a atenção e o trabalho. Nunca tive nenhum problema, e os recomendaria sem hesitar.",a:"Oscar · Proprietário"},
+    {t:"Minha experiência foi excelente. Estiveram atentos a todo o processo: desde a coordenação para ver o apartamento, nos mostrar várias vezes, até o processo de reserva, super simples. Agora que já estamos no apartamento também têm sido um apoio quando tivemos dúvidas.",a:"Catalina · Inquilina"},
+    {t:"Quero compartilhar minha excelente experiência com o Grupo Bairen durante o aluguel da primeira moradia da minha filha. Desde o primeiro momento recebemos um atendimento profissional, claro e próximo. Quero destacar especialmente o trabalho de Julián e de toda a sua equipe, que estiveram sempre disponíveis para responder novas consultas, nos acompanhar em cada etapa do processo e fazer com que tudo fosse ágil, simples e transparente. Uma vez iniciado o contrato, o acompanhamento continuou: se preocuparam em fazer um seguimento para saber se estava tudo bem na moradia e se minha filha precisava de algo, um gesto que demonstra um verdadeiro compromisso com as pessoas e não só com a operação. Saber que a primeira experiência da minha filha alugando o próprio lar esteve acompanhada por uma equipe tão comprometida nos deu muita tranquilidade. Sem dúvidas recomendo o Grupo Bairen a quem busca uma imobiliária séria, confiável e com um atendimento de excelência.",a:"María Eugenia · Inquilina"}
+   ]},
+   en:{more:'Read more',less:'Read less',q:[
+    {t:"Julián, you truly solved everything for us. You answered every question no matter the hour. You gave us the confidence we needed. You are brilliant.",a:"Marcela R. · Owner"},
+    {t:"To this day they have given me the best treatment. More than surprised and grateful.",a:"Tadeo T. · Tenant"},
+    {t:"Very satisfied with the attention and the work. I never had a single problem, and I would recommend them without hesitation.",a:"Oscar · Owner"},
+    {t:"My experience has been excellent. They were on top of the whole process: from coordinating the viewing, showing us the apartment several times, to the reservation process, super simple. Now that we are in the apartment they have also been a support whenever we had questions.",a:"Catalina · Tenant"},
+    {t:"I want to share my excellent experience with Grupo Bairen during the rental of my daughter's first home. From the very first moment we received professional, clear and warm attention. I especially want to highlight the work of Julián and his whole team, who were always available to answer new questions, walk with us through every stage of the process and make everything agile, simple and transparent. Once the contract started, the support continued: they followed up to make sure everything was fine in the home and whether my daughter needed anything, a gesture that shows a true commitment to people and not just to the deal. Knowing that my daughter's first experience renting her own home was accompanied by such a committed team gave us great peace of mind. I recommend Grupo Bairen without hesitation to anyone looking for a serious, trustworthy agency with excellent service.",a:"María Eugenia · Tenant"}
+   ]}
+  };
+  var LIM=200, i=0, expanded=false, hover=false, timer=null;
+  var box=document.getElementById('citaBox'), txt=document.getElementById('citaTxt'),
+      aut=document.getElementById('citaAut'), more=document.getElementById('citaMore'),
+      dots=document.getElementById('citaDots');
+  function L(){ var l=window.BAIREN_LANG||'es'; return DATA[l]||DATA.es; }
+  DATA.es.q.forEach(function(_,k){
+    var d=document.createElement('button'); d.className='cita-dot'; d.type='button';
+    d.setAttribute('aria-label','Testimonio '+(k+1));
+    d.addEventListener('click',function(){ show(k); restart(); });
+    dots.appendChild(d);
+  });
+  function corto(s){
+    if(s.length<=LIM) return s;
+    var c=s.slice(0,LIM); return c.slice(0,c.lastIndexOf(' '))+'…';
+  }
+  function paint(){
+    var d=L(), q=d.q[i], largo=q.t.length>LIM;
+    txt.textContent='“'+((largo&&!expanded)?corto(q.t):q.t)+'”';
+    aut.textContent=q.a;
+    more.hidden=!largo; more.textContent=expanded?d.less:d.more;
+    dots.querySelectorAll('.cita-dot').forEach(function(el,n){ el.classList.toggle('on',n===i); });
+  }
+  function show(k){
+    i=k; expanded=false;
+    box.classList.add('cita-out');
+    setTimeout(function(){ paint(); box.classList.remove('cita-out'); },380);
+  }
+  more.addEventListener('click',function(){ expanded=!expanded; paint(); });
+  box.addEventListener('mouseenter',function(){hover=true;});
+  box.addEventListener('mouseleave',function(){hover=false;});
+  var tx=0;
+  box.addEventListener('touchstart',function(e){tx=e.touches[0].clientX;},{passive:true});
+  box.addEventListener('touchend',function(e){
+    var dx=e.changedTouches[0].clientX-tx;
+    if(Math.abs(dx)>45){ show(dx<0?(i+1)%5:(i+4)%5); restart(); }
+  },{passive:true});
+  document.addEventListener('bairen:lang',function(){ expanded=false; paint(); restart(); });
+  function tickr(){ if(!hover && !expanded) show((i+1)%5); }
+  function restart(){ clearInterval(timer); timer=setInterval(tickr,5000); }
+  paint(); restart();
+})();
+</script>
 
 <section class="contacto" id="contacto">
   <div class="contacto-in">
@@ -699,6 +845,7 @@
         <li><a href="catalogo.html?tipo=temporal" data-i18n="ft_temporal">Alquiler a Mediano Plazo</a></li>
         <li><a href="catalogo.html?tipo=tradicional" data-i18n="ft_tradicional">Alquiler a Largo Plazo</a></li>
         <li><a href="psi.html">PSI · Personal Shopper</a></li>
+        <li><a href="#contacto" data-i18n="ft_vender">Vender mi propiedad</a></li>
       </ul>
     </div>
     <div class="ft-col">
@@ -748,7 +895,7 @@
       pt:{
         nav_comprar:"Comprar",nav_alquilar:"Alugar",nav_contacto:"Contato",
         hero_t2:"no seu",hero_t3:"máximo esplendor.",
-        btn_comprar:"Comprar",btn_alquilar:"Alugar",
+        btn_comprar:"Comprar",btn_alquilar:"Alugar",btn_invertir:"Investir",btn_psi:"Compre representado",nav_psi:"Compre representado",
         psi_q:"Precisa de assessoria para comprar em Buenos Aires?",psi_link:"Conheça nosso serviço de Personal Shopper.",
         caminos_h:"O que oferecemos:",
         c1_name:"Compra",c1_kicker:"Unidades à venda",c1_desc:"Apartamentos premium à venda nos melhores bairros, apresentados como merecem.",
@@ -762,14 +909,20 @@
         opt_comprar:"Comprar",opt_alquilar:"Alugar",opt_invertir:"Investir · Personal Shopper",opt_vender:"Vender meu imóvel",
         f_mensaje:"Mensagem",f_submit:"Enviar consulta",ph_nombre:"Seu nome",ph_contacto:"Como falamos com você",ph_mensaje:"Conte o que você procura",
         ft_tag:"Apartamentos premium em Buenos Aires. Comprar, vender e alugar.",
-        ft_ops:"Operações",ft_comprar:"Comprar",ft_temporal:"Aluguel de Médio Prazo",ft_tradicional:"Aluguel de Longo Prazo",
+        mkt_eyebrow:"O mercado, em números",
+        mkt_l1:"escrituras em Buenos Aires em 2025, o melhor ano em duas décadas",
+        mkt_l2:"o metro quadrado médio portenho; em Madri ronda USD 6.000 e em Miami USD 9.100",
+        mkt_l3:"meses de estadia, mobiliado, tudo incluído e sem garantia",
+        quote_t:"“Você resolveu tudo para nós. Respondeu todas as dúvidas a qualquer hora. Nos deu a confiança que precisávamos.”",
+        quote_a:"Marcela R. · Proprietária",
+        ft_vender:"Vender meu imóvel",ft_ops:"Operações",ft_comprar:"Comprar",ft_temporal:"Aluguel de Médio Prazo",ft_tradicional:"Aluguel de Longo Prazo",
         ft_empresa:"Empresa",ft_como:"Como funciona",ft_vende:"Venda com a gente",ft_prop:"Para proprietários",
         ft_dev:"Desenvolvido por",ft_copy:"© 2026 Grupo Bairen. Todos os direitos reservados.",ft_terms:"Termos e condições",ft_privacy:"Política de privacidade"
       },
       en:{
         nav_comprar:"Buy",nav_alquilar:"Rent",nav_contacto:"Contact",
         hero_t2:"at its",hero_t3:"finest.",
-        btn_comprar:"Buy",btn_alquilar:"Rent",
+        btn_comprar:"Buy",btn_alquilar:"Rent",btn_invertir:"Invest",btn_psi:"Buy represented",nav_psi:"Buy represented",
         psi_q:"Need advice to buy in Buenos Aires?",psi_link:"Discover our Personal Shopper service.",
         caminos_h:"What we offer:",
         c1_name:"Buy",c1_kicker:"Units for sale",c1_desc:"Premium apartments for sale in the best neighbourhoods, shown as they deserve.",
@@ -783,7 +936,13 @@
         opt_comprar:"Buy",opt_alquilar:"Rent",opt_invertir:"Invest · Personal Shopper",opt_vender:"Sell my property",
         f_mensaje:"Message",f_submit:"Send inquiry",ph_nombre:"Your name",ph_contacto:"How we reach you",ph_mensaje:"Tell us what you're looking for",
         ft_tag:"Premium apartments in Buenos Aires. Buy, sell and rent.",
-        ft_ops:"Services",ft_comprar:"Buy",ft_temporal:"Medium-term Rental",ft_tradicional:"Long-term Rental",
+        mkt_eyebrow:"The market, in numbers",
+        mkt_l1:"property deeds in Buenos Aires in 2025, the best year in two decades",
+        mkt_l2:"the average square meter in Buenos Aires; in Madrid around USD 6,000 and in Miami USD 9,100",
+        mkt_l3:"month stays, furnished, all inclusive and no guarantor",
+        quote_t:"“You solved everything for us. You answered every question no matter the hour. You gave us the confidence we needed.”",
+        quote_a:"Marcela R. · Owner",
+        ft_vender:"Sell my property",ft_ops:"Services",ft_comprar:"Buy",ft_temporal:"Medium-term Rental",ft_tradicional:"Long-term Rental",
         ft_empresa:"Company",ft_como:"How it works",ft_vende:"Sell with us",ft_prop:"For owners",
         ft_dev:"Developed by",ft_copy:"© 2026 Grupo Bairen. All rights reserved.",ft_terms:"Terms and conditions",ft_privacy:"Privacy policy"
       }
@@ -966,5 +1125,6 @@ function formatFechaLiberacion(fechaStr) {
   return d.lib_fecha.replace('{f}', formatted);
 }
 </script>
+<script src="/premium.js" defer></script>
 </body>
 </html>
