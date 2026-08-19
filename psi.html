@@ -79,6 +79,10 @@
   .ps-lead{font-size:clamp(.98rem,1.7vw,1.12rem);font-weight:300;color:rgba(255,255,255,.6);max-width:46ch;margin:20px auto 0;line-height:1.72;}
   .ps-lead b{color:var(--white);font-weight:500;}
   @media(max-width:520px){.ps-nots{flex-direction:column;gap:8px;}}
+  /* ── Video de lanzamiento ── */
+  .ps-videosec{background:var(--navy-deeper);padding:70px 24px;text-align:center;border-top:1px solid rgba(194,169,104,.14);}
+  .ps-eyebrow{display:block;font-size:.6rem;font-weight:600;letter-spacing:.38em;text-transform:uppercase;color:var(--gold);margin-bottom:26px;}
+  .ps-videoplayer{width:min(340px,86vw);aspect-ratio:480/848;display:block;margin:0 auto;background:#000;border:1px solid rgba(194,169,104,.35);}
   .ps-cta{display:inline-block;background:var(--off-white,#EEE5D0);color:var(--navy-deeper);font-size:.7rem;font-weight:700;letter-spacing:.22em;text-indent:.22em;text-transform:uppercase;padding:16px 36px;margin-top:36px;transition:background .25s,transform .25s;}
   .ps-cta:hover{background:#fff;transform:translateY(-1px);}
   .ps-pdf{display:inline-flex;align-items:center;gap:9px;margin-top:22px;font-size:.9rem;letter-spacing:.02em;color:var(--gold-light);border-bottom:1px solid var(--gold-light);padding-bottom:3px;transition:color .2s,border-color .2s,gap .25s var(--ease);}
@@ -175,9 +179,13 @@
   </div>
 </header>
 
-<!-- Los 6 pasos / para quién / honorarios viven en el PDF (decisión de Tomás, 19/08).
-     SLOT VIDEO V1 (activar cuando esté grabado el reel de lanzamiento):
-<section class="ps-video"><div class="wrap"><iframe ...></iframe></div></section> -->
+<!-- Los 6 pasos / para quién / honorarios viven en el PDF (decisión de Tomás, 19/08). -->
+
+<!-- VIDEO DE LANZAMIENTO PSI (carga diferida: solo pesa si el usuario reproduce) -->
+<section class="ps-videosec">
+  <span class="ps-eyebrow" data-i18n="ps_video_eye">El servicio, en un minuto</span>
+  <video class="ps-videoplayer" src="psi-video.mp4" poster="psi-video-poster.jpg" controls preload="none" playsinline></video>
+</section>
 
 <section class="ps-formsec" id="consulta">
   <div class="wrap">
@@ -229,7 +237,7 @@
   <svg viewBox="0 0 32 32"><path d="M16 0C7.163 0 0 7.163 0 16c0 2.83.736 5.487 2.023 7.793L0 32l8.438-2.01A15.93 15.93 0 0016 32c8.837 0 16-7.163 16-16S24.837 0 16 0zm0 29.333a13.278 13.278 0 01-6.77-1.848l-.484-.287-5.013 1.195 1.228-4.88-.317-.502A13.278 13.278 0 012.667 16C2.667 8.636 8.636 2.667 16 2.667S29.333 8.636 29.333 16 23.364 29.333 16 29.333zm7.3-9.96c-.4-.2-2.363-1.166-2.728-1.3-.366-.133-.633-.2-.9.2-.266.4-1.033 1.3-1.266 1.566-.233.267-.466.3-.866.1-2.367-1.183-3.917-2.117-5.475-4.8-.413-.712.413-.663 1.183-2.202.133-.267.067-.5-.033-.7-.1-.2-.9-2.163-1.233-2.963-.324-.778-.653-.672-.9-.685l-.767-.013a1.47 1.47 0 00-1.067.5c-.366.4-1.4 1.367-1.4 3.33s1.434 3.863 1.634 4.13c.2.267 2.823 4.312 6.837 6.05 2.54 1.097 3.534 1.19 4.804.999.773-.115 2.363-.966 2.696-1.9.333-.933.333-1.733.233-1.9-.1-.166-.366-.266-.766-.466z"/></svg>
 </a>
 
-<script src="i18n.js?v=2"></script>
+<script src="i18n.js?v=3"></script>
 <script>
   const burger = document.getElementById('burger');
   const mobileMenu = document.getElementById('mobileMenu');

@@ -21,7 +21,7 @@
       ps_lead1: "Você nos diz qual apartamento quer. Nós o revisamos, negociamos e",
       ps_lead_b: "compramos por você.",
       ps_pdf: "Conheça mais sobre nosso serviço",
-      ps_cta: "Solicitar informação",
+      ps_cta: "Solicitar informação", ps_video_eye: "O serviço, em um minuto",
       ps_steps_eyebrow: "Como funciona", ps_steps_h: "Em seis passos:",
       ps_s1_t: "Definimos a sua busca.", ps_s1_d: "Zona, tipo, orçamento e objetivo: moradia, renda ou investimento.",
       ps_s2_t: "Buscamos em todo o mercado.", ps_s2_d: "Inclusive imóveis que ainda não foram publicados.",
@@ -81,7 +81,7 @@
       ps_lead1: "You tell us which apartment you want. We review, negotiate and",
       ps_lead_b: "buy it for you.",
       ps_pdf: "Learn more about our service",
-      ps_cta: "Request information",
+      ps_cta: "Request information", ps_video_eye: "The service, in one minute",
       ps_steps_eyebrow: "How it works", ps_steps_h: "In six steps:",
       ps_s1_t: "We define your search.", ps_s1_d: "Area, type, budget and goal: home, rental income or investment.",
       ps_s2_t: "We search the entire market.", ps_s2_d: "Including properties not yet listed.",
@@ -172,3 +172,12 @@
   try { saved = localStorage.getItem('bairen_lang') || 'es'; } catch (e) {}
   apply(saved);
 })();
+
+/* ── Miniaturas al vuelo (Supabase Image Transformations) ──
+   Convierte una URL pública de storage en su versión redimensionada.
+   Los navegadores modernos reciben WebP automáticamente. */
+window.sbImg = function (u, w) {
+  if (!u || u.indexOf('/storage/v1/object/public/') === -1) return u;
+  return u.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/')
+    + (u.indexOf('?') > -1 ? '&' : '?') + 'width=' + w + '&quality=75';
+};

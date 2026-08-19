@@ -558,6 +558,7 @@
   .cfield textarea{resize:vertical;min-height:96px;}
   .btn-submit{grid-column:1 / -1;justify-self:start;background:var(--gold);color:var(--navy-deeper);border:none;font-family:var(--font-body);font-weight:700;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;padding:17px 46px;cursor:pointer;transition:background .25s,transform .25s;}
   .btn-submit:hover{background:var(--gold-light);transform:translateY(-2px);}
+  .cform-ok{grid-column:1 / -1;font-family:var(--font-display);font-style:italic;font-size:1.05rem;color:var(--gold-light);}
   @media(max-width:560px){.cform{grid-template-columns:1fr;}}
 
   /* Feedback de presión: todo lo clickeable "responde" al tacto (efecto premium) */
@@ -819,15 +820,38 @@
         <div class="ci-row"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg><span>CABA · GBA Norte, Buenos Aires</span></div>
       </div>
     </div>
-    <form class="cform reveal d1" onsubmit="return false">
-      <div class="cfield"><label data-i18n="f_nombre">Nombre</label><input type="text" placeholder="Tu nombre" data-i18n-ph="ph_nombre"></div>
-      <div class="cfield"><label data-i18n="f_contacto">Teléfono o email</label><input type="text" placeholder="Cómo te contactamos" data-i18n-ph="ph_contacto"></div>
+    <form class="cform reveal d1" id="contactForm">
+      <div class="cfield"><label data-i18n="f_nombre">Nombre</label><input type="text" name="nombre" required placeholder="Tu nombre" data-i18n-ph="ph_nombre"></div>
+      <div class="cfield"><label data-i18n="f_contacto">Teléfono o email</label><input type="text" name="contacto" required placeholder="Cómo te contactamos" data-i18n-ph="ph_contacto"></div>
       <div class="cfield full"><label data-i18n="f_interes">Me interesa</label>
-        <select><option data-i18n="opt_comprar">Comprar</option><option data-i18n="opt_alquilar">Alquilar</option><option data-i18n="opt_invertir">Invertir · Personal Shopper</option><option data-i18n="opt_vender">Vender mi propiedad</option></select>
+        <select name="interes"><option data-i18n="opt_comprar">Comprar</option><option data-i18n="opt_alquilar">Alquilar</option><option data-i18n="opt_invertir">Invertir · Personal Shopper</option><option data-i18n="opt_vender">Vender mi propiedad</option></select>
       </div>
-      <div class="cfield full"><label data-i18n="f_mensaje">Mensaje</label><textarea placeholder="Contanos qué estás buscando" data-i18n-ph="ph_mensaje"></textarea></div>
+      <div class="cfield full"><label data-i18n="f_mensaje">Mensaje</label><textarea name="mensaje" placeholder="Contanos qué estás buscando" data-i18n-ph="ph_mensaje"></textarea></div>
       <button class="btn-submit" type="submit" data-i18n="f_submit">Enviar consulta</button>
+      <p class="cform-ok" id="cformOk" hidden></p>
     </form>
+    <script>
+    (function(){
+      var f=document.getElementById('contactForm'), ok=document.getElementById('cformOk');
+      var MSG={es:{ok:'Recibimos tu consulta. Te contactamos a la brevedad.',err:'No se pudo enviar. Escribinos a contacto@bairengroup.com o por WhatsApp.'},
+               pt:{ok:'Recebemos sua consulta. Entraremos em contato em breve.',err:'Não foi possível enviar. Escreva para contacto@bairengroup.com ou pelo WhatsApp.'},
+               en:{ok:'We received your inquiry. We will contact you shortly.',err:'Could not send. Write to contacto@bairengroup.com or via WhatsApp.'}};
+      function M(){ return MSG[window.BAIREN_LANG||'es']||MSG.es; }
+      f.addEventListener('submit',function(e){
+        e.preventDefault();
+        var btn=f.querySelector('.btn-submit'); btn.disabled=true;
+        var fd=new FormData(f);
+        fd.append('_subject','CONTACTO WEB — '+(fd.get('interes')||''));
+        fetch('https://formspree.io/f/xykrypqo',{method:'POST',body:fd,headers:{'Accept':'application/json'}})
+          .then(function(r){
+            if(!r.ok) throw 0;
+            f.querySelectorAll('.cfield,.btn-submit').forEach(function(el){el.style.display='none';});
+            ok.hidden=false; ok.textContent=M().ok;
+          })
+          .catch(function(){ btn.disabled=false; ok.hidden=false; ok.textContent=M().err; });
+      });
+    })();
+    </script>
   </div>
 </section>
 
@@ -973,6 +997,7 @@
 </script>
 <script src="supabase-config.js"></script>
 <script>
+window.sbImg = window.sbImg || function(u){return u};
   const burger = document.getElementById('burger');
   const mobileMenu = document.getElementById('mobileMenu');
   burger.addEventListener('click', () => {
@@ -1073,7 +1098,7 @@ function renderDestacadas() {
   const grid = document.getElementById('destacadasGrid');
   grid.innerHTML = DEST_TOP3.map(p => {
     const portada = (p.imagenes || []).sort((a,b) => a.orden - b.orden)[0];
-    const fotoStyle = portada ? "background-image:url('" + portada.url + "')" : '';
+    const fotoStyle = portada ? "background-image:url('" + window.sbImg(portada.url,700) + "')" : '';
     const reservado = p.estado === 'Reservado';
     const precio = (p.tipo === 'Tradicional' ? p.precio_tradicional : p.precio_temporal) || 0;
     const precioStr = precio > 0 ? 'USD ' + Number(precio).toLocaleString('es-AR') : d.consultar;

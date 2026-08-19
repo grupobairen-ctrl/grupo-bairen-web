@@ -385,8 +385,9 @@ footer{background:var(--navy-dark);border-top:1px solid var(--gold);padding:40px
 </div>
 
 <script src="/supabase-config.js"></script>
-<script src="/i18n.js?v=2"></script>
+<script src="/i18n.js?v=3"></script>
 <script>
+window.sbImg = window.sbImg || function(u){return u};
 'use strict';
 
 // ─── i18n de contenido dinámico (el estático lo maneja i18n.js) ───
@@ -666,10 +667,10 @@ function renderProperty(p) {
   $('heroAddress').textContent = p.dir;
   $('heroSub').textContent     = `${p.barrio} · Buenos Aires`;
   $('heroSlides').innerHTML = PHOTOS.map((ph, i) =>
-    `<div class="hero-slide" data-idx="${i}" style="background-image:url('${escapeHTML(ph.url)}')"></div>`
+    `<div class="hero-slide" data-idx="${i}" style="background-image:url('${escapeHTML(window.sbImg(ph.url,1600))}')"></div>`
   ).join('');
   let lbHTML = PHOTOS.map((ph, i) =>
-    `<div class="lightbox-slide" data-idx="${i}"><img src="${escapeHTML(ph.url)}" alt="Foto ${i+1}" loading="lazy" decoding="async"/></div>`
+    `<div class="lightbox-slide" data-idx="${i}"><img src="${escapeHTML(window.sbImg(ph.url,1600))}" alt="Foto ${i+1}" loading="lazy" decoding="async"/></div>`
   ).join('');
   if (VIDEO) {
     lbHTML += `<div class="lightbox-slide lightbox-slide--video" data-idx="${PHOTOS.length}" data-type="video">
@@ -685,7 +686,7 @@ function renderProperty(p) {
   // ─── GALLERY STRIP ───
   const stripHTML = PHOTOS.map((ph, i) =>
     `<div class="thumb${i===0?' active':''}" data-idx="${i}" data-type="photo">
-       <img src="${escapeHTML(ph.url)}" alt="Foto ${i+1} de ${escapeHTML(titleFull)}" ${i===0?'fetchpriority="high" loading="eager"':'loading="lazy"'}/>
+       <img src="${escapeHTML(window.sbImg(ph.url,240))}" alt="Foto ${i+1} de ${escapeHTML(titleFull)}" ${i===0?'fetchpriority="high" loading="eager"':'loading="lazy"'}/>
      </div>`
   ).join('') + (VIDEO ? `<div class="thumb" data-type="video">▶ VIDEO<span class="vid-dot"></span></div>` : '');
   $('galleryStrip').innerHTML = stripHTML;

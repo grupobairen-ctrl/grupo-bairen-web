@@ -664,9 +664,10 @@ footer{
   <span class="ft-copy" data-i18n="cat_copy">© 2026 Grupo Bairen · Todos los derechos reservados</span>
 </footer>
 
-<script src="i18n.js?v=2"></script>
+<script src="i18n.js?v=3"></script>
 <script src="supabase-config.js"></script>
 <script>
+window.sbImg = window.sbImg || function(u){return u};
 /* ═══════════════════════════════════════════════════════════════
    DATA
 ═══════════════════════════════════════════════════════════════ */
@@ -932,7 +933,7 @@ function render() {
       p.tipo === 'Temporal' ? ct('serv_allin') : null,
     ].filter(Boolean).join(' · ');
     const imgHTML = p.foto
-      ? `<img src="${p.foto}" alt="${p.dir} — foto principal" loading="lazy">`
+      ? `<img src="${window.sbImg(p.foto,700)}" alt="${p.dir} — foto principal" loading="lazy">`
       : `<span class="card-img-placeholder">${ct('foto_ph')}</span>`;
 
     const aria = `Ver ${p.dir}${unidad} en ${p.barrio}`;
