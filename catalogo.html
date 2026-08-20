@@ -947,7 +947,7 @@ function render() {
         ${p.estado === 'Reservado' && p.fecha_liberacion ? `<div class="badge-liberacion"><span>${formatFechaLiberacion(p.fecha_liberacion)}</span></div>` : ''}
       </div>
       <div class="card-body">
-        <div class="card-address">${p.portadaTitulo || `${p.dir}${unidad}`}</div>
+        <div class="card-address">${(p.portadaTitulo && (p.portadaTitulo[L()] || p.portadaTitulo.es)) || `${p.dir}${unidad}`}</div>
         <div class="card-barrio">${p.barrio}</div>
         <div class="card-meta">${metaLine}</div>
         <div class="card-divider"></div>
@@ -1035,8 +1035,11 @@ async function loadFromSupabase() {
         foto,
         fotoEsPortada,
         // título especial del catálogo (opcional): reemplaza a la dirección
-        // como titular de la tarjeta; la ficha no lo usa.
-        portadaTitulo: p.portada_titulo || null,
+        // como titular de la tarjeta; la ficha no lo usa. Guarda las 3
+        // variantes y se elige por idioma al renderizar (pt/en caen a es).
+        portadaTitulo: p.portada_titulo
+          ? { es: p.portada_titulo, pt: p.portada_titulo_pt || null, en: p.portada_titulo_en || null }
+          : null,
       };
       // tipo='Ambos' se expande en dos items (uno por modalidad) para preservar filtros
       if (p.tipo === 'Ambos') {

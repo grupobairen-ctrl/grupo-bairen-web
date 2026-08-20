@@ -48,7 +48,10 @@ create table propiedades (
   portada_path        text,
   -- Título especial del catálogo: reemplaza a la dirección como titular de
   -- la tarjeta, solo en catalogo.html. La ficha muestra la dirección real.
+  -- _pt/_en: traducciones; si son null la tarjeta muestra el español.
   portada_titulo      text,
+  portada_titulo_pt   text,
+  portada_titulo_en   text,
   publicada           boolean not null default false,
   created_at          timestamptz not null default now(),
   updated_at          timestamptz not null default now(),
@@ -156,5 +159,7 @@ create policy "imagenes son lectura publica" on storage.objects
 alter table propiedades add column if not exists portada_url  text;
 alter table propiedades add column if not exists portada_path text;
 
--- MIGRACIÓN 2026-08-20: título especial del catálogo
+-- MIGRACIÓN 2026-08-20: título especial del catálogo (es + traducciones)
 alter table propiedades add column if not exists portada_titulo text;
+alter table propiedades add column if not exists portada_titulo_pt text;
+alter table propiedades add column if not exists portada_titulo_en text;
