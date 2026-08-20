@@ -368,6 +368,11 @@ textarea.fi{resize:vertical;min-height:96px;line-height:1.6;}
             <div class="portada-slot" id="portadaSlot"></div>
             <input type="file" id="portadaInput" accept="image/*" style="display:none">
             <p class="hint" style="margin-top:10px">Imagen especial que se muestra <b>solo en la tarjeta del catálogo</b> — no aparece en la ficha de la propiedad. Formato ideal: <b>1400 × 788 px (16:9), JPG</b>, con el contenido importante centrado. Si queda vacía, el catálogo usa la Foto 1 de la galería.</p>
+            <div class="fg" style="margin-top:14px">
+              <label class="lbl" for="fPortadaTitulo">Título del catálogo (opcional)</label>
+              <input class="fi" id="fPortadaTitulo" type="text" maxlength="60" placeholder="Ej: Balcón al sol en el corazón de Palermo">
+              <span class="hint">Reemplaza a la dirección como titular de la tarjeta, <b>solo en el catálogo</b>. La ficha sigue mostrando la dirección real. Si queda vacío, la tarjeta muestra la dirección.</span>
+            </div>
           </div>
         </div>
 
@@ -826,7 +831,7 @@ function openForm(prop) {
   state.vType = 'bunny';
 
   // reset campos
-  ['fDir','fUnidad','fBarrio','fPrecioTemp','fPrecioTrad','fPrecioVenta','fAmb','fM2','fPlazo','fDesc','fDescPt','fDescEn','fVideo'].forEach(id => $(id).value = '');
+  ['fDir','fUnidad','fBarrio','fPrecioTemp','fPrecioTrad','fPrecioVenta','fAmb','fM2','fPlazo','fDesc','fDescPt','fDescEn','fVideo','fPortadaTitulo'].forEach(id => $(id).value = '');
   $('fTipo').value = 'Temporal';
   $('fEstado').value = 'Disponible';
   $('fPlazo').value = defaultPlazoForTipo('Temporal');
@@ -860,6 +865,7 @@ function openForm(prop) {
     if (prop.portada_url) {
       state.portada = { url: prop.portada_url, storage_path: prop.portada_path || null };
     }
+    $('fPortadaTitulo').value = prop.portada_titulo || '';
 
     // amenities (await para no perderlas si el user guarda rápido)
     loadAmenitiesForProp(prop.id);
@@ -1217,6 +1223,7 @@ function collectFormData() {
     descripcion_en: $('fDescEn').value.trim() || null,
     video_url:    processVideoUrl($('fVideo').value, state.vType),
     video_tipo:   $('fVideo').value.trim() ? state.vType : null,
+    portada_titulo: $('fPortadaTitulo').value.trim() || null,
   };
 }
 
@@ -1475,6 +1482,7 @@ function snapshotForm() {
       descPt:     $('fDescPt').value,
       descEn:     $('fDescEn').value,
       video:      $('fVideo').value,
+      portadaTitulo: $('fPortadaTitulo').value,
     },
     amenities:       [...state.selAmenities.entries()],
     customAmenities: [...state.customAmenities],
@@ -1538,6 +1546,7 @@ async function restoreDraftIntoForm(draft) {
   $('fDescPt').value      = f.descPt || '';
   $('fDescEn').value      = f.descEn || '';
   $('fVideo').value       = f.video || '';
+  $('fPortadaTitulo').value = f.portadaTitulo || '';
   state.selAmenities    = new Map(draft.amenities || []);
   state.customAmenities = new Set(draft.customAmenities || []);
   state.vType           = draft.vType || 'bunny';
@@ -1631,7 +1640,7 @@ function showDraftBanner(draft) {
 
 function wireAutosave() {
   const ids = ['fDir','fUnidad','fBarrio','fTipo','fPrecioTemp','fPrecioTrad','fPrecioVenta',
-               'fAmb','fM2','fEstado','fPlazo','fDesc','fDescPt','fDescEn','fVideo'];
+               'fAmb','fM2','fEstado','fPlazo','fDesc','fDescPt','fDescEn','fVideo','fPortadaTitulo'];
   ids.forEach(id => {
     const el = $(id);
     if (!el) return;
