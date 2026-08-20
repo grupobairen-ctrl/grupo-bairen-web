@@ -68,7 +68,9 @@
       --ease:cubic-bezier(0.22,1,0.36,1);
     }
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-    html{scroll-behavior:smooth;}
+    /* el lienzo del documento en el azul del footer: el rebote del scroll
+       y el área bajo el footer se ven azul continuo, no blanco */
+    html{scroll-behavior:smooth;background:var(--navy-deeper);}
     body{font-family:var(--font-body);font-weight:300;color:var(--text-dark);background:var(--white);-webkit-font-smoothing:antialiased;overflow-x:hidden;}
     a{text-decoration:none;color:inherit;}
     ul{list-style:none;}

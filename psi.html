@@ -99,6 +99,9 @@
   .ps-formsec h2{font-family:var(--font-display);font-weight:500;font-size:clamp(1.6rem,3vw,2.2rem);text-align:center;margin-bottom:8px;}
   .ps-formsec .fsub{text-align:center;color:rgba(255,255,255,.6);font-size:1rem;margin-bottom:38px;}
   .ps-form{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  /* display:grid le gana al atributo hidden: sin esta regla el form
+     nunca se oculta tras enviar y el botón queda en "Enviando..." */
+  .ps-form[hidden]{display:none;}
   .pf{display:flex;flex-direction:column;gap:8px;}
   .pf.full{grid-column:1 / -1;}
   .pf label{font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.55);font-weight:600;}
@@ -257,7 +260,7 @@
     btn.disabled = true; btn.textContent = 'Enviando...';
     try {
       const res = await fetch(psForm.action, { method:'POST', body:new FormData(psForm), headers:{Accept:'application/json'} });
-      if (res.ok) { psForm.hidden = true; document.getElementById('psThanks').hidden = false; }
+      if (res.ok) { btn.textContent = 'Enviado ✓'; psForm.hidden = true; document.getElementById('psThanks').hidden = false; }
       else { btn.disabled=false; btn.textContent='Enviar'; alert('No se pudo enviar. Escriba a contacto@bairengroup.com'); }
     } catch { btn.disabled=false; btn.textContent='Enviar'; alert('No se pudo enviar. Escriba a contacto@bairengroup.com'); }
   });
