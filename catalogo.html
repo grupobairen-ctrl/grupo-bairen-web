@@ -383,7 +383,7 @@ nav {
 .prop-card.hidden{display:none;}
 
 .card-img{
-  height:210px;background:var(--navy);
+  aspect-ratio:16/9;background:var(--navy);
   position:relative;overflow:hidden;
   display:flex;align-items:center;justify-content:center;
 }
@@ -933,7 +933,7 @@ function render() {
       p.tipo === 'Temporal' ? ct('serv_allin') : null,
     ].filter(Boolean).join(' · ');
     const imgHTML = p.foto
-      ? `<img src="${window.sbImg(p.foto,700)}" alt="${p.dir} — foto principal" loading="lazy">`
+      ? `<img src="${p.fotoEsPortada ? p.foto : window.sbImg(p.foto,700)}" alt="${p.dir} — foto principal" loading="lazy">`
       : `<span class="card-img-placeholder">${ct('foto_ph')}</span>`;
 
     const aria = `Ver ${p.dir}${unidad} en ${p.barrio}`;
@@ -1016,6 +1016,10 @@ async function loadFromSupabase() {
       // portada_url = imagen especial de catálogo (cargada en el admin);
       // solo se usa acá — la ficha sigue mostrando su galería normal.
       const foto    = p.portada_url || (primera ? primera.url : null);
+      // la portada ya viene optimizada 16:9 desde el admin: se sirve tal
+      // cual, sin pasar por el transformador de Supabase (recomprime y
+      // puede deformar); las fotos de galería sí se achican con sbImg.
+      const fotoEsPortada = !!p.portada_url;
       const amList  = (p.amenities || []).map(a => a.nombre);
       const base = {
         id: p.id,
@@ -1028,6 +1032,7 @@ async function loadFromSupabase() {
         estado: p.estado,
         amenities: amList,
         foto,
+        fotoEsPortada,
       };
       // tipo='Ambos' se expande en dos items (uno por modalidad) para preservar filtros
       if (p.tipo === 'Ambos') {
