@@ -232,12 +232,10 @@
     .hero-h1{font-family:var(--font-display);font-weight:500;color:#F7F2E6;font-size:clamp(2.3rem,5.4vw,4.2rem);line-height:1.1;text-align:center;margin:0 0 40px;text-shadow:0 2px 34px rgba(0,0,0,.38);}
     .hero-h1 .hline{display:block;padding-bottom:.08em;}
     @media (prefers-reduced-motion: no-preference){
-      .hero-content{opacity:0;animation:heroIn 1.15s var(--ease) .25s forwards;}
-      .hero-h1{letter-spacing:.035em;animation:heroTrack 1.5s var(--ease) .25s forwards;}
+      .hero-content{opacity:0;animation:heroIn 1.35s var(--ease) .25s forwards;}
     }
-    @keyframes heroIn{from{opacity:0;transform:translateY(26px);}to{opacity:1;transform:none;}}
-    /* El tracking que respira: las letras entran apenas abiertas y se asientan */
-    @keyframes heroTrack{to{letter-spacing:0;}}
+    /* Una sola respiración, suave: poco recorrido, sin tocar el texto */
+    @keyframes heroIn{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
     /* Las tres puertas del negocio como línea tipográfica (Tomás, 19/08):
        Comprar = unidades en venta · Alquilar = catálogo · Invertir = PSI.
        Sin cajas: tipografía con subrayado dorado, el gesto de las casas de lujo. */
