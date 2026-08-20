@@ -1012,8 +1012,10 @@ async function loadFromSupabase() {
     props = (data || []).flatMap(p => {
       // Las unidades en venta viven en comprar.html, no en el catálogo de alquileres
       if (p.tipo === 'Venta') return [];
-      const portada = (p.imagenes || []).sort((a, b) => a.orden - b.orden)[0];
-      const foto    = portada ? portada.url : null;
+      const primera = (p.imagenes || []).sort((a, b) => a.orden - b.orden)[0];
+      // portada_url = imagen especial de catálogo (cargada en el admin);
+      // solo se usa acá — la ficha sigue mostrando su galería normal.
+      const foto    = p.portada_url || (primera ? primera.url : null);
       const amList  = (p.amenities || []).map(a => a.nombre);
       const base = {
         id: p.id,

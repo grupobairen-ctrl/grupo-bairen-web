@@ -42,6 +42,10 @@ create table propiedades (
   descripcion         text,
   video_url           text,
   video_tipo          text check (video_tipo in ('bunny','youtube','mp4')),
+  -- Portada especial del catálogo: solo se ve en la tarjeta de catalogo.html,
+  -- nunca en la ficha. Si es null, el catálogo usa la imagen con orden=0.
+  portada_url         text,
+  portada_path        text,
   publicada           boolean not null default false,
   created_at          timestamptz not null default now(),
   updated_at          timestamptz not null default now(),
@@ -141,3 +145,10 @@ create policy "admins actualizan imagenes" on storage.objects
 create policy "imagenes son lectura publica" on storage.objects
   for select to public
   using (bucket_id = 'imagenes-propiedades');
+
+-- =====================================================================
+-- MIGRACIÓN 2026-08-19: portada especial del catálogo
+-- (correr en el SQL Editor si la base ya existe)
+-- =====================================================================
+alter table propiedades add column if not exists portada_url  text;
+alter table propiedades add column if not exists portada_path text;

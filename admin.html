@@ -135,6 +135,13 @@ textarea.fi{resize:vertical;min-height:96px;line-height:1.6;}
 .hero-badge{position:absolute;bottom:4px;left:4px;background:var(--gold);color:var(--navy);font-size:.48rem;font-weight:700;letter-spacing:.12em;padding:2px 7px;text-transform:uppercase;pointer-events:none;}
 .ph-uploading{position:absolute;inset:0;background:rgba(42,58,82,.7);display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:.6rem;letter-spacing:.1em;}
 
+/* ─── PORTADA CATÁLOGO ──────────────────────────────────── */
+.portada-slot{aspect-ratio:16/9;max-width:420px;background:var(--off);border:1.5px dashed rgba(42,58,82,.2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;position:relative;overflow:hidden;transition:border-color .18s;}
+.portada-slot:hover{border-color:var(--gold);}
+.portada-slot.filled{border-style:solid;border-color:rgba(42,58,82,.15);cursor:default;}
+.portada-slot img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;}
+.portada-slot .ph-num{margin-top:0;}
+
 /* ─── AMENITIES ─────────────────────────────────────────── */
 .am-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;}
 @media(max-width:480px){.am-grid{grid-template-columns:repeat(2,1fr);}}
@@ -354,6 +361,16 @@ textarea.fi{resize:vertical;min-height:96px;line-height:1.6;}
           </div>
         </div>
 
+        <!-- PORTADA CATALOGO -->
+        <div class="card">
+          <div class="card-hd"><div class="card-ttl">Portada del catálogo (opcional)</div></div>
+          <div class="card-bd">
+            <div class="portada-slot" id="portadaSlot"></div>
+            <input type="file" id="portadaInput" accept="image/*" style="display:none">
+            <p class="hint" style="margin-top:10px">Imagen especial que se muestra <b>solo en la tarjeta del catálogo</b> — no aparece en la ficha de la propiedad. Formato ideal: <b>1400 × 788 px (16:9), JPG</b>, con el contenido importante centrado. Si queda vacía, el catálogo usa la Foto 1 de la galería.</p>
+          </div>
+        </div>
+
         <!-- AMENITIES -->
         <div class="card">
           <div class="card-hd"><div class="card-ttl">Amenities del edificio</div></div>
@@ -413,6 +430,7 @@ textarea.fi{resize:vertical;min-height:96px;line-height:1.6;}
           <div class="sb-body">
             <div class="sb-row"><span class="sb-lbl">Slug (URL)</span><span class="sb-val" id="pvSlug">—</span></div>
             <div class="sb-row"><span class="sb-lbl">Fotos</span><span class="sb-val" id="pvPhotos">0 / 25</span></div>
+            <div class="sb-row"><span class="sb-lbl">Portada catálogo</span><span class="sb-val" id="pvPortada">—</span></div>
             <div class="sb-row"><span class="sb-lbl">Amenities</span><span class="sb-val" id="pvAm">0</span></div>
             <div class="sb-row"><span class="sb-lbl">Estado</span><span class="sb-val" id="pvStatus">Borrador</span></div>
             <div class="divider"></div>
@@ -455,6 +473,7 @@ const state = {
   properties: [],            // lista cacheada del dashboard
   editing: null,             // propiedad en edición (null = nueva)
   photos: [],                // [{id?, url, storage_path?, file?, _new?}]
+  portada: null,             // {url, storage_path?, file?, _new?} — foto especial SOLO para el catálogo
   selAmenities: new Map(),   // nombre -> icono
   vType: 'bunny',            // tipo de video activo
   customAmenities: new Set(),// amenities custom agregadas en sesión
@@ -692,10 +711,11 @@ function renderProperties() {
   }
 
   const html = list.map(p => {
-    const portada = (p.imagenes || []).sort((a,b) => a.orden - b.orden)[0];
-    const fotoStyle = portada ? `background-image:url('${portada.url}')` : '';
-    const fotoCls = portada ? '' : 'empty';
-    const fotoTxt = portada ? '' : 'Sin foto';
+    const primera = (p.imagenes || []).sort((a,b) => a.orden - b.orden)[0];
+    const coverUrl = p.portada_url || (primera ? primera.url : null);
+    const fotoStyle = coverUrl ? `background-image:url('${coverUrl}')` : '';
+    const fotoCls = coverUrl ? '' : 'empty';
+    const fotoTxt = coverUrl ? '' : 'Sin foto';
     const badge = !p.publicada
       ? '<span class="pc-badge bor">Borrador</span>'
       : p.estado === 'Reservado'
@@ -778,6 +798,7 @@ async function deleteProperty(p) {
     // borrar fotos del storage
     const { data: imgs } = await state.sb.from('imagenes').select('storage_path').eq('propiedad_id', p.id);
     const paths = (imgs || []).map(i => i.storage_path).filter(Boolean);
+    if (p.portada_path) paths.push(p.portada_path);
     if (paths.length) {
       await state.sb.storage.from('imagenes-propiedades').remove(paths);
     }
@@ -799,6 +820,7 @@ async function deleteProperty(p) {
 function openForm(prop) {
   state.editing = prop || null;
   state.photos = [];
+  state.portada = null;
   state.selAmenities = new Map();
   state.customAmenities = new Set();
   state.vType = 'bunny';
@@ -834,6 +856,11 @@ function openForm(prop) {
       .sort((a,b) => a.orden - b.orden)
       .map(i => ({ id: i.id, url: i.url, storage_path: i.storage_path }));
 
+    // portada especial del catálogo
+    if (prop.portada_url) {
+      state.portada = { url: prop.portada_url, storage_path: prop.portada_path || null };
+    }
+
     // amenities (await para no perderlas si el user guarda rápido)
     loadAmenitiesForProp(prop.id);
 
@@ -854,6 +881,7 @@ function openForm(prop) {
 
   setVideoTab(state.vType);
   renderPhotoGrid();
+  renderPortada();
   renderAmenities();
   updateSidebar();
   togglePricesByTipo();
@@ -955,13 +983,13 @@ function renderPhotoGrid() {
   });
 }
 
-function compressImage(file) {
+function compressImage(file, maxW, quality) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = e => {
       const img = new Image();
       img.onload = () => {
-        const MAX_W = 1600;
+        const MAX_W = maxW || 1600;
         let w = img.width, h = img.height;
         if (w > MAX_W) { h = Math.round(h * MAX_W / w); w = MAX_W; }
         const canvas = document.createElement('canvas');
@@ -970,7 +998,7 @@ function compressImage(file) {
         canvas.toBlob(b => {
           if (!b) return reject(new Error('No se pudo procesar la imagen'));
           resolve(b);
-        }, 'image/jpeg', 0.72);
+        }, 'image/jpeg', quality || 0.72);
       };
       img.onerror = () => reject(new Error('Imagen inválida'));
       img.src = e.target.result;
@@ -997,6 +1025,76 @@ async function handleNewFiles(fileList) {
       toast('Error procesando "' + f.name + '": ' + err.message, 'err');
     }
   }
+}
+
+// ════════════════════════════════════════════════════════════════════
+// FORM: portada del catálogo (imagen especial, NO va a la ficha)
+// ════════════════════════════════════════════════════════════════════
+function renderPortada() {
+  const slot = $('portadaSlot');
+  if (!slot) return;
+  if (state.portada) {
+    const uploading = state.portada._uploading ? '<div class="ph-uploading">Subiendo...</div>' : '';
+    slot.className = 'portada-slot filled';
+    slot.innerHTML =
+      `<img src="${state.portada.url}" alt="">
+       <button class="ph-rm" id="portadaRm" title="Quitar">×</button>
+       <span class="hero-badge">Portada catálogo</span>
+       ${uploading}`;
+    $('portadaRm').addEventListener('click', e => {
+      e.stopPropagation();
+      state.portada = null;
+      renderPortada();
+      updateSidebar();
+      saveDraftDebounced();
+    });
+  } else {
+    slot.className = 'portada-slot';
+    slot.innerHTML = `
+      <svg class="ph-add-icon" viewBox="0 0 24 24" fill="none" stroke="rgba(42,58,82,.35)" stroke-width="1.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <span class="ph-num">PORTADA 16:9 — 1400×788</span>
+    `;
+    slot.onclick = () => $('portadaInput').click();
+  }
+  if ($('pvPortada')) $('pvPortada').textContent = state.portada ? 'Sí' : '—';
+}
+
+async function handleNewPortada(fileList) {
+  const f = Array.from(fileList || []).find(x => x.type.startsWith('image/'));
+  if (!f) { toast('Ese archivo no es una imagen válida.', 'err'); return; }
+  try {
+    // Más calidad que la galería: suele ser una pieza gráfica con texto.
+    const blob = await compressImage(f, 1400, 0.85);
+    state.portada = { _new: true, file: blob, url: URL.createObjectURL(blob) };
+    renderPortada();
+    updateSidebar();
+    saveDraftDebounced();
+  } catch (err) {
+    toast('Error procesando la portada: ' + err.message, 'err');
+  }
+}
+
+async function uploadPortada(slug) {
+  const ph = state.portada;
+  if (!ph || !ph._new || !ph.file) return;
+  const path = `${slug}/portada-catalogo-${Date.now()}.jpg`;
+  ph._uploading = true;
+  renderPortada();
+  const { error: upErr } = await state.sb.storage
+    .from('imagenes-propiedades')
+    .upload(path, ph.file, { contentType: 'image/jpeg', upsert: false });
+  if (upErr) {
+    ph._uploading = false;
+    renderPortada();
+    throw new Error('No se pudo subir la portada del catálogo: ' + upErr.message);
+  }
+  const { data: pub } = state.sb.storage.from('imagenes-propiedades').getPublicUrl(path);
+  ph.url = pub.publicUrl;
+  ph.storage_path = path;
+  ph._uploading = false;
+  delete ph.file;
+  delete ph._new;
+  renderPortada();
 }
 
 // ════════════════════════════════════════════════════════════════════
@@ -1070,6 +1168,7 @@ function updateSidebar() {
   const unidad = $('fUnidad').value.trim();
   $('pvSlug').textContent = dir ? makeSlug(dir, unidad) : '—';
   $('pvPhotos').textContent = state.photos.length + ' / ' + MAX_PHOTOS;
+  $('pvPortada').textContent = state.portada ? 'Sí' : '—';
   $('pvAm').textContent = state.selAmenities.size;
   if (state.editing) {
     $('pvStatus').textContent = state.editing.publicada ? 'Publicada' : 'Borrador';
@@ -1183,6 +1282,16 @@ async function saveProperty(publicar) {
   showLoader(state.editing ? 'Guardando cambios...' : 'Creando propiedad...');
   try {
     data.publicada = publicar;
+
+    // Portada del catálogo: subir si es nueva; recordar la anterior para limpiarla
+    const oldPortadaPath = state.editing ? (state.editing.portada_path || null) : null;
+    if (state.portada && state.portada._new) {
+      showLoader('Subiendo portada del catálogo...');
+      await uploadPortada(data.slug);
+    }
+    data.portada_url  = state.portada ? state.portada.url : null;
+    data.portada_path = state.portada ? (state.portada.storage_path || null) : null;
+
     let propId;
 
     if (state.editing) {
@@ -1229,6 +1338,11 @@ async function saveProperty(publicar) {
       }));
       const { error: amErr } = await state.sb.from('amenities').insert(arows);
       if (amErr) throw amErr;
+    }
+
+    // Limpiar el archivo viejo de portada si se reemplazó o se quitó
+    if (oldPortadaPath && oldPortadaPath !== data.portada_path) {
+      await state.sb.storage.from('imagenes-propiedades').remove([oldPortadaPath]);
     }
 
     toast(publicar ? 'Propiedad publicada ✓' : 'Borrador guardado ✓', 'ok');
@@ -1364,6 +1478,10 @@ function snapshotForm() {
     },
     amenities:       [...state.selAmenities.entries()],
     customAmenities: [...state.customAmenities],
+    // solo se guarda una portada ya subida (blob nuevo no entra al draft)
+    portada: (state.portada && !state.portada._new)
+      ? { url: state.portada.url, storage_path: state.portada.storage_path || null }
+      : null,
     vType:           state.vType,
     photoCount:      state.photos.length,
     timestamp:       Date.now(),
@@ -1423,9 +1541,11 @@ async function restoreDraftIntoForm(draft) {
   state.selAmenities    = new Map(draft.amenities || []);
   state.customAmenities = new Set(draft.customAmenities || []);
   state.vType           = draft.vType || 'bunny';
+  if ('portada' in draft) state.portada = draft.portada || null;
   setVideoTab(state.vType);
   togglePricesByTipo();
   renderAmenities();
+  renderPortada();
 
   // Restaurar fotos desde IndexedDB
   const records = await loadDraftPhotos();
@@ -1566,6 +1686,22 @@ function wireUI() {
   $('photoInput').addEventListener('change', e => {
     handleNewFiles(e.target.files);
     e.target.value = '';
+  });
+
+  // portada del catálogo
+  $('portadaInput').addEventListener('change', e => {
+    handleNewPortada(e.target.files);
+    e.target.value = '';
+  });
+  const pSlot = $('portadaSlot');
+  pSlot.addEventListener('dragover', e => { e.preventDefault(); pSlot.classList.add('drag-over'); });
+  pSlot.addEventListener('dragleave', () => pSlot.classList.remove('drag-over'));
+  pSlot.addEventListener('drop', e => {
+    pSlot.classList.remove('drag-over');
+    if (e.dataTransfer.files && e.dataTransfer.files.length) {
+      e.preventDefault();
+      handleNewPortada(e.dataTransfer.files);
+    }
   });
   const grid = $('photoGrid');
   grid.addEventListener('dragover', e => { e.preventDefault(); });
