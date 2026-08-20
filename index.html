@@ -226,20 +226,19 @@
     .flag.active{opacity:1;border-color:var(--gold-light);}
     @media(max-width:700px){.lang-switch{gap:9px;}}
 
-    /* ── Hero editorial: una sola idea (el titular) y las tres puertas del negocio ── */
+    /* ── Hero editorial: una sola idea (el titular) y las tres puertas del negocio.
+       Entrada "una sola respiración": todo el bloque sube junto, sereno,
+       sincronizado con el asentamiento del video (pedido de Tomás, 19/08). ── */
     .hero-h1{font-family:var(--font-display);font-weight:500;color:#F7F2E6;font-size:clamp(2.3rem,5.4vw,4.2rem);line-height:1.1;text-align:center;margin:0 0 40px;text-shadow:0 2px 34px rgba(0,0,0,.38);}
-    .hero-h1 .hline{display:block;overflow:hidden;padding-bottom:.08em;}
-    .hero-h1 .hline>span{display:inline-block;}
+    .hero-h1 .hline{display:block;padding-bottom:.08em;}
     @media (prefers-reduced-motion: no-preference){
-      .hero-h1 .hline>span{transform:translateY(112%);animation:heroLine .95s var(--ease) forwards;}
-      .hero-h1 .hline:nth-child(1)>span{animation-delay:.2s;}
-      .hero-h1 .hline:nth-child(2)>span{animation-delay:.32s;}
+      .hero-content{opacity:0;animation:heroIn 1.15s var(--ease) .25s forwards;}
     }
-    @keyframes heroLine{to{transform:translateY(0);}}
+    @keyframes heroIn{from{opacity:0;transform:translateY(26px);}to{opacity:1;transform:none;}}
     /* Las tres puertas del negocio como línea tipográfica (Tomás, 19/08):
        Comprar = unidades en venta · Alquilar = catálogo · Invertir = PSI.
        Sin cajas: tipografía con subrayado dorado, el gesto de las casas de lujo. */
-    .hero-doors{display:flex;align-items:center;justify-content:center;gap:26px;opacity:0;animation:fadeUp .9s var(--ease) .7s forwards;}
+    .hero-doors{display:flex;align-items:center;justify-content:center;gap:26px;}
     .hero-doors .sep{color:var(--gold);font-size:.85rem;line-height:1;opacity:.85;}
     .hero-doors a{position:relative;font-size:.72rem;font-weight:600;letter-spacing:.3em;text-indent:.3em;text-transform:uppercase;color:rgba(247,242,230,.92);padding:6px 2px;transition:color .35s var(--ease);text-shadow:0 1px 12px rgba(0,0,0,.45);}
     .hero-doors a::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--gold);transform:scaleX(0);transform-origin:left;transition:transform .45s var(--ease);}
