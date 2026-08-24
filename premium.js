@@ -1,4 +1,4 @@
-/* ─── Bairen · Capa de motion premium ────────────────────────────────
+/* ─── BAIREN · Capa de motion premium ────────────────────────────────
    Activa premium.css agregando html.pm, y maneja lo que el CSS no puede:
    revelado de tarjetas (incluidas las que renderiza Supabase), velo de
    transición entre páginas, cifras que cuentan y parallax del hero.

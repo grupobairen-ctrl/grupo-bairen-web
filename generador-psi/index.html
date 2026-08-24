@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex, nofollow" />
 <meta name="theme-color" content="#131D2D" />
 <link rel="icon" href="/bairen_logo.png?v=3">
-<title>Generador de Fichas PSI · Grupo Bairen</title>
+<title>Generador de Fichas PSI · BAIREN</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -379,7 +379,7 @@
   function logoBlock(embPx, wmPx){
     return '<div style="display:flex;align-items:center;gap:12px;">'+
       '<img src="'+LOGO_EMB+'" alt="" style="height:'+embPx+'px;width:'+embPx+'px;display:block;">'+
-      '<img src="'+LOGO_WM+'" alt="Grupo Bairen" style="height:'+wmPx+'px;width:auto;display:block;">'+
+      '<img src="'+LOGO_WM+'" alt="BAIREN" style="height:'+wmPx+'px;width:auto;display:block;">'+
       '</div>';
   }
   document.getElementById('logoTop').innerHTML = logoBlock(44,26);
@@ -605,7 +605,7 @@
       var w=Math.ceil(f.offsetWidth*MM), h=Math.ceil(f.scrollHeight*MM)+4; /* holgura anti-desborde */
       $("pagesize").textContent="@page{size:"+w+"mm "+h+"mm;margin:0;}";
       var prev=document.title;
-      document.title=(S.dir?S.dir+(S.unidad?" "+S.unidad:"")+" · ":"")+"Ficha PSI · Grupo Bairen";
+      document.title=(S.dir?S.dir+(S.unidad?" "+S.unidad:"")+" · ":"")+"Ficha PSI · BAIREN";
       window.print();
       /* segundo documento: la propuesta de servicio, en pagina unica continua */
       document.body.classList.add("pp");
@@ -614,7 +614,7 @@
       var w2=Math.ceil(pr.offsetWidth*MM), h2=Math.ceil(pr.scrollHeight*MM)+3;
       pr.style.display=""; pr.style.position=""; pr.style.left=""; pr.style.top="";
       $("pagesize").textContent="@page{size:"+w2+"mm "+h2+"mm;margin:0;}";
-      document.title="Propuesta PSI"+(S.interesado?" · "+S.interesado:"")+" · Grupo Bairen";
+      document.title="Propuesta PSI"+(S.interesado?" · "+S.interesado:"")+" · BAIREN";
       window.print();
       document.body.classList.remove("pp");
       document.title=prev;
@@ -837,11 +837,11 @@
       '<h2>Servicio de asesoramiento y representación de inversión</h2>'+
       '<div class="prep">'+(S.interesado?'Preparado para '+esc(S.interesado)+' · ':'')+esc(fechaDoc)+(S.asesor?' · '+esc(S.asesor):'')+'</div></div>'+
       '<div class="pb2">'+
-      '<p class="intro">Por la presente enviamos nuestra propuesta de representación de inversión. Bairen representa y defiende los intereses del comprador en cada etapa del proceso.</p>'+
+      '<p class="intro">Por la presente enviamos nuestra propuesta de representación de inversión. BAIREN representa y defiende los intereses del comprador en cada etapa del proceso.</p>'+
       '<ol>'+
       '<li><b>Definición del perfil de la inversión</b><p>Análisis conjunto del tipo de propiedad a buscar, con intercambio de información entre las partes.</p></li>'+
       '<li><b>Búsqueda</b><p>Relevamiento por diversos canales: no solo lo publicado en el mercado, sino también propiedades que todavía no salieron al mismo.</p></li>'+
-      '<li><b>Presentación de opciones</b><p>En un plazo razonable a convenir entre las partes, Bairen presenta las que considera mejores opciones disponibles, con su análisis económico y los pros y contras de cada propiedad.</p></li>'+
+      '<li><b>Presentación de opciones</b><p>En un plazo razonable a convenir entre las partes, BAIREN presenta las que considera mejores opciones disponibles, con su análisis económico y los pros y contras de cada propiedad.</p></li>'+
       '<li><b>Negociación</b><p>De la opción que elija el inversor, buscando las mejores condiciones para el cierre de la operación.</p></li>'+
       '<li><b>Acompañamiento</b><p>Hasta la posesión de la propiedad.</p></li>'+
       '</ol>'+
@@ -851,7 +851,7 @@
       '<p class="fine">Si el inversor no optara por ninguna propiedad o desistiera de la compra, el pago inicial de la contratación no se reintegra y no se abona el saldo final de esta propuesta.</p>'+
       '</div></div>'+
       '<div class="pf2"><div class="tg">Comprá en Buenos Aires, representado.</div>'+
-      '<div class="ct">Grupo Bairen'+(S.tel?'<br>'+esc(S.tel):'')+(S.mail?'<br>'+esc(S.mail):'')+'</div></div>';
+      '<div class="ct">BAIREN'+(S.tel?'<br>'+esc(S.tel):'')+(S.mail?'<br>'+esc(S.mail):'')+'</div></div>';
   }
   loadDraft();
   (function(){ var f=document.getElementById("fecha");

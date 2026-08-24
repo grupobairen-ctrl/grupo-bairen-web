@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="robots" content="noindex, nofollow">
-<title>Coordiná tu visita — Grupo Bairen</title>
+<title>Coordiná tu visita — BAIREN</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <link rel="icon" href="bairen_logo.png?v=3">
 <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet"/>
@@ -140,7 +140,7 @@ footer{background:var(--navy-deeper);border-top:2px solid var(--gold);padding:32
 
 <!-- NAV -->
 <nav>
-  <a class="nav-logo" href="index.html"><img src="bairen_logo.png?v=3" alt="Grupo Bairen" style="height:46px;width:auto;"></a>
+  <a class="nav-logo" href="index.html"><img src="bairen_wordmark.png?v=1" alt="BAIREN" style="height:26px;width:auto;"></a>
   <a class="nav-back" href="javascript:history.back()" data-i18n="nav_volver">← Volver</a>
   <div class="burger" id="burger"><span></span><span></span><span></span></div>
 </nav>
@@ -159,11 +159,11 @@ footer{background:var(--navy-deeper);border-top:2px solid var(--gold);padding:32
 
 <div class="page">
 
-  <h1 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;" data-i18n="sr_title">Confirmá tu visita — Grupo Bairen</h1>
+  <h1 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;" data-i18n="sr_title">Confirmá tu visita — BAIREN</h1>
 
   <!-- HEADER -->
   <div style="text-align:center;margin-bottom:20px;">
-    <div class="prop-pill"><span data-i18n="pill_lead">Coordinando visita para ·</span> <span id="propPillText">Grupo Bairen</span></div>
+    <div class="prop-pill"><span data-i18n="pill_lead">Coordinando visita para ·</span> <span id="propPillText">BAIREN</span></div>
   </div>
 
   <div class="confirm-header">
@@ -217,7 +217,7 @@ footer{background:var(--navy-deeper);border-top:2px solid var(--gold);padding:32
 
 <!-- FOOTER -->
 <footer>
-  <div class="ft-logo"><img src="bairen_logo.png?v=3" alt="Grupo Bairen" style="height:40px;width:auto;opacity:.85;"></div>
+  <div class="ft-logo"><img src="bairen_wordmark.png?v=1" alt="BAIREN" style="height:26px;width:auto;"></div>
   <div class="ft-copy" data-i18n="ft_copy">© 2026 Grupo Bairen · Todos los derechos reservados</div>
 </footer>
 
@@ -234,7 +234,7 @@ footer{background:var(--navy-deeper);border-top:2px solid var(--gold);padding:32
   const urlP = new URLSearchParams(window.location.search);
   const propName = urlP.get('prop') || '';
   const propBarrio = urlP.get('barrio') || '';
-  const pillText = propName ? `${propName} · ${propBarrio}` : 'Grupo Bairen';
+  const pillText = propName ? `${propName} · ${propBarrio}` : 'BAIREN';
   document.getElementById('propPillText').textContent = pillText;
 
   // Prefill Calendly con nombre y (si Calendly lo tiene activado) teléfono
@@ -290,7 +290,7 @@ document.getElementById('burger').addEventListener('click', function() {
   // Mensaje de WhatsApp con las respuestas del cuestionario
   var L = [];
   var nom = ((p.get('r_nombre') || '') + ' ' + (p.get('r_apellido') || '')).trim();
-  L.push('Hola Bairen, soy ' + (nom || 'un interesado') + '. Acabo de agendar una visita para ' + (p.get('prop') || 'una unidad') + (p.get('barrio') ? ' (' + p.get('barrio') + ')' : '') + '.');
+  L.push('Hola BAIREN, soy ' + (nom || 'un interesado') + '. Acabo de agendar una visita para ' + (p.get('prop') || 'una unidad') + (p.get('barrio') ? ' (' + p.get('barrio') + ')' : '') + '.');
   L.push('');
   L.push('Mis respuestas del cuestionario:');
   function add(q, k) { var v = p.get(k); if (v) L.push(q + ': ' + v); }
@@ -323,7 +323,7 @@ document.getElementById('burger').addEventListener('click', function() {
       pt:{
         nav_volver:"← Voltar",
         mm_inicio:"Início",mm_props:"Propriedades",mm_contacto:"Contato",
-        sr_title:"Confirme sua visita — Grupo Bairen",
+        sr_title:"Confirme sua visita — BAIREN",
         pill_lead:"Agendando visita para ·",
         eyebrow:"Última etapa",
         title_1:"Escolha o dia e o horário",title_2:"que melhor",title_3:"combina com você",
@@ -338,7 +338,7 @@ document.getElementById('burger').addEventListener('click', function() {
       en:{
         nav_volver:"← Back",
         mm_inicio:"Home",mm_props:"Properties",mm_contacto:"Contact",
-        sr_title:"Confirm your visit — Grupo Bairen",
+        sr_title:"Confirm your visit — BAIREN",
         pill_lead:"Scheduling a visit for ·",
         eyebrow:"Final step",
         title_1:"Choose the day and time",title_2:"that suits",title_3:"you best",

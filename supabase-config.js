@@ -1,5 +1,5 @@
 /**
- * Supabase config — Grupo Bairen
+ * Supabase config — BAIREN
  *
  * Carga el SDK de Supabase JS v2 desde CDN y expone un cliente global
  * en `window.bairenSupabase`. Las páginas pueden esperar a que esté listo

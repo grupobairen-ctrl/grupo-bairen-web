@@ -1,4 +1,4 @@
-/* i18n compartido de Bairen — banderas ES / PT / EN.
+/* i18n compartido de BAIREN — banderas ES / PT / EN.
    El HTML está en español por default; este script traduce a PT/EN según la
    bandera elegida y recuerda el idioma en localStorage('bairen_lang').
    También ajusta: el link de descarga del PDF (por idioma) y cualquier
@@ -55,7 +55,7 @@
       cat_sort_pdesc: "Preço: do maior ao menor", cat_sort_m2: "Maior área",
       cat_copy: "© 2026 Grupo Bairen · Todos os direitos reservados",
       // Propiedad
-      prop_nav_props: "Imóveis", prop_nav_why: "Por que Bairen", prop_nav_contact: "Contato",
+      prop_nav_props: "Imóveis", prop_nav_why: "Por que BAIREN", prop_nav_contact: "Contato",
       prop_back: "← Catálogo", prop_back_full: "← Voltar ao catálogo",
       prop_loading: "Carregando imóvel...",
       prop_price_m: "Preço mensal",
@@ -115,7 +115,7 @@
       cat_sort_pdesc: "Price: high to low", cat_sort_m2: "Largest area",
       cat_copy: "© 2026 Grupo Bairen · All rights reserved",
       // Propiedad
-      prop_nav_props: "Properties", prop_nav_why: "Why Bairen", prop_nav_contact: "Contact",
+      prop_nav_props: "Properties", prop_nav_why: "Why BAIREN", prop_nav_contact: "Contact",
       prop_back: "← Catalogue", prop_back_full: "← Back to catalogue",
       prop_loading: "Loading property...",
       prop_price_m: "Monthly price",

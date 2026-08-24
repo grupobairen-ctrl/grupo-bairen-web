@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="robots" content="noindex, nofollow">
-<title>Coordinar visita — Grupo Bairen</title>
+<title>Coordinar visita — BAIREN</title>
 <link rel="icon" href="bairen_logo.png?v=3">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
@@ -179,7 +179,7 @@ nav{height:64px;background:var(--navy-deeper);border-bottom:2px solid var(--gold
 <div class="ambient"></div>
 
 <nav>
-  <a class="nav-logo" href="index.html"><img src="bairen_logo.png?v=3" alt="Grupo Bairen"></a>
+  <a class="nav-logo" href="index.html"><img src="bairen_wordmark.png?v=1" alt="BAIREN" style="height:26px;width:auto;"></a>
   <a class="nav-back" href="javascript:history.back()" data-i18n="nav_volver">← Volver</a>
   <div class="burger" id="burger"><span></span><span></span><span></span></div>
 </nav>
@@ -198,10 +198,10 @@ nav{height:64px;background:var(--navy-deeper);border-bottom:2px solid var(--gold
 
 <div class="page">
 
-  <h1 class="sr-only" data-i18n="sr_title">Coordiná tu visita — Grupo Bairen</h1>
+  <h1 class="sr-only" data-i18n="sr_title">Coordiná tu visita — BAIREN</h1>
 
   <!-- Pill de propiedad -->
-  <div class="prop-pill"><span data-i18n="pill_pre">Consultando para</span>&nbsp;· <span id="propPillText">Grupo Bairen</span></div>
+  <div class="prop-pill"><span data-i18n="pill_pre">Consultando para</span>&nbsp;· <span id="propPillText">BAIREN</span></div>
 
   <!-- PROGRESO -->
   <div class="progress-wrap" id="progressWrap">
@@ -584,7 +584,7 @@ const propTipo   = urlP.get('tipo') || '';
 
 const pillText = propName
   ? propName + ' · ' + propBarrio  // URLSearchParams ya decodifica; un segundo decode tira URIError con "%"
-  : 'Grupo Bairen';
+  : 'BAIREN';
 document.getElementById('propPillText').textContent = pillText;
 updateProgress(1);
 
@@ -695,7 +695,7 @@ const T = {
   pt: {
     nav_volver: "← Voltar",
     mm_inicio: "Início", mm_props: "Imóveis", mm_contacto: "Contato",
-    sr_title: "Agende sua visita — Grupo Bairen",
+    sr_title: "Agende sua visita — BAIREN",
     pill_pre: "Consulta sobre",
     s1_eye: "Pergunta 1 de 5", s1_q: "Quando você precisa se mudar?",
     s1_o1: "Em menos de 2 semanas", s1_t1: "Urgente", s1_o2: "Este mês", s1_o3: "Nos próximos 3 meses",
@@ -722,7 +722,7 @@ const T = {
   en: {
     nav_volver: "← Back",
     mm_inicio: "Home", mm_props: "Properties", mm_contacto: "Contact",
-    sr_title: "Schedule your visit — Grupo Bairen",
+    sr_title: "Schedule your visit — BAIREN",
     pill_pre: "Inquiring about",
     s1_eye: "Question 1 of 5", s1_q: "When do you need to move in?",
     s1_o1: "Within 2 weeks", s1_t1: "Urgent", s1_o2: "This month", s1_o3: "Within the next 3 months",

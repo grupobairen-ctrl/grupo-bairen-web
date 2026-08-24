@@ -72,18 +72,18 @@ function injectMeta(html, p) {
   const tipoLabel = p.tipo === 'Ambos' ? 'a mediano o largo plazo' : (p.tipo === 'Temporal' ? 'a mediano plazo' : p.tipo === 'Tradicional' ? 'a largo plazo' : p.tipo.toLowerCase());
   const descSEO = (p.descripcion && p.descripcion.length > 30)
     ? p.descripcion.slice(0, 160).replace(/\s+\S*$/, '') + '…'
-    : `${titleFull} en ${p.barrio}, Buenos Aires. ${isVenta ? 'Venta' : 'Alquiler ' + tipoLabel} — Grupo Bairen.`;
+    : `${titleFull} en ${p.barrio}, Buenos Aires. ${isVenta ? 'Venta' : 'Alquiler ' + tipoLabel} — BAIREN.`;
 
   let out = html;
-  out = out.replace(/<title>[^<]*<\/title>/, `<title>${esc(titleFull)} — ${esc(p.barrio)} — Grupo Bairen</title>`);
+  out = out.replace(/<title>[^<]*<\/title>/, `<title>${esc(titleFull)} — ${esc(p.barrio)} — BAIREN</title>`);
   out = setAttr(out, 'meta name="robots"', 'content', 'index, follow');
   out = setAttr(out, 'meta name="description"', 'content', descSEO);
   out = setAttr(out, 'link id="metaCanonical"', 'href', pageUrl);
-  out = setAttrById(out, 'metaOgTitle', `${titleFull} — Grupo Bairen`);
+  out = setAttrById(out, 'metaOgTitle', `${titleFull} — BAIREN`);
   out = setAttrById(out, 'metaOgDesc', descSEO);
   out = setAttrById(out, 'metaOgImage', ogImg);
   out = setAttrById(out, 'metaOgUrl', pageUrl);
-  out = setAttrById(out, 'metaTwTitle', `${titleFull} — Grupo Bairen`);
+  out = setAttrById(out, 'metaTwTitle', `${titleFull} — BAIREN`);
   out = setAttrById(out, 'metaTwDesc', descSEO);
   out = setAttrById(out, 'metaTwImage', ogImg);
   return out;
