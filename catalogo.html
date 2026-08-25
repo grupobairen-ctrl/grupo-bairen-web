@@ -841,7 +841,7 @@ const CT = {
     count_one:'propiedad', count_many:'propiedades', empty_t:'Sin resultados', empty_s:'Probá con otro barrio o tipo de alquiler.',
     loading:'Cargando propiedades...', err_t:'No pudimos cargar las propiedades', err_s:'Revisá la conexión a internet. Si el problema persiste, contactanos por WhatsApp.',
     per_month:'por mes', per_month_all:'por mes · all in', consult:'Consultar precio', ver_mas:'Ver más →',
-    disponible:'Disponible', reservado:'Reservado', serv_allin:'All in', serv_sin:'Sin incl.', serv_lbl:'Servicios',
+    disponible:'Disponible', reservado:'Reservado', reservado_sem:'Reservada esta semana', serv_allin:'All in', serv_sin:'Sin incl.', serv_lbl:'Servicios',
     amb:'Amb.', sup:'Sup.', foto_ph:'Fotografía de la unidad', tipo_temporal:'Mediano plazo', tipo_tradicional:'Largo plazo',
     lib_hoy:'Se libera hoy', lib_manana:'Se libera mañana', lib_dias:'Se libera en {d} días', lib_fecha:'Se libera: {f}', lib_locale:'es-AR'
   },
@@ -852,7 +852,7 @@ const CT = {
     count_one:'imóvel', count_many:'imóveis', empty_t:'Sem resultados', empty_s:'Tente outro bairro ou tipo de aluguel.',
     loading:'Carregando imóveis...', err_t:'Não foi possível carregar os imóveis', err_s:'Verifique sua conexão. Se o problema persistir, fale conosco pelo WhatsApp.',
     per_month:'por mês', per_month_all:'por mês · tudo incluído', consult:'Consultar preço', ver_mas:'Ver mais →',
-    disponible:'Disponível', reservado:'Reservado', serv_allin:'Tudo incl.', serv_sin:'Não incl.', serv_lbl:'Serviços',
+    disponible:'Disponível', reservado:'Reservado', reservado_sem:'Reservada esta semana', serv_allin:'Tudo incl.', serv_sin:'Não incl.', serv_lbl:'Serviços',
     amb:'Amb.', sup:'Sup.', foto_ph:'Foto do imóvel', tipo_temporal:'Médio prazo', tipo_tradicional:'Longo prazo',
     lib_hoy:'Libera hoje', lib_manana:'Libera amanhã', lib_dias:'Libera em {d} dias', lib_fecha:'Libera em: {f}', lib_locale:'pt-BR'
   },
@@ -863,7 +863,7 @@ const CT = {
     count_one:'property', count_many:'properties', empty_t:'No results', empty_s:'Try another neighbourhood or rental type.',
     loading:'Loading properties...', err_t:'We could not load the properties', err_s:'Check your internet connection. If the problem persists, contact us on WhatsApp.',
     per_month:'per month', per_month_all:'per month · all in', consult:'Ask for price', ver_mas:'See more →',
-    disponible:'Available', reservado:'Reserved', serv_allin:'All in', serv_sin:'Not incl.', serv_lbl:'Services',
+    disponible:'Available', reservado:'Reserved', reservado_sem:'Reserved this week', serv_allin:'All in', serv_sin:'Not incl.', serv_lbl:'Services',
     amb:'Rooms', sup:'Area', foto_ph:'Unit photo', tipo_temporal:'Medium-term', tipo_tradicional:'Long-term',
     lib_hoy:'Available today', lib_manana:'Available tomorrow', lib_dias:'Available in {d} days', lib_fecha:'Available: {f}', lib_locale:'en-US'
   }
@@ -943,7 +943,7 @@ function render() {
       <div class="card-img">
         ${imgHTML}
         <span class="card-tag tag-${p.tipo.toLowerCase()}">${tipoLabel(p.tipo)}</span>
-        ${reservado ? `<span class="card-status status-reservado">${ct('reservado')}</span>` : ''}
+        ${reservado ? `<span class="card-status status-reservado">${(p.reservada_at && (Date.now() - new Date(p.reservada_at).getTime()) < 7*24*3600*1000) ? ct('reservado_sem') : ct('reservado')}</span>` : ''}
         ${p.estado === 'Reservado' && p.fecha_liberacion ? `<div class="badge-liberacion"><span>${formatFechaLiberacion(p.fecha_liberacion)}</span></div>` : ''}
       </div>
       <div class="card-body">
@@ -1031,6 +1031,7 @@ async function loadFromSupabase() {
         amb: p.ambientes,
         m2: p.m2,
         estado: p.estado,
+        reservada_at: p.reservada_at || null,
         amenities: amList,
         foto,
         fotoEsPortada,
