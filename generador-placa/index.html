@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Placa semanal · BAIREN</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<style>
+:root{--navy:#2A3A52;--navy-deeper:#131D2D;--gold:#C2A968;--gold-light:#DECDA0;--gold-pale:#F7F1E2;--paper:#FBFAF6;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#0D141F;font-family:'Jost',sans-serif;color:var(--paper);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:30px 16px 60px;}
+h1{font-size:.8rem;letter-spacing:.3em;text-transform:uppercase;color:rgba(251,250,246,.5);margin-bottom:18px;font-weight:500;}
+.controls{display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap;justify-content:center;}
+.controls button{font-family:'Jost',sans-serif;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;padding:10px 20px;border-radius:999px;border:1px solid rgba(194,169,104,.5);background:transparent;color:var(--gold-light);cursor:pointer;}
+.controls button.on,.controls button:hover{background:var(--gold);color:var(--navy-deeper);border-color:var(--gold);}
+.controls .dl{background:var(--gold-pale);color:var(--navy-deeper);border-color:var(--gold-pale);font-weight:600;}
+.stage{width:346px;height:614px;overflow:hidden;border-radius:18px;box-shadow:0 30px 80px -30px rgba(0,0,0,.7);}
+.placa{width:1080px;height:1920px;transform:scale(0.32);transform-origin:top left;
+  background:radial-gradient(1200px 800px at 80% -5%, rgba(42,58,82,.9), transparent 60%), var(--navy-deeper);
+  display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;position:relative;padding:120px;}
+.placa::before{content:'';position:absolute;inset:54px;border:1.5px solid rgba(194,169,104,.35);}
+.placa .eyebrow{font-size:30px;letter-spacing:.42em;text-transform:uppercase;color:var(--gold);font-weight:500;}
+.placa .fecha{margin-top:26px;font-size:26px;letter-spacing:.2em;color:rgba(251,250,246,.4);text-transform:uppercase;}
+.placa .num{font-family:'Playfair Display',serif;font-size:340px;line-height:1;color:var(--gold-light);margin-top:60px;font-weight:500;}
+.placa .que{font-family:'Playfair Display',serif;font-style:italic;font-size:58px;color:var(--paper);margin-top:10px;}
+.placa .barrios{margin-top:70px;font-size:34px;letter-spacing:.24em;text-transform:uppercase;color:rgba(251,250,246,.65);line-height:1.8;max-width:760px;}
+.placa .extra{margin-top:60px;font-size:30px;color:rgba(251,250,246,.45);font-weight:300;}
+.placa .foot{position:absolute;bottom:110px;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:22px;}
+.placa .foot img{height:42px;width:auto;}
+.placa .foot span{font-size:26px;letter-spacing:.22em;color:rgba(194,169,104,.7);text-transform:uppercase;}
+.empty{margin-top:30px;color:rgba(251,250,246,.5);font-size:.9rem;max-width:40ch;text-align:center;display:none;}
+</style>
+</head>
+<body>
+<h1>Placa semanal · Stories</h1>
+<div class="controls">
+  <button data-l="es" class="on">ES</button>
+  <button data-l="pt">PT</button>
+  <button data-l="en">EN</button>
+  <button class="dl" id="dl">Descargar PNG</button>
+</div>
+<div class="stage"><div class="placa" id="placa">
+  <div class="eyebrow" id="pEyebrow">Esta semana en Bairen</div>
+  <div class="fecha" id="pFecha"></div>
+  <div class="num" id="pNum">–</div>
+  <div class="que" id="pQue">reservas en siete días</div>
+  <div class="barrios" id="pBarrios"></div>
+  <div class="extra" id="pExtra"></div>
+  <div class="foot">
+    <img src="../bairen_wordmark.png" alt="BAIREN">
+    <span>bairengroup.com</span>
+  </div>
+</div></div>
+<p class="empty" id="empty">No hay reservas en los últimos 7 días. La placa solo se publica cuando hay movimiento — no salgas con un cero.</p>
+
+<script>
+const SB = 'https://nmrjyyrhwjroonrppnka.supabase.co/rest/v1/propiedades';
+const KEY = 'sb_publishable_D0YwiSL5Hm3GyOSx2r1lug_ZV7v46_n';
+const T = {
+  es: { eyebrow:'Esta semana en Bairen', que1:'reserva en siete días', queN:'reservas en siete días', extra1:'y {n} unidad nueva en el catálogo', extraN:'y {n} unidades nuevas en el catálogo' },
+  pt: { eyebrow:'Esta semana na Bairen', que1:'reserva em sete dias', queN:'reservas em sete dias', extra1:'e {n} unidade nova no catálogo', extraN:'e {n} unidades novas no catálogo' },
+  en: { eyebrow:'This week at Bairen', que1:'reservation in seven days', queN:'reservations in seven days', extra1:'and {n} new unit in the portfolio', extraN:'and {n} new units in the portfolio' }
+};
+let lang = 'es', reservas = [], nuevas = 0;
+const since = new Date(Date.now() - 7*24*3600*1000).toISOString();
+
+const MESES = {es:['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'],
+               pt:['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'],
+               en:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']};
+function fechaRango(){
+  const b = new Date(Date.now() - 7*24*3600*1000), a = new Date(), m = MESES[lang];
+  return b.getDate() + '–' + a.getDate() + ' ' + m[a.getMonth()];
+}
+function paint(){
+  const t = T[lang];
+  document.getElementById('pEyebrow').textContent = t.eyebrow;
+  document.getElementById('pFecha').textContent = fechaRango();
+  const n = reservas.length;
+  document.getElementById('pNum').textContent = n;
+  document.getElementById('pQue').textContent = (n===1 ? t.que1 : t.queN);
+  const barrios = [...new Set(reservas.map(r=>r.barrio).filter(Boolean))].slice(0,4);
+  document.getElementById('pBarrios').textContent = barrios.join(' · ');
+  document.getElementById('pExtra').textContent = nuevas > 0 ? (nuevas===1 ? t.extra1 : t.extraN).replace('{n}', nuevas) : '';
+  document.getElementById('empty').style.display = n ? 'none' : 'block';
+}
+Promise.all([
+  fetch(SB+'?select=barrio&estado=eq.Reservado&publicada=eq.true&reservada_at=gte.'+encodeURIComponent(since), {headers:{apikey:KEY}}).then(r=>r.ok?r.json():[]),
+  fetch(SB+'?select=id&publicada=eq.true&created_at=gte.'+encodeURIComponent(since), {headers:{apikey:KEY}}).then(r=>r.ok?r.json():[])
+]).then(([res, nue])=>{ reservas = res||[]; nuevas = (nue||[]).length; paint(); });
+
+document.querySelectorAll('[data-l]').forEach(b=>b.addEventListener('click', ()=>{
+  lang = b.dataset.l;
+  document.querySelectorAll('[data-l]').forEach(x=>x.classList.toggle('on', x===b));
+  paint();
+}));
+document.getElementById('dl').addEventListener('click', ()=>{
+  const node = document.getElementById('placa');
+  const prev = node.style.transform; node.style.transform = 'none';
+  html2canvas(node, {width:1080, height:1920, scale:1, backgroundColor:'#131D2D', useCORS:true}).then(canvas=>{
+    node.style.transform = prev;
+    const a = document.createElement('a');
+    a.download = 'bairen-placa-semanal.png';
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+  }).catch(()=>{ node.style.transform = prev; alert('No se pudo generar el PNG. Sacá screenshot de la vista previa.'); });
+});
+</script>
+</body>
+</html>

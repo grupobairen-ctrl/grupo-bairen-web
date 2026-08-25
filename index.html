@@ -523,6 +523,9 @@
   .mkt-lbl{font-size:.88rem;color:rgba(255,255,255,.6);line-height:1.6;font-weight:300;max-width:30ch;margin:0 auto 10px;}
   .mkt-src{font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-dark);}
   @media(max-width:760px){.mkt-grid{grid-template-columns:1fr;gap:36px;margin-top:32px;}}
+  .mkt-live{display:none;justify-content:center;align-items:baseline;gap:10px;margin-top:38px;padding-top:22px;border-top:1px solid rgba(194,169,104,.22);font-size:.82rem;letter-spacing:.06em;color:rgba(255,255,255,.55);}
+  .mkt-live b{color:var(--gold-light);font-weight:600;letter-spacing:.04em;}
+  .mkt-live.on{display:flex;flex-wrap:wrap;}
   /* ── Testimonio real ── */
   .cita{background:var(--white);padding:clamp(72px,9vw,110px) 24px;text-align:center;}
   .cita blockquote{max-width:760px;margin:0 auto;min-height:190px;display:flex;flex-direction:column;justify-content:center;transition:opacity .38s var(--ease);}
@@ -728,6 +731,7 @@
         <div class="mkt-src">BAIREN</div>
       </div>
     </div>
+    <div class="mkt-live" id="mktLive"></div>
   </div>
 </section>
 
@@ -1154,5 +1158,37 @@ function formatFechaLiberacion(fechaStr) {
 }
 </script>
 <script src="/premium.js" defer></script>
+
+<script>
+/* Pulso del catálogo: reservas de los últimos 7 días (reservada_at, Supabase).
+   Se oculta si no hay ninguna: nunca mostrar "0". */
+(function(){
+  var T = {
+    es: function(n,b){ return 'Esta semana: <b>'+n+(n===1?' reserva':' reservas')+'</b>'+(b?' · '+b:''); },
+    pt: function(n,b){ return 'Esta semana: <b>'+n+(n===1?' reserva':' reservas')+'</b>'+(b?' · '+b:''); },
+    en: function(n,b){ return 'This week: <b>'+n+(n===1?' reservation':' reservations')+'</b>'+(b?' · '+b:''); }
+  };
+  var data = null;
+  function paint(){
+    var el = document.getElementById('mktLive');
+    if(!el || !data || !data.n){ return; }
+    var lang = 'es';
+    try{ lang = localStorage.getItem('bairen_lang') || 'es'; }catch(e){}
+    el.innerHTML = (T[lang]||T.es)(data.n, data.barrios);
+    el.classList.add('on');
+  }
+  var since = new Date(Date.now() - 7*24*3600*1000).toISOString();
+  fetch('https://nmrjyyrhwjroonrppnka.supabase.co/rest/v1/propiedades?select=barrio,reservada_at&estado=eq.Reservado&publicada=eq.true&reservada_at=gte.'+encodeURIComponent(since), {
+    headers: { apikey: 'sb_publishable_D0YwiSL5Hm3GyOSx2r1lug_ZV7v46_n' }
+  }).then(function(r){ return r.ok ? r.json() : []; }).then(function(rows){
+    if(!rows || !rows.length) return;
+    var barrios = [];
+    rows.forEach(function(r){ if(r.barrio && barrios.indexOf(r.barrio)===-1) barrios.push(r.barrio); });
+    data = { n: rows.length, barrios: barrios.slice(0,3).join(', ') };
+    paint();
+    new MutationObserver(paint).observe(document.documentElement, {attributes:true, attributeFilter:['lang']});
+  }).catch(function(){});
+})();
+</script>
 </body>
 </html>
