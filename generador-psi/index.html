@@ -276,6 +276,7 @@
   <div class="actions">
     <button class="btn ghost" id="btnNew" type="button">Nueva</button>
     <button class="btn" id="btnSave" type="button">Guardar</button>
+    <button class="btn ghost" id="btnPdfProp" type="button">Solo propuesta</button>
     <button class="btn primary" id="btnPdf" type="button">Descargar PDF</button>
   </div>
 </header>
@@ -596,6 +597,20 @@
   }
 
   /* ============ ACCIONES ============ */
+  function printPropuesta(prev){
+    /* la propuesta de servicio, en pagina unica continua */
+    var MM=0.2645833; /* px a mm (96 dpi) */
+    document.body.classList.add("pp");
+    var pr=$("propuesta");
+    pr.style.display="flex"; pr.style.position="absolute"; pr.style.left="-9999px"; pr.style.top="0";
+    var w2=Math.ceil(pr.offsetWidth*MM), h2=Math.ceil(pr.scrollHeight*MM)+3;
+    pr.style.display=""; pr.style.position=""; pr.style.left=""; pr.style.top="";
+    $("pagesize").textContent="@page{size:"+w2+"mm "+h2+"mm;margin:0;}";
+    document.title="Propuesta PSI"+(S.interesado?" · "+S.interesado:"")+" · BAIREN";
+    window.print();
+    document.body.classList.remove("pp");
+    document.title=prev;
+  }
   $("btnPdf").addEventListener("click", function(){
     if(S.dir && !S.mapImg && S.mapLoading){ toast("Generando el mapa, probá de nuevo en un segundo"); return; }
     function go(){
@@ -607,20 +622,14 @@
       var prev=document.title;
       document.title=(S.dir?S.dir+(S.unidad?" "+S.unidad:"")+" · ":"")+"Ficha PSI · BAIREN";
       window.print();
-      /* segundo documento: la propuesta de servicio, en pagina unica continua */
-      document.body.classList.add("pp");
-      var pr=$("propuesta");
-      pr.style.display="flex"; pr.style.position="absolute"; pr.style.left="-9999px"; pr.style.top="0";
-      var w2=Math.ceil(pr.offsetWidth*MM), h2=Math.ceil(pr.scrollHeight*MM)+3;
-      pr.style.display=""; pr.style.position=""; pr.style.left=""; pr.style.top="";
-      $("pagesize").textContent="@page{size:"+w2+"mm "+h2+"mm;margin:0;}";
-      document.title="Propuesta PSI"+(S.interesado?" · "+S.interesado:"")+" · BAIREN";
-      window.print();
-      document.body.classList.remove("pp");
-      document.title=prev;
+      printPropuesta(prev);
       toast("Dos PDF: la ficha y la propuesta de servicio");
     }
     /* medir recien cuando las fuentes cargaron: evita reflow y garantiza una sola pagina */
+    if(document.fonts && document.fonts.ready && document.fonts.ready.then){ document.fonts.ready.then(go); } else { go(); }
+  });
+  $("btnPdfProp").addEventListener("click", function(){
+    function go(){ printPropuesta(document.title); toast("PDF de la propuesta de servicio"); }
     if(document.fonts && document.fonts.ready && document.fonts.ready.then){ document.fonts.ready.then(go); } else { go(); }
   });
   $("btnSave").addEventListener("click", function(){
