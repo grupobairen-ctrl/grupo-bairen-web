@@ -132,7 +132,9 @@
   const CSS = `
 .bm{--bm-gold:#C2A968;--bm-gold-light:#DECDA0;--bm-navy:#131D2D;--bm-ease:cubic-bezier(.23,1,.32,1);--bm-pin:40px;
   position:relative;width:100%;margin:0 auto;font-family:'Jost',sans-serif;user-select:none;-webkit-user-select:none;}
-.bm-stage{position:relative;width:100%;}
+.bm-stage{position:relative;width:100%;touch-action:none;cursor:grab;}
+.bm-stage.is-dragging{cursor:grabbing;}
+.bm-stage.is-dragging .bm-pin{pointer-events:none;}
 .bm-svg{display:block;width:100%;height:100%;overflow:visible;
   -webkit-mask-image:linear-gradient(to right,transparent 0,#000 20%),linear-gradient(to top,transparent 0,#000 18%),linear-gradient(to bottom,transparent 0,#000 9%),linear-gradient(to left,transparent 0,#000 7%);
   mask-image:linear-gradient(to right,transparent 0,#000 20%),linear-gradient(to top,transparent 0,#000 18%),linear-gradient(to bottom,transparent 0,#000 9%),linear-gradient(to left,transparent 0,#000 7%);
@@ -346,6 +348,7 @@
 
     function render() {
       computeView();
+      base = view.slice();
       svg.setAttribute('viewBox', view.join(' '));
       stage.style.aspectRatio = (view[2] / view[3]).toFixed(4);
 
@@ -375,6 +378,7 @@
         b.style.left = px.toFixed(2) + '%';
         b.style.top  = py.toFixed(2) + '%';
         b.style.setProperty('--bm-pin', PIN + 'px');
+        b._a = a; b._offPx = pref === 'b' ? (PIN / 2 + GAP + LBLH / 2) : 0;
         b.dataset.zona = k;
         const n = nLabel(counts[k], lang);
         b.setAttribute('aria-label', T[lang].aria.replace('{n}', n).replace('{b}', k));
@@ -403,6 +407,104 @@
         });
       }
     }
+
+    /* ── Cámara: arrastrar con un dedo (o el mouse), pellizcar para acercar, doble toque para
+       acercar/volver. Se mueve el viewBox del svg y se reposicionan los pins, así logos y
+       nombres mantienen su tamaño. Límites: 1x a 3x, sin salirse del mapa. ── */
+    let base = view.slice();
+    const ptrs = new Map();
+    let startView = null, startPt = null, startDist = 0, startMid = null, moved = false, suppressClick = false, lastTap = 0, lastTapPt = null;
+    const ZMAX = 3, PAD = 60;
+
+    function clampView(v) {
+      const minW = base[2] / ZMAX;
+      v[2] = Math.min(base[2], Math.max(minW, v[2]));
+      v[3] = v[2] * base[3] / base[2];
+      v[0] = Math.min(VB[0] + VB[2] + PAD - v[2], Math.max(VB[0] - PAD, v[0]));
+      v[1] = Math.min(VB[1] + VB[3] + PAD - v[3], Math.max(VB[1] - PAD, v[1]));
+      return v;
+    }
+    function applyCam() {
+      svg.setAttribute('viewBox', view.join(' '));
+      const scale = (stage.clientWidth || 1) / view[2];
+      Object.keys(pinEls).forEach(k => {
+        const b = pinEls[k]; if (!b._a) return;
+        const [px, py] = pct(b._a[0], b._a[1] - b._offPx / scale);
+        b.style.left = px.toFixed(2) + '%'; b.style.top = py.toFixed(2) + '%';
+        // fuera del encuadre no se dibuja (si no, flotaría sobre el resto de la página)
+        b.style.visibility = (px < -4 || px > 104 || py < -4 || py > 104) ? 'hidden' : '';
+      });
+    }
+    function zoomAt(clientX, clientY, factor) {
+      const r = stage.getBoundingClientRect();
+      const fx = (clientX - r.left) / r.width, fy = (clientY - r.top) / r.height;
+      const mx = view[0] + fx * view[2], my = view[1] + fy * view[3];
+      const w = view[2] / factor, h = w * base[3] / base[2];
+      view = clampView([mx - fx * w, my - fy * h, w, h]);
+      applyCam();
+    }
+    const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+    const mid  = (a, b) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
+
+    let tapOnPin = false;
+    stage.addEventListener('pointerdown', e => {
+      if (opts.pan === false || e.button > 0) return;
+      ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      tapOnPin = !!(e.target && e.target.closest && e.target.closest('.bm-pin'));
+      startView = view.slice(); moved = false;
+      if (ptrs.size === 1) startPt = { x: e.clientX, y: e.clientY };
+      else if (ptrs.size === 2) { const [a, b] = [...ptrs.values()]; startDist = dist(a, b); startMid = mid(a, b); }
+    });
+    stage.addEventListener('pointermove', e => {
+      if (!ptrs.has(e.pointerId)) return;
+      ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      const r = stage.getBoundingClientRect();
+      if (ptrs.size === 1) {
+        const dx = e.clientX - startPt.x, dy = e.clientY - startPt.y;
+        if (!moved && Math.hypot(dx, dy) < 6) return;
+        if (!moved) { ptrs.forEach((_, id) => { try { stage.setPointerCapture(id); } catch (err) {} }); }
+        moved = true; stage.classList.add('is-dragging');
+        const scale = r.width / startView[2];
+        view = clampView([startView[0] - dx / scale, startView[1] - dy / scale, startView[2], startView[3]]);
+        applyCam();
+      } else if (ptrs.size === 2) {
+        const [a, b] = [...ptrs.values()];
+        const d = dist(a, b), m = mid(a, b);
+        if (!startDist) { startDist = d; startMid = m; startView = view.slice(); return; }
+        if (!moved) { ptrs.forEach((_, id) => { try { stage.setPointerCapture(id); } catch (err) {} }); }
+        moved = true; stage.classList.add('is-dragging');
+        const z = d / startDist;
+        const w = startView[2] / z, h = w * base[3] / base[2];
+        // el punto del mapa que estaba bajo el centro del pellizco sigue bajo el centro actual
+        const fx0 = (startMid.x - r.left) / r.width, fy0 = (startMid.y - r.top) / r.height;
+        const mx = startView[0] + fx0 * startView[2], my = startView[1] + fy0 * startView[3];
+        const fx1 = (m.x - r.left) / r.width, fy1 = (m.y - r.top) / r.height;
+        view = clampView([mx - fx1 * w, my - fy1 * h, w, h]);
+        applyCam();
+      }
+    });
+    function endPointer(e) {
+      if (!ptrs.has(e.pointerId)) return;
+      ptrs.delete(e.pointerId);
+      if (ptrs.size === 1) { const [a] = [...ptrs.values()]; startPt = { x: a.x, y: a.y }; startView = view.slice(); startDist = 0; }
+      if (ptrs.size === 0) {
+        stage.classList.remove('is-dragging');
+        if (moved) { suppressClick = true; setTimeout(() => { suppressClick = false; }, 0); placeLabels(); }
+        else if (!tapOnPin) {
+          // doble toque (fuera de un pin): acercar 2x sobre el punto, o volver al encuadre inicial
+          const now = Date.now();
+          if (lastTapPt && now - lastTap < 320 && dist(lastTapPt, { x: e.clientX, y: e.clientY }) < 24) {
+            lastTap = 0;
+            if (view[2] < base[2] * 0.99) { view = base.slice(); applyCam(); } else zoomAt(e.clientX, e.clientY, 2);
+            placeLabels();
+            suppressClick = true; setTimeout(() => { suppressClick = false; }, 0);
+          } else { lastTap = now; lastTapPt = { x: e.clientX, y: e.clientY }; }
+        }
+      }
+    }
+    stage.addEventListener('pointerup', endPointer);
+    stage.addEventListener('pointercancel', endPointer);
+    stage.addEventListener('click', e => { if (suppressClick) { e.stopPropagation(); e.preventDefault(); } }, true);
 
     // Hover / click sobre polígonos con inventario
     svg.addEventListener('mouseover', e => {

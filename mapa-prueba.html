@@ -492,6 +492,13 @@ footer{
 .cp-desc{font-size:.92rem;line-height:1.65;color:rgba(255,255,255,.64);max-width:38ch;font-weight:300;}
 .cp-clear{display:inline-block;margin-top:14px;background:none;border:0;padding:0 0 2px;color:var(--gold-light);font-family:var(--font-body);font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;border-bottom:1px solid rgba(194,169,104,.35);cursor:pointer;transition:color .2s,border-color .2s;}
 .cp-clear:hover{color:var(--white);border-color:var(--gold-light);}
+.filter-clear{display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 14px;margin-left:8px;border:1px solid rgba(42,58,82,.18);background:transparent;color:var(--navy);
+  font-family:var(--font-body);font-size:.66rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;cursor:pointer;transition:background .2s,color .2s,border-color .2s;-webkit-tap-highlight-color:transparent;}
+.filter-clear span[aria-hidden]{font-size:1rem;line-height:1;font-weight:300;}
+.filter-clear:hover{background:var(--navy);color:var(--white);border-color:var(--navy);}
+.filter-clear[hidden]{display:none;}
+@media(min-width:960px){.filter-clear{margin-left:0;margin-right:8px;}}
+@media(max-width:700px){.filter-clear{height:44px;padding:0 16px;font-size:.7rem;}}
 .ico-logo{width:18px;height:18px;display:block;border-radius:50%;flex-shrink:0;}
 .barrio-trigger .ico-logo{margin-right:9px;}
 .cat-hero-mapa{min-width:0;display:none;}
@@ -522,7 +529,7 @@ footer{
 .ms-head{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:0 6px 0 20px;height:56px;background:var(--navy-deeper);border-bottom:1px solid rgba(194,169,104,.25);}
 .ms-title{font-family:var(--font-display);font-weight:500;font-size:1.15rem;color:var(--white);}
 .ms-close{width:44px;height:44px;border:0;background:none;color:var(--gold-light);font-size:1.7rem;font-weight:300;line-height:1;cursor:pointer;-webkit-tap-highlight-color:transparent;}
-.ms-map{padding:10px 8px 0 2px;}
+.ms-map{padding:10px 8px 10px 2px;}
 .ms-list{list-style:none;margin:6px 20px 0;border-top:1px solid rgba(255,255,255,.08);}
 .ms-item{display:flex;flex-wrap:wrap;align-items:center;width:100%;min-height:50px;padding:11px 4px;border:0;border-bottom:1px solid rgba(255,255,255,.08);background:none;color:var(--white);font-family:var(--font-body);font-weight:300;font-size:.95rem;letter-spacing:.02em;cursor:pointer;text-align:left;-webkit-tap-highlight-color:transparent;}
 .ms-item .nm{flex:1;}
@@ -662,6 +669,7 @@ body.sheet-open{overflow:hidden;}
     <span class="bt-badge" id="btBadge">1</span>
     <span class="bt-arrow"></span>
   </button>
+  <button class="filter-clear" id="barrioClear" type="button" hidden><span aria-hidden="true">×</span> <span id="barrioClearLabel">Borrar filtro</span></button>
 
   <div class="filter-sep" id="sepBarrio"></div>
 
@@ -708,7 +716,6 @@ body.sheet-open{overflow:hidden;}
     <button class="ms-close" id="mapaSheetClose" type="button" aria-label="Cerrar">×</button>
   </div>
   <div class="ms-map"><div id="mapaSheetMap" role="group" aria-label="Mapa de barrios"></div></div>
-  <ul class="ms-list" id="mapaSheetList"></ul>
 </div>
 <button class="mapa-fab" id="mapaFab" type="button" aria-haspopup="dialog" aria-controls="mapaSheet">
   <img class="ico-logo" src="/bairen_logo.png?v=3" alt="" aria-hidden="true">
@@ -776,6 +783,10 @@ let dropdownOpen = false;
 function updateBarrioTrigger() {
   const trigger = document.getElementById('barrioTrigger');
   const badge   = document.getElementById('btBadge');
+  const clear   = document.getElementById('barrioClear');
+  clear.hidden = activeBarrio === 'todos';
+  document.getElementById('barrioClearLabel').textContent = ct('borrar_filtro');
+  clear.setAttribute('aria-label', ct('clear_aria'));
   if (activeBarrio !== 'todos') {
     trigger.classList.add('has-filter');
     badge.classList.add('visible');
@@ -828,6 +839,7 @@ document.getElementById('barrioTrigger').addEventListener('click', e => { e.stop
 document.getElementById('mapaSheetClose').addEventListener('click', () => closeSheet());
 document.getElementById('sheetBackdrop').addEventListener('click', () => closeSheet());
 document.getElementById('mapaFab').addEventListener('click', e => openSheet(e.currentTarget));
+document.getElementById('barrioClear').addEventListener('click', () => selectBarrio('todos'));
 
 /* Pastilla flotante: aparece cuando la barra de filtros ya salió de pantalla */
 let filtersOut = false;
@@ -911,7 +923,7 @@ const CT = {
     disponible:'Disponible', reservado:'Reservado', reservado_sem:'Reservada esta semana', serv_allin:'All in', serv_sin:'Sin incl.', serv_lbl:'Servicios',
     amb:'Amb.', sup:'Sup.', foto_ph:'Fotografía de la unidad', tipo_temporal:'Mediano plazo', tipo_tradicional:'Largo plazo',
     lib_hoy:'Se libera hoy', lib_manana:'Se libera mañana', lib_dias:'Se libera en {d} días', lib_fecha:'Se libera: {f}', lib_locale:'es-AR',
-    barrios:'Barrios', todos_barrios:'Todos los barrios', sheet_title:'Elegí un barrio', cerrar:'Cerrar', clear_aria:'Quitar filtro de barrio', u_one:'unidad', u_many:'unidades', panel_todos:'<b>{n}</b> unidades en <b>{z}</b> barrios'
+    barrios:'Barrios', borrar_filtro:'Borrar filtro', todos_barrios:'Todos los barrios', sheet_title:'Elegí un barrio', cerrar:'Cerrar', clear_aria:'Quitar filtro de barrio', u_one:'unidad', u_many:'unidades', panel_todos:'<b>{n}</b> unidades en <b>{z}</b> barrios'
   },
   pt: {
     title_todos:'Todos os imóveis', sub_todos:'Aluguéis de médio e longo prazo em CABA e GBA Norte',
@@ -923,7 +935,7 @@ const CT = {
     disponible:'Disponível', reservado:'Reservado', reservado_sem:'Reservada esta semana', serv_allin:'Tudo incl.', serv_sin:'Não incl.', serv_lbl:'Serviços',
     amb:'Amb.', sup:'Sup.', foto_ph:'Foto do imóvel', tipo_temporal:'Médio prazo', tipo_tradicional:'Longo prazo',
     lib_hoy:'Libera hoje', lib_manana:'Libera amanhã', lib_dias:'Libera em {d} dias', lib_fecha:'Libera em: {f}', lib_locale:'pt-BR',
-    barrios:'Bairros', todos_barrios:'Todos os bairros', sheet_title:'Escolha um bairro', cerrar:'Fechar', clear_aria:'Remover filtro de bairro', u_one:'unidade', u_many:'unidades', panel_todos:'<b>{n}</b> unidades em <b>{z}</b> bairros'
+    barrios:'Bairros', borrar_filtro:'Limpar filtro', todos_barrios:'Todos os bairros', sheet_title:'Escolha um bairro', cerrar:'Fechar', clear_aria:'Remover filtro de bairro', u_one:'unidade', u_many:'unidades', panel_todos:'<b>{n}</b> unidades em <b>{z}</b> bairros'
   },
   en: {
     title_todos:'All properties', sub_todos:'Medium and long-term rentals in CABA and GBA Norte',
@@ -935,7 +947,7 @@ const CT = {
     disponible:'Available', reservado:'Reserved', reservado_sem:'Reserved this week', serv_allin:'All in', serv_sin:'Not incl.', serv_lbl:'Services',
     amb:'Rooms', sup:'Area', foto_ph:'Unit photo', tipo_temporal:'Medium-term', tipo_tradicional:'Long-term',
     lib_hoy:'Available today', lib_manana:'Available tomorrow', lib_dias:'Available in {d} days', lib_fecha:'Available: {f}', lib_locale:'en-US',
-    barrios:'Neighbourhoods', todos_barrios:'All neighbourhoods', sheet_title:'Choose a neighbourhood', cerrar:'Close', clear_aria:'Remove neighbourhood filter', u_one:'unit', u_many:'units', panel_todos:'<b>{n}</b> units across <b>{z}</b> neighbourhoods'
+    barrios:'Neighbourhoods', borrar_filtro:'Clear filter', todos_barrios:'All neighbourhoods', sheet_title:'Choose a neighbourhood', cerrar:'Close', clear_aria:'Remove neighbourhood filter', u_one:'unit', u_many:'units', panel_todos:'<b>{n}</b> units across <b>{z}</b> neighbourhoods'
   }
 };
 const L = () => (window.BAIREN_LANG || 'es');
@@ -986,14 +998,7 @@ function render() {
   updateCatalogHero();
   const rc = document.getElementById('resultsCount');
   rc.textContent = `${list.length} ${list.length !== 1 ? ct('count_many') : ct('count_one')}`;
-  if (activeBarrio !== 'todos') {
-    rc.append(' · ' + activeBarrio);
-    const x = document.createElement('button');
-    x.type = 'button'; x.className = 'results-clear'; x.textContent = '×';
-    x.setAttribute('aria-label', ct('clear_aria'));
-    x.addEventListener('click', () => selectBarrio('todos'));
-    rc.append(x);
-  }
+  if (activeBarrio !== 'todos') rc.append(' · ' + activeBarrio);
 
   if (!list.length) {
     grid.innerHTML = `<div class="empty-state"><div class="empty-title">${ct('empty_t')}</div><div class="empty-sub">${ct('empty_s')}</div></div>`;
@@ -1188,11 +1193,7 @@ function mountSheetMap() {
 }
 
 function buildSheetList() {
-  const ul = document.getElementById('mapaSheetList');
-  const total = props.length;
-  // Solo "Todos los barrios": los nombres ya están en el mapa (una lista los repetiría)
-  ul.innerHTML = `<li><button type="button" class="ms-item" data-zona="todos"><span class="nm">${ct('todos_barrios')}</span><b>${total} ${total === 1 ? ct('u_one') : ct('u_many')}</b></button></li>`;
-  ul.querySelectorAll('[data-zona]').forEach(b => b.addEventListener('click', () => { selectBarrio(b.dataset.zona); closeSheet(); }));
+  // La hoja es solo el mapa: los nombres ya están en él y "Borrar filtro" vive en la barra de filtros
   document.getElementById('mapaSheetTitle').textContent = ct('sheet_title');
   document.getElementById('mapaSheetClose').setAttribute('aria-label', ct('cerrar'));
   document.getElementById('mapaFabLabel').textContent = ct('barrios');
@@ -1222,7 +1223,6 @@ function renderPanel(hoverZ) {
 function syncBarrioUI() {
   updateBarrioTrigger();
   panelShown = null; renderPanel(null);
-  document.querySelectorAll('#mapaSheetList .ms-item').forEach(b => b.classList.toggle('active', b.dataset.zona === activeBarrio));
   if (mapaHero)  mapaHero.setActive(activeBarrio !== 'todos' ? activeBarrio : null);
   if (mapaSheet) mapaSheet.setActive(activeBarrio !== 'todos' ? activeBarrio : null);
   try {
