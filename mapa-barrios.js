@@ -46,14 +46,14 @@
     { key:'Belgrano',      svg:['Belgrano'],                alias:['belgrano c','belgrano r','bajo belgrano','belgrano chico'], desc:{ es:'Avenidas arboladas, casas y el subte a la puerta.', pt:'Avenidas arborizadas, casas e o metrô à porta.', en:'Tree-lined avenues, houses and the subway at the door.' } },
     { key:'Colegiales',    svg:['Colegiales'] },
     { key:'Palermo',       svg:['Palermo'],                 alias:['palermo soho','palermo hollywood','las canitas','canitas','palermo chico','palermo viejo','palermo nuevo','palermo botanico','botanico'], desc:{ es:'Parques, gastronomía y diseño. Incluye Soho, Hollywood y Las Cañitas.', pt:'Parques, gastronomia e design. Inclui Soho, Hollywood e Las Cañitas.', en:'Parks, dining and design. Includes Soho, Hollywood and Las Cañitas.' } },
-    { key:'Recoleta',      svg:['Recoleta'],                alias:['barrio norte'], desc:{ es:'Embajadas, museos y la Buenos Aires clásica, a pasos del centro.', pt:'Embaixadas, museus e a Buenos Aires clássica, a passos do centro.', en:'Embassies, museums and classic Buenos Aires, steps from downtown.' } },
-    { key:'Retiro',        svg:['Retiro'], desc:{ es:'Plaza San Martín, torres y la estación. Entre Recoleta y el centro.', pt:'Plaza San Martín, torres e a estação. Entre Recoleta e o centro.', en:'Plaza San Martín, towers and the station. Between Recoleta and downtown.' } },
-    { key:'Puerto Madero', svg:['Puerto Madero'],           labelKey:'Puerto Madero:diques', lbl:'r', short:'P. Madero', desc:{ es:'Diques, torres y la reserva ecológica. El barrio más nuevo de la ciudad.', pt:'Docas, torres e a reserva ecológica. O bairro mais novo da cidade.', en:'Docks, towers and the ecological reserve. The newest neighbourhood in town.' } },   /* los diques, no la reserva; rótulo hacia el río */
-    { key:'Centro',        svg:['San Nicolas','Monserrat'], alias:['microcentro','san nicolas','monserrat','montserrat','tribunales'], labelKey:'San Nicolas+Monserrat', desc:{ es:'Microcentro y Monserrat: oficinas, teatros y el Obelisco.', pt:'Microcentro e Monserrat: escritórios, teatros e o Obelisco.', en:'Microcentro and Monserrat: offices, theatres and the Obelisk.' } },
+    { key:'Recoleta',      svg:['Recoleta'],                alias:['barrio norte'], at:[668,392], prio:1, desc:{ es:'Embajadas, museos y la Buenos Aires clásica, a pasos del centro.', pt:'Embaixadas, museus e a Buenos Aires clássica, a passos do centro.', en:'Embassies, museums and classic Buenos Aires, steps from downtown.' } },
+    { key:'Retiro',        svg:['Retiro'], lbl:'r', desc:{ es:'Plaza San Martín, torres y la estación. Entre Recoleta y el centro.', pt:'Plaza San Martín, torres e a estação. Entre Recoleta e o centro.', en:'Plaza San Martín, towers and the station. Between Recoleta and downtown.' } },
+    { key:'Puerto Madero', svg:['Puerto Madero'],           labelKey:'Puerto Madero:diques', at:[884,474], lbl:'b', lines:['Puerto','Madero'], prio:2, desc:{ es:'Diques, torres y la reserva ecológica. El barrio más nuevo de la ciudad.', pt:'Docas, torres e a reserva ecológica. O bairro mais novo da cidade.', en:'Docks, towers and the ecological reserve. The newest neighbourhood in town.' } },   /* los diques, no la reserva; rótulo hacia el río */
+    { key:'Centro',        svg:['San Nicolas','Monserrat'], alias:['microcentro','san nicolas','monserrat','montserrat','tribunales'], labelKey:'San Nicolas+Monserrat', lblm:'l', desc:{ es:'Microcentro y Monserrat: oficinas, teatros y el Obelisco.', pt:'Microcentro e Monserrat: escritórios, teatros e o Obelisco.', en:'Microcentro and Monserrat: offices, theatres and the Obelisk.' } },
     { key:'San Telmo',     svg:['San Telmo'], desc:{ es:'Adoquines, anticuarios y la feria de los domingos.', pt:'Paralelepípedos, antiquários e a feira de domingo.', en:'Cobblestones, antiques and the Sunday fair.' } },
     { key:'Villa Crespo',  svg:['Villa Crespo'], short:'V. Crespo', desc:{ es:'Al lado de Palermo, con vida de barrio y outlets.', pt:'Ao lado de Palermo, com vida de bairro e outlets.', en:'Next to Palermo, with neighbourhood life and outlet stores.' } },
     { key:'Chacarita',     svg:['Chacarita'] },
-    { key:'Almagro',       svg:['Almagro'], at:[556,524], lbl:'b', desc:{ es:'Tango, cafés y la Avenida Corrientes. Bien conectado por subte.', pt:'Tango, cafés e a Avenida Corrientes. Bem conectado por metrô.', en:'Tango, cafés and Corrientes Avenue. Well connected by subway.' } },
+    { key:'Almagro',       svg:['Almagro'], at:[566,530], lbl:'b', desc:{ es:'Tango, cafés y la Avenida Corrientes. Bien conectado por subte.', pt:'Tango, cafés e a Avenida Corrientes. Bem conectado por metrô.', en:'Tango, cafés and Corrientes Avenue. Well connected by subway.' } },
     { key:'Balvanera',     svg:['Balvanera'],               alias:['once','congreso'] },
     { key:'Caballito',     svg:['Caballito'] },
     { key:'Villa Urquiza', svg:['Villa Urquiza'] },
@@ -303,6 +303,14 @@
       x0=Math.max(VB[0],x0-padX); y0=Math.max(VB[1],y0-padY);
       x1=Math.min(VB[0]+VB[2],x1+padX); y1=Math.min(VB[1]+VB[3],y1+padY);
       view = [x0, y0, x1-x0, y1-y0];
+      // Encuadre inicial un 30% más abierto que el área con inventario (se ve más ciudad alrededor)
+      const F = narrow ? 1.18 : 1.3, PADV = 60;   // en mobile un poco menos: con 30% los nombres se pisan
+      const cx = view[0] + view[2] / 2, cy = view[1] + view[3] / 2;
+      let w = view[2] * F, h = view[3] * F;
+      let vx = cx - w / 2, vy = cy - h / 2;
+      vx = Math.min(VB[0] + VB[2] + PADV - w, Math.max(VB[0] - PADV, vx));
+      vy = Math.min(VB[1] + VB[3] + PADV - h, Math.max(VB[1] - PADV, vy));
+      view = [vx, vy, w, h];
     }
 
     function setSide(pin, side) {
@@ -315,7 +323,8 @@
        toma el primero que no toca otro pin ni otro rótulo y queda dentro
        de la ventana. Si ninguno entra, se oculta (queda el badge). */
     function placeLabels() {
-      const keys = Object.keys(pinEls).sort((a, b) => counts[b] - counts[a]);
+      const pr = k => (zonaConfig(k) && zonaConfig(k).prio) || 0;
+      const keys = Object.keys(pinEls).sort((a, b) => (pr(b) - pr(a)) || (counts[b] - counts[a]));
       if (!keys.length) return;
       const narrow = isNarrow();
       const vw = document.documentElement.clientWidth;
@@ -328,10 +337,11 @@
         const pref = (narrow && z.lblm) || z.lbl || 'b';
         const tries = [pref].concat(['b','r','l','t'].filter(s => s !== pref));
         const nameEl = lbl.querySelector('b');
-        const names = [k].concat(z.short ? [z.short] : []);
+        const full = z.lines ? z.lines.map(t => t.toUpperCase()).join('<br>') : k;
+        const names = [full].concat(z.short ? [z.short] : []);
         let ok = false;
         for (let n = 0; n < names.length && !ok; n++) {
-          nameEl.textContent = names[n];
+          nameEl.innerHTML = names[n];
           for (let i = 0; i < tries.length; i++) {
             setSide(pin, tries[i]);
             const r = lbl.getBoundingClientRect();
@@ -341,7 +351,7 @@
             if (inView && !hitPin && !hitLbl) { ok = true; placed.push(r); break; }
           }
         }
-        if (!ok) { nameEl.textContent = k; setSide(pin, pref); }
+        if (!ok) { nameEl.innerHTML = full; setSide(pin, pref); }
         lbl.classList.toggle('is-hidden', !ok);
       });
     }
@@ -384,7 +394,7 @@
         b.setAttribute('aria-label', T[lang].aria.replace('{n}', n).replace('{b}', k));
         b.innerHTML = LOGO
           + '<span class="bm-n" aria-hidden="true">' + counts[k] + '</span>'
-          + '<span class="bm-lbl" aria-hidden="true"><b>' + k + '</b><i>' + n + '</i></span>';
+          + '<span class="bm-lbl" aria-hidden="true"><b>' + (z.lines ? z.lines.map(t => t.toUpperCase()).join('<br>') : k) + '</b><i>' + n + '</i></span>';
         b.addEventListener('mouseenter', () => hover(k, true));
         b.addEventListener('mouseleave', () => hover(k, false));
         b.addEventListener('focus', () => hover(k, true));
