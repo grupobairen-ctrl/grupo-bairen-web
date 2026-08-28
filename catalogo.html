@@ -475,6 +475,80 @@ footer{
 }
 *:focus-visible{outline:2px solid var(--gold);outline-offset:3px;}
 
+/* ═══ V3 · EL MAPA ES EL FILTRO DE BARRIOS ═══════════════════════════════
+   Desktop: mapa en el hero, junto a las tarjetas (split view). Sin dropdown.
+   Mobile: lista primero; "Barrios" abre el mapa como modo aparte (hoja a
+   pantalla completa con los pins y la lista de barrios). Pastilla flotante
+   para volver al mapa sin scrollear hasta arriba. */
+.cat-hero{text-align:left;padding:40px 28px 36px;}
+.cat-hero-inner{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1fr;gap:18px;}
+@media(min-width:960px){.cat-hero-inner{grid-template-columns:minmax(300px,5fr) 7fr;gap:48px;align-items:center;}}
+.cat-title{margin-bottom:6px;}
+.cat-sub{margin-bottom:14px;}
+.cat-panel{min-height:120px;margin-top:4px;}
+.cp-default{font-size:.78rem;letter-spacing:.06em;color:rgba(255,255,255,.45);}
+.cp-default b{font-weight:500;color:var(--gold-light);}
+.cp-name{font-family:var(--font-display);font-size:1.5rem;font-weight:500;color:var(--white);line-height:1.15;display:block;}
+.cp-n{display:block;font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin:6px 0 10px;}
+.cp-desc{font-size:.92rem;line-height:1.65;color:rgba(255,255,255,.64);max-width:38ch;font-weight:300;}
+.cp-clear{display:inline-block;margin-top:14px;background:none;border:0;padding:0 0 2px;color:var(--gold-light);font-family:var(--font-body);font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;border-bottom:1px solid rgba(194,169,104,.35);cursor:pointer;transition:color .2s,border-color .2s;}
+.cp-clear:hover{color:var(--white);border-color:var(--gold-light);}
+.filter-clear{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 6px;margin-left:6px;border:0;background:transparent;color:rgba(107,117,137,.85);
+  font-family:var(--font-body);font-size:.66rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;cursor:pointer;transition:color .2s;-webkit-tap-highlight-color:transparent;}
+.filter-clear span[aria-hidden]{font-size:1rem;line-height:1;font-weight:300;}
+.filter-clear:hover{color:var(--navy);}
+.filter-clear[hidden]{display:none;}
+@media(min-width:960px){.filter-clear{margin-left:0;margin-right:8px;}}
+@media(max-width:700px){.filter-clear{height:44px;padding:0 10px;font-size:.7rem;}}
+.ico-loc{width:16px;height:16px;flex-shrink:0;display:block;}
+.barrio-trigger .ico-loc{margin-right:8px;opacity:.9;}
+.mapa-fab .ico-loc{width:15px;height:15px;}
+.cat-hero-mapa{min-width:0;display:none;}
+.mapa-wrap{padding:8px 96px 8px 8px;max-width:760px;margin:0 auto;}
+@media(min-width:960px){
+  .cat-hero-mapa{display:block;}
+  .barrio-trigger,#sepBarrio{display:none!important;}
+}
+@media(max-width:959px){
+  .cat-hero{padding:26px 20px 22px;}
+  .cat-eyebrow{display:none;}
+  .cat-title{font-size:1.55rem;}
+  .cat-sub{font-size:.8rem;margin-bottom:0;}
+  .cat-panel{display:none;}
+}
+.results-bar{scroll-margin-top:calc(var(--nav-h) + 8px);}
+.results-clear{margin-left:8px;width:22px;height:22px;border:1px solid rgba(42,58,82,.25);background:transparent;color:var(--navy);font-size:.95rem;line-height:1;display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;cursor:pointer;transition:background .2s,color .2s;}
+.results-clear:hover{background:var(--navy);color:var(--white);}
+/* Hoja del mapa (mobile) */
+.sheet-backdrop{position:fixed;inset:0;z-index:1199;background:rgba(19,29,45,.62);opacity:0;transition:opacity .25s ease;}
+.sheet-backdrop[hidden]{display:none;}
+.sheet-backdrop.in{opacity:1;}
+.mapa-sheet{position:fixed;left:0;right:0;bottom:0;z-index:1200;max-height:calc(100dvh - 20px);background:var(--navy-deeper);color:var(--white);overflow-y:auto;-webkit-overflow-scrolling:touch;
+  border-top:1px solid rgba(194,169,104,.5);box-shadow:0 -18px 48px rgba(0,0,0,.35);padding-bottom:max(12px, env(safe-area-inset-bottom));
+  transform:translateY(100%);transition:transform .34s cubic-bezier(.32,.72,0,1);}
+.mapa-sheet[hidden]{display:none;}
+.mapa-sheet.in{transform:none;}
+.ms-head{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:0 6px 0 20px;height:56px;background:var(--navy-deeper);border-bottom:1px solid rgba(194,169,104,.25);}
+.ms-title{font-family:var(--font-display);font-weight:500;font-size:1.15rem;color:var(--white);}
+.ms-close{width:44px;height:44px;border:0;background:none;color:var(--gold-light);font-size:1.7rem;font-weight:300;line-height:1;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.ms-map{padding:10px 8px 10px 2px;}
+.ms-list{list-style:none;margin:6px 20px 0;border-top:1px solid rgba(255,255,255,.08);}
+.ms-item{display:flex;flex-wrap:wrap;align-items:center;width:100%;min-height:50px;padding:11px 4px;border:0;border-bottom:1px solid rgba(255,255,255,.08);background:none;color:var(--white);font-family:var(--font-body);font-weight:300;font-size:.95rem;letter-spacing:.02em;cursor:pointer;text-align:left;-webkit-tap-highlight-color:transparent;}
+.ms-item .nm{flex:1;}
+.ms-item b{font-weight:400;font-size:.68rem;letter-spacing:.06em;color:var(--gold-light);opacity:.8;}
+.ms-item small{flex:0 0 100%;font-size:.74rem;line-height:1.45;color:rgba(255,255,255,.42);margin-top:3px;letter-spacing:.01em;}
+.ms-item.active{color:var(--gold-light);}
+.ms-item.active::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--gold);margin-right:10px;flex-shrink:0;}
+.ms-item:active{opacity:.7;}
+/* Pastilla flotante (mobile) */
+.mapa-fab{position:fixed;left:50%;bottom:22px;transform:translate(-50%,16px);z-index:900;display:none;align-items:center;gap:8px;height:44px;padding:0 18px;border:1px solid rgba(194,169,104,.6);background:var(--navy-deeper);color:var(--gold-light);font-family:var(--font-body);font-size:.7rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;box-shadow:0 8px 24px rgba(19,29,45,.35);opacity:0;pointer-events:none;transition:opacity .2s ease,transform .25s var(--ease);cursor:pointer;-webkit-tap-highlight-color:transparent;}
+
+.mapa-fab.show{opacity:1;pointer-events:auto;transform:translate(-50%,0);}
+@media(max-width:959px){.mapa-fab{display:inline-flex;}}
+@media(max-width:700px){.results-clear{display:none;}}
+body.sheet-open{overflow:hidden;}
+@media(prefers-reduced-motion:reduce){.mapa-sheet,.mapa-fab,.sheet-backdrop{transition:none;}}
+
 /* ─── BADGE LIBERACIÓN (EDITORIAL LUXURY) ─────────────────────────────────────── */
 .badge-liberacion {
   position: absolute;
@@ -555,12 +629,16 @@ footer{
   <a href="index.html#contacto" class="m-link" data-i18n="nav_contacto">Contacto</a>
 </div>
 
-<!-- HERO -->
+<!-- HERO: el mapa es el filtro de barrios (desktop) -->
 <div class="cat-hero">
   <div class="cat-hero-inner">
-    <p class="cat-eyebrow">BAIREN · Buenos Aires</p>
-    <h1 class="cat-title" id="catTitle">Propiedades disponibles</h1>
-    <p class="cat-sub" id="catSub">Alquileres a mediano y largo plazo en CABA y GBA Norte</p>
+    <div class="cat-hero-text">
+      <p class="cat-eyebrow">BAIREN · Buenos Aires</p>
+      <h1 class="cat-title" id="catTitle">Propiedades disponibles</h1>
+      <p class="cat-sub" id="catSub">Alquileres a mediano y largo plazo en CABA y GBA Norte</p>
+      <div class="cat-panel" id="catPanel" aria-live="polite"></div>
+    </div>
+    <div class="cat-hero-mapa"><div class="mapa-wrap"><div id="mapaHero" role="group" aria-label="Mapa de barrios"></div></div></div>
   </div>
 </div>
 <script>
@@ -587,13 +665,15 @@ footer{
 <div class="filters-bar" id="filtersBar">
 
   <!-- BARRIO DROPDOWN TRIGGER -->
-  <button class="barrio-trigger" id="barrioTrigger" aria-haspopup="listbox" aria-expanded="false">
+  <button class="barrio-trigger" id="barrioTrigger" aria-haspopup="dialog" aria-controls="mapaSheet" aria-expanded="false">
+    <svg class="ico-loc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6.5-8 12.5-8 12.5S4 16.5 4 10a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="2.8"/></svg>
     <span class="bt-label" data-i18n="cat_barrios">Barrios</span>
     <span class="bt-badge" id="btBadge">1</span>
     <span class="bt-arrow"></span>
   </button>
+  <button class="filter-clear" id="barrioClear" type="button" hidden><span aria-hidden="true">×</span> <span id="barrioClearLabel">Borrar filtro</span></button>
 
-  <div class="filter-sep"></div>
+  <div class="filter-sep" id="sepBarrio"></div>
 
   <!-- TIPO PILLS -->
   <div class="tipo-pills">
@@ -630,14 +710,19 @@ footer{
 
 </div>
 
-<!-- BARRIO DROPDOWN PANEL (outside sticky bar so it overflows correctly) -->
-<div class="barrio-dropdown" id="barrioDropdown" role="listbox" aria-label="Filtrar por barrio">
-  <p class="bd-head" data-i18n="cat_barrio_head">Seleccioná un barrio</p>
-  <div class="bd-grid" id="bdGrid">
-    <!-- pills rendered by JS -->
+<!-- MAPA DE BARRIOS · hoja inferior (mobile) -->
+<div class="sheet-backdrop" id="sheetBackdrop" hidden></div>
+<div class="mapa-sheet" id="mapaSheet" role="dialog" aria-modal="true" aria-labelledby="mapaSheetTitle" hidden>
+  <div class="ms-head">
+    <h2 class="ms-title" id="mapaSheetTitle">Elegí un barrio</h2>
+    <button class="ms-close" id="mapaSheetClose" type="button" aria-label="Cerrar">×</button>
   </div>
-  <button class="bd-clear" id="bdClear" data-i18n="cat_barrio_clear">Limpiar filtro</button>
+  <div class="ms-map"><div id="mapaSheetMap" role="group" aria-label="Mapa de barrios"></div></div>
 </div>
+<button class="mapa-fab" id="mapaFab" type="button" aria-haspopup="dialog" aria-controls="mapaSheet">
+  <svg class="ico-loc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6.5-8 12.5-8 12.5S4 16.5 4 10a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="2.8"/></svg>
+  <span id="mapaFabLabel">Barrios</span>
+</button>
 
 <!-- RESULTADOS -->
 <div class="results-bar">
@@ -667,16 +752,18 @@ footer{
 
 <script src="i18n.js?v=3"></script>
 <script src="supabase-config.js"></script>
+<script src="mapa-barrios.js"></script>
 <script>
 window.sbImg = window.sbImg || function(u){return u};
 /* ═══════════════════════════════════════════════════════════════
    DATA
 ═══════════════════════════════════════════════════════════════ */
-const BARRIOS = [
-  'Palermo','Recoleta','Belgrano','Villa Crespo',
-  'Las Cañitas','San Isidro','Almagro','Centro',
-  'Palermo Hollywood','Otros'
-];
+/* Zonas de barrio: se derivan del inventario real. BairenZonas (mapa-barrios.js)
+   agrupa Palermo Soho / Hollywood / Las Cañitas → Palermo, Belgrano C → Belgrano, etc.
+   La tarjeta y la ficha siguen mostrando el barrio específico. */
+let ZONAS = [];          // [{ key, n }] ordenadas por inventario
+let zonaCounts = {};
+let mapaHero = null, mapaSheet = null;
 
 // Datos cargados dinámicamente desde Supabase en loadFromSupabase()
 let props = [];
@@ -695,86 +782,81 @@ let dropdownOpen = false;
 /* ═══════════════════════════════════════════════════════════════
    BARRIO DROPDOWN — build pills
 ═══════════════════════════════════════════════════════════════ */
-function buildBarrioPills() {
-  const grid = document.getElementById('bdGrid');
-  const allBtn = document.createElement('button');
-  allBtn.className = 'bd-pill active';
-  allBtn.dataset.barrio = 'todos';
-  allBtn.textContent = 'Todos';
-  grid.appendChild(allBtn);
-
-  BARRIOS.forEach(b => {
-    const btn = document.createElement('button');
-    btn.className = 'bd-pill';
-    btn.dataset.barrio = b;
-    btn.textContent = b === 'Palermo Hollywood' ? 'P. Hollywood' : b;
-    grid.appendChild(btn);
-  });
-
-  grid.addEventListener('click', e => {
-    const btn = e.target.closest('.bd-pill');
-    if (!btn) return;
-    grid.querySelectorAll('.bd-pill').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    activeBarrio = btn.dataset.barrio;
-    updateBarrioTrigger();
-    closeDropdown();
-    render();
-  });
-}
-
 function updateBarrioTrigger() {
   const trigger = document.getElementById('barrioTrigger');
   const badge   = document.getElementById('btBadge');
-  const clear   = document.getElementById('bdClear');
-
+  const clear   = document.getElementById('barrioClear');
+  clear.hidden = activeBarrio === 'todos';
+  document.getElementById('barrioClearLabel').textContent = ct('borrar_filtro');
+  clear.setAttribute('aria-label', ct('clear_aria'));
   if (activeBarrio !== 'todos') {
     trigger.classList.add('has-filter');
     badge.classList.add('visible');
-    badge.textContent = '1';
-    clear.classList.add('visible');
-    const label = activeBarrio === 'Palermo Hollywood' ? 'P. Hollywood' : activeBarrio;
-    trigger.querySelector('.bt-label').textContent = label;
+    badge.textContent = zonaCounts[activeBarrio] || '1';
+    trigger.querySelector('.bt-label').textContent = activeBarrio;
   } else {
     trigger.classList.remove('has-filter');
     badge.classList.remove('visible');
-    clear.classList.remove('visible');
-    trigger.querySelector('.bt-label').textContent = 'Barrios';
+    trigger.querySelector('.bt-label').textContent = ct('barrios');
   }
 }
 
-function openDropdown() {
-  dropdownOpen = true;
-  document.getElementById('barrioTrigger').classList.add('open');
-  document.getElementById('barrioTrigger').setAttribute('aria-expanded','true');
-  document.getElementById('barrioDropdown').classList.add('open');
-}
-function closeDropdown() {
-  dropdownOpen = false;
-  document.getElementById('barrioTrigger').classList.remove('open');
-  document.getElementById('barrioTrigger').setAttribute('aria-expanded','false');
-  document.getElementById('barrioDropdown').classList.remove('open');
-}
-
-document.getElementById('barrioTrigger').addEventListener('click', e => {
-  e.stopPropagation();
-  dropdownOpen ? closeDropdown() : openDropdown();
-});
-
-document.getElementById('bdClear').addEventListener('click', () => {
-  activeBarrio = 'todos';
-  document.getElementById('bdGrid').querySelectorAll('.bd-pill').forEach(b => {
-    b.classList.toggle('active', b.dataset.barrio === 'todos');
+/* ── Hoja del mapa (mobile): abre como modo aparte, cierra con ×, Escape o "atrás" ── */
+let sheetOpener = null;
+function openSheet(opener) {
+  const sheet = document.getElementById('mapaSheet');
+  if (!sheet.hidden) return;
+  sheetOpener = opener || document.activeElement;
+  const bd = document.getElementById('sheetBackdrop'); bd.hidden = false;
+  sheet.hidden = false;
+  document.body.classList.add('sheet-open');
+  document.getElementById('mapaFab').classList.remove('show');
+  document.getElementById('barrioTrigger').setAttribute('aria-expanded', 'true');
+  try { history.pushState({ bairenSheet: 1 }, ''); } catch (e) {}
+  requestAnimationFrame(() => {
+    sheet.classList.add('in'); bd.classList.add('in');
+    mountSheetMap();
+    document.getElementById('mapaSheetClose').focus({ preventScroll: true });
   });
-  updateBarrioTrigger();
-  render();
+}
+function closeSheet(fromHistory) {
+  const sheet = document.getElementById('mapaSheet');
+  if (sheet.hidden) return;
+  sheet.classList.remove('in');
+  const bd = document.getElementById('sheetBackdrop'); bd.classList.remove('in');
+  document.body.classList.remove('sheet-open');
+  document.getElementById('barrioTrigger').setAttribute('aria-expanded', 'false');
+  setTimeout(() => { sheet.hidden = true; bd.hidden = true; }, 340);
+  if (!fromHistory && history.state && history.state.bairenSheet) { try { history.back(); } catch (e) {} }
+  if (sheetOpener && sheetOpener.focus) sheetOpener.focus({ preventScroll: true });
+  updateFab();
+}
+function closeDropdown() { closeSheet(); }   // compat (lo llama el burger)
+window.addEventListener('popstate', () => {
+  if (!document.getElementById('mapaSheet').hidden) closeSheet(true);
+  if (Array.isArray(props) && props.length) syncBarrioUI();   // la URL vuelve a reflejar el barrio activo
 });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
+document.getElementById('barrioTrigger').addEventListener('click', e => { e.stopPropagation(); openSheet(e.currentTarget); });
+document.getElementById('mapaSheetClose').addEventListener('click', () => closeSheet());
+document.getElementById('sheetBackdrop').addEventListener('click', () => closeSheet());
+document.getElementById('mapaFab').addEventListener('click', e => openSheet(e.currentTarget));
+document.getElementById('barrioClear').addEventListener('click', () => selectBarrio('todos'));
 
-document.addEventListener('click', e => {
-  if (dropdownOpen && !document.getElementById('barrioDropdown').contains(e.target) && e.target !== document.getElementById('barrioTrigger')) {
-    closeDropdown();
-  }
-});
+/* Pastilla flotante: aparece cuando la barra de filtros ya salió de pantalla */
+let filtersOut = false;
+function updateFab() {
+  const fab = document.getElementById('mapaFab');
+  const sheetOpen = !document.getElementById('mapaSheet').hidden;
+  fab.classList.toggle('show', filtersOut && !sheetOpen && window.innerWidth < 960);
+}
+if (window.IntersectionObserver) {
+  new IntersectionObserver(entries => {
+    const en = entries[0];
+    filtersOut = !en.isIntersecting && en.boundingClientRect.top < 0;
+    updateFab();
+  }, { rootMargin: '-64px 0px 0px 0px' }).observe(document.getElementById('filtersBar'));
+}
 
 /* ═══════════════════════════════════════════════════════════════
    TIPO PILLS
@@ -800,8 +882,7 @@ document.getElementById('ambSelect').addEventListener('change', e => { activeAmb
    FILTER + SORT LOGIC
 ═══════════════════════════════════════════════════════════════ */
 function getBarrioGroup(b) {
-  if (BARRIOS.slice(0,-1).includes(b)) return b; // todo excepto 'Otros'
-  return 'Otros';
+  return window.BairenZonas.zonaDe(b) || 'Otros';
 }
 
 function filtered() {
@@ -843,7 +924,8 @@ const CT = {
     per_month:'por mes', per_month_all:'por mes · all in', consult:'Consultar precio', ver_mas:'Ver más →',
     disponible:'Disponible', reservado:'Reservado', reservado_sem:'Reservada esta semana', serv_allin:'All in', serv_sin:'Sin incl.', serv_lbl:'Servicios',
     amb:'Amb.', sup:'Sup.', foto_ph:'Fotografía de la unidad', tipo_temporal:'Mediano plazo', tipo_tradicional:'Largo plazo',
-    lib_hoy:'Se libera hoy', lib_manana:'Se libera mañana', lib_dias:'Se libera en {d} días', lib_fecha:'Se libera: {f}', lib_locale:'es-AR'
+    lib_hoy:'Se libera hoy', lib_manana:'Se libera mañana', lib_dias:'Se libera en {d} días', lib_fecha:'Se libera: {f}', lib_locale:'es-AR',
+    barrios:'Barrios', borrar_filtro:'Borrar filtro', todos_barrios:'Todos los barrios', sheet_title:'Elegí un barrio', cerrar:'Cerrar', clear_aria:'Quitar filtro de barrio', u_one:'unidad', u_many:'unidades', panel_todos:'<b>{n}</b> unidades en <b>{z}</b> barrios'
   },
   pt: {
     title_todos:'Todos os imóveis', sub_todos:'Aluguéis de médio e longo prazo em CABA e GBA Norte',
@@ -854,7 +936,8 @@ const CT = {
     per_month:'por mês', per_month_all:'por mês · tudo incluído', consult:'Consultar preço', ver_mas:'Ver mais →',
     disponible:'Disponível', reservado:'Reservado', reservado_sem:'Reservada esta semana', serv_allin:'Tudo incl.', serv_sin:'Não incl.', serv_lbl:'Serviços',
     amb:'Amb.', sup:'Sup.', foto_ph:'Foto do imóvel', tipo_temporal:'Médio prazo', tipo_tradicional:'Longo prazo',
-    lib_hoy:'Libera hoje', lib_manana:'Libera amanhã', lib_dias:'Libera em {d} dias', lib_fecha:'Libera em: {f}', lib_locale:'pt-BR'
+    lib_hoy:'Libera hoje', lib_manana:'Libera amanhã', lib_dias:'Libera em {d} dias', lib_fecha:'Libera em: {f}', lib_locale:'pt-BR',
+    barrios:'Bairros', borrar_filtro:'Limpar filtro', todos_barrios:'Todos os bairros', sheet_title:'Escolha um bairro', cerrar:'Fechar', clear_aria:'Remover filtro de bairro', u_one:'unidade', u_many:'unidades', panel_todos:'<b>{n}</b> unidades em <b>{z}</b> bairros'
   },
   en: {
     title_todos:'All properties', sub_todos:'Medium and long-term rentals in CABA and GBA Norte',
@@ -865,7 +948,8 @@ const CT = {
     per_month:'per month', per_month_all:'per month · all in', consult:'Ask for price', ver_mas:'See more →',
     disponible:'Available', reservado:'Reserved', reservado_sem:'Reserved this week', serv_allin:'All in', serv_sin:'Not incl.', serv_lbl:'Services',
     amb:'Rooms', sup:'Area', foto_ph:'Unit photo', tipo_temporal:'Medium-term', tipo_tradicional:'Long-term',
-    lib_hoy:'Available today', lib_manana:'Available tomorrow', lib_dias:'Available in {d} days', lib_fecha:'Available: {f}', lib_locale:'en-US'
+    lib_hoy:'Available today', lib_manana:'Available tomorrow', lib_dias:'Available in {d} days', lib_fecha:'Available: {f}', lib_locale:'en-US',
+    barrios:'Neighbourhoods', borrar_filtro:'Clear filter', todos_barrios:'All neighbourhoods', sheet_title:'Choose a neighbourhood', cerrar:'Close', clear_aria:'Remove neighbourhood filter', u_one:'unit', u_many:'units', panel_todos:'<b>{n}</b> units across <b>{z}</b> neighbourhoods'
   }
 };
 const L = () => (window.BAIREN_LANG || 'es');
@@ -914,7 +998,9 @@ function render() {
   const grid = document.getElementById('catalogGrid');
   const list = sorted(filtered());
   updateCatalogHero();
-  document.getElementById('resultsCount').textContent = `${list.length} ${list.length !== 1 ? ct('count_many') : ct('count_one')}`;
+  const rc = document.getElementById('resultsCount');
+  rc.textContent = `${list.length} ${list.length !== 1 ? ct('count_many') : ct('count_one')}`;
+  if (activeBarrio !== 'todos') rc.append(' · ' + activeBarrio);
 
   if (!list.length) {
     grid.innerHTML = `<div class="empty-state"><div class="empty-title">${ct('empty_t')}</div><div class="empty-sub">${ct('empty_s')}</div></div>`;
@@ -977,12 +1063,7 @@ function readURLParams() {
   }
 
   if (pb) {
-    const match = BARRIOS.slice(0,-1).includes(pb) ? pb : 'Otros';
-    activeBarrio = match;
-    // mark pill in dropdown
-    document.getElementById('bdGrid').querySelectorAll('.bd-pill').forEach(b => {
-      b.classList.toggle('active', b.dataset.barrio === match);
-    });
+    activeBarrio = window.BairenZonas.zonaDe(pb) || 'Otros';
     updateBarrioTrigger();
   }
 }
@@ -1087,17 +1168,104 @@ function formatFechaLiberacion(fechaStr) {
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   ZONAS: el mapa es el filtro (una sola fuente de verdad: activeBarrio)
+═══════════════════════════════════════════════════════════════ */
+function buildZonaUI() {
+  zonaCounts = window.BairenZonas.contar(props);
+  ZONAS = Object.keys(zonaCounts).map(k => ({ key: k, n: zonaCounts[k] })).sort((a, b) => b.n - a.n || a.key.localeCompare(b.key));
+  if (activeBarrio !== 'todos' && !zonaCounts[activeBarrio]) activeBarrio = 'todos';
+  mountHeroMap();
+  buildSheetList();
+  syncBarrioUI();
+}
+
+function onZonaPick(z) { selectBarrio(z === activeBarrio ? 'todos' : z); }
+
+function mountHeroMap() {
+  if (window.innerWidth < 960) return;
+  const el = document.getElementById('mapaHero');
+  if (mapaHero) { mapaHero.setCounts(zonaCounts); return; }
+  mapaHero = window.BairenMapa.mount(el, { counts: zonaCounts, active: activeBarrio !== 'todos' ? activeBarrio : null, modo: 'completo', onSelect: onZonaPick, onHover: z => renderPanel(z) });
+}
+function mountSheetMap() {
+  const el = document.getElementById('mapaSheetMap');
+  if (mapaSheet) { mapaSheet.setCounts(zonaCounts); mapaSheet.setActive(activeBarrio !== 'todos' ? activeBarrio : null); mapaSheet.refresh(); return; }
+  mapaSheet = window.BairenMapa.mount(el, { counts: zonaCounts, active: activeBarrio !== 'todos' ? activeBarrio : null, modo: 'lite',
+    onSelect: z => { onZonaPick(z); closeSheet(); } });
+}
+
+function buildSheetList() {
+  // La hoja es solo el mapa: los nombres ya están en él y "Borrar filtro" vive en la barra de filtros
+  document.getElementById('mapaSheetTitle').textContent = ct('sheet_title');
+  document.getElementById('mapaSheetClose').setAttribute('aria-label', ct('cerrar'));
+  document.getElementById('mapaFabLabel').textContent = ct('barrios');
+}
+
+/* Panel de barrio (desktop): muestra el barrio bajo el mouse; si no hay, el elegido; si no, el total */
+let panelShown = null;
+function renderPanel(hoverZ) {
+  const el = document.getElementById('catPanel');
+  const z = hoverZ || (activeBarrio !== 'todos' ? activeBarrio : null);
+  const key = z || 'todos';
+  if (key === panelShown) return;
+  panelShown = key;
+  if (!z) {
+    el.innerHTML = `<p class="cp-default">${ct('panel_todos').replace('{n}', props.length).replace('{z}', ZONAS.length)}</p>`;
+  } else {
+    const n = zonaCounts[z] || 0;
+    el.innerHTML = `<span class="cp-name">${z}</span><span class="cp-n">${n} ${n === 1 ? ct('u_one') : ct('u_many')}</span><p class="cp-desc">${window.BairenZonas.desc(z, L())}</p>`
+      + (z === activeBarrio ? `<button type="button" class="cp-clear">${ct('todos_barrios')} ×</button>` : '');
+    const c = el.querySelector('.cp-clear'); if (c) c.addEventListener('click', () => selectBarrio('todos'));
+  }
+  if (el.animate && !matchMedia('(prefers-reduced-motion: reduce)').matches)
+    el.animate([{ opacity: 0, transform: 'translateY(4px)' }, { opacity: 1, transform: 'none' }], { duration: 220, easing: 'cubic-bezier(.23,1,.32,1)' });
+}
+
+/* Refleja activeBarrio en trigger, panel, mapas, lista de la hoja y URL */
+function syncBarrioUI() {
+  updateBarrioTrigger();
+  panelShown = null; renderPanel(null);
+  if (mapaHero)  mapaHero.setActive(activeBarrio !== 'todos' ? activeBarrio : null);
+  if (mapaSheet) mapaSheet.setActive(activeBarrio !== 'todos' ? activeBarrio : null);
+  try {
+    const u = new URL(location.href);
+    if (activeBarrio === 'todos') u.searchParams.delete('barrio'); else u.searchParams.set('barrio', activeBarrio);
+    history.replaceState(history.state, '', u.pathname + (u.search || '') + u.hash);
+  } catch (e) {}
+}
+
+function selectBarrio(z) {
+  activeBarrio = z || 'todos';
+  syncBarrioUI();
+  render();
+  // Elegir un barrio lleva a sus unidades: si la grilla quedó fuera de pantalla, se desplaza hasta ella
+  if (activeBarrio !== 'todos') {
+    const bar = document.querySelector('.results-bar');
+    const r = bar.getBoundingClientRect();
+    if (r.top > window.innerHeight * 0.55 || r.top < 0) bar.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+let lastDesk = window.innerWidth >= 960;
+window.addEventListener('resize', () => {
+  const desk = window.innerWidth >= 960;
+  if (desk !== lastDesk) { lastDesk = desk; if (desk && props.length) mountHeroMap(); if (!desk) closeSheet(); updateFab(); }
+});
+
+/* ═══════════════════════════════════════════════════════════════
    INIT
 ═══════════════════════════════════════════════════════════════ */
-buildBarrioPills();
 readURLParams();
 
 // Loading state inicial
 document.getElementById('catalogGrid').innerHTML = `<div class="empty-state"><div class="empty-title">${ct('loading')}</div></div>`;
 document.getElementById('resultsCount').textContent = '';
 
-loadFromSupabase().then(() => render());
-document.addEventListener('bairen:lang', () => { if (Array.isArray(props) && props.length) render(); });
+loadFromSupabase().then(() => { buildZonaUI(); render(); });
+document.addEventListener('bairen:lang', () => {
+  if (!Array.isArray(props) || !props.length) return;
+  buildSheetList(); syncBarrioUI(); render();
+});
 </script>
 <script src="/premium.js" defer></script>
 </body>
