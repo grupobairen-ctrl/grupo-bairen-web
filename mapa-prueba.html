@@ -499,8 +499,9 @@ footer{
 .filter-clear[hidden]{display:none;}
 @media(min-width:960px){.filter-clear{margin-left:0;margin-right:8px;}}
 @media(max-width:700px){.filter-clear{height:44px;padding:0 10px;font-size:.7rem;}}
-.ico-logo{width:18px;height:18px;display:block;border-radius:50%;flex-shrink:0;}
-.barrio-trigger .ico-logo{margin-right:9px;}
+.ico-loc{width:16px;height:16px;flex-shrink:0;display:block;}
+.barrio-trigger .ico-loc{margin-right:8px;opacity:.9;}
+.mapa-fab .ico-loc{width:15px;height:15px;}
 .cat-hero-mapa{min-width:0;display:none;}
 .mapa-wrap{padding:8px 96px 8px 8px;max-width:760px;margin:0 auto;}
 @media(min-width:960px){
@@ -540,7 +541,7 @@ footer{
 .ms-item:active{opacity:.7;}
 /* Pastilla flotante (mobile) */
 .mapa-fab{position:fixed;left:50%;bottom:22px;transform:translate(-50%,16px);z-index:900;display:none;align-items:center;gap:8px;height:44px;padding:0 18px;border:1px solid rgba(194,169,104,.6);background:var(--navy-deeper);color:var(--gold-light);font-family:var(--font-body);font-size:.7rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;box-shadow:0 8px 24px rgba(19,29,45,.35);opacity:0;pointer-events:none;transition:opacity .2s ease,transform .25s var(--ease);cursor:pointer;-webkit-tap-highlight-color:transparent;}
-.mapa-fab svg{width:14px;height:14px;flex-shrink:0;}
+
 .mapa-fab.show{opacity:1;pointer-events:auto;transform:translate(-50%,0);}
 @media(max-width:959px){.mapa-fab{display:inline-flex;}}
 @media(max-width:700px){.results-clear{display:none;}}
@@ -664,7 +665,7 @@ body.sheet-open{overflow:hidden;}
 
   <!-- BARRIO DROPDOWN TRIGGER -->
   <button class="barrio-trigger" id="barrioTrigger" aria-haspopup="dialog" aria-controls="mapaSheet" aria-expanded="false">
-    <img class="ico-logo" src="/bairen_logo.png?v=3" alt="" aria-hidden="true">
+    <svg class="ico-loc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6.5-8 12.5-8 12.5S4 16.5 4 10a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="2.8"/></svg>
     <span class="bt-label" data-i18n="cat_barrios">Barrios</span>
     <span class="bt-badge" id="btBadge">1</span>
     <span class="bt-arrow"></span>
@@ -718,7 +719,7 @@ body.sheet-open{overflow:hidden;}
   <div class="ms-map"><div id="mapaSheetMap" role="group" aria-label="Mapa de barrios"></div></div>
 </div>
 <button class="mapa-fab" id="mapaFab" type="button" aria-haspopup="dialog" aria-controls="mapaSheet">
-  <img class="ico-logo" src="/bairen_logo.png?v=3" alt="" aria-hidden="true">
+  <svg class="ico-loc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6.5-8 12.5-8 12.5S4 16.5 4 10a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="2.8"/></svg>
   <span id="mapaFabLabel">Barrios</span>
 </button>
 
