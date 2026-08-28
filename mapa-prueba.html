@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Mapa de barrios · prueba — BAIREN</title>
+<link rel="icon" href="bairen_logo.png?v=3">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --navy:#2A3A52; --navy-dark:#1E2A3F; --navy-deeper:#131D2D;
+  --gold:#C2A968; --gold-dark:#8A7547; --gold-light:#DECDA0;
+  --white:#FBFAF6; --off-white:#EEE5D0; --gray-light:#D6D2C8;
+  --text-dark:#1A2538; --text-mid:#6B7589;
+  --font-display:'Playfair Display',Georgia,serif;
+  --font-body:'Jost',sans-serif;
+  --ease:cubic-bezier(0.22,1,0.36,1);
+  --nav-h:64px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{background:var(--navy-deeper);}
+body{font-family:var(--font-body);font-weight:300;color:var(--white);background:var(--navy-deeper);-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+a{color:inherit;text-decoration:none;}
+button{cursor:pointer;font-family:var(--font-body);}
+
+/* NAV (igual al catálogo) */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:var(--nav-h);background:var(--navy-deeper);border-bottom:1px solid var(--gold);display:flex;align-items:center;justify-content:space-between;padding:0 28px;}
+.nav-links{display:flex;gap:30px;}
+.nav-links a{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.75);}
+.nav-links a.active,.nav-links a:hover{color:var(--gold);}
+.lang-switch{display:flex;gap:6px;}
+.flag{font-size:.62rem;letter-spacing:.1em;padding:5px 8px;border:1px solid transparent;background:none;color:rgba(255,255,255,.55);}
+.flag.active{border-color:var(--gold);color:var(--gold);}
+@media(max-width:800px){.nav-links{display:none;}}
+
+/* SECCIÓN MAPA */
+.mp{margin-top:var(--nav-h);padding:56px 24px 72px;position:relative;overflow:hidden;}
+.mp::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 55% 60% at 50% 45%, rgba(194,169,104,.06) 0%, transparent 70%);}
+.mp-inner{position:relative;z-index:1;max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1fr;grid-template-areas:"hd" "map" "res";gap:28px;}
+.mp-hd{grid-area:hd;} .mp-map{grid-area:map;} .mp-res{grid-area:res;}
+@media(min-width:960px){.mp-inner{grid-template-columns:4fr 8fr;grid-template-areas:"hd map" "res map";grid-template-rows:auto 1fr;gap:0 56px;align-items:start;align-content:center;min-height:calc(100vh - var(--nav-h) - 128px);}}
+.mp-eyebrow{font-size:.58rem;letter-spacing:.4em;text-transform:uppercase;color:var(--gold);opacity:.8;margin-bottom:14px;}
+.mp-title{font-family:var(--font-display);font-size:clamp(1.85rem,4.2vw,2.8rem);font-weight:500;line-height:1.14;letter-spacing:-.008em;margin-bottom:12px;}
+.mp-title em{font-style:italic;font-weight:400;color:var(--gold-light);}
+.mp-sub{font-size:.9rem;color:rgba(255,255,255,.55);line-height:1.7;max-width:380px;}
+.mp-sub b{font-weight:500;color:var(--gold-light);}
+
+/* Mapa: el componente dibuja adentro */
+.mp-map{width:100%;max-width:820px;margin:0 auto;padding:12px 100px 12px 12px;align-self:center;} /* padding derecho: los rótulos de Retiro y Puerto Madero salen del polígono */
+@media(max-width:640px){.mp-map{padding:4px 12px 4px 0;}}
+
+/* Resultado de la zona elegida */
+.mp-res{margin-top:28px;min-height:64px;}
+@media(max-width:959px){.mp-res{margin-top:0;}}
+.mp-hint{font-size:.78rem;letter-spacing:.06em;color:rgba(255,255,255,.4);}
+.mp-res-h{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;border-top:1px solid rgba(194,169,104,.25);padding-top:18px;margin-top:6px;}
+.mp-res-h h2{font-family:var(--font-display);font-weight:500;font-size:1.35rem;}
+.mp-res-h h2 span{font-family:var(--font-body);font-weight:300;font-size:.8rem;letter-spacing:.06em;color:var(--gold-light);margin-left:10px;}
+.mp-res-h a{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);border-bottom:1px solid rgba(194,169,104,.35);padding-bottom:3px;transition:color .2s;}
+.mp-res-h a:hover{color:var(--gold-light);}
+.mp-list{list-style:none;margin-top:14px;display:grid;gap:6px;}
+.mp-list li{animation:mpIn .32s cubic-bezier(.23,1,.32,1) both;animation-delay:calc(var(--i,0)*35ms);}
+@keyframes mpIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+@media(prefers-reduced-motion:reduce){.mp-list li{animation:none;}}
+.mp-list a{display:flex;justify-content:space-between;gap:12px;font-size:.84rem;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.07);transition:color .2s;}
+.mp-list a:hover{color:var(--gold-light);}
+.mp-list .b{font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);opacity:.85;white-space:nowrap;}
+.mp-list .r{opacity:.5;}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html"><img src="bairen_logo.png?v=3" alt="BAIREN" style="height:46px;width:auto;display:block;"></a>
+  <div class="nav-links">
+    <a href="comprar.html" data-i18n="nav_comprar">Comprar</a>
+    <a href="catalogo.html" class="active" data-i18n="nav_alquilar">Alquilar</a>
+    <a href="psi.html">Personal Shopper</a>
+    <a href="index.html#contacto" data-i18n="nav_contacto">Contacto</a>
+  </div>
+  <div class="lang-switch">
+    <button class="flag" data-lang="es" aria-label="Español">ES</button>
+    <button class="flag" data-lang="pt" aria-label="Português">PT</button>
+    <button class="flag" data-lang="en" aria-label="English">EN</button>
+  </div>
+</nav>
+
+<section class="mp" aria-labelledby="mpTitle">
+  <div class="mp-inner">
+    <div class="mp-hd">
+      <p class="mp-eyebrow">BAIREN · Buenos Aires</p>
+      <h1 class="mp-title" id="mpTitle" data-i18n="mapa_title">Elegí un barrio</h1>
+      <p class="mp-sub" id="mpSub">&nbsp;</p>
+    </div>
+
+    <div class="mp-map" id="mapa" role="group" aria-label="Mapa de barrios"></div>
+
+    <div class="mp-res" id="mpRes" aria-live="polite">
+      <p class="mp-hint" data-i18n="mapa_hint">Elegí un barrio del mapa para ver sus unidades</p>
+    </div>
+  </div>
+</section>
+
+<script src="i18n.js"></script>
+<script src="supabase-config.js"></script>
+<script src="mapa-barrios.js"></script>
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const TT = {
+    es:{ sub:'<b>{n}</b> unidades en <b>{z}</b> barrios de Buenos Aires', one:'unidad', many:'unidades', ver:'Ver en el catálogo →', reservado:'Reservada' },
+    pt:{ sub:'<b>{n}</b> unidades em <b>{z}</b> bairros de Buenos Aires',  one:'unidade', many:'unidades', ver:'Ver no catálogo →', reservado:'Reservada' },
+    en:{ sub:'<b>{n}</b> units across <b>{z}</b> neighbourhoods of Buenos Aires', one:'unit', many:'units', ver:'See in the catalogue →', reservado:'Reserved' }
+  };
+  const L = () => TT[window.BAIREN_LANG] || TT.es;
+  let props = [], counts = {}, zona = null;
+
+  const mapa = window.BairenMapa.mount($('mapa'), {
+    counts: {},
+    onSelect(k){
+      zona = (zona === k) ? null : k; mapa.setActive(zona); renderRes();
+      if (zona && window.innerWidth < 960) {
+        const r = $('mpRes').getBoundingClientRect();
+        if (r.top > window.innerHeight - 120) $('mpRes').scrollIntoView({ behavior:'smooth', block:'start' });
+      }
+    }
+  });
+
+  function renderSub(){
+    const n = Object.values(counts).reduce((a,b)=>a+b,0);
+    const z = Object.keys(counts).filter(k=>counts[k]>0).length;
+    $('mpSub').innerHTML = L().sub.replace('{n}', n).replace('{z}', z);
+  }
+
+  function renderRes(){
+    const t = L();
+    if (!zona){ $('mpRes').innerHTML = '<p class="mp-hint">'+({es:'Elegí un barrio del mapa para ver sus unidades',pt:'Escolha um bairro no mapa para ver as unidades',en:'Pick a neighbourhood on the map to see its units'}[window.BAIREN_LANG]||'Elegí un barrio del mapa para ver sus unidades')+'</p>'; return; }
+    const list = props.filter(p => window.BairenZonas.zonaDe(p.barrio) === zona);
+    const n = list.length;
+    $('mpRes').innerHTML =
+      '<div class="mp-res-h"><h2>'+zona+'<span>'+n+' '+(n===1?t.one:t.many)+'</span></h2>'+
+      '<a href="catalogo.html?barrio='+encodeURIComponent(zona)+'">'+t.ver+'</a></div>'+
+      '<ul class="mp-list">'+ list.map((p,i) =>
+        '<li style="--i:'+i+'"><a href="propiedades/'+encodeURIComponent(p.slug)+'">'+
+        '<span>'+p.dir+(p.unidad?' '+p.unidad:'')+(p.estado==='Reservado'?' <span class="r">· '+t.reservado+'</span>':'')+'</span>'+
+        '<span class="b">'+p.barrio+'</span></a></li>').join('') + '</ul>';
+  }
+
+  document.addEventListener('bairen:lang', () => { renderSub(); renderRes(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && zona) { zona = null; mapa.setActive(null); renderRes(); } });
+
+  window.bairenReady.then(async sb => {
+    const { data, error } = await sb.from('propiedades')
+      .select('slug,dir,unidad,barrio,tipo,estado')
+      .eq('publicada', true)
+      .order('created_at', { ascending:false });
+    if (error){ console.error(error); return; }
+    props  = (data||[]).filter(p => p.tipo !== 'Venta');
+    counts = window.BairenZonas.contar(props);
+    const sinZona = props.filter(p => !window.BairenZonas.zonaDe(p.barrio)).map(p=>p.barrio);
+    if (sinZona.length) console.warn('[mapa] barrios sin zona:', sinZona);
+    mapa.setCounts(counts);
+    renderSub();
+    // Deep-link: ?barrio=Palermo (mismo parámetro que usa el catálogo)
+    const pre = new URLSearchParams(location.search).get('barrio');
+    const preZ = pre && window.BairenZonas.zonaDe(pre);
+    if (preZ && counts[preZ]) { zona = preZ; mapa.setActive(preZ); renderRes(); }
+  }).catch(console.error);
+})();
+</script>
+</body>
+</html>

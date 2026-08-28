@@ -1,0 +1,413 @@
+/* ═══════════════════════════════════════════════════════════════════
+   BAIREN · Mapa interactivo de barrios (CABA)
+   ───────────────────────────────────────────────────────────────────
+   Dos cosas viven acá:
+
+   1. window.BairenZonas — la lógica de ZONAS (compartida con el catálogo):
+        zonaDe('Palermo Soho')  → 'Palermo'
+        contar(props)           → { Palermo: 12, Recoleta: 9, … }
+        lista()                 → nombres canónicos para filtros/pills
+      Una zona agrupa barrios "comerciales" (Palermo Soho, Hollywood,
+      Las Cañitas → Palermo). La tarjeta y la ficha siguen mostrando el
+      barrio específico; solo el filtro y el mapa agrupan.
+
+   2. window.BairenMapa.mount(el, opts) — el mapa SVG con un isotipo por
+      zona con inventario. Los polígonos son los 48 barrios oficiales
+      (Buenos Aires Data, simplificados a ~14 KB). Los pins son HTML
+      posicionados en %, así mantienen tamaño fijo en px en cualquier
+      pantalla. El encuadre se recorta al área con inventario y los
+      bordes cortados se desvanecen. Los rótulos se colocan solos:
+      prueban derecha / izquierda / abajo / arriba y toman el primer
+      lado sin colisión; si no entra ninguno, el rótulo se oculta
+      (queda el badge con el número; el nombre vive en aria-label).
+
+      opts: { counts, lang, active, onSelect(zona), onHover(zona|null) }
+      devuelve: { setCounts, setLang, setActive, refresh }
+   ═══════════════════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
+
+  const VB = [0, 0, 1000, 1106.4];
+  const PATHS = {"Agronomia":"M283.3 403.7 268.3 452.8 244.8 441.0 174.9 435.2 142.5 420.5 144.8 420.1 142.8 417.5 217.6 360.9 238.4 387.5Z","Almagro":"M588.3 441.6 609.1 442.5 598.9 499.7 598.0 503.8 595.1 505.6 596.1 521.3 604.2 542.2 605.9 582.6 528.2 591.5 520.8 548.3 516.8 550.5 513.6 491.6 500.0 471.4 505.6 468.1 519.9 449.5 533.4 442.2 553.4 440.7Z","Balvanera":"M705.8 452.6 711.5 524.7 712.0 567.2 651.9 571.5 605.9 582.6 604.2 542.2 596.1 521.3 595.1 505.6 598.0 503.8 598.9 499.7 609.1 442.5 646.8 442.7 659.5 451.0 676.3 453.4Z","Barracas":"M819.2 637.4 834.5 765.1 824.3 772.5 822.5 777.3 823.6 786.4 809.6 795.1 801.6 806.1 745.3 812.8 738.8 818.1 732.3 827.1 716.8 832.5 712.6 837.9 708.1 839.7 698.8 839.8 692.3 837.6 684.4 838.5 680.3 833.7 666.1 829.2 644.1 763.0 655.8 746.1 666.7 742.9 667.2 739.0 713.6 715.3 713.2 707.5 721.3 703.7 718.9 666.0 754.3 654.3 764.8 645.7 765.2 659.5 770.9 659.3 778.6 643.6 776.5 636.4 799.3 620.7 817.6 619.8Z","Belgrano":"M412.2 56.4 400.2 57.2 394.4 62.1 390.5 67.8 394.3 76.1 404.1 80.9 409.1 72.1 415.8 67.2 415.0 59.6 419.9 56.1 421.3 57.7 418.2 60.8 422.4 67.5 427.2 61.9 433.6 58.9 446.4 59.7 454.4 66.9 454.4 65.2 457.1 70.6 458.0 68.9 459.3 74.8 460.6 73.3 462.1 85.4 464.4 84.9 464.8 78.7 465.0 82.6 470.0 84.4 479.3 83.6 478.5 82.3 487.0 87.3 491.8 95.4 495.6 95.1 491.9 95.9 492.9 98.7 510.2 113.2 513.0 120.3 513.3 128.9 516.4 126.4 517.7 128.9 515.8 133.0 514.0 130.1 513.1 131.5 519.7 138.5 523.4 140.1 529.6 134.5 532.0 136.3 533.4 134.1 541.8 139.1 533.9 157.9 520.0 151.4 512.0 152.4 494.5 164.4 493.3 167.7 496.0 170.0 477.8 183.5 465.2 189.4 460.7 194.3 459.0 200.0 464.4 210.8 476.3 218.2 491.7 218.4 492.2 220.3 489.5 223.1 460.1 220.6 453.1 230.2 426.1 248.9 420.0 256.0 403.5 245.2 376.3 263.0 375.9 266.3 347.1 300.2 326.7 284.7 323.1 287.2 296.1 248.6 331.2 220.9 325.1 217.8 328.4 215.5 317.4 200.7 399.8 148.6 394.0 141.8 394.1 139.2 418.8 100.0 406.4 91.8 391.0 85.6 367.0 70.0 370.7 66.3 395.5 52.9 406.3 32.2 409.9 36.1 414.5 49.2 415.1 53.6Z","La Boca":"M918.0 574.4 920.5 576.6 926.6 577.3 935.3 572.2 951.9 572.4 951.5 576.3 948.9 577.6 943.1 573.7 938.9 578.6 945.1 596.9 944.3 591.1 945.7 590.2 946.0 591.7 947.4 588.1 951.4 586.9 954.6 589.5 953.4 579.7 958.0 570.7 967.4 569.2 982.5 570.2 988.0 578.7 991.0 589.9 989.5 594.3 985.7 596.0 977.8 594.6 965.6 596.1 964.5 592.5 959.9 595.4 963.2 599.5 965.7 597.4 975.1 598.7 984.3 607.7 990.5 608.9 999.9 618.4 1000.0 622.5 994.7 629.2 979.0 633.7 976.6 627.1 971.9 627.1 962.9 616.8 953.6 618.1 968.2 633.7 962.5 637.1 958.4 635.7 952.0 628.1 947.9 632.3 939.4 623.7 930.7 632.4 932.3 634.0 930.6 634.8 932.3 639.6 934.8 640.1 933.0 642.2 934.9 647.6 936.2 646.2 936.8 649.1 944.3 650.8 929.2 656.3 923.6 654.9 918.6 648.9 912.3 634.4 909.2 635.3 904.2 628.7 872.0 603.0 869.1 604.9 864.5 601.1 868.3 605.8 867.0 607.6 899.5 634.3 905.1 644.7 910.3 662.6 906.5 675.9 903.3 680.8 893.6 687.2 883.5 697.4 871.7 697.4 867.7 698.6 866.1 701.6 868.9 706.9 883.0 714.0 887.1 727.4 885.7 733.2 874.4 739.3 861.3 752.8 851.4 753.3 834.5 765.1 819.2 637.4 833.0 622.8 832.9 610.8 857.2 610.4 893.8 563.8 898.2 575.8 902.7 575.3 903.6 576.8 906.5 574.9 910.7 577.2 911.3 575.8 914.6 576.3 916.6 573.5Z","Boedo":"M609.8 642.7 611.1 658.2 616.3 672.9 612.4 690.6 550.1 703.6 528.2 591.5 605.9 582.6 608.4 597.0 606.9 597.4Z","Caballito":"M528.2 591.5 533.5 621.9 407.1 644.5 350.4 500.5 372.0 482.7 434.2 502.0 470.1 489.4 500.0 471.4 513.6 491.6 516.8 550.5 520.8 548.3Z","Chacarita":"M363.1 320.6 375.7 321.5 387.6 325.4 409.9 334.1 443.6 350.9 441.7 359.0 473.5 384.8 412.1 420.2 387.2 441.5 367.9 434.3 345.0 432.8 335.6 434.5 341.9 408.8 329.4 396.7 354.7 368.5 362.3 365.3 361.5 320.6Z","Coghlan":"M317.4 200.7 328.4 215.5 325.1 217.8 331.2 220.9 298.1 247.2 289.9 249.5 287.2 245.8 281.8 249.7 265.9 232.5 267.2 231.7 260.4 227.9 256.5 222.8 244.2 201.8 295.0 167.3Z","Colegiales":"M420.0 256.0 462.3 282.3 445.8 302.4 466.4 322.1 448.6 342.2 443.4 350.7 409.9 334.1 387.6 325.4 375.7 321.5 363.1 320.6 347.1 300.2 375.9 266.3 376.3 263.0 403.5 245.2Z","Constitucion":"M794.1 623.8 776.5 636.4 778.6 643.6 770.9 659.3 765.2 659.5 764.8 645.7 754.3 654.3 718.9 666.0 714.7 623.5 712.0 567.2 785.1 562.9 786.5 600.9 788.2 610.3Z","Flores":"M407.1 644.5 392.8 649.8 407.8 686.7 444.4 719.8 450.4 713.4 479.2 747.9 491.9 741.0 514.8 763.5 476.2 800.2 451.0 776.0 449.1 771.6 442.5 770.1 421.1 771.5 391.5 769.4 389.4 778.5 362.2 806.4 328.4 773.4 348.9 740.6 317.1 711.0 273.5 593.4 320.2 563.5 367.0 540.8Z","Floresta":"M273.5 593.4 306.6 681.7 295.5 685.7 282.4 695.8 169.7 587.1 198.0 558.4 248.4 607.3Z","Liniers":"M106.2 670.3 121.5 677.0 125.8 676.5 131.6 682.1 107.0 686.1 110.5 702.4 148.8 738.4 29.3 806.9 11.8 790.9 5.9 670.2 36.8 668.2 55.2 664.2 54.9 660.4 57.4 657.8 84.8 660.3Z","Mataderos":"M184.4 732.4 268.4 812.8 232.1 841.3 216.8 846.9 175.6 895.3 147.6 915.9 29.3 806.9 175.1 723.5Z","Monserrat":"M834.1 497.6 839.2 551.6 784.7 555.7 785.1 562.9 712.0 567.2 710.7 512.4 814.6 503.7 821.0 499.4 821.6 495.6Z","Monte Castro":"M187.1 547.8 198.0 558.4 169.7 587.1 142.7 603.6 123.4 625.6 101.2 605.1 77.1 630.9 50.3 605.9 94.1 558.4 159.5 511.3Z","Nueva Pompeya":"M655.8 746.1 644.1 763.0 664.4 826.1 654.1 822.1 632.9 826.2 627.2 825.1 612.8 817.3 602.3 816.3 567.8 827.2 547.3 838.8 533.6 817.9 494.4 783.5 514.8 763.5 491.9 741.0 506.2 734.3 505.0 713.2 512.3 711.3 612.4 690.6 601.3 723.8 608.1 755.5Z","Nuñez":"M370.7 66.3 367.0 70.0 372.9 74.9 391.0 85.6 406.4 91.8 418.8 100.0 394.1 139.2 394.0 141.8 399.8 148.6 317.4 200.7 290.7 160.5 322.5 138.9 283.0 75.1 344.9 41.9 358.8 22.5 368.0 4.1 375.4 0.0 386.7 5.8 393.7 15.6 402.1 19.4 407.3 24.3 389.8 54.3Z","Palermo":"M541.4 152.9 538.9 158.8 589.9 175.8 613.0 191.0 618.4 186.6 621.3 186.5 621.7 189.6 617.8 195.4 649.9 228.9 675.9 212.0 649.7 229.4 656.5 231.8 664.1 228.0 665.3 229.3 664.1 232.3 666.1 234.0 673.8 230.0 684.9 238.3 685.7 243.4 668.8 263.1 670.2 264.2 682.5 248.8 685.1 248.6 691.2 255.2 694.2 262.8 697.4 264.5 706.2 283.1 694.2 282.8 669.1 265.2 671.2 274.2 656.3 294.9 663.9 304.7 687.3 321.9 667.0 358.8 659.9 352.3 638.3 352.5 618.4 387.2 596.5 418.1 588.3 441.6 550.8 440.9 532.5 431.4 441.7 359.0 443.4 350.7 448.6 342.2 466.4 322.1 445.8 302.4 462.3 282.3 420.0 256.0 426.1 248.9 453.1 230.2 460.1 220.6 484.2 223.3 489.5 223.1 492.2 220.3 491.7 218.4 479.9 219.0 469.9 215.3 461.7 207.7 459.0 200.0 460.7 194.3 465.2 189.4 477.8 183.5 496.0 170.0 493.3 167.7 494.5 164.4 508.4 154.2 518.2 151.3 538.7 158.7 546.3 140.8Z","Parque Avellaneda":"M362.2 806.4 341.6 826.5 325.2 810.8 315.5 820.6 310.4 816.4 300.5 843.3 184.4 732.4 269.8 683.8 282.4 695.8 295.5 685.7 306.6 681.7 317.1 711.0 348.9 740.6 328.4 773.4Z","Parque Chacabuco":"M550.1 703.6 505.0 713.2 506.2 734.3 479.2 747.9 450.4 713.4 444.4 719.8 407.8 686.7 392.8 649.8 407.1 644.5 533.5 621.9Z","Parque Chas":"M309.1 377.2 283.3 403.7 238.4 387.5 217.6 360.9 267.5 325.7 285.7 330.9 295.1 342.0Z","Parque Patricios":"M718.9 666.0 721.3 703.7 713.2 707.5 713.6 715.3 667.2 739.0 668.1 741.7 664.2 744.0 608.1 755.5 601.3 723.8 616.2 675.8 611.1 658.2 609.8 642.7 627.2 637.5 714.7 623.5Z","Paternal":"M329.4 396.7 341.9 408.8 335.6 434.5 345.0 432.8 367.9 434.3 383.4 440.0 373.6 478.6 369.6 481.9 318.8 466.4 292.8 487.7 275.1 460.0 280.7 456.1 268.3 452.8 284.1 401.1 309.1 377.2Z","Puerto Madero":"M918.0 574.4 916.6 573.5 914.6 576.3 911.3 575.8 910.7 577.2 906.5 574.9 903.6 576.8 902.7 575.3 898.2 575.8 893.8 563.8 857.2 610.4 844.0 603.3 830.7 461.2 825.0 444.5 857.0 442.9 855.9 437.1 877.3 425.4 894.2 424.7 906.9 434.4 912.2 442.1 940.6 469.3 945.4 496.4 967.8 515.9 970.9 520.9 975.4 540.7 976.0 554.5 971.7 559.4 949.7 563.4 929.1 559.0 923.0 561.5 920.3 567.3 925.4 567.6 924.5 570.7 920.7 569.7 922.5 572.0ZM850.7 531.6 849.3 529.8 849.3 531.7 845.6 532.4 848.5 563.6 852.3 563.5 852.6 565.4 853.7 563.3 857.4 562.8 854.4 531.5ZM846.8 488.8 845.2 487.0 845.2 489.0 841.6 489.5 845.1 527.5 848.9 527.4 849.2 529.2 850.3 527.2 854.0 526.6 850.4 488.7ZM843.3 449.7 841.4 447.0 841.5 449.8 837.9 450.6 841.2 485.1 844.8 484.9 845.2 486.5 850.0 484.1 846.7 449.7ZM854.2 567.7 852.7 566.0 852.6 567.9 849.0 568.4 851.8 599.7 859.9 599.1 863.0 601.6 860.6 598.2 857.8 567.6Z","Recoleta":"M791.8 315.5 788.4 315.9 802.3 325.6 796.4 334.3 791.2 330.8 772.4 332.1 755.2 320.7 738.1 319.4 721.4 320.0 712.3 336.3 736.1 353.1 744.5 364.4 748.7 374.2 752.8 377.5 731.1 403.2 734.6 422.4 736.7 450.5 676.3 453.4 659.5 451.0 646.8 442.7 588.3 441.6 596.5 418.1 618.4 387.2 638.3 352.5 659.9 352.3 667.0 358.8 687.3 321.9 663.9 304.7 656.3 294.9 671.2 274.2 669.1 265.2 694.2 282.8 706.2 283.1 705.5 281.5 744.6 308.2 754.3 307.4 757.1 302.4 714.3 273.0 715.4 269.7 719.1 265.1 749.8 262.4 755.7 259.2 766.3 260.1 768.0 269.9 769.8 269.8 769.6 260.6 771.2 258.5 771.5 271.5 778.7 271.8 816.9 299.2 778.3 272.2 769.8 272.2 769.0 275.7 780.2 283.5 780.4 286.2 753.5 288.9 753.5 290.4 762.4 296.5 794.4 293.4 818.7 310.1 818.8 312.9Z","Retiro":"M891.4 424.1 877.3 425.4 855.9 437.1 857.0 442.9 736.7 450.5 734.6 422.4 731.1 403.2 752.8 377.5 748.7 374.2 744.5 364.4 736.1 353.1 712.3 336.3 721.4 320.0 753.4 320.2 772.4 332.1 791.2 330.8 796.4 334.3 802.3 325.6 788.4 315.9 791.8 315.5 800.7 323.1 833.1 320.0 846.4 329.3 846.7 332.1 819.6 334.7 819.5 336.0 827.8 341.8 865.2 338.2 866.3 349.5 842.4 351.8 842.2 353.1 848.3 359.0 873.9 356.6 874.9 367.7 854.9 369.7 855.5 377.3 875.5 375.6 876.2 381.1 869.2 384.1 869.7 386.4 868.9 384.1 832.8 393.0 833.2 395.7 840.3 399.0 851.2 419.4 848.9 420.6 837.4 401.6 836.4 402.6 840.9 411.5 838.2 412.8 833.4 405.1 837.1 413.4 827.2 418.7 833.2 439.2 840.4 438.9 841.0 443.9 842.4 443.8 842.1 438.7 853.9 437.5 851.0 427.1 852.6 425.9 856.1 434.2 871.5 427.1 873.2 423.9 903.3 421.9 919.6 425.2 903.4 422.1 890.3 423.1Z","Saavedra":"M295.0 167.3 245.0 201.4 206.4 223.8 201.6 215.4 116.7 265.5 114.5 269.2 110.2 264.7 157.7 142.3 283.0 75.1 322.5 138.9 290.7 160.5Z","San Cristobal":"M714.7 623.5 627.2 637.5 609.8 642.7 606.9 597.4 608.4 597.0 605.9 582.6 651.9 571.5 712.0 567.2Z","San Nicolas":"M834.1 497.6 821.6 495.6 821.0 499.4 814.6 503.7 710.7 512.4 705.8 452.6 825.0 444.5 830.7 461.2Z","San Telmo":"M855.9 610.3 832.9 610.8 833.0 622.8 819.2 637.4 817.6 619.8 799.3 620.7 794.1 623.8 788.2 610.3 786.5 600.9 784.7 555.7 839.2 551.6 844.0 603.3Z","Velez Sarsfield":"M269.8 683.8 222.6 710.4 194.5 683.6 195.6 680.8 192.1 681.6 160.6 651.5 155.2 654.2 123.4 625.6 142.7 603.6 169.7 587.1Z","Versalles":"M50.3 605.9 117.8 669.0 106.2 670.3 84.8 660.3 57.4 657.8 54.9 660.4 55.2 664.2 36.8 668.2 5.9 670.2 3.6 625.2 44.2 600.2Z","Villa Crespo":"M550.8 440.9 533.4 442.2 528.3 444.5 519.9 449.5 505.6 468.1 470.1 489.4 434.2 502.0 369.6 481.9 373.6 478.6 383.4 440.0 387.2 441.5 412.1 420.2 473.5 384.8 532.5 431.4Z","Villa Del Parque":"M268.3 452.8 280.7 456.1 275.1 460.0 292.8 487.7 274.5 500.4 218.3 517.6 187.1 547.8 129.1 469.6 175.1 435.0 244.8 441.0Z","Villa Devoto":"M142.8 417.5 144.8 420.1 142.5 420.5 174.9 435.2 129.1 469.6 159.5 511.3 94.1 558.4 74.2 580.0 10.4 522.3 81.4 339.0 86.6 341.9Z","Villa Gral. Mitre":"M369.6 481.9 372.0 482.7 350.4 500.5 367.0 540.8 341.1 552.6 305.0 573.4 260.3 505.2 280.9 496.6 318.8 466.4Z","Villa Lugano":"M341.6 826.5 321.2 848.8 317.2 850.1 312.3 848.5 311.4 853.6 339.9 881.1 347.8 884.2 364.6 904.5 366.5 909.9 375.8 915.1 411.9 950.1 346.9 1022.9 283.8 963.1 245.3 1005.3 147.6 915.9 175.6 895.3 216.8 846.9 232.1 841.3 268.4 812.8 300.5 843.3 310.4 816.4 315.5 820.6 325.2 810.8Z","Villa Luro":"M123.4 625.6 155.2 654.2 160.6 651.5 192.1 681.6 195.6 680.8 194.5 683.6 222.6 710.4 184.4 732.4 175.1 723.5 148.8 738.4 110.5 702.4 107.0 686.1 131.6 682.1 125.8 676.5 121.5 677.0 106.2 670.3 117.8 669.0 77.1 630.9 101.2 605.1Z","Villa Ortuzar":"M347.1 300.2 363.1 320.6 361.5 320.6 362.3 365.3 354.7 368.5 329.4 396.7 309.2 377.3 295.1 342.0 285.7 330.9 267.5 325.7 326.7 284.7Z","Villa Pueyrredon":"M114.5 269.2 145.5 291.2 217.6 360.9 142.8 417.5 86.6 341.9 81.4 339.0 110.2 264.7Z","Villa Real":"M74.2 580.0 50.3 605.9 44.2 600.2 3.6 625.2 0.0 550.8 10.4 522.3Z","Villa Riachuelo":"M444.2 980.4 355.5 1106.4 245.3 1005.3 283.8 963.1 346.9 1022.9 409.3 953.2 410.2 955.3 415.5 953.0Z","Villa Santa Rita":"M305.0 573.4 248.4 607.3 187.1 547.8 218.3 517.6 260.3 505.2Z","Villa Soldati":"M494.4 783.5 533.6 817.9 547.3 838.8 530.2 856.3 444.2 980.4 415.5 953.0 409.5 955.0 411.2 948.9 375.8 915.1 367.2 910.6 364.6 904.5 347.8 884.2 339.9 881.1 312.5 855.0 311.3 849.5 321.2 848.8 389.4 778.5 391.5 769.4 421.1 771.5 442.5 770.1 449.1 771.6 451.0 776.0 476.2 800.2Z","Villa Urquiza":"M298.1 247.2 296.1 248.6 323.1 287.2 217.6 360.9 145.5 291.2 114.5 269.2 116.7 265.5 201.6 215.4 206.4 223.8 244.2 201.8 256.5 222.8 260.4 227.9 267.2 231.7 265.9 232.5 281.8 249.7 287.2 245.8 289.9 249.5Z"};
+  const CENT = {"Agronomia":[218.2,411.2],"Almagro":[559.0,512.0],"Balvanera":[654.2,511.2],"Barracas":[749.9,742.0],"Belgrano":[414.2,174.8],"La Boca":[889.7,647.1],"Boedo":[573.8,640.3],"Caballito":[447.7,559.0],"Chacarita":[393.8,382.9],"Coghlan":[288.1,211.2],"Colegiales":[410.2,298.0],"Constitucion":[749.3,609.8],"Flores":[373.0,682.6],"Floresta":[244.1,626.2],"Liniers":[63.1,725.9],"Mataderos":[151.7,816.1],"Monserrat":[773.4,533.4],"Monte Castro":[127.0,574.3],"Nueva Pompeya":[573.6,767.5],"Nuñez":[351.0,103.9],"Palermo":[556.0,293.1],"Parque Avellaneda":[280.4,755.9],"Parque Chacabuco":[477.8,677.3],"Parque Chas":[266.8,365.3],"Parque Patricios":[661.2,687.2],"Paternal":[320.1,438.9],"Puerto Madero":[891.9,511.8],"Recoleta":[695.6,366.9],"Retiro":[792.0,383.1],"Saavedra":[217.8,164.5],"San Cristobal":[660.2,602.5],"San Nicolas":[769.0,477.6],"San Telmo":[814.7,588.0],"Velez Sarsfield":[194.7,648.9],"Versalles":[46.3,641.3],"Villa Crespo":[452.2,447.6],"Villa Del Parque":[208.0,481.2],"Villa Devoto":[87.8,469.4],"Villa Gral. Mitre":[318.7,516.9],"Villa Lugano":[281.9,918.9],"Villa Luro":[146.6,680.2],"Villa Ortuzar":[325.2,337.1],"Villa Pueyrredon":[142.7,344.1],"Villa Real":[27.9,575.5],"Villa Riachuelo":[347.1,1023.3],"Villa Santa Rita":[247.3,555.1],"Villa Soldati":[432.5,859.7],"Villa Urquiza":[222.4,278.8]};
+  const RIO  = {"x": 686, "y": 146, "rot": 33.6};
+
+  /* ── Zonas canónicas ─────────────────────────────────────────────
+     key = nombre visible = valor que viaja en ?barrio=  (sin traducir:
+     son nombres propios). svg = polígonos que pinta; at = ancla del pin
+     (por defecto, centroide del primer polígono); lbl = lado preferido
+     del rótulo (r/l/b/t), lblm = idem en mobile. */
+  const ZONAS = [
+    { key:'Núñez',         svg:['Nuñez'],                   alias:['nunez'] },
+    { key:'Saavedra',      svg:['Saavedra'] },
+    { key:'Belgrano',      svg:['Belgrano'],                alias:['belgrano c','belgrano r','bajo belgrano','belgrano chico'] },
+    { key:'Colegiales',    svg:['Colegiales'] },
+    { key:'Palermo',       svg:['Palermo'],                 alias:['palermo soho','palermo hollywood','las canitas','canitas','palermo chico','palermo viejo','palermo nuevo','palermo botanico','botanico'], at:[560,300] },
+    { key:'Recoleta',      svg:['Recoleta'],                alias:['barrio norte'], lbl:'l', lblm:'b' },
+    { key:'Retiro',        svg:['Retiro'],                  at:[790,392] },
+    { key:'Puerto Madero', svg:['Puerto Madero'],           at:[862,478], lblm:'b' },
+    { key:'Centro',        svg:['San Nicolas','Monserrat'], alias:['microcentro','san nicolas','monserrat','montserrat','tribunales'], at:[768,505], lbl:'l' },
+    { key:'San Telmo',     svg:['San Telmo'],               lbl:'b' },
+    { key:'Villa Crespo',  svg:['Villa Crespo'] },
+    { key:'Chacarita',     svg:['Chacarita'] },
+    { key:'Almagro',       svg:['Almagro'],                 lbl:'b' },
+    { key:'Balvanera',     svg:['Balvanera'],               alias:['once','congreso'] },
+    { key:'Caballito',     svg:['Caballito'] },
+    { key:'Villa Urquiza', svg:['Villa Urquiza'] },
+    /* Fuera de CABA: sin polígono; si hay inventario aparece un pin al norte. */
+    { key:'GBA Norte',     svg:[], alias:['san isidro','vicente lopez','olivos','martinez','acassuso','la lucila','beccar','san fernando','tigre','nordelta'], at:[300,40], offmap:true }
+  ];
+
+  const norm = s => (s || '').toString().trim().toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '');
+
+  const SVG_BY_NORM = {};
+  Object.keys(PATHS).forEach(n => { SVG_BY_NORM[norm(n)] = n; });
+
+  const ALIAS = {};
+  ZONAS.forEach(z => {
+    ALIAS[norm(z.key)] = z.key;
+    (z.svg || []).forEach(s => { ALIAS[norm(s)] = z.key; });
+    (z.alias || []).forEach(a => { ALIAS[norm(a)] = z.key; });
+  });
+
+  /* barrio (texto libre de Supabase) → zona canónica, o null si no se conoce.
+     Sin alias explícito, si coincide con un barrio oficial la zona es ese barrio. */
+  function zonaDe(barrio) {
+    const n = norm(barrio);
+    if (!n) return null;
+    if (ALIAS[n]) return ALIAS[n];
+    if (SVG_BY_NORM[n]) return SVG_BY_NORM[n];
+    return null;
+  }
+
+  function contar(props) {
+    const c = {};
+    (props || []).forEach(p => {
+      const z = zonaDe(p && p.barrio);
+      if (z) c[z] = (c[z] || 0) + 1;
+    });
+    return c;
+  }
+
+  function zonaConfig(key) {
+    let z = ZONAS.find(z => z.key === key);
+    if (!z && PATHS[key]) z = { key, svg:[key] };   // barrio oficial sin config explícita
+    return z || null;
+  }
+
+  function anclaDe(z) {
+    if (z.at) return z.at;
+    const pts = (z.svg || []).map(s => CENT[s]).filter(Boolean);
+    if (!pts.length) return [500, 550];
+    return [pts.reduce((a,p)=>a+p[0],0)/pts.length, pts.reduce((a,p)=>a+p[1],0)/pts.length];
+  }
+
+  window.BairenZonas = {
+    zonaDe, contar, zonaConfig,
+    lista: () => ZONAS.filter(z => !z.offmap).map(z => z.key).concat(['GBA Norte'])
+  };
+
+  /* ── Textos (ES/PT/EN) ───────────────────────────────────────────── */
+  const T = {
+    es: { one:'unidad',  many:'unidades', aria:'Ver {n} en {b}' },
+    pt: { one:'unidade', many:'unidades', aria:'Ver {n} em {b}' },
+    en: { one:'unit',    many:'units',    aria:'See {n} in {b}' }
+  };
+  const nLabel = (n, lang) => n + ' ' + (n === 1 ? T[lang].one : T[lang].many);
+
+  /* ── Isotipo: Obelisco en trazo fino dorado dentro de doble anillo ── */
+  const ISO = '<svg viewBox="0 0 48 48" fill="none" aria-hidden="true">'
+    + '<circle class="bm-iso-bg" cx="24" cy="24" r="22.5"/>'
+    + '<circle class="bm-iso-ring" cx="24" cy="24" r="22.5"/>'
+    + '<circle class="bm-iso-ring2" cx="24" cy="24" r="19"/>'
+    + '<path class="bm-iso-ob" d="M21.4 35.5 L22.7 16 L24 12.2 L25.3 16 L26.6 35.5 Z"/>'
+    + '<path class="bm-iso-ob" d="M22.7 16 H25.3"/>'
+    + '<path class="bm-iso-ob" d="M19.6 35.5 H28.4"/>'
+    + '</svg>';
+
+  /* ── CSS del componente (inyectado una sola vez) ─────────────────── */
+  const CSS = `
+.bm{--bm-gold:#C2A968;--bm-gold-light:#DECDA0;--bm-navy:#131D2D;--bm-ease:cubic-bezier(.23,1,.32,1);--bm-pin:40px;
+  position:relative;width:100%;margin:0 auto;font-family:'Jost',sans-serif;user-select:none;-webkit-user-select:none;}
+.bm-stage{position:relative;width:100%;}
+.bm-svg{display:block;width:100%;height:100%;overflow:visible;
+  -webkit-mask-image:linear-gradient(to right,transparent 0,#000 20%),linear-gradient(to top,transparent 0,#000 18%);
+  mask-image:linear-gradient(to right,transparent 0,#000 20%),linear-gradient(to top,transparent 0,#000 18%);
+  -webkit-mask-composite:source-in;mask-composite:intersect;}
+.bm-b{fill:rgba(255,255,255,.03);stroke:rgba(194,169,104,.22);stroke-width:1;stroke-linejoin:round;vector-effect:non-scaling-stroke;pointer-events:none;transition:fill .2s ease,stroke .2s ease;}
+.bm-b.has{fill:rgba(194,169,104,.08);stroke:rgba(194,169,104,.55);pointer-events:auto;cursor:pointer;}
+.bm-b.has.hov{fill:rgba(194,169,104,.16);stroke:rgba(222,205,160,.8);}
+.bm-b.has.act{fill:rgba(194,169,104,.24);stroke:rgba(222,205,160,.9);}
+.bm-rio{font-family:'Playfair Display',Georgia,serif;font-style:italic;font-size:21px;letter-spacing:.06em;fill:var(--bm-gold-light);opacity:.42;pointer-events:none;}
+.bm-pin{position:absolute;width:var(--bm-pin);height:var(--bm-pin);margin:calc(var(--bm-pin) / -2) 0 0 calc(var(--bm-pin) / -2);padding:0;border:0;background:none;cursor:pointer;border-radius:50%;
+  filter:drop-shadow(0 3px 6px rgba(0,0,0,.45));transition:transform .18s var(--bm-ease);-webkit-tap-highlight-color:transparent;}
+@media(hover:hover) and (pointer:fine){.bm-pin:hover,.bm-pin.hov{transform:scale(1.08);}}
+.bm-pin:active{transform:scale(.96);}
+.bm-pin:focus-visible{outline:2px solid var(--bm-gold-light);outline-offset:3px;}
+.bm-pin > svg{display:block;width:100%;height:100%;overflow:visible;}
+.bm-iso-bg{fill:var(--bm-navy);transition:fill .2s ease;}
+.bm-iso-ring{stroke:var(--bm-gold);stroke-width:1.5;transition:stroke .2s ease,stroke-width .2s ease;}
+.bm-iso-ring2{stroke:var(--bm-gold);stroke-width:.75;opacity:.65;}
+.bm-iso-ob{stroke:var(--bm-gold);stroke-width:1.2;stroke-linejoin:round;stroke-linecap:round;}
+.bm-pin.hov .bm-iso-ring,.bm-pin.act .bm-iso-ring{stroke:var(--bm-gold-light);stroke-width:2;}
+.bm-pin.act .bm-iso-bg{fill:#1B2942;}
+.bm-n{display:none;position:absolute;top:-5px;right:-6px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--bm-gold);color:var(--bm-navy);
+  font-size:.58rem;font-weight:600;line-height:16px;text-align:center;letter-spacing:0;box-shadow:0 0 0 2px var(--bm-navy);}
+.bm-lbl{position:absolute;white-space:nowrap;line-height:1.15;pointer-events:none;
+  text-shadow:0 0 8px var(--bm-navy),0 0 3px var(--bm-navy),0 1px 2px var(--bm-navy);}
+.bm-lbl b{display:block;font-weight:500;font-size:.76rem;letter-spacing:.07em;text-transform:uppercase;color:#FBFAF6;}
+.bm-lbl i{display:block;font-style:normal;font-weight:400;font-size:.66rem;letter-spacing:.04em;color:var(--bm-gold-light);opacity:.82;margin-top:2px;}
+.bm-lbl.is-hidden{visibility:hidden;}
+@media(hover:hover) and (pointer:fine){.bm-pin.hov .bm-lbl.is-hidden,.bm-pin:hover .bm-lbl.is-hidden{visibility:visible;}}
+.bm-pin--r .bm-lbl{left:calc(100% + 10px);top:50%;transform:translateY(-50%);text-align:left;}
+.bm-pin--l .bm-lbl{right:calc(100% + 10px);top:50%;transform:translateY(-50%);text-align:right;}
+.bm-pin--b .bm-lbl{top:calc(100% + 6px);left:50%;transform:translateX(-50%);text-align:center;}
+.bm-pin--t .bm-lbl{bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);text-align:center;}
+@media(max-width:640px){
+  .bm{--bm-pin:32px;}
+  .bm-n{display:block;}
+  .bm-lbl i{display:none;}
+  .bm-lbl b{font-size:.62rem;letter-spacing:.06em;}
+  .bm-pin--r .bm-lbl{left:calc(100% + 6px);} .bm-pin--l .bm-lbl{right:calc(100% + 6px);}
+  .bm-pin--b .bm-lbl{top:calc(100% + 3px);} .bm-pin--t .bm-lbl{bottom:calc(100% + 3px);}
+  .bm-rio{font-size:24px;}
+}
+@media(prefers-reduced-motion:reduce){.bm-pin,.bm-b,.bm-iso-ring,.bm-iso-bg{transition:none;}}
+`;
+
+  function injectCSS() {
+    if (document.getElementById('bm-css')) return;
+    const s = document.createElement('style'); s.id = 'bm-css'; s.textContent = CSS;
+    document.head.appendChild(s);
+  }
+
+  const SIDES = ['r', 'l', 'b', 't'];
+  function intersects(a, b, m) {
+    m = m || 0;
+    return !(a.right + m < b.left || a.left - m > b.right || a.bottom + m < b.top || a.top - m > b.bottom);
+  }
+
+  /* ── Componente ──────────────────────────────────────────────────── */
+  function mount(el, opts) {
+    opts = opts || {};
+    injectCSS();
+    let counts = opts.counts || {};
+    let lang   = opts.lang || window.BAIREN_LANG || 'es';
+    let active = opts.active || null;
+    let view   = [VB[0], VB[1], VB[2], VB[3]];
+    let entered = false;
+    const REDUCED = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    el.classList.add('bm');
+    el.innerHTML = '<div class="bm-stage"><svg class="bm-svg" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"></svg><div class="bm-pins"></div></div>';
+    const stage = el.querySelector('.bm-stage');
+    const svg   = el.querySelector('.bm-svg');
+    const pins  = el.querySelector('.bm-pins');
+    const isNarrow = () => stage.clientWidth < 520;
+
+    // Polígonos: uno por barrio oficial
+    const pathEls = {};
+    Object.keys(PATHS).forEach(name => {
+      const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      p.setAttribute('d', PATHS[name]);
+      p.setAttribute('class', 'bm-b');
+      p.dataset.barrio = name;
+      svg.appendChild(p);
+      pathEls[name] = p;
+    });
+
+    // Río de la Plata: rótulo cartográfico sobre la costa
+    const rio = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    rio.setAttribute('class', 'bm-rio');
+    rio.setAttribute('text-anchor', 'middle');
+    rio.setAttribute('transform', 'translate(' + RIO.x + ' ' + RIO.y + ') rotate(' + RIO.rot + ')');
+    rio.textContent = 'Río de la Plata';
+    svg.appendChild(rio);
+
+    const zonaDeSvg = {};   // nombre svg → zona (hover/click sobre el polígono)
+    const pinEls = {};
+
+    function pathsOf(key) {
+      const z = zonaConfig(key);
+      return z ? (z.svg || []).map(s => pathEls[s]).filter(Boolean) : [];
+    }
+
+    function hover(key, on) {
+      pathsOf(key).forEach(p => p.classList.toggle('hov', on));
+      if (pinEls[key]) pinEls[key].classList.toggle('hov', on);
+      if (opts.onHover) opts.onHover(on ? key : null);
+    }
+
+    function select(key) {
+      if (opts.onSelect) opts.onSelect(key);
+    }
+
+    function applyActive() {
+      Object.keys(pathEls).forEach(n => pathEls[n].classList.remove('act'));
+      Object.keys(pinEls).forEach(k => pinEls[k].classList.remove('act'));
+      if (active) {
+        pathsOf(active).forEach(p => p.classList.add('act'));
+        if (pinEls[active]) pinEls[active].classList.add('act');
+      }
+    }
+
+    function pct(x, y) {
+      return [ (x - view[0]) / view[2] * 100, (y - view[1]) / view[3] * 100 ];
+    }
+
+    function computeView() {
+      const keys = Object.keys(counts).filter(k => counts[k] > 0);
+      if (!keys.length) { view = [VB[0], VB[1], VB[2], VB[3]]; return; }
+      // Encuadre: bbox de los polígonos con inventario + margen para pins y rótulos.
+      const narrow = isNarrow();
+      const padX = narrow ? 40 : 70, padY = narrow ? 40 : 60;
+      let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+      keys.forEach(k => {
+        const z = zonaConfig(k); if (!z) return;
+        const a = anclaDe(z);
+        x0=Math.min(x0,a[0]-120); x1=Math.max(x1,a[0]+120);
+        y0=Math.min(y0,a[1]-70);  y1=Math.max(y1,a[1]+70);
+        (z.svg||[]).forEach(s => {
+          let b = null;
+          try { b = pathEls[s] && pathEls[s].getBBox(); } catch (e) {}
+          if (!b || !b.width) return;
+          x0=Math.min(x0,b.x); y0=Math.min(y0,b.y); x1=Math.max(x1,b.x+b.width); y1=Math.max(y1,b.y+b.height);
+        });
+      });
+      x0=Math.max(VB[0],x0-padX); y0=Math.max(VB[1],y0-padY);
+      x1=Math.min(VB[0]+VB[2],x1+padX); y1=Math.min(VB[1]+VB[3],y1+padY);
+      view = [x0, y0, x1-x0, y1-y0];
+    }
+
+    function setSide(pin, side) {
+      SIDES.forEach(s => pin.classList.remove('bm-pin--' + s));
+      pin.classList.add('bm-pin--' + side);
+    }
+
+    /* Colocación de rótulos: por orden de inventario (los grandes eligen
+       primero), cada rótulo prueba su lado preferido y luego r/l/b/t;
+       toma el primero que no toca otro pin ni otro rótulo y queda dentro
+       de la ventana. Si ninguno entra, se oculta (queda el badge). */
+    function placeLabels() {
+      const keys = Object.keys(pinEls).sort((a, b) => counts[b] - counts[a]);
+      if (!keys.length) return;
+      const narrow = isNarrow();
+      const vw = document.documentElement.clientWidth;
+      const pinRects = {};
+      keys.forEach(k => { pinRects[k] = pinEls[k].getBoundingClientRect(); });
+      const placed = [];
+      keys.forEach(k => {
+        const pin = pinEls[k], lbl = pin.querySelector('.bm-lbl');
+        const z = zonaConfig(k) || {};
+        const pref = (narrow && z.lblm) || z.lbl || 'r';
+        const tries = [pref].concat(SIDES.filter(s => s !== pref));
+        let ok = false;
+        for (let i = 0; i < tries.length; i++) {
+          setSide(pin, tries[i]);
+          const r = lbl.getBoundingClientRect();
+          const inView = r.left >= 4 && r.right <= vw - 4;
+          const hitPin = keys.some(o => o !== k && intersects(r, pinRects[o], 3));
+          const hitLbl = placed.some(p => intersects(r, p, 4));
+          if (inView && !hitPin && !hitLbl) { ok = true; placed.push(r); break; }
+        }
+        if (!ok) setSide(pin, pref);
+        lbl.classList.toggle('is-hidden', !ok);
+      });
+    }
+
+    function render() {
+      computeView();
+      svg.setAttribute('viewBox', view.join(' '));
+      stage.style.aspectRatio = (view[2] / view[3]).toFixed(4);
+
+      Object.keys(pathEls).forEach(n => { pathEls[n].classList.remove('has'); delete zonaDeSvg[n]; });
+      Object.keys(counts).forEach(k => {
+        if (!(counts[k] > 0)) return;
+        pathsOf(k).forEach(p => { p.classList.add('has'); zonaDeSvg[p.dataset.barrio] = k; });
+      });
+
+      pins.innerHTML = '';
+      Object.keys(pinEls).forEach(k => delete pinEls[k]);
+      Object.keys(counts).filter(k => counts[k] > 0).forEach(k => {
+        const z = zonaConfig(k); if (!z) return;
+        const a = anclaDe(z);
+        const [px, py] = pct(a[0], a[1]);
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'bm-pin bm-pin--' + (z.lbl || 'r');
+        b.style.left = px.toFixed(2) + '%';
+        b.style.top  = py.toFixed(2) + '%';
+        b.dataset.zona = k;
+        const n = nLabel(counts[k], lang);
+        b.setAttribute('aria-label', T[lang].aria.replace('{n}', n).replace('{b}', k));
+        b.innerHTML = ISO
+          + '<span class="bm-n" aria-hidden="true">' + counts[k] + '</span>'
+          + '<span class="bm-lbl" aria-hidden="true"><b>' + k + '</b><i>' + n + '</i></span>';
+        b.addEventListener('mouseenter', () => hover(k, true));
+        b.addEventListener('mouseleave', () => hover(k, false));
+        b.addEventListener('focus', () => hover(k, true));
+        b.addEventListener('blur',  () => hover(k, false));
+        b.addEventListener('click', () => select(k));
+        pins.appendChild(b);
+        pinEls[k] = b;
+      });
+      applyActive();
+      placeLabels();
+
+      // Entrada: los polígonos aparecen y los pins llegan escalonados (solo la primera vez)
+      if (!entered && Object.keys(pinEls).length && svg.animate) {
+        entered = true;
+        svg.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 600, easing: 'ease-out' });
+        Object.keys(pinEls).forEach((k, i) => {
+          const from = REDUCED ? { opacity: 0 } : { opacity: 0, transform: 'scale(.9)' };
+          const to   = REDUCED ? { opacity: 1 } : { opacity: 1, transform: 'scale(1)' };
+          pinEls[k].animate([from, to], { duration: 420, delay: 180 + i * 45, easing: 'cubic-bezier(.23,1,.32,1)', fill: 'backwards' });
+        });
+      }
+    }
+
+    // Hover / click sobre polígonos con inventario
+    svg.addEventListener('mouseover', e => {
+      const n = e.target && e.target.dataset && e.target.dataset.barrio;
+      if (n && zonaDeSvg[n]) hover(zonaDeSvg[n], true);
+    });
+    svg.addEventListener('mouseout', e => {
+      const n = e.target && e.target.dataset && e.target.dataset.barrio;
+      if (n && zonaDeSvg[n]) hover(zonaDeSvg[n], false);
+    });
+    svg.addEventListener('click', e => {
+      const n = e.target && e.target.dataset && e.target.dataset.barrio;
+      if (n && zonaDeSvg[n]) select(zonaDeSvg[n]);
+    });
+
+    // Resize: si cambia mobile ↔ desktop se re-encuadra; si no, solo se recolocan rótulos
+    let lastNarrow = null, lastW = 0, raf = null;
+    function onResize() {
+      const w = stage.clientWidth;
+      if (w === lastW) return;
+      lastW = w;
+      const narrow = isNarrow();
+      const full = narrow !== lastNarrow;
+      lastNarrow = narrow;
+      if (raf) cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(full ? render : placeLabels);
+    }
+    if (window.ResizeObserver) new ResizeObserver(onResize).observe(stage);
+    else window.addEventListener('resize', onResize);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(placeLabels);
+    document.addEventListener('bairen:lang', () => { const l = window.BAIREN_LANG || 'es'; if (l !== lang) { lang = l; render(); } });
+
+    render();
+    lastNarrow = isNarrow(); lastW = stage.clientWidth;
+
+    return {
+      setCounts(c) { counts = c || {}; render(); },
+      setLang(l)   { lang = l; render(); },
+      setActive(k) { active = k || null; applyActive(); },
+      refresh: render
+    };
+  }
+
+  window.BairenMapa = { mount, VIEWBOX: VB };
+})();
