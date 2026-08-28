@@ -32,6 +32,7 @@
   const CENT = {"Agronomia":[218.2,411.2],"Almagro":[559.0,512.0],"Balvanera":[654.2,511.2],"Barracas":[749.9,742.0],"Belgrano":[414.2,174.8],"La Boca":[889.7,647.1],"Boedo":[573.8,640.3],"Caballito":[447.7,559.0],"Chacarita":[393.8,382.9],"Coghlan":[288.1,211.2],"Colegiales":[410.2,298.0],"Constitucion":[749.3,609.8],"Flores":[373.0,682.6],"Floresta":[244.1,626.2],"Liniers":[63.1,725.9],"Mataderos":[151.7,816.1],"Monserrat":[773.4,533.4],"Monte Castro":[127.0,574.3],"Nueva Pompeya":[573.6,767.5],"Nuñez":[351.0,103.9],"Palermo":[556.0,293.1],"Parque Avellaneda":[280.4,755.9],"Parque Chacabuco":[477.8,677.3],"Parque Chas":[266.8,365.3],"Parque Patricios":[661.2,687.2],"Paternal":[320.1,438.9],"Puerto Madero":[891.9,511.8],"Recoleta":[695.6,366.9],"Retiro":[792.0,383.1],"Saavedra":[217.8,164.5],"San Cristobal":[660.2,602.5],"San Nicolas":[769.0,477.6],"San Telmo":[814.7,588.0],"Velez Sarsfield":[194.7,648.9],"Versalles":[46.3,641.3],"Villa Crespo":[452.2,447.6],"Villa Del Parque":[208.0,481.2],"Villa Devoto":[87.8,469.4],"Villa Gral. Mitre":[318.7,516.9],"Villa Lugano":[281.9,918.9],"Villa Luro":[146.6,680.2],"Villa Ortuzar":[325.2,337.1],"Villa Pueyrredon":[142.7,344.1],"Villa Real":[27.9,575.5],"Villa Riachuelo":[347.1,1023.3],"Villa Santa Rita":[247.3,555.1],"Villa Soldati":[432.5,859.7],"Villa Urquiza":[222.4,278.8]};
   const RIO  = {"x": 686, "y": 146, "rot": 33.6};
   const OUTLINE = "M0.0 550.8 157.7 142.3 344.8 42.0 358.8 22.5 366.7 8.4 368.0 4.0 371.7 1.1 376.4 0.0 380.9 1.6 386.7 5.8 393.6 15.4 402.1 19.4 406.4 22.3 407.3 24.3 390.3 53.5 390.4 55.3 391.5 55.6 395.9 52.3 406.4 32.2 409.9 36.2 414.5 49.3 415.1 53.6 413.1 56.0 410.3 57.0 399.9 57.3 393.4 63.5 390.5 68.0 391.6 72.0 394.3 76.1 404.0 80.8 409.1 72.1 415.5 67.5 415.0 59.6 419.9 56.1 421.3 57.7 418.3 61.0 422.7 67.4 427.2 61.9 433.5 58.9 445.3 60.6 446.4 59.7 453.2 65.4 454.4 65.2 456.5 69.1 458.0 68.9 459.0 73.0 460.6 73.3 462.1 84.9 464.3 84.5 464.7 78.7 465.3 82.5 469.9 84.4 478.5 82.3 486.3 86.7 489.8 90.7 492.1 95.2 495.6 95.1 495.6 96.1 492.6 96.3 492.8 98.6 495.7 101.6 506.1 108.3 510.2 113.2 513.0 120.3 513.5 127.6 514.8 128.3 516.4 126.4 517.2 127.5 517.7 130.1 516.3 133.6 519.7 138.5 523.4 140.1 529.6 134.5 531.8 135.8 533.4 134.1 541.8 138.8 534.9 155.6 535.4 157.2 539.0 158.0 546.4 140.8 539.4 157.6 539.8 159.2 589.9 175.8 597.2 179.4 612.6 190.6 615.0 190.4 618.4 186.6 621.1 186.3 621.7 189.6 618.3 193.3 618.6 196.1 649.5 228.1 653.5 226.5 675.9 212.0 676.4 213.0 653.8 226.7 651.4 229.2 651.4 230.7 657.4 231.7 664.1 228.0 665.3 229.0 664.7 232.6 666.1 233.7 671.8 229.8 673.8 230.0 684.9 238.3 686.2 242.3 682.4 246.1 682.4 247.8 687.4 249.9 689.0 252.0 693.9 260.6 694.4 263.0 697.4 264.5 705.5 281.5 723.2 294.2 744.5 308.2 754.4 307.2 757.1 303.9 756.8 302.3 714.3 273.0 714.3 271.7 719.1 265.1 749.7 262.4 755.7 259.2 766.0 259.9 767.8 265.3 768.9 265.8 769.7 264.8 769.7 260.0 771.2 258.5 770.4 267.5 772.0 271.2 776.5 271.1 778.8 271.8 816.9 299.2 776.7 271.6 770.4 272.2 769.6 275.6 780.2 283.5 780.3 286.2 754.8 288.8 754.0 289.8 754.4 291.1 762.4 296.5 794.8 293.5 818.7 310.1 819.0 312.7 793.1 315.4 792.3 316.4 792.8 317.7 800.9 323.1 833.0 320.0 846.5 329.4 846.6 332.1 820.3 335.1 820.5 336.8 827.6 341.7 865.2 338.2 866.3 349.5 843.3 351.7 842.5 353.3 848.4 358.9 873.9 356.6 874.9 367.7 855.6 369.7 854.9 370.9 855.4 376.3 856.4 377.4 875.5 375.6 876.2 381.1 874.5 382.7 869.9 384.0 869.7 386.4 868.2 384.3 833.2 393.2 833.4 395.7 840.3 399.1 851.2 419.4 848.9 420.6 842.9 410.6 827.8 418.3 827.5 419.7 833.1 438.8 841.2 439.3 853.1 437.5 853.7 436.1 851.0 427.0 852.6 425.9 853.7 426.5 856.7 434.1 860.8 433.2 871.2 427.3 871.9 424.4 873.2 423.9 903.3 421.9 919.5 424.8 903.4 422.1 895.4 422.7 894.5 423.9 906.9 434.4 912.1 442.0 940.6 469.3 942.4 481.5 944.4 485.8 944.0 489.8 945.4 496.4 967.8 515.9 970.2 519.6 973.6 532.0 976.1 548.0 975.4 555.6 971.7 559.4 969.8 559.9 961.2 560.2 949.7 563.4 938.1 561.9 935.1 560.2 929.4 559.1 923.6 561.5 921.6 564.0 921.5 566.3 925.4 567.6 924.5 570.7 921.3 572.8 920.3 575.3 926.6 577.3 935.3 572.2 941.9 573.0 948.8 571.3 951.9 572.4 951.5 576.3 948.9 577.6 947.6 577.8 942.5 573.9 939.0 578.3 939.8 584.6 943.4 592.1 948.4 587.4 953.3 586.9 953.4 579.7 954.7 575.4 958.0 570.6 967.3 569.2 973.2 570.4 976.6 569.2 982.5 570.2 985.2 572.2 987.9 578.5 988.5 584.4 990.9 589.5 990.4 593.1 986.2 596.0 970.2 594.8 968.9 595.3 968.7 596.6 975.1 598.7 985.0 607.9 990.5 608.9 999.9 618.4 1000.0 622.5 994.9 627.8 994.7 629.2 992.6 628.8 991.0 630.5 979.0 633.7 976.6 627.6 971.9 627.1 971.0 625.0 969.3 624.4 968.4 622.3 966.3 621.4 962.8 617.2 954.7 618.0 954.5 620.0 959.6 623.9 959.8 625.3 964.1 628.4 968.2 633.7 962.5 637.1 958.4 635.7 957.7 633.9 952.1 628.8 947.9 632.2 939.0 624.1 932.0 631.1 932.3 634.0 930.7 635.4 932.1 636.7 932.5 639.5 934.8 640.1 935.1 641.2 933.8 642.4 934.2 645.3 936.2 646.2 936.2 648.8 944.3 650.8 929.2 656.3 923.7 654.9 918.6 648.9 914.0 636.2 912.6 634.8 909.2 635.3 904.1 628.6 872.6 603.5 870.4 603.3 867.8 606.7 867.9 608.3 896.5 631.1 903.7 641.2 910.3 662.6 907.8 672.2 903.3 680.8 893.7 687.1 888.9 693.5 883.5 697.4 871.6 697.4 867.8 698.7 866.4 701.1 869.0 706.9 881.2 712.0 883.0 714.0 887.1 727.4 885.7 733.2 874.4 739.3 864.2 750.9 861.3 752.8 851.5 753.2 848.1 756.8 824.5 772.3 822.5 777.2 824.2 784.3 823.6 786.4 809.6 795.1 804.1 803.8 801.6 806.1 796.5 807.2 790.4 806.5 785.0 807.3 775.4 810.4 754.3 810.8 745.3 812.8 738.8 818.4 734.5 824.8 730.8 828.2 719.6 831.4 716.8 833.0 712.6 837.9 704.5 840.3 692.4 837.8 683.6 838.3 680.4 833.8 670.7 831.7 666.0 829.2 664.2 825.9 657.0 822.6 649.4 822.6 637.2 826.2 632.9 826.2 627.2 825.1 613.3 817.4 606.6 816.1 595.7 817.5 567.8 827.2 558.5 831.5 546.8 839.2 538.6 846.3 530.2 856.4 408.8 1031.5 355.5 1106.4 11.8 790.9Z";   // silueta exacta de CABA (unión de los 48 barrios)
+  const LABELS = {"Agronomia": [211.8, 405.8, 32.1], "Almagro": [556.6, 484.6, 43.6], "Balvanera": [654.2, 513.1, 56.4], "Barracas": [767.5, 746.6, 62.4], "Belgrano": [455.4, 134.5, 49.2], "La Boca": [862.6, 656.8, 41.4], "Boedo": [571.6, 623.5, 37.1], "Caballito": [450.7, 567.8, 67.7], "Chacarita": [403.2, 377.1, 41.8], "Coghlan": [286.7, 208.9, 29.6], "Colegiales": [404.6, 291.2, 38.0], "Constitucion": [750.7, 608.8, 36.7], "Flores": [342.0, 624.6, 53.0], "Floresta": [258.8, 633.8, 28.1], "Liniers": [61.9, 724.5, 53.3], "Mataderos": [147.2, 819.9, 70.0], "Monserrat": [763.4, 535.7, 28.5], "Monte Castro": [148.4, 560.8, 33.6], "Nueva Pompeya": [562.7, 776.2, 49.5], "Nu\u00f1ez": [358.1, 115.9, 42.5], "Palermo": [559.0, 291.8, 97.2], "Parque Avellaneda": [279.5, 749.3, 53.5], "Parque Chacabuco": [477.9, 677.2, 44.8], "Parque Chas": [268.5, 364.9, 32.3], "Parque Patricios": [666.2, 683.1, 50.4], "Paternal": [305.2, 437.0, 30.5], "Puerto Madero": [901.5, 516.0, 48.1], "Recoleta": [682.2, 404.8, 48.4], "Retiro": [786.6, 404.3, 43.1], "Saavedra": [208.7, 168.2, 46.9], "San Cristobal": [658.2, 602.0, 31.0], "San Nicolas": [740.6, 479.7, 29.4], "San Telmo": [814.3, 588.4, 28.2], "Velez Sarsfield": [166.0, 623.3, 28.6], "Versalles": [36.0, 638.7, 28.5], "Villa Crespo": [452.8, 448.0, 44.4], "Villa Del Parque": [192.7, 480.8, 44.3], "Villa Devoto": [80.2, 498.8, 56.4], "Villa Gral. Mitre": [316.8, 520.6, 38.7], "Villa Lugano": [263.0, 900.1, 66.4], "Villa Luro": [160.4, 695.3, 31.7], "Villa Ortuzar": [327.3, 330.4, 34.2], "Villa Pueyrredon": [151.6, 356.9, 43.2], "Villa Real": [29.3, 576.4, 27.9], "Villa Riachuelo": [350.6, 1056.3, 33.5], "Villa Santa Rita": [244.0, 550.0, 38.0], "Villa Soldati": [431.0, 862.0, 76.6], "Villa Urquiza": [224.3, 282.0, 60.7], "San Nicolas+Monserrat": [765.4, 504.0, 55.0], "Puerto Madero:diques": [876.5, 463.6, 28.4]};     // punto de rótulo por barrio: polylabel (pole of inaccessibility) + radio libre
 
   /* ── Zonas canónicas ─────────────────────────────────────────────
      key = nombre visible = valor que viaja en ?barrio=  (sin traducir:
@@ -43,15 +44,15 @@
     { key:'Saavedra',      svg:['Saavedra'] },
     { key:'Belgrano',      svg:['Belgrano'],                alias:['belgrano c','belgrano r','bajo belgrano','belgrano chico'] },
     { key:'Colegiales',    svg:['Colegiales'] },
-    { key:'Palermo',       svg:['Palermo'],                 alias:['palermo soho','palermo hollywood','las canitas','canitas','palermo chico','palermo viejo','palermo nuevo','palermo botanico','botanico'], at:[560,300] },
-    { key:'Recoleta',      svg:['Recoleta'],                alias:['barrio norte'], lbl:'l', lblm:'b' },
-    { key:'Retiro',        svg:['Retiro'],                  at:[790,392] },
-    { key:'Puerto Madero', svg:['Puerto Madero'],           at:[862,478], lblm:'b' },
-    { key:'Centro',        svg:['San Nicolas','Monserrat'], alias:['microcentro','san nicolas','monserrat','montserrat','tribunales'], at:[768,505], lbl:'l' },
-    { key:'San Telmo',     svg:['San Telmo'],               lbl:'b' },
-    { key:'Villa Crespo',  svg:['Villa Crespo'] },
+    { key:'Palermo',       svg:['Palermo'],                 alias:['palermo soho','palermo hollywood','las canitas','canitas','palermo chico','palermo viejo','palermo nuevo','palermo botanico','botanico'] },
+    { key:'Recoleta',      svg:['Recoleta'],                alias:['barrio norte'] },
+    { key:'Retiro',        svg:['Retiro'] },
+    { key:'Puerto Madero', svg:['Puerto Madero'],           labelKey:'Puerto Madero:diques', lbl:'r', short:'P. Madero' },   /* los diques, no la reserva; rótulo hacia el río */
+    { key:'Centro',        svg:['San Nicolas','Monserrat'], alias:['microcentro','san nicolas','monserrat','montserrat','tribunales'], labelKey:'San Nicolas+Monserrat' },
+    { key:'San Telmo',     svg:['San Telmo'] },
+    { key:'Villa Crespo',  svg:['Villa Crespo'], short:'V. Crespo' },
     { key:'Chacarita',     svg:['Chacarita'] },
-    { key:'Almagro',       svg:['Almagro'],                 lbl:'b' },
+    { key:'Almagro',       svg:['Almagro'] },
     { key:'Balvanera',     svg:['Balvanera'],               alias:['once','congreso'] },
     { key:'Caballito',     svg:['Caballito'] },
     { key:'Villa Urquiza', svg:['Villa Urquiza'] },
@@ -97,9 +98,13 @@
     return z || null;
   }
 
+  /* Punto de rótulo de la zona: polylabel (el punto más lejano de los bordes),
+     así el nombre queda adentro del área como en un mapa de verdad. */
   function anclaDe(z) {
     if (z.at) return z.at;
-    const pts = (z.svg || []).map(s => CENT[s]).filter(Boolean);
+    const lk = z.labelKey || ((z.svg || []).length === 1 ? z.svg[0] : null);
+    if (lk && LABELS[lk]) return [LABELS[lk][0], LABELS[lk][1]];
+    const pts = (z.svg || []).map(s => LABELS[s] || CENT[s]).filter(Boolean);
     if (!pts.length) return [500, 550];
     return [pts.reduce((a,p)=>a+p[0],0)/pts.length, pts.reduce((a,p)=>a+p[1],0)/pts.length];
   }
@@ -131,9 +136,8 @@
   mask-image:linear-gradient(to right,transparent 0,#000 20%),linear-gradient(to top,transparent 0,#000 18%);
   -webkit-mask-composite:source-in;mask-composite:intersect;}
 .bm-outline{fill:rgba(255,255,255,.028);stroke:rgba(194,169,104,.38);stroke-width:1;stroke-linejoin:round;vector-effect:non-scaling-stroke;pointer-events:none;}
-.bm-b{fill:rgba(194,169,104,.07);stroke:rgba(194,169,104,.5);stroke-width:1;stroke-linejoin:round;vector-effect:non-scaling-stroke;visibility:hidden;pointer-events:none;transition:fill .2s ease,stroke .2s ease;}
-.bm-b.has{visibility:visible;pointer-events:auto;cursor:pointer;}
-.bm--lite .bm-b.has{visibility:hidden;pointer-events:none;}
+.bm-b{fill:none;stroke:rgba(194,169,104,.17);stroke-width:1;stroke-linejoin:round;vector-effect:non-scaling-stroke;pointer-events:none;transition:fill .2s ease,stroke .2s ease;}
+.bm-b.has{fill:rgba(194,169,104,.075);stroke:rgba(194,169,104,.55);pointer-events:auto;cursor:pointer;}
 .bm-b.has.hov{fill:rgba(194,169,104,.16);stroke:rgba(222,205,160,.8);}
 .bm-b.has.act{fill:rgba(194,169,104,.24);stroke:rgba(222,205,160,.9);}
 .bm-rio{font-family:'Playfair Display',Georgia,serif;font-style:italic;font-size:21px;letter-spacing:.06em;fill:var(--bm-gold-light);opacity:.42;pointer-events:none;}
@@ -153,15 +157,19 @@
 .bm-lbl i{display:block;font-style:normal;font-weight:400;font-size:.66rem;letter-spacing:.04em;color:var(--bm-gold-light);opacity:.82;margin-top:2px;}
 .bm-lbl.is-hidden{visibility:hidden;}
 @media(hover:hover) and (pointer:fine){.bm-pin.hov .bm-lbl.is-hidden,.bm-pin:hover .bm-lbl.is-hidden{visibility:visible;}}
-.bm-pin--r .bm-lbl{left:calc(100% + 10px);top:50%;transform:translateY(-50%);text-align:left;}
-.bm-pin--l .bm-lbl{right:calc(100% + 10px);top:50%;transform:translateY(-50%);text-align:right;}
-.bm-pin--b .bm-lbl{top:calc(100% + 6px);left:50%;transform:translateX(-50%);text-align:center;}
-.bm-pin--t .bm-lbl{bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);text-align:center;}
-/* Mobile: sin rótulos (los nombres viven en los chips de barrio); el pin lleva el número */
+.bm-pin--r .bm-lbl{left:calc(100% + 8px);top:50%;transform:translateY(-50%);text-align:left;}
+.bm-pin--l .bm-lbl{right:calc(100% + 8px);top:50%;transform:translateY(-50%);text-align:right;}
+.bm-pin--b .bm-lbl{top:calc(100% + 5px);left:50%;transform:translateX(-50%);text-align:center;}
+.bm-pin--t .bm-lbl{bottom:calc(100% + 5px);left:50%;transform:translateX(-50%);text-align:center;}
+/* Mobile: nombre adentro del área (más chico), número en el pin */
 @media(max-width:640px){
-  .bm{--bm-pin:34px;}
-  .bm-n{display:block;}
-  .bm-lbl{display:none;}
+  .bm{--bm-pin:30px;}
+  .bm-n{display:block;min-width:15px;height:15px;line-height:15px;font-size:.55rem;top:-4px;right:-5px;}
+  .bm-lbl i{display:none;}
+  .bm-lbl b{font-size:.58rem;letter-spacing:.08em;}
+  .bm-pin--b .bm-lbl{top:calc(100% + 3px);}
+  .bm-pin--t .bm-lbl{bottom:calc(100% + 3px);}
+  .bm-pin--r .bm-lbl{left:calc(100% + 6px);} .bm-pin--l .bm-lbl{right:calc(100% + 6px);}
   .bm-rio{font-size:24px;}
 }
 @media(prefers-reduced-motion:reduce){.bm-pin,.bm-b,.bm-logo{transition:none;}}
@@ -291,7 +299,6 @@
       const keys = Object.keys(pinEls).sort((a, b) => counts[b] - counts[a]);
       if (!keys.length) return;
       const narrow = isNarrow();
-      if (narrow) { keys.forEach(k => pinEls[k].querySelector('.bm-lbl').classList.add('is-hidden')); return; }
       const vw = document.documentElement.clientWidth;
       const pinRects = {};
       keys.forEach(k => { pinRects[k] = pinEls[k].getBoundingClientRect(); });
@@ -299,18 +306,23 @@
       keys.forEach(k => {
         const pin = pinEls[k], lbl = pin.querySelector('.bm-lbl');
         const z = zonaConfig(k) || {};
-        const pref = (narrow && z.lblm) || z.lbl || 'r';
-        const tries = [pref].concat(SIDES.filter(s => s !== pref));
+        const pref = (narrow && z.lblm) || z.lbl || 'b';
+        const tries = [pref].concat(['b','r','l','t'].filter(s => s !== pref));
+        const nameEl = lbl.querySelector('b');
+        const names = [k].concat(z.short ? [z.short] : []);
         let ok = false;
-        for (let i = 0; i < tries.length; i++) {
-          setSide(pin, tries[i]);
-          const r = lbl.getBoundingClientRect();
-          const inView = r.left >= 4 && r.right <= vw - 4;
-          const hitPin = keys.some(o => o !== k && intersects(r, pinRects[o], 3));
-          const hitLbl = placed.some(p => intersects(r, p, 4));
-          if (inView && !hitPin && !hitLbl) { ok = true; placed.push(r); break; }
+        for (let n = 0; n < names.length && !ok; n++) {
+          nameEl.textContent = names[n];
+          for (let i = 0; i < tries.length; i++) {
+            setSide(pin, tries[i]);
+            const r = lbl.getBoundingClientRect();
+            const inView = r.left >= 4 && r.right <= vw - 4;
+            const hitPin = keys.some(o => o !== k && intersects(r, pinRects[o], 2));
+            const hitLbl = placed.some(p => intersects(r, p, 3));
+            if (inView && !hitPin && !hitLbl) { ok = true; placed.push(r); break; }
+          }
         }
-        if (!ok) setSide(pin, pref);
+        if (!ok) { nameEl.textContent = k; setSide(pin, pref); }
         lbl.classList.toggle('is-hidden', !ok);
       });
     }
@@ -328,13 +340,19 @@
 
       pins.innerHTML = '';
       Object.keys(pinEls).forEach(k => delete pinEls[k]);
+      const narrowNow = isNarrow();
+      const scale = (stage.clientWidth || 1) / view[2];                 // px por unidad de mapa
+      const PIN = narrowNow ? 30 : 40, LBLH = narrowNow ? 11 : 26, GAP = narrowNow ? 3 : 5;
       Object.keys(counts).filter(k => counts[k] > 0).forEach(k => {
         const z = zonaConfig(k); if (!z) return;
         const a = anclaDe(z);
-        const [px, py] = pct(a[0], a[1]);
+        const pref = (narrowNow && z.lblm) || z.lbl || 'b';
+        // con el nombre debajo, el logo sube para que el conjunto quede centrado en el punto de rótulo
+        const up = pref === 'b' ? (PIN / 2 + GAP + LBLH / 2) / scale : 0;
+        const [px, py] = pct(a[0], a[1] - up);
         const b = document.createElement('button');
         b.type = 'button';
-        b.className = 'bm-pin bm-pin--' + (z.lbl || 'r');
+        b.className = 'bm-pin bm-pin--' + pref;
         b.style.left = px.toFixed(2) + '%';
         b.style.top  = py.toFixed(2) + '%';
         b.dataset.zona = k;
