@@ -116,15 +116,9 @@
   };
   const nLabel = (n, lang) => n + ' ' + (n === 1 ? T[lang].one : T[lang].many);
 
-  /* ── Isotipo: Obelisco en trazo fino dorado dentro de doble anillo ── */
-  const ISO = '<svg viewBox="0 0 48 48" fill="none" aria-hidden="true">'
-    + '<circle class="bm-iso-bg" cx="24" cy="24" r="22.5"/>'
-    + '<circle class="bm-iso-ring" cx="24" cy="24" r="22.5"/>'
-    + '<circle class="bm-iso-ring2" cx="24" cy="24" r="19"/>'
-    + '<path class="bm-iso-ob" d="M21.4 35.5 L22.7 16 L24 12.2 L25.3 16 L26.6 35.5 Z"/>'
-    + '<path class="bm-iso-ob" d="M22.7 16 H25.3"/>'
-    + '<path class="bm-iso-ob" d="M19.6 35.5 H28.4"/>'
-    + '</svg>';
+  /* ── Pin: el logo real de BAIREN (el mismo del nav) ─────────────── */
+  const LOGO_SRC = '/bairen_logo.png?v=3';
+  const LOGO = '<img class="bm-logo" src="' + LOGO_SRC + '" alt="" draggable="false" decoding="async">';
 
   /* ── CSS del componente (inyectado una sola vez) ─────────────────── */
   const CSS = `
@@ -145,13 +139,9 @@
 @media(hover:hover) and (pointer:fine){.bm-pin:hover,.bm-pin.hov{transform:scale(1.08);}}
 .bm-pin:active{transform:scale(.96);}
 .bm-pin:focus-visible{outline:2px solid var(--bm-gold-light);outline-offset:3px;}
-.bm-pin > svg{display:block;width:100%;height:100%;overflow:visible;}
-.bm-iso-bg{fill:var(--bm-navy);transition:fill .2s ease;}
-.bm-iso-ring{stroke:var(--bm-gold);stroke-width:1.5;transition:stroke .2s ease,stroke-width .2s ease;}
-.bm-iso-ring2{stroke:var(--bm-gold);stroke-width:.75;opacity:.65;}
-.bm-iso-ob{stroke:var(--bm-gold);stroke-width:1.2;stroke-linejoin:round;stroke-linecap:round;}
-.bm-pin.hov .bm-iso-ring,.bm-pin.act .bm-iso-ring{stroke:var(--bm-gold-light);stroke-width:2;}
-.bm-pin.act .bm-iso-bg{fill:#1B2942;}
+.bm-logo{display:block;width:100%;height:100%;border-radius:50%;box-shadow:0 0 0 0 rgba(222,205,160,0);transition:box-shadow .2s ease;}
+.bm-pin.hov .bm-logo,.bm-pin.act .bm-logo{box-shadow:0 0 0 2px var(--bm-gold-light);}
+.bm-pin.act{transform:scale(1.06);}
 .bm-n{display:none;position:absolute;top:-5px;right:-6px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--bm-gold);color:var(--bm-navy);
   font-size:.58rem;font-weight:600;line-height:16px;text-align:center;letter-spacing:0;box-shadow:0 0 0 2px var(--bm-navy);}
 .bm-lbl{position:absolute;white-space:nowrap;line-height:1.15;pointer-events:none;
@@ -164,16 +154,14 @@
 .bm-pin--l .bm-lbl{right:calc(100% + 10px);top:50%;transform:translateY(-50%);text-align:right;}
 .bm-pin--b .bm-lbl{top:calc(100% + 6px);left:50%;transform:translateX(-50%);text-align:center;}
 .bm-pin--t .bm-lbl{bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);text-align:center;}
+/* Mobile: sin rótulos (los nombres viven en los chips de barrio); el pin lleva el número */
 @media(max-width:640px){
-  .bm{--bm-pin:32px;}
+  .bm{--bm-pin:34px;}
   .bm-n{display:block;}
-  .bm-lbl i{display:none;}
-  .bm-lbl b{font-size:.62rem;letter-spacing:.06em;}
-  .bm-pin--r .bm-lbl{left:calc(100% + 6px);} .bm-pin--l .bm-lbl{right:calc(100% + 6px);}
-  .bm-pin--b .bm-lbl{top:calc(100% + 3px);} .bm-pin--t .bm-lbl{bottom:calc(100% + 3px);}
+  .bm-lbl{display:none;}
   .bm-rio{font-size:24px;}
 }
-@media(prefers-reduced-motion:reduce){.bm-pin,.bm-b,.bm-iso-ring,.bm-iso-bg{transition:none;}}
+@media(prefers-reduced-motion:reduce){.bm-pin,.bm-b,.bm-logo{transition:none;}}
 `;
 
   function injectCSS() {
@@ -293,6 +281,7 @@
       const keys = Object.keys(pinEls).sort((a, b) => counts[b] - counts[a]);
       if (!keys.length) return;
       const narrow = isNarrow();
+      if (narrow) { keys.forEach(k => pinEls[k].querySelector('.bm-lbl').classList.add('is-hidden')); return; }
       const vw = document.documentElement.clientWidth;
       const pinRects = {};
       keys.forEach(k => { pinRects[k] = pinEls[k].getBoundingClientRect(); });
@@ -341,7 +330,7 @@
         b.dataset.zona = k;
         const n = nLabel(counts[k], lang);
         b.setAttribute('aria-label', T[lang].aria.replace('{n}', n).replace('{b}', k));
-        b.innerHTML = ISO
+        b.innerHTML = LOGO
           + '<span class="bm-n" aria-hidden="true">' + counts[k] + '</span>'
           + '<span class="bm-lbl" aria-hidden="true"><b>' + k + '</b><i>' + n + '</i></span>';
         b.addEventListener('mouseenter', () => hover(k, true));
