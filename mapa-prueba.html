@@ -511,15 +511,19 @@ footer{
 .results-clear{margin-left:8px;width:22px;height:22px;border:1px solid rgba(42,58,82,.25);background:transparent;color:var(--navy);font-size:.95rem;line-height:1;display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;cursor:pointer;transition:background .2s,color .2s;}
 .results-clear:hover{background:var(--navy);color:var(--white);}
 /* Hoja del mapa (mobile) */
-.mapa-sheet{position:fixed;inset:0;z-index:1200;background:var(--navy-deeper);color:var(--white);overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:32px;
-  opacity:0;transform:translateY(14px);transition:opacity .2s ease,transform .28s var(--ease);}
+.sheet-backdrop{position:fixed;inset:0;z-index:1199;background:rgba(19,29,45,.62);opacity:0;transition:opacity .25s ease;}
+.sheet-backdrop[hidden]{display:none;}
+.sheet-backdrop.in{opacity:1;}
+.mapa-sheet{position:fixed;left:0;right:0;bottom:0;z-index:1200;max-height:calc(100dvh - 20px);background:var(--navy-deeper);color:var(--white);overflow-y:auto;-webkit-overflow-scrolling:touch;
+  border-top:1px solid rgba(194,169,104,.5);box-shadow:0 -18px 48px rgba(0,0,0,.35);padding-bottom:max(12px, env(safe-area-inset-bottom));
+  transform:translateY(100%);transition:transform .34s cubic-bezier(.32,.72,0,1);}
 .mapa-sheet[hidden]{display:none;}
-.mapa-sheet.in{opacity:1;transform:none;}
+.mapa-sheet.in{transform:none;}
 .ms-head{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:0 6px 0 20px;height:56px;background:var(--navy-deeper);border-bottom:1px solid rgba(194,169,104,.25);}
 .ms-title{font-family:var(--font-display);font-weight:500;font-size:1.15rem;color:var(--white);}
 .ms-close{width:44px;height:44px;border:0;background:none;color:var(--gold-light);font-size:1.7rem;font-weight:300;line-height:1;cursor:pointer;-webkit-tap-highlight-color:transparent;}
-.ms-map{padding:12px 8px 0 2px;}
-.ms-list{list-style:none;margin:8px 20px 0;border-top:1px solid rgba(255,255,255,.08);}
+.ms-map{padding:10px 8px 0 2px;}
+.ms-list{list-style:none;margin:6px 20px 0;border-top:1px solid rgba(255,255,255,.08);}
 .ms-item{display:flex;flex-wrap:wrap;align-items:center;width:100%;min-height:50px;padding:11px 4px;border:0;border-bottom:1px solid rgba(255,255,255,.08);background:none;color:var(--white);font-family:var(--font-body);font-weight:300;font-size:.95rem;letter-spacing:.02em;cursor:pointer;text-align:left;-webkit-tap-highlight-color:transparent;}
 .ms-item .nm{flex:1;}
 .ms-item b{font-weight:400;font-size:.68rem;letter-spacing:.06em;color:var(--gold-light);opacity:.8;}
@@ -534,7 +538,7 @@ footer{
 @media(max-width:959px){.mapa-fab{display:inline-flex;}}
 @media(max-width:700px){.results-clear{display:none;}}
 body.sheet-open{overflow:hidden;}
-@media(prefers-reduced-motion:reduce){.mapa-sheet,.mapa-fab{transition:none;}}
+@media(prefers-reduced-motion:reduce){.mapa-sheet,.mapa-fab,.sheet-backdrop{transition:none;}}
 
 /* ─── BADGE LIBERACIÓN (EDITORIAL LUXURY) ─────────────────────────────────────── */
 .badge-liberacion {
@@ -696,7 +700,8 @@ body.sheet-open{overflow:hidden;}
 
 </div>
 
-<!-- MAPA DE BARRIOS · modo aparte (mobile) -->
+<!-- MAPA DE BARRIOS · hoja inferior (mobile) -->
+<div class="sheet-backdrop" id="sheetBackdrop" hidden></div>
 <div class="mapa-sheet" id="mapaSheet" role="dialog" aria-modal="true" aria-labelledby="mapaSheetTitle" hidden>
   <div class="ms-head">
     <h2 class="ms-title" id="mapaSheetTitle">Elegí un barrio</h2>
@@ -789,13 +794,14 @@ function openSheet(opener) {
   const sheet = document.getElementById('mapaSheet');
   if (!sheet.hidden) return;
   sheetOpener = opener || document.activeElement;
+  const bd = document.getElementById('sheetBackdrop'); bd.hidden = false;
   sheet.hidden = false;
   document.body.classList.add('sheet-open');
   document.getElementById('mapaFab').classList.remove('show');
   document.getElementById('barrioTrigger').setAttribute('aria-expanded', 'true');
   try { history.pushState({ bairenSheet: 1 }, ''); } catch (e) {}
   requestAnimationFrame(() => {
-    sheet.classList.add('in');
+    sheet.classList.add('in'); bd.classList.add('in');
     mountSheetMap();
     document.getElementById('mapaSheetClose').focus({ preventScroll: true });
   });
@@ -804,9 +810,10 @@ function closeSheet(fromHistory) {
   const sheet = document.getElementById('mapaSheet');
   if (sheet.hidden) return;
   sheet.classList.remove('in');
+  const bd = document.getElementById('sheetBackdrop'); bd.classList.remove('in');
   document.body.classList.remove('sheet-open');
   document.getElementById('barrioTrigger').setAttribute('aria-expanded', 'false');
-  setTimeout(() => { sheet.hidden = true; }, 220);
+  setTimeout(() => { sheet.hidden = true; bd.hidden = true; }, 340);
   if (!fromHistory && history.state && history.state.bairenSheet) { try { history.back(); } catch (e) {} }
   if (sheetOpener && sheetOpener.focus) sheetOpener.focus({ preventScroll: true });
   updateFab();
@@ -819,6 +826,7 @@ window.addEventListener('popstate', () => {
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
 document.getElementById('barrioTrigger').addEventListener('click', e => { e.stopPropagation(); openSheet(e.currentTarget); });
 document.getElementById('mapaSheetClose').addEventListener('click', () => closeSheet());
+document.getElementById('sheetBackdrop').addEventListener('click', () => closeSheet());
 document.getElementById('mapaFab').addEventListener('click', e => openSheet(e.currentTarget));
 
 /* Pastilla flotante: aparece cuando la barra de filtros ya salió de pantalla */
@@ -1182,11 +1190,8 @@ function mountSheetMap() {
 function buildSheetList() {
   const ul = document.getElementById('mapaSheetList');
   const total = props.length;
-  const row = (key, label, n) => {
-    const d = key === 'todos' ? '' : window.BairenZonas.desc(key, L());
-    return `<li><button type="button" class="ms-item" data-zona="${key}"><span class="nm">${label}</span><b>${n} ${n === 1 ? ct('u_one') : ct('u_many')}</b>${d ? `<small>${d}</small>` : ''}</button></li>`;
-  };
-  ul.innerHTML = row('todos', ct('todos_barrios'), total) + ZONAS.map(z => row(z.key, z.key, z.n)).join('');
+  // Solo "Todos los barrios": los nombres ya están en el mapa (una lista los repetiría)
+  ul.innerHTML = `<li><button type="button" class="ms-item" data-zona="todos"><span class="nm">${ct('todos_barrios')}</span><b>${total} ${total === 1 ? ct('u_one') : ct('u_many')}</b></button></li>`;
   ul.querySelectorAll('[data-zona]').forEach(b => b.addEventListener('click', () => { selectBarrio(b.dataset.zona); closeSheet(); }));
   document.getElementById('mapaSheetTitle').textContent = ct('sheet_title');
   document.getElementById('mapaSheetClose').setAttribute('aria-label', ct('cerrar'));
