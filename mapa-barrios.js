@@ -53,7 +53,7 @@
     { key:'San Telmo',     svg:['San Telmo'], desc:{ es:'Adoquines, anticuarios y la feria de los domingos.', pt:'Paralelepípedos, antiquários e a feira de domingo.', en:'Cobblestones, antiques and the Sunday fair.' } },
     { key:'Villa Crespo',  svg:['Villa Crespo'], short:'V. Crespo', desc:{ es:'Al lado de Palermo, con vida de barrio y outlets.', pt:'Ao lado de Palermo, com vida de bairro e outlets.', en:'Next to Palermo, with neighbourhood life and outlet stores.' } },
     { key:'Chacarita',     svg:['Chacarita'] },
-    { key:'Almagro',       svg:['Almagro'], desc:{ es:'Tango, cafés y la Avenida Corrientes. Bien conectado por subte.', pt:'Tango, cafés e a Avenida Corrientes. Bem conectado por metrô.', en:'Tango, cafés and Corrientes Avenue. Well connected by subway.' } },
+    { key:'Almagro',       svg:['Almagro'], at:[556,524], lbl:'b', desc:{ es:'Tango, cafés y la Avenida Corrientes. Bien conectado por subte.', pt:'Tango, cafés e a Avenida Corrientes. Bem conectado por metrô.', en:'Tango, cafés and Corrientes Avenue. Well connected by subway.' } },
     { key:'Balvanera',     svg:['Balvanera'],               alias:['once','congreso'] },
     { key:'Caballito',     svg:['Caballito'] },
     { key:'Villa Urquiza', svg:['Villa Urquiza'] },
@@ -130,7 +130,7 @@
 
   /* ── CSS del componente (inyectado una sola vez) ─────────────────── */
   const CSS = `
-.bm{--bm-gold:#C2A968;--bm-gold-light:#DECDA0;--bm-navy:#131D2D;--bm-ease:cubic-bezier(.23,1,.32,1);--bm-pin:40px;
+.bm{--bm-gold:#C2A968;--bm-gold-light:#DECDA0;--bm-navy:#131D2D;--bm-ease:cubic-bezier(.23,1,.32,1);--bm-pin:34px;
   position:relative;width:100%;margin:0 auto;font-family:'Jost',sans-serif;user-select:none;-webkit-user-select:none;}
 .bm-stage{position:relative;width:100%;touch-action:none;cursor:grab;}
 .bm-stage.is-dragging{cursor:grabbing;}
@@ -160,7 +160,7 @@
 .bm-lbl{position:absolute;white-space:nowrap;line-height:1.15;pointer-events:none;
   text-shadow:0 0 8px var(--bm-navy),0 0 3px var(--bm-navy),0 1px 2px var(--bm-navy);}
 .bm-lbl b{display:block;font-weight:500;font-size:.76rem;letter-spacing:.07em;text-transform:uppercase;color:#FBFAF6;}
-.bm-lbl i{display:block;font-style:normal;font-weight:400;font-size:.66rem;letter-spacing:.04em;color:var(--bm-gold-light);opacity:.82;margin-top:2px;}
+.bm-lbl i{display:block;font-style:normal;font-weight:400;font-size:.69rem;letter-spacing:.04em;color:var(--bm-gold-light);opacity:.85;margin-top:2px;}
 .bm-lbl.is-hidden{visibility:hidden;}
 @media(hover:hover) and (pointer:fine){.bm-pin.hov .bm-lbl.is-hidden,.bm-pin:hover .bm-lbl.is-hidden{visibility:visible;}}
 .bm-pin--r .bm-lbl{left:calc(100% + 8px);top:50%;transform:translateY(-50%);text-align:left;}
@@ -169,10 +169,10 @@
 .bm-pin--t .bm-lbl{bottom:calc(100% + 5px);left:50%;transform:translateX(-50%);text-align:center;}
 /* Mobile: nombre adentro del área (más chico), número en el pin */
 @media(max-width:640px){
-  .bm{--bm-pin:30px;}
-  .bm-n{display:block;min-width:15px;height:15px;line-height:15px;font-size:.55rem;top:-4px;right:-5px;}
+  .bm{--bm-pin:26px;}
+  .bm-n{display:block;min-width:14px;height:14px;line-height:14px;font-size:.52rem;top:-4px;right:-5px;padding:0 3px;}
   .bm-lbl i{display:none;}
-  .bm-lbl b{font-size:.58rem;letter-spacing:.08em;}
+  .bm-lbl b{font-size:.625rem;letter-spacing:.07em;}
   .bm-pin--b .bm-lbl{top:calc(100% + 3px);}
   .bm-pin--t .bm-lbl{bottom:calc(100% + 3px);}
   .bm-pin--r .bm-lbl{left:calc(100% + 6px);} .bm-pin--l .bm-lbl{right:calc(100% + 6px);}
@@ -363,7 +363,7 @@
       const narrowNow = isNarrow();
       const scale = (stage.clientWidth || 1) / view[2];                 // px por unidad de mapa
       const LBLH = narrowNow ? 11 : 26, GAP = narrowNow ? 3 : 5;
-      const pinPx = n => narrowNow ? (n >= 6 ? 34 : n >= 2 ? 30 : 27) : (n >= 6 ? 46 : n >= 2 ? 40 : 36);
+      const pinPx = n => narrowNow ? (n >= 6 ? 30 : n >= 2 ? 26 : 24) : (n >= 6 ? 38 : n >= 2 ? 34 : 30);
       Object.keys(counts).filter(k => counts[k] > 0).forEach(k => {
         const z = zonaConfig(k); if (!z) return;
         const a = anclaDe(z);
@@ -416,12 +416,17 @@
     let startView = null, startPt = null, startDist = 0, startMid = null, moved = false, suppressClick = false, lastTap = 0, lastTapPt = null;
     const ZMAX = 3, PAD = 60;
 
+    /* Zoom: desde la ciudad entera (alejar) hasta 3x sobre el encuadre inicial (acercar) */
     function clampView(v) {
       const minW = base[2] / ZMAX;
-      v[2] = Math.min(base[2], Math.max(minW, v[2]));
+      const maxW = Math.max(base[2], VB[2] * 1.12, VB[3] * 1.12 * base[2] / base[3]);
+      v[2] = Math.min(maxW, Math.max(minW, v[2]));
       v[3] = v[2] * base[3] / base[2];
-      v[0] = Math.min(VB[0] + VB[2] + PAD - v[2], Math.max(VB[0] - PAD, v[0]));
-      v[1] = Math.min(VB[1] + VB[3] + PAD - v[3], Math.max(VB[1] - PAD, v[1]));
+      // dentro del mapa; si el encuadre es más grande que el mapa, se centra
+      if (v[2] >= VB[2] + 2 * PAD) v[0] = VB[0] + (VB[2] - v[2]) / 2;
+      else v[0] = Math.min(VB[0] + VB[2] + PAD - v[2], Math.max(VB[0] - PAD, v[0]));
+      if (v[3] >= VB[3] + 2 * PAD) v[1] = VB[1] + (VB[3] - v[3]) / 2;
+      else v[1] = Math.min(VB[1] + VB[3] + PAD - v[3], Math.max(VB[1] - PAD, v[1]));
       return v;
     }
     function applyCam() {
@@ -495,13 +500,19 @@
           const now = Date.now();
           if (lastTapPt && now - lastTap < 320 && dist(lastTapPt, { x: e.clientX, y: e.clientY }) < 24) {
             lastTap = 0;
-            if (view[2] < base[2] * 0.99) { view = base.slice(); applyCam(); } else zoomAt(e.clientX, e.clientY, 2);
+            if (Math.abs(view[2] - base[2]) > base[2] * 0.01) { view = base.slice(); applyCam(); } else zoomAt(e.clientX, e.clientY, 2);
             placeLabels();
             suppressClick = true; setTimeout(() => { suppressClick = false; }, 0);
           } else { lastTap = now; lastTapPt = { x: e.clientX, y: e.clientY }; }
         }
       }
     }
+    stage.addEventListener('wheel', e => {
+      if (opts.pan === false || !e.ctrlKey) return;      // el scroll normal de la página no se toca
+      e.preventDefault();
+      zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY * 0.01));
+      clearTimeout(stage._wheelT); stage._wheelT = setTimeout(placeLabels, 120);
+    }, { passive: false });
     stage.addEventListener('pointerup', endPointer);
     stage.addEventListener('pointercancel', endPointer);
     stage.addEventListener('click', e => { if (suppressClick) { e.stopPropagation(); e.preventDefault(); } }, true);
