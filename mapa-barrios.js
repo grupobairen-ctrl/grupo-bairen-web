@@ -33,6 +33,7 @@
   const RIO  = {"x": 686, "y": 146, "rot": 33.6};
   const OUTLINE = "M0.0 550.8 157.7 142.3 344.8 42.0 358.8 22.5 366.7 8.4 368.0 4.0 371.7 1.1 376.4 0.0 380.9 1.6 386.7 5.8 393.6 15.4 402.1 19.4 406.4 22.3 407.3 24.3 390.3 53.5 390.4 55.3 391.5 55.6 395.9 52.3 406.4 32.2 409.9 36.2 414.5 49.3 415.1 53.6 413.1 56.0 410.3 57.0 399.9 57.3 393.4 63.5 390.5 68.0 391.6 72.0 394.3 76.1 404.0 80.8 409.1 72.1 415.5 67.5 415.0 59.6 419.9 56.1 421.3 57.7 418.3 61.0 422.7 67.4 427.2 61.9 433.5 58.9 445.3 60.6 446.4 59.7 453.2 65.4 454.4 65.2 456.5 69.1 458.0 68.9 459.0 73.0 460.6 73.3 462.1 84.9 464.3 84.5 464.7 78.7 465.3 82.5 469.9 84.4 478.5 82.3 486.3 86.7 489.8 90.7 492.1 95.2 495.6 95.1 495.6 96.1 492.6 96.3 492.8 98.6 495.7 101.6 506.1 108.3 510.2 113.2 513.0 120.3 513.5 127.6 514.8 128.3 516.4 126.4 517.2 127.5 517.7 130.1 516.3 133.6 519.7 138.5 523.4 140.1 529.6 134.5 531.8 135.8 533.4 134.1 541.8 138.8 534.9 155.6 535.4 157.2 539.0 158.0 546.4 140.8 539.4 157.6 539.8 159.2 589.9 175.8 597.2 179.4 612.6 190.6 615.0 190.4 618.4 186.6 621.1 186.3 621.7 189.6 618.3 193.3 618.6 196.1 649.5 228.1 653.5 226.5 675.9 212.0 676.4 213.0 653.8 226.7 651.4 229.2 651.4 230.7 657.4 231.7 664.1 228.0 665.3 229.0 664.7 232.6 666.1 233.7 671.8 229.8 673.8 230.0 684.9 238.3 686.2 242.3 682.4 246.1 682.4 247.8 687.4 249.9 689.0 252.0 693.9 260.6 694.4 263.0 697.4 264.5 705.5 281.5 723.2 294.2 744.5 308.2 754.4 307.2 757.1 303.9 756.8 302.3 714.3 273.0 714.3 271.7 719.1 265.1 749.7 262.4 755.7 259.2 766.0 259.9 767.8 265.3 768.9 265.8 769.7 264.8 769.7 260.0 771.2 258.5 770.4 267.5 772.0 271.2 776.5 271.1 778.8 271.8 816.9 299.2 776.7 271.6 770.4 272.2 769.6 275.6 780.2 283.5 780.3 286.2 754.8 288.8 754.0 289.8 754.4 291.1 762.4 296.5 794.8 293.5 818.7 310.1 819.0 312.7 793.1 315.4 792.3 316.4 792.8 317.7 800.9 323.1 833.0 320.0 846.5 329.4 846.6 332.1 820.3 335.1 820.5 336.8 827.6 341.7 865.2 338.2 866.3 349.5 843.3 351.7 842.5 353.3 848.4 358.9 873.9 356.6 874.9 367.7 855.6 369.7 854.9 370.9 855.4 376.3 856.4 377.4 875.5 375.6 876.2 381.1 874.5 382.7 869.9 384.0 869.7 386.4 868.2 384.3 833.2 393.2 833.4 395.7 840.3 399.1 851.2 419.4 848.9 420.6 842.9 410.6 827.8 418.3 827.5 419.7 833.1 438.8 841.2 439.3 853.1 437.5 853.7 436.1 851.0 427.0 852.6 425.9 853.7 426.5 856.7 434.1 860.8 433.2 871.2 427.3 871.9 424.4 873.2 423.9 903.3 421.9 919.5 424.8 903.4 422.1 895.4 422.7 894.5 423.9 906.9 434.4 912.1 442.0 940.6 469.3 942.4 481.5 944.4 485.8 944.0 489.8 945.4 496.4 967.8 515.9 970.2 519.6 973.6 532.0 976.1 548.0 975.4 555.6 971.7 559.4 969.8 559.9 961.2 560.2 949.7 563.4 938.1 561.9 935.1 560.2 929.4 559.1 923.6 561.5 921.6 564.0 921.5 566.3 925.4 567.6 924.5 570.7 921.3 572.8 920.3 575.3 926.6 577.3 935.3 572.2 941.9 573.0 948.8 571.3 951.9 572.4 951.5 576.3 948.9 577.6 947.6 577.8 942.5 573.9 939.0 578.3 939.8 584.6 943.4 592.1 948.4 587.4 953.3 586.9 953.4 579.7 954.7 575.4 958.0 570.6 967.3 569.2 973.2 570.4 976.6 569.2 982.5 570.2 985.2 572.2 987.9 578.5 988.5 584.4 990.9 589.5 990.4 593.1 986.2 596.0 970.2 594.8 968.9 595.3 968.7 596.6 975.1 598.7 985.0 607.9 990.5 608.9 999.9 618.4 1000.0 622.5 994.9 627.8 994.7 629.2 992.6 628.8 991.0 630.5 979.0 633.7 976.6 627.6 971.9 627.1 971.0 625.0 969.3 624.4 968.4 622.3 966.3 621.4 962.8 617.2 954.7 618.0 954.5 620.0 959.6 623.9 959.8 625.3 964.1 628.4 968.2 633.7 962.5 637.1 958.4 635.7 957.7 633.9 952.1 628.8 947.9 632.2 939.0 624.1 932.0 631.1 932.3 634.0 930.7 635.4 932.1 636.7 932.5 639.5 934.8 640.1 935.1 641.2 933.8 642.4 934.2 645.3 936.2 646.2 936.2 648.8 944.3 650.8 929.2 656.3 923.7 654.9 918.6 648.9 914.0 636.2 912.6 634.8 909.2 635.3 904.1 628.6 872.6 603.5 870.4 603.3 867.8 606.7 867.9 608.3 896.5 631.1 903.7 641.2 910.3 662.6 907.8 672.2 903.3 680.8 893.7 687.1 888.9 693.5 883.5 697.4 871.6 697.4 867.8 698.7 866.4 701.1 869.0 706.9 881.2 712.0 883.0 714.0 887.1 727.4 885.7 733.2 874.4 739.3 864.2 750.9 861.3 752.8 851.5 753.2 848.1 756.8 824.5 772.3 822.5 777.2 824.2 784.3 823.6 786.4 809.6 795.1 804.1 803.8 801.6 806.1 796.5 807.2 790.4 806.5 785.0 807.3 775.4 810.4 754.3 810.8 745.3 812.8 738.8 818.4 734.5 824.8 730.8 828.2 719.6 831.4 716.8 833.0 712.6 837.9 704.5 840.3 692.4 837.8 683.6 838.3 680.4 833.8 670.7 831.7 666.0 829.2 664.2 825.9 657.0 822.6 649.4 822.6 637.2 826.2 632.9 826.2 627.2 825.1 613.3 817.4 606.6 816.1 595.7 817.5 567.8 827.2 558.5 831.5 546.8 839.2 538.6 846.3 530.2 856.4 408.8 1031.5 355.5 1106.4 11.8 790.9Z";   // silueta exacta de CABA (unión de los 48 barrios)
   const LABELS = {"Agronomia": [211.8, 405.8, 32.1], "Almagro": [556.6, 484.6, 43.6], "Balvanera": [654.2, 513.1, 56.4], "Barracas": [767.5, 746.6, 62.4], "Belgrano": [455.4, 134.5, 49.2], "La Boca": [862.6, 656.8, 41.4], "Boedo": [571.6, 623.5, 37.1], "Caballito": [450.7, 567.8, 67.7], "Chacarita": [403.2, 377.1, 41.8], "Coghlan": [286.7, 208.9, 29.6], "Colegiales": [404.6, 291.2, 38.0], "Constitucion": [750.7, 608.8, 36.7], "Flores": [342.0, 624.6, 53.0], "Floresta": [258.8, 633.8, 28.1], "Liniers": [61.9, 724.5, 53.3], "Mataderos": [147.2, 819.9, 70.0], "Monserrat": [763.4, 535.7, 28.5], "Monte Castro": [148.4, 560.8, 33.6], "Nueva Pompeya": [562.7, 776.2, 49.5], "Nu\u00f1ez": [358.1, 115.9, 42.5], "Palermo": [559.0, 291.8, 97.2], "Parque Avellaneda": [279.5, 749.3, 53.5], "Parque Chacabuco": [477.9, 677.2, 44.8], "Parque Chas": [268.5, 364.9, 32.3], "Parque Patricios": [666.2, 683.1, 50.4], "Paternal": [305.2, 437.0, 30.5], "Puerto Madero": [901.5, 516.0, 48.1], "Recoleta": [682.2, 404.8, 48.4], "Retiro": [786.6, 404.3, 43.1], "Saavedra": [208.7, 168.2, 46.9], "San Cristobal": [658.2, 602.0, 31.0], "San Nicolas": [740.6, 479.7, 29.4], "San Telmo": [814.3, 588.4, 28.2], "Velez Sarsfield": [166.0, 623.3, 28.6], "Versalles": [36.0, 638.7, 28.5], "Villa Crespo": [452.8, 448.0, 44.4], "Villa Del Parque": [192.7, 480.8, 44.3], "Villa Devoto": [80.2, 498.8, 56.4], "Villa Gral. Mitre": [316.8, 520.6, 38.7], "Villa Lugano": [263.0, 900.1, 66.4], "Villa Luro": [160.4, 695.3, 31.7], "Villa Ortuzar": [327.3, 330.4, 34.2], "Villa Pueyrredon": [151.6, 356.9, 43.2], "Villa Real": [29.3, 576.4, 27.9], "Villa Riachuelo": [350.6, 1056.3, 33.5], "Villa Santa Rita": [244.0, 550.0, 38.0], "Villa Soldati": [431.0, 862.0, 76.6], "Villa Urquiza": [224.3, 282.0, 60.7], "San Nicolas+Monserrat": [765.4, 504.0, 55.0], "Puerto Madero:diques": [876.5, 463.6, 28.4]};     // punto de rótulo por barrio: polylabel (pole of inaccessibility) + radio libre
+  const AVENIDAS = "M356 1100 323 1074 299 1049 30 804 19 792 15 780 4 550 160 149M160 149 171 138 284 77 328 54 343 50 304 68 241 103 200 128M227 105 270 82M296 68 325 53M327 51 346 48 354 51 340 49 323 56 170 138 158 149 4 547 3 556 14 778 18 791 301 1052 353 1104M762 403 764 386 773 362 772 355 767 349 732 327 708 305 659 274 626 247 593 227 536 176 498 149M609 239 702 302 728 325 769 352 772 363 763 386 761 403M63 389 106 404 174 435 245 441 268 453M268 453 245 441 174 434 106 404 63 388M302 462 268 453M302 462 371 482M371 482 302 462M733 367 668 329 614 283M387 135 347 92 330 59M398 146 439 204M472 224 451 219 439 204M439 204 451 220 472 224M472 224 482 228 511 250M550 276 511 250M511 250 551 277M584 295 595 299 550 276M551 277 584 295M600 304 635 323 653 340 733 367 791 407M805 507 733 513 728 511M229 746 268 706M268 706 296 685 326 675M268 706 296 686 326 675M326 675 407 644 534 622M205 678 103 698 45 695 9 698M205 678 246 666M246 666 205 678M315 645 246 666M315 645 349 634M349 634 315 645M442 591 349 634M728 511 569 524 442 591M906 676 906 654 899 638 844 594M844 596 899 639 906 654 906 677M844 594 740 597 706 602 658 615 597 623 477 644 430 677 401 680 389 688 358 717 344 749M345 751 358 719 387 691 402 681 431 678 477 645 609 622 657 617 707 603 740 598 838 594 844 596M185 733 229 746M137 787 102 817 73 837M198 725 185 732 149 772M321 661 269 684 198 725M321 661 270 684 198 725M528 591 485 599 448 597 391 634 321 661M761 403 759 423 765 529 766 592M768 592 766 476 761 420 762 403M766 592 778 635 779 655 795 737 814 793M815 792 796 737 786 677 780 655 779 636 768 592M534 622 688 598 837 589M344 749 321 787 257 962 234 994M235 994 258 962 320 792 330 772 345 751M803 416 817 447 821 491M827 495 823 490 818 445 809 422 803 415M73 660 87 661 107 670 132 666 180 643 207 622 245 604 268 580 278 573 304 539 334 519 344 506 468 403 478 378 517 343 527 331M527 331 478 377 468 402 344 505 334 518 303 538 277 573 268 579 245 604 206 621 180 643 132 665 107 669 87 660 73 660M8 671 22 673 47 683 96 673 131 680 172 677 182 683 214 723 234 738 285 758 329 761M268 749 247 743 223 730 201 708 182 682 172 676 132 679 96 672 47 682 23 672 8 669M328 760 290 758 276 750 268 749M584 819 552 834 532 852 497 901 487 909 485 919 472 932 464 950 363 1095 353 1104M354 1105 382 1069 534 851 553 834 586 820M555 441 532 431 442 359 421 348M825 444 677 453 660 451 646 443 555 441M444 422 472 454 506 468 601 480 624 480 651 484 688 483M498 149 409 89 378 74 354 51M343 50 374 75 409 93 527 171 570 207 588 225 609 239M829 560 658 571 606 583 528 591M824 510 825 565 830 582 832 623M834 621 827 513M550 280 534 318M688 293 713 311 756 322 771 331 793 332 802 340 834 461 845 594 859 609M872 615 854 605 845 594 835 461 802 339 793 332 772 331 755 322 725 313 705 297 693 295"; // avenidas principales y autopistas (OpenStreetMap), recortadas a la ciudad
 
   /* ── Zonas canónicas ─────────────────────────────────────────────
      key = nombre visible = valor que viaja en ?barrio=  (sin traducir:
@@ -40,24 +41,24 @@
      (por defecto, centroide del primer polígono); lbl = lado preferido
      del rótulo (r/l/b/t), lblm = idem en mobile. */
   const ZONAS = [
-    { key:'Núñez',         svg:['Nuñez'],                   alias:['nunez'] },
+    { key:'Núñez',         svg:['Nuñez'],                   alias:['nunez'], desc:{ es:'Residencial y verde, sobre el río. Colegios, clubes y el estadio.', pt:'Residencial e verde, à beira do rio. Escolas, clubes e o estádio.', en:'Residential and green, by the river. Schools, clubs and the stadium.' } },
     { key:'Saavedra',      svg:['Saavedra'] },
-    { key:'Belgrano',      svg:['Belgrano'],                alias:['belgrano c','belgrano r','bajo belgrano','belgrano chico'] },
+    { key:'Belgrano',      svg:['Belgrano'],                alias:['belgrano c','belgrano r','bajo belgrano','belgrano chico'], desc:{ es:'Avenidas arboladas, casas y el subte a la puerta.', pt:'Avenidas arborizadas, casas e o metrô à porta.', en:'Tree-lined avenues, houses and the subway at the door.' } },
     { key:'Colegiales',    svg:['Colegiales'] },
-    { key:'Palermo',       svg:['Palermo'],                 alias:['palermo soho','palermo hollywood','las canitas','canitas','palermo chico','palermo viejo','palermo nuevo','palermo botanico','botanico'] },
-    { key:'Recoleta',      svg:['Recoleta'],                alias:['barrio norte'] },
-    { key:'Retiro',        svg:['Retiro'] },
-    { key:'Puerto Madero', svg:['Puerto Madero'],           labelKey:'Puerto Madero:diques', lbl:'r', short:'P. Madero' },   /* los diques, no la reserva; rótulo hacia el río */
-    { key:'Centro',        svg:['San Nicolas','Monserrat'], alias:['microcentro','san nicolas','monserrat','montserrat','tribunales'], labelKey:'San Nicolas+Monserrat' },
-    { key:'San Telmo',     svg:['San Telmo'] },
-    { key:'Villa Crespo',  svg:['Villa Crespo'], short:'V. Crespo' },
+    { key:'Palermo',       svg:['Palermo'],                 alias:['palermo soho','palermo hollywood','las canitas','canitas','palermo chico','palermo viejo','palermo nuevo','palermo botanico','botanico'], desc:{ es:'Parques, gastronomía y diseño. Incluye Soho, Hollywood y Las Cañitas.', pt:'Parques, gastronomia e design. Inclui Soho, Hollywood e Las Cañitas.', en:'Parks, dining and design. Includes Soho, Hollywood and Las Cañitas.' } },
+    { key:'Recoleta',      svg:['Recoleta'],                alias:['barrio norte'], desc:{ es:'Embajadas, museos y la Buenos Aires clásica, a pasos del centro.', pt:'Embaixadas, museus e a Buenos Aires clássica, a passos do centro.', en:'Embassies, museums and classic Buenos Aires, steps from downtown.' } },
+    { key:'Retiro',        svg:['Retiro'], desc:{ es:'Plaza San Martín, torres y la estación. Entre Recoleta y el centro.', pt:'Plaza San Martín, torres e a estação. Entre Recoleta e o centro.', en:'Plaza San Martín, towers and the station. Between Recoleta and downtown.' } },
+    { key:'Puerto Madero', svg:['Puerto Madero'],           labelKey:'Puerto Madero:diques', lbl:'r', short:'P. Madero', desc:{ es:'Diques, torres y la reserva ecológica. El barrio más nuevo de la ciudad.', pt:'Docas, torres e a reserva ecológica. O bairro mais novo da cidade.', en:'Docks, towers and the ecological reserve. The newest neighbourhood in town.' } },   /* los diques, no la reserva; rótulo hacia el río */
+    { key:'Centro',        svg:['San Nicolas','Monserrat'], alias:['microcentro','san nicolas','monserrat','montserrat','tribunales'], labelKey:'San Nicolas+Monserrat', desc:{ es:'Microcentro y Monserrat: oficinas, teatros y el Obelisco.', pt:'Microcentro e Monserrat: escritórios, teatros e o Obelisco.', en:'Microcentro and Monserrat: offices, theatres and the Obelisk.' } },
+    { key:'San Telmo',     svg:['San Telmo'], desc:{ es:'Adoquines, anticuarios y la feria de los domingos.', pt:'Paralelepípedos, antiquários e a feira de domingo.', en:'Cobblestones, antiques and the Sunday fair.' } },
+    { key:'Villa Crespo',  svg:['Villa Crespo'], short:'V. Crespo', desc:{ es:'Al lado de Palermo, con vida de barrio y outlets.', pt:'Ao lado de Palermo, com vida de bairro e outlets.', en:'Next to Palermo, with neighbourhood life and outlet stores.' } },
     { key:'Chacarita',     svg:['Chacarita'] },
-    { key:'Almagro',       svg:['Almagro'] },
+    { key:'Almagro',       svg:['Almagro'], desc:{ es:'Tango, cafés y la Avenida Corrientes. Bien conectado por subte.', pt:'Tango, cafés e a Avenida Corrientes. Bem conectado por metrô.', en:'Tango, cafés and Corrientes Avenue. Well connected by subway.' } },
     { key:'Balvanera',     svg:['Balvanera'],               alias:['once','congreso'] },
     { key:'Caballito',     svg:['Caballito'] },
     { key:'Villa Urquiza', svg:['Villa Urquiza'] },
     /* Fuera de CABA: sin polígono; si hay inventario aparece un pin al norte. */
-    { key:'GBA Norte',     svg:[], alias:['san isidro','vicente lopez','olivos','martinez','acassuso','la lucila','beccar','san fernando','tigre','nordelta'], at:[300,40], offmap:true }
+    { key:'GBA Norte',     svg:[], alias:['san isidro','vicente lopez','olivos','martinez','acassuso','la lucila','beccar','san fernando','tigre','nordelta'], at:[300,40], offmap:true, desc:{ es:'San Isidro, Vicente López y Olivos: casas, río y colegios.', pt:'San Isidro, Vicente López e Olivos: casas, rio e escolas.', en:'San Isidro, Vicente López and Olivos: houses, river and schools.' } }
   ];
 
   const norm = s => (s || '').toString().trim().toLowerCase()
@@ -111,6 +112,7 @@
 
   window.BairenZonas = {
     zonaDe, contar, zonaConfig,
+    desc: (key, lang) => { const z = zonaConfig(key); const d = z && z.desc; return d ? (d[lang] || d.es) : ''; },
     lista: () => ZONAS.filter(z => !z.offmap).map(z => z.key).concat(['GBA Norte'])
   };
 
@@ -132,15 +134,17 @@
   position:relative;width:100%;margin:0 auto;font-family:'Jost',sans-serif;user-select:none;-webkit-user-select:none;}
 .bm-stage{position:relative;width:100%;}
 .bm-svg{display:block;width:100%;height:100%;overflow:visible;
-  -webkit-mask-image:linear-gradient(to right,transparent 0,#000 20%),linear-gradient(to top,transparent 0,#000 18%);
-  mask-image:linear-gradient(to right,transparent 0,#000 20%),linear-gradient(to top,transparent 0,#000 18%);
+  -webkit-mask-image:linear-gradient(to right,transparent 0,#000 20%),linear-gradient(to top,transparent 0,#000 18%),linear-gradient(to bottom,transparent 0,#000 9%),linear-gradient(to left,transparent 0,#000 7%);
+  mask-image:linear-gradient(to right,transparent 0,#000 20%),linear-gradient(to top,transparent 0,#000 18%),linear-gradient(to bottom,transparent 0,#000 9%),linear-gradient(to left,transparent 0,#000 7%);
   -webkit-mask-composite:source-in;mask-composite:intersect;}
-.bm-outline{fill:rgba(255,255,255,.028);stroke:rgba(194,169,104,.38);stroke-width:1;stroke-linejoin:round;vector-effect:non-scaling-stroke;pointer-events:none;}
+.bm-water{fill:url(#bmWater);pointer-events:none;}
+.bm-outline{fill:url(#bmLand);stroke:rgba(194,169,104,.5);stroke-width:1.2;stroke-linejoin:round;vector-effect:non-scaling-stroke;pointer-events:none;}
+.bm-av{fill:none;stroke:rgba(222,205,160,.17);stroke-width:.9;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke;pointer-events:none;}
 .bm-b{fill:none;stroke:rgba(194,169,104,.17);stroke-width:1;stroke-linejoin:round;vector-effect:non-scaling-stroke;pointer-events:none;transition:fill .2s ease,stroke .2s ease;}
 .bm-b.has{fill:rgba(194,169,104,.075);stroke:rgba(194,169,104,.55);pointer-events:auto;cursor:pointer;}
 .bm-b.has.hov{fill:rgba(194,169,104,.16);stroke:rgba(222,205,160,.8);}
 .bm-b.has.act{fill:rgba(194,169,104,.24);stroke:rgba(222,205,160,.9);}
-.bm-rio{font-family:'Playfair Display',Georgia,serif;font-style:italic;font-size:21px;letter-spacing:.06em;fill:var(--bm-gold-light);opacity:.42;pointer-events:none;}
+.bm-rio{font-family:'Playfair Display',Georgia,serif;font-style:italic;font-size:25px;letter-spacing:.08em;fill:var(--bm-gold-light);opacity:.55;pointer-events:none;}
 .bm-pin{position:absolute;width:var(--bm-pin);height:var(--bm-pin);margin:calc(var(--bm-pin) / -2) 0 0 calc(var(--bm-pin) / -2);padding:0;border:0;background:none;cursor:pointer;border-radius:50%;
   filter:drop-shadow(0 3px 6px rgba(0,0,0,.45));transition:transform .18s var(--bm-ease);-webkit-tap-highlight-color:transparent;}
 @media(hover:hover) and (pointer:fine){.bm-pin:hover,.bm-pin.hov{transform:scale(1.08);}}
@@ -170,7 +174,7 @@
   .bm-pin--b .bm-lbl{top:calc(100% + 3px);}
   .bm-pin--t .bm-lbl{bottom:calc(100% + 3px);}
   .bm-pin--r .bm-lbl{left:calc(100% + 6px);} .bm-pin--l .bm-lbl{right:calc(100% + 6px);}
-  .bm-rio{font-size:24px;}
+  .bm-rio{font-size:27px;}
 }
 @media(prefers-reduced-motion:reduce){.bm-pin,.bm-b,.bm-logo{transition:none;}}
 `;
@@ -207,10 +211,23 @@
 
     const modo = opts.modo || 'completo';     // 'completo' (silueta + zonas + rótulos) | 'lite' (silueta + pins)
     if (modo === 'lite') el.classList.add('bm--lite');
+    // Profundidad: el agua brilla apenas junto a la costa y la tierra es un tono más clara
+    svg.innerHTML = '<defs>'
+      + '<radialGradient id="bmWater" gradientUnits="userSpaceOnUse" cx="830" cy="230" r="360"><stop offset="0" stop-color="#7FA0D8" stop-opacity=".17"/><stop offset=".5" stop-color="#5C7DB8" stop-opacity=".07"/><stop offset="1" stop-color="#3E5A8C" stop-opacity="0"/></radialGradient>'
+      + '<radialGradient id="bmLand" cx="62%" cy="42%" r="70%"><stop offset="0" stop-color="#FBFAF6" stop-opacity=".075"/><stop offset="1" stop-color="#FBFAF6" stop-opacity=".03"/></radialGradient>'
+      + '</defs>';
+    const water = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    water.setAttribute('class', 'bm-water'); water.setAttribute('x', -400); water.setAttribute('y', -400); water.setAttribute('width', 1800); water.setAttribute('height', 1900);
+    svg.appendChild(water);
     if (OUTLINE) {
       const o = document.createElementNS('http://www.w3.org/2000/svg', 'path');
       o.setAttribute('d', OUTLINE); o.setAttribute('class', 'bm-outline');
       svg.appendChild(o);
+    }
+    if (AVENIDAS) {
+      const av = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      av.setAttribute('d', AVENIDAS); av.setAttribute('class', 'bm-av');
+      svg.appendChild(av);
     }
     // Polígonos: uno por barrio oficial (solo se ven los de zonas con inventario)
     const pathEls = {};
@@ -342,12 +359,14 @@
       Object.keys(pinEls).forEach(k => delete pinEls[k]);
       const narrowNow = isNarrow();
       const scale = (stage.clientWidth || 1) / view[2];                 // px por unidad de mapa
-      const PIN = narrowNow ? 30 : 40, LBLH = narrowNow ? 11 : 26, GAP = narrowNow ? 3 : 5;
+      const LBLH = narrowNow ? 11 : 26, GAP = narrowNow ? 3 : 5;
+      const pinPx = n => narrowNow ? (n >= 6 ? 34 : n >= 2 ? 30 : 27) : (n >= 6 ? 46 : n >= 2 ? 40 : 36);
       Object.keys(counts).filter(k => counts[k] > 0).forEach(k => {
         const z = zonaConfig(k); if (!z) return;
         const a = anclaDe(z);
         const pref = (narrowNow && z.lblm) || z.lbl || 'b';
         // con el nombre debajo, el logo sube para que el conjunto quede centrado en el punto de rótulo
+        const PIN = pinPx(counts[k]);
         const up = pref === 'b' ? (PIN / 2 + GAP + LBLH / 2) / scale : 0;
         const [px, py] = pct(a[0], a[1] - up);
         const b = document.createElement('button');
@@ -355,6 +374,7 @@
         b.className = 'bm-pin bm-pin--' + pref;
         b.style.left = px.toFixed(2) + '%';
         b.style.top  = py.toFixed(2) + '%';
+        b.style.setProperty('--bm-pin', PIN + 'px');
         b.dataset.zona = k;
         const n = nLabel(counts[k], lang);
         b.setAttribute('aria-label', T[lang].aria.replace('{n}', n).replace('{b}', k));
