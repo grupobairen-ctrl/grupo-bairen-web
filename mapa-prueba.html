@@ -510,6 +510,8 @@ footer{
   .cat-hero-mapa.open .mapa-wrap{padding:10px 4px 4px;}
 }
 .results-bar{scroll-margin-top:calc(var(--nav-h) + 8px);}
+/* mobile: el dropdown "Barrios" queda redundante con los chips (mismo filtro, con inventario a la vista) */
+@media(max-width:700px){.barrio-trigger,.barrio-dropdown{display:none!important;}}
 
 /* ─── BADGE LIBERACIÓN (EDITORIAL LUXURY) ─────────────────────────────────────── */
 .badge-liberacion {
@@ -1180,7 +1182,10 @@ function syncBarrioUI() {
     const on = b.dataset.zona === activeBarrio;
     b.classList.toggle('active', on);
     b.setAttribute('aria-pressed', on ? 'true' : 'false');
-    if (on && window.innerWidth < 960) b.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+    if (on && window.innerWidth < 960) {
+      const row = b.parentElement, rr = row.getBoundingClientRect(), br = b.getBoundingClientRect();
+      if (br.left < rr.left + 20 || br.right > rr.right - 20) row.scrollTo({ left: b.offsetLeft - 20, behavior: 'smooth' });
+    }
   });
   document.querySelectorAll('#bdGrid .bd-pill').forEach(b => b.classList.toggle('active', b.dataset.barrio === activeBarrio));
   updateBarrioTrigger();
