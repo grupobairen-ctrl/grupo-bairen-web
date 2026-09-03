@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Publicadores — BAIREN</title>
+  <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#131D2D">
+  <link rel="icon" href="../bairen_logo.png?v=3">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css"><link rel="stylesheet" href="css/catalogo.css"><link rel="stylesheet" href="css/portal.css">
+</head>
+<body>
+<div id="pHeader"></div>
+<section class="p-page"><div class="p-container">
+  <div style="max-width:720px" data-reveal><span class="p-eyebrow">Publicadores</span><h1 class="p-h2" style="font-size:clamp(1.8rem,3.4vw,2.6rem)">Quiénes publican en BAIREN</h1><p class="p-sub">Corredores matriculados, dueños verificados y desarrolladoras. Todos con las mismas reglas y el mismo lugar en la grilla. Cada uno es responsable de la operación de lo que publica.</p></div>
+  <div id="pubs" style="display:grid;gap:22px" data-reveal></div>
+  <div class="p-prose" style="margin-top:44px" data-reveal><div class="box"><b>¿Sos inmobiliaria o corredor de estos barrios?</b> Publicá tu cartera gratis durante la etapa de lanzamiento, con importación desde Tokko. <a href="publicar.html#inmobiliaria" style="text-decoration:underline">Empezar</a>.</div></div>
+</div></section>
+<div id="pFooter"></div>
+<script src="../mapa-barrios.js"></script><script src="js/ui.js"></script><script src="js/data.js"></script>
+<script>
+BP.header('publicadores'); BP.footer(); BP.reveal();
+BPData.load().then(function(d){
+  var av = d.avisos;
+  document.getElementById('pubs').innerHTML = Object.values(d.publicadores).map(function(p){
+    var mine = av.filter(function(a){ return a.publicadorId === p.id; });
+    var venta = mine.filter(function(a){ return a.op === 'venta'; }).length, alq = mine.length - venta;
+    return '<article class="p-pub-block" id="' + p.id + '">' +
+      '<div class="row"><div class="p-pub-logo">' + p.inicial + '</div><div><b>' + BP.esc(p.nombre) + '</b><div class="p-kicker">' + (p.tipo === 'dueno' ? 'Dueño directo verificado' : BP.esc(p.responsable) + ' · ' + BP.esc(p.badge)) + '</div></div></div>' +
+      '<div class="badges">' + BPData.badgeHTML(p) + (p.demo ? '<span class="p-badge demo">Ejemplo</span>' : '') + '</div>' +
+      '<p class="p-text" style="margin:12px 0;font-size:.92rem">' + BP.esc(p.desc) + '</p>' +
+      '<p class="p-codes">Publica desde ' + p.desde + ' · ' + venta + ' en venta · ' + alq + ' en alquiler · Zonas: ' + p.zonas.map(BP.zonaLabel).join(', ') + '</p>' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><a class="p-btn p-btn-sm p-btn-navy" href="mailto:' + p.email + '">Enviar consulta</a><a class="p-btn p-btn-sm" href="buscar.html?pub=' + p.id + '&op=">Ver sus ' + mine.length + ' propiedades</a></div>' +
+      '<div class="p-grid" style="margin-top:18px">' + mine.slice(0,3).map(BPData.cardV).join('') + '</div></article>';
+  }).join('');
+});
+</script>
+</body>
+</html>

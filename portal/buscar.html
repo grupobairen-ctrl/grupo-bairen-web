@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Propiedades en Buenos Aires — BAIREN</title>
+  <meta name="description" content="Departamentos en venta y en alquiler en los barrios seleccionados de Buenos Aires, publicados por corredores matriculados y dueños verificados.">
+  <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#131D2D">
+  <link rel="icon" href="../bairen_logo.png?v=3">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css"><link rel="stylesheet" href="css/catalogo.css"><link rel="stylesheet" href="css/portal.css">
+  <style>body{padding-top:64px}.p-skel{background:linear-gradient(90deg,#EEE9DD 25%,#F6F2E9 50%,#EEE9DD 75%);background-size:200% 100%;animation:sk 1.2s infinite;border-radius:var(--p-radius);height:240px}@keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}</style>
+</head>
+<body>
+<div id="pHeader"></div>
+
+<div class="p-filters" id="filters">
+  <div class="p-filters-in">
+    <div class="p-fchip" id="zonaBox"><span style="color:var(--gold-dark);display:inline-flex"></span><span id="zonaChips" style="display:flex;gap:6px;flex-wrap:wrap"></span><input type="text" id="qInput" placeholder="Barrio, calle o característica" aria-label="Ubicación o característica"><div class="p-sugg" id="sugg" role="listbox"></div></div>
+    <select class="p-fsel" id="opSel" aria-label="Operación"><option value="venta">Comprar</option><option value="alquiler">Alquilar, largo plazo</option><option value="mediano">Alquilar, mediano plazo</option><option value="">Todas las operaciones</option></select>
+    <select class="p-fsel" id="tipoSel" aria-label="Tipo de propiedad"><option value="departamento">Departamento</option><option value="piso">Piso</option><option value="ph">PH</option><option value="casa">Casa</option><option value="todos">Todos los tipos</option></select>
+    <div class="p-fwrap"><button type="button" class="p-fbtn" id="ambBtn" aria-haspopup="true" aria-expanded="false">Amb | Dorm</button>
+      <div class="p-pop" id="ambPop"><label>Ambientes, mínimo</label><div class="seg" data-key="amb"><button type="button" data-v="">Todos</button><button type="button" data-v="1">1+</button><button type="button" data-v="2">2+</button><button type="button" data-v="3">3+</button><button type="button" data-v="4">4+</button></div><label>Dormitorios, mínimo</label><div class="seg" data-key="dorm"><button type="button" data-v="">Todos</button><button type="button" data-v="1">1+</button><button type="button" data-v="2">2+</button><button type="button" data-v="3">3+</button></div><div class="acts"><button type="button" class="lnk" data-clear="amb,dorm">Limpiar</button><button type="button" class="p-btn p-btn-sm p-btn-navy" data-apply>Aplicar</button></div></div></div>
+    <div class="p-fwrap"><button type="button" class="p-fbtn" id="precioBtn" aria-haspopup="true" aria-expanded="false">Precio</button>
+      <div class="p-pop" id="precioPop"><label>USD, desde y hasta</label><div class="row"><input type="number" id="pmin" placeholder="Mínimo" min="0"><input type="number" id="pmax" placeholder="Máximo" min="0"></div><div class="acts"><button type="button" class="lnk" data-clear="pmin,pmax">Limpiar</button><button type="button" class="p-btn p-btn-sm p-btn-navy" data-apply>Aplicar</button></div></div></div>
+    <button type="button" class="p-fbtn" id="moreBtn"> Más filtros <span class="cnt" id="moreCnt" hidden></span></button>
+  </div>
+</div>
+
+<main class="p-container">
+  <div class="p-results-head">
+    <h1 id="resTitle">Propiedades en Buenos Aires</h1>
+    <div class="acts"><button type="button" class="p-fbtn" id="alertBtn"> Crear alerta</button><select class="p-fsel" id="sortSel" aria-label="Ordenar"><option value="relevancia">Más relevantes</option><option value="precio_asc">Menor precio</option><option value="precio_desc">Mayor precio</option><option value="recientes">Más recientes</option><option value="m2">Mayor superficie</option></select></div>
+  </div>
+  <div class="p-results">
+    <div>
+      <div class="p-list" id="list"><div class="p-skel"></div><div class="p-skel"></div><div class="p-skel"></div></div>
+      <div class="p-pager" id="pager"></div>
+      <p class="p-legend" id="leyendaAlq" hidden style="margin-top:22px"></p>
+      <nav class="p-breadcrumb" aria-label="Migas de pan" id="crumbs"></nav>
+    </div>
+    <aside class="p-map-col"><div class="p-map-card"><div class="in"><div id="mapaResultados" role="group" aria-label="Mapa de barrios"></div><p class="p-map-hint">Tocá un barrio para filtrar. Los números son unidades publicadas.</p></div></div></aside>
+  </div>
+</main>
+
+<div class="p-drawer" id="drawer" aria-hidden="true">
+  <div class="bg" data-close></div>
+  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
+    <button type="button" class="x" data-close aria-label="Cerrar">×</button>
+    <h3 id="drawerTitle">Más filtros</h3>
+    <p class="p-note" style="margin:0 0 6px">Todo lo que no entra en la barra.</p>
+    <div class="grp"><label class="t">Expensas, hasta (pesos por mes)</label><input type="number" id="expmax" class="p-fsel" style="width:100%;padding-left:12px;background-image:none" placeholder="Sin máximo"></div>
+    <div class="grp"><label class="t">Baños, mínimo</label><div class="seg" data-key="banos" style="display:flex;gap:6px;flex-wrap:wrap"><button type="button" class="p-fbtn" data-v="">Todos</button><button type="button" class="p-fbtn" data-v="1">1+</button><button type="button" class="p-fbtn" data-v="2">2+</button><button type="button" class="p-fbtn" data-v="3">3+</button></div></div>
+    <div class="grp"><label class="t">Cocheras, mínimo</label><div class="seg" data-key="coch" style="display:flex;gap:6px;flex-wrap:wrap"><button type="button" class="p-fbtn" data-v="">Todas</button><button type="button" class="p-fbtn" data-v="1">1+</button><button type="button" class="p-fbtn" data-v="2">2+</button></div></div>
+    <div class="grp"><label class="t">Superficie total, m²</label><div style="display:flex;gap:8px"><input type="number" id="m2min" class="p-fsel" style="flex:1;padding-left:12px;background-image:none" placeholder="Desde"><input type="number" id="m2max" class="p-fsel" style="flex:1;padding-left:12px;background-image:none" placeholder="Hasta"></div></div>
+    <div class="grp"><label class="t">Antigüedad</label><select id="antig" class="p-fsel" style="width:100%"><option value="">Cualquiera</option><option value="0">A estrenar</option><option value="5">Hasta 5 años</option><option value="20">Hasta 20 años</option><option value="50">Hasta 50 años</option></select></div>
+    <div class="grp"><label class="t">Amenities y características</label><div class="checks" id="amenChecks"></div></div>
+    <div class="grp"><label class="t">Publicación</label><div class="checks"><label><input type="checkbox" id="amoblado"> Amoblado</label><label><input type="checkbox" id="dueno"> Solo dueños directos</label><label><input type="checkbox" id="video"> Con video</label><label>Publicado hace <select id="hace" class="p-fsel" style="height:34px;padding:0 28px 0 8px;margin-left:6px"><option value="">cualquier fecha</option><option value="1">hoy</option><option value="7">7 días</option><option value="30">30 días</option></select></label></div></div>
+    <div class="foot"><button type="button" class="lnk" id="clearAll" style="background:none;border:0;text-decoration:underline;color:var(--text-mid);cursor:pointer">Limpiar todo</button><button type="button" class="p-btn p-btn-navy" id="applyDrawer">Ver resultados</button></div>
+  </div>
+</div>
+
+<div id="pFooter"></div>
+
+<script src="../mapa-barrios.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/data.js"></script>
+<script>
+(async function(){
+  BP.header(); BP.footer();
+  document.querySelector('#zonaBox > span').innerHTML = BP.ico.pin;
+  document.getElementById('moreBtn').innerHTML = BP.ico.filter + ' Más filtros <span class="cnt" id="moreCnt" hidden></span>';
+  document.getElementById('alertBtn').innerHTML = BP.ico.bell + ' Crear alerta';
+  const AMEN = ['Pileta','Gimnasio','SUM','Parrilla','Seguridad 24hs','Cochera','Terraza o jardín','Ascensor','Laundry','Pet friendly','Aire acondicionado','Baulera'];
+  document.getElementById('amenChecks').innerHTML = AMEN.map(a => `<label><input type="checkbox" data-amen="${a}"> ${a}</label>`).join('');
+
+  const PER_PAGE = 12;
+  const F = { op:'venta', tipo:'departamento', zonas:[], q:'', pub:'', emp:false, amb:0, dorm:0, banos:0, coch:0, pmin:0, pmax:0, expmax:0, m2min:0, m2max:0, antig:0, amen:[], amoblado:false, dueno:false, video:false, hace:0, favs:false, sort:'relevancia', page:1 };
+  const qs = BP.qs();
+  if (qs.has('op')) F.op = qs.get('op'); if (qs.get('tipo')) F.tipo = qs.get('tipo'); F.zonas = qs.getAll('zona').map(z => BP.zonaFromSlug(z) || z).filter(Boolean);
+  ['q'].forEach(k => { if (qs.get(k)) F[k] = qs.get(k); }); ['amb','dorm','banos','coch','pmin','pmax','expmax','m2min','m2max','antig','hace','page'].forEach(k => { if (qs.get(k)) F[k] = Number(qs.get(k)); });
+  ['amoblado','dueno','video','favs'].forEach(k => { if (qs.get(k)==='1') F[k] = true; }); if (qs.get('sort')) F.sort = qs.get('sort'); if (qs.getAll('amen').length) F.amen = qs.getAll('amen');
+  if (qs.get('pub')) { F.pub = qs.get('pub'); if (qs.has('op') && !qs.get('op')) F.op = ''; }
+  if (qs.get('emp') === '1') { F.emp = true; }
+  if (F.favs) F.op = '';
+
+  const { avisos } = await BPData.load();
+  const countsAll = BPData.countsByZona(avisos);
+  let mapa = null;
+
+  function syncControls(){
+    document.getElementById('opSel').value = F.op; document.getElementById('tipoSel').value = F.tipo; document.getElementById('qInput').value = F.q; document.getElementById('sortSel').value = F.sort;
+    document.getElementById('pmin').value = F.pmin||''; document.getElementById('pmax').value = F.pmax||''; document.getElementById('expmax').value = F.expmax||''; document.getElementById('m2min').value = F.m2min||''; document.getElementById('m2max').value = F.m2max||''; document.getElementById('antig').value = F.antig||''; document.getElementById('hace').value = F.hace||'';
+    document.getElementById('amoblado').checked = F.amoblado; document.getElementById('dueno').checked = F.dueno; document.getElementById('video').checked = F.video;
+    document.querySelectorAll('[data-amen]').forEach(c => c.checked = F.amen.indexOf(c.dataset.amen) > -1);
+    document.querySelectorAll('.seg').forEach(s => { const k = s.dataset.key; s.querySelectorAll('button').forEach(b => b.classList.toggle('on', String(F[k]||'') === b.dataset.v)); });
+    document.getElementById('ambBtn').textContent = (F.amb||F.dorm) ? [F.amb?F.amb+'+ amb.':null, F.dorm?F.dorm+'+ dorm.':null].filter(Boolean).join(' · ') : 'Amb | Dorm';
+    document.getElementById('precioBtn').textContent = (F.pmin||F.pmax) ? 'USD ' + (F.pmin?BP.fmtN(F.pmin):'0') + ' a ' + (F.pmax?BP.fmtN(F.pmax):'sin máximo') : 'Precio';
+    const more = [F.expmax,F.banos,F.coch,F.m2min,F.m2max,F.antig,F.amen.length,F.amoblado,F.dueno,F.video,F.hace].filter(Boolean).length; const cnt = document.getElementById('moreCnt'); cnt.textContent = more; cnt.hidden = !more;
+    document.getElementById('zonaChips').innerHTML = F.zonas.map(z => `<span class="p-chip">${BP.zonaLabel(z)}<button type="button" data-z="${z}" aria-label="Quitar ${BP.zonaLabel(z)}">×</button></span>`).join('');
+    document.querySelectorAll('#zonaChips button').forEach(b => b.addEventListener('click', () => { F.zonas = F.zonas.filter(z => z !== b.dataset.z); apply(); }));
+  }
+  function pushURL(){ const p = new URLSearchParams(); if (F.op) p.set('op', F.op); if (F.tipo !== 'departamento') p.set('tipo', F.tipo); F.zonas.forEach(z => p.append('zona', z)); if (F.q) p.set('q', F.q); ['amb','dorm','banos','coch','pmin','pmax','expmax','m2min','m2max','antig','hace'].forEach(k => { if (F[k]) p.set(k, F[k]); }); F.amen.forEach(a => p.append('amen', a)); ['amoblado','dueno','video','favs'].forEach(k => { if (F[k]) p.set(k, '1'); }); if (F.pub) p.set('pub', F.pub); if (F.emp) p.set('emp', '1'); if (F.sort !== 'relevancia') p.set('sort', F.sort); if (F.page > 1) p.set('page', F.page); history.replaceState(null, '', 'buscar.html' + (p.toString() ? '?' + p.toString() : '')); }
+
+  function titulo(n){ const tipo = F.tipo === 'todos' ? 'Propiedades' : F.tipo === 'departamento' ? 'Departamentos' : F.tipo === 'piso' ? 'Pisos' : F.tipo === 'ph' ? 'PH' : 'Casas'; const op = F.favs ? 'guardadas' : F.op ? BP.OPS[F.op].h : 'en venta y alquiler'; const where = F.zonas.length ? ' en ' + F.zonas.map(BP.zonaLabel).join(', ') : ' en Buenos Aires'; return `<span>${BP.fmtN(n)}</span> ${tipo} ${op}${where}`; }
+
+  function render(){
+    let list = BPData.filter(avisos, F); list = BPData.sort(list, F.sort);
+    const n = list.length; const pages = Math.max(1, Math.ceil(n / PER_PAGE)); if (F.page > pages) F.page = pages;
+    const slice = list.slice((F.page-1)*PER_PAGE, F.page*PER_PAGE);
+    document.getElementById('resTitle').innerHTML = titulo(n); document.title = titulo(n).replace(/<[^>]+>/g,'') + ' — BAIREN';
+    const el = document.getElementById('list');
+    el.innerHTML = n ? slice.map(BPData.cardH).join('') : `<div class="p-empty"><b style="display:block;color:var(--navy-deeper);font-family:var(--font-display);font-size:1.2rem;margin-bottom:6px">${F.favs ? 'Todavía no guardaste propiedades' : F.emp ? 'Todavía no hay emprendimientos publicados' : 'No hay unidades publicadas con estos filtros'}</b>${F.favs ? 'Tocá el corazón en cualquier ficha y la vas a ver acá.' : F.emp ? 'Las desarrolladoras publican venta directa de sus unidades. Si sos una, <a href="publicar.html#desarrolladora" style="text-decoration:underline">publicá tu emprendimiento</a>.' : 'Probá con menos filtros o con otro barrio. Si tenés una propiedad así, <a href="publicar.html" style="text-decoration:underline">publicala</a>.'}</div>`;
+    BPData.bindFavs(el);
+    const pg = document.getElementById('pager'); pg.innerHTML = pages > 1 ? Array.from({length: pages}, (_, i) => `<button type="button" class="${i+1===F.page?'on':''}" data-p="${i+1}" aria-label="Página ${i+1}">${i+1}</button>`).join('') : '';
+    pg.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { F.page = Number(b.dataset.p); pushURL(); render(); window.scrollTo({top: 0, behavior: 'smooth'}); }));
+    const ley = document.getElementById('leyendaAlq'); const hayAlqCorredor = F.op !== 'venta' && list.some(a => BPData.pub(a.publicadorId).tipo !== 'dueno'); ley.hidden = !hayAlqCorredor; ley.textContent = 'Avisos de alquiler de vivienda publicados por corredores matriculados (Ley 2340, art. 10 inc. 8): ' + BP.LEYENDA_ALQUILER;
+    document.getElementById('crumbs').innerHTML = ['<a href="index.html">BAIREN</a>', F.tipo === 'todos' ? 'Propiedades' : 'Departamentos', F.op ? BP.OPS[F.op].label.split(' ·')[0] : 'Todas las operaciones', 'Buenos Aires'].concat(F.zonas.map(BP.zonaLabel)).join(' › ');
+    const counts = BPData.countsByZona(BPData.filter(avisos, Object.assign({}, F, {zonas: []})));
+    if (window.BairenMapa && window.innerWidth >= 1024) { const mel = document.getElementById('mapaResultados'); if (!mapa) { try { mapa = window.BairenMapa.mount(mel, { counts, modo:'lite', active: F.zonas[0] || null, onSelect: z => { F.zonas = F.zonas.indexOf(z) > -1 ? [] : [z]; apply(); } }); } catch (e) { mel.innerHTML = '<p class="p-note">Mapa no disponible.</p>'; } } else { mapa.setCounts(counts); mapa.setActive(F.zonas[0] || null); mapa.refresh && mapa.refresh(); } }
+  }
+  function apply(){ F.page = 1; syncControls(); pushURL(); render(); }
+
+  /* controles */
+  document.getElementById('opSel').addEventListener('change', e => { F.op = e.target.value; F.favs = false; apply(); });
+  document.getElementById('tipoSel').addEventListener('change', e => { F.tipo = e.target.value; apply(); });
+  document.getElementById('sortSel').addEventListener('change', e => { F.sort = e.target.value; apply(); });
+  const qi = document.getElementById('qInput'), sugg = document.getElementById('sugg');
+  function showSugg(){ const q = qi.value.trim().toLowerCase(); const zs = BP.ZONAS.filter(z => F.zonas.indexOf(z)===-1 && (!q || BP.zonaLabel(z).toLowerCase().indexOf(q)>-1)); sugg.innerHTML = zs.map(z => `<button type="button" data-z="${z}">${BP.ico.pin} ${BP.zonaLabel(z)}<small>${countsAll[z]||0} publicadas</small></button>`).join(''); sugg.classList.toggle('open', zs.length>0); sugg.querySelectorAll('button').forEach(b => b.addEventListener('mousedown', e => { e.preventDefault(); F.zonas.push(b.dataset.z); qi.value=''; F.q=''; sugg.classList.remove('open'); apply(); })); }
+  qi.addEventListener('focus', showSugg); qi.addEventListener('input', showSugg); qi.addEventListener('blur', () => setTimeout(() => sugg.classList.remove('open'), 120));
+  qi.addEventListener('keydown', e => { if (e.key === 'Enter') { F.q = qi.value.trim(); sugg.classList.remove('open'); apply(); } });
+  /* popovers */
+  [['ambBtn','ambPop'],['precioBtn','precioPop']].forEach(([b,p]) => { const btn = document.getElementById(b), pop = document.getElementById(p); btn.addEventListener('click', () => { const o = !pop.classList.contains('open'); document.querySelectorAll('.p-pop').forEach(x => x.classList.remove('open')); pop.classList.toggle('open', o); btn.setAttribute('aria-expanded', o); }); });
+  document.addEventListener('click', e => { if (!e.target.closest('.p-fwrap')) document.querySelectorAll('.p-pop').forEach(x => x.classList.remove('open')); });
+  document.querySelectorAll('.seg').forEach(s => s.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { F[s.dataset.key] = Number(b.dataset.v||0); s.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); })));
+  document.querySelectorAll('[data-apply]').forEach(b => b.addEventListener('click', () => { F.pmin = Number(document.getElementById('pmin').value||0); F.pmax = Number(document.getElementById('pmax').value||0); document.querySelectorAll('.p-pop').forEach(x => x.classList.remove('open')); apply(); }));
+  document.querySelectorAll('[data-clear]').forEach(b => b.addEventListener('click', () => { b.dataset.clear.split(',').forEach(k => F[k] = 0); apply(); }));
+  /* drawer */
+  const drawer = document.getElementById('drawer');
+  const openDrawer = o => { drawer.classList.toggle('open', o); drawer.setAttribute('aria-hidden', !o); document.body.style.overflow = o ? 'hidden' : ''; };
+  document.getElementById('moreBtn').addEventListener('click', () => openDrawer(true));
+  drawer.querySelectorAll('[data-close]').forEach(x => x.addEventListener('click', () => openDrawer(false)));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') openDrawer(false); });
+  document.getElementById('applyDrawer').addEventListener('click', () => { F.expmax = Number(document.getElementById('expmax').value||0); F.m2min = Number(document.getElementById('m2min').value||0); F.m2max = Number(document.getElementById('m2max').value||0); F.antig = Number(document.getElementById('antig').value||0); F.hace = Number(document.getElementById('hace').value||0); F.amoblado = document.getElementById('amoblado').checked; F.dueno = document.getElementById('dueno').checked; F.video = document.getElementById('video').checked; F.amen = Array.from(document.querySelectorAll('[data-amen]:checked')).map(c => c.dataset.amen); openDrawer(false); apply(); });
+  document.getElementById('clearAll').addEventListener('click', () => { Object.assign(F, { zonas:[], q:'', amb:0, dorm:0, banos:0, coch:0, pmin:0, pmax:0, expmax:0, m2min:0, m2max:0, antig:0, amen:[], amoblado:false, dueno:false, video:false, hace:0, favs:false }); openDrawer(false); apply(); });
+  /* alerta */
+  document.getElementById('alertBtn').addEventListener('click', () => { const a = BP.alerts.get(); a.push({ creada: new Date().toISOString(), filtros: Object.assign({}, F), url: location.href }); BP.alerts.set(a); BP.toast('Alerta guardada en este navegador. Con tu cuenta te llega por mail.'); });
+
+  syncControls(); render();
+})();
+</script>
+</body>
+</html>

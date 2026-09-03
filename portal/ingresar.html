@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ingresar — BAIREN</title>
+  <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#131D2D">
+  <link rel="icon" href="../bairen_logo.png?v=3">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css"><link rel="stylesheet" href="css/catalogo.css"><link rel="stylesheet" href="css/portal.css">
+</head>
+<body>
+<div id="pHeader"></div>
+<section class="p-page"><div class="p-container">
+  <div class="p-login" data-reveal>
+    <h1>Iniciar sesión</h1>
+    <p class="p-sub" style="margin-bottom:18px">Con tu cuenta guardás favoritos y búsquedas, recibís alertas, ves tus contactos y, si publicás, tu panel.</p>
+    <form id="loginForm"><input type="email" name="email" placeholder="Ingresá tu e-mail" required autocomplete="email"><button type="submit" class="p-btn p-btn-fill" style="width:100%">Continuar</button></form>
+    <p class="p-note" style="text-align:center;margin-top:10px">¿No tenés cuenta? <a href="publicar.html" style="text-decoration:underline;color:var(--navy-deeper)">Crear una cuenta</a></p>
+    <div class="or">o</div>
+    <button type="button" class="soc">Continuar con Google</button><button type="button" class="soc">Continuar con Apple</button>
+    <p class="p-note" style="margin-top:14px">Al continuar aceptás los <a href="legales.html#terminos" style="text-decoration:underline">Términos y condiciones</a> y la <a href="legales.html#privacidad" style="text-decoration:underline">Política de privacidad</a>.</p>
+  </div>
+</div></section>
+<div id="pFooter"></div>
+<script src="../mapa-barrios.js"></script><script src="js/ui.js"></script><script src="js/data.js"></script>
+<script>BP.header("ingresar"); BP.footer(); BP.reveal(); document.getElementById("loginForm").addEventListener("submit",function(e){e.preventDefault();BP.toast("Te mandamos un código a "+e.target.email.value+". Cuentas reales en la Fase 2.");});</script>
+</body>
+</html>

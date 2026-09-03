@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Propiedad — BAIREN</title>
+  <meta name="description" content="Ficha de propiedad en BAIREN, plataforma de propiedades seleccionadas en Buenos Aires.">
+  <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#131D2D">
+  <link rel="icon" href="../bairen_logo.png?v=3">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css"><link rel="stylesheet" href="css/catalogo.css"><link rel="stylesheet" href="css/portal.css">
+  <style>body{padding-top:64px}.p-video{aspect-ratio:16/9;background:#0b1220;border-radius:12px;overflow:hidden}.p-video iframe,.p-video video{width:100%;height:100%;border:0;display:block}</style>
+</head>
+<body>
+<div id="pHeader"></div>
+<main class="p-container" id="ficha"><div class="p-ficha-top"><div class="p-skel" style="height:440px;border-radius:var(--p-radius);background:#EEE9DD"></div></div></main>
+<div class="p-lb" id="lb" aria-hidden="true"><button type="button" class="x" data-lb-close aria-label="Cerrar">×</button><img id="lbImg" alt=""><div class="ctl"><button type="button" data-lb-prev aria-label="Anterior">‹</button><span id="lbCount"></span><button type="button" data-lb-next aria-label="Siguiente">›</button></div></div>
+<div id="pFooter"></div>
+
+<script src="../mapa-barrios.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/data.js"></script>
+<script>
+(async function(){
+  BP.header(); BP.footer();
+  const id = BP.qs().get('id');
+  const { avisos } = await BPData.load();
+  const a = avisos.find(x => x.id === id) || avisos.find(x => x.slug === id);
+  const main = document.getElementById('ficha');
+  if (!a) { main.innerHTML = `<div class="p-page"><div class="p-prose"><h1>No encontramos esa propiedad</h1><p>Puede que ya no esté publicada. <a href="buscar.html" style="text-decoration:underline">Volver a las propiedades</a>.</p></div></div>`; return; }
+  const pub = BPData.pub(a.publicadorId);
+  const esAlqCorredor = a.op !== 'venta' && pub.tipo !== 'dueno';
+  const fotos = a.fotos.length ? a.fotos : [];
+  const kicker = [a.tipoProp, a.m2 ? a.m2 + ' m²' : null, a.amb ? (a.amb === 1 ? 'monoambiente' : a.amb + ' ambientes') : null].filter(Boolean).join(' · ');
+  const icon = (ic, v, lbl) => `<div>${BP.ico[ic]}${v}<small>${lbl}</small></div>`;
+  const similares = BPData.sort(avisos.filter(x => x.id !== a.id && x.op === a.op && (x.zona === a.zona || x.barrio === a.barrio)), 'relevancia').slice(0,4);
+  const msgDefault = `Hola, quiero que se comuniquen conmigo por ${a.titulo} (${a.codigo}) que vi en BAIREN.`;
+  document.title = `${a.titulo} · ${BPData.opTag(a)} en ${a.barrio} — BAIREN`;
+
+  main.innerHTML = `
+<div class="p-ficha-top">
+  <div class="p-tray"><div class="p-gallery" id="gal">
+    ${fotos.slice(0,5).map((f,i) => `<a href="#" data-i="${i}"><img src="${BP.sbImg(f, i===0?1400:700)}" alt="${BP.esc(a.titulo)}, foto ${i+1}" ${i>0?'loading="lazy"':''}></a>`).join('')}
+    ${fotos.length < 5 ? Array.from({length: 5 - fotos.length}, () => '<a href="#" aria-hidden="true" tabindex="-1"></a>').join('') : ''}
+    <div class="cts"><span>${BP.ico.photo} ${fotos.length} fotos</span>${a.video ? `<span>${BP.ico.video} Video</span>` : ''}</div>
+    ${fotos.length ? '<button type="button" class="all" data-i="0">Ver todas las fotos</button>' : ''}
+  </div></div>
+</div>
+<div class="p-ficha">
+  <div class="p-ficha-main">
+    <div>
+      <div class="p-kicker">${BP.esc(kicker)}</div>
+      <div class="p-ficha-price"><div class="big">${BPData.opTag(a)} ${BPData.precioHTML(a)}</div><button type="button" class="p-btn p-btn-sm" id="bajaPrecio">${BP.ico.bell} Avisarme si baja de precio</button></div>
+      ${a.expensas ? `<div class="p-expensas" style="font-size:1rem;margin-top:4px">Expensas $ ${BP.fmtN(a.expensas)}</div>` : ''}
+      <h1>${BP.esc(a.titulo)}</h1>
+      <p class="p-kicker">${a.apto.map(x => `<span class="p-badge" style="margin-right:6px">${x}</span>`).join('')}${a.demo ? '<span class="p-badge demo">Aviso de ejemplo</span>' : ''}</p>
+    </div>
+    <div>
+      <div class="p-addr-line">${BP.ico.pin} ${BP.esc(a.dir)}${a.unidad ? ' · ' + BP.esc(a.unidad) : ''}, ${BP.esc(a.barrio)}, ${BP.esc(a.ciudad)}</div>
+      <div class="p-map-ficha"><div id="mapaFicha"></div><p class="p-note" style="margin:6px 8px 2px">Ubicación aproximada por barrio. La dirección exacta la confirma quien publica.</p></div>
+    </div>
+    <div class="p-icons">
+      ${icon('ruler', a.m2 ? a.m2 + ' m²' : '—', 'totales')}${icon('ruler', a.m2cub ? a.m2cub + ' m²' : '—', 'cubiertos')}${icon('door', a.amb || '—', a.amb === 1 ? 'monoamb.' : 'ambientes')}${icon('bath', a.banos || '—', a.banos === 1 ? 'baño' : 'baños')}${icon('bed', a.dorm || '—', a.dorm === 1 ? 'dorm.' : 'dorms.')}${icon('cal', a.antiguedad != null ? a.antiguedad + ' años' : '—', 'antigüedad')}
+    </div>
+    ${a.video ? `<div><h2 class="p-sec-t">Recorrido en video</h2><div class="p-video" id="video"></div></div>` : ''}
+    <div>
+      <h2 class="p-sec-t">La unidad</h2>
+      <p class="p-text clamp" id="desc">${BP.esc(a.descripcion || 'Descripción en producción.')}</p>
+      <button type="button" class="p-more" id="descMore">Leer descripción completa</button>
+    </div>
+    <div>
+      <h2 class="p-sec-t">Preguntas para quien publica</h2>
+      <p class="p-kicker" style="margin-bottom:10px">Elegí una o escribí la tuya. Le llega directo a ${BP.esc(pub.nombre)}.</p>
+      <div class="p-quick" id="quick"><button type="button">¿Sigue disponible?</button><button type="button">¿Valor de las expensas?</button><button type="button">¿En qué piso está?</button><button type="button">¿Cuándo puedo visitarla?</button></div>
+      <div class="p-qrow"><input type="text" id="qText" placeholder="Escribí tu consulta" maxlength="200"><button type="button" class="p-btn p-btn-navy" id="qSend">Enviar</button></div>
+    </div>
+    <div>
+      <h2 class="p-sec-t">Conocé más sobre esta propiedad</h2>
+      <div class="p-tabs2" role="tablist"><button type="button" class="on" data-tab="gen">Características</button><button type="button" data-tab="serv">Servicios y amenities</button><button type="button" data-tab="amb">Ambientes</button></div>
+      <div class="p-feat" id="tab-gen"><ul>${[a.op !== 'venta' && a.plazo ? 'Plazo: ' + a.plazo : null, a.amoblado ? 'Amoblado y equipado' : 'Sin amoblar', a.op === 'venta' ? 'Apto crédito' : 'Contrato digital en dólares', a.op === 'mediano' ? 'Sin garantía propietaria ni seguro de caución' : null, a.cocheras ? 'Cochera' : null, 'Estado: ' + (a.reservado ? 'reservada' : 'disponible')].filter(Boolean).map(x => `<li>${BP.esc(x)}</li>`).join('')}</ul></div>
+      <div class="p-feat" id="tab-serv" hidden><ul>${(a.amenities.length ? a.amenities : ['Sin amenities informados']).map(x => `<li>${BP.esc(x)}</li>`).join('')}</ul></div>
+      <div class="p-feat" id="tab-amb" hidden><ul>${[a.amb ? (a.amb === 1 ? 'Monoambiente' : a.amb + ' ambientes') : null, a.dorm ? a.dorm + (a.dorm === 1 ? ' dormitorio' : ' dormitorios') : null, a.banos ? a.banos + (a.banos === 1 ? ' baño' : ' baños') : null, a.amenities.indexOf('Terraza o jardín') > -1 ? 'Terraza o jardín' : null].filter(Boolean).map(x => `<li>${BP.esc(x)}</li>`).join('')}</ul></div>
+    </div>
+    <div class="p-pub-block">
+      <h2 class="p-sec-t">Quién publica</h2>
+      <div class="row"><div class="p-pub-logo">${pub.inicial}</div><div><b>${BP.esc(pub.nombre)}</b><div class="p-kicker">${pub.tipo === 'dueno' ? 'Propietario con titularidad verificada por BAIREN' : BP.esc(pub.responsable) + ' · ' + BP.esc(pub.badge)}</div></div></div>
+      <div class="badges">${BPData.badgeHTML(pub)}<span class="p-badge">${BP.ico.check} Ficha verificada por BAIREN</span>${pub.demo ? '<span class="p-badge demo">Publicador de ejemplo</span>' : ''}</div>
+      <p class="p-text" style="margin:12px 0 10px;font-size:.9rem">${BP.esc(pub.desc)} ${pub.tipo !== 'dueno' ? 'La intermediación y la conclusión de la operación están a cargo de ' + BP.esc(pub.responsable) + ', ' + BP.esc(pub.matricula) + '.' : ''}</p>
+      <a class="p-link" href="publicadores.html#${pub.id}">Ver todas sus propiedades</a>
+      <p class="p-codes" style="margin-top:14px">Cód. BAIREN: ${a.codigo} · Publica desde ${pub.desde}</p>
+    </div>
+    <div class="p-report">
+      <b>${BP.ico.flag} ¿Tenés algún problema con este aviso?</b>
+      <div class="chips"><button type="button" data-rep="vendida">La propiedad está vendida o reservada</button><button type="button" data-rep="contacto">No me puedo contactar</button><button type="button" data-rep="otro">Otros motivos</button></div>
+      <p class="p-note" style="margin-top:10px"><a href="legales.html#fraudes" style="text-decoration:underline">¿Cómo evitar fraudes inmobiliarios?</a></p>
+    </div>
+    <div class="p-meta-line"><span>${BP.hace(a.publicadoEn)}</span><span>·</span><span id="vistas"></span></div>
+    ${esAlqCorredor ? `<p class="p-legend">${BP.LEYENDA_ALQUILER} (Ley 2340, art. 10 inc. 8)</p>` : ''}
+    <p class="p-legend">${BP.LEYENDA_PLATAFORMA}</p>
+  </div>
+  <aside class="p-side" id="contacto">
+    <form class="p-form" id="contactForm">
+      <h3>Contactá a quien publica</h3>
+      <div class="r2"><input type="text" name="nombre" placeholder="Nombre" required autocomplete="name"><input type="email" name="email" placeholder="Email" required autocomplete="email"></div>
+      <input type="tel" name="telefono" placeholder="Teléfono con código de área" required autocomplete="tel">
+      <textarea name="mensaje" id="mensaje">${BP.esc(msgDefault)}</textarea>
+      <label class="chk"><input type="checkbox" required> Acepto los <a href="legales.html#terminos">Términos y condiciones de uso</a> y la <a href="legales.html#privacidad">Política de privacidad</a>.</label>
+      <label class="chk"><input type="checkbox" required> Entiendo que mis datos se envían a ${BP.esc(pub.nombre)}, responsable de la operación. BAIREN no interviene en la conversación.</label>
+      <button type="submit" class="p-btn p-btn-fill">${BP.ico.mail} Contactar</button>
+      <a class="p-btn p-btn-dark" id="waBtn" href="${BPData.waLink(a, pub)}" target="_blank" rel="noopener" style="margin-top:8px">${BP.ico.wa} Contactar por WhatsApp</a>
+    </form>
+    <div class="p-side-pub"><div><b>${BP.esc(pub.nombre)}</b><small>${pub.tipo === 'dueno' ? 'Dueño verificado' : BP.esc(pub.matricula)}</small></div><button type="button" class="p-btn p-btn-sm" id="verTel">${BP.ico.phone} Ver teléfono</button></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end"><button type="button" class="p-icon-btn ${BP.isFav(a.id)?'on':''}" data-fav="${BP.esc(a.id)}" aria-label="Guardar en favoritos">${BP.isFav(a.id)?BP.ico.heartFill:BP.ico.heart}</button><button type="button" class="p-icon-btn" id="share" aria-label="Compartir">${BP.ico.share}</button></div>
+  </aside>
+</div>
+<section style="padding:0 0 64px">
+  <div class="p-head-row"><h2 class="p-h2">Propiedades similares</h2><a class="p-link" href="buscar.html?op=${a.op}&zona=${encodeURIComponent(a.zona)}">Ver más en ${BP.zonaLabel(a.zona)}</a></div>
+  <div class="p-grid">${similares.map(BPData.cardV).join('') || '<p class="p-note">Todavía no hay otras unidades similares publicadas.</p>'}</div>
+  <nav class="p-breadcrumb" aria-label="Migas de pan"><a href="index.html">BAIREN</a> › <a href="buscar.html?op=${a.op}">${BPData.opTag(a)}</a> › <a href="buscar.html?op=${a.op}&zona=${encodeURIComponent(a.zona)}">${BP.zonaLabel(a.zona)}</a> › <span>${BP.esc(a.barrio)}</span> › <span>${BP.esc(a.titulo)}</span></nav>
+</section>`;
+
+  /* comportamiento */
+  BPData.bindFavs(main);
+  const gal = document.getElementById('gal'); const lb = document.getElementById('lb'), lbImg = document.getElementById('lbImg'), lbCount = document.getElementById('lbCount'); let cur = 0;
+  const showLb = i => { if (!fotos.length) return; cur = (i + fotos.length) % fotos.length; lbImg.src = BP.sbImg(fotos[cur], 1800); lbImg.alt = a.titulo + ', foto ' + (cur+1); lbCount.textContent = (cur+1) + ' / ' + fotos.length; lb.classList.add('open'); lb.setAttribute('aria-hidden','false'); document.body.style.overflow = 'hidden'; };
+  const closeLb = () => { lb.classList.remove('open'); lb.setAttribute('aria-hidden','true'); document.body.style.overflow = ''; };
+  gal.querySelectorAll('[data-i]').forEach(el => el.addEventListener('click', e => { e.preventDefault(); showLb(Number(el.dataset.i)); }));
+  lb.querySelector('[data-lb-close]').addEventListener('click', closeLb); lb.querySelector('[data-lb-prev]').addEventListener('click', () => showLb(cur-1)); lb.querySelector('[data-lb-next]').addEventListener('click', () => showLb(cur+1));
+  document.addEventListener('keydown', e => { if (!lb.classList.contains('open')) return; if (e.key === 'Escape') closeLb(); if (e.key === 'ArrowLeft') showLb(cur-1); if (e.key === 'ArrowRight') showLb(cur+1); });
+  if (a.video) { const v = document.getElementById('video'); if (a.video.tipo === 'youtube') { const m = a.video.url.match(/(?:v=|be\/|embed\/)([A-Za-z0-9_-]{6,})/); v.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${m ? m[1] : ''}" title="Video de ${BP.esc(a.titulo)}" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>`; } else if (a.video.tipo === 'bunny') { v.innerHTML = `<iframe src="${BP.esc(a.video.url)}" title="Video de ${BP.esc(a.titulo)}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>`; } else { v.innerHTML = `<video src="${BP.esc(a.video.url)}" controls playsinline preload="metadata"></video>`; } }
+  const desc = document.getElementById('desc'), more = document.getElementById('descMore'); if (desc.scrollHeight <= desc.clientHeight + 4) more.hidden = true; more.addEventListener('click', () => { desc.classList.toggle('clamp'); more.textContent = desc.classList.contains('clamp') ? 'Leer descripción completa' : 'Leer menos'; });
+  document.querySelectorAll('.p-tabs2 button').forEach(b => b.addEventListener('click', () => { document.querySelectorAll('.p-tabs2 button').forEach(x => x.classList.toggle('on', x === b)); ['gen','serv','amb'].forEach(k => document.getElementById('tab-' + k).hidden = k !== b.dataset.tab); }));
+  const mensaje = document.getElementById('mensaje'), qText = document.getElementById('qText');
+  document.querySelectorAll('#quick button').forEach(b => b.addEventListener('click', () => { b.classList.toggle('on'); const qs = Array.from(document.querySelectorAll('#quick button.on')).map(x => x.textContent); mensaje.value = msgDefault + (qs.length ? ' ' + qs.join(' ') : '') + (qText.value.trim() ? ' ' + qText.value.trim() : ''); }));
+  document.getElementById('qSend').addEventListener('click', () => { const t = qText.value.trim(); const qs = Array.from(document.querySelectorAll('#quick button.on')).map(x => x.textContent); if (!t && !qs.length) { BP.toast('Elegí una pregunta o escribí la tuya.'); return; } mensaje.value = msgDefault + (qs.length ? ' ' + qs.join(' ') : '') + (t ? ' ' + t : ''); document.getElementById('contactForm').scrollIntoView({behavior:'smooth', block:'center'}); document.querySelector('#contactForm input[name=nombre]').focus(); });
+  document.getElementById('contactForm').addEventListener('submit', e => { e.preventDefault(); const f = e.target; const c = BP.consultas.get(); c.push({ avisoId: a.id, publicador: pub.id, nombre: f.nombre.value, email: f.email.value, telefono: f.telefono.value, mensaje: f.mensaje.value, fecha: new Date().toISOString() }); BP.consultas.set(c); const subject = encodeURIComponent('Consulta por ' + a.titulo + ' (' + a.codigo + ') desde BAIREN'); const body = encodeURIComponent(f.mensaje.value + '\n\n' + f.nombre.value + ' · ' + f.telefono.value + ' · ' + f.email.value); window.location.href = 'mailto:' + pub.email + '?subject=' + subject + '&body=' + body; BP.toast('Tu consulta va directo a ' + pub.nombre + '.'); });
+  document.getElementById('verTel').addEventListener('click', e => { e.target.closest('button').outerHTML = `<a class="p-btn p-btn-sm" href="tel:${pub.telefono.replace(/\s/g,'')}">${BP.ico.phone} ${pub.telefono}</a>`; });
+  document.getElementById('bajaPrecio').addEventListener('click', () => { const al = BP.alerts.get(); al.push({ tipo: 'precio', avisoId: a.id, creada: new Date().toISOString() }); BP.alerts.set(al); BP.toast('Te avisamos si baja de precio. Con tu cuenta, por mail.'); });
+  document.querySelectorAll('[data-rep]').forEach(b => b.addEventListener('click', () => { const r = BP.reportes.get(); r.push({ avisoId: a.id, motivo: b.dataset.rep, fecha: new Date().toISOString() }); BP.reportes.set(r); BP.toast('Gracias. Revisamos el aviso en menos de 24 horas.'); }));
+  document.getElementById('share').addEventListener('click', async () => { const data = { title: a.titulo + ' — BAIREN', url: location.href }; if (navigator.share) { try { await navigator.share(data); } catch (e) {} } else { try { await navigator.clipboard.writeText(location.href); BP.toast('Link copiado.'); } catch (e) { BP.toast(location.href); } } });
+  /* vistas (contador local de prueba) */
+  try { const k = 'bp_vistas_' + a.id; const n = Number(localStorage.getItem(k)||0) + 1; localStorage.setItem(k, n); document.getElementById('vistas').textContent = n + (n === 1 ? ' visualización' : ' visualizaciones') + ' en este navegador'; } catch (e) {}
+  /* mapa por barrio */
+  if (window.BairenMapa) { try { const counts = {}; counts[a.zona] = 1; window.BairenMapa.mount(document.getElementById('mapaFicha'), { counts, modo: 'lite', active: a.zona, onSelect: z => { location.href = 'buscar.html?op=' + a.op + '&zona=' + encodeURIComponent(z); } }); } catch (e) {} }
+  /* JSON-LD */
+  const ld = { '@context':'https://schema.org', '@type':'RealEstateListing', name: a.titulo, description: (a.descripcion||'').slice(0,300), url: location.href, image: fotos.slice(0,3), datePosted: a.publicadoEn, offers: { '@type':'Offer', price: a.precio, priceCurrency: 'USD', availability: a.reservado ? 'https://schema.org/LimitedAvailability' : 'https://schema.org/InStock', offeredBy: { '@type': pub.tipo === 'dueno' ? 'Person' : 'RealEstateAgent', name: pub.nombre, identifier: pub.matricula || 'Dueño verificado' } }, address: { '@type':'PostalAddress', streetAddress: a.dir, addressLocality: a.barrio, addressRegion: a.ciudad, addressCountry: 'AR' } };
+  const s = document.createElement('script'); s.type = 'application/ld+json'; s.textContent = JSON.stringify(ld); document.head.appendChild(s);
+})();
+</script>
+</body>
+</html>

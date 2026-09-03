@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BAIREN — Propiedades seleccionadas en Buenos Aires</title>
+  <meta name="description" content="Plataforma de propiedades seleccionadas en Buenos Aires. Departamentos en venta y en alquiler en Palermo, Recoleta, Belgrano, Núñez, Colegiales, Puerto Madero, Saavedra y Zona Norte, publicados por corredores matriculados y dueños verificados.">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#131D2D">
+  <link rel="icon" href="../bairen_logo.png?v=3">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css"><link rel="stylesheet" href="css/catalogo.css"><link rel="stylesheet" href="css/portal.css">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"BAIREN","url":"https://www.bairengroup.com","logo":"https://www.bairengroup.com/bairen_logo.png","description":"Plataforma de propiedades seleccionadas en Buenos Aires. Alquileres a mediano y largo plazo y departamentos en venta, publicados por corredores matriculados y dueños verificados.","areaServed":[{"@type":"City","name":"Ciudad Autónoma de Buenos Aires"},{"@type":"AdministrativeArea","name":"Zona Norte, Buenos Aires"}]}</script>
+</head>
+<body>
+<div id="pHeader"></div>
+
+<section class="p-hero">
+  <video autoplay muted loop playsinline preload="metadata" poster="../hero-poster.jpg?v=2" aria-hidden="true"><source src="../hero.mp4?v=2" type="video/mp4"></video>
+  <div class="p-hero-in">
+    <h1>Buenos Aires no se alquila. Se elige.</h1>
+    <p class="p-hero-sub">Propiedades seleccionadas en los barrios que valen la pena.</p>
+    <div class="p-search" role="search" aria-label="Buscar propiedades">
+      <div class="p-tabs" role="tablist">
+        <button class="p-tab active" role="tab" data-op="venta" aria-selected="true">Comprar</button>
+        <button class="p-tab" role="tab" data-op="alquiler" aria-selected="false">Alquilar</button>
+        <button class="p-tab" role="tab" data-op="mediano" aria-selected="false">Mediano plazo</button>
+        <button class="p-tab" role="tab" data-op="emprendimientos" aria-selected="false" title="Venta directa de desarrolladoras">Emprendimientos</button>
+      </div>
+      <form class="p-search-row" id="searchForm" action="buscar.html" method="get">
+        <input type="hidden" name="op" id="opInput" value="venta">
+        <div class="p-field"><select name="tipo" aria-label="Tipo de propiedad"><option value="departamento">Departamento</option><option value="piso">Piso</option><option value="ph">PH</option><option value="casa">Casa</option><option value="todos">Todos los tipos</option></select></div>
+        <div class="p-field"><input type="text" id="zonaInput" name="q" placeholder="Barrio, calle o característica (ej: terraza)" autocomplete="off" aria-label="Ubicación o característica" aria-autocomplete="list" aria-controls="sugg"><div class="p-sugg" id="sugg" role="listbox"></div></div>
+        <button class="p-btn p-btn-fill" type="submit">Buscar <span class="ic"></span></button>
+      </form>
+      <div class="p-chips" id="zonaChips" aria-live="polite"></div>
+    </div>
+  </div>
+</section>
+
+<section class="p-section" id="barrios">
+  <div class="p-container p-zonas-wrap">
+    <div data-reveal>
+      <span class="p-eyebrow">Ocho zonas, un criterio</span>
+      <h2 class="p-h2">Los barrios que seleccionamos</h2>
+      <p class="p-sub">Cada unidad entra porque pasó un estándar de edificio, estado y presentación. Elegí el barrio y mirá lo que hay publicado hoy.</p>
+      <div class="p-zonas" id="zonasGrid"></div>
+    </div>
+    <div class="p-map-home" data-reveal><div class="in"><div id="mapaHome" role="group" aria-label="Mapa de barrios"></div></div></div>
+  </div>
+</section>
+
+<section class="p-section alt" id="seleccionadas">
+  <div class="p-container">
+    <div class="p-head-row" data-reveal><div><h2 class="p-h2">Seleccionadas de la semana</h2><p class="p-sub" style="margin:0">Las unidades que más vale la pena ver ahora.</p></div><a class="p-link" href="buscar.html">Ver todas las propiedades</a></div>
+    <div class="p-grid" id="destacadasGrid" data-reveal></div>
+  </div>
+</section>
+
+<section class="p-section" id="publicar">
+  <div class="p-container">
+    <div class="p-publica" data-reveal>
+      <img src="../hero-poster.jpg?v=2" alt="" aria-hidden="true">
+      <div>
+        <h3>Publicá tu propiedad en BAIREN</h3>
+        <p>Si tu unidad está en uno de los ocho barrios y cumple el estándar, la producimos y la mostramos a la gente que la está buscando. La operación la lleva quien publica: vos como dueño verificado, tu inmobiliaria o la desarrolladora.</p>
+        <ul><li>Fotos profesionales o producidas por BAIREN, ficha completa y verificada</li><li>Contacto directo con los interesados, sin intermediarios de la plataforma</li><li>Panel con vistas, consultas y visitas, en Bairen OS</li></ul>
+        <div class="p-cta-row"><a class="p-btn p-btn-fill" href="publicar.html#dueno">Soy dueño directo</a><a class="p-btn" href="publicar.html#inmobiliaria">Soy inmobiliaria o corredor</a><a class="p-btn" href="publicar.html#desarrolladora">Soy desarrolladora</a></div>
+      </div>
+      <div><div class="p-index" style="border:0;background:rgba(255,255,255,.06)"><table class="p-index" style="background:transparent;border:0;color:#fff"><thead><tr><th style="background:transparent;color:var(--gold)">Condiciones de ingreso</th></tr></thead><tbody><tr><td style="color:rgba(255,255,255,.85);border-color:rgba(255,255,255,.1)">Ubicación en Palermo, Recoleta, Belgrano, Núñez, Colegiales, Puerto Madero, Saavedra o Zona Norte</td></tr><tr><td style="color:rgba(255,255,255,.85);border-color:rgba(255,255,255,.1)">Edificio de categoría o con amenities, unidad en estado impecable</td></tr><tr><td style="color:rgba(255,255,255,.85);border-color:rgba(255,255,255,.1)">Ficha completa: metros, expensas, orientación, planos</td></tr><tr><td style="color:rgba(255,255,255,.85);border-color:rgba(255,255,255,.1)">Fotos profesionales, mínimo ocho. Si no las tenés, las hacemos</td></tr><tr><td style="color:rgba(255,255,255,.85);border:0">Publicador verificado: titularidad, matrícula o CUIT</td></tr></tbody></table></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="p-section alt" id="publicadores">
+  <div class="p-container">
+    <div class="p-head-row" data-reveal><div><h2 class="p-h2">Quiénes publican</h2><p class="p-sub" style="margin:0">Corredores matriculados, dueños verificados y desarrolladoras. Cada ficha dice quién la publica.</p></div><a class="p-link" href="publicadores.html">Ver todos los publicadores</a></div>
+    <div class="p-pubs" id="pubsRow" data-reveal></div>
+  </div>
+</section>
+
+<section class="p-section" id="indice">
+  <div class="p-container" style="display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start">
+    <div data-reveal>
+      <h2 class="p-h2">Índice BAIREN</h2>
+      <p class="p-sub">Precio por metro cuadrado de lo que está publicado hoy, por barrio. Se recalcula con cada unidad que entra.</p>
+      <table class="p-index" id="indiceTabla"><thead><tr><th>Barrio</th><th class="num">Venta, USD/m²</th><th class="num">Alquiler, USD/m² por mes</th><th class="num">Unidades</th></tr></thead><tbody></tbody></table>
+      <p class="p-note">Estimación con las unidades publicadas en BAIREN. No es una tasación.</p>
+    </div>
+    <div data-reveal id="guia">
+      <h2 class="p-h2">Cómo es vivir en cada barrio</h2>
+      <p class="p-sub">La guía la escribe el equipo que camina esos barrios todos los días.</p>
+      <div class="p-zonas" id="guiaGrid"></div>
+    </div>
+  </div>
+</section>
+
+<section class="p-section alt" id="busquedas">
+  <div class="p-container">
+    <h2 class="p-h2" data-reveal>Búsquedas frecuentes</h2>
+    <div class="p-seo" id="seoLinks" data-reveal></div>
+  </div>
+</section>
+
+<div id="pFooter"></div>
+
+<script src="../mapa-barrios.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/data.js"></script>
+<script>
+(async function(){
+  BP.header('home'); BP.footer(); BP.reveal();
+  document.querySelector('#searchForm .p-btn .ic').innerHTML = BP.ico.arrow;
+
+  /* pestañas de operación */
+  const opInput = document.getElementById('opInput');
+  document.querySelectorAll('.p-tab').forEach(t => t.addEventListener('click', () => {
+    document.querySelectorAll('.p-tab').forEach(x => { x.classList.remove('active'); x.setAttribute('aria-selected','false'); });
+    t.classList.add('active'); t.setAttribute('aria-selected','true'); opInput.value = t.dataset.op;
+  }));
+
+  /* sugerencias limitadas a las ocho zonas + características */
+  const input = document.getElementById('zonaInput'), sugg = document.getElementById('sugg'), chips = document.getElementById('zonaChips');
+  const zonasSel = [];
+  const CARACT = ['Terraza o jardín','Pileta','Cochera','Amoblado','Pet friendly','Gimnasio','Seguridad 24hs'];
+  function renderChips(){ chips.innerHTML = zonasSel.map(z => `<span class="p-chip">${BP.zonaLabel(z)}<button type="button" data-z="${z}" aria-label="Quitar ${BP.zonaLabel(z)}">×</button></span>`).join(''); chips.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { zonasSel.splice(zonasSel.indexOf(b.dataset.z),1); renderChips(); })); }
+  function showSugg(){ const q = input.value.trim().toLowerCase(); const zs = BP.ZONAS.filter(z => zonasSel.indexOf(z)===-1 && (!q || BP.zonaLabel(z).toLowerCase().indexOf(q)>-1)); const cs = CARACT.filter(c => q && c.toLowerCase().indexOf(q)>-1); const items = zs.map(z => `<button type="button" data-z="${z}">${BP.ico.pin} ${BP.zonaLabel(z)}<small>${(window.__counts||{})[z]||0} publicadas</small></button>`).concat(cs.map(c => `<button type="button" data-c="${c}">${BP.ico.search} ${c}<small>característica</small></button>`)); sugg.innerHTML = items.join(''); sugg.classList.toggle('open', items.length>0); sugg.querySelectorAll('button').forEach(b => b.addEventListener('mousedown', e => { e.preventDefault(); if (b.dataset.z) { zonasSel.push(b.dataset.z); input.value=''; renderChips(); } else { input.value = b.dataset.c; } sugg.classList.remove('open'); })); }
+  input.addEventListener('focus', showSugg); input.addEventListener('input', showSugg); input.addEventListener('blur', () => setTimeout(() => sugg.classList.remove('open'), 120));
+  document.getElementById('searchForm').addEventListener('submit', e => { e.preventDefault(); const p = new URLSearchParams(); p.set('op', opInput.value === 'emprendimientos' ? 'venta' : opInput.value); const tipo = e.target.tipo.value; if (tipo && tipo !== 'departamento') p.set('tipo', tipo); zonasSel.forEach(z => p.append('zona', z)); if (input.value.trim()) p.set('q', input.value.trim()); if (opInput.value === 'emprendimientos') p.set('emp', '1'); location.href = 'buscar.html?' + p.toString(); });
+
+  /* datos */
+  const { avisos } = await BPData.load();
+  const counts = BPData.countsByZona(avisos); window.__counts = counts;
+
+  /* zonas */
+  document.getElementById('zonasGrid').innerHTML = BP.ZONAS.map(z => `<a class="p-zona" href="buscar.html?zona=${encodeURIComponent(z)}"><div><b>${BP.zonaLabel(z)}</b><br><span>${z==='GBA Norte'?'Vicente López · San Isidro · Tigre':'Capital Federal'}</span></div><span class="n">${counts[z]||0} ${counts[z]===1?'unidad':'unidades'}</span></a>`).join('');
+  if (window.BairenMapa && window.innerWidth >= 960) {
+    const el = document.getElementById('mapaHome');
+    try { window.BairenMapa.mount(el, { counts, modo:'completo', onSelect: z => { location.href = 'buscar.html?zona=' + encodeURIComponent(z); } }); } catch (e) { el.innerHTML = '<p class="p-note">El mapa no se pudo montar en este navegador.</p>'; }
+  }
+
+  /* seleccionadas */
+  const dest = BPData.sort(avisos.filter(a => a.destacado && !a.demo), 'relevancia').slice(0,6);
+  document.getElementById('destacadasGrid').innerHTML = dest.map(BPData.cardV).join('');
+
+  /* publicadores */
+  document.getElementById('pubsRow').innerHTML = Object.values(BPData.PUBLICADORES).map(p => `<a class="p-pub-card" href="publicadores.html#${p.id}"><div class="p-pub-logo">${p.inicial}</div><div><b>${BP.esc(p.nombre)}</b><small>${p.tipo==='dueno'?'Dueño verificado':p.badge + ' · ' + p.matricula}${p.demo?' · ejemplo':''}</small></div></a>`).join('') + `<a class="p-pub-card" href="publicar.html#inmobiliaria" style="border-style:dashed"><div class="p-pub-logo" style="background:var(--p-tray);color:var(--gold-dark)">+</div><div><b>Tu inmobiliaria acá</b><small>Publicá tu cartera de los ocho barrios</small></div></a>`;
+
+  /* índice */
+  const tb = document.querySelector('#indiceTabla tbody');
+  tb.innerHTML = BP.ZONAS.map(z => { const zs = avisos.filter(a => a.zona===z && !a.demo && a.m2 && a.precio); const v = zs.filter(a=>a.op==='venta'); const r = zs.filter(a=>a.op!=='venta'); const avg = l => l.length ? Math.round(l.reduce((s,a)=>s+a.precio/a.m2,0)/l.length) : null; return `<tr><td>${BP.zonaLabel(z)}</td><td class="num">${avg(v)?BP.fmtUSD(avg(v)):'—'}</td><td class="num">${avg(r)?'USD '+avg(r):'—'}</td><td class="num">${counts[z]||0}</td></tr>`; }).join('');
+
+  /* guía */
+  document.getElementById('guiaGrid').innerHTML = BP.ZONAS.map(z => `<a class="p-zona" href="buscar.html?zona=${encodeURIComponent(z)}"><div><b>${BP.zonaLabel(z)}</b><br><span>${(window.BairenZonas && window.BairenZonas.desc(z,'es')) ? BP.esc(window.BairenZonas.desc(z,'es')).slice(0,70) + '…' : 'Guía en producción'}</span></div>${BP.ico.arrow}</a>`).join('');
+
+  /* SEO */
+  const seo = []; ['venta','alquiler'].forEach(op => BP.ZONAS.forEach(z => seo.push(`<a href="buscar.html?op=${op}&zona=${encodeURIComponent(z)}">Departamentos ${BP.OPS[op].h} en ${BP.zonaLabel(z)}</a>`))); [1,2,3].forEach(n => seo.push(`<a href="buscar.html?op=venta&amb=${n}">Departamentos de ${n===1?'un ambiente':n+' ambientes'} en venta</a>`)); seo.push('<a href="buscar.html?op=mediano&amoblado=1">Departamentos amoblados a mediano plazo</a>','<a href="buscar.html?dueno=1">Propiedades de dueño directo</a>','<a href="buscar.html?video=1">Propiedades con video</a>');
+  document.getElementById('seoLinks').innerHTML = seo.join('');
+})();
+</script>
+</body>
+</html>
