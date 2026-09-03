@@ -341,3 +341,34 @@ body{background:var(--p-bg);color:var(--text-dark);font-family:var(--font-body)}
 .card-tag.tag-venta{background:var(--gold);color:var(--navy-deeper)}
 .card-tag.tag-mediano{background:var(--navy-deeper);color:#fff}
 .card-tag.tag-alquiler{background:#fff;color:var(--navy-deeper)}
+
+/* ── Correcciones tras la primera revisión visual (3/9) ─────── */
+html{background:var(--p-bg)}
+.p-container{min-width:0}
+.p-hero-in{min-width:0}
+.p-search{overflow:hidden}
+.p-tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.p-tabs::-webkit-scrollbar{display:none}
+.p-tab{white-space:nowrap;flex-shrink:0}
+.p-feat[hidden]{display:none}
+.p-report b svg,.p-card-photo .ct svg,.p-gallery .cts svg,.p-sugg svg,.p-zona>svg,.p-kicker svg,.p-addr-line svg,.p-meta-line svg{width:16px;height:16px;flex-shrink:0}
+.p-form .chk span{flex:1}
+.p-form .chk input{margin-top:2px}
+.card-img{background:var(--p-tray)}
+.p-grid .card-footer{flex-wrap:wrap;gap:8px}
+.p-grid .price-amount{white-space:nowrap}
+.p-grid .price-amount small{font-size:.72rem;color:var(--text-mid);font-family:var(--font-body)}
+#mapaResultados,#mapaFicha,#mapaHome{height:auto;min-height:0;width:100%}
+.p-map-ficha{overflow:hidden}
+.p-map-ficha .p-note{padding:6px 8px 2px}
+.p-cond{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.p-cond li{display:flex;gap:10px;align-items:flex-start;color:rgba(255,255,255,.85);font-size:.92rem;line-height:1.45}
+.p-cond li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0;margin-top:8px}
+.p-cond-ttl{font-size:.64rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin:0 0 12px}
+.p-zona .n.zero{color:var(--text-mid)}
+@media(max-width:700px){.p-index{display:block;overflow-x:auto}.p-icons{grid-template-columns:repeat(3,1fr)}.p-results-head h1{font-size:1.1rem}}
+.p-two{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
+.p-two>*{min-width:0}
+.p-zonas-wrap>*{min-width:0}
+.p-index{width:100%;max-width:100%}
+@media(max-width:900px){.p-two{grid-template-columns:1fr;gap:28px}}

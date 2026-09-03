@@ -68,7 +68,7 @@
         <ul><li>Fotos profesionales o producidas por BAIREN, ficha completa y verificada</li><li>Contacto directo con los interesados, sin intermediarios de la plataforma</li><li>Panel con vistas, consultas y visitas, en Bairen OS</li></ul>
         <div class="p-cta-row"><a class="p-btn p-btn-fill" href="publicar.html#dueno">Soy dueño directo</a><a class="p-btn" href="publicar.html#inmobiliaria">Soy inmobiliaria o corredor</a><a class="p-btn" href="publicar.html#desarrolladora">Soy desarrolladora</a></div>
       </div>
-      <div><div class="p-index" style="border:0;background:rgba(255,255,255,.06)"><table class="p-index" style="background:transparent;border:0;color:#fff"><thead><tr><th style="background:transparent;color:var(--gold)">Condiciones de ingreso</th></tr></thead><tbody><tr><td style="color:rgba(255,255,255,.85);border-color:rgba(255,255,255,.1)">Ubicación en Palermo, Recoleta, Belgrano, Núñez, Colegiales, Puerto Madero, Saavedra o Zona Norte</td></tr><tr><td style="color:rgba(255,255,255,.85);border-color:rgba(255,255,255,.1)">Edificio de categoría o con amenities, unidad en estado impecable</td></tr><tr><td style="color:rgba(255,255,255,.85);border-color:rgba(255,255,255,.1)">Ficha completa: metros, expensas, orientación, planos</td></tr><tr><td style="color:rgba(255,255,255,.85);border-color:rgba(255,255,255,.1)">Fotos profesionales, mínimo ocho. Si no las tenés, las hacemos</td></tr><tr><td style="color:rgba(255,255,255,.85);border:0">Publicador verificado: titularidad, matrícula o CUIT</td></tr></tbody></table></div></div>
+      <div><p class="p-cond-ttl">Condiciones de ingreso</p><ul class="p-cond"><li>Ubicación en Palermo, Recoleta, Belgrano, Núñez, Colegiales, Puerto Madero, Saavedra o Zona Norte</li><li>Edificio de categoría o con amenities, unidad en estado impecable</li><li>Ficha completa: metros, expensas, orientación, planos</li><li>Fotos profesionales, mínimo ocho. Si no las tenés, las hacemos</li><li>Publicador verificado: titularidad, matrícula o CUIT</li></ul></div>
     </div>
   </div>
 </section>
@@ -81,7 +81,7 @@
 </section>
 
 <section class="p-section" id="indice">
-  <div class="p-container" style="display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start">
+  <div class="p-container p-two">
     <div data-reveal>
       <h2 class="p-h2">Índice BAIREN</h2>
       <p class="p-sub">Precio por metro cuadrado de lo que está publicado hoy, por barrio. Se recalcula con cada unidad que entra.</p>
@@ -134,7 +134,7 @@
   const counts = BPData.countsByZona(avisos); window.__counts = counts;
 
   /* zonas */
-  document.getElementById('zonasGrid').innerHTML = BP.ZONAS.map(z => `<a class="p-zona" href="buscar.html?zona=${encodeURIComponent(z)}"><div><b>${BP.zonaLabel(z)}</b><br><span>${z==='GBA Norte'?'Vicente López · San Isidro · Tigre':'Capital Federal'}</span></div><span class="n">${counts[z]||0} ${counts[z]===1?'unidad':'unidades'}</span></a>`).join('');
+  document.getElementById('zonasGrid').innerHTML = BP.ZONAS.map(z => `<a class="p-zona" href="buscar.html?zona=${encodeURIComponent(z)}"><div><b>${BP.zonaLabel(z)}</b><br><span>${z==='GBA Norte'?'Vicente López · San Isidro · Tigre':'Capital Federal'}</span></div><span class="n ${counts[z]?'':'zero'}">${counts[z] ? counts[z] + (counts[z]===1?' unidad':' unidades') : 'Próximamente'}</span></a>`).join('');
   if (window.BairenMapa && window.innerWidth >= 960) {
     const el = document.getElementById('mapaHome');
     try { window.BairenMapa.mount(el, { counts, modo:'completo', onSelect: z => { location.href = 'buscar.html?zona=' + encodeURIComponent(z); } }); } catch (e) { el.innerHTML = '<p class="p-note">El mapa no se pudo montar en este navegador.</p>'; }

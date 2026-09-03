@@ -104,8 +104,8 @@
       <div class="r2"><input type="text" name="nombre" placeholder="Nombre" required autocomplete="name"><input type="email" name="email" placeholder="Email" required autocomplete="email"></div>
       <input type="tel" name="telefono" placeholder="Teléfono con código de área" required autocomplete="tel">
       <textarea name="mensaje" id="mensaje">${BP.esc(msgDefault)}</textarea>
-      <label class="chk"><input type="checkbox" required> Acepto los <a href="legales.html#terminos">Términos y condiciones de uso</a> y la <a href="legales.html#privacidad">Política de privacidad</a>.</label>
-      <label class="chk"><input type="checkbox" required> Entiendo que mis datos se envían a ${BP.esc(pub.nombre)}, responsable de la operación. BAIREN no interviene en la conversación.</label>
+      <label class="chk"><input type="checkbox" required><span>Acepto los <a href="legales.html#terminos">Términos y condiciones de uso</a> y la <a href="legales.html#privacidad">Política de privacidad</a>.</span></label>
+      <label class="chk"><input type="checkbox" required><span>Entiendo que mis datos se envían a ${BP.esc(pub.nombre)}, responsable de la operación. BAIREN no interviene en la conversación.</span></label>
       <button type="submit" class="p-btn p-btn-fill">${BP.ico.mail} Contactar</button>
       <a class="p-btn p-btn-dark" id="waBtn" href="${BPData.waLink(a, pub)}" target="_blank" rel="noopener" style="margin-top:8px">${BP.ico.wa} Contactar por WhatsApp</a>
     </form>
@@ -116,7 +116,7 @@
 <section style="padding:0 0 64px">
   <div class="p-head-row"><h2 class="p-h2">Propiedades similares</h2><a class="p-link" href="buscar.html?op=${a.op}&zona=${encodeURIComponent(a.zona)}">Ver más en ${BP.zonaLabel(a.zona)}</a></div>
   <div class="p-grid">${similares.map(BPData.cardV).join('') || '<p class="p-note">Todavía no hay otras unidades similares publicadas.</p>'}</div>
-  <nav class="p-breadcrumb" aria-label="Migas de pan"><a href="index.html">BAIREN</a> › <a href="buscar.html?op=${a.op}">${BPData.opTag(a)}</a> › <a href="buscar.html?op=${a.op}&zona=${encodeURIComponent(a.zona)}">${BP.zonaLabel(a.zona)}</a> › <span>${BP.esc(a.barrio)}</span> › <span>${BP.esc(a.titulo)}</span></nav>
+  <div class="p-breadcrumb" role="navigation" aria-label="Migas de pan"><a href="index.html">BAIREN</a> › <a href="buscar.html?op=${a.op}">${BPData.opTag(a)}</a> › <a href="buscar.html?op=${a.op}&zona=${encodeURIComponent(a.zona)}">${BP.zonaLabel(a.zona)}</a> › <span>${BP.esc(a.barrio)}</span> › <span>${BP.esc(a.titulo)}</span></div>
 </section>`;
 
   /* comportamiento */
