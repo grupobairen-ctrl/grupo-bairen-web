@@ -8,7 +8,7 @@
   <link rel="icon" href="../bairen_logo.png?v=3">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css"><link rel="stylesheet" href="css/catalogo.css"><link rel="stylesheet" href="css/portal.css">
+  <link rel="stylesheet" href="css/base.css?v=20260904a"><link rel="stylesheet" href="css/catalogo.css?v=20260904a"><link rel="stylesheet" href="css/portal.css?v=20260904a">
   <style>body{padding-top:64px}.p-skel{background:linear-gradient(90deg,#EEE9DD 25%,#F6F2E9 50%,#EEE9DD 75%);background-size:200% 100%;animation:sk 1.2s infinite;border-radius:var(--p-radius);height:240px}@keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}</style>
 </head>
 <body>
@@ -64,8 +64,8 @@
 
 <script src="../supabase-config.js"></script>
 <script src="../mapa-barrios.js"></script>
-<script src="js/ui.js"></script><script src="js/store.js"></script>
-<script src="js/data.js"></script>
+<script src="js/ui.js?v=20260904a"></script><script src="js/store.js?v=20260904a"></script>
+<script src="js/data.js?v=20260904a"></script>
 <script>
 (async function(){
   BP.header(); BP.footer(); if (window.BPStore) BPStore.init();
@@ -77,8 +77,9 @@
 
   const PER_PAGE = 12;
   const F = { op:'venta', tipo:'departamento', zonas:[], q:'', pub:'', emp:false, amb:0, dorm:0, banos:0, coch:0, pmin:0, pmax:0, expmax:0, m2min:0, m2max:0, antig:0, amen:[], amoblado:false, dueno:false, video:false, hace:0, favs:false, sort:'relevancia', page:1 };
+  await BP.probePretty(); const pretty = BP.parsePretty(); if (pretty) { F.op = pretty.op; F.tipo = pretty.tipo; if (pretty.zona) F.zonas = [pretty.zona]; }
   const qs = BP.qs();
-  if (qs.has('op')) F.op = qs.get('op'); if (qs.get('tipo')) F.tipo = qs.get('tipo'); F.zonas = qs.getAll('zona').map(z => BP.zonaFromSlug(z) || z).filter(Boolean);
+  if (qs.has('op')) F.op = qs.get('op'); if (qs.get('tipo')) F.tipo = qs.get('tipo'); if (qs.getAll('zona').length) F.zonas = qs.getAll('zona').map(z => BP.zonaFromSlug(z) || z).filter(Boolean);
   ['q'].forEach(k => { if (qs.get(k)) F[k] = qs.get(k); }); ['amb','dorm','banos','coch','pmin','pmax','expmax','m2min','m2max','antig','hace','page'].forEach(k => { if (qs.get(k)) F[k] = Number(qs.get(k)); });
   ['amoblado','dueno','video','favs'].forEach(k => { if (qs.get(k)==='1') F[k] = true; }); if (qs.get('sort')) F.sort = qs.get('sort'); if (qs.getAll('amen').length) F.amen = qs.getAll('amen');
   if (qs.get('pub')) { F.pub = qs.get('pub'); if (qs.has('op') && !qs.get('op')) F.op = ''; }
@@ -101,7 +102,7 @@
     document.getElementById('zonaChips').innerHTML = F.zonas.map(z => `<span class="p-chip">${BP.zonaLabel(z)}<button type="button" data-z="${z}" aria-label="Quitar ${BP.zonaLabel(z)}">×</button></span>`).join('');
     document.querySelectorAll('#zonaChips button').forEach(b => b.addEventListener('click', () => { F.zonas = F.zonas.filter(z => z !== b.dataset.z); apply(); }));
   }
-  function pushURL(){ const p = new URLSearchParams(); if (F.op) p.set('op', F.op); if (F.tipo !== 'departamento') p.set('tipo', F.tipo); F.zonas.forEach(z => p.append('zona', z)); if (F.q) p.set('q', F.q); ['amb','dorm','banos','coch','pmin','pmax','expmax','m2min','m2max','antig','hace'].forEach(k => { if (F[k]) p.set(k, F[k]); }); F.amen.forEach(a => p.append('amen', a)); ['amoblado','dueno','video','favs'].forEach(k => { if (F[k]) p.set(k, '1'); }); if (F.pub) p.set('pub', F.pub); if (F.emp) p.set('emp', '1'); if (F.sort !== 'relevancia') p.set('sort', F.sort); if (F.page > 1) p.set('page', F.page); history.replaceState(null, '', 'buscar.html' + (p.toString() ? '?' + p.toString() : '')); }
+  function pushURL(){ const p = new URLSearchParams(); if (F.op) p.set('op', F.op); if (F.tipo !== 'departamento') p.set('tipo', F.tipo); F.zonas.forEach(z => p.append('zona', z)); if (F.q) p.set('q', F.q); ['amb','dorm','banos','coch','pmin','pmax','expmax','m2min','m2max','antig','hace'].forEach(k => { if (F[k]) p.set(k, F[k]); }); F.amen.forEach(a => p.append('amen', a)); ['amoblado','dueno','video','favs'].forEach(k => { if (F[k]) p.set(k, '1'); }); if (F.pub) p.set('pub', F.pub); if (F.emp) p.set('emp', '1'); if (F.sort !== 'relevancia') p.set('sort', F.sort); if (F.page > 1) p.set('page', F.page); const target = BP.pretty && F.op && F.zonas.length <= 1 && !F.q && !F.pub && !F.favs ? BP.urlBuscar(Object.assign({}, Object.fromEntries(p), { op: F.op, tipo: F.tipo, zonas: F.zonas })) : 'buscar.html' + (p.toString() ? '?' + p.toString() : ''); history.replaceState(null, '', target); }
 
   function titulo(n){ const tipo = F.tipo === 'todos' ? 'Propiedades' : F.tipo === 'departamento' ? 'Departamentos' : F.tipo === 'piso' ? 'Pisos' : F.tipo === 'ph' ? 'PH' : 'Casas'; const op = F.favs ? 'guardadas' : F.op ? BP.OPS[F.op].h : 'en venta y alquiler'; const where = F.zonas.length ? ' en ' + F.zonas.map(BP.zonaLabel).join(', ') : ' en Buenos Aires'; return `<span>${BP.fmtN(n)}</span> ${tipo} ${op}${where}`; }
 

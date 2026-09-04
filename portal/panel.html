@@ -7,7 +7,7 @@
   <link rel="icon" href="../bairen_logo.png?v=3">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css"><link rel="stylesheet" href="css/catalogo.css"><link rel="stylesheet" href="css/portal.css">
+  <link rel="stylesheet" href="css/base.css?v=20260904a"><link rel="stylesheet" href="css/catalogo.css?v=20260904a"><link rel="stylesheet" href="css/portal.css?v=20260904a">
   <style>
     .p-panel{display:grid;grid-template-columns:240px 1fr;gap:28px;align-items:start}
     .p-side-nav{background:var(--p-card);border:1px solid var(--p-line);border-radius:var(--p-radius);padding:10px;position:sticky;top:84px}
@@ -29,7 +29,7 @@
 </div></section>
 <div id="pFooter"></div>
 <script src="../supabase-config.js"></script>
-<script src="../mapa-barrios.js"></script><script src="js/ui.js"></script><script src="js/store.js"></script><script src="js/data.js"></script>
+<script src="../mapa-barrios.js"></script><script src="js/ui.js?v=20260904a"></script><script src="js/store.js?v=20260904a"></script><script src="js/data.js?v=20260904a"></script>
 <script>
 (async function(){
   BP.header(); BP.footer();
@@ -58,7 +58,7 @@
     const avisos = await BPStore.myAvisos(); const cons = await BPStore.consultasRecibidas(pub.id);
     const pubCount = avisos.filter(a => a.estado_curacion === 'publicado').length, rev = avisos.filter(a => a.estado_curacion === 'en_revision').length;
     const vistas = avisos.reduce((s, a) => s + BPStore.vistas(a.id), 0);
-    let html = `<div class="p-head-row"><div><h1 class="p-h2">Mis avisos</h1><p class="p-sub" style="margin:0">${BP.esc(pub.nombre)} · ${pub.verificado ? BP.ico.check + ' verificado' : 'verificación pendiente'}</p></div><a class="p-btn p-btn-fill" href="publicar-aviso.html">Publicar otra</a></div>
+    let html = `<div class="p-head-row"><div><h1 class="p-h2">Mis avisos</h1><p class="p-sub" style="margin:0">${BP.esc(pub.nombre)} · ${pub.verificado ? BP.ico.check + ' verificado' : 'verificación pendiente'}</p></div><div style="display:flex;gap:8px">${pub.tipo !== 'dueno' ? '<a class="p-btn" href="importar.html">Importar cartera</a>' : ''}<a class="p-btn p-btn-fill" href="publicar-aviso.html">Publicar otra</a></div></div>
       <div class="p-kpis"><div class="p-kpi"><b>${pubCount}</b><span>Publicados</span></div><div class="p-kpi"><b>${rev}</b><span>En revisión</span></div><div class="p-kpi"><b>${vistas}</b><span>Vistas</span></div><div class="p-kpi"><b>${cons.length}</b><span>Consultas</span></div></div>`;
     if (!avisos.length) html += `<div class="p-empty">Todavía no cargaste ninguna propiedad. <a href="publicar-aviso.html" style="text-decoration:underline">Empezá acá</a>.</div>`;
     for (const a of avisos) { const foto = a.fotos && a.fotos.length ? await BPStore.resolveFoto(a.fotos.slice().sort((x,y)=>(x.orden||0)-(y.orden||0))[0].url) : ''; const nCons = cons.filter(c => c.aviso_id === a.id).length;

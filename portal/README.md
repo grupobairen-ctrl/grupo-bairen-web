@@ -5,9 +5,16 @@ Rama `portal`. No toca producción. Estructura de referencia: Zonaprop. Identida
 ## Correr en local
 ```
 cd "~/Desktop/WEB DE BAIREN"
-python3 -m http.server 8080
+node portal/test/dev-server.mjs
 ```
-Abrir http://localhost:8080/portal/
+Abrir http://localhost:8080/portal/. El dev server reproduce las reescrituras de `vercel.json` (rutas limpias como `/portal/departamentos-venta-palermo` y `/portal/propiedad-<id>`). Con `python3 -m http.server 8080` también funciona, sin rutas limpias.
+
+## Prueba de punta a punta
+```
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --remote-debugging-port=9222 --user-data-dir=/tmp/chrome-bp-cdp about:blank &
+node portal/test/e2e.mjs
+```
+Recorre ingresar con código, publicar en cinco pasos con ocho fotos, panel, curación, resultados, ficha, consulta, importación por CSV y rutas limpias. Deja capturas en `/tmp/bp-e2e/shots/`. Necesita ocho JPG en `/tmp/bp-e2e/foto-1.jpg` a `foto-8.jpg` y `/tmp/bp-e2e/cartera.csv` (el script los describe).
 
 ## Qué hay (Fase 1)
 - `index.html` home: buscador con pestañas, ocho barrios con el mapa del sitio, seleccionadas de la semana, publicá tu propiedad, publicadores, índice BAIREN, guía, búsquedas frecuentes.
@@ -21,5 +28,17 @@ Abrir http://localhost:8080/portal/
 ## Datos inferidos hasta que exista el esquema portal
 La tabla actual no tiene dormitorios, baños, cocheras, expensas ni antigüedad. En la prueba: dormitorios = ambientes menos uno; baños = 1 (2 si hay 4 o más ambientes); cocheras = 1 si "Cochera" está en amenities; expensas y antigüedad vacías. El WhatsApp y el mail de Maxim Rentals son los de BAIREN como marcador: reemplazar por los de Maxi.
 
-## Lo que sigue (Fase 2)
-Ingresar con Supabase Auth, Publicar con carga de aviso y verificación, panel del publicador, cola de curación, importación desde Tokko, y reemplazo de `data.js` por consultas al esquema `portal`.
+## Fase 2 y 3 (hechas)
+- `js/store.js`: sesión y datos. Modo `supabase` si el esquema `portal` responde (Auth por mail con código, storage `portal-fotos` y `portal-docs`); si no, modo `local` (localStorage e IndexedDB) para probar todo sin base.
+- `ingresar.html` (mail y código), `publicar-aviso.html` (cinco pasos con verificación y fotos), `panel.html` (mis avisos, interesados, contactos, favoritos, alertas, cuenta), `curacion.html` (cola y verificación de publicadores), `importar.html` (cartera por CSV con mapeo de columnas).
+- Rutas limpias: `vercel.json` y `test/dev-server.mjs`; las páginas sondean `/portal/_rewrite-probe` y, si hay reescritura, generan links limpios.
+- Assets con versión (`?v=`) en todos los includes: al cambiar CSS o JS, subir la versión en las páginas.
+
+## Pasar a datos reales (pasos en Supabase, una vez)
+1. Settings → API → Exposed schemas: agregar `portal`.
+2. Authentication → Providers → Email: habilitado, con código por mail (OTP). En la plantilla "Magic Link" usar `{{ .Token }}`.
+3. SQL Editor: correr `schema-portal.sql` completo (crea esquema, migra las unidades actuales como avisos de Maxim Rentals, permisos, curadores, buckets).
+4. En `js/data.js`, cuando la migración esté verificada, se puede dejar de leer `data/avisos-src.json`.
+
+## Lo que sigue
+Mails de aviso al publicador (aprobado, rechazado, consulta) por función de servidor; borrado automático de documentos ya está al resolver la verificación; Emprendimientos con etapa de obra; Bairen OS como panel del propietario; Índice BAIREN con series.

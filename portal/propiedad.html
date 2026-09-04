@@ -8,7 +8,7 @@
   <link rel="icon" href="../bairen_logo.png?v=3">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css"><link rel="stylesheet" href="css/catalogo.css"><link rel="stylesheet" href="css/portal.css">
+  <link rel="stylesheet" href="css/base.css?v=20260904a"><link rel="stylesheet" href="css/catalogo.css?v=20260904a"><link rel="stylesheet" href="css/portal.css?v=20260904a">
   <style>body{padding-top:64px}.p-video{aspect-ratio:16/9;background:#0b1220;border-radius:12px;overflow:hidden}.p-video iframe,.p-video video{width:100%;height:100%;border:0;display:block}</style>
 </head>
 <body>
@@ -19,12 +19,12 @@
 
 <script src="../supabase-config.js"></script>
 <script src="../mapa-barrios.js"></script>
-<script src="js/ui.js"></script><script src="js/store.js"></script>
-<script src="js/data.js"></script>
+<script src="js/ui.js?v=20260904a"></script><script src="js/store.js?v=20260904a"></script>
+<script src="js/data.js?v=20260904a"></script>
 <script>
 (async function(){
   BP.header(); BP.footer();
-  const id = BP.qs().get('id');
+  await BP.probePretty(); const id = BP.qs().get('id') || BP.idFromPath();
   const { avisos } = await BPData.load();
   const a = avisos.find(x => x.id === id) || avisos.find(x => x.slug === id);
   const main = document.getElementById('ficha');

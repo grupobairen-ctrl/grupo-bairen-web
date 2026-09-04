@@ -2,18 +2,62 @@
   "redirects": [
     {
       "source": "/propiedad.html",
-      "has": [{ "type": "query", "key": "slug", "value": "(?<slug>.+)" }],
+      "has": [
+        {
+          "type": "query",
+          "key": "slug",
+          "value": "(?<slug>.+)"
+        }
+      ],
       "destination": "/propiedades/:slug",
       "permanent": true
     }
   ],
   "rewrites": [
-    { "source": "/julian", "destination": "/julian.html" },
-    { "source": "/propiedades/:slug", "destination": "/api/og-propiedad?slug=:slug" },
+    {
+      "source": "/julian",
+      "destination": "/julian.html"
+    },
+    {
+      "source": "/propiedades/:slug",
+      "destination": "/api/og-propiedad?slug=:slug"
+    },
     {
       "source": "/propiedad.html",
-      "has": [{ "type": "query", "key": "slug" }],
+      "has": [
+        {
+          "type": "query",
+          "key": "slug"
+        }
+      ],
       "destination": "/api/og-propiedad"
+    },
+    {
+      "source": "/portal/_rewrite-probe",
+      "destination": "/portal/probe.txt"
+    },
+    {
+      "source": "/portal/propiedad-:id",
+      "destination": "/portal/propiedad.html"
+    },
+    {
+      "source": "/portal/:tipo(departamentos|pisos|ph|casas|propiedades)-:op(venta|alquiler-mediano-plazo|alquiler)-:zona",
+      "destination": "/portal/buscar.html"
+    },
+    {
+      "source": "/portal/:page(publicar|ingresar|panel|curacion|legales|publicadores|buscar|importar)",
+      "destination": "/portal/:page.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/portal/_rewrite-probe",
+      "headers": [
+        {
+          "key": "x-bp-rewrite",
+          "value": "1"
+        }
+      ]
     }
   ]
 }

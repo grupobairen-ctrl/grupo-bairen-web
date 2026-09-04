@@ -19,7 +19,7 @@ const step = (n, msg) => console.log(`  ${n}. ${msg}`);
 import { mkdirSync, writeFileSync } from 'node:fs';
 mkdirSync('/tmp/bp-e2e/shots', { recursive: true });
 const shot = async (name) => { try { await send('Emulation.setDeviceMetricsOverride', { width: 1440, height: 1000, deviceScaleFactor: 1, mobile: false }); const r = await send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true }); writeFileSync('/tmp/bp-e2e/shots/' + name + '.png', Buffer.from(r.result.data, 'base64')); } catch (e) { console.log('   (sin captura ' + name + ')'); } };
-await send('Page.enable'); await send('Runtime.enable'); await send('DOM.enable');
+await send('Page.enable'); await send('Runtime.enable'); await send('DOM.enable'); await send('Network.enable'); await send('Network.clearBrowserCache'); await send('Network.setCacheDisabled', { cacheDisabled: true });
 const results = [];
 const ok = (name, cond, detail) => { results.push({ name, ok: !!cond, detail }); console.log(`${cond ? 'OK ' : 'FALLA'} ${name}${detail ? ' · ' + detail : ''}`); };
 
@@ -106,6 +106,29 @@ try {
   await waitFor('!!document.querySelector("#content .p-tbl") && document.querySelector("#content").textContent.includes("Interesada Prueba")', 'consulta en Interesados');
   await shot('10-panel-interesados');
   ok('Panel: la consulta aparece en Interesados', true);
+  /* 5. Importación por archivo (inmobiliaria) */
+  await goto(BASE + 'importar.html');
+  await waitFor('document.querySelector(".p-imp") && document.querySelector(".p-imp").textContent.includes("inmobiliarias y desarrolladoras")', 'gating de importar para dueño');
+  ok('Importar: un dueño directo no puede importar', true);
+  await evalJs('BPStore.init().then(() => BPStore.getMyPublicador()).then(p => BPStore.savePublicador(Object.assign({}, p, { tipo: "inmobiliaria", nombre: "Inmobiliaria Prueba", responsable: "Corredora Prueba", matricula: "CUCICBA 1234", colegio: "CUCICBA", badge: "Corredor inmobiliario matriculado" })))');
+  await goto(BASE + 'importar.html');
+  await waitFor('!!document.getElementById("fileIn")', 'página de importación');
+  const d2 = await send('DOM.getDocument', { depth: -1 }); const q2 = await send('DOM.querySelector', { nodeId: d2.result.root.nodeId, selector: '#fileIn' });
+  await send('DOM.setFileInputFiles', { nodeId: q2.result.nodeId, files: ['/tmp/bp-e2e/cartera.csv'] });
+  await waitFor('document.querySelectorAll("#prev tbody tr").length >= 3', 'vista previa del CSV');
+  const prev = await evalJs('Array.from(document.querySelectorAll("#prev tbody tr")).map(r => r.cells[2].textContent.trim() + " → " + r.cells[7].textContent.trim()).join(" | ")');
+  await shot('11-importar-preview');
+  ok('Importar: tres filas leídas con mapeo automático', true, prev);
+  await evalJs('document.getElementById("importar").click(); true');
+  await waitFor('location.pathname.endsWith("panel.html")', 'vuelta al panel', 10000);
+  await waitFor('document.querySelectorAll("#content .p-aviso-row").length >= 4', 'borradores en el panel');
+  const nRows = await evalJs('document.querySelectorAll("#content .p-aviso-row").length');
+  await shot('12-panel-tras-importar');
+  ok('Importar: los borradores aparecen en Mis avisos', nRows >= 4, nRows + ' avisos en el panel');
+  /* 6. Rutas limpias */
+  const pretty = await evalJs('BP.probePretty()');
+  if (pretty) { await goto(BASE + 'departamentos-venta-palermo'); await waitFor('document.querySelectorAll(".p-card-h").length > 0', 'resultados por ruta limpia'); const t = await evalJs('document.getElementById("resTitle").textContent'); const link = await evalJs('document.querySelector(".p-card-h .p-addr").getAttribute("href")'); ok('Rutas limpias: resultados y links de ficha', /Palermo/.test(t) && /^propiedad-/.test(link), t + ' · ' + link); await goto(BASE + link); await waitFor('!!document.getElementById("contactForm")', 'ficha por ruta limpia'); ok('Rutas limpias: la ficha abre desde su URL', true, await evalJs('document.querySelector("h1").textContent')); }
+  else ok('Rutas limpias: servidor sin reescritura (se usan parámetros)', true);
 } catch (e) { ok('Flujo completo', false, e.message); }
 
 console.log('\nResultado: ' + results.filter(r => r.ok).length + ' de ' + results.length + ' pasos OK');

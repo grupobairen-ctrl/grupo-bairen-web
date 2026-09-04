@@ -104,7 +104,7 @@
 
   D.cardH = function(a){
     const pub = D.pub(a.publicadorId);
-    const href = 'propiedad.html?id=' + encodeURIComponent(a.id);
+    const href = BP.urlFicha(a);
     const foto = a.fotos[0] ? `<img src="${BP.sbImg(a.fotos[0], 900)}" alt="${BP.esc(a.titulo)}, ${BP.esc(a.barrio)}" loading="lazy">` : '';
     const tag = a.reservado ? '<span class="tag res">Reservada</span>' : a.destacado ? '<span class="tag">Seleccionada</span>' : a.demo ? '<span class="tag" style="background:#F4F0E6">Ejemplo</span>' : '';
     return `
@@ -127,7 +127,7 @@
 
   D.cardV = function(a){
     const pub = D.pub(a.publicadorId);
-    const href = 'propiedad.html?id=' + encodeURIComponent(a.id);
+    const href = BP.urlFicha(a);
     const foto = a.fotos[0] ? `<img src="${BP.sbImg(a.fotos[0], 700)}" alt="${BP.esc(a.titulo)}, ${BP.esc(a.barrio)}" loading="lazy">` : '<span class="card-img-placeholder">Fotos en producción</span>';
     return `
 <a class="prop-card" href="${href}" aria-label="Ver ${BP.esc(a.titulo)} en ${BP.esc(a.barrio)}">

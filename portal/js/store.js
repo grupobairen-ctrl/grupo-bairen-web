@@ -150,7 +150,10 @@
     const v = L.verif.get([]); return L.pubs.get([]).filter(p => !p.verificado).map(p => Object.assign({}, p, { verificaciones: v.filter(x => x.publicador_id === p.id) }));
   };
   S.verificarPublicador = async function(id, ok, nota){
-    if (S.mode === 'supabase') { const { error } = await S.sb.schema('portal').from('publicadores').update({ verificado: ok, verificado_en: ok ? now() : null }).eq('id', id); if (error) throw error; await S.sb.schema('portal').from('verificaciones').update({ resultado: ok ? 'aprobada' : 'rechazada', nota: nota || null }).eq('publicador_id', id).eq('resultado', 'pendiente'); return; }
+    if (S.mode === 'supabase') { const { error } = await S.sb.schema('portal').from('publicadores').update({ verificado: ok, verificado_en: ok ? now() : null }).eq('id', id); if (error) throw error; await S.sb.schema('portal').from('verificaciones').update({ resultado: ok ? 'aprobada' : 'rechazada', nota: nota || null }).eq('publicador_id', id).eq('resultado', 'pendiente');
+      /* política de privacidad: los documentos se borran al resolver; queda solo el resultado */
+      try { const { data: files } = await S.sb.storage.from('portal-docs').list(id); if (files && files.length) await S.sb.storage.from('portal-docs').remove(files.map(f => id + '/' + f.name)); } catch (e) { console.warn('no se pudieron borrar los documentos', e); }
+      return; }
     const all = L.pubs.get([]); const p = all.find(x => x.id === id); if (p) { p.verificado = ok; p.verificado_en = ok ? now() : null; } L.pubs.set(all);
     const v = L.verif.get([]); v.forEach(x => { if (x.publicador_id === id && x.resultado === 'pendiente') { x.resultado = ok ? 'aprobada' : 'rechazada'; x.nota = nota || null; } }); L.verif.set(v);
   };
