@@ -13,8 +13,12 @@
  *   PORTAL_MAIL_FROM   remitente, ej. "BAIREN <avisos@bairengroup.com>" (dominio verificado en Resend)
  * Sin RESEND_API_KEY responde 501 {configured:false} y la web sigue con el mailto de siempre.
  */
-const SUPABASE_URL = 'https://nmrjyyrhwjroonrppnka.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_D0YwiSL5Hm3GyOSx2r1lug_ZV7v46_n';
+/* El portal vive en su propio proyecto, separado del de bairengroup.com.
+   Se configuran como variables de entorno en Vercel para no repetir el dato
+   en dos lugares; si faltan, cae al proyecto del sitio y avisa. */
+const SUPABASE_URL = process.env.PORTAL_SUPABASE_URL || 'https://nmrjyyrhwjroonrppnka.supabase.co';
+const SUPABASE_ANON_KEY = process.env.PORTAL_SUPABASE_KEY || 'sb_publishable_D0YwiSL5Hm3GyOSx2r1lug_ZV7v46_n';
+if (!process.env.PORTAL_SUPABASE_URL) console.warn('[portal-notify] sin PORTAL_SUPABASE_URL: usando el proyecto del sitio');
 const SITE = 'https://www.bairengroup.com/portal/';
 const TIPOS = ['consulta', 'aprobado', 'rechazado', 'cambios', 'verificado', 'verificacion_rechazada'];
 // Límite de frecuencia por instancia. En un entorno sin estado cada instancia tiene el suyo,
