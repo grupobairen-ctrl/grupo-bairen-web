@@ -806,3 +806,13 @@ select.p-fsel,.p-field select,.p-band select,.p-product select{background-repeat
 /* Anillo de foco: dos tonos, para que contraste en los dos registros */
 :root{--p-focus:0 0 0 2px #131D2D, 0 0 0 4px #DECDA0}
 body.p-product{--p-focus:0 0 0 2px #F6F2E8, 0 0 0 4px #131D2D}
+
+/* OLA 2 · los menús dicen la verdad */
+.p-dd a{display:flex;justify-content:space-between;gap:14px;align-items:baseline}
+.p-dd-n{font-size:.72rem;color:var(--gold-dark);font-variant-numeric:tabular-nums;flex:0 0 auto}
+.p-dd a.zero{opacity:.5} .p-dd a.zero .p-dd-n{color:var(--text-mid);font-size:.68rem}
+.p-zona.zero{opacity:.62}
+.p-reservada{display:flex;gap:10px;align-items:flex-start;background:rgba(179,66,60,.08);border:1px solid rgba(179,66,60,.3);border-radius:10px;padding:12px 14px;margin:14px 0 0;font-size:.88rem;color:var(--navy-deeper)}
+.p-reservada svg{width:16px;height:16px;color:#B3423C;flex-shrink:0;margin-top:2px}
+.p-reservada a{text-decoration:underline}
+.p-cta-res{display:inline-block;font-family:var(--font-body);font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:#B3423C;border:1px solid rgba(179,66,60,.4);border-radius:999px;padding:3px 9px;margin-left:10px;vertical-align:middle}

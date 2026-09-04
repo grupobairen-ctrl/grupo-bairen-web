@@ -82,8 +82,8 @@
 
   /* ── Header ─────────────────────────────────────────────── */
   BP.header = function(active){ BP._active = active;
-    const dd = (ttl, items) => `<div class="p-dd-ttl">${ttl}</div>` + items.map(i=>`<a href="${i[1]}">${i[0]}</a>`).join('');
-    const zonasLinks = op => BP.ZONAS.map(z=>[`Departamentos ${BP.OPS[op].h} en ${BP.zonaLabel(z)}`, BP.urlBuscar({ op, zona: z })]);
+    const dd = (ttl, items) => `<div class="p-dd-ttl">${ttl}</div>` + items.map(i=>`<a href="${i[1]}"${i[2]?` data-op="${i[2]}" data-zona="${BP.esc(i[3])}"`:''}>${i[0]}<span class="p-dd-n" hidden></span></a>`).join('');
+    const zonasLinks = op => BP.ZONAS.map(z=>[`Departamentos ${BP.OPS[op].h} en ${BP.zonaLabel(z)}`, BP.urlBuscar({ op, zona: z }), op, z]);
     const html = `
 <nav class="navbar" aria-label="Principal">
   <div class="p-nav-left">
@@ -186,6 +186,16 @@
     }
     document.querySelectorAll('[data-notif]').forEach(el => el.addEventListener('click', () => BP.toast(session ? 'No tenés notificaciones nuevas.' : 'Ingresá para ver tus notificaciones.')));
     BP.syncFavCount();
+  };
+  /* Después de cargar los datos: cada enlace de barrio dice cuántas unidades tiene,
+     y las combinaciones sin inventario quedan marcadas en vez de prometer en falso. */
+  BP.anotarMenus = function(avisos){
+    document.querySelectorAll('.p-dd a[data-op]').forEach(a => {
+      const n = avisos.filter(x => x.op === a.dataset.op && x.zona === a.dataset.zona && !x.reservado).length;
+      const tag = a.querySelector('.p-dd-n');
+      if (tag) { tag.textContent = n ? n : 'sin unidades'; tag.hidden = false; }
+      a.classList.toggle('zero', n === 0);
+    });
   };
   BP.estadoLabel = e => ({ borrador:'Borrador', en_revision:'En revisión', publicado:'Publicado', rechazado:'Rechazado', pausado:'Pausado', vencido:'Vencido' })[e] || e;
   BP.estadoBadge = e => `<span class="p-badge ${e==='publicado'?'':e==='rechazado'?'demo':'dueno'}">${BP.estadoLabel(e)}</span>`;

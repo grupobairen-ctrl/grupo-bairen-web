@@ -8,7 +8,7 @@
   <link rel="icon" href="../bairen_logo.png?v=3">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260904s"><link rel="stylesheet" href="css/catalogo.css?v=20260904s"><link rel="stylesheet" href="css/portal.css?v=20260904s">
+  <link rel="stylesheet" href="css/base.css?v=20260904v"><link rel="stylesheet" href="css/catalogo.css?v=20260904v"><link rel="stylesheet" href="css/portal.css?v=20260904v">
   <style>body{padding-top:64px}.p-skel{background:linear-gradient(90deg,#EEE9DD 25%,#F6F2E9 50%,#EEE9DD 75%);background-size:200% 100%;animation:sk 1.2s infinite;border-radius:var(--p-radius);height:240px}@keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}</style>
 </head>
 <body class="p-product">
@@ -55,7 +55,7 @@
     <div class="grp"><label class="t">Superficie total, m²</label><div style="display:flex;gap:8px"><input type="number" id="m2min" class="p-fsel" style="flex:1;padding-left:12px;background-image:none" placeholder="Desde"><input type="number" id="m2max" class="p-fsel" style="flex:1;padding-left:12px;background-image:none" placeholder="Hasta"></div></div>
     <div class="grp"><label class="t">Antigüedad</label><select id="antig" class="p-fsel" style="width:100%"><option value="">Cualquiera</option><option value="0">A estrenar</option><option value="5">Hasta 5 años</option><option value="20">Hasta 20 años</option><option value="50">Hasta 50 años</option></select></div>
     <div class="grp"><label class="t">Amenities y características</label><div class="checks" id="amenChecks"></div></div>
-    <div class="grp"><label class="t">Publicación</label><div class="checks"><label><input type="checkbox" id="amoblado"> Amoblado</label><label><input type="checkbox" id="dueno"> Solo dueños directos</label><label><input type="checkbox" id="video"> Con video</label><label>Publicado hace <select id="hace" class="p-fsel" style="height:34px;padding:0 28px 0 8px;margin-left:6px"><option value="">cualquier fecha</option><option value="1">hoy</option><option value="7">7 días</option><option value="30">30 días</option></select></label></div></div>
+    <div class="grp"><label class="t">Publicación</label><div class="checks"><label><input type="checkbox" id="reservadas"> Incluir reservadas</label><label><input type="checkbox" id="amoblado"> Amoblado</label><label><input type="checkbox" id="dueno"> Solo dueños directos</label><label><input type="checkbox" id="video"> Con video</label><label>Publicado hace <select id="hace" class="p-fsel" style="height:34px;padding:0 28px 0 8px;margin-left:6px"><option value="">cualquier fecha</option><option value="1">hoy</option><option value="7">7 días</option><option value="30">30 días</option></select></label></div></div>
     <div class="foot"><button type="button" class="lnk" id="clearAll" style="background:none;border:0;text-decoration:underline;color:var(--text-mid);cursor:pointer">Limpiar todo</button><button type="button" class="p-btn p-btn-navy" id="applyDrawer">Ver resultados</button></div>
   </div>
 </div>
@@ -64,8 +64,8 @@
 
 <script src="../supabase-config.js"></script>
 <script src="../mapa-barrios.js"></script>
-<script src="js/ui.js?v=20260904s"></script><script src="js/store.js?v=20260904s"></script>
-<script src="js/data.js?v=20260904s"></script>
+<script src="js/ui.js?v=20260904v"></script><script src="js/store.js?v=20260904v"></script>
+<script src="js/data.js?v=20260904v"></script>
 <script>
 (async function(){
   BP.header(); BP.footer(); if (window.BPStore) BPStore.init();
@@ -76,43 +76,57 @@
   document.getElementById('amenChecks').innerHTML = AMEN.map(a => `<label><input type="checkbox" data-amen="${a}"> ${a}</label>`).join('');
 
   const PER_PAGE = 12;
-  const F = { op:'venta', tipo:'departamento', zonas:[], q:'', pub:'', emp:false, amb:0, dorm:0, banos:0, coch:0, pmin:0, pmax:0, expmax:0, m2min:0, m2max:0, antig:0, amen:[], amoblado:false, dueno:false, video:false, hace:0, favs:false, sort:'relevancia', page:1 };
+  const F = { op:'venta', tipo:'departamento', zonas:[], q:'', pub:'', emp:false, reservadas:false, amb:0, dorm:0, banos:0, coch:0, pmin:0, pmax:0, expmax:0, m2min:0, m2max:0, antig:0, amen:[], amoblado:false, dueno:false, video:false, hace:0, favs:false, sort:'relevancia', page:1 };
   await BP.probePretty(); const pretty = BP.parsePretty(); if (pretty) { F.op = pretty.op; F.tipo = pretty.tipo; if (pretty.zona) F.zonas = [pretty.zona]; }
   const qs = BP.qs();
   if (qs.has('op')) F.op = qs.get('op'); if (qs.get('tipo')) F.tipo = qs.get('tipo'); if (qs.getAll('zona').length) F.zonas = qs.getAll('zona').map(z => BP.zonaFromSlug(z) || z).filter(Boolean);
   ['q'].forEach(k => { if (qs.get(k)) F[k] = qs.get(k); }); ['amb','dorm','banos','coch','pmin','pmax','expmax','m2min','m2max','antig','hace','page'].forEach(k => { if (qs.get(k)) F[k] = Number(qs.get(k)); });
-  ['amoblado','dueno','video','favs'].forEach(k => { if (qs.get(k)==='1') F[k] = true; }); if (qs.get('sort')) F.sort = qs.get('sort'); if (qs.getAll('amen').length) F.amen = qs.getAll('amen');
+  ['amoblado','dueno','video','favs','reservadas'].forEach(k => { if (qs.get(k)==='1') F[k] = true; }); if (qs.get('sort')) F.sort = qs.get('sort'); if (qs.getAll('amen').length) F.amen = qs.getAll('amen');
   if (qs.get('pub')) { F.pub = qs.get('pub'); if (qs.has('op') && !qs.get('op')) F.op = ''; }
   if (qs.get('emp') === '1') { F.emp = true; }
   if (F.favs) F.op = '';
 
   const { avisos } = await BPData.load();
+  BP.anotarMenus(avisos);
   const countsAll = BPData.countsByZona(avisos);
   let mapa = null;
 
   function syncControls(){
     document.getElementById('opSel').value = F.op; document.getElementById('tipoSel').value = F.tipo; document.getElementById('qInput').value = F.q; document.getElementById('sortSel').value = F.sort;
     document.getElementById('pmin').value = F.pmin||''; document.getElementById('pmax').value = F.pmax||''; document.getElementById('expmax').value = F.expmax||''; document.getElementById('m2min').value = F.m2min||''; document.getElementById('m2max').value = F.m2max||''; document.getElementById('antig').value = F.antig||''; document.getElementById('hace').value = F.hace||'';
-    document.getElementById('amoblado').checked = F.amoblado; document.getElementById('dueno').checked = F.dueno; document.getElementById('video').checked = F.video;
+    document.getElementById('reservadas').checked = F.reservadas; document.getElementById('amoblado').checked = F.amoblado; document.getElementById('dueno').checked = F.dueno; document.getElementById('video').checked = F.video;
     document.querySelectorAll('[data-amen]').forEach(c => c.checked = F.amen.indexOf(c.dataset.amen) > -1);
     document.querySelectorAll('.seg').forEach(s => { const k = s.dataset.key; s.querySelectorAll('button').forEach(b => b.classList.toggle('on', String(F[k]||'') === b.dataset.v)); });
     document.getElementById('ambBtn').textContent = (F.amb||F.dorm) ? [F.amb?F.amb+'+ amb.':null, F.dorm?F.dorm+'+ dorm.':null].filter(Boolean).join(' · ') : 'Amb | Dorm';
     document.getElementById('precioBtn').textContent = (F.pmin||F.pmax) ? 'USD ' + (F.pmin?BP.fmtN(F.pmin):'0') + ' a ' + (F.pmax?BP.fmtN(F.pmax):'sin máximo') : 'Precio';
-    const more = [F.expmax,F.banos,F.coch,F.m2min,F.m2max,F.antig,F.amen.length,F.amoblado,F.dueno,F.video,F.hace].filter(Boolean).length; const cnt = document.getElementById('moreCnt'); cnt.textContent = more; cnt.hidden = !more;
+    const more = [F.expmax,F.banos,F.coch,F.m2min,F.m2max,F.antig,F.amen.length,F.amoblado,F.dueno,F.video,F.hace,F.reservadas].filter(Boolean).length; const cnt = document.getElementById('moreCnt'); cnt.textContent = more; cnt.hidden = !more;
     document.getElementById('zonaChips').innerHTML = F.zonas.map(z => `<span class="p-chip">${BP.zonaLabel(z)}<button type="button" data-z="${z}" aria-label="Quitar ${BP.zonaLabel(z)}">×</button></span>`).join('');
     document.querySelectorAll('#zonaChips button').forEach(b => b.addEventListener('click', () => { F.zonas = F.zonas.filter(z => z !== b.dataset.z); apply(); }));
   }
-  function pushURL(){ const p = new URLSearchParams(); if (F.op) p.set('op', F.op); if (F.tipo !== 'departamento') p.set('tipo', F.tipo); F.zonas.forEach(z => p.append('zona', z)); if (F.q) p.set('q', F.q); ['amb','dorm','banos','coch','pmin','pmax','expmax','m2min','m2max','antig','hace'].forEach(k => { if (F[k]) p.set(k, F[k]); }); F.amen.forEach(a => p.append('amen', a)); ['amoblado','dueno','video','favs'].forEach(k => { if (F[k]) p.set(k, '1'); }); if (F.pub) p.set('pub', F.pub); if (F.emp) p.set('emp', '1'); if (F.sort !== 'relevancia') p.set('sort', F.sort); if (F.page > 1) p.set('page', F.page); const target = BP.pretty && F.op && F.zonas.length <= 1 && !F.q && !F.pub && !F.favs ? BP.urlBuscar(Object.assign({}, Object.fromEntries(p), { op: F.op, tipo: F.tipo, zonas: F.zonas })) : 'buscar.html' + (p.toString() ? '?' + p.toString() : ''); history.replaceState(null, '', target); }
+  function pushURL(){ const p = new URLSearchParams(); if (F.op) p.set('op', F.op); if (F.tipo !== 'departamento') p.set('tipo', F.tipo); F.zonas.forEach(z => p.append('zona', z)); if (F.q) p.set('q', F.q); ['amb','dorm','banos','coch','pmin','pmax','expmax','m2min','m2max','antig','hace'].forEach(k => { if (F[k]) p.set(k, F[k]); }); F.amen.forEach(a => p.append('amen', a)); ['amoblado','dueno','video','favs','reservadas'].forEach(k => { if (F[k]) p.set(k, '1'); }); if (F.pub) p.set('pub', F.pub); if (F.emp) p.set('emp', '1'); if (F.sort !== 'relevancia') p.set('sort', F.sort); if (F.page > 1) p.set('page', F.page); const target = BP.pretty && F.op && F.zonas.length <= 1 && !F.q && !F.pub && !F.favs ? BP.urlBuscar(Object.assign({}, Object.fromEntries(p), { op: F.op, tipo: F.tipo, zonas: F.zonas })) : 'buscar.html' + (p.toString() ? '?' + p.toString() : ''); history.replaceState(null, '', target); }
 
   function titulo(n){ const tipo = F.tipo === 'todos' ? 'Propiedades' : F.tipo === 'departamento' ? 'Departamentos' : F.tipo === 'piso' ? 'Pisos' : F.tipo === 'ph' ? 'PH' : 'Casas'; const op = F.favs ? 'guardadas' : F.op ? BP.OPS[F.op].h : 'en venta y alquiler'; const where = F.zonas.length ? ' en ' + F.zonas.map(BP.zonaLabel).join(', ') : ' en Buenos Aires'; return `<span>${BP.fmtN(n)}</span> ${tipo} ${op}${where}`; }
 
+  /* El vacío no es culpa de quien busca: acá entran pocas unidades por diseño.
+     Se explica la curación y se ofrece la operación que sí tiene inventario en esa zona. */
+  function sugerencias(){
+    const zona = F.zonas[0] || null;
+    const ops = BPData.opsConUnidades(avisos, zona);
+    const otras = Object.keys(ops).filter(o => o !== F.op).sort((a,b) => ops[b]-ops[a]);
+    const donde = zona ? ' en ' + BP.zonaLabel(zona) : '';
+    let t = 'En BAIREN entran pocas unidades: cada una pasa un estándar de edificio, estado y presentación. ';
+    if (otras.length) t += 'Hoy' + donde + ' hay ' + otras.map(o => `<a href="${BP.urlBuscar({ op: o, zona: zona || undefined })}" style="text-decoration:underline">${ops[o]} ${ops[o] === 1 ? 'unidad' : 'unidades'} ${BP.OPS[o].h}</a>`).join(' y ') + '.';
+    else t += 'Probá con otro barrio o sacá algún filtro.';
+    if (!F.reservadas) { const res = BPData.filter(avisos, Object.assign({}, F, { reservadas: true })).filter(a => a.reservado).length; if (res) t += ' También hay ' + res + (res === 1 ? ' reservada' : ' reservadas') + ', que podés incluir desde Más filtros.'; }
+    return t + ' Si tenés una propiedad así, <a href="publicar.html" style="text-decoration:underline">publicala</a>.';
+  }
   function render(){
     let list = BPData.filter(avisos, F); list = BPData.sort(list, F.sort);
     const n = list.length; const pages = Math.max(1, Math.ceil(n / PER_PAGE)); if (F.page > pages) F.page = pages;
     const slice = list.slice((F.page-1)*PER_PAGE, F.page*PER_PAGE);
     document.getElementById('resTitle').innerHTML = titulo(n); document.title = titulo(n).replace(/<[^>]+>/g,'') + ' — BAIREN';
     const el = document.getElementById('list');
-    el.innerHTML = n ? slice.map(BPData.cardH).join('') : `<div class="p-empty"><b style="display:block;color:var(--navy-deeper);font-family:var(--font-display);font-size:1.2rem;margin-bottom:6px">${F.favs ? 'Todavía no guardaste propiedades' : F.emp ? 'Todavía no hay emprendimientos publicados' : 'No hay unidades publicadas con estos filtros'}</b>${F.favs ? 'Tocá el corazón en cualquier ficha y la vas a ver acá.' : F.emp ? 'Las desarrolladoras publican venta directa de sus unidades. Si sos una, <a href="publicar.html#desarrolladora" style="text-decoration:underline">publicá tu emprendimiento</a>.' : 'Probá con menos filtros o con otro barrio. Si tenés una propiedad así, <a href="publicar.html" style="text-decoration:underline">publicala</a>.'}</div>`;
+    el.innerHTML = n ? slice.map(BPData.cardH).join('') : `<div class="p-empty"><b style="display:block;color:var(--navy-deeper);font-family:var(--font-display);font-size:1.2rem;margin-bottom:6px">${F.favs ? 'Todavía no guardaste propiedades' : F.emp ? 'Todavía no hay emprendimientos publicados' : 'Todavía no hay unidades así'}</b>${F.favs ? 'Tocá el corazón en cualquier ficha y la vas a ver acá.' : F.emp ? 'Los emprendimientos tienen su propia página: <a href="emprendimientos.html" style="text-decoration:underline">ver emprendimientos</a>. Si sos desarrolladora, <a href="publicar.html#desarrolladora" style="text-decoration:underline">publicá el tuyo</a>.' : sugerencias()}</div>`;
     BPData.bindFavs(el);
     const pg = document.getElementById('pager'); pg.innerHTML = pages > 1 ? Array.from({length: pages}, (_, i) => `<button type="button" class="${i+1===F.page?'on':''}" data-p="${i+1}" aria-label="Página ${i+1}">${i+1}</button>`).join('') : '';
     pg.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { F.page = Number(b.dataset.p); pushURL(); render(); window.scrollTo({top: 0, behavior: 'smooth'}); }));
@@ -128,7 +142,7 @@
   document.getElementById('tipoSel').addEventListener('change', e => { F.tipo = e.target.value; apply(); });
   document.getElementById('sortSel').addEventListener('change', e => { F.sort = e.target.value; apply(); });
   const qi = document.getElementById('qInput'), sugg = document.getElementById('sugg');
-  function showSugg(){ const q = qi.value.trim().toLowerCase(); const zs = BP.ZONAS.filter(z => F.zonas.indexOf(z)===-1 && (!q || BP.zonaLabel(z).toLowerCase().indexOf(q)>-1)); sugg.innerHTML = zs.map(z => `<button type="button" data-z="${z}">${BP.ico.pin} ${BP.zonaLabel(z)}<small>${countsAll[z]||0} publicadas</small></button>`).join(''); sugg.classList.toggle('open', zs.length>0); sugg.querySelectorAll('button').forEach(b => b.addEventListener('mousedown', e => { e.preventDefault(); F.zonas.push(b.dataset.z); qi.value=''; F.q=''; sugg.classList.remove('open'); apply(); })); }
+  function showSugg(){ const q = qi.value.trim().toLowerCase(); const cz = BPData.countsByZona(avisos, F.op || null); const zs = BP.ZONAS.filter(z => F.zonas.indexOf(z)===-1 && (!q || BP.zonaLabel(z).toLowerCase().indexOf(q)>-1)); sugg.innerHTML = zs.map(z => `<button type="button" data-z="${z}">${BP.ico.pin} ${BP.zonaLabel(z)}<small>${cz[z] ? cz[z] : 'sin unidades'}</small></button>`).join(''); sugg.classList.toggle('open', zs.length>0); sugg.querySelectorAll('button').forEach(b => b.addEventListener('mousedown', e => { e.preventDefault(); F.zonas.push(b.dataset.z); qi.value=''; F.q=''; sugg.classList.remove('open'); apply(); })); }
   qi.addEventListener('focus', showSugg); qi.addEventListener('input', showSugg); qi.addEventListener('blur', () => setTimeout(() => sugg.classList.remove('open'), 120));
   qi.addEventListener('keydown', e => { if (e.key === 'Enter') { F.q = qi.value.trim(); sugg.classList.remove('open'); apply(); } });
   /* popovers */
@@ -143,8 +157,8 @@
   document.getElementById('moreBtn').addEventListener('click', () => openDrawer(true));
   drawer.querySelectorAll('[data-close]').forEach(x => x.addEventListener('click', () => openDrawer(false)));
   document.addEventListener('keydown', e => { if (e.key === 'Escape') openDrawer(false); });
-  document.getElementById('applyDrawer').addEventListener('click', () => { F.expmax = Number(document.getElementById('expmax').value||0); F.m2min = Number(document.getElementById('m2min').value||0); F.m2max = Number(document.getElementById('m2max').value||0); F.antig = Number(document.getElementById('antig').value||0); F.hace = Number(document.getElementById('hace').value||0); F.amoblado = document.getElementById('amoblado').checked; F.dueno = document.getElementById('dueno').checked; F.video = document.getElementById('video').checked; F.amen = Array.from(document.querySelectorAll('[data-amen]:checked')).map(c => c.dataset.amen); openDrawer(false); apply(); });
-  document.getElementById('clearAll').addEventListener('click', () => { Object.assign(F, { zonas:[], q:'', amb:0, dorm:0, banos:0, coch:0, pmin:0, pmax:0, expmax:0, m2min:0, m2max:0, antig:0, amen:[], amoblado:false, dueno:false, video:false, hace:0, favs:false }); openDrawer(false); apply(); });
+  document.getElementById('applyDrawer').addEventListener('click', () => { F.expmax = Number(document.getElementById('expmax').value||0); F.m2min = Number(document.getElementById('m2min').value||0); F.m2max = Number(document.getElementById('m2max').value||0); F.antig = Number(document.getElementById('antig').value||0); F.hace = Number(document.getElementById('hace').value||0); F.reservadas = document.getElementById('reservadas').checked; F.amoblado = document.getElementById('amoblado').checked; F.dueno = document.getElementById('dueno').checked; F.video = document.getElementById('video').checked; F.amen = Array.from(document.querySelectorAll('[data-amen]:checked')).map(c => c.dataset.amen); openDrawer(false); apply(); });
+  document.getElementById('clearAll').addEventListener('click', () => { Object.assign(F, { zonas:[], q:'', amb:0, dorm:0, banos:0, coch:0, pmin:0, pmax:0, expmax:0, m2min:0, m2max:0, antig:0, amen:[], amoblado:false, dueno:false, video:false, hace:0, favs:false, reservadas:false }); openDrawer(false); apply(); });
   /* alerta */
   document.getElementById('alertBtn').addEventListener('click', () => { const a = BP.alerts.get(); a.push({ creada: new Date().toISOString(), filtros: Object.assign({}, F), url: location.href }); BP.alerts.set(a); BP.toast('Alerta guardada en este navegador. Con tu cuenta te llega por mail.'); });
 
