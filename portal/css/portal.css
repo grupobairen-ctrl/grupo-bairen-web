@@ -712,3 +712,58 @@ select.p-fsel,.p-field select,.p-band select,.p-product select{background-repeat
 /* aire entre el header fijo y la galería */
 .p-band.p-band-gal,.p-product .p-band.p-band-gal{padding:88px 0 0}
 @media(max-width:900px){.p-map-ficha{max-width:none}.p-band.p-band-gal,.p-product .p-band.p-band-gal{padding:76px 0 0}}
+
+/* ══════════════════════════════════════════════════════════════
+   Ajuste de producto (4/9): una cosa manda por pantalla,
+   nada se dice dos veces.
+   ══════════════════════════════════════════════════════════════ */
+/* Resultados: el conteo vive sobre el plano claro, el cromo es una sola barra */
+.p-product .p-results-head{margin:0 0 18px;align-items:center}
+.p-product .p-results-head h1{font-size:1.35rem;color:var(--navy-deeper)}
+.p-product .p-results-head h1 span{color:var(--gold-dark)}
+.p-product .p-results-head .p-fbtn,.p-product .p-results-head .p-fsel{background:var(--p-card-w);border-color:var(--p-hair);color:var(--navy-deeper)}
+.p-product .p-filters{top:64px}
+/* la tarjeta entera es el objetivo, con un solo botón visible */
+.p-card-h .p-addr{position:static}
+.p-card-h .p-addr::after{content:"";position:absolute;inset:0;z-index:1}
+.p-card-h .acts,.p-card-h .p-fav,.p-card-h .p-card-photo{position:relative;z-index:2}
+.p-card-h{cursor:pointer}
+.p-card-h .acts{align-items:center}
+.p-card-h .acts .p-icon-btn{width:38px;height:38px}
+.p-product .p-card-h .acts .p-icon-btn{color:#1E7A47;border-color:rgba(30,122,71,.35)}
+.p-product .p-card-h .acts .p-icon-btn:hover{background:#1E7A47;color:#fff;border-color:#1E7A47}
+/* Ficha: una sola voz de título, el precio con tratamiento propio */
+.p-ficha-head h1{font-size:clamp(1.5rem,2.6vw,2rem);margin:6px 0 12px;letter-spacing:.005em}
+.p-price-row{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.p-price-big{font-family:var(--font-body);font-weight:500;font-size:clamp(1.5rem,2.4vw,1.9rem);color:var(--navy-deeper);letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.p-price-big small{font-size:.6em;color:var(--p-mid-ink);font-weight:400}
+.p-price-row .p-expensas{font-size:.92rem}
+.p-price-row .p-btn{margin-left:auto}
+.p-tags{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0 0}
+/* la lectura no pasa de 72 caracteres */
+.p-product .p-ficha-main>*{max-width:min(100%,68ch)}
+.p-product .p-ficha-main .p-icons,.p-product .p-ficha-main .p-map-ficha,.p-product .p-ficha-main .p-video,.p-product .p-ficha-main .p-feat{max-width:none}
+.p-product .p-ficha-main .p-ficha-head{max-width:none}
+/* el mapa, ahora abajo y contenido */
+.p-map-ficha{max-width:none}
+.p-product #mapaFicha{max-height:340px}
+.p-product .p-map-ficha{overflow:hidden}
+/* Tarjeta de contacto compacta */
+.p-cta{background:var(--p-card-w);border:1px solid var(--p-hair);border-radius:var(--p-radius);padding:20px;box-shadow:var(--p-shadow);display:grid;gap:10px}
+.p-cta-price{font-family:var(--font-body);font-weight:500;font-size:1.5rem;color:var(--navy-deeper);font-variant-numeric:tabular-nums}
+.p-cta-price small{font-size:.6em;color:var(--p-mid-ink);font-weight:400}
+.p-cta-pub{font-size:.84rem;color:var(--p-mid-ink);line-height:1.5;padding-bottom:6px;border-bottom:1px solid var(--p-hair)}
+.p-cta-pub b{display:block;color:var(--navy-deeper);font-weight:500}
+.p-cta .p-btn{width:100%}
+.p-cta-acts{display:flex;gap:8px;justify-content:center;padding-top:4px}
+.p-product .p-cta .p-btn-fill{background:var(--navy-deeper);border-color:var(--navy-deeper);color:var(--p-ink)}
+.p-product .p-cta .p-btn-fill:hover{background:var(--navy)}
+.p-form[hidden]{display:none}
+/* el corazón sigue anclado a la tarjeta: solo sube de capa, no cambia de posición */
+.p-card-h .p-fav{position:absolute;z-index:3}
+.p-card-h .acts,.p-card-h .p-card-photo{position:relative;z-index:2}
+/* los botones de la tarjeta siempre a la derecha, aunque el publicador tenga nombre corto */
+.p-card-foot{flex-wrap:nowrap;gap:12px}
+.p-card-foot .p-publine{flex:1 1 auto;min-width:0;flex-wrap:wrap}
+.p-card-foot .acts{flex:0 0 auto;margin-left:auto}
+@media(max-width:640px){.p-card-foot{flex-wrap:wrap}.p-card-foot .acts{width:100%}.p-card-foot .acts .p-btn{flex:1}}

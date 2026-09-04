@@ -123,7 +123,7 @@
     <p class="p-desc">${BP.esc(a.descripcion).slice(0, 220)}</p>
     <div class="p-card-foot">
       <div class="p-publine">Publica <b>${BP.esc(pub.nombre)}</b> ${D.badgeHTML(pub)}</div>
-      <div class="acts"><a class="p-btn p-btn-sm p-btn-dark" href="${D.waLink(a,pub)}" target="_blank" rel="noopener">${BP.ico.wa} WhatsApp</a><a class="p-btn p-btn-sm p-btn-navy" href="${href}#contacto">${BP.ico.mail} Contactar</a></div>
+      <div class="acts"><a class="p-icon-btn" href="${D.waLink(a,pub)}" target="_blank" rel="noopener" aria-label="Escribir por WhatsApp a ${BP.esc(pub.nombre)}" title="WhatsApp">${BP.ico.wa}</a><a class="p-btn p-btn-sm p-btn-navy" href="${href}#contacto">${BP.ico.mail} Contactar</a></div>
     </div>
   </div>
   <button type="button" class="p-icon-btn p-fav ${BP.isFav(a.id)?'on':''}" data-fav="${BP.esc(a.id)}" aria-label="Guardar en favoritos" aria-pressed="${BP.isFav(a.id)}">${BP.isFav(a.id)?BP.ico.heartFill:BP.ico.heart}</button>
