@@ -7,7 +7,7 @@
   <link rel="icon" href="../bairen_logo.png?v=3">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260904c"><link rel="stylesheet" href="css/catalogo.css?v=20260904c"><link rel="stylesheet" href="css/portal.css?v=20260904c">
+  <link rel="stylesheet" href="css/base.css?v=20260904h"><link rel="stylesheet" href="css/catalogo.css?v=20260904h"><link rel="stylesheet" href="css/portal.css?v=20260904h">
   <style>
     .p-imp{background:var(--p-card);border:1px solid var(--p-line);border-radius:var(--p-radius);padding:26px;margin-top:18px}
     .p-drop{border:1px dashed var(--gold);border-radius:12px;padding:26px;text-align:center;color:var(--text-mid);cursor:pointer;background:var(--p-card)} .p-drop b{display:block;color:var(--navy-deeper);font-weight:500;margin-bottom:4px}
@@ -19,11 +19,13 @@
 </head>
 <body>
 <div id="pHeader"></div>
-<section class="p-page"><div class="p-container" style="max-width:980px">
+<div class="p-band"><div class="p-container" style="max-width:980px">
   <span class="p-eyebrow">Publicadores</span>
   <h1 class="p-h2" style="font-size:clamp(1.7rem,3vw,2.3rem)">Importá tu cartera</h1>
-  <p class="p-sub">Para inmobiliarias y desarrolladoras. Exportá tus propiedades desde tu sistema de gestión a un archivo CSV o Excel guardado como CSV, subilo acá, revisá el mapeo de columnas y BAIREN crea los avisos como borradores en tu panel. Después los completás, agregás fotos si faltan y los mandás a revisión. Sin intermediarios ni marcas de terceros: el archivo es tuyo.</p>
-  <div class="p-imp">
+  <p class="p-sub" style="margin-bottom:0">Para inmobiliarias y desarrolladoras. Exportá tus propiedades desde tu sistema de gestión a un archivo CSV o Excel guardado como CSV, subilo acá, revisá el mapeo de columnas y BAIREN crea los avisos como borradores en tu panel. Después los completás, agregás fotos si faltan y los mandás a revisión. Sin intermediarios ni marcas de terceros: el archivo es tuyo.</p>
+</div></div>
+<section class="p-page after-band"><div class="p-container" style="max-width:980px">
+  <div class="p-imp" style="margin-top:0">
     <h2 class="p-sec-t">1. El archivo</h2>
     <p class="p-kicker" style="margin-bottom:12px">Separado por comas o punto y coma, con una fila de encabezados. Columnas que entendemos solas: <code>operacion</code>, <code>tipo</code>, <code>direccion</code>, <code>unidad</code>, <code>barrio</code>, <code>precio</code>, <code>moneda</code>, <code>expensas</code>, <code>m2_total</code>, <code>m2_cubierto</code>, <code>ambientes</code>, <code>dormitorios</code>, <code>banos</code>, <code>cocheras</code>, <code>antiguedad</code>, <code>titulo</code>, <code>descripcion</code>, <code>amenities</code> (separadas por <code>|</code>), <code>fotos</code> (URLs separadas por <code>|</code>), <code>video</code>, <code>codigo_interno</code>. Si tus columnas se llaman distinto, las asignás en el paso 2. <a href="#" id="plantilla" style="text-decoration:underline">Bajar plantilla de ejemplo</a>.</p>
     <div class="p-drop" id="drop"><b>Arrastrá el CSV acá o tocá para elegirlo</b>Hasta 2.000 filas por archivo.<input type="file" id="fileIn" accept=".csv,text/csv" hidden></div>
@@ -34,7 +36,7 @@
 </div></section>
 <div id="pFooter"></div>
 <script src="../supabase-config.js"></script>
-<script src="../mapa-barrios.js"></script><script src="js/ui.js?v=20260904c"></script><script src="js/store.js?v=20260904c"></script><script src="js/data.js?v=20260904c"></script>
+<script src="../mapa-barrios.js"></script><script src="js/ui.js?v=20260904h"></script><script src="js/store.js?v=20260904h"></script><script src="js/data.js?v=20260904h"></script>
 <script>
 (async function(){
   BP.header(); BP.footer(); BP.reveal();
@@ -56,6 +58,7 @@
   const get = (row, k) => mapping[k] == null ? '' : String(row[mapping[k]] || '').trim();
   function toAviso(row){ const opRaw = norm(get(row,'operacion')); const op = /vent|sale/.test(opRaw) ? 'venta' : /temp|median|amobl/.test(opRaw) ? 'mediano' : 'alquiler'; const tipoRaw = norm(get(row,'tipo')); const tipo = /piso/.test(tipoRaw) ? 'Piso' : /ph/.test(tipoRaw) ? 'PH' : /casa/.test(tipoRaw) ? 'Casa' : 'Departamento'; const barrio = get(row,'barrio'); const zona = (window.BairenZonas && window.BairenZonas.zonaDe(barrio)) || (BP.ZONAS.find(z => norm(z) === norm(barrio)) || null); const num = k => { const v = get(row,k).replace(/[^\d.,-]/g,'').replace(/\.(?=\d{3}(\D|$))/g,'').replace(',', '.'); return v === '' ? null : Number(v); }; const moneda = norm(get(row,'moneda')); const precio = num('precio'); const fotos = get(row,'fotos').split('|').map(x => x.trim()).filter(x => /^https?:\/\//.test(x)).map(url => ({ url })); const amen = get(row,'amenities').split('|').map(x => x.trim()).filter(Boolean); const errs = []; if (!get(row,'direccion')) errs.push('sin dirección'); if (!zona || BP.ZONAS.indexOf(zona) === -1) errs.push('barrio fuera de las ocho zonas'); if (!precio) errs.push('sin precio'); if (moneda && /ars|peso|\$/.test(moneda) && !/usd|u\$s|dol/.test(moneda)) errs.push('precio en pesos: convertir a USD'); if ((get(row,'descripcion')||'').length < 150) errs.push('descripción corta'); if (fotos.length < 8) errs.push(fotos.length + ' fotos'); return { rec: { operacion: op, tipo, direccion: get(row,'direccion'), unidad: get(row,'unidad'), barrio: barrio || zona || '', zona: zona || '', precio, moneda: 'USD', expensas: num('expensas'), m2_total: num('m2_total'), m2_cubierto: num('m2_cubierto'), ambientes: num('ambientes'), dormitorios: num('dormitorios'), banos: num('banos'), cocheras: num('cocheras') || 0, antiguedad: num('antiguedad'), titulo: get(row,'titulo'), descripcion: get(row,'descripcion'), amenities: amen, caracteristicas: [], fotos, video_url: get(row,'video') || null, video_tipo: get(row,'video') ? (/youtu/.test(get(row,'video')) ? 'youtube' : 'mp4') : null, codigo_interno: get(row,'codigo_interno'), amoblado: op === 'mediano', estado_curacion: 'borrador' }, errs }; }
   function preview(){ document.getElementById('paso3').hidden = false; const parsed = data.map(toAviso); const listos = parsed.filter(p => !p.errs.length).length; document.getElementById('resumen').textContent = `${parsed.length} avisos leídos. ${listos} completos para enviar a revisión; el resto se crea como borrador con lo que falta marcado.`; document.getElementById('prev').innerHTML = `<thead><tr><th>#</th><th>Operación</th><th>Dirección</th><th>Barrio</th><th>Precio</th><th>Datos</th><th>Fotos</th><th>Estado</th></tr></thead><tbody>${parsed.slice(0, 50).map((p, i) => `<tr><td>${i+1}</td><td>${p.rec.operacion}</td><td>${BP.esc(p.rec.direccion)} ${BP.esc(p.rec.unidad||'')}</td><td>${BP.esc(p.rec.barrio)}</td><td>${p.rec.precio ? BP.fmtUSD(p.rec.precio) : '—'}</td><td>${[p.rec.m2_total ? p.rec.m2_total + ' m²' : null, p.rec.ambientes ? p.rec.ambientes + ' amb.' : null].filter(Boolean).join(' · ') || '—'}</td><td>${p.rec.fotos.length}</td><td class="${p.errs.length ? 'err' : 'ok'}">${p.errs.length ? p.errs.join(', ') : 'completo'}</td></tr>`).join('')}${parsed.length > 50 ? `<tr><td colspan="8">… y ${parsed.length - 50} más</td></tr>` : ''}</tbody>`; }
+  document.body.dataset.ready = 'importar';
   document.getElementById('importar').addEventListener('click', async () => { const parsed = data.map(toAviso); const b = document.getElementById('importar'); b.disabled = true; let n = 0; for (const p of parsed) { try { p.rec.slug = null; await BPStore.saveAviso(p.rec); n++; b.textContent = 'Creando ' + n + ' de ' + parsed.length + '…'; } catch (e) { console.warn(e); } } BP.toast(n + ' borradores creados en tu panel.'); setTimeout(() => location.href = 'panel.html#avisos', 900); });
 })();
 </script>

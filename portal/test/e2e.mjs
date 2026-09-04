@@ -112,7 +112,7 @@ try {
   ok('Importar: un dueño directo no puede importar', true);
   await evalJs('BPStore.init().then(() => BPStore.getMyPublicador()).then(p => BPStore.savePublicador(Object.assign({}, p, { tipo: "inmobiliaria", nombre: "Inmobiliaria Prueba", responsable: "Corredora Prueba", matricula: "CUCICBA 1234", colegio: "CUCICBA", badge: "Corredor inmobiliario matriculado" })))');
   await goto(BASE + 'importar.html');
-  await waitFor('!!document.getElementById("fileIn")', 'página de importación');
+  await waitFor('document.body.dataset.ready === "importar" && !!document.getElementById("fileIn")', 'página de importación lista');
   const d2 = await send('DOM.getDocument', { depth: -1 }); const q2 = await send('DOM.querySelector', { nodeId: d2.result.root.nodeId, selector: '#fileIn' });
   await send('DOM.setFileInputFiles', { nodeId: q2.result.nodeId, files: ['/tmp/bp-e2e/cartera.csv'] });
   await waitFor('document.querySelectorAll("#prev tbody tr").length >= 3', 'vista previa del CSV');

@@ -7,7 +7,9 @@ Fuente de verdad: los tokens de index.html y el manual de marca (manual-marca-ba
 - gold #C2A968 (acento, líneas, botones) · gold-dark #8A7547 (texto de acento sobre claro) · gold-light #DECDA0
 - white #FBFAF6 (fondo de página, cálido) · off-white #EEE5D0 · wheat #D9C9A8 · silver #BFBAB0 · silver-light #DDD8CE
 - text-dark #1A2538 · text-mid #6B7589
-- Estrategia: restringida sobre crema cálido, con el navy como color comprometido en header, hero y pie. El oro es acento, nunca relleno de superficies grandes. Nada de blanco ni negro puros: superficies #FDFCF9 sobre #FBFAF6.
+- **Estrategia (definida el 4/9/2026): navy comprometido. La casa es navy; el papel es crema.** El navy (#131D2D, #1E2A3F, #2A3A52) carga lienzo, header, hero, barra de filtros, cabeceras de página, mapa, rieles, formularios de contacto, bloques de captación y pie. El crema carga una sola hoja por página (#EEE5D0) donde viven las tarjetas (#FDFCF9), la lectura y los formularios largos: las fotos respiran sobre papel, no sobre navy. Objetivo: 50 a 60 % navy en home y resultados, 40 % en ficha y panel. El oro es acento y nunca rellena superficies grandes. Nada de blanco ni negro puros.
+- **Nota:** el manual de marca (sección 03) propone un sistema "light-dominante"; el sitio publicado y la decisión de Tomás mandan navy. Si se actualiza el manual, alinear esa sección.
+- **Tinta según superficie:** sobre navy, crema #FBFAF6 y sus opacidades (.78 subtítulos, .62 meta, piso .55 para texto chico), oro #C2A968 para grande y gold-light #DECDA0 para chico. Sobre crema, #59647A para texto secundario y #75623C para etiquetas chicas en oro; oro puro solo como filete de 1 px. Nunca #6B7589 sobre navy (3,7:1) ni oro puro como texto sobre crema (2,2:1).
 - Estados: hover eleva 1 a 2 px y suma sombra difusa; foco con borde oro; activo con fondo navy y texto claro; deshabilitado al 45 %.
 
 ## Tipografía
