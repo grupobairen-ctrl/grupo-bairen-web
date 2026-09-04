@@ -76,9 +76,126 @@
   BP.toggleFav = id => { const f=BP.favs.get(); const i=f.indexOf(id); if(i>-1) f.splice(i,1); else f.push(id); BP.favs.set(f); BP.syncFavCount(); if (window.BPStore && BPStore.syncFavorito) BPStore.syncFavorito(id, i===-1); return i===-1; };
   BP.syncFavCount = () => { const n=BP.favs.get().length; document.querySelectorAll('[data-fav-count]').forEach(el=>{ el.textContent=n||''; el.hidden=!n; }); };
 
-  BP.toast = msg => { let t=document.getElementById('bpToast'); if(!t){ t=document.createElement('div'); t.id='bpToast'; t.className='p-toast'; document.body.appendChild(t);} t.textContent=msg; t.classList.add('on'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('on'),2600); };
+  /* 5.6 Un aviso flotante que no anuncia nada no existe para quien usa lector de pantalla.
+     Rol de alerta y region activa; el texto se reescribe en dos tiempos para que se relea aunque repita. */
+  BP.toast = (msg, tipo) => {
+    let t = document.getElementById('bpToast');
+    if (!t) { t = document.createElement('div'); t.id = 'bpToast'; t.className = 'p-toast'; t.setAttribute('role','status'); t.setAttribute('aria-live','polite'); t.setAttribute('aria-atomic','true'); document.body.appendChild(t); }
+    t.setAttribute('role', tipo === 'error' ? 'alert' : 'status');
+    t.setAttribute('aria-live', tipo === 'error' ? 'assertive' : 'polite');
+    t.classList.toggle('err', tipo === 'error');
+    t.textContent = ''; setTimeout(() => { t.textContent = msg; }, 40);
+    t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), tipo === 'error' ? 5200 : 2600);
+  };
+  /* Region viva aparte para lo que cambia en la pagina y no es un aviso flotante */
+  BP.anunciar = msg => {
+    let r = document.getElementById('bpLive');
+    if (!r) { r = document.createElement('div'); r.id = 'bpLive'; r.className = 'p-sr'; r.setAttribute('role','status'); r.setAttribute('aria-live','polite'); r.setAttribute('aria-atomic','true'); document.body.appendChild(r); }
+    r.textContent = ''; setTimeout(() => { r.textContent = msg; }, 40);
+  };
+
+  /* 5.6 El error de un formulario se dice al lado del campo, no solo de paso en un aviso flotante */
+  BP.errorCampo = (campo, msg) => {
+    const el = typeof campo === 'string' ? document.getElementById(campo) : campo;
+    if (!el) { BP.toast(msg, 'error'); return; }
+    let id = el.id ? el.id + '-err' : 'err-' + Math.random().toString(36).slice(2, 8);
+    let box = document.getElementById(id);
+    if (!box) { box = document.createElement('p'); box.id = id; box.className = 'p-err-campo'; (el.closest('.p-fld, .p-field, .cfield, label') || el.parentNode).appendChild(box); }
+    box.textContent = msg; box.hidden = false;
+    el.setAttribute('aria-invalid', 'true'); el.setAttribute('aria-describedby', id);
+    el.classList.add('p-invalido');
+    const limpiar = () => { box.hidden = true; el.removeAttribute('aria-invalid'); el.classList.remove('p-invalido'); el.removeEventListener('input', limpiar); el.removeEventListener('change', limpiar); };
+    el.addEventListener('input', limpiar); el.addEventListener('change', limpiar);
+    BP.toast(msg, 'error');
+    try { el.focus({ preventScroll: false }); } catch (e) {}
+  };
+
+  /* 5.4 Una sola funcion de atrapado de foco, con Escape y devolucion al que abrio.
+     La usan el panel lateral de filtros, el lightbox, los desplegables y el menu del header. */
+  const FOCO = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+  BP.focoAtrapado = function (caja, opciones) {
+    const o = opciones || {};
+    const devolver = o.devolverA || document.activeElement;
+    const foca = () => Array.from(caja.querySelectorAll(FOCO)).filter(el => el.offsetParent !== null || el === document.activeElement);
+    const onKey = e => {
+      if (e.key === 'Escape') { e.stopPropagation(); e.preventDefault(); salir(); return; }
+      if (e.key !== 'Tab') return;
+      const f = foca(); if (!f.length) return;
+      const primero = f[0], ultimo = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === primero) { e.preventDefault(); ultimo.focus(); }
+      else if (!e.shiftKey && document.activeElement === ultimo) { e.preventDefault(); primero.focus(); }
+    };
+    const onClickFuera = e => { if (o.cerrarAlClicFuera && !caja.contains(e.target) && (!o.disparador || !o.disparador.contains(e.target))) salir(); };
+    function salir(){
+      document.removeEventListener('keydown', onKey, true);
+      document.removeEventListener('mousedown', onClickFuera, true);
+      if (o.alCerrar) o.alCerrar();
+      if (devolver && devolver.focus) { try { devolver.focus({ preventScroll: true }); } catch (e) {} }
+    }
+    document.addEventListener('keydown', onKey, true);
+    if (o.cerrarAlClicFuera) document.addEventListener('mousedown', onClickFuera, true);
+    if (o.enfocar !== false) { const f = foca(); const objetivo = o.primero || f[0]; if (objetivo) { try { objetivo.focus({ preventScroll: true }); } catch (e) {} } }
+    return salir;
+  };
+
+  /* 5.5 Las sugerencias de barrio se enganchaban solo al raton: con el teclado, Enter no hacia nada. */
+  BP.sugerenciasTeclado = function (input, caja, elegir) {
+    if (!input || !caja || input._bpKb) return; input._bpKb = true;
+    input.setAttribute('role', 'combobox'); input.setAttribute('aria-expanded', 'false');
+    input.setAttribute('aria-autocomplete', 'list'); input.setAttribute('autocomplete', 'off');
+    if (!caja.id) caja.id = 'sugg-' + Math.random().toString(36).slice(2, 8);
+    input.setAttribute('aria-controls', caja.id); caja.setAttribute('role', 'listbox');
+    let i = -1;
+    const items = () => Array.from(caja.querySelectorAll('[data-sugg],button,a,li'));
+    const pintar = () => {
+      const it = items();
+      it.forEach((el, k) => { el.setAttribute('role', 'option'); el.setAttribute('aria-selected', k === i ? 'true' : 'false'); el.classList.toggle('sel', k === i); if (!el.id) el.id = caja.id + '-o' + k; });
+      const act = it[i];
+      if (act) { input.setAttribute('aria-activedescendant', act.id); act.scrollIntoView({ block: 'nearest' }); }
+      else input.removeAttribute('aria-activedescendant');
+      const abierta = (caja.offsetHeight > 0 || caja.classList.contains('open')) && it.length > 0;
+      input.setAttribute('aria-expanded', abierta ? 'true' : 'false');
+      if (abierta) BP.anunciar(it.length === 1 ? 'Una sugerencia' : it.length + ' sugerencias');
+    };
+    const cerrar = () => { caja.classList.remove('open'); caja.style.display = ''; i = -1; input.setAttribute('aria-expanded', 'false'); input.removeAttribute('aria-activedescendant'); };
+    input.addEventListener('keydown', e => {
+      const it = items(); const abierta = (caja.offsetHeight > 0 || caja.classList.contains('open')) && it.length > 0;
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        if (!abierta) return;
+        e.preventDefault(); i = e.key === 'ArrowDown' ? (i + 1) % it.length : (i <= 0 ? it.length - 1 : i - 1); pintar();
+      } else if (e.key === 'Enter') {
+        if (abierta && i > -1 && it[i]) { e.preventDefault(); elegir(it[i], i); cerrar(); }
+      } else if (e.key === 'Escape') {
+        if (abierta) { e.preventDefault(); e.stopPropagation(); cerrar(); }
+      } else if (e.key === 'Tab') { cerrar(); }
+    });
+    input.addEventListener('input', () => { i = -1; setTimeout(pintar, 0); });
+    caja.addEventListener('mouseover', e => { const it = items(); const k = it.indexOf(e.target.closest('[data-sugg],button,a,li')); if (k > -1) { i = k; pintar(); } });
+    input._bpCerrarSugg = cerrar; input._bpPintarSugg = pintar;
+  };
+
+  /* 5.1 Si los datos no cargan, no se puede dejar el esqueleto latiendo para siempre. */
+  BP.estadoError = function (host, msg, reintentar) {
+    if (!host) return;
+    const id = 'err-' + Math.random().toString(36).slice(2, 8);
+    host.innerHTML = `<div class="p-error" role="alert" aria-labelledby="${id}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></svg>
+      <div><b id="${id}">${BP.esc(msg || 'No pudimos cargar la información.')}</b>
+      <span>Puede ser tu conexión o algo de nuestro lado. Volvé a intentar en un momento.</span></div>
+      <button type="button" class="p-btn p-btn-sm" data-reintentar>Reintentar</button></div>`;
+    const b = host.querySelector('[data-reintentar]');
+    if (b) b.addEventListener('click', () => { if (reintentar) reintentar(); else location.reload(); });
+    BP.anunciar(msg || 'No pudimos cargar la información.');
+    if (b) setTimeout(() => { try { b.focus(); } catch (e) {} }, 60);
+  };
 
   BP.reveal = () => { const els=document.querySelectorAll('[data-reveal]'); if(!('IntersectionObserver' in window)){ els.forEach(e=>e.classList.add('in')); return; } const io=new IntersectionObserver(en=>{ en.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} }); },{rootMargin:'0px 0px -8% 0px'}); els.forEach(e=>io.observe(e)); };
+
+  /* El destino del enlace de salto: la etiqueta main si existe, si no la primera
+     sección de contenido después del header. La home no usa main. */
+  BP._destino = () => document.querySelector('main')
+    || document.querySelector('#pHeader ~ section, #pHeader ~ div.p-page, #pHeader ~ *:not(script):not(style):not(.p-skip)')
+    || null;
 
   /* ── Header ─────────────────────────────────────────────── */
   BP.header = function(active){ BP._active = active;
@@ -119,8 +236,46 @@
   <div class="m-cta"><a class="p-btn p-btn-sm" href="publicar.html">Publicar</a><a class="p-btn p-btn-sm p-btn-fill" href="ingresar.html">Ingresar</a></div>
 </div>`;
     const host = document.getElementById('pHeader'); if (host) host.innerHTML = html;
+    /* 5.8 Cuarenta tabulaciones para pasar el header. Un enlace de salto y los desplegables fuera del orden. */
+    if (host && !document.getElementById('pSkip')) {
+      const sk = document.createElement('a'); sk.id = 'pSkip'; sk.className = 'p-skip';
+      sk.href = '#contenido'; sk.textContent = 'Saltar al contenido';
+      sk.addEventListener('click', e => {
+        const d = document.getElementById('contenido') || BP._destino();
+        if (d) { e.preventDefault(); d.setAttribute('tabindex', '-1'); d.focus(); d.scrollIntoView(); }
+      });
+      host.parentNode.insertBefore(sk, host);
+      const d = BP._destino();
+      if (d && !document.getElementById('contenido') && !d.id) d.id = 'contenido';
+      if (d && d.id && d.id !== 'contenido') sk.href = '#' + d.id;
+    }
+    const cerrarDD = dd => { dd.classList.remove('abierto'); dd.querySelectorAll('a,button').forEach(x => x.tabIndex = -1); const bt = dd.parentNode.querySelector('button[aria-haspopup]'); if (bt) bt.setAttribute('aria-expanded','false'); };
+    const abrirDD = dd => { dd.querySelectorAll('a,button').forEach(x => x.removeAttribute('tabindex')); dd.classList.add('abierto'); const bt = dd.parentNode.querySelector('button[aria-haspopup]'); if (bt) bt.setAttribute('aria-expanded','true'); };
+    document.querySelectorAll('.p-nav-menu .p-dd, .p-nav-right .p-dd').forEach(dd => {
+      cerrarDD(dd);
+      const cont = dd.parentNode, bt = cont.querySelector('button[aria-haspopup],button');
+      cont.addEventListener('mouseenter', () => abrirDD(dd));
+      cont.addEventListener('mouseleave', () => { if (!cont.contains(document.activeElement)) cerrarDD(dd); });
+      if (bt) bt.addEventListener('click', e => {
+        e.preventDefault();
+        const abierto = dd.classList.contains('abierto');
+        document.querySelectorAll('.p-dd.abierto').forEach(cerrarDD);
+        if (!abierto) { abrirDD(dd); BP.focoAtrapado(dd, { disparador: bt, cerrarAlClicFuera: true, devolverA: bt, alCerrar: () => cerrarDD(dd) }); }
+      });
+      cont.addEventListener('focusin', () => abrirDD(dd));
+      cont.addEventListener('focusout', () => setTimeout(() => { if (!cont.contains(document.activeElement)) cerrarDD(dd); }, 0));
+    });
     const b=document.getElementById('burger'), m=document.getElementById('mobileMenu');
-    if (b && m) b.addEventListener('click', () => { const o=m.classList.toggle('open'); b.classList.toggle('open',o); b.setAttribute('aria-expanded', o?'true':'false'); });
+    if (b && m) {
+      m.querySelectorAll('a,button').forEach(x => x.tabIndex = -1);
+      let soltar = null;
+      b.addEventListener('click', () => {
+        const o = m.classList.toggle('open'); b.classList.toggle('open', o); b.setAttribute('aria-expanded', o ? 'true' : 'false');
+        m.querySelectorAll('a,button').forEach(x => { if (o) x.removeAttribute('tabindex'); else x.tabIndex = -1; });
+        if (o) soltar = BP.focoAtrapado(m, { devolverA: b, alCerrar: () => { m.classList.remove('open'); b.classList.remove('open'); b.setAttribute('aria-expanded','false'); m.querySelectorAll('a,button').forEach(x => x.tabIndex = -1); } });
+        else if (soltar) { soltar(); soltar = null; }
+      });
+    }
     document.querySelectorAll('[data-notif]').forEach(el=>el.addEventListener('click',()=>BP.toast('Ingresá para ver tus notificaciones.')));
     BP.syncFavCount();
   };

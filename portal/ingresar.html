@@ -7,7 +7,7 @@
   <link rel="icon" href="../bairen_logo.png?v=3">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=202609041b"><link rel="stylesheet" href="css/catalogo.css?v=202609041b"><link rel="stylesheet" href="css/portal.css?v=202609041b">
+  <link rel="stylesheet" href="css/base.css?v=202609042e"><link rel="stylesheet" href="css/catalogo.css?v=202609042e"><link rel="stylesheet" href="css/portal.css?v=202609042e">
 </head>
 <body>
 <div id="pHeader"></div>
@@ -24,7 +24,7 @@
 </div></section>
 <div id="pFooter"></div>
 <script src="../supabase-config.js"></script>
-<script src="../mapa-barrios.js"></script><script src="js/ui.js?v=202609041b"></script><script src="js/store.js?v=202609041b"></script><script src="js/data.js?v=202609041b"></script>
+<script src="../mapa-barrios.js"></script><script src="js/ui.js?v=202609042e"></script><script src="js/store.js?v=202609042e"></script><script src="js/data.js?v=202609042e"></script>
 <script>
 (async function(){
   BP.header(); BP.footer(); BP.reveal();
@@ -37,12 +37,12 @@
   document.getElementById('modeNote').textContent = mode === 'local' ? 'Modo local: todavía no está creado el esquema portal en Supabase, así que la sesión y los datos quedan en este navegador. Sirve para probar todo el flujo.' : '';
   if (BPStore.session) { location.replace(destino()); return; }
   let mail = '';
-  async function send(){ const b = document.getElementById('btnMail'); b.disabled = true; b.textContent = 'Enviando…'; await BPStore.init(); const r = await BPStore.sendCode(email.value); b.disabled = false; b.textContent = 'Continuar'; if (!r.ok) { BP.toast(r.msg); return; } mail = email.value.trim().toLowerCase(); document.getElementById('codeMsg').textContent = r.msg; fm.hidden = true; document.getElementById('social').hidden = true; fc.hidden = false; document.getElementById('code').focus(); }
+  async function send(){ const b = document.getElementById('btnMail'); b.disabled = true; b.textContent = 'Enviando…'; await BPStore.init(); const r = await BPStore.sendCode(email.value); b.disabled = false; b.textContent = 'Continuar'; if (!r.ok) { BP.errorCampo('email', r.msg); return; } mail = email.value.trim().toLowerCase(); document.getElementById('codeMsg').textContent = r.msg; fm.hidden = true; document.getElementById('social').hidden = true; fc.hidden = false; document.getElementById('code').focus(); }
   fm.addEventListener('submit', e => { e.preventDefault(); send(); });
   document.getElementById('again').addEventListener('click', e => { e.preventDefault(); send(); });
   document.getElementById('back').addEventListener('click', e => { e.preventDefault(); fc.hidden = true; fm.hidden = false; document.getElementById('social').hidden = false; });
-  fc.addEventListener('submit', async e => { e.preventDefault(); const r = await BPStore.verifyCode(mail, document.getElementById('code').value); if (!r.ok) { BP.toast(r.msg); return; } BP.toast('Listo, entraste.'); setTimeout(() => location.href = destino(), 500); });
-  document.querySelectorAll('[data-soc]').forEach(b => b.addEventListener('click', async () => { if (mode === 'supabase') { const { error } = await BPStore.sb.auth.signInWithOAuth({ provider: b.dataset.soc, options: { redirectTo: location.origin + location.pathname.replace(/[^/]*$/, '') + destino() } }); if (error) BP.toast(error.message); } else { BP.toast('Google y Apple se activan cuando el proyecto esté conectado a Supabase. Usá el mail.'); } }));
+  fc.addEventListener('submit', async e => { e.preventDefault(); const r = await BPStore.verifyCode(mail, document.getElementById('code').value); if (!r.ok) { BP.errorCampo('code', r.msg); return; } BP.toast('Listo, entraste.'); setTimeout(() => location.href = destino(), 500); });
+  document.querySelectorAll('[data-soc]').forEach(b => b.addEventListener('click', async () => { if (mode === 'supabase') { const { error } = await BPStore.sb.auth.signInWithOAuth({ provider: b.dataset.soc, options: { redirectTo: location.origin + location.pathname.replace(/[^/]*$/, '') + destino() } }); if (error) BP.toast(error.message, 'error'); } else { BP.toast('Google y Apple se activan cuando el proyecto esté conectado a Supabase. Usá el mail.'); } }));
 })();
 </script>
 </body>

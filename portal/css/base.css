@@ -345,7 +345,7 @@
       font-size:.78rem;color:var(--gold-dark);
       background:var(--off-white);padding:0 6px;line-height:1.3;
       font-feature-settings:"lnum" 1;
-      border-radius:6px;
+      border-radius:8px;
     }
     .step-title{font-family:var(--font-display);font-size:clamp(1.06rem,1.5vw,1.22rem);font-weight:500;color:var(--navy);margin-bottom:10px;line-height:1.25;letter-spacing:-.005em;}
     .step-desc{font-size:.92rem;line-height:1.7;color:var(--text-mid);max-width:26ch;margin:0 auto;}

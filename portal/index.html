@@ -10,7 +10,7 @@
   <link rel="icon" href="../bairen_logo.png?v=3">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=202609041b"><link rel="stylesheet" href="css/catalogo.css?v=202609041b"><link rel="stylesheet" href="css/portal.css?v=202609041b">
+  <link rel="stylesheet" href="css/base.css?v=202609042e"><link rel="stylesheet" href="css/catalogo.css?v=202609042e"><link rel="stylesheet" href="css/portal.css?v=202609042e">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"BAIREN","url":"https://www.bairengroup.com","logo":"https://www.bairengroup.com/bairen_logo.png","description":"Plataforma de propiedades seleccionadas en Buenos Aires. Alquileres a mediano y largo plazo y departamentos en venta, publicados por corredores matriculados y dueños verificados.","areaServed":[{"@type":"City","name":"Ciudad Autónoma de Buenos Aires"},{"@type":"AdministrativeArea","name":"Zona Norte, Buenos Aires"}]}</script>
 </head>
 <body>
@@ -107,8 +107,8 @@
 
 <script src="../supabase-config.js"></script>
 <script src="../mapa-barrios.js"></script>
-<script src="js/ui.js?v=202609041b"></script><script src="js/store.js?v=202609041b"></script>
-<script src="js/data.js?v=202609041b"></script>
+<script src="js/ui.js?v=202609042e"></script><script src="js/store.js?v=202609042e"></script>
+<script src="js/data.js?v=202609042e"></script>
 <script>
 (async function(){
   BP.header('home'); BP.footer(); if (window.BPStore) BPStore.init(); BP.reveal();
@@ -127,12 +127,16 @@
   const CARACT = ['Terraza o jardín','Pileta','Cochera','Amoblado','Pet friendly','Gimnasio','Seguridad 24hs'];
   function renderChips(){ chips.innerHTML = zonasSel.map(z => `<span class="p-chip">${BP.zonaLabel(z)}<button type="button" data-z="${z}" aria-label="Quitar ${BP.zonaLabel(z)}">×</button></span>`).join(''); chips.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { zonasSel.splice(zonasSel.indexOf(b.dataset.z),1); renderChips(); })); }
   function showSugg(){ const q = input.value.trim().toLowerCase(); const zs = BP.ZONAS.filter(z => zonasSel.indexOf(z)===-1 && (!q || BP.zonaLabel(z).toLowerCase().indexOf(q)>-1)); const cs = CARACT.filter(c => q && c.toLowerCase().indexOf(q)>-1); const items = zs.map(z => `<button type="button" data-z="${z}">${BP.ico.pin} ${BP.zonaLabel(z)}<small>${(window.__counts||{})[z] || 'sin unidades'}</small></button>`).concat(cs.map(c => `<button type="button" data-c="${c}">${BP.ico.search} ${c}<small>característica</small></button>`)); sugg.innerHTML = items.join(''); sugg.classList.toggle('open', items.length>0); sugg.querySelectorAll('button').forEach(b => b.addEventListener('mousedown', e => { e.preventDefault(); if (b.dataset.z) { zonasSel.push(b.dataset.z); input.value=''; renderChips(); } else { input.value = b.dataset.c; } sugg.classList.remove('open'); })); }
-  input.addEventListener('focus', showSugg); input.addEventListener('input', showSugg); input.addEventListener('blur', () => setTimeout(() => sugg.classList.remove('open'), 120));
+  BP.sugerenciasTeclado(input, sugg, el => { if (el.dataset.z) { zonasSel.push(el.dataset.z); input.value=''; renderChips(); } else if (el.dataset.c) { input.value = el.dataset.c; } sugg.classList.remove('open'); });
+  input.addEventListener('focus', showSugg); input.addEventListener('input', showSugg);
+  input.addEventListener('blur', () => setTimeout(() => { if (!sugg.contains(document.activeElement)) sugg.classList.remove('open'); }, 120));
   document.getElementById('searchForm').addEventListener('submit', e => { e.preventDefault(); const p = new URLSearchParams(); p.set('op', opInput.value === 'emprendimientos' ? 'venta' : opInput.value); const tipo = e.target.tipo.value; if (tipo && tipo !== 'departamento') p.set('tipo', tipo); zonasSel.forEach(z => p.append('zona', z)); if (input.value.trim()) p.set('q', input.value.trim()); if (opInput.value === 'emprendimientos') p.set('emp', '1'); const zs = zonasSel.slice(); if (opInput.value === 'emprendimientos') { location.href = 'emprendimientos.html' + (zs[0] ? '?zona=' + encodeURIComponent(zs[0]) : ''); return; } location.href = (zs.length <= 1 && !input.value.trim() && opInput.value !== 'emprendimientos') ? BP.urlBuscar({ op: opInput.value, tipo, zonas: zs }) : 'buscar.html?' + p.toString(); });
 
   /* datos */
   await BP.probePretty();
-  const { avisos } = await BPData.load();
+  let avisos;
+  try { ({ avisos } = await BPData.load()); }
+  catch (err) { console.error(err); const h = document.getElementById('destacadasGrid') || document.querySelector('main'); BP.estadoError(h, 'No pudimos cargar las propiedades.'); return; }
   BP.anotarMenus(avisos);
   /* La pestaña por defecto es la operación con más inventario publicado, calculada de los datos */
   let opActiva = BPData.opConMasInventario(avisos);
