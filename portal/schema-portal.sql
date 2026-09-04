@@ -238,7 +238,7 @@ $mig$;
 grant usage on schema portal to anon, authenticated;
 grant select on all tables in schema portal to anon, authenticated;
 grant insert, update on all tables in schema portal to authenticated;
-grant insert on portal.consultas, portal.vistas to anon;
+grant insert on portal.consultas to anon;
 alter default privileges in schema portal grant select on tables to anon, authenticated;
 
 alter table portal.publicadores add column if not exists auth_user_id uuid unique;
@@ -257,6 +257,7 @@ create table if not exists portal.vistas (
 alter table portal.vistas enable row level security;
 drop policy if exists "vistas insert" on portal.vistas;
 create policy "vistas insert" on portal.vistas for insert with check (true);
+grant insert on portal.vistas to anon;  -- el permiso va acá: en el bloque de arriba la tabla todavía no existía
 
 create or replace function portal.es_curador() returns boolean language sql stable as $$
   select exists (select 1 from portal.curadores c where c.email = coalesce(auth.jwt() ->> 'email', ''));
