@@ -376,3 +376,4 @@ html{background:var(--p-bg)}
 .p-btn svg{width:16px;height:16px}
 .p-form .chk input{width:auto;flex:0 0 auto;margin:3px 0 0;accent-color:var(--navy-deeper)}
 .p-form .chk{align-items:flex-start}
+.p-sub svg,.p-kicker svg,.p-note svg,.p-m svg,.p-codes svg,.p-meta-line svg{width:.95em;height:.95em;vertical-align:-.12em}
