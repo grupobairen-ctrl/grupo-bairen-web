@@ -603,3 +603,112 @@ html,body{background:var(--p-canvas)}
 /* la flecha del select también en las bandas y popovers (el shorthand la repetía) */
 .p-band .p-fsel,.p-band .p-field select,.p-pop .p-fsel,.p-drawer .p-fsel,select.p-fsel{background-repeat:no-repeat;background-position:right 12px center;background-size:10px 6px}
 .p-band .p-results-head .acts .p-fsel{min-width:170px}
+
+/* ══════════════════════════════════════════════════════════════
+   Registro partido (4/9, decisión de Tomás)
+   Marca en navy: home, publicar, emprendimientos, publicadores, legales, ingresar.
+   Herramienta en claro con marco navy: resultados, ficha, panel, curación, importar.
+   El navy queda en el marco (header, banda, filtros, mapa, formulario, pie) y el
+   trabajo pasa a un plano claro continuo, sin caja contenedora.
+   ══════════════════════════════════════════════════════════════ */
+:root{--p-paper:#F6F2E8; --p-paper-2:#EFEADD; --p-card-w:#FFFDF8; --p-hair:rgba(19,29,45,.10)}
+body.p-product{background:var(--p-paper);color:var(--text-dark)}
+.p-product .p-page{background:transparent;color:var(--text-dark)}
+/* fuera la caja: el plano es continuo */
+.p-product .p-sheet,.p-product .p-results>div:first-child,.p-product .p-ficha-main,
+.p-product .p-page #content,.p-product .p-page .p-card-panel,.p-product .p-prose{
+  background:transparent;border:0;border-radius:0;padding:0;color:var(--text-dark);font-weight:300;line-height:1.6}
+.p-product .p-page .p-card-panel{padding:0}
+.p-product .p-imp{background:var(--p-card-w);border-color:var(--p-hair)}
+/* tinta sobre papel */
+.p-product .p-h2,.p-product h1,.p-product h2,.p-product .p-sec-t,.p-product .p-addr,.p-product .p-price,
+.p-product .p-ficha h1,.p-product .p-pub-block b,.p-product .p-aviso-row b,.p-product .p-cur b{color:var(--navy-deeper)}
+.p-product .p-sub,.p-product .p-kicker,.p-product .p-note,.p-product .p-desc,.p-product .p-barrio,
+.p-product .p-expensas,.p-product .p-publine,.p-product .p-text,.p-product .p-codes,.p-product .p-meta-line,
+.p-product .p-legend,.p-product .p-card-pub,.p-product .p-empty,.p-product .p-icons small,.p-product .p-aviso-row .m,
+.p-product .p-aviso-row .stats,.p-product .p-cur .m,.p-product .p-tbl td{color:var(--p-mid-ink)}
+.p-product .p-meta,.p-product .p-icons div,.p-product .p-feat,.p-product .p-prose p,.p-product .p-prose li{color:var(--navy-deeper)}
+.p-product .p-eyebrow,.p-product .p-fld label,.p-product .p-tbl th,.p-product .p-resumen dt,.p-product .p-cond-ttl{color:var(--p-gold-ink)}
+.p-product .p-link{color:var(--navy-deeper);border-bottom-color:var(--gold)}
+.p-product .p-legend{background:var(--p-paper-2);color:var(--p-mid-ink)}
+/* tarjetas: casi blancas sobre el plano, con hairline y aire */
+.p-product .p-card-h,.p-product .p-aviso-row,.p-product .p-cur,.p-product .p-pub-block,.p-product .p-emp,
+.p-product .p-tbl,.p-product .p-report,.p-product .p-quick button,.p-product .p-report .chips button,
+.p-product .p-pager button,.p-product .p-icon-btn,.p-product .p-empty{background:var(--p-card-w);border-color:var(--p-hair)}
+.p-product .p-list{gap:14px}
+.p-product .p-card-photo{background:var(--p-paper-2)}
+.p-product .p-report{background:var(--p-paper-2);border:1px solid var(--p-hair)}
+.p-product .p-card-foot{border-top-color:var(--p-hair)}
+/* una sola línea de descripción: en el listado se escanea, no se lee */
+.p-product .p-desc{-webkit-line-clamp:1;font-size:.84rem}
+/* el oro aparece una sola vez por tarjeta: la etiqueta. La matrícula pasa a tinta navy */
+.p-product .p-badge{background:transparent;border-color:rgba(19,29,45,.22);color:var(--navy)}
+.p-product .p-badge.dueno{border-color:rgba(19,29,45,.22);color:var(--navy)}
+.p-product .p-badge.demo{border-color:rgba(179,66,60,.5);color:#9C3A34}
+.p-product .p-card-photo .tag{background:var(--gold);color:var(--navy-deeper)}
+/* botones sobre papel: uno lleno navy, el resto contorno */
+.p-product .p-btn{background:transparent;border-color:rgba(19,29,45,.35);color:var(--navy-deeper)}
+.p-product .p-btn:hover{background:var(--navy-deeper);border-color:var(--navy-deeper);color:var(--p-ink)}
+.p-product .p-btn-navy,.p-product .p-btn-fill{background:var(--navy-deeper);border-color:var(--navy-deeper);color:var(--p-ink)}
+.p-product .p-btn-navy:hover,.p-product .p-btn-fill:hover{background:var(--navy)}
+.p-product .p-btn .ic{background:rgba(251,250,246,.18)}
+.p-product .p-icon-btn{color:var(--navy)} .p-product .p-icon-btn.on{color:#B3423C;border-color:#B3423C}
+/* el marco sigue navy: banda, filtros, mapa, riel del panel, formulario de la ficha */
+.p-product .p-band,.p-product .p-filters{background:var(--p-navy-2)}
+.p-product .p-band{padding:84px 0 26px}
+.p-product .p-map-card,.p-product .p-map-ficha,.p-product .p-ficha-top .p-tray{background:var(--p-navy-2);border-color:var(--p-line-d)}
+.p-product .p-side-nav{background:var(--p-navy-2);border-color:var(--p-line-d)}
+.p-product .p-form{background:var(--p-navy-2);border-color:var(--p-line-d);box-shadow:0 18px 44px rgba(19,29,45,.14)}
+.p-product .p-form h3{color:var(--p-ink)}
+.p-product .p-side-pub{background:var(--p-card-w);border-color:var(--p-hair)} .p-product .p-side-pub b{color:var(--navy-deeper)} .p-product .p-side-pub small{color:var(--p-mid-ink)}
+/* mapa lateral más alto: se acabó el hueco muerto a la derecha */
+.p-product #mapaResultados{height:520px}
+.p-product .p-map-col{top:128px}
+/* tablas del panel sobre papel */
+.p-product .p-tbl th{background:var(--p-paper-2);color:var(--p-gold-ink)} .p-product .p-tbl td{border-color:var(--p-hair)}
+.p-product .p-kpis{border-bottom-color:var(--p-hair)} .p-product .p-kpi b{color:var(--navy-deeper)} .p-product .p-kpi span{color:var(--p-mid-ink)}
+.p-product .p-visitas summary{color:var(--navy-deeper)}
+/* curación e importar sobre papel */
+.p-product .p-check .ok{color:#2F6B41} .p-product .p-check .no{color:#B3423C}
+.p-product .p-cur textarea,.p-product .p-imp input,.p-product .p-imp select,.p-product .p-fld input,
+.p-product .p-fld select,.p-product .p-fld textarea,.p-product .p-qrow input{background:var(--p-card-w);border-color:var(--p-hair);color:var(--navy-deeper)}
+.p-product .p-drop{background:var(--p-card-w)}
+.p-product .p-stepper button{background:var(--p-card-w);border-color:var(--p-hair);color:var(--p-mid-ink)}
+.p-product .p-stepper button i{background:var(--p-paper-2);color:var(--navy-deeper)}
+.p-product .p-tabs2 button{color:var(--p-mid-ink)} .p-product .p-tabs2 button.on{color:var(--navy-deeper)} .p-product .p-tabs2{border-bottom-color:var(--p-hair)}
+.p-product .p-breadcrumb,.p-product .p-breadcrumb a{color:var(--p-mid-ink)} .p-product .p-breadcrumb a:hover{color:var(--navy-deeper)}
+.p-product .p-gallery .all{background:var(--p-card-w);color:var(--navy-deeper)}
+.p-product .p-more{color:var(--navy-deeper)}
+.p-product .p-feat li::before{background:var(--gold-dark)}
+.p-product .p-quick button{border-color:rgba(19,29,45,.25);color:var(--navy-deeper)} .p-product .p-quick button.on{background:var(--navy-deeper);color:var(--p-ink);border-color:var(--navy-deeper)}
+/* la ficha respira: la hoja ya no existe, así que el contenido lleva su propio ancho */
+.p-product .p-ficha{padding-top:34px}
+@media(max-width:900px){.p-product .p-band{padding:78px 0 20px}.p-product .p-sheet,.p-product .p-results>div:first-child,.p-product .p-ficha-main,.p-product .p-page #content{padding:0}}
+/* la banda sigue siendo marco navy: su tinta no se aclara con el registro herramienta */
+.p-product .p-band h1,.p-product .p-band .p-h2,.p-product .p-band .p-sec-t{color:var(--p-ink)}
+.p-product .p-band .p-sub,.p-product .p-band .p-kicker,.p-product .p-band .p-note{color:var(--p-ink-2)}
+.p-product .p-band .p-eyebrow,.p-product .p-band .p-results-head h1 span{color:var(--gold-light)}
+.p-product .p-band .p-link{color:var(--p-ink);border-bottom-color:rgba(194,169,104,.6)}
+.p-product .p-band .p-btn,.p-product .p-band .p-fbtn,.p-product .p-band .p-fsel{background:var(--p-tile);border-color:var(--p-line-d);color:var(--p-ink)}
+.p-product .p-band .p-btn:hover,.p-product .p-band .p-fbtn:hover,.p-product .p-band .p-fsel:hover{border-color:var(--gold);background:var(--p-tile-hi);color:var(--p-ink)}
+.p-product .p-band .p-stepper button{background:var(--p-tile);border-color:var(--p-line-d);color:var(--p-ink-3)}
+.p-product .p-band .p-stepper button i{background:var(--p-tile-hi);color:var(--p-ink)}
+.p-product .p-band .p-stepper button.on{border-color:var(--gold);color:var(--p-ink)} .p-product .p-band .p-stepper button.on i{background:var(--gold);color:var(--navy-deeper)}
+.p-product .p-band .p-stepper button.done i{background:var(--p-ink);color:var(--navy-deeper)}
+.p-product .p-band .p-tabs2{border-bottom-color:var(--p-line-d)} .p-product .p-band .p-tabs2 button{color:var(--p-ink-2)} .p-product .p-band .p-tabs2 button.on{color:var(--p-ink);border-bottom-color:var(--gold)}
+/* el formulario navy de la ficha conserva su tinta clara */
+.p-product .p-form label,.p-product .p-form .chk{color:var(--p-ink-3)} .p-product .p-form .chk a{color:var(--p-ink)}
+.p-product .p-form input,.p-product .p-form textarea{background:var(--p-tile);border-color:rgba(255,255,255,.16);color:var(--p-ink)}
+.p-product .p-form .p-btn{background:transparent;border-color:rgba(194,169,104,.7);color:var(--gold-light)}
+.p-product .p-form .p-btn:hover{background:var(--gold);border-color:var(--gold);color:var(--navy-deeper)}
+.p-product .p-form .p-btn-fill{background:var(--gold);border-color:var(--gold);color:var(--navy-deeper)}
+/* el riel del panel conserva su tinta clara */
+.p-product .p-side-nav a{color:var(--p-ink-2)} .p-product .p-side-nav a.on{background:var(--p-tile-hi);color:var(--p-ink)} .p-product .p-side-nav .who{color:var(--p-ink-3);border-color:var(--p-line-d)}
+.p-product .p-map-card .p-map-hint,.p-product .p-map-ficha .p-note{color:var(--p-ink-3)}
+/* regla final: la flecha de todos los select nunca se repite, gane quien gane el shorthand */
+select.p-fsel,.p-field select,.p-band select,.p-product select{background-repeat:no-repeat!important;background-position:right 12px center!important;background-size:10px 6px!important}
+/* el mapa de la ficha no debe comerse la columna: se acota por ancho para no recortarlo */
+.p-map-ficha{max-width:520px}
+/* aire entre el header fijo y la galería */
+.p-band.p-band-gal,.p-product .p-band.p-band-gal{padding:88px 0 0}
+@media(max-width:900px){.p-map-ficha{max-width:none}.p-band.p-band-gal,.p-product .p-band.p-band-gal{padding:76px 0 0}}
