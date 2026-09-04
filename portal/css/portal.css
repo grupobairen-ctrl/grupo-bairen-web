@@ -947,3 +947,26 @@ body:not(.p-product){--p-shadow-d:0 16px 40px rgba(0,0,0,.28)}
   .p-foto .mover button,.p-foto .portada,.p-foto .quitar{width:44px;height:44px;min-width:44px}
   .p-foto .portada{width:auto;padding:0 16px}
 }
+
+/* ══════════════════════════════════════════════════════════════
+   CIERRE · Contrastes que la medición final encontró abajo del umbral
+   ══════════════════════════════════════════════════════════════ */
+
+/* El header, el pie y el menú del celular son navy aunque el cuerpo sea papel.
+   La regla del registro claro les pintaba el botón Publicar de navy sobre navy, 1 a 1. */
+.p-product #pHeader .p-btn,.p-product .navbar .p-btn,.p-product .mobile-menu .p-btn,
+.p-product .footer .p-btn{background:transparent;border-color:var(--gold);color:var(--gold)}
+.p-product #pHeader .p-btn:hover,.p-product .navbar .p-btn:hover,
+.p-product .mobile-menu .p-btn:hover{background:var(--gold);border-color:var(--gold);color:var(--navy-deeper)}
+.p-product #pHeader .p-btn-fill,.p-product .navbar .p-btn-fill,.p-product .mobile-menu .p-btn-fill,
+.p-btn-fill,.mobile-menu .p-btn-fill{background:var(--gold);border-color:var(--gold);color:var(--navy-deeper)}
+.p-product #pHeader .p-btn .ic,.p-product .navbar .p-btn .ic{background:rgba(194,169,104,.22)}
+
+/* Las dos tintas heredadas del sitio, oro oscuro y gris medio, quedaban en 3,55 y 3,7
+   sobre crema. Sobre superficies claras se usan las versiones que pasan 4,5. */
+.p-product,.p-section.alt,.p-page,.p-card-h,.p-zona,.p-perfil,.p-tray,.p-index,
+.p-pub-card,.p-map-home .in,.p-empty,.p-prose,.p-results,.p-ficha-main,#busquedas{
+  --gold-dark:#6F5C32; --text-mid:#565E6E; --p-gold-ink:#6F5C32; --p-mid-ink:#565E6E
+}
+/* El oro lleno del botón lleva tinta navy, no blanco al 80 por ciento, que daba 2,29 */
+.p-btn-fill,.p-btn-fill span,.m-cta .p-btn-fill{color:var(--navy-deeper)}

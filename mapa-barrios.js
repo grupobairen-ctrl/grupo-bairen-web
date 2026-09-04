@@ -125,7 +125,7 @@
   const nLabel = (n, lang) => n + ' ' + (n === 1 ? T[lang].one : T[lang].many);
 
   /* ── Pin: el logo real de BAIREN (el mismo del nav) ─────────────── */
-  const LOGO_SRC = '/bairen_logo.png?v=3';
+  const LOGO_SRC = '/bairen_logo_96.png?v=3'; /* el pin se muestra a 28 px: el archivo de 96 alcanza y pesa 13 KB en vez de 165 */
   const LOGO = '<img class="bm-logo" src="' + LOGO_SRC + '" alt="" draggable="false" decoding="async">';
 
   /* ── CSS del componente (inyectado una sola vez) ─────────────────── */
