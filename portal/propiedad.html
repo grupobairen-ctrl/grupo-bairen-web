@@ -8,7 +8,7 @@
   <link rel="icon" href="../bairen_logo.png?v=3">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260904v"><link rel="stylesheet" href="css/catalogo.css?v=20260904v"><link rel="stylesheet" href="css/portal.css?v=20260904v">
+  <link rel="stylesheet" href="css/base.css?v=20260904x"><link rel="stylesheet" href="css/catalogo.css?v=20260904x"><link rel="stylesheet" href="css/portal.css?v=20260904x">
   <style>body{padding-top:0}#ficha>.p-ficha-top,#ficha>.p-ficha,#ficha>section{max-width:var(--p-max);margin:0 auto;padding-left:24px;padding-right:24px}#ficha>.p-ficha-top{padding-top:88px}@media(max-width:900px){#ficha>.p-ficha-top{padding-top:76px}}.p-video{aspect-ratio:16/9;background:#0b1220;border-radius:12px;overflow:hidden}.p-video iframe,.p-video video{width:100%;height:100%;border:0;display:block}</style>
 </head>
 <body class="p-product">
@@ -19,8 +19,8 @@
 
 <script src="../supabase-config.js"></script>
 <script src="../mapa-barrios.js"></script>
-<script src="js/ui.js?v=20260904v"></script><script src="js/store.js?v=20260904v"></script>
-<script src="js/data.js?v=20260904v"></script>
+<script src="js/ui.js?v=20260904x"></script><script src="js/store.js?v=20260904x"></script>
+<script src="js/data.js?v=20260904x"></script>
 <script>
 (async function(){
   BP.header(); BP.footer();
@@ -95,7 +95,7 @@
     </div>
     <div class="p-pub-block">
       <h2 class="p-sec-t">Quién publica</h2>
-      <div class="row"><div class="p-pub-logo">${pub.inicial}</div><div><b>${BP.esc(pub.nombre)}</b><div class="p-kicker">${pub.tipo === 'dueno' ? 'Propietario con titularidad verificada por BAIREN' : BP.esc(pub.responsable) + ' · ' + BP.esc(pub.badge)}</div></div></div>
+      <div class="row"><div class="p-pub-logo">${pub.inicial}</div><div><b>${BP.esc(pub.nombre)}</b><div class="p-kicker">${pub.tipo === 'dueno' ? 'Propietario con titularidad verificada por BAIREN' : BP.esc(pub.responsable || '') + ' · ' + BP.esc(pub.badge || '')}</div></div></div>
       <div class="badges">${BPData.badgeHTML(pub)}<span class="p-badge">${BP.ico.check} Ficha verificada por BAIREN</span>${pub.demo ? '<span class="p-badge demo">Publicador de ejemplo</span>' : ''}</div>
       <p class="p-text" style="margin:12px 0 10px;font-size:.9rem">${BP.esc(pub.desc)} ${pub.tipo !== 'dueno' ? 'La intermediación y la conclusión de la operación están a cargo de ' + BP.esc(pub.responsable) + ', ' + BP.esc(pub.matricula) + '.' : ''}</p>
       <a class="p-link" href="publicadores.html#${pub.id}">Ver todas sus propiedades</a>
@@ -113,10 +113,11 @@
   <aside class="p-side" id="contacto">
     <div class="p-cta" id="ctaCard">
       <div class="p-cta-price">${BPData.precioHTML(a)}${a.reservado ? '<span class="p-cta-res">Reservada</span>' : ''}</div>
-      <div class="p-cta-pub">Publica <b>${BP.esc(pub.nombre)}</b><span>${pub.tipo === 'dueno' ? 'Dueño verificado' : BP.esc(pub.matricula)}</span></div>
+      <div class="p-cta-pub">Publica <b>${BP.esc(pub.nombre)}</b><span>${pub.tipo === 'dueno' ? 'Dueño verificado' : BP.esc(pub.matricula || 'matrícula pendiente')}</span></div>
+      ${BPData.sinContacto(pub) ? `<p class="p-sincontacto-box">Contacto pendiente. ${BP.esc(pub.nombre)} todavía no cargó su WhatsApp ni su mail, así que no podemos derivarte. BAIREN no interviene en la operación, por eso no te damos un contacto que no es el de quien publica.</p>` : `
       <button type="button" class="p-btn p-btn-fill" id="abrirForm">${BP.ico.mail} Contactar</button>
-      <a class="p-btn" id="waBtn" href="${BPData.waLink(a, pub)}" target="_blank" rel="noopener">${BP.ico.wa} WhatsApp</a>
-      <button type="button" class="p-btn p-btn-sm" id="verTel">${BP.ico.phone} Ver teléfono</button>
+      ${BPData.waLink(a, pub) ? `<a class="p-btn" id="waBtn" href="${BPData.waLink(a, pub)}" target="_blank" rel="noopener">${BP.ico.wa} WhatsApp</a>` : ''}
+      ${pub.telefono ? `<button type="button" class="p-btn p-btn-sm" id="verTel">${BP.ico.phone} Ver teléfono</button>` : ''}`}
       <div class="p-cta-acts"><button type="button" class="p-icon-btn ${BP.isFav(a.id)?'on':''}" data-fav="${BP.esc(a.id)}" aria-label="Guardar en favoritos">${BP.isFav(a.id)?BP.ico.heartFill:BP.ico.heart}</button><button type="button" class="p-icon-btn" id="share" aria-label="Compartir">${BP.ico.share}</button></div>
     </div>
     <form class="p-form" id="contactForm" hidden>
@@ -132,7 +133,7 @@
 <section style="padding:0 0 64px">
   <div class="p-head-row"><h2 class="p-h2">Propiedades similares</h2><a class="p-link" href="buscar.html?op=${a.op}&zona=${encodeURIComponent(a.zona)}">Ver más en ${BP.zonaLabel(a.zona)}</a></div>
   <div class="p-grid">${similares.map(BPData.cardV).join('') || '<p class="p-note">Todavía no hay otras unidades similares publicadas.</p>'}</div>
-  <div class="p-mcta" id="mcta"><div class="p-mcta-price">${BPData.precioHTML(a)}</div><button type="button" class="p-btn p-btn-fill p-btn-sm" id="mctaBtn">${BP.ico.mail} Contactar</button><a class="p-icon-btn" href="${BPData.waLink(a, pub)}" target="_blank" rel="noopener" aria-label="WhatsApp">${BP.ico.wa}</a></div>
+  ${BPData.sinContacto(pub) ? '' : `<div class="p-mcta" id="mcta"><div class="p-mcta-price">${BPData.precioHTML(a)}</div><button type="button" class="p-btn p-btn-fill p-btn-sm" id="mctaBtn">${BP.ico.mail} Contactar</button>${BPData.waLink(a, pub) ? `<a class="p-icon-btn" href="${BPData.waLink(a, pub)}" target="_blank" rel="noopener" aria-label="WhatsApp">${BP.ico.wa}</a>` : ''}</div>`}
   <div class="p-breadcrumb" role="navigation" aria-label="Migas de pan"><a href="index.html">BAIREN</a> › <a href="buscar.html?op=${a.op}">${BPData.opTag(a)}</a> › <a href="buscar.html?op=${a.op}&zona=${encodeURIComponent(a.zona)}">${BP.zonaLabel(a.zona)}</a> › <span>${BP.esc(a.barrio)}</span> › <span>${BP.esc(a.titulo)}</span></div>
 </section>`;
 
@@ -151,11 +152,11 @@
   document.querySelectorAll('#quick button').forEach(b => b.addEventListener('click', () => { b.classList.toggle('on'); const qs = Array.from(document.querySelectorAll('#quick button.on')).map(x => x.textContent); mensaje.value = msgDefault + (qs.length ? ' ' + qs.join(' ') : '') + (qText.value.trim() ? ' ' + qText.value.trim() : ''); }));
   const ctaCard = document.getElementById('ctaCard'), contactForm = document.getElementById('contactForm');
   const openForm = () => { ctaCard.hidden = true; contactForm.hidden = false; contactForm.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => contactForm.querySelector('input[name=nombre]').focus(), 320); };
-  document.getElementById('abrirForm').addEventListener('click', openForm);
+  const btnAbrir = document.getElementById('abrirForm'); if (btnAbrir) btnAbrir.addEventListener('click', openForm);
   const mctaBtn = document.getElementById('mctaBtn'); if (mctaBtn) mctaBtn.addEventListener('click', openForm);
-  document.getElementById('qSend').addEventListener('click', () => { const t = qText.value.trim(); const qs = Array.from(document.querySelectorAll('#quick button.on')).map(x => x.textContent); if (!t && !qs.length) { BP.toast('Elegí una pregunta o escribí la tuya.'); return; } mensaje.value = msgDefault + (qs.length ? ' ' + qs.join(' ') : '') + (t ? ' ' + t : ''); openForm(); });
+  const qSendBtn = document.getElementById('qSend'); if (qSendBtn) qSendBtn.addEventListener('click', () => { const t = qText.value.trim(); const qs = Array.from(document.querySelectorAll('#quick button.on')).map(x => x.textContent); if (!t && !qs.length) { BP.toast('Elegí una pregunta o escribí la tuya.'); return; } mensaje.value = msgDefault + (qs.length ? ' ' + qs.join(' ') : '') + (t ? ' ' + t : ''); openForm(); });
   document.getElementById('contactForm').addEventListener('submit', async e => { e.preventDefault(); const f = e.target; try { await BPStore.addConsulta({ aviso_id: a.id, aviso_titulo: a.titulo, publicador_id: pub.storeId || pub.id, publicador_nombre: pub.nombre, nombre: f.nombre.value, email: f.email.value, telefono: f.telefono.value, mensaje: f.mensaje.value, acepto_tyc: true, enviada_a: pub.email }); } catch (err) { console.warn(err); } const subject = encodeURIComponent('Consulta por ' + a.titulo + ' (' + a.codigo + ') desde BAIREN'); const body = encodeURIComponent(f.mensaje.value + '\n\n' + f.nombre.value + ' · ' + f.telefono.value + ' · ' + f.email.value); window.location.href = 'mailto:' + pub.email + '?subject=' + subject + '&body=' + body; BP.toast('Tu consulta va directo a ' + pub.nombre + '.'); });
-  document.getElementById('verTel').addEventListener('click', e => { e.target.closest('button').outerHTML = `<a class="p-btn p-btn-sm" href="tel:${pub.telefono.replace(/\s/g,'')}">${BP.ico.phone} ${pub.telefono}</a>`; });
+  const btnTel = document.getElementById('verTel'); if (btnTel) btnTel.addEventListener('click', e => { e.target.closest('button').outerHTML = `<a class="p-btn p-btn-sm" href="tel:${BP.esc(String(pub.telefono || '').replace(/\s/g,''))}">${BP.ico.phone} ${BP.esc(pub.telefono || '')}</a>`; });
   document.getElementById('bajaPrecio').addEventListener('click', () => { const al = BP.alerts.get(); al.push({ tipo: 'precio', avisoId: a.id, creada: new Date().toISOString() }); BP.alerts.set(al); BP.toast('Te avisamos si baja de precio. Con tu cuenta, por mail.'); });
   document.querySelectorAll('[data-rep]').forEach(b => b.addEventListener('click', () => { const r = BP.reportes.get(); r.push({ avisoId: a.id, motivo: b.dataset.rep, fecha: new Date().toISOString() }); BP.reportes.set(r); BP.toast('Gracias. Revisamos el aviso en menos de 24 horas.'); }));
   document.getElementById('share').addEventListener('click', async () => { const data = { title: a.titulo + ' — BAIREN', url: location.href }; if (navigator.share) { try { await navigator.share(data); } catch (e) {} } else { try { await navigator.clipboard.writeText(location.href); BP.toast('Link copiado.'); } catch (e) { BP.toast(location.href); } } });

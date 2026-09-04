@@ -17,6 +17,9 @@ const SUPABASE_URL = 'https://nmrjyyrhwjroonrppnka.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_D0YwiSL5Hm3GyOSx2r1lug_ZV7v46_n';
 const SITE = 'https://www.bairengroup.com/portal/';
 const TIPOS = ['consulta', 'aprobado', 'rechazado', 'cambios', 'verificado', 'verificacion_rechazada'];
+// Límite de frecuencia por instancia. En un entorno sin estado cada instancia tiene el suyo,
+// así que frena ráfagas de un mismo cliente pero no es una defensa dura. El control real
+// es que el destinatario se resuelve en el servidor y el origen está restringido.
 const hits = new Map();
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 
@@ -26,11 +29,23 @@ async function sbGet(path) {
   return r.json();
 }
 
+// Solo estos orígenes pueden llamar a la función. Nada de comodín: era usable como relay.
+const ORIGENES = [/^https:\/\/(www\.)?bairengroup\.com$/, /^https:\/\/grupo-bairen[a-z0-9-]*\.vercel\.app$/, /^http:\/\/(localhost|127\.0\.0\.1):\d+$/];
+// Los avisos derivan su destinatario del propio aviso; la verificación es del equipo y va con clave.
+const POR_AVISO = ['consulta', 'aprobado', 'rechazado', 'cambios'];
+const POR_CLAVE = ['verificado', 'verificacion_rechazada'];
+const esMail = v => typeof v === 'string' && /^[^@\s]{1,64}@[^@\s]{1,190}\.[a-z]{2,}$/i.test(v);
+
 module.exports = async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  const origin = req.headers.origin || '';
+  if (origin && ORIGENES.some(re => re.test(origin))) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+  }
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Bairen-Key');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   if (req.method === 'OPTIONS') { res.statusCode = 204; return res.end(); }
+  if (origin && !ORIGENES.some(re => re.test(origin))) { res.statusCode = 403; return res.end(JSON.stringify({ error: 'origen' })); }
   const json = (code, obj) => { res.statusCode = code; res.setHeader('Content-Type', 'application/json; charset=utf-8'); res.end(JSON.stringify(obj)); };
   if (req.method !== 'POST') return json(405, { error: 'POST' });
   const key = process.env.RESEND_API_KEY;
@@ -40,14 +55,24 @@ module.exports = async (req, res) => {
   const now = Date.now(); const h = (hits.get(ip) || []).filter(t => now - t < 60000); h.push(now); hits.set(ip, h);
   if (h.length > 20) return json(429, { error: 'Demasiados envíos, probá en un minuto.' });
 
-  let body = req.body; if (typeof body === 'string') { try { body = JSON.parse(body); } catch (e) { body = {}; } } body = body || {};
+  let body = req.body;
+  if (typeof body === 'string') { if (body.length > 20000) return json(413, { error: 'cuerpo' }); try { body = JSON.parse(body); } catch (e) { body = {}; } }
+  body = body || {};
   const tipo = String(body.tipo || ''); if (TIPOS.indexOf(tipo) === -1) return json(400, { error: 'tipo' });
   const datos = body.datos && typeof body.datos === 'object' ? body.datos : {};
+  // La verificación la manda el equipo, no el navegador: sin clave no sale.
+  if (POR_CLAVE.indexOf(tipo) > -1) {
+    const clave = process.env.PORTAL_NOTIFY_KEY;
+    if (!clave || req.headers['x-bairen-key'] !== clave) return json(403, { error: 'clave' });
+  }
+  if (POR_AVISO.indexOf(tipo) > -1 && !body.aviso_id) return json(400, { error: 'aviso_id' });
 
   try {
     let aviso = null, pub = null;
     if (body.aviso_id) { const a = await sbGet(`avisos?id=eq.${encodeURIComponent(body.aviso_id)}&select=id,titulo,direccion,unidad,codigo,publicador_id`); aviso = a[0] || null; }
-    const pubId = body.publicador_id || (aviso && aviso.publicador_id);
+    // El destinatario nunca viene del cliente cuando hay un aviso de por medio.
+    const pubId = POR_AVISO.indexOf(tipo) > -1 ? (aviso && aviso.publicador_id) : body.publicador_id;
+    if (!pubId) return json(404, { error: 'publicador' });
     if (pubId) { const p = await sbGet(`publicadores?id=eq.${encodeURIComponent(pubId)}&select=id,nombre,email`); pub = p[0] || null; }
     if (!pub || !pub.email) return json(404, { error: 'publicador' });
     const titulo = aviso ? (aviso.titulo || `${aviso.direccion}${aviso.unidad ? ' · ' + aviso.unidad : ''}`) : '';
@@ -70,7 +95,7 @@ module.exports = async (req, res) => {
       subject = 'No pudimos verificar tu cuenta de publicador en BAIREN';
       html = wrap(`<h2 style="font-weight:500;margin:0 0 12px">Verificación pendiente</h2><p>${esc(datos.nota || 'Revisá los datos y volvé a cargar la documentación desde tu perfil.')}</p><p><a href="${SITE}panel#cuenta" style="color:#1A2538">Ir a mi cuenta</a></p>`);
     }
-    const r = await fetch('https://api.resend.com/emails', { method: 'POST', headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ from: process.env.PORTAL_MAIL_FROM || 'BAIREN <onboarding@resend.dev>', to: [pub.email], subject, html, reply_to: tipo === 'consulta' && datos.email ? datos.email : undefined }) });
+    const r = await fetch('https://api.resend.com/emails', { method: 'POST', headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ from: process.env.PORTAL_MAIL_FROM || 'BAIREN <onboarding@resend.dev>', to: [pub.email], subject, html, reply_to: tipo === 'consulta' && esMail(datos.email) ? datos.email : undefined }) });
     if (!r.ok) return json(502, { error: 'resend ' + r.status, detail: await r.text() });
     return json(200, { ok: true });
   } catch (err) { return json(500, { error: String(err.message || err) }); }

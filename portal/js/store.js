@@ -117,7 +117,7 @@
     const all = L.avisos.get([]); const a = all.find(x => x.id === id); if (a) Object.assign(a, patch); L.avisos.set(all);
   };
   S.publishedAvisos = async function(){
-    if (S.mode === 'supabase') { const { data } = await S.sb.schema('portal').from('avisos').select('*, fotos(url, orden), publicadores(*)').eq('estado_curacion', 'publicado').order('publicado_en', { ascending:false }); return (data || []).map(a => { a.publicador = a.publicadores; delete a.publicadores; return a; }); }
+    if (S.mode === 'supabase') { const { data } = await S.sb.schema('portal').from('avisos').select('id,codigo,slug,publicador_id,operacion,tipo,titulo,direccion,unidad,barrio,zona,ciudad,mostrar_direccion,precio,moneda,expensas,m2_total,m2_cubierto,ambientes,dormitorios,banos,cocheras,antiguedad,orientacion,disposicion,piso,amoblado,amenities,caracteristicas,descripcion,descripcion_en,descripcion_pt,video_url,video_tipo,plazo,estado,estado_curacion,destacado_hasta,publicado_en,created_at,emprendimiento,etapa,entrega, fotos(url, orden), publicadores(id,slug,tipo,nombre,responsable,matricula,colegio,badge,verificado,descripcion,telefono,whatsapp,email,zonas,created_at)').eq('estado_curacion', 'publicado').order('publicado_en', { ascending:false }); return (data || []).map(a => { a.publicador = a.publicadores; delete a.publicadores; return a; }); }
     const pubs = L.pubs.get([]); return L.avisos.get([]).filter(a => a.estado_curacion === 'publicado').map(a => Object.assign({}, a, { publicador: pubs.find(p => p.id === a.publicador_id) || null }));
   };
 
@@ -177,7 +177,18 @@
   S.verificarPublicador = async function(id, ok, nota){
     if (S.mode === 'supabase') { const { error } = await S.sb.schema('portal').from('publicadores').update({ verificado: ok, verificado_en: ok ? now() : null }).eq('id', id); if (error) throw error; await S.sb.schema('portal').from('verificaciones').update({ resultado: ok ? 'aprobada' : 'rechazada', nota: nota || null }).eq('publicador_id', id).eq('resultado', 'pendiente');
       /* política de privacidad: los documentos se borran al resolver; queda solo el resultado */
-      try { const { data: files } = await S.sb.storage.from('portal-docs').list(id); if (files && files.length) await S.sb.storage.from('portal-docs').remove(files.map(f => id + '/' + f.name)); } catch (e) { console.warn('no se pudieron borrar los documentos', e); }
+      try {
+        const { data: files, error: le } = await S.sb.storage.from('portal-docs').list(id);
+        if (le) throw le;
+        if (files && files.length) {
+          const { data: borrados, error: de } = await S.sb.storage.from('portal-docs').remove(files.map(f => id + '/' + f.name));
+          if (de) throw de;
+          if (!borrados || borrados.length !== files.length) throw new Error('se borraron ' + ((borrados||[]).length) + ' de ' + files.length);
+        }
+      } catch (e) {
+        console.error('[bairen] los documentos de verificación NO se borraron:', e);
+        if (window.BP && BP.toast) BP.toast('Atención: los documentos de verificación no se pudieron borrar. Revisalo antes de seguir.');
+      }
       S.notify(ok ? 'verificado' : 'verificacion_rechazada', { publicador_id: id, datos: { nota } });
       return; }
     const all = L.pubs.get([]); const p = all.find(x => x.id === id); if (p) { p.verificado = ok; p.verificado_en = ok ? now() : null; } L.pubs.set(all);

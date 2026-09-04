@@ -324,3 +324,68 @@ create policy "visitas las ve el propietario" on portal.visitas_reservas for sel
 alter table portal.avisos add column if not exists quiero_produccion boolean not null default false;
 alter table portal.avisos add column if not exists codigo_interno text;
 create unique index if not exists avisos_codigo_interno_idx on portal.avisos(publicador_id, codigo_interno) where codigo_interno is not null;
+
+-- =====================================================================
+-- OLA 3 de la remediación (auditoría 4/9/2026) · cerrar la confianza en el servidor
+-- =====================================================================
+
+-- 3.1 La verificación no puede ser auto declarada.
+-- RLS no filtra por columna, así que se protege con un disparador: al insertar,
+-- nadie nace verificado; al actualizar, solo un curador toca los campos de confianza,
+-- y la matrícula solo se corrige mientras el publicador todavía no fue verificado.
+create or replace function portal.proteger_verificacion() returns trigger language plpgsql as $$
+begin
+  if portal.es_curador() then return new; end if;
+  if tg_op = 'INSERT' then
+    new.verificado := false;
+    new.verificado_en := null;
+    return new;
+  end if;
+  new.verificado := old.verificado;
+  new.verificado_en := old.verificado_en;
+  if old.verificado then
+    new.matricula := old.matricula;
+    new.colegio := old.colegio;
+    new.badge := old.badge;
+    new.cuit := old.cuit;
+    new.tipo := old.tipo;
+  end if;
+  return new;
+end $$;
+drop trigger if exists trg_pub_verificacion on portal.publicadores;
+create trigger trg_pub_verificacion before insert or update on portal.publicadores
+  for each row execute function portal.proteger_verificacion();
+
+-- 3.2 Tablas que se habían quedado sin seguridad por fila y con lectura para anónimos.
+alter table portal.favoritos enable row level security;
+alter table portal.alertas   enable row level security;
+alter table portal.denuncias enable row level security;
+revoke select on portal.favoritos, portal.alertas, portal.denuncias from anon;
+
+drop policy if exists "favoritos propios" on portal.favoritos;
+create policy "favoritos propios" on portal.favoritos for all
+  using (usuario_id = auth.uid()) with check (usuario_id = auth.uid());
+
+drop policy if exists "alertas propias" on portal.alertas;
+create policy "alertas propias" on portal.alertas for all
+  using (usuario_id = auth.uid()) with check (usuario_id = auth.uid());
+
+-- Denunciar es un acto de cuidado: cualquiera puede, solo el equipo lee.
+grant insert on portal.denuncias to anon, authenticated;
+drop policy if exists "denuncia cualquiera" on portal.denuncias;
+create policy "denuncia cualquiera" on portal.denuncias for insert with check (true);
+drop policy if exists "denuncias las lee el curador" on portal.denuncias;
+create policy "denuncias las lee el curador" on portal.denuncias for select using (portal.es_curador());
+drop policy if exists "denuncias las resuelve el curador" on portal.denuncias;
+create policy "denuncias las resuelve el curador" on portal.denuncias for update using (portal.es_curador());
+
+-- 3.3 Los documentos de verificación tienen que poder borrarse de verdad.
+drop policy if exists "docs borra curador" on storage.objects;
+create policy "docs borra curador" on storage.objects for delete
+  using (bucket_id = 'portal-docs' and portal.es_curador());
+drop policy if exists "docs borra su dueño" on storage.objects;
+create policy "docs borra su dueño" on storage.objects for delete
+  using (bucket_id = 'portal-docs' and owner = auth.uid());
+
+-- 3.4 El mail del propietario no sale al público.
+revoke select (propietario_email) on portal.avisos from anon;
