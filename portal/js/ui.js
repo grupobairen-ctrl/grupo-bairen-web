@@ -154,5 +154,29 @@
     const host = document.getElementById('pFooter'); if (host) host.innerHTML = html;
   };
 
+  /* ── Sesión en el header ───────────────────────────────── */
+  BP.applySession = function(session, mode){
+    const right = document.querySelector('.p-nav-right'); const mob = document.getElementById('mobileMenu');
+    if (!right) return;
+    const modeTag = mode === 'local' ? '<span class="p-badge demo" style="margin-left:6px" title="Sin conexión con el esquema portal en Supabase: los datos quedan en este navegador">modo local</span>' : '';
+    if (session) {
+      right.innerHTML = `<button type="button" class="p-ghost p-bell" aria-label="Notificaciones" data-notif>${BP.ico.bell}<span class="dot" hidden></span></button>
+        <a class="p-ghost" href="panel.html#interesados">${BP.ico.chat} Mis contactos</a>
+        <a class="p-ghost" href="buscar.html?favs=1" aria-label="Favoritos">${BP.ico.heart}<span data-fav-count hidden></span></a>
+        <a class="p-btn p-btn-sm" href="publicar-aviso.html">Publicar</a>
+        <div class="p-nav-menu" style="display:flex"><div><button type="button" class="p-btn p-btn-sm p-btn-fill" aria-haspopup="true" style="padding:0 14px">${BP.ico.user} Mi cuenta <span class="car" style="border-color:var(--navy-deeper)"></span></button>
+          <div class="p-dd" style="left:auto;right:0"><div class="p-dd-ttl">${BP.esc(session.email)}${modeTag}</div><a href="panel.html#avisos">Mis avisos</a><a href="panel.html#interesados">Interesados</a><a href="panel.html#contactos">Mis contactos</a><a href="buscar.html?favs=1">Favoritos</a><a href="panel.html#alertas">Búsquedas y alertas</a><a href="panel.html#cuenta">Mi cuenta</a><a href="curacion.html" data-curador hidden>Curación BAIREN</a><a href="#" data-logout>Cerrar sesión</a></div></div></div>`;
+      if (mob) { const cta = mob.querySelector('.m-cta'); if (cta) cta.innerHTML = `<a class="p-btn p-btn-sm" href="publicar-aviso.html">Publicar</a><a class="p-btn p-btn-sm p-btn-fill" href="panel.html">Mi cuenta</a>`; }
+      right.querySelectorAll('[data-logout]').forEach(b => b.addEventListener('click', async e => { e.preventDefault(); await window.BPStore.signOut(); BP.toast('Sesión cerrada.'); setTimeout(() => location.href = 'index.html', 600); }));
+      if (window.BPStore) window.BPStore.isCurador().then(ok => { right.querySelectorAll('[data-curador]').forEach(a => a.hidden = !ok); });
+    } else if (mode === 'local') {
+      const ing = right.querySelector('a[href="ingresar.html"]'); if (ing && !ing.dataset.tagged) { ing.dataset.tagged = '1'; ing.insertAdjacentHTML('afterend', modeTag); }
+    }
+    document.querySelectorAll('[data-notif]').forEach(el => el.addEventListener('click', () => BP.toast(session ? 'No tenés notificaciones nuevas.' : 'Ingresá para ver tus notificaciones.')));
+    BP.syncFavCount();
+  };
+  BP.estadoLabel = e => ({ borrador:'Borrador', en_revision:'En revisión', publicado:'Publicado', rechazado:'Rechazado', pausado:'Pausado', vencido:'Vencido' })[e] || e;
+  BP.estadoBadge = e => `<span class="p-badge ${e==='publicado'?'':e==='rechazado'?'demo':'dueno'}">${BP.estadoLabel(e)}</span>`;
+
   window.BP = BP;
 })();

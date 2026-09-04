@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi cuenta — BAIREN</title>
+  <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#131D2D">
+  <link rel="icon" href="../bairen_logo.png?v=3">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css"><link rel="stylesheet" href="css/catalogo.css"><link rel="stylesheet" href="css/portal.css">
+  <style>
+    .p-panel{display:grid;grid-template-columns:240px 1fr;gap:28px;align-items:start}
+    .p-side-nav{background:var(--p-card);border:1px solid var(--p-line);border-radius:var(--p-radius);padding:10px;position:sticky;top:84px}
+    .p-side-nav a{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:10px;color:var(--navy-deeper);font-size:.9rem} .p-side-nav a svg{width:16px;height:16px;color:var(--gold-dark)} .p-side-nav a.on{background:var(--p-tray);font-weight:500} .p-side-nav .who{padding:10px 12px 14px;border-bottom:1px solid var(--p-line);margin-bottom:8px;font-size:.8rem;color:var(--text-mid);word-break:break-all}
+    .p-aviso-row{display:grid;grid-template-columns:120px 1fr auto;gap:16px;align-items:center;background:var(--p-card);border:1px solid var(--p-line);border-radius:var(--p-radius);padding:12px}
+    .p-aviso-row .ph{aspect-ratio:4/3;border-radius:10px;overflow:hidden;background:var(--p-tray)} .p-aviso-row .ph img{width:100%;height:100%;object-fit:cover}
+    .p-aviso-row b{display:block;color:var(--navy-deeper);font-weight:500} .p-aviso-row .m{font-size:.82rem;color:var(--text-mid);margin-top:2px} .p-aviso-row .stats{display:flex;gap:14px;font-size:.8rem;color:var(--text-mid);margin-top:8px} .p-aviso-row .stats b{display:inline;color:var(--navy-deeper)}
+    .p-aviso-row .acts{display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+    .p-tbl{width:100%;border-collapse:collapse;background:var(--p-card);border:1px solid var(--p-line);border-radius:12px;overflow:hidden} .p-tbl th,.p-tbl td{padding:10px 12px;border-bottom:1px solid var(--p-line);text-align:left;font-size:.86rem;vertical-align:top} .p-tbl th{font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-dark);background:var(--p-tray)}
+    .p-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px} .p-kpi{background:var(--p-card);border:1px solid var(--p-line);border-radius:12px;padding:14px} .p-kpi b{display:block;font-family:var(--font-display);font-size:1.5rem;color:var(--navy-deeper)} .p-kpi span{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text-mid)}
+    @media(max-width:900px){.p-panel{grid-template-columns:1fr}.p-side-nav{position:static}.p-kpis{grid-template-columns:1fr 1fr}.p-aviso-row{grid-template-columns:1fr}.p-aviso-row .acts{flex-direction:row;flex-wrap:wrap;align-items:center}}
+  </style>
+</head>
+<body>
+<div id="pHeader"></div>
+<section class="p-page"><div class="p-container p-panel">
+  <nav class="p-side-nav" aria-label="Mi cuenta" id="sideNav"></nav>
+  <div id="content"></div>
+</div></section>
+<div id="pFooter"></div>
+<script src="../supabase-config.js"></script>
+<script src="../mapa-barrios.js"></script><script src="js/ui.js"></script><script src="js/store.js"></script><script src="js/data.js"></script>
+<script>
+(async function(){
+  BP.header(); BP.footer();
+  const mode = await BPStore.init();
+  if (!BPStore.requireSession('panel.html')) return;
+  const pub = await BPStore.getMyPublicador();
+  const curador = await BPStore.isCurador();
+  const TABS = [['avisos','Mis avisos','building'],['interesados','Interesados','chat'],['contactos','Mis contactos','mail'],['favoritos','Favoritos','heart'],['alertas','Búsquedas y alertas','bell'],['cuenta','Mi cuenta','user']];
+  const nav = document.getElementById('sideNav'), content = document.getElementById('content');
+  let tab = (location.hash || '#avisos').slice(1); if (!TABS.some(t => t[0] === tab)) tab = 'avisos';
+  function renderNav(){ nav.innerHTML = `<div class="who">${BP.esc(BPStore.session.email)}${mode === 'local' ? '<br><span class="p-badge demo" style="margin-top:6px">modo local</span>' : ''}</div>` + TABS.map(t => `<a href="#${t[0]}" class="${t[0]===tab?'on':''}">${BP.ico[t[2]]} ${t[1]}</a>`).join('') + (curador ? `<a href="curacion.html">${BP.ico.shield} Curación BAIREN</a>` : '') + `<a href="#" data-logout>${BP.ico.x} Cerrar sesión</a>`; nav.querySelector('[data-logout]').addEventListener('click', async e => { e.preventDefault(); await BPStore.signOut(); location.href = 'index.html'; }); }
+  window.addEventListener('hashchange', () => { tab = (location.hash || '#avisos').slice(1); renderNav(); render(); });
+
+  async function render(){
+    renderNav();
+    if (tab === 'avisos') return renderAvisos();
+    if (tab === 'interesados') return renderInteresados();
+    if (tab === 'contactos') return renderContactos();
+    if (tab === 'favoritos') return renderFavoritos();
+    if (tab === 'alertas') return renderAlertas();
+    return renderCuenta();
+  }
+
+  async function renderAvisos(){
+    if (!pub) { content.innerHTML = `<h1 class="p-h2">Mis avisos</h1><p class="p-sub">Todavía no tenés perfil de publicador. Se crea en el primer paso al publicar.</p><a class="p-btn p-btn-fill" href="publicar-aviso.html">Publicar una propiedad</a>`; return; }
+    const avisos = await BPStore.myAvisos(); const cons = await BPStore.consultasRecibidas(pub.id);
+    const pubCount = avisos.filter(a => a.estado_curacion === 'publicado').length, rev = avisos.filter(a => a.estado_curacion === 'en_revision').length;
+    const vistas = avisos.reduce((s, a) => s + BPStore.vistas(a.id), 0);
+    let html = `<div class="p-head-row"><div><h1 class="p-h2">Mis avisos</h1><p class="p-sub" style="margin:0">${BP.esc(pub.nombre)} · ${pub.verificado ? BP.ico.check + ' verificado' : 'verificación pendiente'}</p></div><a class="p-btn p-btn-fill" href="publicar-aviso.html">Publicar otra</a></div>
+      <div class="p-kpis"><div class="p-kpi"><b>${pubCount}</b><span>Publicados</span></div><div class="p-kpi"><b>${rev}</b><span>En revisión</span></div><div class="p-kpi"><b>${vistas}</b><span>Vistas</span></div><div class="p-kpi"><b>${cons.length}</b><span>Consultas</span></div></div>`;
+    if (!avisos.length) html += `<div class="p-empty">Todavía no cargaste ninguna propiedad. <a href="publicar-aviso.html" style="text-decoration:underline">Empezá acá</a>.</div>`;
+    for (const a of avisos) { const foto = a.fotos && a.fotos.length ? await BPStore.resolveFoto(a.fotos.slice().sort((x,y)=>(x.orden||0)-(y.orden||0))[0].url) : ''; const nCons = cons.filter(c => c.aviso_id === a.id).length;
+      html += `<div class="p-aviso-row" style="margin-bottom:10px"><div class="ph">${foto ? `<img src="${foto}" alt="">` : ''}</div><div><b>${BP.esc(a.titulo || a.direccion)}</b><div class="m">${a.operacion === 'venta' ? 'Venta' : a.operacion === 'mediano' ? 'Mediano plazo' : 'Alquiler'} · ${BP.esc(a.barrio||'')} · ${BP.fmtUSD(Number(a.precio))}${a.operacion !== 'venta' ? '/mes' : ''} · ${a.codigo || ''}</div><div style="margin-top:6px">${BP.estadoBadge(a.estado_curacion)}${a.estado === 'reservado' ? ' <span class="p-badge demo">Reservada</span>' : ''}${a.motivo_rechazo ? `<div class="p-note" style="margin-top:6px">Motivo: ${BP.esc(a.motivo_rechazo)}</div>` : ''}</div><div class="stats"><span><b>${BPStore.vistas(a.id)}</b> vistas</span><span><b>${nCons}</b> consultas</span><span>${(a.fotos||[]).length} fotos</span></div></div>
+        <div class="acts">${a.estado_curacion === 'publicado' ? `<a class="p-btn p-btn-sm" href="propiedad.html?id=${encodeURIComponent(a.id)}">Ver ficha</a>` : ''}<a class="p-btn p-btn-sm p-btn-dark" href="publicar-aviso.html?id=${encodeURIComponent(a.id)}">Editar</a>${a.estado_curacion === 'publicado' ? `<button type="button" class="p-btn p-btn-sm" data-act="pausar" data-id="${a.id}">Pausar</button><button type="button" class="p-btn p-btn-sm" data-act="${a.estado === 'reservado' ? 'disponible' : 'reservar'}" data-id="${a.id}">${a.estado === 'reservado' ? 'Marcar disponible' : 'Marcar reservada'}</button>` : a.estado_curacion === 'pausado' ? `<button type="button" class="p-btn p-btn-sm" data-act="reactivar" data-id="${a.id}">Reactivar</button>` : a.estado_curacion === 'borrador' || a.estado_curacion === 'rechazado' ? `<a class="p-btn p-btn-sm p-btn-fill" href="publicar-aviso.html?id=${encodeURIComponent(a.id)}">Completar y enviar</a>` : ''}</div></div>`; }
+    content.innerHTML = html;
+    content.querySelectorAll('[data-act]').forEach(b => b.addEventListener('click', async () => { const act = b.dataset.act, id = b.dataset.id; try { if (act === 'pausar') await BPStore.setEstado(id, 'pausado'); else if (act === 'reactivar') await BPStore.setEstado(id, 'publicado'); else if (act === 'reservar') await BPStore.setEstado(id, 'publicado', null, { estado: 'reservado' }); else if (act === 'disponible') await BPStore.setEstado(id, 'publicado', null, { estado: 'disponible' }); BP.toast('Listo.'); renderAvisos(); } catch (e) { BP.toast(e.message || 'No se pudo.'); } }));
+  }
+  async function renderInteresados(){
+    if (!pub) { content.innerHTML = `<h1 class="p-h2">Interesados</h1><p class="p-sub">Acá vas a ver las consultas que reciban tus avisos.</p>`; return; }
+    const cons = await BPStore.consultasRecibidas(pub.id); const avisos = await BPStore.myAvisos();
+    content.innerHTML = `<h1 class="p-h2">Interesados</h1><p class="p-sub">Cada consulta te llegó también por mail o WhatsApp. Respondé vos: BAIREN no interviene.</p>` + (cons.length ? `<table class="p-tbl"><thead><tr><th>Fecha</th><th>Propiedad</th><th>Persona</th><th>Mensaje</th><th></th></tr></thead><tbody>${cons.map(c => { const a = avisos.find(x => x.id === c.aviso_id); return `<tr><td>${new Date(c.created_at).toLocaleDateString('es-AR')}</td><td>${a ? BP.esc(a.titulo || a.direccion) : c.aviso_id}</td><td>${BP.esc(c.nombre)}<br><small>${BP.esc(c.email)} · ${BP.esc(c.telefono||'')}</small></td><td>${BP.esc(c.mensaje||'')}</td><td>${c.telefono ? `<a class="p-btn p-btn-sm" href="https://wa.me/${String(c.telefono).replace(/\D/g,'')}" target="_blank" rel="noopener">${BP.ico.wa}</a>` : ''}</td></tr>`; }).join('')}</tbody></table>` : '<div class="p-empty">Todavía no recibiste consultas.</div>');
+  }
+  function renderContactos(){
+    const cons = BPStore.misConsultas();
+    content.innerHTML = `<h1 class="p-h2">Mis contactos</h1><p class="p-sub">Las propiedades por las que consultaste y a quién le llegó tu mensaje.</p>` + (cons.length ? `<table class="p-tbl"><thead><tr><th>Fecha</th><th>Propiedad</th><th>Publicador</th><th>Mensaje</th><th></th></tr></thead><tbody>${cons.map(c => `<tr><td>${new Date(c.created_at||c.fecha).toLocaleDateString('es-AR')}</td><td><a href="propiedad.html?id=${encodeURIComponent(c.aviso_id||c.avisoId)}" style="text-decoration:underline">${BP.esc(c.aviso_titulo || c.aviso_id || c.avisoId)}</a></td><td>${BP.esc(c.publicador_nombre || c.publicador || '')}</td><td>${BP.esc(c.mensaje||'')}</td><td><a class="p-btn p-btn-sm" href="propiedad.html?id=${encodeURIComponent(c.aviso_id||c.avisoId)}#contacto">Volver a escribir</a></td></tr>`).join('')}</tbody></table>` : '<div class="p-empty">Todavía no contactaste a ningún publicador. Cuando lo hagas desde una ficha, queda acá.</div>');
+  }
+  async function renderFavoritos(){
+    const { avisos } = await BPData.load(); const favs = avisos.filter(a => BP.isFav(a.id));
+    content.innerHTML = `<div class="p-head-row"><h1 class="p-h2">Favoritos</h1><a class="p-link" href="buscar.html?favs=1">Ver como búsqueda</a></div>` + (favs.length ? `<div class="p-grid">${favs.map(BPData.cardV).join('')}</div>` : '<div class="p-empty">Tocá el corazón en cualquier ficha y la vas a ver acá.</div>');
+  }
+  function renderAlertas(){
+    const al = BP.alerts.get();
+    content.innerHTML = `<h1 class="p-h2">Búsquedas y alertas</h1><p class="p-sub">Te avisamos por mail cuando entra una propiedad que coincide o cuando una que seguís baja de precio.</p>` + (al.length ? `<table class="p-tbl"><thead><tr><th>Creada</th><th>Tipo</th><th>Detalle</th><th></th></tr></thead><tbody>${al.map((a, i) => `<tr><td>${new Date(a.creada).toLocaleDateString('es-AR')}</td><td>${a.tipo === 'precio' ? 'Baja de precio' : 'Búsqueda guardada'}</td><td>${a.tipo === 'precio' ? `<a href="propiedad.html?id=${encodeURIComponent(a.avisoId)}" style="text-decoration:underline">${BP.esc(a.avisoId)}</a>` : `<a href="${BP.esc(a.url||'buscar.html')}" style="text-decoration:underline">${a.filtros ? [a.filtros.op, (a.filtros.zonas||[]).map(BP.zonaLabel).join(', ')].filter(Boolean).join(' · ') : 'búsqueda'}</a>`}</td><td><button type="button" class="p-btn p-btn-sm" data-del="${i}">Quitar</button></td></tr>`).join('')}</tbody></table>` : '<div class="p-empty">No tenés alertas. Creá una desde los resultados con "Crear alerta".</div>');
+    content.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => { const a = BP.alerts.get(); a.splice(Number(b.dataset.del), 1); BP.alerts.set(a); renderAlertas(); }));
+  }
+  function renderCuenta(){
+    content.innerHTML = `<h1 class="p-h2">Mi cuenta</h1><div class="p-prose"><p><b>Mail:</b> ${BP.esc(BPStore.session.email)}</p>${pub ? `<p><b>Publicador:</b> ${BP.esc(pub.nombre)} · ${pub.tipo === 'dueno' ? 'dueño directo' : pub.tipo} · ${pub.verificado ? 'verificado' : 'verificación pendiente'}${pub.matricula ? ' · ' + BP.esc(pub.matricula) : ''}</p><p><a class="p-btn p-btn-sm p-btn-dark" href="publicar-aviso.html?paso=perfil">Editar mi perfil de publicador</a></p>` : '<p>No tenés perfil de publicador. Se crea al publicar la primera propiedad.</p>'}<p style="margin-top:18px"><b>Privacidad.</b> Podés pedir acceso, corrección o borrado de tus datos escribiendo a contacto@bairengroup.com. Los documentos de verificación se eliminan después de revisarlos.</p><p><button type="button" class="p-btn p-btn-sm" data-logout>Cerrar sesión</button></p></div>`;
+    content.querySelector('[data-logout]').addEventListener('click', async () => { await BPStore.signOut(); location.href = 'index.html'; });
+  }
+  render();
+})();
+</script>
+</body>
+</html>

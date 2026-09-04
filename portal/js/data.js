@@ -55,6 +55,19 @@
     ];
   }
 
+  /* aviso del esquema portal (o del modo local) → modelo del portal */
+  D.fromStore = async function(r){
+    const pub = r.publicador || null; const pubId = pub ? (pub.slug || pub.id) : 'maxim-rentals';
+    if (pub && !D.PUBLICADORES[pubId]) D.PUBLICADORES[pubId] = Object.assign({ storeId: pub.id, id: pubId, inicial: (pub.nombre||'P').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(), desde: (pub.created_at||'').slice(0,4) || '2026', zonas: pub.zonas || [], desc: pub.descripcion || '', responsable: pub.responsable || pub.nombre, badge: pub.badge || (pub.tipo === 'dueno' ? 'Dueño verificado' : 'Corredor inmobiliario matriculado') }, pub, { id: pubId });
+    const fotos = []; for (const f of (r.fotos||[]).slice().sort((a,b)=>(a.orden||0)-(b.orden||0))) { const u = window.BPStore ? await window.BPStore.resolveFoto(f.url) : f.url; if (u) fotos.push(u); }
+    const amb = r.ambientes || null;
+    return { id: r.id, slug: r.slug, op: r.operacion, tipoProp: r.tipo || 'Departamento', dir: r.direccion, unidad: r.unidad || '', titulo: r.titulo || (r.direccion + (r.unidad ? ' · ' + r.unidad : '')), barrio: r.barrio, zona: r.zona || r.barrio, ciudad: r.ciudad || 'Capital Federal',
+      precio: r.precio == null ? null : Number(r.precio), moneda: r.moneda || 'USD', periodo: r.operacion === 'venta' ? '' : '/mes', expensas: r.expensas == null ? null : Number(r.expensas),
+      m2: r.m2_total || null, m2cub: r.m2_cubierto || null, amb, dorm: r.dormitorios || null, banos: r.banos || null, cocheras: r.cocheras || 0, antiguedad: r.antiguedad == null ? null : Number(r.antiguedad),
+      amoblado: !!r.amoblado, amenities: r.amenities || [], caracteristicas: r.caracteristicas || [], fotos, video: r.video_url ? { tipo: r.video_tipo || 'youtube', url: r.video_url } : null,
+      descripcion: r.descripcion || '', plazo: r.plazo || '', publicadoEn: r.publicado_en || r.created_at, estado: r.estado, reservado: r.estado === 'reservado', publicadorId: pubId, destacado: !!(r.destacado_hasta && new Date(r.destacado_hasta) > new Date()), demo: false, codigo: r.codigo, apto: r.caracteristicas && r.caracteristicas.length ? r.caracteristicas.slice(0,2) : (r.operacion === 'venta' ? ['Apto crédito'] : []), fromStore: true };
+  };
+
   let cache = null;
   D.load = async function(){
     if (cache) return cache;
@@ -68,7 +81,9 @@
     });
     // "Seleccionadas de la semana": las 6 con más fotos y disponibles
     avisos.filter(a=>!a.reservado).sort((a,b)=>b.fotos.length-a.fotos.length).slice(0,6).forEach(a=>a.destacado=true);
-    const all = avisos.concat(demoAvisos(avisos));
+    let extra = [];
+    try { if (window.BPStore) { await window.BPStore.init(); const recs = await window.BPStore.publishedAvisos(); for (const r of recs) extra.push(await D.fromStore(r)); } } catch (e) { console.warn('store', e); }
+    const all = extra.concat(avisos, demoAvisos(avisos));
     cache = { avisos: all, publicadores: D.PUBLICADORES };
     return cache;
   };

@@ -17,8 +17,9 @@
 <div class="p-lb" id="lb" aria-hidden="true"><button type="button" class="x" data-lb-close aria-label="Cerrar">×</button><img id="lbImg" alt=""><div class="ctl"><button type="button" data-lb-prev aria-label="Anterior">‹</button><span id="lbCount"></span><button type="button" data-lb-next aria-label="Siguiente">›</button></div></div>
 <div id="pFooter"></div>
 
+<script src="../supabase-config.js"></script>
 <script src="../mapa-barrios.js"></script>
-<script src="js/ui.js"></script>
+<script src="js/ui.js"></script><script src="js/store.js"></script>
 <script src="js/data.js"></script>
 <script>
 (async function(){
@@ -133,13 +134,13 @@
   const mensaje = document.getElementById('mensaje'), qText = document.getElementById('qText');
   document.querySelectorAll('#quick button').forEach(b => b.addEventListener('click', () => { b.classList.toggle('on'); const qs = Array.from(document.querySelectorAll('#quick button.on')).map(x => x.textContent); mensaje.value = msgDefault + (qs.length ? ' ' + qs.join(' ') : '') + (qText.value.trim() ? ' ' + qText.value.trim() : ''); }));
   document.getElementById('qSend').addEventListener('click', () => { const t = qText.value.trim(); const qs = Array.from(document.querySelectorAll('#quick button.on')).map(x => x.textContent); if (!t && !qs.length) { BP.toast('Elegí una pregunta o escribí la tuya.'); return; } mensaje.value = msgDefault + (qs.length ? ' ' + qs.join(' ') : '') + (t ? ' ' + t : ''); document.getElementById('contactForm').scrollIntoView({behavior:'smooth', block:'center'}); document.querySelector('#contactForm input[name=nombre]').focus(); });
-  document.getElementById('contactForm').addEventListener('submit', e => { e.preventDefault(); const f = e.target; const c = BP.consultas.get(); c.push({ avisoId: a.id, publicador: pub.id, nombre: f.nombre.value, email: f.email.value, telefono: f.telefono.value, mensaje: f.mensaje.value, fecha: new Date().toISOString() }); BP.consultas.set(c); const subject = encodeURIComponent('Consulta por ' + a.titulo + ' (' + a.codigo + ') desde BAIREN'); const body = encodeURIComponent(f.mensaje.value + '\n\n' + f.nombre.value + ' · ' + f.telefono.value + ' · ' + f.email.value); window.location.href = 'mailto:' + pub.email + '?subject=' + subject + '&body=' + body; BP.toast('Tu consulta va directo a ' + pub.nombre + '.'); });
+  document.getElementById('contactForm').addEventListener('submit', async e => { e.preventDefault(); const f = e.target; try { await BPStore.addConsulta({ aviso_id: a.id, aviso_titulo: a.titulo, publicador_id: pub.storeId || pub.id, publicador_nombre: pub.nombre, nombre: f.nombre.value, email: f.email.value, telefono: f.telefono.value, mensaje: f.mensaje.value, acepto_tyc: true, enviada_a: pub.email }); } catch (err) { console.warn(err); } const subject = encodeURIComponent('Consulta por ' + a.titulo + ' (' + a.codigo + ') desde BAIREN'); const body = encodeURIComponent(f.mensaje.value + '\n\n' + f.nombre.value + ' · ' + f.telefono.value + ' · ' + f.email.value); window.location.href = 'mailto:' + pub.email + '?subject=' + subject + '&body=' + body; BP.toast('Tu consulta va directo a ' + pub.nombre + '.'); });
   document.getElementById('verTel').addEventListener('click', e => { e.target.closest('button').outerHTML = `<a class="p-btn p-btn-sm" href="tel:${pub.telefono.replace(/\s/g,'')}">${BP.ico.phone} ${pub.telefono}</a>`; });
   document.getElementById('bajaPrecio').addEventListener('click', () => { const al = BP.alerts.get(); al.push({ tipo: 'precio', avisoId: a.id, creada: new Date().toISOString() }); BP.alerts.set(al); BP.toast('Te avisamos si baja de precio. Con tu cuenta, por mail.'); });
   document.querySelectorAll('[data-rep]').forEach(b => b.addEventListener('click', () => { const r = BP.reportes.get(); r.push({ avisoId: a.id, motivo: b.dataset.rep, fecha: new Date().toISOString() }); BP.reportes.set(r); BP.toast('Gracias. Revisamos el aviso en menos de 24 horas.'); }));
   document.getElementById('share').addEventListener('click', async () => { const data = { title: a.titulo + ' — BAIREN', url: location.href }; if (navigator.share) { try { await navigator.share(data); } catch (e) {} } else { try { await navigator.clipboard.writeText(location.href); BP.toast('Link copiado.'); } catch (e) { BP.toast(location.href); } } });
   /* vistas (contador local de prueba) */
-  try { const k = 'bp_vistas_' + a.id; const n = Number(localStorage.getItem(k)||0) + 1; localStorage.setItem(k, n); document.getElementById('vistas').textContent = n + (n === 1 ? ' visualización' : ' visualizaciones') + ' en este navegador'; } catch (e) {}
+  try { const n = await BPStore.addVista(a.id); document.getElementById('vistas').textContent = n + (n === 1 ? ' visualización' : ' visualizaciones'); } catch (e) {}
   /* mapa por barrio */
   if (window.BairenMapa) { try { const counts = {}; counts[a.zona] = 1; window.BairenMapa.mount(document.getElementById('mapaFicha'), { counts, modo: 'lite', active: a.zona, onSelect: z => { location.href = 'buscar.html?op=' + a.op + '&zona=' + encodeURIComponent(z); } }); } catch (e) {} }
   /* JSON-LD */

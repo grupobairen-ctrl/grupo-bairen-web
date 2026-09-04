@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Publicar una propiedad — BAIREN</title>
+  <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#131D2D">
+  <link rel="icon" href="../bairen_logo.png?v=3">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css"><link rel="stylesheet" href="css/catalogo.css"><link rel="stylesheet" href="css/portal.css">
+  <style>
+    .p-stepper{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0 26px}
+    .p-stepper button{display:flex;align-items:center;gap:8px;border:1px solid var(--p-line);background:var(--p-card);border-radius:999px;padding:8px 14px;font:500 .78rem var(--font-body);color:var(--text-mid);cursor:pointer;letter-spacing:.06em}
+    .p-stepper button i{font-style:normal;width:22px;height:22px;border-radius:50%;background:var(--p-tray);color:var(--navy-deeper);display:inline-flex;align-items:center;justify-content:center;font-size:.72rem}
+    .p-stepper button.on{border-color:var(--gold);color:var(--navy-deeper)} .p-stepper button.on i{background:var(--gold)} .p-stepper button.done i{background:var(--navy-deeper);color:#fff}
+    .p-formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px} .p-formgrid .full{grid-column:1/-1}
+    .p-fld label{display:block;font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-dark);margin:0 0 6px}
+    .p-fld input,.p-fld select,.p-fld textarea{width:100%;height:46px;border:1px solid var(--p-line);border-radius:10px;padding:0 12px;font:400 .95rem var(--font-body);color:var(--navy-deeper);background:var(--p-card)}
+    .p-fld textarea{height:auto;min-height:150px;padding:12px;resize:vertical} .p-fld input:focus,.p-fld select:focus,.p-fld textarea:focus{outline:0;border-color:var(--gold)}
+    .p-fld .hint{font-size:.76rem;color:var(--text-mid);margin-top:4px}
+    .p-fld.err input,.p-fld.err select,.p-fld.err textarea{border-color:#B3423C}
+    .p-card-panel{background:var(--p-card);border:1px solid var(--p-line);border-radius:var(--p-radius);padding:26px}
+    .p-seg{display:flex;gap:8px;flex-wrap:wrap} .p-seg label{border:1px solid var(--p-line);border-radius:999px;padding:9px 14px;font:500 .84rem var(--font-body);cursor:pointer;color:var(--navy-deeper);background:var(--p-card);display:inline-flex;gap:8px;align-items:center} .p-seg input{accent-color:var(--navy-deeper)} .p-seg label:has(input:checked){background:var(--navy-deeper);color:#fff;border-color:var(--navy-deeper)}
+    .p-fotos{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-top:12px} .p-foto{position:relative;aspect-ratio:4/3;border-radius:10px;overflow:hidden;background:var(--p-tray)} .p-foto img{width:100%;height:100%;object-fit:cover} .p-foto .x{position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;border:0;background:rgba(19,29,45,.8);color:#fff;cursor:pointer} .p-foto .main{position:absolute;left:6px;bottom:6px;background:var(--gold);color:var(--navy-deeper);font-size:.62rem;padding:3px 7px;border-radius:6px;letter-spacing:.1em;text-transform:uppercase}
+    .p-drop{border:1px dashed var(--gold);border-radius:12px;padding:26px;text-align:center;color:var(--text-mid);cursor:pointer;background:var(--p-card)} .p-drop b{display:block;color:var(--navy-deeper);font-weight:500;margin-bottom:4px}
+    .p-nav-steps{display:flex;justify-content:space-between;gap:10px;margin-top:22px;flex-wrap:wrap}
+    .p-resumen dt{font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-dark);margin-top:12px} .p-resumen dd{margin:2px 0 0;color:var(--navy-deeper)}
+    @media(max-width:700px){.p-formgrid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<div id="pHeader"></div>
+<section class="p-page"><div class="p-container" style="max-width:920px">
+  <span class="p-eyebrow">Publicar</span>
+  <h1 class="p-h2" id="ttl" style="font-size:clamp(1.7rem,3vw,2.3rem)">Publicá tu propiedad</h1>
+  <p class="p-sub" id="sub">Cinco pasos. Podés guardar y seguir después: el borrador queda en tu panel.</p>
+  <div class="p-stepper" id="stepper"></div>
+  <div class="p-card-panel" id="panel"></div>
+  <p class="p-note" id="modeNote" style="margin-top:12px"></p>
+</div></section>
+<div id="pFooter"></div>
+<script src="../supabase-config.js"></script>
+<script src="../mapa-barrios.js"></script><script src="js/ui.js"></script><script src="js/store.js"></script><script src="js/data.js"></script>
+<script>
+(async function(){
+  BP.header(); BP.footer();
+  const mode = await BPStore.init();
+  if (!BPStore.requireSession('publicar')) return;
+  document.getElementById('modeNote').textContent = mode === 'local' ? 'Modo local: el aviso y las fotos quedan en este navegador hasta que el esquema portal exista en Supabase.' : '';
+  const qs = BP.qs(); const editId = qs.get('id'); let perfil = qs.get('perfil') || '';
+  const ZONAS = BP.ZONAS; const BARRIOS = { 'Palermo':['Palermo','Palermo Soho','Palermo Hollywood','Palermo Chico','Las Cañitas','Botánico'], 'Recoleta':['Recoleta','Barrio Norte','Barrio Parque'], 'Belgrano':['Belgrano','Belgrano R','Belgrano C','Bajo Belgrano'], 'Núñez':['Núñez'], 'Colegiales':['Colegiales'], 'Puerto Madero':['Puerto Madero'], 'Saavedra':['Saavedra'], 'GBA Norte':['Vicente López','Olivos','La Lucila','Martínez','San Isidro','Acassuso','Beccar','Tigre','Nordelta','Pilar'] };
+  const AMEN = ['Pileta','Gimnasio','SUM','Parrilla','Seguridad 24hs','Conserje 24hs','Cochera','Terraza o jardín','Balcón','Ascensor','Laundry','Baulera','Bicicletero','Spa / Sauna','Aire acondicionado','Calefacción central','Pet friendly','Amoblado'];
+  const CARACT = ['Apto crédito','Apto profesional','Ofrece financiación','Permite mascotas','Luminoso','Acepta seguro de caución','Contrato digital'];
+  let pub = await BPStore.getMyPublicador();
+  let aviso = editId ? (await BPStore.getAviso(editId)) : null;
+  if (!aviso) aviso = { operacion: 'venta', tipo: 'Departamento', zona: '', barrio: '', amenities: [], caracteristicas: [], fotos: [], mostrar_direccion: 'aproximada', estado_curacion: 'borrador' };
+  if (!perfil && pub) perfil = pub.tipo;
+  let step = pub ? 1 : 0;
+  const STEPS = ['Tu perfil', 'Principales', 'Fotos y video', 'Extras', 'Revisar y enviar'];
+  const el = document.getElementById('panel');
+  const v = (o, k) => o && o[k] != null ? o[k] : '';
+  const fld = (name, label, type, val, extra, hint) => `<div class="p-fld ${extra && extra.full ? 'full' : ''}" data-fld="${name}"><label for="f-${name}">${label}</label>${type === 'textarea' ? `<textarea id="f-${name}" name="${name}" ${extra && extra.attrs || ''}>${BP.esc(val)}</textarea>` : type === 'select' ? `<select id="f-${name}" name="${name}" ${extra && extra.attrs || ''}>${(extra.opts||[]).map(o => `<option value="${o[0]}" ${String(o[0])===String(val)?'selected':''}>${o[1]}</option>`).join('')}</select>` : `<input id="f-${name}" name="${name}" type="${type}" value="${BP.esc(val)}" ${extra && extra.attrs || ''}>`}${hint ? `<div class="hint">${hint}</div>` : ''}</div>`;
+
+  function renderStepper(){ document.getElementById('stepper').innerHTML = STEPS.map((s, i) => `<button type="button" class="${i===step?'on':i<step?'done':''}" data-s="${i}"><i>${i<step?'✓':i+1}</i>${s}</button>`).join(''); document.querySelectorAll('#stepper button').forEach(b => b.addEventListener('click', () => { const i = Number(b.dataset.s); if (i <= step || pub) { if (step > 0) collect(); step = i; render(); } })); }
+
+  function render(){ renderStepper(); if (step === 0) renderPerfil(); else if (step === 1) renderPrincipales(); else if (step === 2) renderFotos(); else if (step === 3) renderExtras(); else renderRevision(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+  const navBtns = (backLabel, nextLabel) => `<div class="p-nav-steps"><div>${step > 0 ? `<button type="button" class="p-btn p-btn-dark" data-back>${backLabel||'Volver'}</button>` : ''}</div><div style="display:flex;gap:8px"><button type="button" class="p-btn" data-save>Guardar borrador</button><button type="button" class="p-btn p-btn-fill" data-next>${nextLabel||'Continuar'} <span class="ic">${BP.ico.arrow}</span></button></div></div>`;
+
+  /* ── Paso 0: perfil del publicador ── */
+  function renderPerfil(){
+    const p = pub || { tipo: perfil || 'dueno' }; const tipo = p.tipo || 'dueno';
+    el.innerHTML = `<h2 class="p-sec-t">Quién publica</h2><p class="p-kicker" style="margin-bottom:16px">Esto aparece en cada ficha como "Publica: …". La verificación la hace BAIREN en menos de 48 horas.</p>
+      <div class="p-seg" style="margin-bottom:18px"><label><input type="radio" name="tipo" value="dueno" ${tipo==='dueno'?'checked':''}> Dueño directo</label><label><input type="radio" name="tipo" value="inmobiliaria" ${tipo==='inmobiliaria'?'checked':''}> Inmobiliaria o corredor</label><label><input type="radio" name="tipo" value="desarrolladora" ${tipo==='desarrolladora'?'checked':''}> Desarrolladora</label></div>
+      <div class="p-formgrid" id="perfilForm"></div>${p.verificado ? `<p class="p-note" style="margin-top:12px">${BP.ico.check} Publicador verificado.</p>` : ''}
+      ${navBtns('', 'Guardar y continuar')}`;
+    const form = document.getElementById('perfilForm');
+    const draw = t => { form.innerHTML = (t === 'dueno' ? fld('nombre','Nombre y apellido','text',v(p,'nombre'),{attrs:'required'}) + fld('dni','DNI','text',v(p,'dni'),{attrs:'inputmode="numeric"'}) : t === 'inmobiliaria' ? fld('nombre','Nombre de la inmobiliaria o del corredor','text',v(p,'nombre'),{attrs:'required'}) + fld('responsable','Corredor responsable, nombre y apellido','text',v(p,'responsable'),{attrs:'required'}) + fld('matricula','Matrícula','text',v(p,'matricula'),{attrs:'required placeholder="CUCICBA 7527"'},'Se valida contra el registro público del colegio.') + fld('colegio','Colegio','select',v(p,'colegio')||'CUCICBA',{opts:[['CUCICBA','CUCICBA, Ciudad de Buenos Aires'],['CMCPSI','Colegio de Martilleros de San Isidro'],['CMCPLZ','Colegio de Martilleros de Lomas de Zamora'],['Otro','Otro colegio de Provincia']]}) + fld('cuit','CUIT','text',v(p,'cuit')) : fld('nombre','Razón social','text',v(p,'nombre'),{attrs:'required'}) + fld('cuit','CUIT','text',v(p,'cuit'),{attrs:'required'}) + fld('responsable','Responsable comercial','text',v(p,'responsable')))
+      + fld('telefono','Teléfono','tel',v(p,'telefono'),{attrs:'required'}) + fld('whatsapp','WhatsApp (solo números, con 54 9 11)','tel',v(p,'whatsapp'),{attrs:'required placeholder="5491123456789"'}) + fld('email','Mail de contacto','email',v(p,'email')||BPStore.session.email,{attrs:'required'}) + fld('descripcion','Presentación corta','textarea',v(p,'descripcion'),{full:true,attrs:'maxlength="400" style="min-height:90px"'},'Dos líneas. Aparece en tu perfil.')
+      + `<div class="p-fld full"><label>Verificación</label><div class="p-note" style="margin-bottom:8px">${t === 'dueno' ? 'Subí tu DNI y un comprobante de titularidad (escritura, ABL o expensas a tu nombre). Lo revisamos y lo borramos; guardamos solo el resultado.' : t === 'inmobiliaria' ? 'Con la matrícula alcanza para validar contra el registro público. Si querés, subí también el certificado de matrícula.' : 'Subí constancia de CUIT y un documento de la sociedad.'}</div><input type="file" id="docs" multiple accept="image/*,.pdf"></div>`; };
+    draw(tipo); form.querySelectorAll('[name=tipo]').length; document.querySelectorAll('[name=tipo]').forEach(r => r.addEventListener('change', () => draw(r.value)));
+    bindNav(async () => {
+      const t = document.querySelector('[name=tipo]:checked').value; const data = { tipo: t }; form.querySelectorAll('input:not([type=file]),select,textarea').forEach(i => data[i.name] = i.value.trim());
+      if (!data.nombre || !data.telefono || !data.whatsapp || (t === 'inmobiliaria' && !data.matricula) || (t === 'desarrolladora' && !data.cuit)) { BP.toast('Completá los campos obligatorios.'); return false; }
+      data.zonas = data.zonas || []; data.badge = t === 'dueno' ? 'Dueño verificado' : t === 'desarrolladora' ? 'Venta directa' : 'Corredor inmobiliario matriculado';
+      try { pub = await BPStore.savePublicador(data); const files = Array.from(document.getElementById('docs').files || []); for (const f of files) { const path = await BPStore.uploadDoc(f, pub.id, t === 'dueno' ? 'titularidad' : t === 'inmobiliaria' ? 'matricula' : 'cuit'); await BPStore.requestVerificacion(pub.id, t === 'dueno' ? 'titularidad' : t === 'inmobiliaria' ? 'matricula' : 'cuit', path); } if (!files.length && !pub.verificado) await BPStore.requestVerificacion(pub.id, t === 'inmobiliaria' ? 'matricula' : t === 'desarrolladora' ? 'cuit' : 'dni', null); BP.toast('Perfil guardado.'); return true; } catch (e) { BP.toast('No se pudo guardar: ' + (e.message || e)); return false; }
+    });
+  }
+
+  /* ── Paso 1: principales ── */
+  function renderPrincipales(){
+    const a = aviso;
+    el.innerHTML = `<h2 class="p-sec-t">Principales</h2><p class="p-kicker" style="margin-bottom:16px">Operación, ubicación y los datos que salen en la tarjeta.</p><div class="p-formgrid">
+      ${fld('operacion','Operación','select',a.operacion,{opts:[['venta','Venta'],['alquiler','Alquiler, largo plazo'],['mediano','Alquiler, mediano plazo (amoblado)']]})}
+      ${fld('tipo','Tipo de propiedad','select',a.tipo,{opts:[['Departamento','Departamento'],['Piso','Piso'],['PH','PH'],['Casa','Casa']]})}
+      ${fld('zona','Zona','select',a.zona,{opts:[['','Elegí la zona']].concat(ZONAS.map(z=>[z,BP.zonaLabel(z)]))},'Solo las ocho zonas de BAIREN.')}
+      ${fld('barrio','Barrio o subzona','select',a.barrio,{opts:[['','Elegí primero la zona']]})}
+      ${fld('direccion','Calle y altura','text',a.direccion,{attrs:'required placeholder="Ortega y Gasset 1500"'})}
+      ${fld('unidad','Piso y unidad','text',a.unidad,{attrs:'placeholder="4° B"'})}
+      ${fld('mostrar_direccion','Dirección en la ficha','select',a.mostrar_direccion,{opts:[['aproximada','Aproximada, solo la cuadra'],['exacta','Exacta']]})}
+      ${fld('precio','Precio en USD','number',a.precio,{attrs:'required min="0" step="1"'},'Sin puntos. Para alquiler, por mes.')}
+      ${fld('expensas','Expensas por mes, en pesos','number',a.expensas,{attrs:'min="0" step="1"'})}
+      ${fld('m2_total','Superficie total, m²','number',a.m2_total,{attrs:'required min="10"'})}
+      ${fld('m2_cubierto','Superficie cubierta, m²','number',a.m2_cubierto,{attrs:'min="10"'})}
+      ${fld('ambientes','Ambientes','number',a.ambientes,{attrs:'required min="1" max="12"'})}
+      ${fld('dormitorios','Dormitorios','number',a.dormitorios,{attrs:'min="0" max="10"'})}
+      ${fld('banos','Baños','number',a.banos,{attrs:'min="1" max="8"'})}
+      ${fld('cocheras','Cocheras','number',a.cocheras,{attrs:'min="0" max="6"'})}
+      ${fld('antiguedad','Antigüedad en años, 0 a estrenar','number',a.antiguedad,{attrs:'min="0" max="150"'})}
+      ${fld('titulo','Título del aviso','text',a.titulo,{full:true,attrs:'maxlength="80" placeholder="Piso alto con vista al río y terraza propia"'},'Hasta 80 caracteres. Sin mayúsculas sostenidas ni signos de exclamación.')}
+      ${fld('descripcion','Descripción','textarea',a.descripcion,{full:true,attrs:'required minlength="150" maxlength="4000"'},'Mínimo 150 caracteres. Contá la unidad como se la contarías a alguien que la va a vivir: luz, distribución, edificio, cuadra.')}
+    </div>${navBtns()}`;
+    const zs = document.getElementById('f-zona'), bs = document.getElementById('f-barrio');
+    const fillBarrios = () => { const z = zs.value; bs.innerHTML = z ? BARRIOS[z].map(b => `<option value="${b}" ${b===a.barrio?'selected':''}>${b}</option>`).join('') : '<option value="">Elegí primero la zona</option>'; };
+    fillBarrios(); zs.addEventListener('change', fillBarrios);
+    bindNav(async () => { collect(); const req = ['zona','barrio','direccion','precio','m2_total','ambientes','descripcion']; let ok = true; req.forEach(k => { const f = document.querySelector(`[data-fld=${k}]`); const bad = !aviso[k] || (k === 'descripcion' && String(aviso[k]).length < 150); f.classList.toggle('err', bad); if (bad) ok = false; }); if (!ok) { BP.toast('Faltan datos obligatorios o la descripción es corta.'); return false; } return true; });
+  }
+
+  /* ── Paso 2: fotos y video ── */
+  function renderFotos(){
+    const a = aviso;
+    el.innerHTML = `<h2 class="p-sec-t">Fotos y video</h2><p class="p-kicker" style="margin-bottom:16px">Mínimo ocho fotos horizontales, la primera es la portada. Si no tenés fotos profesionales, BAIREN las produce: marcá la casilla y seguí.</p>
+      <div class="p-drop" id="drop"><b>Arrastrá las fotos acá o tocá para elegirlas</b>JPG o PNG, hasta 10 MB cada una. Las reducimos en el navegador antes de subirlas.<input type="file" id="fotosIn" multiple accept="image/*" hidden></div>
+      <div class="p-fotos" id="fotosGrid"></div>
+      <div class="p-formgrid" style="margin-top:18px">${fld('video_url','Video, link de YouTube o Bunny','url',a.video_url,{full:true,attrs:'placeholder="https://"'})}<label class="full" style="display:flex;gap:10px;align-items:center;color:var(--navy-deeper)"><input type="checkbox" id="quieroProd" ${a.quiero_produccion?'checked':''}> Quiero que BAIREN produzca las fotos y el video de la unidad (servicio con honorario fijo).</label></div>
+      ${navBtns()}`;
+    const inp = document.getElementById('fotosIn'), drop = document.getElementById('drop'), grid = document.getElementById('fotosGrid');
+    const draw = async () => { const items = []; for (let i = 0; i < a.fotos.length; i++) { const u = await BPStore.resolveFoto(a.fotos[i].url); items.push(`<div class="p-foto" draggable="true" data-i="${i}"><img src="${u}" alt="Foto ${i+1}">${i===0?'<span class="main">Portada</span>':''}<button type="button" class="x" data-del="${i}" aria-label="Quitar">×</button></div>`); } grid.innerHTML = items.join('') + (a.fotos.length ? `<p class="p-note" style="grid-column:1/-1">${a.fotos.length} de mínimo 8. Arrastrá para reordenar.</p>` : ''); grid.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => { a.fotos.splice(Number(b.dataset.del), 1); draw(); })); let from = null; grid.querySelectorAll('.p-foto').forEach(f => { f.addEventListener('dragstart', () => from = Number(f.dataset.i)); f.addEventListener('dragover', e => e.preventDefault()); f.addEventListener('drop', () => { const to = Number(f.dataset.i); if (from == null || from === to) return; const m = a.fotos.splice(from, 1)[0]; a.fotos.splice(to, 0, m); draw(); }); }); };
+    const add = async files => { const key = aviso.id || aviso.slug || ('nuevo-' + BPStore.session.id.slice(-4)); let i = a.fotos.length; for (const f of Array.from(files)) { if (!/^image\//.test(f.type)) continue; try { BP.toast('Subiendo foto ' + (i + 1) + '…'); const url = await BPStore.uploadFoto(f, key, i++); a.fotos.push({ url }); } catch (e) { BP.toast('No se pudo subir una foto: ' + (e.message || e)); } } draw(); };
+    drop.addEventListener('click', () => inp.click()); inp.addEventListener('change', () => add(inp.files)); drop.addEventListener('dragover', e => { e.preventDefault(); drop.style.borderColor = 'var(--navy)'; }); drop.addEventListener('dragleave', () => drop.style.borderColor = ''); drop.addEventListener('drop', e => { e.preventDefault(); drop.style.borderColor = ''; add(e.dataTransfer.files); });
+    draw();
+    bindNav(async () => { collect(); a.quiero_produccion = document.getElementById('quieroProd').checked; if (a.fotos.length < 8 && !a.quiero_produccion) { BP.toast('Cargá al menos ocho fotos o pedí la producción de BAIREN.'); return false; } return true; });
+  }
+
+  /* ── Paso 3: extras ── */
+  function renderExtras(){
+    const a = aviso;
+    el.innerHTML = `<h2 class="p-sec-t">Extras</h2><p class="p-kicker" style="margin-bottom:16px">Lo que hace que la ficha sea completa.</p>
+      <div class="p-fld"><label>Amenities y comodidades</label><div class="p-seg">${AMEN.map(x => `<label><input type="checkbox" name="amen" value="${x}" ${a.amenities.indexOf(x)>-1?'checked':''}> ${x}</label>`).join('')}</div></div>
+      <div class="p-fld" style="margin-top:18px"><label>Características</label><div class="p-seg">${CARACT.map(x => `<label><input type="checkbox" name="car" value="${x}" ${a.caracteristicas.indexOf(x)>-1?'checked':''}> ${x}</label>`).join('')}</div></div>
+      <div class="p-formgrid" style="margin-top:18px">${fld('orientacion','Orientación','select',a.orientacion||'',{opts:[['','No informada'],['Norte','Norte'],['Sur','Sur'],['Este','Este'],['Oeste','Oeste'],['Noreste','Noreste'],['Noroeste','Noroeste']]})}${fld('disposicion','Disposición','select',a.disposicion||'',{opts:[['','No informada'],['Frente','Frente'],['Contrafrente','Contrafrente'],['Lateral','Lateral'],['Interior','Interior']]})}${fld('piso','Piso','text',a.piso||'',{attrs:'placeholder="4"'})}${a.operacion !== 'venta' ? fld('plazo','Plazo','text',a.plazo||'',{attrs:'placeholder="3 a 24 meses"'}) : ''}</div>
+      ${navBtns()}`;
+    bindNav(async () => { collect(); return true; });
+  }
+
+  /* ── Paso 4: revisión ── */
+  function renderRevision(){
+    const a = aviso; const pubName = pub ? pub.nombre : '';
+    el.innerHTML = `<h2 class="p-sec-t">Revisar y enviar</h2><p class="p-kicker" style="margin-bottom:10px">Así se va a ver. Cuando lo envíes, BAIREN lo revisa en menos de 48 horas y te avisa por mail.</p>
+      <div class="p-grid" style="max-width:320px;margin:14px 0 18px" id="prev"></div>
+      <dl class="p-resumen" style="margin:0"><dt>Publica</dt><dd>${BP.esc(pubName)} ${pub && pub.matricula ? '· ' + BP.esc(pub.matricula) : ''} ${pub && !pub.verificado ? '<span class="p-badge dueno">Verificación pendiente</span>' : ''}</dd><dt>Operación</dt><dd>${a.operacion === 'venta' ? 'Venta' : a.operacion === 'mediano' ? 'Alquiler a mediano plazo' : 'Alquiler'} · ${BP.esc(a.tipo)}</dd><dt>Ubicación</dt><dd>${BP.esc(a.direccion)} ${BP.esc(a.unidad||'')}, ${BP.esc(a.barrio)} (${BP.zonaLabel(a.zona)}) · dirección ${a.mostrar_direccion}</dd><dt>Precio</dt><dd>${BP.fmtUSD(Number(a.precio))}${a.operacion !== 'venta' ? ' por mes' : ''}${a.expensas ? ' · expensas $ ' + BP.fmtN(a.expensas) : ''}</dd><dt>Datos</dt><dd>${[a.m2_total ? a.m2_total + ' m²' : null, a.ambientes ? a.ambientes + ' amb.' : null, a.dormitorios ? a.dormitorios + ' dorm.' : null, a.banos ? a.banos + ' baños' : null, a.cocheras ? a.cocheras + ' coch.' : null, a.antiguedad != null && a.antiguedad !== '' ? a.antiguedad + ' años' : null].filter(Boolean).join(' · ')}</dd><dt>Fotos</dt><dd>${a.fotos.length}${a.quiero_produccion ? ' · producción de BAIREN solicitada' : ''}</dd><dt>Amenities</dt><dd>${a.amenities.join(', ') || 'Sin informar'}</dd></dl>
+      <div class="p-prose" style="margin-top:18px"><div class="box"><b>Condiciones.</b> Al enviar confirmás que la propiedad está en una de las ocho zonas, que tenés derecho a publicarla (titularidad, mandato o matrícula) y que los datos son ciertos. Si no cumple el estándar de BAIREN, te decimos por qué.</div></div>
+      <label style="display:flex;gap:10px;align-items:flex-start;margin-top:14px;color:var(--navy-deeper)"><input type="checkbox" id="acepto"><span>Acepto los <a href="legales.html#terminos" style="text-decoration:underline">Términos y condiciones</a> y los <a href="legales.html#criterios" style="text-decoration:underline">criterios de selección</a>.</span></label>
+      <div class="p-nav-steps"><button type="button" class="p-btn p-btn-dark" data-back>Volver</button><div style="display:flex;gap:8px"><button type="button" class="p-btn" data-save>Guardar borrador</button><button type="button" class="p-btn p-btn-fill" id="enviar">Enviar a revisión ${BP.ico.arrow}</button></div></div>`;
+    (async () => { const m = await BPData.fromStore(Object.assign({}, a, { publicador: pub, id: a.id || 'prev', fotos: a.fotos.map((f, i) => ({ url: f.url, orden: i })) })); document.getElementById('prev').innerHTML = BPData.cardV(m).replace(/href="[^"]*"/, 'href="#"'); })();
+    el.querySelector('[data-back]').addEventListener('click', () => { step = 3; render(); });
+    el.querySelector('[data-save]').addEventListener('click', async () => { await save('borrador'); BP.toast('Borrador guardado en tu panel.'); });
+    document.getElementById('enviar').addEventListener('click', async () => { if (!document.getElementById('acepto').checked) { BP.toast('Aceptá los términos para enviar.'); return; } if (a.fotos.length < 8 && !a.quiero_produccion) { BP.toast('Faltan fotos.'); return; } try { await save('en_revision'); BP.toast('Enviado. Te avisamos por mail cuando esté publicado.'); setTimeout(() => location.href = 'panel.html#avisos', 900); } catch (e) { BP.toast('No se pudo enviar: ' + (e.message || e)); } });
+  }
+
+  function collect(){ el.querySelectorAll('input[name]:not([type=checkbox]):not([type=radio]):not([type=file]),select[name],textarea[name]').forEach(i => { const k = i.name; let val = i.value; if (i.type === 'number') val = val === '' ? null : Number(val); if (typeof val === 'string') val = val.trim(); aviso[k] = val; }); const am = el.querySelectorAll('[name=amen]:checked'); if (el.querySelector('[name=amen]')) aviso.amenities = Array.from(am).map(x => x.value); const ca = el.querySelectorAll('[name=car]:checked'); if (el.querySelector('[name=car]')) aviso.caracteristicas = Array.from(ca).map(x => x.value); if (aviso.operacion === 'mediano') aviso.amoblado = true; else aviso.amoblado = aviso.amenities.indexOf('Amoblado') > -1; if (aviso.video_url) aviso.video_tipo = /youtu/.test(aviso.video_url) ? 'youtube' : /bunny|mediadelivery/.test(aviso.video_url) ? 'bunny' : 'mp4'; }
+  async function save(estado){ collect(); const rec = Object.assign({}, aviso); rec.estado_curacion = estado; delete rec.publicador; if (estado === 'en_revision') rec.motivo_rechazo = null; const saved = await BPStore.saveAviso(rec); aviso.id = saved.id; aviso.codigo = saved.codigo; aviso.slug = saved.slug; aviso.estado_curacion = estado; return saved; }
+  function bindNav(validate){ const b = el.querySelector('[data-back]'); if (b) b.addEventListener('click', () => { if (step > 0) collect(); step = Math.max(0, step - 1); render(); }); el.querySelector('[data-save]').addEventListener('click', async () => { if (step === 0) { const ok = await validate(); if (!ok) return; } try { await save('borrador'); BP.toast('Borrador guardado.'); } catch (e) { BP.toast(e.message || 'No se pudo guardar.'); } }); el.querySelector('[data-next]').addEventListener('click', async () => { const ok = await validate(); if (!ok) return; if (step > 0) { try { await save(aviso.estado_curacion === 'publicado' ? 'publicado' : 'borrador'); } catch (e) { BP.toast(e.message || 'No se pudo guardar.'); return; } } step++; render(); }); }
+
+  if (editId && aviso) document.getElementById('ttl').textContent = 'Editar aviso';
+  render();
+})();
+</script>
+</body>
+</html>

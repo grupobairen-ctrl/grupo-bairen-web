@@ -33,7 +33,8 @@
   <h2 id="ayuda">Ayuda</h2><p>Escribinos a contacto@bairengroup.com. Respondemos en el día hábil.</p>
 </div></section>
 <div id="pFooter"></div>
-<script src="../mapa-barrios.js"></script><script src="js/ui.js"></script><script src="js/data.js"></script>
-<script>BP.header("legales"); BP.footer(); BP.reveal(); </script>
+<script src="../supabase-config.js"></script>
+<script src="../mapa-barrios.js"></script><script src="js/ui.js"></script><script src="js/store.js"></script><script src="js/data.js"></script>
+<script>BP.header("legales"); BP.footer(); if (window.BPStore) BPStore.init(); BP.reveal(); </script>
 </body>
 </html>

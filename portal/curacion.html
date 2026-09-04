@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Curación — BAIREN</title>
+  <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#131D2D">
+  <link rel="icon" href="../bairen_logo.png?v=3">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css"><link rel="stylesheet" href="css/catalogo.css"><link rel="stylesheet" href="css/portal.css">
+  <style>
+    .p-cur{background:var(--p-card);border:1px solid var(--p-line);border-radius:var(--p-radius);padding:18px;margin-bottom:14px;display:grid;grid-template-columns:200px 1fr;gap:18px}
+    .p-cur .ph{aspect-ratio:4/3;border-radius:10px;overflow:hidden;background:var(--p-tray)} .p-cur .ph img{width:100%;height:100%;object-fit:cover}
+    .p-cur .thumbs{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px} .p-cur .thumbs img{width:34px;height:26px;object-fit:cover;border-radius:4px}
+    .p-cur b{color:var(--navy-deeper);font-weight:500} .p-cur .m{font-size:.84rem;color:var(--text-mid)}
+    .p-check{display:grid;grid-template-columns:repeat(2,1fr);gap:6px 16px;margin:10px 0;font-size:.84rem} .p-check span{display:flex;gap:6px;align-items:center} .p-check .ok{color:#3C7A4A} .p-check .no{color:#B3423C}
+    .p-cur textarea{width:100%;min-height:60px;border:1px solid var(--p-line);border-radius:10px;padding:10px;font:400 .9rem var(--font-body);margin-top:8px}
+    .p-cur .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    @media(max-width:700px){.p-cur{grid-template-columns:1fr}.p-check{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<div id="pHeader"></div>
+<section class="p-page"><div class="p-container" style="max-width:980px">
+  <span class="p-eyebrow">Panel BAIREN</span>
+  <h1 class="p-h2">Curación</h1>
+  <p class="p-sub">Lo que entra, entra porque pasó el estándar. Cada rechazo lleva un motivo que el publicador ve en su panel.</p>
+  <div class="p-tabs2" role="tablist"><button type="button" class="on" data-t="cola">Avisos en revisión</button><button type="button" data-t="pubs">Publicadores por verificar</button></div>
+  <div id="out"></div>
+</div></section>
+<div id="pFooter"></div>
+<script src="../supabase-config.js"></script>
+<script src="../mapa-barrios.js"></script><script src="js/ui.js"></script><script src="js/store.js"></script><script src="js/data.js"></script>
+<script>
+(async function(){
+  BP.header(); BP.footer();
+  await BPStore.init();
+  if (!BPStore.requireSession('curacion')) return;
+  if (!(await BPStore.isCurador())) { document.getElementById('out').innerHTML = '<div class="p-empty">Esta sección es solo para el equipo de curación de BAIREN.</div>'; return; }
+  const out = document.getElementById('out'); let t = 'cola';
+  document.querySelectorAll('.p-tabs2 button').forEach(b => b.addEventListener('click', () => { document.querySelectorAll('.p-tabs2 button').forEach(x => x.classList.toggle('on', x === b)); t = b.dataset.t; render(); }));
+  const ok = (c, txt) => `<span class="${c?'ok':'no'}">${c ? BP.ico.check : BP.ico.x} ${txt}</span>`;
+  async function render(){ t === 'cola' ? renderCola() : renderPubs(); }
+  async function renderCola(){
+    const cola = await BPStore.colaCuracion();
+    if (!cola.length) { out.innerHTML = '<div class="p-empty">No hay avisos esperando revisión.</div>'; return; }
+    let html = '';
+    for (const a of cola) { const fotos = []; for (const f of (a.fotos||[]).slice().sort((x,y)=>(x.orden||0)-(y.orden||0))) fotos.push(await BPStore.resolveFoto(f.url)); const p = a.publicador || {};
+      const enZona = BP.ZONAS.indexOf(a.zona) > -1; const descOk = (a.descripcion||'').length >= 150; const fotosOk = fotos.length >= 8 || a.quiero_produccion; const datosOk = !!(a.m2_total && a.ambientes && a.precio);
+      html += `<div class="p-cur" data-id="${a.id}"><div><div class="ph">${fotos[0] ? `<img src="${fotos[0]}" alt="">` : ''}</div><div class="thumbs">${fotos.slice(1,9).map(u => `<img src="${u}" alt="">`).join('')}</div></div>
+        <div><b>${BP.esc(a.titulo || a.direccion)}</b><div class="m">${a.operacion === 'venta' ? 'Venta' : a.operacion === 'mediano' ? 'Mediano plazo' : 'Alquiler'} · ${BP.esc(a.tipo||'')} · ${BP.esc(a.direccion)} ${BP.esc(a.unidad||'')}, ${BP.esc(a.barrio||'')} (${BP.zonaLabel(a.zona||'')}) · ${BP.fmtUSD(Number(a.precio))}${a.operacion !== 'venta' ? '/mes' : ''}${a.expensas ? ' · expensas $ ' + BP.fmtN(a.expensas) : ''}</div>
+        <div class="m" style="margin-top:4px">Publica: <b>${BP.esc(p.nombre||'?')}</b> · ${p.tipo === 'dueno' ? 'dueño directo' : BP.esc(p.matricula||p.tipo||'')} · ${p.verificado ? 'verificado' : '<span class="p-badge dueno">sin verificar</span>'} · ${a.codigo||''}</div>
+        <div class="p-check">${ok(enZona,'Zona BAIREN')}${ok(datosOk,'Datos completos')}${ok(fotosOk, fotos.length + ' fotos' + (a.quiero_produccion ? ' (pide producción)' : ''))}${ok(descOk,'Descripción de 150 o más')}${ok((a.amenities||[]).length>0,'Amenities informados')}${ok(!!p.verificado,'Publicador verificado')}</div>
+        <p class="p-text" style="font-size:.86rem;max-height:120px;overflow:auto">${BP.esc(a.descripcion||'')}</p>
+        <textarea placeholder="Motivo si rechazás o pedís cambios (lo ve el publicador)"></textarea>
+        <div class="acts"><button type="button" class="p-btn p-btn-sm p-btn-fill" data-ok>Aprobar y publicar</button><button type="button" class="p-btn p-btn-sm p-btn-dark" data-cambios>Pedir cambios</button><button type="button" class="p-btn p-btn-sm" data-no>Rechazar</button><a class="p-btn p-btn-sm" href="publicar-aviso.html?id=${encodeURIComponent(a.id)}">Abrir el aviso</a></div></div></div>`; }
+    out.innerHTML = html;
+    out.querySelectorAll('.p-cur').forEach(card => { const id = card.dataset.id, ta = card.querySelector('textarea');
+      card.querySelector('[data-ok]').addEventListener('click', async () => { await BPStore.setEstado(id, 'publicado', null); BP.toast('Publicado.'); renderCola(); });
+      card.querySelector('[data-cambios]').addEventListener('click', async () => { if (!ta.value.trim()) { BP.toast('Escribí qué hay que cambiar.'); return; } await BPStore.setEstado(id, 'borrador', ta.value.trim()); BP.toast('Devuelto al publicador con el motivo.'); renderCola(); });
+      card.querySelector('[data-no]').addEventListener('click', async () => { if (!ta.value.trim()) { BP.toast('Escribí el motivo del rechazo.'); return; } await BPStore.setEstado(id, 'rechazado', ta.value.trim()); BP.toast('Rechazado.'); renderCola(); }); });
+  }
+  async function renderPubs(){
+    const pubs = await BPStore.publicadoresPendientes();
+    if (!pubs.length) { out.innerHTML = '<div class="p-empty">No hay publicadores esperando verificación.</div>'; return; }
+    out.innerHTML = pubs.map(p => `<div class="p-cur" data-id="${p.id}" style="grid-template-columns:1fr"><div><b>${BP.esc(p.nombre)}</b> <span class="p-badge dueno">${p.tipo === 'dueno' ? 'Dueño directo' : p.tipo}</span><div class="m">${BP.esc(p.responsable||'')} ${p.matricula ? '· ' + BP.esc(p.matricula) + ' (' + BP.esc(p.colegio||'') + ')' : ''} ${p.dni ? '· DNI ' + BP.esc(p.dni) : ''} ${p.cuit ? '· CUIT ' + BP.esc(p.cuit) : ''} · ${BP.esc(p.email||'')} · ${BP.esc(p.telefono||'')}</div>
+      <div class="m" style="margin-top:6px">${(p.verificaciones||[]).length ? (p.verificaciones||[]).map(v => `${v.tipo}: ${v.resultado}${v.nota ? ' · ' + BP.esc(v.nota) : ''}`).join('<br>') : 'Sin documentos cargados'}</div>
+      ${p.matricula ? `<div class="m" style="margin-top:6px">Verificar la matrícula en el registro público: <a href="https://www.colegioinmobiliario.org.ar/" target="_blank" rel="noopener" style="text-decoration:underline">CUCICBA</a></div>` : ''}
+      <textarea placeholder="Nota (opcional)"></textarea><div class="acts"><button type="button" class="p-btn p-btn-sm p-btn-fill" data-ok>Verificar</button><button type="button" class="p-btn p-btn-sm" data-no>Rechazar</button></div></div></div>`).join('');
+    out.querySelectorAll('.p-cur').forEach(card => { const id = card.dataset.id, ta = card.querySelector('textarea'); card.querySelector('[data-ok]').addEventListener('click', async () => { await BPStore.verificarPublicador(id, true, ta.value.trim()); BP.toast('Publicador verificado.'); renderPubs(); }); card.querySelector('[data-no]').addEventListener('click', async () => { await BPStore.verificarPublicador(id, false, ta.value.trim()); BP.toast('Rechazado.'); renderPubs(); }); });
+  }
+  render();
+})();
+</script>
+</body>
+</html>

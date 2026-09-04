@@ -17,9 +17,10 @@
   <div class="p-prose" style="margin-top:44px" data-reveal><div class="box"><b>¿Sos inmobiliaria o corredor de estos barrios?</b> Publicá tu cartera gratis durante la etapa de lanzamiento, con importación desde Tokko. <a href="publicar.html#inmobiliaria" style="text-decoration:underline">Empezar</a>.</div></div>
 </div></section>
 <div id="pFooter"></div>
-<script src="../mapa-barrios.js"></script><script src="js/ui.js"></script><script src="js/data.js"></script>
+<script src="../supabase-config.js"></script>
+<script src="../mapa-barrios.js"></script><script src="js/ui.js"></script><script src="js/store.js"></script><script src="js/data.js"></script>
 <script>
-BP.header('publicadores'); BP.footer(); BP.reveal();
+BP.header('publicadores'); BP.footer(); if (window.BPStore) BPStore.init(); BP.reveal();
 BPData.load().then(function(d){
   var av = d.avisos;
   document.getElementById('pubs').innerHTML = Object.values(d.publicadores).map(function(p){

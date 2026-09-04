@@ -207,3 +207,74 @@ insert into portal.fotos (aviso_id, url, orden)
 select av.id, i.url, i.orden from portal.avisos av join public.imagenes i on i.propiedad_id = av.propiedad_id
 where not exists (select 1 from portal.fotos f where f.aviso_id = av.id);
 -- Nota: la zona se normaliza después con la misma tabla que usa mapa-barrios.js (Palermo Soho -> Palermo, etc.).
+
+-- =====================================================================
+-- FASE 2 · cuentas, permisos, curación y archivos
+-- =====================================================================
+-- 0) En Dashboard -> Settings -> API -> "Exposed schemas": agregar `portal`.
+-- 1) Auth: Dashboard -> Authentication -> Providers -> Email: habilitado, con "Email OTP" (código de 6 dígitos)
+--    o magic link. Para el código, en la plantilla "Magic Link" usar {{ .Token }}.
+-- 2) Este bloque crea lo que falta y los permisos.
+
+grant usage on schema portal to anon, authenticated;
+grant select on all tables in schema portal to anon, authenticated;
+grant insert, update on all tables in schema portal to authenticated;
+grant insert on portal.consultas, portal.vistas to anon;
+alter default privileges in schema portal grant select on tables to anon, authenticated;
+
+alter table portal.publicadores add column if not exists auth_user_id uuid unique;
+create table if not exists portal.curadores (
+  email      text primary key,
+  nombre     text,
+  created_at timestamptz not null default now()
+);
+insert into portal.curadores (email, nombre) values ('grupobairen@gmail.com', 'BAIREN') on conflict do nothing;
+
+create table if not exists portal.vistas (
+  id        bigint generated always as identity primary key,
+  aviso_id  uuid not null references portal.avisos(id) on delete cascade,
+  fecha     timestamptz not null default now()
+);
+alter table portal.vistas enable row level security;
+create policy if not exists "vistas insert" on portal.vistas for insert with check (true);
+
+create or replace function portal.es_curador() returns boolean language sql stable as $$
+  select exists (select 1 from portal.curadores c where c.email = coalesce(auth.jwt() ->> 'email', ''));
+$$;
+create or replace function portal.mi_publicador() returns uuid language sql stable as $$
+  select id from portal.publicadores where auth_user_id = auth.uid() limit 1;
+$$;
+
+-- publicadores: cada cuenta ve y edita el suyo; los curadores todo
+create policy if not exists "publicador propio select" on portal.publicadores for select using (auth_user_id = auth.uid() or portal.es_curador());
+create policy if not exists "publicador propio insert" on portal.publicadores for insert with check (auth_user_id = auth.uid());
+create policy if not exists "publicador propio update" on portal.publicadores for update using (auth_user_id = auth.uid() or portal.es_curador());
+
+-- avisos: el publicador ve y edita los suyos en cualquier estado; los curadores todo; el público solo publicados
+create policy if not exists "avisos propios select" on portal.avisos for select using (publicador_id = portal.mi_publicador() or portal.es_curador());
+create policy if not exists "avisos propios insert" on portal.avisos for insert with check (publicador_id = portal.mi_publicador());
+create policy if not exists "avisos propios update" on portal.avisos for update using (publicador_id = portal.mi_publicador() or portal.es_curador());
+
+create policy if not exists "fotos propias all" on portal.fotos for all using (exists (select 1 from portal.avisos a where a.id = aviso_id and (a.publicador_id = portal.mi_publicador() or portal.es_curador())));
+
+-- consultas: el publicador ve las que recibe; los curadores todo
+create policy if not exists "consultas del publicador" on portal.consultas for select using (publicador_id = portal.mi_publicador() or portal.es_curador());
+
+-- verificaciones: el publicador crea las suyas y las ve; los curadores todo
+alter table portal.verificaciones enable row level security;
+create policy if not exists "verif propias" on portal.verificaciones for select using (publicador_id = portal.mi_publicador() or portal.es_curador());
+create policy if not exists "verif insert" on portal.verificaciones for insert with check (publicador_id = portal.mi_publicador());
+create policy if not exists "verif update curador" on portal.verificaciones for update using (portal.es_curador());
+
+alter table portal.curadores enable row level security;
+create policy if not exists "curadores se ven a si mismos" on portal.curadores for select using (email = coalesce(auth.jwt() ->> 'email', ''));
+
+-- Storage: fotos públicas, documentos privados
+insert into storage.buckets (id, name, public) values ('portal-fotos', 'portal-fotos', true) on conflict (id) do nothing;
+insert into storage.buckets (id, name, public) values ('portal-docs', 'portal-docs', false) on conflict (id) do nothing;
+create policy if not exists "fotos publicas lectura" on storage.objects for select using (bucket_id = 'portal-fotos');
+create policy if not exists "fotos sube autenticado" on storage.objects for insert with check (bucket_id = 'portal-fotos' and auth.role() = 'authenticated');
+create policy if not exists "fotos edita autenticado" on storage.objects for update using (bucket_id = 'portal-fotos' and auth.role() = 'authenticated');
+create policy if not exists "docs sube autenticado" on storage.objects for insert with check (bucket_id = 'portal-docs' and auth.role() = 'authenticated');
+create policy if not exists "docs lee curador" on storage.objects for select using (bucket_id = 'portal-docs' and portal.es_curador());
+-- Los documentos de verificación se borran al aprobar o rechazar (política de privacidad): hacerlo desde el panel de curación o con un cron.

@@ -62,12 +62,13 @@
 
 <div id="pFooter"></div>
 
+<script src="../supabase-config.js"></script>
 <script src="../mapa-barrios.js"></script>
-<script src="js/ui.js"></script>
+<script src="js/ui.js"></script><script src="js/store.js"></script>
 <script src="js/data.js"></script>
 <script>
 (async function(){
-  BP.header(); BP.footer();
+  BP.header(); BP.footer(); if (window.BPStore) BPStore.init();
   document.querySelector('#zonaBox > span').innerHTML = BP.ico.pin;
   document.getElementById('moreBtn').innerHTML = BP.ico.filter + ' Más filtros <span class="cnt" id="moreCnt" hidden></span>';
   document.getElementById('alertBtn').innerHTML = BP.ico.bell + ' Crear alerta';

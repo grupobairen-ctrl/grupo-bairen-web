@@ -13,17 +13,37 @@
 <div id="pHeader"></div>
 <section class="p-page"><div class="p-container">
   <div class="p-login" data-reveal>
-    <h1>Iniciar sesión</h1>
-    <p class="p-sub" style="margin-bottom:18px">Con tu cuenta guardás favoritos y búsquedas, recibís alertas, ves tus contactos y, si publicás, tu panel.</p>
-    <form id="loginForm"><input type="email" name="email" placeholder="Ingresá tu e-mail" required autocomplete="email"><button type="submit" class="p-btn p-btn-fill" style="width:100%">Continuar</button></form>
-    <p class="p-note" style="text-align:center;margin-top:10px">¿No tenés cuenta? <a href="publicar.html" style="text-decoration:underline;color:var(--navy-deeper)">Crear una cuenta</a></p>
-    <div class="or">o</div>
-    <button type="button" class="soc">Continuar con Google</button><button type="button" class="soc">Continuar con Apple</button>
-    <p class="p-note" style="margin-top:14px">Al continuar aceptás los <a href="legales.html#terminos" style="text-decoration:underline">Términos y condiciones</a> y la <a href="legales.html#privacidad" style="text-decoration:underline">Política de privacidad</a>.</p>
+    <h1 id="ttl">Iniciar sesión</h1>
+    <p class="p-sub" id="sub" style="margin-bottom:18px">Con tu cuenta guardás favoritos y búsquedas, recibís alertas, ves tus contactos y, si publicás, tu panel. Sin contraseña: te mandamos un código al mail.</p>
+    <form id="stepMail"><input type="email" name="email" id="email" placeholder="Ingresá tu e-mail" required autocomplete="email"><button type="submit" class="p-btn p-btn-fill" style="width:100%" id="btnMail">Continuar</button></form>
+    <form id="stepCode" hidden><p class="p-note" id="codeMsg" style="margin-bottom:10px"></p><input type="text" name="code" id="code" inputmode="numeric" pattern="[0-9]*" maxlength="8" placeholder="Código de seis dígitos" required autocomplete="one-time-code"><button type="submit" class="p-btn p-btn-fill" style="width:100%">Ingresar</button><p class="p-note" style="text-align:center;margin-top:10px"><a href="#" id="again" style="text-decoration:underline;color:var(--navy-deeper)">Mandar otro código</a> · <a href="#" id="back" style="text-decoration:underline;color:var(--navy-deeper)">Cambiar mail</a></p></form>
+    <div id="social"><div class="or">o</div><button type="button" class="soc" data-soc="google">Continuar con Google</button><button type="button" class="soc" data-soc="apple">Continuar con Apple</button></div>
+    <p class="p-note" style="margin-top:14px">Al continuar aceptás los <a href="legales.html#terminos" style="text-decoration:underline">Términos y condiciones</a> y la <a href="legales.html#privacidad" style="text-decoration:underline">Política de privacidad</a>. Una cuenta por persona.</p>
+    <p class="p-note" id="modeNote" style="margin-top:8px"></p>
   </div>
 </div></section>
 <div id="pFooter"></div>
-<script src="../mapa-barrios.js"></script><script src="js/ui.js"></script><script src="js/data.js"></script>
-<script>BP.header("ingresar"); BP.footer(); BP.reveal(); document.getElementById("loginForm").addEventListener("submit",function(e){e.preventDefault();BP.toast("Te mandamos un código a "+e.target.email.value+". Cuentas reales en la Fase 2.");});</script>
+<script src="../supabase-config.js"></script>
+<script src="../mapa-barrios.js"></script><script src="js/ui.js"></script><script src="js/store.js"></script><script src="js/data.js"></script>
+<script>
+(async function(){
+  BP.header(); BP.footer(); BP.reveal();
+  const qs = BP.qs(); const volver = qs.get('volver') || 'panel'; const perfil = qs.get('perfil') || '';
+  const destino = () => { if (volver === 'publicar') return 'publicar-aviso.html' + (perfil ? '?perfil=' + perfil : ''); if (volver === 'contactos') return 'panel.html#contactos'; if (volver === 'curacion') return 'curacion.html'; if (/\.html/.test(volver)) return volver; return 'panel.html'; };
+  const fm = document.getElementById('stepMail'), fc = document.getElementById('stepCode'), email = document.getElementById('email');
+  fm.addEventListener('submit', e => e.preventDefault()); fc.addEventListener('submit', e => e.preventDefault());
+  if (volver === 'publicar') { document.getElementById('ttl').textContent = 'Creá tu cuenta para publicar'; document.getElementById('sub').textContent = 'Un mail y un código. Después completás tu perfil de publicador y cargás la propiedad.'; }
+  const mode = await BPStore.init();
+  document.getElementById('modeNote').textContent = mode === 'local' ? 'Modo local: todavía no está creado el esquema portal en Supabase, así que la sesión y los datos quedan en este navegador. Sirve para probar todo el flujo.' : '';
+  if (BPStore.session) { location.replace(destino()); return; }
+  let mail = '';
+  async function send(){ const b = document.getElementById('btnMail'); b.disabled = true; b.textContent = 'Enviando…'; await BPStore.init(); const r = await BPStore.sendCode(email.value); b.disabled = false; b.textContent = 'Continuar'; if (!r.ok) { BP.toast(r.msg); return; } mail = email.value.trim().toLowerCase(); document.getElementById('codeMsg').textContent = r.msg; fm.hidden = true; document.getElementById('social').hidden = true; fc.hidden = false; document.getElementById('code').focus(); }
+  fm.addEventListener('submit', e => { e.preventDefault(); send(); });
+  document.getElementById('again').addEventListener('click', e => { e.preventDefault(); send(); });
+  document.getElementById('back').addEventListener('click', e => { e.preventDefault(); fc.hidden = true; fm.hidden = false; document.getElementById('social').hidden = false; });
+  fc.addEventListener('submit', async e => { e.preventDefault(); const r = await BPStore.verifyCode(mail, document.getElementById('code').value); if (!r.ok) { BP.toast(r.msg); return; } BP.toast('Listo, entraste.'); setTimeout(() => location.href = destino(), 500); });
+  document.querySelectorAll('[data-soc]').forEach(b => b.addEventListener('click', async () => { if (mode === 'supabase') { const { error } = await BPStore.sb.auth.signInWithOAuth({ provider: b.dataset.soc, options: { redirectTo: location.origin + location.pathname.replace(/[^/]*$/, '') + destino() } }); if (error) BP.toast(error.message); } else { BP.toast('Google y Apple se activan cuando el proyecto esté conectado a Supabase. Usá el mail.'); } }));
+})();
+</script>
 </body>
 </html>
