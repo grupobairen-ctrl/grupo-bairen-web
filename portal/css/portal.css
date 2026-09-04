@@ -767,3 +767,14 @@ select.p-fsel,.p-field select,.p-band select,.p-product select{background-repeat
 .p-card-foot .p-publine{flex:1 1 auto;min-width:0;flex-wrap:wrap}
 .p-card-foot .acts{flex:0 0 auto;margin-left:auto}
 @media(max-width:640px){.p-card-foot{flex-wrap:wrap}.p-card-foot .acts{width:100%}.p-card-foot .acts .p-btn{flex:1}}
+/* Barra de contacto al pie, solo en celular: el precio y una acción siempre a mano */
+.p-mcta{display:none}
+@media(max-width:900px){
+  .p-mcta{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:1400;align-items:center;gap:10px;
+    background:var(--navy-deeper);border-top:1px solid rgba(194,169,104,.35);padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
+  .p-mcta-price{font-family:var(--font-body);font-weight:500;font-size:1.05rem;color:var(--p-ink);font-variant-numeric:tabular-nums;flex:1;min-width:0}
+  .p-mcta-price small{font-size:.7em;color:var(--p-ink-3)}
+  .p-mcta .p-btn{flex:0 0 auto} .p-mcta .p-icon-btn{flex:0 0 auto;background:transparent;border-color:rgba(251,250,246,.3);color:var(--p-ink)}
+  body.p-product{padding-bottom:76px}
+  .p-demo-banner{bottom:80px}
+}

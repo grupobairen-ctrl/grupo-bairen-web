@@ -8,7 +8,7 @@
   <link rel="icon" href="../bairen_logo.png?v=3">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260904p"><link rel="stylesheet" href="css/catalogo.css?v=20260904p"><link rel="stylesheet" href="css/portal.css?v=20260904p">
+  <link rel="stylesheet" href="css/base.css?v=20260904q"><link rel="stylesheet" href="css/catalogo.css?v=20260904q"><link rel="stylesheet" href="css/portal.css?v=20260904q">
   <style>body{padding-top:0}#ficha>.p-ficha-top,#ficha>.p-ficha,#ficha>section{max-width:var(--p-max);margin:0 auto;padding-left:24px;padding-right:24px}#ficha>.p-ficha-top{padding-top:88px}@media(max-width:900px){#ficha>.p-ficha-top{padding-top:76px}}.p-video{aspect-ratio:16/9;background:#0b1220;border-radius:12px;overflow:hidden}.p-video iframe,.p-video video{width:100%;height:100%;border:0;display:block}</style>
 </head>
 <body class="p-product">
@@ -19,8 +19,8 @@
 
 <script src="../supabase-config.js"></script>
 <script src="../mapa-barrios.js"></script>
-<script src="js/ui.js?v=20260904p"></script><script src="js/store.js?v=20260904p"></script>
-<script src="js/data.js?v=20260904p"></script>
+<script src="js/ui.js?v=20260904q"></script><script src="js/store.js?v=20260904q"></script>
+<script src="js/data.js?v=20260904q"></script>
 <script>
 (async function(){
   BP.header(); BP.footer();
@@ -131,6 +131,7 @@
 <section style="padding:0 0 64px">
   <div class="p-head-row"><h2 class="p-h2">Propiedades similares</h2><a class="p-link" href="buscar.html?op=${a.op}&zona=${encodeURIComponent(a.zona)}">Ver más en ${BP.zonaLabel(a.zona)}</a></div>
   <div class="p-grid">${similares.map(BPData.cardV).join('') || '<p class="p-note">Todavía no hay otras unidades similares publicadas.</p>'}</div>
+  <div class="p-mcta" id="mcta"><div class="p-mcta-price">${BPData.precioHTML(a)}</div><button type="button" class="p-btn p-btn-fill p-btn-sm" id="mctaBtn">${BP.ico.mail} Contactar</button><a class="p-icon-btn" href="${BPData.waLink(a, pub)}" target="_blank" rel="noopener" aria-label="WhatsApp">${BP.ico.wa}</a></div>
   <div class="p-breadcrumb" role="navigation" aria-label="Migas de pan"><a href="index.html">BAIREN</a> › <a href="buscar.html?op=${a.op}">${BPData.opTag(a)}</a> › <a href="buscar.html?op=${a.op}&zona=${encodeURIComponent(a.zona)}">${BP.zonaLabel(a.zona)}</a> › <span>${BP.esc(a.barrio)}</span> › <span>${BP.esc(a.titulo)}</span></div>
 </section>`;
 
@@ -150,6 +151,7 @@
   const ctaCard = document.getElementById('ctaCard'), contactForm = document.getElementById('contactForm');
   const openForm = () => { ctaCard.hidden = true; contactForm.hidden = false; contactForm.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => contactForm.querySelector('input[name=nombre]').focus(), 320); };
   document.getElementById('abrirForm').addEventListener('click', openForm);
+  const mctaBtn = document.getElementById('mctaBtn'); if (mctaBtn) mctaBtn.addEventListener('click', openForm);
   document.getElementById('qSend').addEventListener('click', () => { const t = qText.value.trim(); const qs = Array.from(document.querySelectorAll('#quick button.on')).map(x => x.textContent); if (!t && !qs.length) { BP.toast('Elegí una pregunta o escribí la tuya.'); return; } mensaje.value = msgDefault + (qs.length ? ' ' + qs.join(' ') : '') + (t ? ' ' + t : ''); openForm(); });
   document.getElementById('contactForm').addEventListener('submit', async e => { e.preventDefault(); const f = e.target; try { await BPStore.addConsulta({ aviso_id: a.id, aviso_titulo: a.titulo, publicador_id: pub.storeId || pub.id, publicador_nombre: pub.nombre, nombre: f.nombre.value, email: f.email.value, telefono: f.telefono.value, mensaje: f.mensaje.value, acepto_tyc: true, enviada_a: pub.email }); } catch (err) { console.warn(err); } const subject = encodeURIComponent('Consulta por ' + a.titulo + ' (' + a.codigo + ') desde BAIREN'); const body = encodeURIComponent(f.mensaje.value + '\n\n' + f.nombre.value + ' · ' + f.telefono.value + ' · ' + f.email.value); window.location.href = 'mailto:' + pub.email + '?subject=' + subject + '&body=' + body; BP.toast('Tu consulta va directo a ' + pub.nombre + '.'); });
   document.getElementById('verTel').addEventListener('click', e => { e.target.closest('button').outerHTML = `<a class="p-btn p-btn-sm" href="tel:${pub.telefono.replace(/\s/g,'')}">${BP.ico.phone} ${pub.telefono}</a>`; });
