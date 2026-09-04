@@ -73,7 +73,7 @@
   const store = key => ({ get(){ try{ return JSON.parse(localStorage.getItem(key)||'[]'); }catch(e){ return []; } }, set(v){ try{ localStorage.setItem(key, JSON.stringify(v)); }catch(e){} } });
   BP.favs = store('bp_favs'); BP.alerts = store('bp_alertas'); BP.consultas = store('bp_consultas'); BP.reportes = store('bp_reportes');
   BP.isFav = id => BP.favs.get().indexOf(id) > -1;
-  BP.toggleFav = id => { const f=BP.favs.get(); const i=f.indexOf(id); if(i>-1) f.splice(i,1); else f.push(id); BP.favs.set(f); BP.syncFavCount(); return i===-1; };
+  BP.toggleFav = id => { const f=BP.favs.get(); const i=f.indexOf(id); if(i>-1) f.splice(i,1); else f.push(id); BP.favs.set(f); BP.syncFavCount(); if (window.BPStore && BPStore.syncFavorito) BPStore.syncFavorito(id, i===-1); return i===-1; };
   BP.syncFavCount = () => { const n=BP.favs.get().length; document.querySelectorAll('[data-fav-count]').forEach(el=>{ el.textContent=n||''; el.hidden=!n; }); };
 
   BP.toast = msg => { let t=document.getElementById('bpToast'); if(!t){ t=document.createElement('div'); t.id='bpToast'; t.className='p-toast'; document.body.appendChild(t);} t.textContent=msg; t.classList.add('on'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('on'),2600); };
@@ -199,6 +199,13 @@
   };
   BP.estadoLabel = e => ({ borrador:'Borrador', en_revision:'En revisión', publicado:'Publicado', rechazado:'Rechazado', pausado:'Pausado', vencido:'Vencido' })[e] || e;
   BP.estadoBadge = e => `<span class="p-badge ${e==='publicado'?'':e==='rechazado'?'demo':'dueno'}">${BP.estadoLabel(e)}</span>`;
+
+  /* 4.2 El canal dominante es WhatsApp y no dejaba rastro. Se registra al salir, sin frenar el clic. */
+  document.addEventListener('click', e => {
+    const a = e.target.closest && e.target.closest('a[data-wa]');
+    if (!a || !window.BPStore || !window.BPStore.addConsulta) return;
+    try { BPStore.addConsulta({ aviso_id: a.dataset.aviso, publicador_id: a.dataset.pub, canal: 'whatsapp', acepto_tyc: true }); } catch (err) { console.warn(err); }
+  }, true);
 
   window.BP = BP;
 })();

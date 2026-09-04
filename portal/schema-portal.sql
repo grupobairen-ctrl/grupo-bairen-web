@@ -389,3 +389,49 @@ create policy "docs borra su dueño" on storage.objects for delete
 
 -- 3.4 El mail del propietario no sale al público.
 revoke select (propietario_email) on portal.avisos from anon;
+
+-- =====================================================================
+-- OLA 4 de la remediación · que se pueda medir
+-- =====================================================================
+-- 4.1 Los avisos semilla no tienen identificador de base, así que consultas y vistas
+-- se perdían. Se agrega una referencia de texto y el identificador pasa a ser opcional.
+alter table portal.consultas add column if not exists aviso_ref text;
+alter table portal.consultas alter column aviso_id drop not null;
+alter table portal.vistas    add column if not exists aviso_ref text;
+alter table portal.vistas    alter column aviso_id drop not null;
+alter table portal.consultas add column if not exists publicador_ref text;
+alter table portal.consultas alter column publicador_id drop not null;
+create index if not exists consultas_ref_idx on portal.consultas(aviso_ref);
+create index if not exists vistas_ref_idx on portal.vistas(aviso_ref);
+
+-- 4.4 Un solo registro de eventos, sin dependencias.
+create table if not exists portal.eventos (
+  id         bigint generated always as identity primary key,
+  evento     text not null,
+  aviso_ref  text,
+  publicador_ref text,
+  usuario_id uuid,
+  canal      text,
+  datos      jsonb,
+  creado_en  timestamptz not null default now()
+);
+create index if not exists eventos_evento_idx on portal.eventos(evento, creado_en desc);
+alter table portal.eventos enable row level security;
+grant insert on portal.eventos to anon, authenticated;
+drop policy if exists "eventos escribe cualquiera" on portal.eventos;
+create policy "eventos escribe cualquiera" on portal.eventos for insert with check (true);
+drop policy if exists "eventos los lee el curador" on portal.eventos;
+create policy "eventos los lee el curador" on portal.eventos for select using (portal.es_curador());
+
+-- 4.3 Vistas agregadas por aviso, para que el panel muestre las reales y no las del navegador.
+create or replace view portal.vistas_por_aviso as
+  select coalesce(aviso_ref, aviso_id::text) as ref, count(*)::int as vistas
+  from portal.vistas group by 1;
+grant select on portal.vistas_por_aviso to anon, authenticated;
+create or replace view portal.consultas_por_aviso as
+  select coalesce(aviso_ref, aviso_id::text) as ref, count(*)::int as consultas
+  from portal.consultas group by 1;
+grant select on portal.consultas_por_aviso to authenticated;
+-- 4.2 Una consulta por WhatsApp no trae nombre ni mail: se registra igual, con su canal.
+alter table portal.consultas alter column nombre drop not null;
+alter table portal.consultas alter column email  drop not null;

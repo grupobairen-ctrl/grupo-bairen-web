@@ -67,6 +67,7 @@
     if (!S.session) throw new Error('sin sesión');
     const rec = Object.assign({ tipo:'dueno', verificado:false, zonas:[], badge: p.tipo === 'dueno' ? 'Dueño verificado' : p.tipo === 'desarrolladora' ? 'Venta directa' : 'Corredor inmobiliario matriculado' }, p, { auth_user_id: S.session.id, email: p.email || S.session.email, slug: p.slug || slugify(p.nombre) + '-' + (S.session.id||'').slice(-4), updated_at: now() });
     if (S.mode === 'supabase') { const { data, error } = await S.sb.schema('portal').from('publicadores').upsert(rec, { onConflict: 'auth_user_id' }).select().single(); if (error) throw error; return data; }
+    S.track('publicador_alta', { publicador_id: rec.id || null, datos: { tipo: rec.tipo } });
     const all = L.pubs.get([]); const i = all.findIndex(x => x.auth_user_id === S.session.id); if (i > -1) { rec.id = all[i].id; rec.created_at = all[i].created_at; rec.verificado = all[i].verificado; all[i] = Object.assign(all[i], rec); } else { rec.id = uid(); rec.created_at = now(); all.push(rec); } L.pubs.set(all); return rec;
   };
   S.uploadDoc = async function(file, pubId, tipo){
@@ -103,6 +104,7 @@
       if (fotos.length) { await S.sb.schema('portal').from('fotos').delete().eq('aviso_id', saved.id); const rows = fotos.map((f, i) => ({ aviso_id: saved.id, url: f.url, orden: i })); const { error } = await S.sb.schema('portal').from('fotos').insert(rows); if (error) throw error; }
       saved.fotos = fotos.map((f, i) => ({ url: f.url, orden: i })); return saved;
     }
+    S.track(rec.estado_curacion === 'en_revision' ? 'aviso_enviado' : 'aviso_creado', { aviso_id: rec.id || null, publicador_id: pub.id, datos: { operacion: rec.operacion, zona: rec.zona } });
     const all = L.avisos.get([]); const i = all.findIndex(x => x.id === rec.id); rec.fotos = fotos.map((f, i2) => ({ url: f.url, orden: i2 }));
     if (i > -1) { rec.created_at = all[i].created_at; all[i] = rec; } else { rec.id = rec.id || uid(); rec.created_at = now(); all.push(rec); } L.avisos.set(all); return rec;
   };
@@ -113,6 +115,7 @@
   };
   S.setEstado = async function(id, estado_curacion, motivo, extra){
     const patch = Object.assign({ estado_curacion, motivo_rechazo: motivo || null, updated_at: now() }, extra || {}); if (estado_curacion === 'publicado') patch.publicado_en = now();
+    S.track(estado_curacion === 'publicado' ? 'aviso_aprobado' : estado_curacion === 'rechazado' ? 'aviso_rechazado' : 'aviso_estado', { aviso_id: id, datos: { estado_curacion, motivo: motivo || null } });
     if (S.mode === 'supabase') { const { error } = await S.sb.schema('portal').from('avisos').update(patch).eq('id', id); if (error) throw error; if (estado_curacion === 'publicado' && !(extra && extra.estado)) S.notify('aprobado', { aviso_id: id }); else if (estado_curacion === 'rechazado') S.notify('rechazado', { aviso_id: id, datos: { motivo } }); else if (estado_curacion === 'borrador' && motivo) S.notify('cambios', { aviso_id: id, datos: { motivo } }); return; }
     const all = L.avisos.get([]); const a = all.find(x => x.id === id); if (a) Object.assign(a, patch); L.avisos.set(all);
   };
@@ -121,18 +124,57 @@
     const pubs = L.pubs.get([]); return L.avisos.get([]).filter(a => a.estado_curacion === 'publicado').map(a => Object.assign({}, a, { publicador: pubs.find(p => p.id === a.publicador_id) || null }));
   };
 
+  /* ── 4.4 Registro de eventos: una sola puerta para todo lo que queremos medir ── */
+  const esUUID = v => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(v || ''));
+  const LE = LS('bp_eventos');
+  S.EVENTOS = ['aviso_creado','aviso_enviado','aviso_aprobado','aviso_rechazado','consulta','vista_ficha','publicador_alta','publicador_verificado','importacion','favorito','alerta','denuncia'];
+  S.track = async function(evento, campos){
+    const rec = Object.assign({ evento, creado_en: now() }, campos || {});
+    if (rec.aviso_id && !esUUID(rec.aviso_id)) { rec.aviso_ref = String(rec.aviso_id); delete rec.aviso_id; }
+    if (rec.publicador_id && !esUUID(rec.publicador_id)) { rec.publicador_ref = String(rec.publicador_id); delete rec.publicador_id; }
+    const local = LE.get([]); local.push(rec); if (local.length > 500) local.splice(0, local.length - 500); LE.set(local);
+    if (S.mode === 'supabase') {
+      const fila = { evento, aviso_ref: rec.aviso_ref || (rec.aviso_id ? String(rec.aviso_id) : null), publicador_ref: rec.publicador_ref || (rec.publicador_id ? String(rec.publicador_id) : null), usuario_id: S.session ? S.session.id : null, canal: rec.canal || null, datos: rec.datos || null };
+      try { await S.sb.schema('portal').from('eventos').insert(fila); } catch (e) { console.warn('evento no registrado', e); }
+    }
+    return rec;
+  };
+  S.eventos = () => LE.get([]);
+
   /* ── consultas, vistas ────────────────────────────────── */
   S.addConsulta = async function(c){
     const rec = Object.assign({ canal: 'formulario', created_at: now() }, c);
-    if (S.mode === 'supabase' && /^[0-9a-f-]{36}$/.test(String(c.aviso_id))) { const { error } = await S.sb.schema('portal').from('consultas').insert(rec); if (error) console.warn(error); S.notify('consulta', { aviso_id: c.aviso_id, publicador_id: c.publicador_id, datos: { nombre: c.nombre, email: c.email, telefono: c.telefono, mensaje: c.mensaje } }); }
-    const all = L.consultas.get([]); rec.id = uid(); all.push(rec); L.consultas.set(all); return rec;
+    if (S.mode === 'supabase') {
+      const fila = { publicador_id: esUUID(c.publicador_id) ? c.publicador_id : null, publicador_ref: esUUID(c.publicador_id) ? null : String(c.publicador_id || ''), nombre: c.nombre || '', email: c.email || '', telefono: c.telefono || null, mensaje: c.mensaje || null, canal: rec.canal, acepto_tyc: !!c.acepto_tyc, enviada_a: c.enviada_a || null };
+      if (esUUID(c.aviso_id)) fila.aviso_id = c.aviso_id; else fila.aviso_ref = String(c.aviso_id || '');
+      const { error } = await S.sb.schema('portal').from('consultas').insert(fila);
+      if (error) console.warn('consulta no guardada', error);
+      if (esUUID(c.aviso_id)) S.notify('consulta', { aviso_id: c.aviso_id, datos: { nombre: c.nombre, email: c.email, telefono: c.telefono, mensaje: c.mensaje } });
+    }
+    const all = L.consultas.get([]); rec.id = uid(); all.push(rec); L.consultas.set(all);
+    S.track('consulta', { aviso_id: c.aviso_id, publicador_id: c.publicador_id, canal: rec.canal });
+    return rec;
   };
   S.consultasRecibidas = async function(pubId){
     if (S.mode === 'supabase') { const { data } = await S.sb.schema('portal').from('consultas').select('*').eq('publicador_id', pubId).order('created_at', { ascending:false }); return data || []; }
     return L.consultas.get([]).filter(c => c.publicador_id === pubId).reverse();
   };
   S.misConsultas = function(){ const e = S.session && S.session.email; return L.consultas.get([]).filter(c => !e || (c.email||'').toLowerCase() === e.toLowerCase()).reverse(); };
-  S.addVista = async function(avisoId){ const v = L.vistas.get({}); v[avisoId] = (v[avisoId]||0) + 1; L.vistas.set(v); if (S.mode === 'supabase' && /^[0-9a-f-]{36}$/.test(String(avisoId))) { S.sb.schema('portal').from('vistas').insert({ aviso_id: avisoId }).then(() => {}, () => {}); } return v[avisoId]; };
+  S.addVista = async function(avisoId){
+    const v = L.vistas.get({}); v[avisoId] = (v[avisoId]||0) + 1; L.vistas.set(v);
+    if (S.mode === 'supabase') { const fila = esUUID(avisoId) ? { aviso_id: avisoId } : { aviso_ref: String(avisoId) }; S.sb.schema('portal').from('vistas').insert(fila).then(() => {}, () => {}); }
+    S.track('vista_ficha', { aviso_id: avisoId });
+    return S.mode === 'supabase' ? (await S.vistasDe([avisoId]))[String(avisoId)] || v[avisoId] : v[avisoId];
+  };
+  /* 4.3 Vistas reales del servidor, no las de este navegador */
+  S.vistasDe = async function(ids){
+    if (S.mode !== 'supabase' || !ids || !ids.length) return {};
+    try { const { data } = await S.sb.schema('portal').from('vistas_por_aviso').select('ref,vistas').in('ref', ids.map(String)); const r = {}; (data||[]).forEach(x => r[x.ref] = x.vistas); return r; } catch (e) { return {}; }
+  };
+  S.consultasDe = async function(ids){
+    if (S.mode !== 'supabase' || !ids || !ids.length) return {};
+    try { const { data } = await S.sb.schema('portal').from('consultas_por_aviso').select('ref,consultas').in('ref', ids.map(String)); const r = {}; (data||[]).forEach(x => r[x.ref] = x.consultas); return r; } catch (e) { return {}; }
+  };
   S.vistas = id => (L.vistas.get({})[id] || 0);
 
   /* ── visitas y reservas, propietario ─────────────────── */
@@ -158,6 +200,25 @@
   S.notify = async function(tipo, payload){
     if (S.mode !== 'supabase') return { skipped: true };
     try { const r = await fetch('/api/portal-notify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign({ tipo }, payload)) }); return await r.json().catch(() => ({ ok: r.ok })); } catch (e) { return { error: String(e) }; }
+  };
+
+  /* ── 4.5 Lo que hoy vive en el navegador y tiene tabla propia ── */
+  S.addDenuncia = async function(avisoId, motivo, detalle){
+    S.track('denuncia', { aviso_id: avisoId, datos: { motivo } });
+    if (S.mode !== 'supabase' || !esUUID(avisoId)) return { local: true };
+    try { const { error } = await S.sb.schema('portal').from('denuncias').insert({ aviso_id: avisoId, motivo, detalle: detalle || null }); if (error) throw error; return { ok: true }; } catch (e) { console.warn('denuncia no guardada', e); return { error: String(e) }; }
+  };
+  S.syncFavorito = async function(avisoId, activo){
+    S.track('favorito', { aviso_id: avisoId, datos: { activo } });
+    if (S.mode !== 'supabase' || !S.session || !esUUID(avisoId)) return;
+    try { if (activo) await S.sb.schema('portal').from('favoritos').upsert({ usuario_id: S.session.id, aviso_id: avisoId }); else await S.sb.schema('portal').from('favoritos').delete().eq('usuario_id', S.session.id).eq('aviso_id', avisoId); } catch (e) { console.warn('favorito no sincronizado', e); }
+  };
+  S.syncAlerta = async function(alerta){
+    S.track('alerta', { aviso_id: alerta.avisoId || null, datos: { tipo: alerta.tipo || 'busqueda' } });
+    if (S.mode !== 'supabase' || !S.session) return;
+    const fila = { usuario_id: S.session.id, tipo: alerta.tipo === 'precio' ? 'precio' : 'busqueda', filtros: alerta.filtros || null, frecuencia: 'diaria' };
+    if (alerta.avisoId && esUUID(alerta.avisoId)) fila.aviso_id = alerta.avisoId;
+    try { await S.sb.schema('portal').from('alertas').insert(fila); } catch (e) { console.warn('alerta no sincronizada', e); }
   };
 
   /* ── curación ─────────────────────────────────────────── */
