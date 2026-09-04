@@ -87,7 +87,7 @@
     const html = `
 <nav class="navbar" aria-label="Principal">
   <div class="p-nav-left">
-    <a class="nav-logo" href="index.html" aria-label="BAIREN, inicio"><img src="../bairen_logo.png?v=3" alt="BAIREN" style="height:44px;width:auto;"></a>
+    <a class="nav-logo" href="index.html" aria-label="BAIREN, inicio"><img src="../bairen_logo_96.png?v=1" alt="BAIREN" width="44" height="44" style="height:44px;width:44px;"></a>
     <div class="p-nav-menu">
       <div><button type="button" aria-haspopup="true" ${active==='venta'?'aria-current="page"':''}>Comprar <span class="car"></span></button>
         <div class="p-dd">${dd('Por barrio', zonasLinks('venta'))}${dd('Otras operaciones', [['Emprendimientos, venta directa','emprendimientos.html']])}${dd('Servicios', [['Publicá tu propiedad para vender','publicar.html'],['Índice BAIREN por barrio','index.html#indice'],['Guía de barrios','index.html#guia']])}</div></div>
@@ -132,7 +132,7 @@
 <footer class="footer">
   <div class="footer-grid">
     <div>
-      <div><img src="../bairen_logo.png?v=3" alt="BAIREN" style="height:46px;width:auto;"></div>
+      <div><img src="../bairen_logo_96.png?v=1" alt="BAIREN" width="46" height="46" style="height:46px;width:46px;"></div>
       <div class="ft-brand-rule"></div>
       <p class="ft-brand-tag">Propiedades seleccionadas en Buenos Aires. Para comprar, alquilar o publicar la tuya, en CABA y Zona Norte.</p>
       <p class="p-legend">${BP.LEYENDA_PLATAFORMA}</p>

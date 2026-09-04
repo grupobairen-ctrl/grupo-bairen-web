@@ -319,3 +319,8 @@ create policy "visitas del publicador" on portal.visitas_reservas for all using 
 drop policy if exists "visitas las ve el propietario" on portal.visitas_reservas;
 create policy "visitas las ve el propietario" on portal.visitas_reservas for select using (exists (select 1 from portal.avisos a where a.id = aviso_id and a.propietario_email is not null and lower(a.propietario_email) = lower(coalesce(auth.jwt() ->> 'email', ''))));
 -- Mails: la función /api/portal-notify (Vercel) lee publicador y aviso con la clave pública y envía por Resend. Variables RESEND_API_KEY y PORTAL_MAIL_FROM en Vercel.
+
+-- Columnas que el código ya escribía y no existían (auditoría 4/9/2026, hallazgo 15)
+alter table portal.avisos add column if not exists quiero_produccion boolean not null default false;
+alter table portal.avisos add column if not exists codigo_interno text;
+create unique index if not exists avisos_codigo_interno_idx on portal.avisos(publicador_id, codigo_interno) where codigo_interno is not null;
