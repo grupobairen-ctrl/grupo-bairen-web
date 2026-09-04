@@ -7,7 +7,7 @@
   <link rel="icon" href="../bairen_logo.png?v=3">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260904b"><link rel="stylesheet" href="css/catalogo.css?v=20260904b"><link rel="stylesheet" href="css/portal.css?v=20260904b">
+  <link rel="stylesheet" href="css/base.css?v=20260904c"><link rel="stylesheet" href="css/catalogo.css?v=20260904c"><link rel="stylesheet" href="css/portal.css?v=20260904c">
   <style>
     .p-panel{display:grid;grid-template-columns:240px 1fr;gap:28px;align-items:start}
     .p-side-nav{background:var(--p-card);border:1px solid var(--p-line);border-radius:var(--p-radius);padding:10px;position:sticky;top:84px}
@@ -29,7 +29,7 @@
 </div></section>
 <div id="pFooter"></div>
 <script src="../supabase-config.js"></script>
-<script src="../mapa-barrios.js"></script><script src="js/ui.js?v=20260904b"></script><script src="js/store.js?v=20260904b"></script><script src="js/data.js?v=20260904b"></script>
+<script src="../mapa-barrios.js"></script><script src="js/ui.js?v=20260904c"></script><script src="js/store.js?v=20260904c"></script><script src="js/data.js?v=20260904c"></script>
 <script>
 (async function(){
   BP.header(); BP.footer();
@@ -37,7 +37,7 @@
   if (!BPStore.requireSession('panel.html')) return;
   const pub = await BPStore.getMyPublicador();
   const curador = await BPStore.isCurador();
-  const TABS = [['avisos','Mis avisos','building'],['interesados','Interesados','chat'],['contactos','Mis contactos','mail'],['favoritos','Favoritos','heart'],['alertas','Búsquedas y alertas','bell'],['cuenta','Mi cuenta','user']];
+  const TABS = [['avisos','Mis avisos','building'],['propiedades','Mis propiedades','home'],['interesados','Interesados','chat'],['contactos','Mis contactos','mail'],['favoritos','Favoritos','heart'],['alertas','Búsquedas y alertas','bell'],['cuenta','Mi cuenta','user']];
   const nav = document.getElementById('sideNav'), content = document.getElementById('content');
   let tab = (location.hash || '#avisos').slice(1); if (!TABS.some(t => t[0] === tab)) tab = 'avisos';
   function renderNav(){ nav.innerHTML = `<div class="who">${BP.esc(BPStore.session.email)}${mode === 'local' ? '<br><span class="p-badge demo" style="margin-top:6px">modo local</span>' : ''}</div>` + TABS.map(t => `<a href="#${t[0]}" class="${t[0]===tab?'on':''}">${BP.ico[t[2]]} ${t[1]}</a>`).join('') + (curador ? `<a href="curacion.html">${BP.ico.shield} Curación BAIREN</a>` : '') + `<a href="#" data-logout>${BP.ico.x} Cerrar sesión</a>`; nav.querySelector('[data-logout]').addEventListener('click', async e => { e.preventDefault(); await BPStore.signOut(); location.href = 'index.html'; }); }
@@ -46,6 +46,7 @@
   async function render(){
     renderNav();
     if (tab === 'avisos') return renderAvisos();
+    if (tab === 'propiedades') return renderPropiedades();
     if (tab === 'interesados') return renderInteresados();
     if (tab === 'contactos') return renderContactos();
     if (tab === 'favoritos') return renderFavoritos();
@@ -58,14 +59,29 @@
     const avisos = await BPStore.myAvisos(); const cons = await BPStore.consultasRecibidas(pub.id);
     const pubCount = avisos.filter(a => a.estado_curacion === 'publicado').length, rev = avisos.filter(a => a.estado_curacion === 'en_revision').length;
     const vistas = avisos.reduce((s, a) => s + BPStore.vistas(a.id), 0);
+    const vis = {}; for (const a of avisos) vis[a.id] = await BPStore.visitas(a.id);
     let html = `<div class="p-head-row"><div><h1 class="p-h2">Mis avisos</h1><p class="p-sub" style="margin:0">${BP.esc(pub.nombre)} · ${pub.verificado ? BP.ico.check + ' verificado' : 'verificación pendiente'}</p></div><div style="display:flex;gap:8px">${pub.tipo !== 'dueno' ? '<a class="p-btn" href="importar.html">Importar cartera</a>' : ''}<a class="p-btn p-btn-fill" href="publicar-aviso.html">Publicar otra</a></div></div>
       <div class="p-kpis"><div class="p-kpi"><b>${pubCount}</b><span>Publicados</span></div><div class="p-kpi"><b>${rev}</b><span>En revisión</span></div><div class="p-kpi"><b>${vistas}</b><span>Vistas</span></div><div class="p-kpi"><b>${cons.length}</b><span>Consultas</span></div></div>`;
     if (!avisos.length) html += `<div class="p-empty">Todavía no cargaste ninguna propiedad. <a href="publicar-aviso.html" style="text-decoration:underline">Empezá acá</a>.</div>`;
     for (const a of avisos) { const foto = a.fotos && a.fotos.length ? await BPStore.resolveFoto(a.fotos.slice().sort((x,y)=>(x.orden||0)-(y.orden||0))[0].url) : ''; const nCons = cons.filter(c => c.aviso_id === a.id).length;
-      html += `<div class="p-aviso-row" style="margin-bottom:10px"><div class="ph">${foto ? `<img src="${foto}" alt="">` : ''}</div><div><b>${BP.esc(a.titulo || a.direccion)}</b><div class="m">${a.operacion === 'venta' ? 'Venta' : a.operacion === 'mediano' ? 'Mediano plazo' : 'Alquiler'} · ${BP.esc(a.barrio||'')} · ${BP.fmtUSD(Number(a.precio))}${a.operacion !== 'venta' ? '/mes' : ''} · ${a.codigo || ''}</div><div style="margin-top:6px">${BP.estadoBadge(a.estado_curacion)}${a.estado === 'reservado' ? ' <span class="p-badge demo">Reservada</span>' : ''}${a.motivo_rechazo ? `<div class="p-note" style="margin-top:6px">Motivo: ${BP.esc(a.motivo_rechazo)}</div>` : ''}</div><div class="stats"><span><b>${BPStore.vistas(a.id)}</b> vistas</span><span><b>${nCons}</b> consultas</span><span>${(a.fotos||[]).length} fotos</span></div></div>
+      html += `<div class="p-aviso-row" style="margin-bottom:10px"><div class="ph">${foto ? `<img src="${foto}" alt="">` : ''}</div><div><b>${BP.esc(a.titulo || a.direccion)}</b><div class="m">${a.operacion === 'venta' ? 'Venta' : a.operacion === 'mediano' ? 'Mediano plazo' : 'Alquiler'} · ${BP.esc(a.barrio||'')} · ${BP.fmtUSD(Number(a.precio))}${a.operacion !== 'venta' ? '/mes' : ''} · ${a.codigo || ''}</div><div style="margin-top:6px">${BP.estadoBadge(a.estado_curacion)}${a.estado === 'reservado' ? ' <span class="p-badge demo">Reservada</span>' : ''}${a.motivo_rechazo ? `<div class="p-note" style="margin-top:6px">Motivo: ${BP.esc(a.motivo_rechazo)}</div>` : ''}</div><div class="stats"><span><b>${BPStore.vistas(a.id)}</b> vistas</span><span><b>${nCons}</b> consultas</span><span>${(a.fotos||[]).length} fotos</span><span><b>${(vis[a.id]||[]).length}</b> visitas y reservas</span></div>
+        <details class="p-visitas" style="margin-top:8px"><summary style="cursor:pointer;font-size:.82rem;color:var(--navy-deeper)">Visitas y reservas${a.propietario_email ? ' · las ve ' + BP.esc(a.propietario_email) : ''}</summary>
+          <ul style="list-style:none;margin:8px 0;padding:0;font-size:.82rem;color:var(--text-mid)">${(vis[a.id]||[]).slice(0,5).map(v => `<li>${new Date(v.fecha).toLocaleString('es-AR', { dateStyle: 'short', timeStyle: 'short' })} · <b style="color:var(--navy-deeper)">${v.tipo === 'reserva' ? 'Reserva' : v.tipo === 'cierre' ? 'Cierre' : 'Visita'}</b>${v.nota ? ' · ' + BP.esc(v.nota) : ''}</li>`).join('') || '<li>Sin registros todavía.</li>'}</ul>
+          <form class="p-visita-form" data-aviso="${a.id}" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><select name="tipo" class="p-fsel" style="height:36px"><option value="visita">Visita</option><option value="reserva">Reserva</option><option value="cierre">Cierre</option></select><input type="datetime-local" name="fecha" class="p-fsel" style="height:36px;padding-left:10px;background-image:none" required><input type="text" name="nota" placeholder="Nota (opcional)" class="p-fsel" style="height:36px;padding-left:10px;background-image:none;flex:1;min-width:160px"><button type="submit" class="p-btn p-btn-sm p-btn-navy" data-visita>Registrar</button></form></details></div>
         <div class="acts">${a.estado_curacion === 'publicado' ? `<a class="p-btn p-btn-sm" href="propiedad.html?id=${encodeURIComponent(a.id)}">Ver ficha</a>` : ''}<a class="p-btn p-btn-sm p-btn-dark" href="publicar-aviso.html?id=${encodeURIComponent(a.id)}">Editar</a>${a.estado_curacion === 'publicado' ? `<button type="button" class="p-btn p-btn-sm" data-act="pausar" data-id="${a.id}">Pausar</button><button type="button" class="p-btn p-btn-sm" data-act="${a.estado === 'reservado' ? 'disponible' : 'reservar'}" data-id="${a.id}">${a.estado === 'reservado' ? 'Marcar disponible' : 'Marcar reservada'}</button>` : a.estado_curacion === 'pausado' ? `<button type="button" class="p-btn p-btn-sm" data-act="reactivar" data-id="${a.id}">Reactivar</button>` : a.estado_curacion === 'borrador' || a.estado_curacion === 'rechazado' ? `<a class="p-btn p-btn-sm p-btn-fill" href="publicar-aviso.html?id=${encodeURIComponent(a.id)}">Completar y enviar</a>` : ''}</div></div>`; }
     content.innerHTML = html;
+    content.querySelectorAll('.p-visita-form').forEach(f => f.addEventListener('submit', async e => { e.preventDefault(); const open = f.closest('details'); try { await BPStore.addVisita(f.dataset.aviso, { tipo: f.tipo.value, fecha: new Date(f.fecha.value).toISOString(), nota: f.nota.value.trim() }); BP.toast('Registrado. El propietario lo ve en su cuenta.'); await renderAvisos(); const d = content.querySelector(`.p-visita-form[data-aviso="${f.dataset.aviso}"]`); if (d) d.closest('details').open = true; } catch (err) { BP.toast(err.message || 'No se pudo registrar.'); } }));
     content.querySelectorAll('[data-act]').forEach(b => b.addEventListener('click', async () => { const act = b.dataset.act, id = b.dataset.id; try { if (act === 'pausar') await BPStore.setEstado(id, 'pausado'); else if (act === 'reactivar') await BPStore.setEstado(id, 'publicado'); else if (act === 'reservar') await BPStore.setEstado(id, 'publicado', null, { estado: 'reservado' }); else if (act === 'disponible') await BPStore.setEstado(id, 'publicado', null, { estado: 'disponible' }); BP.toast('Listo.'); renderAvisos(); } catch (e) { BP.toast(e.message || 'No se pudo.'); } }));
+  }
+  async function renderPropiedades(){
+    const mine = await BPStore.avisosDePropietario();
+    let html = `<h1 class="p-h2">Mis propiedades</h1><p class="p-sub">Las unidades tuyas que publica una inmobiliaria en BAIREN, con las visitas y reservas que va registrando. Lo ves con tu cuenta, sin intermediarios.</p>`;
+    if (!mine.length) { content.innerHTML = html + `<div class="p-empty">Todavía no hay propiedades asociadas a ${BP.esc(BPStore.session.email)}. Pedile a tu inmobiliaria que cargue tu mail en el aviso, o <a href="publicar-aviso.html" style="text-decoration:underline">publicala vos como dueño directo</a>.</div>`; return; }
+    for (const a of mine) { const vis = await BPStore.visitas(a.id); const foto = a.fotos && a.fotos.length ? await BPStore.resolveFoto(a.fotos.slice().sort((x,y)=>(x.orden||0)-(y.orden||0))[0].url) : ''; const p = a.publicador || {};
+      html += `<div class="p-aviso-row" style="margin-bottom:10px;grid-template-columns:120px 1fr"><div class="ph">${foto ? `<img src="${foto}" alt="">` : ''}</div><div><b>${BP.esc(a.titulo || a.direccion)}</b><div class="m">${a.operacion === 'venta' ? 'Venta' : 'Alquiler'} · ${BP.esc(a.barrio||'')} · ${BP.fmtUSD(Number(a.precio))}${a.operacion !== 'venta' ? '/mes' : ''} · publica <b style="display:inline">${BP.esc(p.nombre||'')}</b>${p.matricula ? ' · ' + BP.esc(p.matricula) : ''}</div><div style="margin-top:6px">${BP.estadoBadge(a.estado_curacion)}${a.estado === 'reservado' ? ' <span class="p-badge demo">Reservada</span>' : ''}</div><div class="stats"><span><b>${BPStore.vistas(a.id)}</b> vistas</span><span><b>${vis.length}</b> visitas y reservas</span></div>
+        <ul style="list-style:none;margin:10px 0 0;padding:0;font-size:.84rem;color:var(--text-mid)">${vis.map(v => `<li style="padding:6px 0;border-top:1px solid var(--p-line)">${new Date(v.fecha).toLocaleString('es-AR', { dateStyle: 'medium', timeStyle: 'short' })} · <b style="color:var(--navy-deeper)">${v.tipo === 'reserva' ? 'Reserva' : v.tipo === 'cierre' ? 'Cierre' : 'Visita'}</b>${v.nota ? ' · ' + BP.esc(v.nota) : ''}</li>`).join('') || '<li>Todavía no hay visitas registradas.</li>'}</ul>
+        ${a.estado_curacion === 'publicado' ? `<p style="margin-top:10px"><a class="p-btn p-btn-sm" href="${BP.urlFicha({ id: a.id })}">Ver la ficha</a></p>` : ''}</div></div>`; }
+    content.innerHTML = html;
   }
   async function renderInteresados(){
     if (!pub) { content.innerHTML = `<h1 class="p-h2">Interesados</h1><p class="p-sub">Acá vas a ver las consultas que reciban tus avisos.</p>`; return; }

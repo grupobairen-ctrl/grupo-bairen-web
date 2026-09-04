@@ -113,7 +113,7 @@
   };
   S.setEstado = async function(id, estado_curacion, motivo, extra){
     const patch = Object.assign({ estado_curacion, motivo_rechazo: motivo || null, updated_at: now() }, extra || {}); if (estado_curacion === 'publicado') patch.publicado_en = now();
-    if (S.mode === 'supabase') { const { error } = await S.sb.schema('portal').from('avisos').update(patch).eq('id', id); if (error) throw error; return; }
+    if (S.mode === 'supabase') { const { error } = await S.sb.schema('portal').from('avisos').update(patch).eq('id', id); if (error) throw error; if (estado_curacion === 'publicado' && !(extra && extra.estado)) S.notify('aprobado', { aviso_id: id }); else if (estado_curacion === 'rechazado') S.notify('rechazado', { aviso_id: id, datos: { motivo } }); else if (estado_curacion === 'borrador' && motivo) S.notify('cambios', { aviso_id: id, datos: { motivo } }); return; }
     const all = L.avisos.get([]); const a = all.find(x => x.id === id); if (a) Object.assign(a, patch); L.avisos.set(all);
   };
   S.publishedAvisos = async function(){
@@ -124,7 +124,7 @@
   /* ── consultas, vistas ────────────────────────────────── */
   S.addConsulta = async function(c){
     const rec = Object.assign({ canal: 'formulario', created_at: now() }, c);
-    if (S.mode === 'supabase' && /^[0-9a-f-]{36}$/.test(String(c.aviso_id))) { const { error } = await S.sb.schema('portal').from('consultas').insert(rec); if (error) console.warn(error); }
+    if (S.mode === 'supabase' && /^[0-9a-f-]{36}$/.test(String(c.aviso_id))) { const { error } = await S.sb.schema('portal').from('consultas').insert(rec); if (error) console.warn(error); S.notify('consulta', { aviso_id: c.aviso_id, publicador_id: c.publicador_id, datos: { nombre: c.nombre, email: c.email, telefono: c.telefono, mensaje: c.mensaje } }); }
     const all = L.consultas.get([]); rec.id = uid(); all.push(rec); L.consultas.set(all); return rec;
   };
   S.consultasRecibidas = async function(pubId){
@@ -134,6 +134,31 @@
   S.misConsultas = function(){ const e = S.session && S.session.email; return L.consultas.get([]).filter(c => !e || (c.email||'').toLowerCase() === e.toLowerCase()).reverse(); };
   S.addVista = async function(avisoId){ const v = L.vistas.get({}); v[avisoId] = (v[avisoId]||0) + 1; L.vistas.set(v); if (S.mode === 'supabase' && /^[0-9a-f-]{36}$/.test(String(avisoId))) { S.sb.schema('portal').from('vistas').insert({ aviso_id: avisoId }).then(() => {}, () => {}); } return v[avisoId]; };
   S.vistas = id => (L.vistas.get({})[id] || 0);
+
+  /* ── visitas y reservas, propietario ─────────────────── */
+  const LV = LS('bp_visitas_db');
+  S.addVisita = async function(aviso_id, v){
+    const pub = await S.getMyPublicador(); if (!pub) throw new Error('sin publicador');
+    const rec = Object.assign({ tipo: 'visita', fecha: now(), nota: '' }, v, { aviso_id, publicador_id: pub.id, created_at: now() });
+    if (S.mode === 'supabase') { const { data, error } = await S.sb.schema('portal').from('visitas_reservas').insert(rec).select().single(); if (error) throw error; return data; }
+    const all = LV.get([]); rec.id = uid(); all.push(rec); LV.set(all); return rec;
+  };
+  S.visitas = async function(aviso_id){
+    if (S.mode === 'supabase') { const { data } = await S.sb.schema('portal').from('visitas_reservas').select('*').eq('aviso_id', aviso_id).order('fecha', { ascending:false }); return data || []; }
+    return LV.get([]).filter(v => v.aviso_id === aviso_id).sort((a,b) => (b.fecha||'').localeCompare(a.fecha||''));
+  };
+  S.avisosDePropietario = async function(){
+    if (!S.session) return [];
+    const e = S.session.email.toLowerCase();
+    if (S.mode === 'supabase') { const { data } = await S.sb.schema('portal').from('avisos').select('*, fotos(url, orden), publicadores(nombre, tipo, matricula, badge)').ilike('propietario_email', e); return (data || []).map(a => { a.publicador = a.publicadores; delete a.publicadores; return a; }); }
+    const pubs = L.pubs.get([]); return L.avisos.get([]).filter(a => (a.propietario_email||'').toLowerCase() === e).map(a => Object.assign({}, a, { publicador: pubs.find(p => p.id === a.publicador_id) || null }));
+  };
+
+  /* ── mails al publicador (función de servidor; en modo local no hay envío) ── */
+  S.notify = async function(tipo, payload){
+    if (S.mode !== 'supabase') return { skipped: true };
+    try { const r = await fetch('/api/portal-notify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign({ tipo }, payload)) }); return await r.json().catch(() => ({ ok: r.ok })); } catch (e) { return { error: String(e) }; }
+  };
 
   /* ── curación ─────────────────────────────────────────── */
   S.isCurador = async function(){
@@ -153,6 +178,7 @@
     if (S.mode === 'supabase') { const { error } = await S.sb.schema('portal').from('publicadores').update({ verificado: ok, verificado_en: ok ? now() : null }).eq('id', id); if (error) throw error; await S.sb.schema('portal').from('verificaciones').update({ resultado: ok ? 'aprobada' : 'rechazada', nota: nota || null }).eq('publicador_id', id).eq('resultado', 'pendiente');
       /* política de privacidad: los documentos se borran al resolver; queda solo el resultado */
       try { const { data: files } = await S.sb.storage.from('portal-docs').list(id); if (files && files.length) await S.sb.storage.from('portal-docs').remove(files.map(f => id + '/' + f.name)); } catch (e) { console.warn('no se pudieron borrar los documentos', e); }
+      S.notify(ok ? 'verificado' : 'verificacion_rechazada', { publicador_id: id, datos: { nota } });
       return; }
     const all = L.pubs.get([]); const p = all.find(x => x.id === id); if (p) { p.verificado = ok; p.verificado_en = ok ? now() : null; } L.pubs.set(all);
     const v = L.verif.get([]); v.forEach(x => { if (x.publicador_id === id && x.resultado === 'pendiente') { x.resultado = ok ? 'aprobada' : 'rechazada'; x.nota = nota || null; } }); L.verif.set(v);

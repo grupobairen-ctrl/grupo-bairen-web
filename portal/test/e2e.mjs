@@ -125,7 +125,31 @@ try {
   const nRows = await evalJs('document.querySelectorAll("#content .p-aviso-row").length');
   await shot('12-panel-tras-importar');
   ok('Importar: los borradores aparecen en Mis avisos', nRows >= 4, nRows + ' avisos en el panel');
-  /* 6. Rutas limpias */
+  /* 6. Visitas y reservas + vista del propietario */
+  await goto(BASE + 'panel.html#avisos');
+  await waitFor('!!document.querySelector("#content .p-visita-form")', 'formulario de visita');
+  await evalJs('(async () => { const a = (await BPStore.myAvisos()).find(x => x.estado_curacion === "publicado"); const rec = Object.assign({}, a); delete rec.publicador; rec.propietario_email = "duenio@bairen.test"; await BPStore.saveAviso(rec); })()');
+  await goto(BASE + 'panel.html#avisos');
+  await waitFor('!!document.querySelector("#content .p-visita-form")', 'formulario de visita');
+  await evalJs('(() => { const f = Array.from(document.querySelectorAll("#content .p-visita-form")).find(x => x.closest(".p-aviso-row").textContent.includes("Honduras")); f.tipo.value = "visita"; f.fecha.value = "2026-09-05T15:30"; f.nota.value = "Pareja joven, volvería con los padres"; f.requestSubmit(); return true; })()');
+  await waitFor('document.querySelector("#content").textContent.includes("Pareja joven")', 'visita registrada');
+  await shot('13-panel-visitas');
+  ok('Visitas: la inmobiliaria registra una visita en el aviso', true);
+  await evalJs('BPStore.signOut()');
+  await evalJs('BPStore.sendCode("duenio@bairen.test")');
+  const code2 = await evalJs('JSON.parse(localStorage.getItem("bp_code")).code');
+  await evalJs(`BPStore.verifyCode("duenio@bairen.test", "${code2}")`);
+  await goto(BASE + 'panel.html#propiedades');
+  await waitFor('document.querySelector("#content") && document.querySelector("#content").textContent.includes("Pareja joven")', 'el propietario ve la visita');
+  await shot('14-propietario-mis-propiedades');
+  ok('Propietario: entra con su mail y ve la unidad con la visita registrada', true, await evalJs('document.querySelector("#content .p-aviso-row b").textContent'));
+  /* 7. Emprendimientos */
+  await goto(BASE + 'emprendimientos.html');
+  await waitFor('document.querySelectorAll(".p-emp").length > 0', 'emprendimientos');
+  const emp = await evalJs('(() => { const e = document.querySelector(".p-emp"); return e.querySelector("h2").textContent + " · " + e.querySelector(".desde").textContent + " · " + e.querySelector(".facts").textContent.replace(/\s+/g," ").trim() + " · " + (e.querySelector(".p-badge") || {}).textContent; })()');
+  await shot('15-emprendimientos');
+  ok('Emprendimientos: la página agrupa las unidades de la desarrolladora', /Torre Ejemplo/.test(emp) && /Venta directa/.test(emp), emp);
+  /* 8. Rutas limpias */
   const pretty = await evalJs('BP.probePretty()');
   if (pretty) { await goto(BASE + 'departamentos-venta-palermo'); await waitFor('document.querySelectorAll(".p-card-h").length > 0', 'resultados por ruta limpia'); const t = await evalJs('document.getElementById("resTitle").textContent'); const link = await evalJs('document.querySelector(".p-card-h .p-addr").getAttribute("href")'); ok('Rutas limpias: resultados y links de ficha', /Palermo/.test(t) && /^propiedad-/.test(link), t + ' · ' + link); await goto(BASE + link); await waitFor('!!document.getElementById("contactForm")', 'ficha por ruta limpia'); ok('Rutas limpias: la ficha abre desde su URL', true, await evalJs('document.querySelector("h1").textContent')); }
   else ok('Rutas limpias: servidor sin reescritura (se usan parámetros)', true);

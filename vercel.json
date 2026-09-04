@@ -45,7 +45,7 @@
       "destination": "/portal/buscar.html"
     },
     {
-      "source": "/portal/:page(publicar|ingresar|panel|curacion|legales|publicadores|buscar|importar)",
+      "source": "/portal/:page(publicar|ingresar|panel|curacion|legales|publicadores|buscar|importar|emprendimientos|publicar-aviso)",
       "destination": "/portal/:page.html"
     }
   ],

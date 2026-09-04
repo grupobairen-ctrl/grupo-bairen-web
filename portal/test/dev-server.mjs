@@ -9,7 +9,7 @@ const REWRITES = [
   [/^\/portal\/_rewrite-probe$/, () => ({ probe: true })],
   [/^\/portal\/propiedad-[^/]+$/, () => ({ file: '/portal/propiedad.html' })],
   [/^\/portal\/(departamentos|pisos|ph|casas|propiedades)-(venta|alquiler-mediano-plazo|alquiler)-([a-z0-9-]+)$/, () => ({ file: '/portal/buscar.html' })],
-  [/^\/portal\/(publicar|ingresar|panel|curacion|legales|publicadores|buscar|importar)$/, (m) => ({ file: '/portal/' + m[1] + '.html' })],
+  [/^\/portal\/(publicar|ingresar|panel|curacion|legales|publicadores|buscar|importar|emprendimientos|publicar-aviso)$/, (m) => ({ file: '/portal/' + m[1] + '.html' })],
 ];
 createServer(async (req, res) => {
   const url = new URL(req.url, 'http://x'); let path = decodeURIComponent(url.pathname);

@@ -40,5 +40,11 @@ La tabla actual no tiene dormitorios, baños, cocheras, expensas ni antigüedad.
 3. SQL Editor: correr `schema-portal.sql` completo (crea esquema, migra las unidades actuales como avisos de Maxim Rentals, permisos, curadores, buckets).
 4. En `js/data.js`, cuando la migración esté verificada, se puede dejar de leer `data/avisos-src.json`.
 
+## Fase 4 (hecha)
+- **Mails al publicador** (`api/portal-notify.js`, función de Vercel): consulta recibida, aviso aprobado, cambios pedidos, rechazo, verificación. El destinatario se busca en Supabase del lado del servidor (nunca viene del cliente) y se envía por Resend por HTTP, sin dependencias. Variables en Vercel: `RESEND_API_KEY` y `PORTAL_MAIL_FROM` (remitente con dominio verificado en Resend). Sin la clave responde 501 y la web sigue con el mailto. En modo local no hay envío.
+- **Emprendimientos** (`emprendimientos.html`): unidades de desarrolladoras agrupadas por nombre de emprendimiento, con etapa de obra, entrega, "desde", rango de ambientes y m², contacto directo a la empresa. Los campos se cargan en el paso Extras cuando el publicador es desarrolladora.
+- **Panel del propietario:** la inmobiliaria carga el mail del dueño en el aviso y registra visitas, reservas y cierres desde Mis avisos; el dueño entra a BAIREN con ese mail y las ve en "Mis propiedades" (solo lectura, sin consultas). Cuando Bairen OS exponga una API, este es el punto de integración.
+- Prueba e2e: 22 pasos.
+
 ## Lo que sigue
-Mails de aviso al publicador (aprobado, rechazado, consulta) por función de servidor; borrado automático de documentos ya está al resolver la verificación; Emprendimientos con etapa de obra; Bairen OS como panel del propietario; Índice BAIREN con series.
+Índice BAIREN con series históricas; producción de fichas como servicio con pedido desde el panel; destacados y planes cuando se monetice; integración con Bairen OS.

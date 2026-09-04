@@ -7,7 +7,7 @@
   <link rel="icon" href="../bairen_logo.png?v=3">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260904b"><link rel="stylesheet" href="css/catalogo.css?v=20260904b"><link rel="stylesheet" href="css/portal.css?v=20260904b">
+  <link rel="stylesheet" href="css/base.css?v=20260904c"><link rel="stylesheet" href="css/catalogo.css?v=20260904c"><link rel="stylesheet" href="css/portal.css?v=20260904c">
   <style>
     .p-stepper{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0 26px}
     .p-stepper button{display:flex;align-items:center;gap:8px;border:1px solid var(--p-line);background:var(--p-card);border-radius:999px;padding:8px 14px;font:500 .78rem var(--font-body);color:var(--text-mid);cursor:pointer;letter-spacing:.06em}
@@ -40,7 +40,7 @@
 </div></section>
 <div id="pFooter"></div>
 <script src="../supabase-config.js"></script>
-<script src="../mapa-barrios.js"></script><script src="js/ui.js?v=20260904b"></script><script src="js/store.js?v=20260904b"></script><script src="js/data.js?v=20260904b"></script>
+<script src="../mapa-barrios.js"></script><script src="js/ui.js?v=20260904c"></script><script src="js/store.js?v=20260904c"></script><script src="js/data.js?v=20260904c"></script>
 <script>
 (async function(){
   BP.header(); BP.footer();
@@ -137,6 +137,8 @@
     el.innerHTML = `<h2 class="p-sec-t">Extras</h2><p class="p-kicker" style="margin-bottom:16px">Lo que hace que la ficha sea completa.</p>
       <div class="p-fld"><label>Amenities y comodidades</label><div class="p-seg">${AMEN.map(x => `<label><input type="checkbox" name="amen" value="${x}" ${a.amenities.indexOf(x)>-1?'checked':''}> ${x}</label>`).join('')}</div></div>
       <div class="p-fld" style="margin-top:18px"><label>Características</label><div class="p-seg">${CARACT.map(x => `<label><input type="checkbox" name="car" value="${x}" ${a.caracteristicas.indexOf(x)>-1?'checked':''}> ${x}</label>`).join('')}</div></div>
+      ${pub && pub.tipo === 'desarrolladora' ? `<div class="p-fld" style="margin-top:18px"><label>Emprendimiento</label></div><div class="p-formgrid">${fld('emprendimiento','Nombre del emprendimiento','text',a.emprendimiento||'',{attrs:'placeholder="Torre Libertador 5600"'},'Las unidades con el mismo nombre se agrupan en la página de emprendimientos.')}${fld('etapa','Etapa de obra','select',a.etapa||'construccion',{opts:[['pozo','En pozo'],['construccion','En construcción'],['terminado','Terminado']]})}${fld('entrega','Entrega','text',a.entrega||'',{attrs:'placeholder="Diciembre 2027"'})}</div>` : ''}
+      ${pub && pub.tipo !== 'dueno' ? `<div class="p-formgrid" style="margin-top:18px">${fld('propietario_email','Mail del propietario (opcional)','email',a.propietario_email||'',{full:true,attrs:'placeholder="propietario@mail.com"'},'Si lo cargás, el dueño de la unidad puede entrar a BAIREN con ese mail y ver las visitas y reservas que registrás. No ve las consultas.')}</div>` : ''}
       <div class="p-formgrid" style="margin-top:18px">${fld('orientacion','Orientación','select',a.orientacion||'',{opts:[['','No informada'],['Norte','Norte'],['Sur','Sur'],['Este','Este'],['Oeste','Oeste'],['Noreste','Noreste'],['Noroeste','Noroeste']]})}${fld('disposicion','Disposición','select',a.disposicion||'',{opts:[['','No informada'],['Frente','Frente'],['Contrafrente','Contrafrente'],['Lateral','Lateral'],['Interior','Interior']]})}${fld('piso','Piso','text',a.piso||'',{attrs:'placeholder="4"'})}${a.operacion !== 'venta' ? fld('plazo','Plazo','text',a.plazo||'',{attrs:'placeholder="3 a 24 meses"'}) : ''}</div>
       ${navBtns()}`;
     bindNav(async () => { collect(); return true; });

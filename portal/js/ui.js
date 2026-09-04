@@ -90,7 +90,7 @@
     <a class="nav-logo" href="index.html" aria-label="BAIREN, inicio"><img src="../bairen_logo.png?v=3" alt="BAIREN" style="height:44px;width:auto;"></a>
     <div class="p-nav-menu">
       <div><button type="button" aria-haspopup="true" ${active==='venta'?'aria-current="page"':''}>Comprar <span class="car"></span></button>
-        <div class="p-dd">${dd('Por barrio', zonasLinks('venta'))}${dd('Servicios', [['Publicá tu propiedad para vender','publicar.html'],['Índice BAIREN por barrio','index.html#indice'],['Guía de barrios','index.html#guia']])}</div></div>
+        <div class="p-dd">${dd('Por barrio', zonasLinks('venta'))}${dd('Otras operaciones', [['Emprendimientos, venta directa','emprendimientos.html']])}${dd('Servicios', [['Publicá tu propiedad para vender','publicar.html'],['Índice BAIREN por barrio','index.html#indice'],['Guía de barrios','index.html#guia']])}</div></div>
       <div><button type="button" aria-haspopup="true" ${active==='alquiler'?'aria-current="page"':''}>Alquilar <span class="car"></span></button>
         <div class="p-dd">${dd('Operación', [['Largo plazo', BP.urlBuscar({ op:'alquiler' })],['Mediano plazo, amoblado', BP.urlBuscar({ op:'mediano' })]])}${dd('Por barrio', zonasLinks('alquiler'))}</div></div>
       <div><button type="button" aria-haspopup="true">Servicios <span class="car"></span></button>

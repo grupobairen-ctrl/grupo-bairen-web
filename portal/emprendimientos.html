@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Emprendimientos — BAIREN</title>
+  <meta name="description" content="Emprendimientos en venta directa de desarrolladoras en los barrios seleccionados de Buenos Aires.">
+  <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#131D2D">
+  <link rel="icon" href="../bairen_logo.png?v=3">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css?v=20260904c"><link rel="stylesheet" href="css/catalogo.css?v=20260904c"><link rel="stylesheet" href="css/portal.css?v=20260904c">
+  <style>
+    .p-emp{display:grid;grid-template-columns:minmax(260px,42%) 1fr;background:var(--p-card);border:1px solid var(--p-line);border-radius:var(--p-radius);overflow:hidden;margin-bottom:18px}
+    .p-emp .ph{position:relative;min-height:260px;background:var(--p-tray)} .p-emp .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+    .p-emp .ph .tag{position:absolute;left:12px;top:12px;background:var(--navy-deeper);color:#fff;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;padding:5px 9px;border-radius:6px}
+    .p-emp .body{padding:22px 24px} .p-emp h2{font-family:var(--font-display);font-weight:500;font-size:1.35rem;margin:0 0 4px;color:var(--navy-deeper)}
+    .p-emp .desde{font-family:var(--font-display);font-size:1.4rem;color:var(--navy-deeper);margin:8px 0 2px} .p-emp .desde small{font-family:var(--font-body);font-size:.8rem;color:var(--text-mid)}
+    .p-emp .facts{display:flex;gap:14px;flex-wrap:wrap;font-size:.86rem;color:var(--navy-deeper);margin:8px 0}
+    .p-emp .units{margin-top:14px;border-top:1px solid var(--p-line);padding-top:12px} .p-emp .units summary{cursor:pointer;font-size:.86rem;color:var(--navy-deeper)}
+    @media(max-width:760px){.p-emp{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<div id="pHeader"></div>
+<section class="p-page"><div class="p-container">
+  <div class="p-head-row" data-reveal><div><span class="p-eyebrow">Venta directa</span><h1 class="p-h2" style="font-size:clamp(1.7rem,3vw,2.3rem)">Emprendimientos</h1><p class="p-sub" style="margin:0">Unidades en pozo, en construcción o a estrenar que venden las propias desarrolladoras. Sin corretaje: el contacto va directo a la empresa.</p></div><a class="p-btn" href="publicar.html#desarrolladora">Publicar un emprendimiento</a></div>
+  <div id="lista" style="margin-top:22px"><div class="p-skel" style="height:260px;border-radius:var(--p-radius);background:#EEE9DD"></div></div>
+</div></section>
+<div id="pFooter"></div>
+<script src="../supabase-config.js"></script>
+<script src="../mapa-barrios.js"></script><script src="js/ui.js?v=20260904c"></script><script src="js/store.js?v=20260904c"></script><script src="js/data.js?v=20260904c"></script>
+<script>
+(async function(){
+  BP.header('venta'); BP.footer(); BP.reveal(); await BP.probePretty();
+  const zona = BP.qs().get('zona');
+  const { avisos } = await BPData.load();
+  let emps = BPData.emprendimientos(avisos.filter(a => a.op === 'venta')); if (zona) emps = emps.filter(e => e.zona === zona);
+  const ETAPA = { pozo:'En pozo', construccion:'En construcción', terminado:'Terminado' };
+  const el = document.getElementById('lista');
+  if (!emps.length) { el.innerHTML = `<div class="p-empty">Todavía no hay emprendimientos publicados${zona ? ' en ' + BP.zonaLabel(zona) : ''}. Si sos desarrolladora, <a href="publicar.html#desarrolladora" style="text-decoration:underline">publicá el tuyo</a>.</div>`; return; }
+  el.innerHTML = emps.map(e => { const pub = BPData.pub(e.publicadorId); return `<article class="p-emp" data-emp="${BP.esc(e.nombre)}">
+    <div class="ph">${e.foto ? `<img src="${BP.sbImg(e.foto, 900)}" alt="${BP.esc(e.nombre)}">` : ''}<span class="tag">${ETAPA[e.etapa] || 'En construcción'}${e.entrega ? ' · entrega ' + BP.esc(e.entrega) : ''}</span></div>
+    <div class="body"><h2>${BP.esc(e.nombre)}</h2><div class="p-barrio">${BP.esc(e.dir)}, ${BP.esc(e.barrio)}</div>
+      <div class="desde">${e.desde ? 'Desde ' + BP.fmtUSD(e.desde) : 'Consultar'}</div>
+      <div class="facts"><span>${e.unidades.length} ${e.unidades.length === 1 ? 'unidad' : 'unidades'}</span>${e.ambmin ? `<span>${e.ambmin === e.ambmax ? e.ambmin : e.ambmin + ' a ' + e.ambmax} amb.</span>` : ''}${e.m2min ? `<span>${e.m2min === e.m2max ? e.m2min : e.m2min + ' a ' + e.m2max} m²</span>` : ''}</div>
+      <div class="p-publine">Publica <b>${BP.esc(pub.nombre)}</b> ${BPData.badgeHTML(pub)}${pub.demo ? '<span class="p-badge demo">Ejemplo</span>' : ''}</div>
+      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><a class="p-btn p-btn-sm p-btn-dark" href="https://wa.me/${pub.whatsapp}?text=${encodeURIComponent('Hola, vi ' + e.nombre + ' en BAIREN y quiero más información.')}" target="_blank" rel="noopener">${BP.ico.wa} WhatsApp</a><a class="p-btn p-btn-sm p-btn-navy" href="mailto:${pub.email}?subject=${encodeURIComponent('Consulta por ' + e.nombre + ' desde BAIREN')}">${BP.ico.mail} Contactar</a></div>
+      <details class="units"><summary>Ver las ${e.unidades.length} unidades</summary><div class="p-grid" style="margin-top:12px">${e.unidades.map(BPData.cardV).join('')}</div></details>
+    </div></article>`; }).join('');
+})();
+</script>
+</body>
+</html>

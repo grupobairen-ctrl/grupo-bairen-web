@@ -278,3 +278,19 @@ create policy if not exists "fotos edita autenticado" on storage.objects for upd
 create policy if not exists "docs sube autenticado" on storage.objects for insert with check (bucket_id = 'portal-docs' and auth.role() = 'authenticated');
 create policy if not exists "docs lee curador" on storage.objects for select using (bucket_id = 'portal-docs' and portal.es_curador());
 -- Los documentos de verificación se borran al aprobar o rechazar (política de privacidad): hacerlo desde el panel de curación o con un cron.
+
+-- =====================================================================
+-- FASE 4 · propietario, emprendimientos, visitas
+-- =====================================================================
+alter table portal.avisos add column if not exists propietario_email text;
+alter table portal.avisos add column if not exists emprendimiento text;
+alter table portal.avisos add column if not exists etapa text check (etapa in ('pozo','construccion','terminado'));
+alter table portal.avisos add column if not exists entrega text;
+create index if not exists avisos_propietario_idx on portal.avisos(lower(propietario_email));
+
+-- El propietario (dueño de la unidad que publica una inmobiliaria) ve su aviso y sus visitas con su cuenta
+create policy if not exists "propietario ve su aviso" on portal.avisos for select using (propietario_email is not null and lower(propietario_email) = lower(coalesce(auth.jwt() ->> 'email', '')));
+alter table portal.visitas_reservas enable row level security;
+create policy if not exists "visitas del publicador" on portal.visitas_reservas for all using (publicador_id = portal.mi_publicador() or portal.es_curador());
+create policy if not exists "visitas las ve el propietario" on portal.visitas_reservas for select using (exists (select 1 from portal.avisos a where a.id = aviso_id and a.propietario_email is not null and lower(a.propietario_email) = lower(coalesce(auth.jwt() ->> 'email', ''))));
+-- Mails: la función /api/portal-notify (Vercel) lee publicador y aviso con la clave pública y envía por Resend. Variables RESEND_API_KEY y PORTAL_MAIL_FROM en Vercel.
