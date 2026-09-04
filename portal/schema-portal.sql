@@ -168,10 +168,14 @@ alter table portal.publicadores enable row level security;
 alter table portal.avisos enable row level security;
 alter table portal.fotos enable row level security;
 alter table portal.consultas enable row level security;
-create policy if not exists "publicadores visibles" on portal.publicadores for select using (verificado);
-create policy if not exists "avisos publicados visibles" on portal.avisos for select using (estado_curacion = 'publicado');
-create policy if not exists "fotos de avisos publicados" on portal.fotos for select using (exists (select 1 from portal.avisos a where a.id = aviso_id and a.estado_curacion = 'publicado'));
-create policy if not exists "cualquiera consulta" on portal.consultas for insert with check (true);
+drop policy if exists "publicadores visibles" on portal.publicadores;
+create policy "publicadores visibles" on portal.publicadores for select using (verificado);
+drop policy if exists "avisos publicados visibles" on portal.avisos;
+create policy "avisos publicados visibles" on portal.avisos for select using (estado_curacion = 'publicado');
+drop policy if exists "fotos de avisos publicados" on portal.fotos;
+create policy "fotos de avisos publicados" on portal.fotos for select using (exists (select 1 from portal.avisos a where a.id = aviso_id and a.estado_curacion = 'publicado'));
+drop policy if exists "cualquiera consulta" on portal.consultas;
+create policy "cualquiera consulta" on portal.consultas for insert with check (true);
 
 -- Exponer el esquema a la API (Dashboard -> Settings -> API -> Exposed schemas: agregar `portal`)
 
@@ -236,7 +240,8 @@ create table if not exists portal.vistas (
   fecha     timestamptz not null default now()
 );
 alter table portal.vistas enable row level security;
-create policy if not exists "vistas insert" on portal.vistas for insert with check (true);
+drop policy if exists "vistas insert" on portal.vistas;
+create policy "vistas insert" on portal.vistas for insert with check (true);
 
 create or replace function portal.es_curador() returns boolean language sql stable as $$
   select exists (select 1 from portal.curadores c where c.email = coalesce(auth.jwt() ->> 'email', ''));
@@ -246,37 +251,54 @@ create or replace function portal.mi_publicador() returns uuid language sql stab
 $$;
 
 -- publicadores: cada cuenta ve y edita el suyo; los curadores todo
-create policy if not exists "publicador propio select" on portal.publicadores for select using (auth_user_id = auth.uid() or portal.es_curador());
-create policy if not exists "publicador propio insert" on portal.publicadores for insert with check (auth_user_id = auth.uid());
-create policy if not exists "publicador propio update" on portal.publicadores for update using (auth_user_id = auth.uid() or portal.es_curador());
+drop policy if exists "publicador propio select" on portal.publicadores;
+create policy "publicador propio select" on portal.publicadores for select using (auth_user_id = auth.uid() or portal.es_curador());
+drop policy if exists "publicador propio insert" on portal.publicadores;
+create policy "publicador propio insert" on portal.publicadores for insert with check (auth_user_id = auth.uid());
+drop policy if exists "publicador propio update" on portal.publicadores;
+create policy "publicador propio update" on portal.publicadores for update using (auth_user_id = auth.uid() or portal.es_curador());
 
 -- avisos: el publicador ve y edita los suyos en cualquier estado; los curadores todo; el público solo publicados
-create policy if not exists "avisos propios select" on portal.avisos for select using (publicador_id = portal.mi_publicador() or portal.es_curador());
-create policy if not exists "avisos propios insert" on portal.avisos for insert with check (publicador_id = portal.mi_publicador());
-create policy if not exists "avisos propios update" on portal.avisos for update using (publicador_id = portal.mi_publicador() or portal.es_curador());
+drop policy if exists "avisos propios select" on portal.avisos;
+create policy "avisos propios select" on portal.avisos for select using (publicador_id = portal.mi_publicador() or portal.es_curador());
+drop policy if exists "avisos propios insert" on portal.avisos;
+create policy "avisos propios insert" on portal.avisos for insert with check (publicador_id = portal.mi_publicador());
+drop policy if exists "avisos propios update" on portal.avisos;
+create policy "avisos propios update" on portal.avisos for update using (publicador_id = portal.mi_publicador() or portal.es_curador());
 
-create policy if not exists "fotos propias all" on portal.fotos for all using (exists (select 1 from portal.avisos a where a.id = aviso_id and (a.publicador_id = portal.mi_publicador() or portal.es_curador())));
+drop policy if exists "fotos propias all" on portal.fotos;
+create policy "fotos propias all" on portal.fotos for all using (exists (select 1 from portal.avisos a where a.id = aviso_id and (a.publicador_id = portal.mi_publicador() or portal.es_curador())));
 
 -- consultas: el publicador ve las que recibe; los curadores todo
-create policy if not exists "consultas del publicador" on portal.consultas for select using (publicador_id = portal.mi_publicador() or portal.es_curador());
+drop policy if exists "consultas del publicador" on portal.consultas;
+create policy "consultas del publicador" on portal.consultas for select using (publicador_id = portal.mi_publicador() or portal.es_curador());
 
 -- verificaciones: el publicador crea las suyas y las ve; los curadores todo
 alter table portal.verificaciones enable row level security;
-create policy if not exists "verif propias" on portal.verificaciones for select using (publicador_id = portal.mi_publicador() or portal.es_curador());
-create policy if not exists "verif insert" on portal.verificaciones for insert with check (publicador_id = portal.mi_publicador());
-create policy if not exists "verif update curador" on portal.verificaciones for update using (portal.es_curador());
+drop policy if exists "verif propias" on portal.verificaciones;
+create policy "verif propias" on portal.verificaciones for select using (publicador_id = portal.mi_publicador() or portal.es_curador());
+drop policy if exists "verif insert" on portal.verificaciones;
+create policy "verif insert" on portal.verificaciones for insert with check (publicador_id = portal.mi_publicador());
+drop policy if exists "verif update curador" on portal.verificaciones;
+create policy "verif update curador" on portal.verificaciones for update using (portal.es_curador());
 
 alter table portal.curadores enable row level security;
-create policy if not exists "curadores se ven a si mismos" on portal.curadores for select using (email = coalesce(auth.jwt() ->> 'email', ''));
+drop policy if exists "curadores se ven a si mismos" on portal.curadores;
+create policy "curadores se ven a si mismos" on portal.curadores for select using (email = coalesce(auth.jwt() ->> 'email', ''));
 
 -- Storage: fotos públicas, documentos privados
 insert into storage.buckets (id, name, public) values ('portal-fotos', 'portal-fotos', true) on conflict (id) do nothing;
 insert into storage.buckets (id, name, public) values ('portal-docs', 'portal-docs', false) on conflict (id) do nothing;
-create policy if not exists "fotos publicas lectura" on storage.objects for select using (bucket_id = 'portal-fotos');
-create policy if not exists "fotos sube autenticado" on storage.objects for insert with check (bucket_id = 'portal-fotos' and auth.role() = 'authenticated');
-create policy if not exists "fotos edita autenticado" on storage.objects for update using (bucket_id = 'portal-fotos' and auth.role() = 'authenticated');
-create policy if not exists "docs sube autenticado" on storage.objects for insert with check (bucket_id = 'portal-docs' and auth.role() = 'authenticated');
-create policy if not exists "docs lee curador" on storage.objects for select using (bucket_id = 'portal-docs' and portal.es_curador());
+drop policy if exists "fotos publicas lectura" on storage.objects;
+create policy "fotos publicas lectura" on storage.objects for select using (bucket_id = 'portal-fotos');
+drop policy if exists "fotos sube autenticado" on storage.objects;
+create policy "fotos sube autenticado" on storage.objects for insert with check (bucket_id = 'portal-fotos' and auth.role() = 'authenticated');
+drop policy if exists "fotos edita autenticado" on storage.objects;
+create policy "fotos edita autenticado" on storage.objects for update using (bucket_id = 'portal-fotos' and auth.role() = 'authenticated');
+drop policy if exists "docs sube autenticado" on storage.objects;
+create policy "docs sube autenticado" on storage.objects for insert with check (bucket_id = 'portal-docs' and auth.role() = 'authenticated');
+drop policy if exists "docs lee curador" on storage.objects;
+create policy "docs lee curador" on storage.objects for select using (bucket_id = 'portal-docs' and portal.es_curador());
 -- Los documentos de verificación se borran al aprobar o rechazar (política de privacidad): hacerlo desde el panel de curación o con un cron.
 
 -- =====================================================================
@@ -289,8 +311,11 @@ alter table portal.avisos add column if not exists entrega text;
 create index if not exists avisos_propietario_idx on portal.avisos(lower(propietario_email));
 
 -- El propietario (dueño de la unidad que publica una inmobiliaria) ve su aviso y sus visitas con su cuenta
-create policy if not exists "propietario ve su aviso" on portal.avisos for select using (propietario_email is not null and lower(propietario_email) = lower(coalesce(auth.jwt() ->> 'email', '')));
+drop policy if exists "propietario ve su aviso" on portal.avisos;
+create policy "propietario ve su aviso" on portal.avisos for select using (propietario_email is not null and lower(propietario_email) = lower(coalesce(auth.jwt() ->> 'email', '')));
 alter table portal.visitas_reservas enable row level security;
-create policy if not exists "visitas del publicador" on portal.visitas_reservas for all using (publicador_id = portal.mi_publicador() or portal.es_curador());
-create policy if not exists "visitas las ve el propietario" on portal.visitas_reservas for select using (exists (select 1 from portal.avisos a where a.id = aviso_id and a.propietario_email is not null and lower(a.propietario_email) = lower(coalesce(auth.jwt() ->> 'email', ''))));
+drop policy if exists "visitas del publicador" on portal.visitas_reservas;
+create policy "visitas del publicador" on portal.visitas_reservas for all using (publicador_id = portal.mi_publicador() or portal.es_curador());
+drop policy if exists "visitas las ve el propietario" on portal.visitas_reservas;
+create policy "visitas las ve el propietario" on portal.visitas_reservas for select using (exists (select 1 from portal.avisos a where a.id = aviso_id and a.propietario_email is not null and lower(a.propietario_email) = lower(coalesce(auth.jwt() ->> 'email', ''))));
 -- Mails: la función /api/portal-notify (Vercel) lee publicador y aviso con la clave pública y envía por Resend. Variables RESEND_API_KEY y PORTAL_MAIL_FROM en Vercel.

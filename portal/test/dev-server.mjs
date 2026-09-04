@@ -3,7 +3,7 @@
 import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import { extname, join, normalize } from 'node:path';
-const ROOT = process.cwd(); const PORT = Number(process.env.PORT || 8080);
+const ROOT = process.cwd(); const PORT = Number(process.env.PORT || 8080); const HOST = process.env.HOST || '127.0.0.1';
 const MIME = { '.html':'text/html; charset=utf-8', '.css':'text/css; charset=utf-8', '.js':'text/javascript; charset=utf-8', '.mjs':'text/javascript; charset=utf-8', '.json':'application/json; charset=utf-8', '.png':'image/png', '.jpg':'image/jpeg', '.jpeg':'image/jpeg', '.webp':'image/webp', '.svg':'image/svg+xml', '.mp4':'video/mp4', '.ico':'image/x-icon', '.woff2':'font/woff2', '.pdf':'application/pdf', '.txt':'text/plain; charset=utf-8', '.xml':'application/xml' };
 const REWRITES = [
   [/^\/portal\/_rewrite-probe$/, () => ({ probe: true })],
@@ -18,4 +18,4 @@ createServer(async (req, res) => {
   const file = normalize(join(ROOT, path)); if (!file.startsWith(ROOT)) { res.writeHead(403); return res.end(); }
   try { const st = await stat(file); if (st.isDirectory()) { res.writeHead(301, { Location: url.pathname + '/' }); return res.end(); } const body = await readFile(file); res.writeHead(200, { 'Content-Type': MIME[extname(file).toLowerCase()] || 'application/octet-stream', 'Cache-Control': 'no-store' }); res.end(body); }
   catch (e) { res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' }); res.end('No encontrado: ' + path); }
-}).listen(PORT, '127.0.0.1', () => console.log('BAIREN dev server: http://127.0.0.1:' + PORT + '/portal/'));
+}).listen(PORT, HOST, () => console.log('BAIREN dev server: http://' + (HOST === '0.0.0.0' ? 'localhost' : HOST) + ':' + PORT + '/portal/' + (HOST === '0.0.0.0' ? '  (también desde el celular en la misma red, con la IP de la Mac)' : '')));
