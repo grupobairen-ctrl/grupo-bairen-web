@@ -778,3 +778,9 @@ select.p-fsel,.p-field select,.p-band select,.p-product select{background-repeat
   body.p-product{padding-bottom:76px}
   .p-demo-banner{bottom:80px}
 }
+
+/* La bandeja navy alrededor de la galería era el fondo de la ficha cuando la ficha
+   era oscura. Sobre el plano claro es un marco azul que no aporta: se va. */
+.p-product .p-ficha-top .p-tray{background:transparent;border:0;padding:0;border-radius:0}
+.p-product .p-gallery{border-radius:var(--p-radius);box-shadow:0 10px 30px rgba(19,29,45,.08)}
+.p-product .p-gallery a{background:var(--p-paper-2)}
