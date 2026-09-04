@@ -8,7 +8,7 @@
   <link rel="icon" href="../bairen_logo.png?v=3">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=202609042e"><link rel="stylesheet" href="css/catalogo.css?v=202609042e"><link rel="stylesheet" href="css/portal.css?v=202609042e">
+  <link rel="stylesheet" href="css/base.css?v=202609043b"><link rel="stylesheet" href="css/catalogo.css?v=202609043b"><link rel="stylesheet" href="css/portal.css?v=202609043b">
   <style>body{padding-top:0}#ficha>.p-ficha-top,#ficha>.p-ficha,#ficha>section{max-width:var(--p-max);margin:0 auto;padding-left:24px;padding-right:24px}#ficha>.p-ficha-top{padding-top:88px}@media(max-width:900px){#ficha>.p-ficha-top{padding-top:76px}}.p-video{aspect-ratio:16/9;background:#0b1220;border-radius:16px;overflow:hidden}.p-video iframe,.p-video video{width:100%;height:100%;border:0;display:block}</style>
 </head>
 <body class="p-product">
@@ -17,17 +17,19 @@
 <div class="p-lb" id="lb" aria-hidden="true"><button type="button" class="x" data-lb-close aria-label="Cerrar">×</button><img id="lbImg" alt=""><div class="ctl"><button type="button" data-lb-prev aria-label="Anterior">‹</button><span id="lbCount"></span><button type="button" data-lb-next aria-label="Siguiente">›</button></div></div>
 <div id="pFooter"></div>
 
-<script src="../supabase-config.js"></script>
-<script src="../mapa-barrios.js"></script>
-<script src="js/ui.js?v=202609042e"></script><script src="js/store.js?v=202609042e"></script>
-<script src="js/data.js?v=202609042e"></script>
+<script src="../supabase-config.js" defer></script>
+<script src="../mapa-barrios.js" defer></script>
+<script src="js/ui.js?v=202609043b" defer></script><script src="js/store.js?v=202609043b" defer></script>
+<script src="js/data.js?v=202609043b" defer></script>
 <script>
+/* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
+document.addEventListener('DOMContentLoaded', function(){
 (async function(){
   BP.header(); BP.footer();
-  await BP.probePretty(); const id = BP.qs().get('id') || BP.idFromPath();
+  const _datos = BPData.load(); await BP.probePretty(); const id = BP.qs().get('id') || BP.idFromPath();
   const main = document.getElementById('ficha');
   let avisos;
-  try { ({ avisos } = await BPData.load()); }
+  try { ({ avisos } = await _datos); }
   catch (err) { console.error(err); BP.estadoError(main, 'No pudimos cargar esta propiedad.'); return; }
   const a = avisos.find(x => x.id === id) || avisos.find(x => x.slug === id);
   if (!a) { main.innerHTML = `<div class="p-page"><div class="p-prose"><h1>No encontramos esa propiedad</h1><p>Puede que ya no esté publicada. <a href="buscar.html" style="text-decoration:underline">Volver a las propiedades</a>.</p></div></div>`; return; }
@@ -183,6 +185,7 @@
   const ld = { '@context':'https://schema.org', '@type':'RealEstateListing', name: a.titulo, description: (a.descripcion||'').slice(0,300), url: location.href, image: fotos.slice(0,3), datePosted: a.publicadoEn, offers: { '@type':'Offer', price: a.precio, priceCurrency: 'USD', availability: a.reservado ? 'https://schema.org/LimitedAvailability' : 'https://schema.org/InStock', offeredBy: { '@type': pub.tipo === 'dueno' ? 'Person' : 'RealEstateAgent', name: pub.nombre, identifier: pub.matricula || 'Dueño verificado' } }, address: { '@type':'PostalAddress', streetAddress: a.dir, addressLocality: a.barrio, addressRegion: a.ciudad, addressCountry: 'AR' } };
   const s = document.createElement('script'); s.type = 'application/ld+json'; s.textContent = JSON.stringify(ld); document.head.appendChild(s);
 })();
+});
 </script>
 </body>
 </html>

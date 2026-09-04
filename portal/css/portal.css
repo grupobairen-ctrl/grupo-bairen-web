@@ -900,3 +900,50 @@ body:not(.p-product){--p-shadow-d:0 16px 40px rgba(0,0,0,.28)}
 .p-product #pHeader,.p-product .navbar,.p-product .mobile-menu,.p-product .footer,
 .p-product .p-band,.p-product .p-skip,.p-product .p-publica{--p-focus-a:#131D2D;--p-focus-b:#DECDA0}
 .p-skip:focus-visible{outline-color:#DECDA0}
+
+/* ══════════════════════════════════════════════════════════════
+   OLA 6 · Rendimiento y celular (4/9)
+   ══════════════════════════════════════════════════════════════ */
+
+/* 6.3 · Safari hace zoom solo si el campo mide menos de 16 px. Los desplegables del
+   buscador median 13,6 y los del asistente 15,2, así que la pantalla saltaba al tocarlos. */
+@media(max-width:900px){
+  input,select,textarea,
+  .p-fsel,.p-fbtn,.p-fchip input,.p-field input,.p-field select,.p-qrow input,
+  .p-form input,.p-form textarea,.p-form select,.p-pop input,.p-pop select,
+  .p-login input,.search-input,.filter-select,.cfield input,.cfield select,.cfield textarea{
+    font-size:16px!important;line-height:1.35
+  }
+  .p-fsel,.p-fbtn,.p-fchip{height:46px}
+  .p-field select,.p-field input{height:52px}
+}
+
+/* 6.4 · Objetivos táctiles del lightbox: cerrar medía 17 por 42 y las flechas 40 por 40 */
+.p-lb .x{width:48px;height:48px;min-width:48px;display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;line-height:1;border-radius:999px;top:16px;right:16px}
+.p-lb .ctl{gap:16px;align-items:center}
+.p-lb .ctl button{width:48px;height:48px;min-width:48px;display:flex;align-items:center;justify-content:center;
+  font-size:1.6rem;line-height:1;border-radius:999px}
+@media(max-width:760px){
+  .p-lb .x{width:52px;height:52px;top:12px;right:12px}
+  .p-lb .ctl{gap:20px;padding-bottom:env(safe-area-inset-bottom,0)}
+  .p-lb .ctl button{width:52px;height:52px}
+}
+
+/* 6.2 · Subir y ordenar fotos desde el celular: arrastrar y soltar no existe con el dedo */
+.p-foto{position:relative}
+.p-foto .mover{position:absolute;left:6px;bottom:6px;display:flex;gap:4px;z-index:2}
+.p-foto .mover button,.p-foto .portada{width:34px;height:34px;min-width:34px;border:0;border-radius:999px;
+  background:rgba(19,29,45,.82);color:#F6F2E8;font:500 .9rem/1 var(--font-body);cursor:pointer;
+  display:flex;align-items:center;justify-content:center}
+.p-foto .portada{position:absolute;right:6px;bottom:6px;width:auto;padding:0 12px;height:34px;font-size:.7rem;
+  letter-spacing:.08em;text-transform:uppercase;z-index:2}
+.p-foto .portada.on{background:var(--gold);color:var(--navy-deeper)}
+.p-foto .quitar{position:absolute;right:6px;top:6px;width:32px;height:32px;border-radius:999px;border:0;
+  background:rgba(19,29,45,.82);color:#F6F2E8;cursor:pointer;font-size:1rem;line-height:1;z-index:2}
+.p-foto .es-portada{position:absolute;left:6px;top:6px;background:var(--gold);color:var(--navy-deeper);
+  font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;padding:4px 8px;border-radius:8px;z-index:2}
+@media(pointer:coarse){
+  .p-foto .mover button,.p-foto .portada,.p-foto .quitar{width:44px;height:44px;min-width:44px}
+  .p-foto .portada{width:auto;padding:0 16px}
+}

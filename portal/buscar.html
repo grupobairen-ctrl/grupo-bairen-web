@@ -8,7 +8,7 @@
   <link rel="icon" href="../bairen_logo.png?v=3">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=202609042e"><link rel="stylesheet" href="css/catalogo.css?v=202609042e"><link rel="stylesheet" href="css/portal.css?v=202609042e">
+  <link rel="stylesheet" href="css/base.css?v=202609043b"><link rel="stylesheet" href="css/catalogo.css?v=202609043b"><link rel="stylesheet" href="css/portal.css?v=202609043b">
   <style>body{padding-top:64px}</style>
 </head>
 <body class="p-product">
@@ -62,11 +62,13 @@
 
 <div id="pFooter"></div>
 
-<script src="../supabase-config.js"></script>
-<script src="../mapa-barrios.js"></script>
-<script src="js/ui.js?v=202609042e"></script><script src="js/store.js?v=202609042e"></script>
-<script src="js/data.js?v=202609042e"></script>
+<script src="../supabase-config.js" defer></script>
+<script src="../mapa-barrios.js" defer></script>
+<script src="js/ui.js?v=202609043b" defer></script><script src="js/store.js?v=202609043b" defer></script>
+<script src="js/data.js?v=202609043b" defer></script>
 <script>
+/* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
+document.addEventListener('DOMContentLoaded', function(){
 (async function(){
   BP.header(); BP.footer(); if (window.BPStore) BPStore.init();
   document.querySelector('#zonaBox > span').innerHTML = BP.ico.pin;
@@ -77,7 +79,7 @@
 
   const PER_PAGE = 12;
   const F = { op:'venta', tipo:'departamento', zonas:[], q:'', pub:'', emp:false, reservadas:false, amb:0, dorm:0, banos:0, coch:0, pmin:0, pmax:0, expmax:0, m2min:0, m2max:0, antig:0, amen:[], amoblado:false, dueno:false, video:false, hace:0, favs:false, sort:'relevancia', page:1 };
-  await BP.probePretty(); const pretty = BP.parsePretty(); if (pretty) { F.op = pretty.op; F.tipo = pretty.tipo; if (pretty.zona) F.zonas = [pretty.zona]; }
+  const _datos = BPData.load(); await BP.probePretty(); const pretty = BP.parsePretty(); if (pretty) { F.op = pretty.op; F.tipo = pretty.tipo; if (pretty.zona) F.zonas = [pretty.zona]; }
   const qs = BP.qs();
   if (qs.has('op')) F.op = qs.get('op'); if (qs.get('tipo')) F.tipo = qs.get('tipo'); if (qs.getAll('zona').length) F.zonas = qs.getAll('zona').map(z => BP.zonaFromSlug(z) || z).filter(Boolean);
   ['q'].forEach(k => { if (qs.get(k)) F[k] = qs.get(k); }); ['amb','dorm','banos','coch','pmin','pmax','expmax','m2min','m2max','antig','hace','page'].forEach(k => { if (qs.get(k)) F[k] = Number(qs.get(k)); });
@@ -87,7 +89,7 @@
   if (F.favs) F.op = '';
 
   let avisos;
-  try { ({ avisos } = await BPData.load()); }
+  try { ({ avisos } = await _datos); }
   catch (err) { console.error(err); BP.estadoError(document.getElementById('list'), 'No pudimos cargar las propiedades.'); document.getElementById('resTitle').textContent = 'Propiedades en Buenos Aires'; return; }
   BP.anotarMenus(avisos);
   const countsAll = BPData.countsByZona(avisos);
@@ -178,6 +180,7 @@
   syncControls();
   try { render(); } catch (err) { console.error(err); BP.estadoError(document.getElementById('list'), 'No pudimos cargar las propiedades.', () => location.reload()); }
 })();
+});
 </script>
 </body>
 </html>

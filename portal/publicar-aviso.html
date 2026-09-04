@@ -4,10 +4,20 @@
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Publicar una propiedad — BAIREN</title>
   <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#131D2D">
+  <script>
+/* 6.5 · Cuatro páginas bajaban todo para terminar redirigiendo a Ingresar.
+   La comprobación de sesión ocurre acá, antes de los datos y de los assets pesados.
+   Solo decide en modo local; con base conectada decide el store, que ya tiene la sesión. */
+(function(){try{
+  var u=localStorage.getItem('bp_user');
+  var sb=Object.keys(localStorage).some(function(k){return k.indexOf('sb-')===0&&k.indexOf('auth-token')>-1});
+  if((!u||u==='null')&&!sb){location.replace('ingresar.html?volver='+encodeURIComponent('publicar'));}
+}catch(e){}})();
+</script>
   <link rel="icon" href="../bairen_logo.png?v=3">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=202609042e"><link rel="stylesheet" href="css/catalogo.css?v=202609042e"><link rel="stylesheet" href="css/portal.css?v=202609042e">
+  <link rel="stylesheet" href="css/base.css?v=202609043b"><link rel="stylesheet" href="css/catalogo.css?v=202609043b"><link rel="stylesheet" href="css/portal.css?v=202609043b">
   <style>
     .p-stepper{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0 26px}
     .p-stepper button{display:flex;align-items:center;gap:8px;border:1px solid var(--p-line);background:var(--p-card);border-radius:999px;padding:8px 14px;font:500 .78rem var(--font-body);color:var(--text-mid);cursor:pointer;letter-spacing:.06em}
@@ -41,9 +51,10 @@
   <p class="p-note" id="modeNote" style="margin-top:12px"></p>
 </div></section>
 <div id="pFooter"></div>
-<script src="../supabase-config.js"></script>
-<script src="../mapa-barrios.js"></script><script src="js/ui.js?v=202609042e"></script><script src="js/store.js?v=202609042e"></script><script src="js/data.js?v=202609042e"></script>
+<script src="../supabase-config.js" defer></script><script src="js/ui.js?v=202609043b" defer></script><script src="js/store.js?v=202609043b" defer></script><script src="js/data.js?v=202609043b" defer></script>
 <script>
+/* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
+document.addEventListener('DOMContentLoaded', function(){
 (async function(){
   BP.header(); BP.footer();
   const mode = await BPStore.init();
@@ -129,16 +140,45 @@
   function renderFotos(){
     const a = aviso;
     el.innerHTML = `<h2 class="p-sec-t">Fotos y video</h2><p class="p-kicker" style="margin-bottom:16px">Mínimo ocho fotos horizontales, la primera es la portada. Si no tenés fotos profesionales, BAIREN las produce: marcá la casilla y seguí.</p>
-      <div class="p-drop" id="drop"><b>Arrastrá las fotos acá o tocá para elegirlas</b>JPG o PNG, hasta 10 MB cada una. Las reducimos en el navegador antes de subirlas.<input type="file" id="fotosIn" multiple accept="image/*" hidden></div>
+      <button type="button" class="p-drop" id="drop"><b>Tocá para elegir las fotos, o arrastralas acá</b>JPG o PNG, hasta 10 MB cada una. Las reducimos en el navegador antes de subirlas.</button><input type="file" id="fotosIn" multiple accept="image/*" capture="environment" hidden>
       <div class="p-fotos" id="fotosGrid"></div>
       <div class="p-formgrid" style="margin-top:18px">${fld('video_url','Video, link de YouTube o Bunny','url',a.video_url,{full:true,attrs:'placeholder="https://"'})}<label class="full" style="display:flex;gap:10px;align-items:center;color:var(--navy-deeper)"><input type="checkbox" id="quieroProd" ${a.quiero_produccion?'checked':''}> Quiero que BAIREN produzca las fotos y el video de la unidad (servicio con honorario fijo).</label></div>
       ${navBtns()}`;
     const inp = document.getElementById('fotosIn'), drop = document.getElementById('drop'), grid = document.getElementById('fotosGrid');
-    const draw = async () => { const items = []; for (let i = 0; i < a.fotos.length; i++) { const u = await BPStore.resolveFoto(a.fotos[i].url); items.push(`<div class="p-foto" draggable="true" data-i="${i}"><img src="${u}" alt="Foto ${i+1}">${i===0?'<span class="main">Portada</span>':''}<button type="button" class="x" data-del="${i}" aria-label="Quitar">×</button></div>`); } grid.innerHTML = items.join('') + (a.fotos.length ? `<p class="p-note" style="grid-column:1/-1">${a.fotos.length} de mínimo 8. Arrastrá para reordenar.</p>` : ''); grid.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => { a.fotos.splice(Number(b.dataset.del), 1); draw(); })); let from = null; grid.querySelectorAll('.p-foto').forEach(f => { f.addEventListener('dragstart', () => from = Number(f.dataset.i)); f.addEventListener('dragover', e => e.preventDefault()); f.addEventListener('drop', () => { const to = Number(f.dataset.i); if (from == null || from === to) return; const m = a.fotos.splice(from, 1)[0]; a.fotos.splice(to, 0, m); draw(); }); }); };
+    /* 6.2 · Arrastrar y soltar no existe con el dedo. Cada foto trae botones para moverse,
+       ponerse de portada y salir, que funcionan igual con mouse, teclado y pantalla táctil. */
+    const draw = async () => {
+      const items = [];
+      for (let i = 0; i < a.fotos.length; i++) {
+        const u = await BPStore.resolveFoto(a.fotos[i].url);
+        items.push(`<div class="p-foto" draggable="true" data-i="${i}">
+          <img src="${u}" alt="Foto ${i+1} de ${a.fotos.length}">
+          ${i===0?'<span class="es-portada">Portada</span>':''}
+          <div class="mover">
+            <button type="button" data-mov="-1" data-i="${i}" ${i===0?'disabled':''} aria-label="Mover la foto ${i+1} hacia atrás">‹</button>
+            <button type="button" data-mov="1" data-i="${i}" ${i===a.fotos.length-1?'disabled':''} aria-label="Mover la foto ${i+1} hacia adelante">›</button>
+          </div>
+          ${i===0?'':`<button type="button" class="portada" data-portada="${i}" aria-label="Usar la foto ${i+1} como portada">Portada</button>`}
+          <button type="button" class="quitar" data-del="${i}" aria-label="Quitar la foto ${i+1}">×</button>
+        </div>`);
+      }
+      grid.innerHTML = items.join('') + (a.fotos.length ? `<p class="p-note" style="grid-column:1/-1">${a.fotos.length} de mínimo 8. Ordenalas con las flechas de cada foto. La primera es la portada.</p>` : '');
+      const mover = (de, aI) => { if (aI < 0 || aI >= a.fotos.length) return; const m = a.fotos.splice(de, 1)[0]; a.fotos.splice(aI, 0, m); BP.anunciar('Foto movida al lugar ' + (aI + 1) + ' de ' + a.fotos.length); draw().then(() => { const b = grid.querySelector(`.p-foto[data-i="${aI}"] [data-mov="${aI > de ? 1 : -1}"]`); if (b && !b.disabled) b.focus(); }); };
+      grid.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => { a.fotos.splice(Number(b.dataset.del), 1); BP.anunciar('Foto quitada, quedan ' + a.fotos.length); draw(); }));
+      grid.querySelectorAll('[data-mov]').forEach(b => b.addEventListener('click', () => { const i = Number(b.dataset.i); mover(i, i + Number(b.dataset.mov)); }));
+      grid.querySelectorAll('[data-portada]').forEach(b => b.addEventListener('click', () => { mover(Number(b.dataset.portada), 0); }));
+      let from = null;
+      grid.querySelectorAll('.p-foto').forEach(f => {
+        f.addEventListener('dragstart', () => from = Number(f.dataset.i));
+        f.addEventListener('dragover', e => e.preventDefault());
+        f.addEventListener('drop', () => { const to = Number(f.dataset.i); if (from == null || from === to) return; mover(from, to); });
+      });
+      document.body.dataset.fotos = a.fotos.length;
+    };
     const add = async files => { const key = aviso.id || aviso.slug || ('nuevo-' + BPStore.session.id.slice(-4)); let i = a.fotos.length; for (const f of Array.from(files)) { if (!/^image\//.test(f.type)) continue; try { BP.toast('Subiendo foto ' + (i + 1) + '…'); const url = await BPStore.uploadFoto(f, key, i++); a.fotos.push({ url }); } catch (e) { BP.toast('No se pudo subir una foto: ' + (e.message || e)); } } draw(); };
     drop.addEventListener('click', () => inp.click()); inp.addEventListener('change', () => add(inp.files)); drop.addEventListener('dragover', e => { e.preventDefault(); drop.style.borderColor = 'var(--navy)'; }); drop.addEventListener('dragleave', () => drop.style.borderColor = ''); drop.addEventListener('drop', e => { e.preventDefault(); drop.style.borderColor = ''; add(e.dataTransfer.files); });
     draw();
-    bindNav(async () => { collect(); a.quiero_produccion = document.getElementById('quieroProd').checked; if (a.fotos.length < 8 && !a.quiero_produccion) { BP.toast('Cargá al menos ocho fotos o pedí la producción de BAIREN.'); return false; } return true; });
+    bindNav(async () => { collect(); a.quiero_produccion = document.getElementById('quieroProd').checked; if (a.fotos.length < 8 && !a.quiero_produccion) { BP.toast('Cargá al menos ocho fotos, hay ' + a.fotos.length + ', o pedí la producción de BAIREN.', 'error'); return false; } return true; });
   }
 
   /* ── Paso 3: extras ── */
@@ -176,6 +216,7 @@
   if (editId && aviso) document.getElementById('ttl').textContent = 'Editar aviso';
   render();
 })();
+});
 </script>
 </body>
 </html>

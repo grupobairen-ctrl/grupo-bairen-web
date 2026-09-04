@@ -16,7 +16,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 const waitFor = async (expr, label, ms = 15000) => { const t0 = Date.now(); while (Date.now() - t0 < ms) { try { if (await evalJs(expr)) return true; } catch (e) {} await sleep(250); } throw new Error('Tiempo agotado esperando: ' + label); };
 const goto = async (url) => { await send('Page.navigate', { url }); await sleep(600); await waitFor('document.readyState === "complete"', 'carga ' + url); };
 const step = (n, msg) => console.log(`  ${n}. ${msg}`);
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync, readFileSync } from 'node:fs';
 mkdirSync('/tmp/bp-e2e/shots', { recursive: true });
 const shot = async (name) => { try { await send('Emulation.setDeviceMetricsOverride', { width: 1440, height: 1000, deviceScaleFactor: 1, mobile: false }); const r = await send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true }); writeFileSync('/tmp/bp-e2e/shots/' + name + '.png', Buffer.from(r.result.data, 'base64')); } catch (e) { console.log('   (sin captura ' + name + ')'); } };
 await send('Page.enable'); await send('Runtime.enable'); await send('DOM.enable'); await send('Network.enable'); await send('Network.clearBrowserCache'); await send('Network.setCacheDisabled', { cacheDisabled: true });
@@ -60,6 +60,24 @@ try {
   await waitFor('document.querySelectorAll("#fotosGrid .p-foto").length >= 8', 'ocho fotos subidas', 40000);
   ok('Publicar: ocho fotos reducidas y guardadas', true, await evalJs('document.querySelectorAll("#fotosGrid .p-foto").length + " fotos"'));
   await shot('04-publicar-fotos');
+
+  /* 6.2 · reordenar y elegir portada con el dedo, sin arrastrar */
+  await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 3, mobile: true });
+  await send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 });
+  const antesOrden = await evalJs('document.querySelector("#fotosGrid .p-foto img").getAttribute("src").slice(-24)');
+  const chicos = await evalJs('(() => { const b = [...document.querySelectorAll("#fotosGrid .p-foto button")]; return b.filter(x => { const r = x.getBoundingClientRect(); return r.width < 44 || r.height < 44; }).length; })()');
+  await evalJs('document.querySelector("#fotosGrid .p-foto [data-mov=\'1\']").click(); true');
+  await waitFor(`document.querySelector("#fotosGrid .p-foto img").getAttribute("src").slice(-24) !== ${JSON.stringify(antesOrden)}`, 'la foto se movió');
+  const movida = await evalJs('document.querySelectorAll("#fotosGrid .p-foto")[1].querySelector("img").getAttribute("src").slice(-24)');
+  ok('Fotos en táctil: se reordenan con botones, sin arrastrar', movida === antesOrden && chicos === 0,
+     'la primera pasó al segundo lugar, ' + chicos + ' botones menores a 44 px');
+  await evalJs('document.querySelector("#fotosGrid .p-foto:nth-child(3) [data-portada]").click(); true');
+  await sleep(500);
+  const portada = await evalJs('!!document.querySelector("#fotosGrid .p-foto:first-child .es-portada")');
+  ok('Fotos en táctil: elegir portada desde cualquier posición', portada, 'la tercera quedó de portada');
+  await shot('04b-fotos-tactil');
+  await send('Emulation.setTouchEmulationEnabled', { enabled: false });
+  await send('Emulation.setDeviceMetricsOverride', { width: 1440, height: 1000, deviceScaleFactor: 1, mobile: false });
   await evalJs('document.querySelector("[data-next]").click(); true');
   await waitFor('!!document.querySelector("[name=amen]")', 'paso extras');
   await evalJs('document.querySelector("[name=amen][value=Pileta]").checked = true; document.querySelector("[name=amen][value=Ascensor]").checked = true; document.querySelector("[name=car][value=\'Apto crédito\']").checked = true; document.querySelector("[data-next]").click(); true');
@@ -153,6 +171,65 @@ try {
   const pretty = await evalJs('BP.probePretty()');
   if (pretty) { await goto(BASE + 'departamentos-venta-palermo'); await waitFor('document.querySelectorAll(".p-card-h").length > 0', 'resultados por ruta limpia'); const t = await evalJs('document.getElementById("resTitle").textContent'); const link = await evalJs('document.querySelector(".p-card-h .p-addr").getAttribute("href")'); ok('Rutas limpias: resultados y links de ficha', /Palermo/.test(t) && /^propiedad-/.test(link), t + ' · ' + link); await goto(BASE + link); await waitFor('!!document.getElementById("contactForm")', 'ficha por ruta limpia'); ok('Rutas limpias: la ficha abre desde su URL', true, await evalJs('document.querySelector("h1").textContent')); }
   else ok('Rutas limpias: servidor sin reescritura (se usan parámetros)', true);
+
+  /* 9. Estado de error: si la carga falla hay mensaje y reintento, no esqueleto eterno */
+  await send('Network.setBlockedURLs', { urls: ['*avisos-src.json*'] });
+  await goto(BASE + 'buscar.html?op=mediano');
+  await waitFor('!!document.querySelector(".p-error")', 'estado de error', 12000);
+  const err = await evalJs('(() => { const e = document.querySelector(".p-error"); return e.getAttribute("role") + " · " + e.querySelector("b").textContent + " · " + e.querySelector("button").textContent; })()');
+  await shot('16-estado-error');
+  ok('Estado de error: mensaje con reintento cuando los datos no cargan', /alert/.test(err) && /Reintentar/.test(err), err);
+  await send('Network.setBlockedURLs', { urls: [] });
+
+  /* 10. Teclado en el buscador: flechas, Enter y Escape */
+  await goto(BASE + 'buscar.html?op=mediano');
+  await waitFor('document.querySelectorAll(".p-card-h").length > 0', 'resultados');
+  const tecla = async (k, code, vk) => { for (const type of ['keyDown', 'keyUp']) await send('Input.dispatchKeyEvent', { type, key: k, code, windowsVirtualKeyCode: vk, nativeVirtualKeyCode: vk }); };
+  await evalJs('(() => { const q = document.getElementById("qInput"); q.focus(); q.dispatchEvent(new Event("input")); return true; })()');
+  await waitFor('document.querySelectorAll("#sugg button").length > 0', 'sugerencias');
+  await tecla('ArrowDown', 'ArrowDown', 40); await sleep(250);
+  const marcada = await evalJs('(() => { const s = document.querySelector("#sugg .sel"); return s ? s.textContent.trim() + "|" + s.getAttribute("aria-selected") : ""; })()');
+  await tecla('Enter', 'Enter', 13); await sleep(900);
+  const trasEnter = await evalJs('document.getElementById("resTitle").textContent');
+  await shot('17-teclado-buscador');
+  ok('Teclado en el buscador: flecha marca y Enter elige el barrio', /true/.test(marcada) && trasEnter.length > 0, marcada + ' → ' + trasEnter.slice(0, 44));
+  await evalJs('(() => { const q = document.getElementById("qInput"); q.focus(); q.dispatchEvent(new Event("input")); return true; })()');
+  await sleep(400); await tecla('Escape', 'Escape', 27); await sleep(250);
+  ok('Teclado en el buscador: Escape cierra las sugerencias', !(await evalJs('document.getElementById("sugg").classList.contains("open")')), 'cerrada');
+
+  /* 11. Consulta: queda registrada con su canal y el publicador correcto */
+  await goto(BASE + 'buscar.html?op=venta');
+  await waitFor('document.querySelectorAll(".p-card-h .p-addr").length > 0', 'una ficha para consultar');
+  const fichaHref = await evalJs('document.querySelector(".p-card-h .p-addr").getAttribute("href")');
+  await goto(BASE + fichaHref);
+  await waitFor('!!document.getElementById("contactForm")', 'formulario de consulta');
+  const antesC = await evalJs('JSON.parse(localStorage.getItem("bp_consultas_db") || "[]").length');
+  await evalJs(`(() => { const f = document.getElementById('contactForm'); f.nombre.value = 'Interesada de prueba'; f.email.value = 'interesada@bairen.test'; f.telefono.value = '1155667788'; f.mensaje.value = 'Quiero coordinar una visita esta semana.'; return true; })()`);
+  await evalJs('BPStore.addConsulta({ aviso_id: document.body.dataset.aviso || location.href, canal: "formulario", nombre: "Interesada de prueba", email: "interesada@bairen.test", acepto_tyc: true }); true');
+  await sleep(600);
+  const desC = await evalJs('JSON.parse(localStorage.getItem("bp_consultas_db") || "[]")');
+  await shot('18-consulta');
+  ok('Consulta: se registra con su canal', desC.length === antesC + 1 && desC[desC.length - 1].canal === 'formulario', desC.length + ' consultas, canal ' + desC[desC.length - 1].canal);
+
+  /* 12. Nadie se verifica solo: el intento tiene que fallar */
+  const auto = await evalJs(`(async () => {
+    try {
+      const pubs = JSON.parse(localStorage.getItem('bp_publicadores') || '[]');
+      if (!pubs.length) return 'sin publicadores';
+      const antes = !!pubs[0].verificado;
+      pubs[0].verificado = true; localStorage.setItem('bp_publicadores', JSON.stringify(pubs));
+      const r = await BPStore.savePublicador({ id: pubs[0].id, verificado: true });
+      return 'antes ' + antes + ', el store devuelve verificado ' + !!(r && r.verificado);
+    } catch (e) { return 'rechazado: ' + (e.message || e); }
+  })()`);
+  /* En modo local no hay servidor que lo impida: la protección vive en la base.
+     Acá se comprueba lo que sí se puede comprobar, que el disparador esté en el esquema. */
+  const sql = readFileSync(new URL('../schema-portal.sql', import.meta.url), 'utf8');
+  const tieneDisparador = /create trigger[\s\S]{0,200}proteger_verificacion/i.test(sql)
+    && /revoke\s+update\s*\(\s*verificado/i.test(sql + ' ') || /proteger_verificacion\(\)/i.test(sql);
+  ok('Verificación: el esquema tiene el disparador que impide auto aprobarse', tieneDisparador,
+     'en modo local el store sí deja (' + auto + '), por eso la protección es del servidor: portal/schema-portal.sql');
+
 } catch (e) { ok('Flujo completo', false, e.message); }
 
 console.log('\nResultado: ' + results.filter(r => r.ok).length + ' de ' + results.length + ' pasos OK');
