@@ -183,33 +183,48 @@ create policy "cualquiera consulta" on portal.consultas for insert with check (t
 -- MIGRACIÓN INICIAL: las unidades actuales como avisos de Maxim Rentals
 -- ---------------------------------------------------------------------
 insert into portal.publicadores (slug, tipo, nombre, responsable, matricula, colegio, badge, verificado, verificado_en, zonas, email)
-values ('maxim-rentals','inmobiliaria','Maxim Rentals','Maximiliano Matzkin','CUCICBA 7527','Colegio Único de Corredores Inmobiliarios de la Ciudad de Buenos Aires','Corredor inmobiliario matriculado', true, now(), '{Recoleta,Palermo,Núñez,Puerto Madero,Belgrano}', 'contacto@bairengroup.com')
+values ('maxim-rentals','inmobiliaria','Maxim Rentals','Maximiliano Matzkin','CUCICBA 7527','Colegio Único de Corredores Inmobiliarios de la Ciudad de Buenos Aires','Corredor inmobiliario matriculado', true, now(), '{Recoleta,Palermo,Núñez,Puerto Madero,Belgrano}', null)  -- el mail y el WhatsApp reales de Maxim Rentals se cargan aparte; hasta entonces la ficha dice Contacto pendiente
 on conflict (slug) do nothing;
 
+-- El portal vive en su propio proyecto de Supabase, separado del de bairengroup.com,
+-- así que public.propiedades puede no existir acá. Si está, se migran las unidades;
+-- si no, el esquema queda listo y las unidades se cargan con portal/seed-avisos.sql.
+do $mig$
+begin
+  if to_regclass('public.propiedades') is null then
+    raise notice 'sin public.propiedades en este proyecto: se omite la migracion inicial. Corré portal/seed-avisos.sql para cargar las unidades.';
+    return;
+  end if;
+  execute $sql1$
 with pub as (select id from portal.publicadores where slug = 'maxim-rentals'),
-src as (
-  select p.*, op.operacion, op.precio
-  from public.propiedades p
-  cross join lateral (
-    values ('venta', p.precio_venta), ('alquiler', p.precio_tradicional), ('mediano', p.precio_temporal)
-  ) as op(operacion, precio)
-  where p.publicada and op.precio is not null
-)
-insert into portal.avisos (codigo, slug, publicador_id, propiedad_id, operacion, titulo, direccion, unidad, barrio, zona, precio, m2_total, m2_cubierto, ambientes, dormitorios, banos, amoblado, amenities, descripcion, descripcion_en, descripcion_pt, video_url, video_tipo, plazo, estado, estado_curacion, publicado_en)
-select 'BA-' || upper(regexp_replace(s.slug, '[^A-Za-z0-9]', '', 'g')) || case s.operacion when 'venta' then 'V' when 'alquiler' then 'L' else 'M' end,
-       s.slug, pub.id, s.id, s.operacion, s.portada_titulo, s.dir, nullif(s.unidad,'-'), s.barrio, s.barrio, s.precio, s.m2, s.m2, s.ambientes,
-       case when s.ambientes is null then null else greatest(1, s.ambientes - 1) end,
-       case when s.ambientes is null then null when s.ambientes >= 4 then 2 else 1 end,
-       s.operacion = 'mediano',
-       coalesce((select array_agg(a.nombre) from public.amenities a where a.propiedad_id = s.id), '{}'),
-       s.descripcion, s.descripcion_en, s.descripcion_pt, s.video_url, s.video_tipo, s.plazo,
-       case when s.estado = 'Reservado' then 'reservado' else 'disponible' end, 'publicado', s.created_at
-from src s, pub
-on conflict (codigo) do nothing;
-
+  src as (
+    select p.*, op.operacion, op.precio
+    from public.propiedades p
+    cross join lateral (
+      values ('venta', p.precio_venta), ('alquiler', p.precio_tradicional), ('mediano', p.precio_temporal)
+    ) as op(operacion, precio)
+    where p.publicada and op.precio is not null
+  )
+  insert into portal.avisos (codigo, slug, publicador_id, propiedad_id, operacion, titulo, direccion, unidad, barrio, zona, precio, m2_total, m2_cubierto, ambientes, dormitorios, banos, amoblado, amenities, descripcion, descripcion_en, descripcion_pt, video_url, video_tipo, plazo, estado, estado_curacion, publicado_en)
+  select 'BA-' || upper(regexp_replace(s.slug, '[^A-Za-z0-9]', '', 'g')) || case s.operacion when 'venta' then 'V' when 'alquiler' then 'L' else 'M' end,
+         s.slug, pub.id, s.id, s.operacion, s.portada_titulo, s.dir, nullif(s.unidad,'-'), s.barrio, s.barrio, s.precio, s.m2, s.m2, s.ambientes,
+         case when s.ambientes is null then null else greatest(1, s.ambientes - 1) end,
+         case when s.ambientes is null then null when s.ambientes >= 4 then 2 else 1 end,
+         s.operacion = 'mediano',
+         coalesce((select array_agg(a.nombre) from public.amenities a where a.propiedad_id = s.id), '{}'),
+         s.descripcion, s.descripcion_en, s.descripcion_pt, s.video_url, s.video_tipo, s.plazo,
+         case when s.estado = 'Reservado' then 'reservado' else 'disponible' end, 'publicado', s.created_at
+  from src s, pub
+  on conflict (codigo) do nothing
+  $sql1$;
+  execute $sql2$
 insert into portal.fotos (aviso_id, url, orden)
-select av.id, i.url, i.orden from portal.avisos av join public.imagenes i on i.propiedad_id = av.propiedad_id
-where not exists (select 1 from portal.fotos f where f.aviso_id = av.id);
+  select av.id, i.url, i.orden from portal.avisos av join public.imagenes i on i.propiedad_id = av.propiedad_id
+  where not exists (select 1 from portal.fotos f where f.aviso_id = av.id)
+  $sql2$;
+end
+$mig$;
+
 -- Nota: la zona se normaliza después con la misma tabla que usa mapa-barrios.js (Palermo Soho -> Palermo, etc.).
 
 -- =====================================================================
