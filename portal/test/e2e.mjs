@@ -68,7 +68,7 @@ try {
   await shot('05-publicar-revision');
   await evalJs('document.getElementById("acepto").checked = true; document.getElementById("enviar").click(); true');
   await waitFor('location.pathname.endsWith("panel.html")', 'panel', 8000);
-  await waitFor('document.body.textContent.includes("En revisión")', 'aviso en revisión en el panel');
+  await waitFor('!!document.querySelector("#content .p-aviso-row") && document.querySelector("#content").textContent.includes("En revisión")', 'aviso en revisión en el panel');
   await shot('06-panel-mis-avisos');
   ok('Panel: el aviso figura en revisión', true);
 
@@ -79,7 +79,7 @@ try {
   await shot('07-curacion-cola');
   ok('Curación: el aviso aparece en la cola con sus chequeos', true, checks);
   await evalJs('document.querySelector(".p-cur [data-ok]").click(); true');
-  await waitFor('document.body.textContent.includes("No hay avisos esperando")', 'cola vacía tras aprobar');
+  await waitFor('document.getElementById("out").textContent.includes("No hay avisos esperando")', 'cola vacía tras aprobar');
   ok('Curación: aprobado y publicado', true);
   await evalJs('document.querySelector(".p-tabs2 [data-t=pubs]").click(); true'); await sleep(500);
   const pend = await evalJs('!!document.querySelector(".p-cur [data-ok]")');
@@ -103,7 +103,7 @@ try {
   const consultas = await evalJs('JSON.parse(localStorage.getItem("bp_consultas_db") || "[]").length');
   ok('Ficha: la consulta queda registrada para el publicador', consultas >= 1, consultas + ' consulta(s)');
   await goto(BASE + 'panel.html#interesados');
-  await waitFor('document.body.textContent.includes("Interesada Prueba")', 'consulta en Interesados');
+  await waitFor('!!document.querySelector("#content .p-tbl") && document.querySelector("#content").textContent.includes("Interesada Prueba")', 'consulta en Interesados');
   await shot('10-panel-interesados');
   ok('Panel: la consulta aparece en Interesados', true);
 } catch (e) { ok('Flujo completo', false, e.message); }

@@ -372,3 +372,7 @@ html{background:var(--p-bg)}
 .p-zonas-wrap>*{min-width:0}
 .p-index{width:100%;max-width:100%}
 @media(max-width:900px){.p-two{grid-template-columns:1fr;gap:28px}}
+.p-side-nav svg,.p-kpi svg,.p-aviso-row svg,.p-tbl svg{width:16px;height:16px}
+.p-btn svg{width:16px;height:16px}
+.p-form .chk input{width:auto;flex:0 0 auto;margin:3px 0 0;accent-color:var(--navy-deeper)}
+.p-form .chk{align-items:flex-start}
