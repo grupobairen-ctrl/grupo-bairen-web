@@ -65,7 +65,7 @@
     if (pub && !D.PUBLICADORES[pubId]) D.PUBLICADORES[pubId] = Object.assign({ storeId: pub.id, id: pubId, inicial: (pub.nombre||'P').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(), desde: (pub.created_at||'').slice(0,4) || '2026', zonas: pub.zonas || [], desc: pub.descripcion || '', responsable: pub.responsable || pub.nombre, badge: pub.badge || (pub.tipo === 'dueno' ? 'Dueño verificado' : 'Corredor inmobiliario matriculado') }, pub, { id: pubId });
     const fotos = []; for (const f of (r.fotos||[]).slice().sort((a,b)=>(a.orden||0)-(b.orden||0))) { const u = window.BPStore ? await window.BPStore.resolveFoto(f.url) : f.url; if (u) fotos.push(u); }
     const amb = r.ambientes || null;
-    return { id: r.id, slug: r.slug, op: r.operacion, tipoProp: r.tipo || 'Departamento', dir: r.direccion, unidad: r.unidad || '', titulo: r.titulo || (r.direccion + (r.unidad ? ' · ' + r.unidad : '')), barrio: r.barrio, zona: r.zona || r.barrio, ciudad: r.ciudad || 'Capital Federal',
+    return { id: r.id, slug: r.slug, op: r.operacion, tipoProp: r.tipo || 'Departamento', dir: r.direccion, unidad: r.unidad || '', titulo: r.titulo || (r.direccion + (r.unidad ? ' · ' + r.unidad : '')), barrio: r.barrio, zona: (window.BairenZonas && window.BairenZonas.zonaDe(r.barrio)) || r.zona || r.barrio, ciudad: r.ciudad || 'Capital Federal',
       precio: r.precio == null ? null : Number(r.precio), moneda: r.moneda || 'USD', periodo: r.operacion === 'venta' ? '' : '/mes', expensas: r.expensas == null ? null : Number(r.expensas),
       m2: r.m2_total || null, m2cub: r.m2_cubierto || null, amb, dorm: r.dormitorios || null, banos: r.banos || null, cocheras: r.cocheras || 0, antiguedad: r.antiguedad == null ? null : Number(r.antiguedad),
       amoblado: !!r.amoblado, amenities: r.amenities || [], caracteristicas: r.caracteristicas || [], fotos, video: r.video_url ? { tipo: r.video_tipo || 'youtube', url: r.video_url } : null,
@@ -75,19 +75,41 @@
   let cache = null;
   D.load = async function(){
     if (cache) return cache;
-    const src = new URL('data/avisos-src.json', document.baseURI).href;
-    const res = await fetch(src); const units = await res.json();
-    const avisos = [];
-    units.forEach(p => {
-      if (p.precio_venta) avisos.push(fromUnit(p, 'venta', Number(p.precio_venta)));
-      if (p.precio_tradicional) avisos.push(fromUnit(p, 'alquiler', Number(p.precio_tradicional)));
-      if (p.precio_temporal) avisos.push(fromUnit(p, 'mediano', Number(p.precio_temporal)));
-    });
+
+    /* Supabase es la fuente de las unidades publicadas. El JSON local es el respaldo
+       de cuando el esquema `portal` todavía no existía: si Supabase responde con
+       avisos, no se lee, porque si no cada unidad aparecería dos veces. */
+    let publicados = [];
+    try {
+      if (window.BPStore) {
+        await window.BPStore.init();
+        const recs = await window.BPStore.publishedAvisos();
+        for (const r of recs) publicados.push(await D.fromStore(r));
+      }
+    } catch (e) { console.warn('store', e); }
+
+    if (!publicados.length) {
+      const src = new URL('data/avisos-src.json', document.baseURI).href;
+      const res = await fetch(src); const units = await res.json();
+      units.forEach(p => {
+        if (p.precio_venta) publicados.push(fromUnit(p, 'venta', Number(p.precio_venta)));
+        if (p.precio_tradicional) publicados.push(fromUnit(p, 'alquiler', Number(p.precio_tradicional)));
+        if (p.precio_temporal) publicados.push(fromUnit(p, 'mediano', Number(p.precio_temporal)));
+      });
+    }
+
+    /* El nicho es el filtro: lo que cae fuera de BP.ZONAS no se publica (hoy, Centro
+       y Almagro). zonaDe() vive en mapa-barrios.js y sabe que Palermo Hollywood es
+       Palermo. Si esa biblioteca no está cargada no se puede saber la zona, y entonces
+       no se filtra nada, para no esconder inventario por error. */
+    if (window.BairenZonas) {
+      publicados = publicados.filter(a => BP.ZONAS.indexOf(a.zona) > -1);
+    }
+
     // "Seleccionadas de la semana": las 6 con más fotos y disponibles
-    avisos.filter(a=>!a.reservado).sort((a,b)=>b.fotos.length-a.fotos.length).slice(0,6).forEach(a=>a.destacado=true);
-    let extra = [];
-    try { if (window.BPStore) { await window.BPStore.init(); const recs = await window.BPStore.publishedAvisos(); for (const r of recs) extra.push(await D.fromStore(r)); } } catch (e) { console.warn('store', e); }
-    const all = extra.concat(avisos, demoAvisos(avisos));
+    publicados.filter(a=>!a.reservado).sort((a,b)=>b.fotos.length-a.fotos.length).slice(0,6).forEach(a=>a.destacado=true);
+
+    const all = publicados.concat(demoAvisos(publicados));
     cache = { avisos: all, publicadores: D.PUBLICADORES };
     return cache;
   };
@@ -117,14 +139,14 @@
 <article class="p-card-h" data-id="${BP.esc(a.id)}">
   <a class="p-card-photo" href="${href}" aria-label="Ver ${BP.esc(a.titulo)}">${foto}${tag}<span class="ct">${BP.ico.photo} ${a.fotos.length}${a.video ? ' · ' + BP.ico.video : ''}</span></a>
   <div class="p-card-body">
-    <div class="p-card-top"><div><div class="p-price">${D.precioHTML(a)}</div>${a.expensas ? `<div class="p-expensas">$ ${BP.fmtN(a.expensas)} expensas</div>` : ''}</div></div>
+    <div class="p-card-top"><div><div class="p-price">${a.reservado ? '<span class="p-cta-res">Reservada</span>' : D.precioHTML(a)}</div>${a.expensas ? `<div class="p-expensas">$ ${BP.fmtN(a.expensas)} expensas</div>` : ''}</div></div>
     <div class="p-meta">${D.metaLine(a).split(' · ').map(x=>`<span>${x}</span>`).join('')}</div>
     <a class="p-addr" href="${href}">${BP.esc(a.titulo)}</a>
     <div class="p-barrio">${BP.esc(a.barrio)}, ${BP.esc(a.ciudad)}</div>
     <p class="p-desc">${BP.esc(a.descripcion).slice(0, 220)}</p>
     <div class="p-card-foot">
       <div class="p-publine">Publica <b>${BP.esc(pub.nombre)}</b> ${D.badgeHTML(pub)}</div>
-      <div class="acts">${D.waLink(a,pub) ? `<a class="p-icon-btn" href="${D.waLink(a,pub)}" target="_blank" rel="noopener" data-wa data-aviso="${BP.esc(a.id)}" data-pub="${BP.esc(pub.storeId || pub.id)}" aria-label="Escribir por WhatsApp a ${BP.esc(pub.nombre)}" title="WhatsApp">${BP.ico.wa}</a>` : ''}${D.sinContacto(pub) ? `<span class="p-sincontacto">Contacto pendiente</span>` : `<a class="p-btn p-btn-sm p-btn-navy" href="${href}#contacto">${BP.ico.mail} Contactar</a>`}</div>
+      <div class="acts">${a.reservado ? '' : `${D.waLink(a,pub) ? `<a class="p-icon-btn" href="${D.waLink(a,pub)}" target="_blank" rel="noopener" data-wa data-aviso="${BP.esc(a.id)}" data-pub="${BP.esc(pub.storeId || pub.id)}" aria-label="Escribir por WhatsApp a ${BP.esc(pub.nombre)}" title="WhatsApp">${BP.ico.wa}</a>` : ''}${D.sinContacto(pub) ? `<span class="p-sincontacto">Contacto pendiente</span>` : `<a class="p-btn p-btn-sm p-btn-navy" href="${href}#contacto">${BP.ico.mail} Contactar</a>`}`}</div>
     </div>
   </div>
   <button type="button" class="p-icon-btn p-fav ${BP.isFav(a.id)?'on':''}" data-fav="${BP.esc(a.id)}" aria-label="Guardar en favoritos" aria-pressed="${BP.isFav(a.id)}">${BP.isFav(a.id)?BP.ico.heartFill:BP.ico.heart}</button>
@@ -143,7 +165,7 @@
     <div class="card-barrio">${BP.esc(a.barrio)}</div>
     <div class="card-meta">${D.metaLine(a)}</div>
     <div class="card-divider"></div>
-    <div class="card-footer"><div class="card-price"><span class="price-amount">${D.precioHTML(a)}</span></div><span class="card-cta">Ver ficha</span></div>
+    <div class="card-footer"><div class="card-price"><span class="price-amount">${a.reservado ? 'Reservada' : D.precioHTML(a)}</span></div><span class="card-cta">Ver ficha</span></div>
     <div class="p-card-pub">Publica <b>${BP.esc(pub.nombre)}</b> ${D.badgeHTML(pub)}</div>
   </div>
 </a>`;

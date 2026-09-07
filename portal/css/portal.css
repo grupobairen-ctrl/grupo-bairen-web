@@ -790,6 +790,7 @@ body.p-product{--p-focus:0 0 0 2px #F6F2E8, 0 0 0 4px #131D2D}
 .p-reservada{display:flex;gap:10px;align-items:flex-start;background:rgba(179,66,60,.08);border:1px solid rgba(179,66,60,.3);border-radius:8px;padding:12px 14px;margin:14px 0 0;font-size:.88rem;color:var(--navy-deeper)}
 .p-reservada svg{width:16px;height:16px;color:#B3423C;flex-shrink:0;margin-top:2px}
 .p-reservada a{text-decoration:underline}
+.p-price .p-cta-res,.p-cta-price .p-cta-res{margin-left:0}
 .p-cta-res{display:inline-block;font-family:var(--font-body);font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:#B3423C;border:1px solid rgba(179,66,60,.4);border-radius:999px;padding:3px 9px;margin-left:10px;vertical-align:middle}
 
 /* OLA 3 · cuando el publicador todavía no cargó su contacto, no se ofrece uno ajeno */

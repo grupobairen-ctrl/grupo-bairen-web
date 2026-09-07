@@ -16,13 +16,13 @@
  * los datos son las políticas por fila del esquema, en portal/schema-portal.sql.
  * El único secreto de verdad es la "service_role", que nunca va al navegador.
  *
- * Mientras estas dos líneas estén vacías, el portal funciona en modo local:
- * todo se guarda en el navegador y nada sale a ningún lado.
+ * Proyecto: BAIREN PORTAL (dahusnnbyrvltcuaelxj), separado del de bairengroup.com.
+ * Configurado el 4/9/2026. La clave es la publishable: es pública por diseño.
  * ────────────────────────────────────────────────────────────────────────
  */
 
-const PORTAL_SUPABASE_URL = '';
-const PORTAL_SUPABASE_KEY = '';
+const PORTAL_SUPABASE_URL = 'https://dahusnnbyrvltcuaelxj.supabase.co';
+const PORTAL_SUPABASE_KEY = 'sb_publishable_tSRRvyBksexYaiuwJ5YTQw_R_4VNp-0';
 
 window.bairenReady = new Promise((resolve, reject) => {
   if (!PORTAL_SUPABASE_URL || !PORTAL_SUPABASE_KEY) {

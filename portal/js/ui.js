@@ -3,7 +3,7 @@
 (function(){
   'use strict';
   const BP = {};
-  BP.ZONAS = ['Palermo','Recoleta','Belgrano','Núñez','Colegiales','Puerto Madero','Saavedra','GBA Norte'];
+  BP.ZONAS = ['Palermo','Recoleta','Retiro','Belgrano','Núñez','Colegiales','Villa Crespo','Puerto Madero','Saavedra','GBA Norte'];
   BP.zonaLabel = z => z === 'GBA Norte' ? 'Zona Norte' : z;
   BP.zonaSlug = z => z.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/gba norte/,'zona-norte').replace(/\s+/g,'-');
   BP.zonaFromSlug = s => BP.ZONAS.find(z => BP.zonaSlug(z) === s) || null;
