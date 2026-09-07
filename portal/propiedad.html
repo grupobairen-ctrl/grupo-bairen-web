@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function(){
         ${a.reservado ? '' : `<button type="button" class="p-btn p-btn-sm" id="bajaPrecio">${BP.ico.bell} Avisarme si baja</button>`}
       </div>
       ${a.reservado ? `<p class="p-reservada">${BP.ico.flag} Esta propiedad está reservada. Podés consultar por si se libera, o <a href="${BP.urlBuscar({ op: a.op, zona: a.zona })}">ver las disponibles en ${BP.zonaLabel(a.zona)}</a>.</p>` : ''}
-      ${(a.apto.length || a.demo) ? `<p class="p-tags">${a.apto.map(x => `<span class="p-badge">${BP.esc(x)}</span>`).join('')}${a.demo ? '<span class="p-badge demo">Aviso de ejemplo</span>' : ''}</p>` : ''}
+      ${(a.apto.length || (a.cualidades||[]).length || a.demo) ? `<p class="p-tags">${(a.cualidades||[]).map(x => `<span class="p-badge" title="Verificada por BAIREN">${BP.ico.shield} ${BP.esc(x)}</span>`).join('')}${a.apto.map(x => `<span class="p-badge">${BP.esc(x)}</span>`).join('')}${a.demo ? '<span class="p-badge demo">Aviso de ejemplo</span>' : ''}</p>` : ''}
     </div>
     <div class="p-icons">${[
       a.m2 ? ['ruler', a.m2 + ' m²', 'totales'] : null,
@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function(){
   <aside class="p-side" id="contacto">
     <div class="p-cta" id="ctaCard">
       <div class="p-cta-price">${a.reservado ? '<span class="p-cta-res">Reservada</span>' : BPData.precioHTML(a)}</div>
-      <div class="p-cta-pub">Publica <b>${BP.esc(pub.nombre)}</b><span>${pub.tipo === 'dueno' ? 'Dueño verificado' : BP.esc(pub.matricula || 'matrícula pendiente')}</span></div>
+      <div class="p-cta-pub">Publica <b>${BP.esc(pub.nombre)}</b><span>${pub.tipo === 'dueno' ? 'Dueño verificado' : pub.tipo === 'desarrolladora' ? 'Venta directa' : 'Corredor responsable: ' + BP.esc(pub.responsable || '') + (pub.matricula ? ', ' + BP.esc(pub.matricula) : ', matrícula pendiente')}</span></div>
       ${a.reservado ? `<p class="p-sincontacto-box">Esta propiedad está reservada, así que no está tomando consultas. Cuando se libere vuelve a publicarse acá.</p>` : BPData.sinContacto(pub) ? `<p class="p-sincontacto-box">Contacto pendiente. ${BP.esc(pub.nombre)} todavía no cargó su WhatsApp ni su mail, así que no podemos derivarte. BAIREN no interviene en la operación, por eso no te damos un contacto que no es el de quien publica.</p>` : `
       <button type="button" class="p-btn p-btn-fill" id="abrirForm">${BP.ico.mail} Contactar</button>
       ${BPData.waLink(a, pub) ? `<a class="p-btn" id="waBtn" href="${BPData.waLink(a, pub)}" target="_blank" rel="noopener" data-wa data-aviso="${BP.esc(a.id)}" data-pub="${BP.esc(pub.storeId || pub.id)}">${BP.ico.wa} WhatsApp</a>` : ''}

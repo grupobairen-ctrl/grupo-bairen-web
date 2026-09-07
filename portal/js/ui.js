@@ -4,6 +4,9 @@
   'use strict';
   const BP = {};
   BP.ZONAS = ['Palermo','Recoleta','Retiro','Belgrano','Núñez','Colegiales','Villa Crespo','Puerto Madero','Saavedra','GBA Norte'];
+  /* Las cualidades que la curación verifica en cada unidad. La zona es dónde empezamos;
+     la cualidad es por qué una propiedad entra. Es lo que alimenta la búsqueda por cualidades. */
+  BP.CUALIDADES = ['Luminoso','Silencioso','Terraza propia','Balcón','Vista abierta','Piso alto','Apto home office','Acepta mascotas','Reciclado a nuevo','Edificio con amenities','Cochera','Calefacción central'];
   BP.zonaLabel = z => z === 'GBA Norte' ? 'Zona Norte' : z;
   BP.zonaSlug = z => z.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/gba norte/,'zona-norte').replace(/\s+/g,'-');
   BP.zonaFromSlug = s => BP.ZONAS.find(z => BP.zonaSlug(z) === s) || null;
@@ -295,7 +298,7 @@
     <div class="ft-col"><div class="ft-col-ttl">Más BAIREN</div><ul>
       <li><a href="buscar.html">Propiedades en Buenos Aires</a></li><li><a href="publicar.html">Publicar tu propiedad</a></li><li><a href="index.html#guia">Guía de barrios</a></li><li><a href="index.html#indice">Índice BAIREN</a></li><li><a href="legales.html#ayuda">Ayuda</a></li><li><a href="mailto:contacto@bairengroup.com">Contacto</a></li></ul></div>
     <div class="ft-col"><div class="ft-col-ttl">Publicadores</div><ul>
-      <li><a href="publicadores.html">Inmobiliarias y corredores</a></li><li><a href="publicar.html#dueno">Dueños directos</a></li><li><a href="publicar.html#desarrolladora">Desarrolladoras</a></li><li><a href="legales.html#criterios">Criterios de selección</a></li></ul></div>
+      <li><a href="publicadores.html">Inmobiliarias y corredores</a></li><li><a href="publicar.html#dueno">Dueños directos</a></li><li><a href="publicar.html#desarrolladora">Desarrolladoras</a></li><li><a href="criterios.html">Criterios de selección</a></li></ul></div>
     <div class="ft-col"><div class="ft-col-ttl">Barrios</div><ul>${zonas}</ul></div>
     <div class="ft-col"><div class="ft-col-ttl">Seguinos</div><ul>
       <li><a href="https://www.instagram.com/" rel="noopener" target="_blank">Instagram</a></li><li><a href="https://www.tiktok.com/" rel="noopener" target="_blank">TikTok</a></li><li><a href="https://www.youtube.com/" rel="noopener" target="_blank">YouTube</a></li></ul>

@@ -18,6 +18,7 @@
     'dueno-ejemplo': { id:'dueno-ejemplo', tipo:'dueno', nombre:'Dueño directo', responsable:'Propietario verificado', matricula:null, badge:'Dueño verificado', verificado:true, desde:'2026', inicial:'DD', demo:true,
       whatsapp:'5491100000001', email:'dueno@ejemplo.com', telefono:'+54 11 0000 0001', zonas:['Núñez'], desc:'Publicador de ejemplo: un propietario que muestra su propia unidad con titularidad verificada por BAIREN.' },
   };
+  D.titulares = {};
   D.pub = id => D.PUBLICADORES[id] || D.PUBLICADORES['maxim-rentals'];
 
   const AMEN_MAP = { 'Aire acond.':'Aire acondicionado', 'Jardín / Terraza':'Terraza o jardín' };
@@ -62,13 +63,14 @@
   /* aviso del esquema portal (o del modo local) → modelo del portal */
   D.fromStore = async function(r){
     const pub = r.publicador || null; const pubId = pub ? (pub.slug || pub.id) : 'maxim-rentals';
-    if (pub && !D.PUBLICADORES[pubId]) D.PUBLICADORES[pubId] = Object.assign({ storeId: pub.id, id: pubId, inicial: (pub.nombre||'P').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(), desde: (pub.created_at||'').slice(0,4) || '2026', zonas: pub.zonas || [], desc: pub.descripcion || '', responsable: pub.responsable || pub.nombre, badge: pub.badge || (pub.tipo === 'dueno' ? 'Dueño verificado' : 'Corredor inmobiliario matriculado') }, pub, { id: pubId });
+    const T = (pub && D.titulares[pub.id]) || null;   /* titular con matrícula, de la vista publicador_publico */
+    if (pub && !D.PUBLICADORES[pubId]) D.PUBLICADORES[pubId] = Object.assign({ storeId: pub.id, id: pubId, inicial: (pub.nombre||'P').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(), desde: (pub.created_at||'').slice(0,4) || '2026', zonas: pub.zonas || [], desc: pub.descripcion || '', responsable: pub.responsable || pub.nombre, badge: pub.badge || (pub.tipo === 'dueno' ? 'Dueño verificado' : 'Corredor inmobiliario matriculado') }, pub, { id: pubId }, T && T.titular_nombre ? { responsable: T.titular_nombre, matricula: T.titular_matricula ? ((T.titular_colegio || 'CUCICBA') + ' ' + T.titular_matricula) : pub.matricula } : {});
     const fotos = []; for (const f of (r.fotos||[]).slice().sort((a,b)=>(a.orden||0)-(b.orden||0))) { const u = window.BPStore ? await window.BPStore.resolveFoto(f.url) : f.url; if (u) fotos.push(u); }
     const amb = r.ambientes || null;
     return { id: r.id, slug: r.slug, op: r.operacion, tipoProp: r.tipo || 'Departamento', dir: r.direccion, unidad: r.unidad || '', titulo: r.titulo || (r.direccion + (r.unidad ? ' · ' + r.unidad : '')), barrio: r.barrio, zona: (window.BairenZonas && window.BairenZonas.zonaDe(r.barrio)) || r.zona || r.barrio, ciudad: r.ciudad || 'Capital Federal',
       precio: r.precio == null ? null : Number(r.precio), moneda: r.moneda || 'USD', periodo: r.operacion === 'venta' ? '' : '/mes', expensas: r.expensas == null ? null : Number(r.expensas),
       m2: r.m2_total || null, m2cub: r.m2_cubierto || null, amb, dorm: r.dormitorios || null, banos: r.banos || null, cocheras: r.cocheras || 0, antiguedad: r.antiguedad == null ? null : Number(r.antiguedad),
-      amoblado: !!r.amoblado, amenities: r.amenities || [], caracteristicas: r.caracteristicas || [], fotos, video: r.video_url ? { tipo: r.video_tipo || 'youtube', url: r.video_url } : null,
+      amoblado: !!r.amoblado, amenities: r.amenities || [], caracteristicas: r.caracteristicas || [], cualidades: r.cualidades_verificadas || [], fotos, video: r.video_url ? { tipo: r.video_tipo || 'youtube', url: r.video_url } : null,
       descripcion: r.descripcion || '', plazo: r.plazo || '', emprendimiento: r.emprendimiento || null, etapa: r.etapa || null, entrega: r.entrega || null, propietarioEmail: r.propietario_email || null, publicadoEn: r.publicado_en || r.created_at, estado: r.estado, reservado: r.estado === 'reservado', publicadorId: pubId, destacado: !!(r.destacado_hasta && new Date(r.destacado_hasta) > new Date()), demo: false, codigo: r.codigo, apto: r.caracteristicas && r.caracteristicas.length ? r.caracteristicas.slice(0,2) : (r.operacion === 'venta' ? ['Apto crédito'] : []), fromStore: true };
   };
 
@@ -84,6 +86,9 @@
       if (window.BPStore) {
         await window.BPStore.init();
         const recs = await window.BPStore.publishedAvisos();
+        /* Quién responde por cada publicador: la persona titular y su matrícula (migración 01).
+           Si la vista no existe todavía, se sigue con lo que trae la fila del publicador. */
+        try { if (window.BPStore.sb) { const { data: tit } = await window.BPStore.sb.schema('portal').from('publicador_publico').select('id,titular_nombre,titular_colegio,titular_matricula,titular_matricula_verificada'); (tit || []).forEach(t => { D.titulares[t.id] = t; }); } } catch (e) { /* sin migración */ }
         for (const r of recs) publicados.push(await D.fromStore(r));
       }
     } catch (e) { console.warn('store', e); }
