@@ -257,6 +257,7 @@
   /* ── curación ─────────────────────────────────────────── */
   S.isCurador = async function(){
     if (!S.session) return false;
+    if (DEMO) return true; /* modo demo: también se recorre la curación */
     if (S.mode === 'supabase') { const { data } = await S.sb.schema('portal').from('curadores').select('email').eq('email', S.session.email).maybeSingle(); return !!data; }
     return true; /* modo local: cualquiera con sesión, para probar */
   };
