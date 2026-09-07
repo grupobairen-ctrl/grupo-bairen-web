@@ -87,13 +87,47 @@
       return data || null;
     }
     if (!S.session) return null;
-    if (S.mode === 'supabase') { const { data } = await S.sb.schema('portal').from('publicadores').select('*').eq('auth_user_id', S.session.id).maybeSingle(); return data || null; }
+    if (S.mode === 'supabase') {
+      /* Modelo nuevo (migración 01): la cuenta es una persona, y la persona es miembro de un publicador.
+         Si la migración todavía no corrió, la consulta falla y se cae al modelo viejo (auth_user_id). */
+      try {
+        const { data: m, error } = await S.sb.schema('portal').from('membresias')
+          .select('rol, publicadores(*), personas!inner(auth_user_id)')
+          .eq('personas.auth_user_id', S.session.id).is('hasta', null).order('desde').limit(1).maybeSingle();
+        if (!error && m && m.publicadores) return m.publicadores;
+      } catch (e) { /* sin migración: seguimos */ }
+      const { data } = await S.sb.schema('portal').from('publicadores').select('*').eq('auth_user_id', S.session.id).maybeSingle(); return data || null;
+    }
     return L.pubs.get([]).find(p => p.auth_user_id === S.session.id) || null;
+  };
+  /* La persona detrás de la cuenta (modelo nuevo). null si no hay migración o no se registró. */
+  S.getMyPersona = async function(){
+    if (!S.session || S.mode !== 'supabase' || DEMO) return null;
+    try { const { data, error } = await S.sb.schema('portal').from('personas').select('*').eq('auth_user_id', S.session.id).maybeSingle(); return error ? null : (data || null); }
+    catch (e) { return null; }
+  };
+  /* Asegura persona + membresía de titular para un publicador recién guardado. Tolerante: si no hay migración, no hace nada. */
+  S.vincularTitular = async function(pub, datos){
+    if (!S.session || S.mode !== 'supabase' || !pub || !pub.id) return null;
+    try {
+      const mat = (datos && datos.matricula) ? String(datos.matricula) : (pub.matricula || '');
+      const persona = {
+        auth_user_id: S.session.id,
+        nombre: (datos && datos.responsable) || pub.responsable || pub.nombre,
+        email: pub.email || S.session.email, telefono: pub.telefono || null, whatsapp: pub.whatsapp || null,
+        matricula: (mat.replace(/\D/g, '') || null), colegio: mat ? (/cucicba/i.test(mat) ? 'CUCICBA' : (pub.colegio || null)) : null,
+      };
+      const { data: per, error } = await S.sb.schema('portal').from('personas').upsert(persona, { onConflict: 'auth_user_id' }).select().single();
+      if (error || !per) return null;
+      const { data: ya } = await S.sb.schema('portal').from('membresias').select('id').eq('persona_id', per.id).eq('publicador_id', pub.id).is('hasta', null).maybeSingle();
+      if (!ya) await S.sb.schema('portal').from('membresias').insert({ persona_id: per.id, publicador_id: pub.id, rol: 'titular' });
+      return per;
+    } catch (e) { return null; }
   };
   S.savePublicador = async function(p){
     if (!S.session) throw new Error('sin sesión');
     const rec = Object.assign({ tipo:'dueno', verificado:false, zonas:[], badge: p.tipo === 'dueno' ? 'Dueño verificado' : p.tipo === 'desarrolladora' ? 'Venta directa' : 'Corredor inmobiliario matriculado' }, p, { auth_user_id: S.session.id, email: p.email || S.session.email, slug: p.slug || slugify(p.nombre) + '-' + (S.session.id||'').slice(-4), updated_at: now() });
-    if (S.mode === 'supabase') { const { data, error } = await S.sb.schema('portal').from('publicadores').upsert(rec, { onConflict: 'auth_user_id' }).select().single(); if (error) throw error; return data; }
+    if (S.mode === 'supabase') { const { data, error } = await S.sb.schema('portal').from('publicadores').upsert(rec, { onConflict: 'auth_user_id' }).select().single(); if (error) throw error; await S.vincularTitular(data, p); return data; }
     S.track('publicador_alta', { publicador_id: rec.id || null, datos: { tipo: rec.tipo } });
     const all = L.pubs.get([]); const i = all.findIndex(x => x.auth_user_id === S.session.id); if (i > -1) { rec.id = all[i].id; rec.created_at = all[i].created_at; rec.verificado = all[i].verificado; all[i] = Object.assign(all[i], rec); } else { rec.id = uid(); rec.created_at = now(); all.push(rec); } L.pubs.set(all); return rec;
   };
