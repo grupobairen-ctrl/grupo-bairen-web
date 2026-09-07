@@ -317,7 +317,7 @@
   <div><b>Defensa de las y los consumidores</b>Para reclamos, <a href="https://autogestion.produccion.gob.ar/consumidores" rel="noopener" target="_blank">ingresá acá</a>. Normativa: <a href="https://www.argentina.gob.ar/normativa/nacional/ley-24240-638/texto" rel="noopener" target="_blank">Ley 24.240</a>. Consultas: consultas@consumidor.gob.ar</div>
   <div><b>Alquileres de vivienda en CABA</b>En cada aviso de alquiler publicado por un corredor se muestra la leyenda del art. 10 inc. 8 de la Ley 2340.</div>
 </div></div>
-<div class="p-demo-banner"><b>Web de prueba</b> · rama portal · datos reales de BAIREN más dos avisos de ejemplo</div>`;
+<div class="p-demo-banner">${window.BPStore && BPStore.demo ? '<b style="color:#E8B84B">MODO DEMO</b> · sesión de mentira para recorrer el panel · nada de lo que toques se guarda · salir con <code>?demo=0</code>' : '<b>Web de prueba</b> · rama portal · datos reales de BAIREN más dos avisos de ejemplo'}</div>`;
     const host = document.getElementById('pFooter'); if (host) host.innerHTML = html;
   };
 

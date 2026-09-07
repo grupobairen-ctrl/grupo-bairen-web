@@ -23,6 +23,23 @@
   /* Reducción de fotos en el navegador (máximo 1600 px de lado, JPEG 82 %) */
   S.shrink = function(file, max){ return new Promise(res => { const img = new Image(); const u = URL.createObjectURL(file); img.onload = () => { const k = Math.min(1, (max||1600) / Math.max(img.width, img.height)); const c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); c.toBlob(b => { URL.revokeObjectURL(u); res(b || file); }, 'image/jpeg', .82); }; img.onerror = () => res(file); img.src = u; }); };
 
+  /* ── modo demo ─────────────────────────────────────────
+     Entra al panel sin pasar por el código de mail, leyendo los datos reales de
+     Supabase. Sirve para recorrer el producto sin depender del envío de mails.
+     Solo se activa en la máquina de desarrollo o en un preview de Vercel: en un
+     dominio de verdad queda muerto. Se prende con ?demo=1 y se apaga con ?demo=0. */
+  const DEMO = (() => {
+    try {
+      const h = location.hostname;
+      if (!(h === 'localhost' || h === '127.0.0.1' || /^192\.168\./.test(h) || /\.vercel\.app$/.test(h))) return false;
+      const q = new URLSearchParams(location.search).get('demo');
+      if (q === '1') sessionStorage.setItem('bp_demo', '1');
+      if (q === '0') sessionStorage.removeItem('bp_demo');
+      return sessionStorage.getItem('bp_demo') === '1';
+    } catch (e) { return false; }
+  })();
+  S.demo = DEMO;
+
   /* ── init ─────────────────────────────────────────────── */
   S.init = function(){
     if (S.ready) return S.ready;
@@ -31,10 +48,16 @@
         if (window.bairenReady) {
           const sb = await Promise.race([window.bairenReady, new Promise((_, r) => setTimeout(() => r(new Error('sdk')), 6000))]);
           const probe = await sb.schema('portal').from('publicadores').select('id').limit(1);
-          if (!probe.error) { S.mode = 'supabase'; S.sb = sb; const { data } = await sb.auth.getUser(); S.session = data && data.user ? { id: data.user.id, email: data.user.email } : null; sb.auth.onAuthStateChange((_, sess) => { S.session = sess && sess.user ? { id: sess.user.id, email: sess.user.email } : null; if (window.BP && BP.applySession) BP.applySession(S.session, S.mode); }); }
+          if (!probe.error) { S.mode = 'supabase'; S.sb = sb; const { data } = await sb.auth.getUser(); S.session = data && data.user ? { id: data.user.id, email: data.user.email } : null; sb.auth.onAuthStateChange((_, sess) => { if (DEMO) return; S.session = sess && sess.user ? { id: sess.user.id, email: sess.user.email } : null; if (window.BP && BP.applySession) BP.applySession(S.session, S.mode); }); }
         }
       } catch (e) { /* modo local */ }
-      if (S.mode === 'local') S.session = L.user.get(null);
+      if (DEMO) {
+        /* Sesión de mentira: alcanza para ver el panel. Todo lo que se lee es real;
+           lo que se intente guardar lo va a rechazar la política por fila de Supabase,
+           que es justamente lo que tiene que pasar. */
+        S.session = { id: 'demo', email: 'demo@bairen.local', demo: true };
+      }
+      if (S.mode === 'local' && !DEMO) S.session = L.user.get(null);
       if (window.BP && BP.applySession) BP.applySession(S.session, S.mode);
       return S.mode;
     })();
@@ -59,6 +82,10 @@
 
   /* ── publicador ───────────────────────────────────────── */
   S.getMyPublicador = async function(){
+    if (DEMO && S.mode === 'supabase') {
+      const { data } = await S.sb.schema('portal').from('publicadores').select('*').eq('slug', 'maxim-rentals').maybeSingle();
+      return data || null;
+    }
     if (!S.session) return null;
     if (S.mode === 'supabase') { const { data } = await S.sb.schema('portal').from('publicadores').select('*').eq('auth_user_id', S.session.id).maybeSingle(); return data || null; }
     return L.pubs.get([]).find(p => p.auth_user_id === S.session.id) || null;
@@ -83,6 +110,12 @@
   /* ── avisos ───────────────────────────────────────────── */
   const codigo = (slug, op) => 'BA-' + (slug||'x').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8) + (op === 'venta' ? 'V' : op === 'alquiler' ? 'L' : 'M') + '-' + Math.random().toString(36).slice(2,5).toUpperCase();
   S.myAvisos = async function(){
+    if (DEMO && S.mode === 'supabase') {
+      const pub = await S.getMyPublicador();
+      if (!pub) return [];
+      const { data } = await S.sb.schema('portal').from('avisos').select('*, fotos(url, orden)').eq('publicador_id', pub.id).order('updated_at', { ascending:false });
+      return data || [];
+    }
     const pub = await S.getMyPublicador(); if (!pub) return [];
     if (S.mode === 'supabase') { const { data } = await S.sb.schema('portal').from('avisos').select('*, fotos(url, orden)').eq('publicador_id', pub.id).order('updated_at', { ascending:false }); return data || []; }
     return L.avisos.get([]).filter(a => a.publicador_id === pub.id).sort((a,b) => (b.updated_at||'').localeCompare(a.updated_at||''));
