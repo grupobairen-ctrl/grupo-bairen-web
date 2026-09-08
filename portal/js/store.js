@@ -214,7 +214,9 @@
     if (S.mode === 'supabase') {
       const fila = { publicador_id: esUUID(c.publicador_id) ? c.publicador_id : null, publicador_ref: esUUID(c.publicador_id) ? null : String(c.publicador_id || ''), nombre: c.nombre || '', email: c.email || '', telefono: c.telefono || null, mensaje: c.mensaje || null, canal: rec.canal, acepto_tyc: !!c.acepto_tyc, enviada_a: c.enviada_a || null };
       if (esUUID(c.aviso_id)) fila.aviso_id = c.aviso_id; else fila.aviso_ref = String(c.aviso_id || '');
-      const { error } = await S.sb.schema('portal').from('consultas').insert(fila);
+      if (c.visita_deseada) fila.visita_deseada = c.visita_deseada;
+      let { error } = await S.sb.schema('portal').from('consultas').insert(fila);
+      if (error && (fila.visita_deseada || fila.canal === 'visita')) { /* sin migración 02: se guarda como consulta común y la fecha va en el mensaje */ fila.mensaje = ((fila.mensaje || '') + ' [Pide visita: ' + new Date(c.visita_deseada).toLocaleString('es-AR') + ']').trim(); delete fila.visita_deseada; fila.canal = 'formulario'; ({ error } = await S.sb.schema('portal').from('consultas').insert(fila)); }
       if (error) console.warn('consulta no guardada', error);
       if (esUUID(c.aviso_id)) S.notify('consulta', { aviso_id: c.aviso_id, datos: { nombre: c.nombre, email: c.email, telefono: c.telefono, mensaje: c.mensaje } });
     }
@@ -249,7 +251,7 @@
   S.addVisita = async function(aviso_id, v){
     const pub = await S.getMyPublicador(); if (!pub) throw new Error('sin publicador');
     const rec = Object.assign({ tipo: 'visita', fecha: now(), nota: '' }, v, { aviso_id, publicador_id: pub.id, created_at: now() });
-    if (S.mode === 'supabase') { const { data, error } = await S.sb.schema('portal').from('visitas_reservas').insert(rec).select().single(); if (error) throw error; return data; }
+    if (S.mode === 'supabase') { let { data, error } = await S.sb.schema('portal').from('visitas_reservas').insert(rec).select().single(); if (error && (rec.consulta_id || rec.estado)) { delete rec.consulta_id; delete rec.estado; ({ data, error } = await S.sb.schema('portal').from('visitas_reservas').insert(rec).select().single()); } if (error) throw error; return data; }
     const all = LV.get([]); rec.id = uid(); all.push(rec); LV.set(all); return rec;
   };
   /* Todas las visitas de varios avisos en UNA consulta, agrupadas por aviso. El panel
