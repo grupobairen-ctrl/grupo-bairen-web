@@ -40,7 +40,7 @@
       m2: p.m2 || null, m2cub: p.m2 || null, amb,
       dorm: amb == null ? null : Math.max(1, amb - 1), banos: amb == null ? null : (amb >= 4 ? 2 : 1),
       cocheras: amen.indexOf('Cochera') > -1 ? 1 : 0, antiguedad: null,
-      amoblado: op === 'mediano' || amen.indexOf('Amoblado') > -1, amenities: amen,
+      amoblado: op === 'mediano' || amen.indexOf('Amoblado') > -1, amenities: amen, cualidades: [],
       fotos, video: p.video_url ? { tipo: p.video_tipo, url: p.video_url } : null,
       descripcion: p.descripcion || '', plazo: p.plazo || '',
       publicadoEn: p.created_at, estado: p.estado, reservado, fechaLiberacion: p.fecha_liberacion,
@@ -196,13 +196,14 @@
       if (f.m2max && a.m2 && a.m2 > f.m2max) return false;
       if (f.antig && a.antiguedad != null && a.antiguedad > f.antig) return false;
       if (f.amen && f.amen.length && !f.amen.every(x => a.amenities.indexOf(x) > -1)) return false;
+      if (f.cual && f.cual.length && !f.cual.every(x => (a.cualidades||[]).indexOf(x) > -1)) return false;
       if (f.amoblado && !a.amoblado) return false;
       if (f.dueno && D.pub(a.publicadorId).tipo !== 'dueno') return false;
       if (f.pub && a.publicadorId !== f.pub) return false;
       if (f.emp && D.pub(a.publicadorId).tipo !== 'desarrolladora') return false;
       if (f.video && !a.video) return false;
       if (f.hace && (BP.diasDesde(a.publicadoEn) == null || BP.diasDesde(a.publicadoEn) > f.hace)) return false;
-      if (f.q) { const q = f.q.toLowerCase(); const hay = [a.titulo, a.dir, a.barrio, a.zona, a.descripcion, a.amenities.join(' ')].join(' ').toLowerCase(); if (hay.indexOf(q) === -1) return false; }
+      if (f.q) { const q = f.q.toLowerCase(); const hay = [a.titulo, a.dir, a.barrio, a.zona, a.descripcion, a.amenities.join(' '), (a.cualidades||[]).join(' ')].join(' ').toLowerCase(); if (hay.indexOf(q) === -1) return false; }
       return true;
     });
   };
