@@ -252,6 +252,14 @@
     if (S.mode === 'supabase') { const { data, error } = await S.sb.schema('portal').from('visitas_reservas').insert(rec).select().single(); if (error) throw error; return data; }
     const all = LV.get([]); rec.id = uid(); all.push(rec); LV.set(all); return rec;
   };
+  /* Todas las visitas de varios avisos en UNA consulta, agrupadas por aviso. El panel
+     antes pedía una por aviso: 38 consultas en serie, quince segundos de espera. */
+  S.visitasDe = async function(ids){
+    const r = {}; (ids||[]).forEach(i => r[i] = []);
+    if (!ids || !ids.length) return r;
+    if (S.mode === 'supabase') { const { data } = await S.sb.schema('portal').from('visitas_reservas').select('*').in('aviso_id', ids).order('fecha', { ascending:false }); (data||[]).forEach(v => { (r[v.aviso_id] = r[v.aviso_id] || []).push(v); }); return r; }
+    LV.get([]).forEach(v => { if (r[v.aviso_id]) r[v.aviso_id].push(v); }); Object.values(r).forEach(l => l.sort((a,b) => (b.fecha||'').localeCompare(a.fecha||''))); return r;
+  };
   S.visitas = async function(aviso_id){
     if (S.mode === 'supabase') { const { data } = await S.sb.schema('portal').from('visitas_reservas').select('*').eq('aviso_id', aviso_id).order('fecha', { ascending:false }); return data || []; }
     return LV.get([]).filter(v => v.aviso_id === aviso_id).sort((a,b) => (b.fecha||'').localeCompare(a.fecha||''));
