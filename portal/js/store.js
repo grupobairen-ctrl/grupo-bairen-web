@@ -309,6 +309,26 @@
     if (S.mode === 'supabase') { const { data } = await S.sb.schema('portal').from('avisos').select('*, fotos(url, orden), publicadores(*)').in('estado_curacion', ['en_revision']).order('updated_at', { ascending:true }); return (data || []).map(a => { a.publicador = a.publicadores; delete a.publicadores; return a; }); }
     const pubs = L.pubs.get([]); return L.avisos.get([]).filter(a => a.estado_curacion === 'en_revision').map(a => Object.assign({}, a, { publicador: pubs.find(p => p.id === a.publicador_id) || null }));
   };
+  /* La persona titular de un publicador (migración 01). null si no hay migración o no tiene titular. */
+  S.titularDe = async function(pubId){
+    if (S.mode !== 'supabase') return null;
+    try { const { data, error } = await S.sb.schema('portal').from('membresias').select('personas(*)').eq('publicador_id', pubId).eq('rol', 'titular').is('hasta', null).order('desde').limit(1).maybeSingle(); return (!error && data && data.personas) ? data.personas : null; } catch (e) { return null; }
+  };
+  /* El curador deja constancia de que comprobó la matrícula en el registro público. */
+  S.marcarMatricula = async function(personaId, ok){
+    if (S.mode !== 'supabase') return;
+    const { error } = await S.sb.schema('portal').from('personas').update({ matricula_verificada_en: ok ? now() : null, matricula_verificada_por: ok ? ((S.session && S.session.email) || 'curador') : null }).eq('id', personaId);
+    if (error) throw error;
+  };
+  /* Qué dijo el que visitó. Lo carga el corredor; lo lee el propietario. Sin migración 02, va en la nota. */
+  S.feedbackVisita = async function(id, feedback){
+    if (S.mode === 'supabase') {
+      let { error } = await S.sb.schema('portal').from('visitas_reservas').update({ feedback, estado: 'realizada' }).eq('id', id);
+      if (error) { const { data: v } = await S.sb.schema('portal').from('visitas_reservas').select('nota').eq('id', id).maybeSingle(); ({ error } = await S.sb.schema('portal').from('visitas_reservas').update({ nota: ((v && v.nota) ? v.nota + ' · ' : '') + 'Feedback: ' + feedback }).eq('id', id)); }
+      if (error) throw error; return;
+    }
+    const all = LV.get([]); const v = all.find(x => x.id === id); if (v) { v.feedback = feedback; v.estado = 'realizada'; LV.set(all); }
+  };
   S.publicadoresPendientes = async function(){
     if (S.mode === 'supabase') { const { data } = await S.sb.schema('portal').from('publicadores').select('*, verificaciones(*)').eq('verificado', false); return data || []; }
     const v = L.verif.get([]); return L.pubs.get([]).filter(p => !p.verificado).map(p => Object.assign({}, p, { verificaciones: v.filter(x => x.publicador_id === p.id) }));
