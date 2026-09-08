@@ -312,7 +312,12 @@
   /* La persona titular de un publicador (migración 01). null si no hay migración o no tiene titular. */
   S.titularDe = async function(pubId){
     if (S.mode !== 'supabase') return null;
-    try { const { data, error } = await S.sb.schema('portal').from('membresias').select('personas(*)').eq('publicador_id', pubId).eq('rol', 'titular').is('hasta', null).order('desde').limit(1).maybeSingle(); return (!error && data && data.personas) ? data.personas : null; } catch (e) { return null; }
+    try { const { data, error } = await S.sb.schema('portal').from('membresias').select('personas(*)').eq('publicador_id', pubId).eq('rol', 'titular').is('hasta', null).order('desde').limit(1).maybeSingle(); if (!error && data && data.personas) return data.personas; } catch (e) { /* sigue */ }
+    /* Sin sesión con permiso (o en demo), lo público alcanza: la vista publicador_publico. */
+    try { const { data } = await S.sb.schema('portal').from('publicador_publico').select('titular_id,titular_nombre,titular_colegio,titular_matricula,titular_matricula_verificada').eq('id', pubId).maybeSingle();
+      if (data && data.titular_id) return { id: data.titular_id, nombre: data.titular_nombre, apellido: '', colegio: data.titular_colegio, matricula: data.titular_matricula, matricula_verificada_en: data.titular_matricula_verificada ? 'sí' : null, publico: true };
+    } catch (e) { /* nada */ }
+    return null;
   };
   /* El curador deja constancia de que comprobó la matrícula en el registro público. */
   S.marcarMatricula = async function(personaId, ok){
