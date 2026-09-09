@@ -46,7 +46,7 @@
     S.ready = (async () => {
       try {
         if (window.bairenReady) {
-          const sb = await Promise.race([window.bairenReady, new Promise((_, r) => setTimeout(() => r(new Error('sdk')), 6000))]);
+          const sb = await Promise.race([window.bairenReady, new Promise((_, r) => setTimeout(() => r(new Error('sdk')), 15000))]);
           const probe = await sb.schema('portal').from('publicadores').select('id').limit(1);
           if (!probe.error) { S.mode = 'supabase'; S.sb = sb; const { data } = await sb.auth.getUser(); S.session = data && data.user ? { id: data.user.id, email: data.user.email } : null; sb.auth.onAuthStateChange((_, sess) => { if (DEMO) return; S.session = sess && sess.user ? { id: sess.user.id, email: sess.user.email } : null; if (window.BP && BP.applySession) BP.applySession(S.session, S.mode); }); }
         }

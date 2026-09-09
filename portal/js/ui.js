@@ -205,19 +205,19 @@
     const dd = (ttl, items) => `<div class="p-dd-ttl">${ttl}</div>` + items.map(i=>`<a href="${i[1]}"${i[2]?` data-op="${i[2]}" data-zona="${BP.esc(i[3])}"`:''}>${i[0]}<span class="p-dd-n" hidden></span></a>`).join('');
     const zonasLinks = op => BP.ZONAS.map(z=>[`Departamentos ${BP.OPS[op].h} en ${BP.zonaLabel(z)}`, BP.urlBuscar({ op, zona: z }), op, z]);
     const html = `
-<nav class="navbar" aria-label="Principal">
+<nav class="navbar p-navbar" aria-label="Principal">
   <div class="p-nav-left">
     <a class="nav-logo" href="index.html" aria-label="BAIREN, inicio"><img src="../bairen_logo_96.png?v=1" alt="BAIREN" width="44" height="44" style="height:44px;width:44px;"></a>
+  </div>
     <div class="p-nav-menu">
       <div><button type="button" aria-haspopup="true" ${active==='venta'?'aria-current="page"':''}>Comprar <span class="car"></span></button>
         <div class="p-dd">${dd('Por barrio', zonasLinks('venta'))}${dd('Otras operaciones', [['Emprendimientos, venta directa','emprendimientos.html']])}${dd('Servicios', [['Publicá tu propiedad para vender','publicar.html'],['Índice BAIREN por barrio','index.html#indice'],['Guía de barrios','index.html#guia']])}</div></div>
       <div><button type="button" aria-haspopup="true" ${active==='alquiler'?'aria-current="page"':''}>Alquilar <span class="car"></span></button>
         <div class="p-dd">${dd('Operación', [['Largo plazo', BP.urlBuscar({ op:'alquiler' })],['Mediano plazo, amoblado', BP.urlBuscar({ op:'mediano' })]])}${dd('Por barrio', zonasLinks('alquiler'))}</div></div>
+      <a href="publicadores.html" ${active==='publicadores'?'aria-current="page"':''}>Publicadores</a>
       <div><button type="button" aria-haspopup="true">Servicios <span class="car"></span></button>
         <div class="p-dd">${dd('Para quien publica', [['Publicá tu propiedad','publicar.html'],['Importá tu cartera por archivo','importar.html'],['Producción de fichas, fotos y video','publicar.html#produccion'],['Panel del propietario en Bairen OS','publicar.html#panel']])}${dd('Para quien busca', [['Guía de barrios','index.html#guia'],['Índice BAIREN','index.html#indice'],['Cómo evitar fraudes','legales.html#fraudes']])}</div></div>
-      <a href="publicadores.html" ${active==='publicadores'?'aria-current="page"':''}>Buscar publicadores</a>
     </div>
-  </div>
   <div class="p-nav-right">
     <button type="button" class="p-ghost p-bell" aria-label="Notificaciones" data-notif>${BP.ico.bell}<span class="dot" hidden></span></button>
     <a class="p-ghost" href="ingresar.html?volver=contactos">${BP.ico.chat} Mis contactos</a>

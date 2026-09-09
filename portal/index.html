@@ -16,12 +16,19 @@
 <body>
 <div id="pHeader"></div>
 
-<section class="p-hero">
+<section class="p-hero p-hero-site">
   <video autoplay muted loop playsinline preload="metadata" poster="../hero-poster.jpg?v=2" aria-hidden="true"><source src="../hero.mp4?v=2" type="video/mp4"></video>
   <div class="p-hero-in">
-    <h1>Buenos Aires no se alquila. Se elige.</h1>
-    <p class="p-hero-sub">Propiedades seleccionadas en los barrios que valen la pena.</p>
-    <div class="p-search" role="search" aria-label="Buscar propiedades">
+    <h1><span class="hline">Buenos Aires</span><span class="hline">en su máximo esplendor.</span></h1>
+    <div class="p-doors" role="navigation" aria-label="Operaciones">
+      <a href="buscar.html?op=venta">Comprar</a><span class="sep" aria-hidden="true">·</span>
+      <a href="buscar.html?op=alquiler">Alquilar</a><span class="sep" aria-hidden="true">·</span>
+      <a href="publicar.html">Publicar</a>
+    </div>
+  </div>
+</section>
+<div class="p-searchbar"><div class="p-container">
+<div class="p-search" role="search" aria-label="Buscar propiedades">
       <div class="p-tabs" role="tablist">
         <button class="p-tab active" role="tab" data-op="venta" aria-selected="true">Comprar</button>
         <button class="p-tab" role="tab" data-op="alquiler" aria-selected="false">Alquilar</button>
@@ -36,8 +43,7 @@
       </form>
       <div class="p-chips" id="zonaChips" aria-live="polite"></div>
     </div>
-  </div>
-</section>
+</div></div>
 
 <section class="p-section" id="barrios">
   <div class="p-container p-zonas-wrap">
