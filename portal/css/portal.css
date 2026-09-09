@@ -1036,3 +1036,17 @@ html body .p-searchbar .p-field select,html body .p-searchbar .p-field input{bac
 html body .p-searchbar .p-field input::placeholder{color:#9AA1AE}
 html body .p-searchbar .p-field:focus-within select,html body .p-searchbar .p-field:focus-within input{border-color:var(--gold)}
 html body .p-searchbar .p-chips .p-chip{background:#fff;border:1px solid var(--p-line);color:var(--navy-deeper,#131D2D)}
+
+
+/* ── Buscador: la banda del catálogo de bairengroup.com (título, cantidad, mapa) ── */
+.p-catband{background:var(--navy-deeper,#131D2D);color:#FBFAF6;padding:40px 28px 36px;border-bottom:1px solid rgba(194,169,104,.18)}
+.p-catband-in{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:minmax(300px,5fr) 7fr;gap:48px;align-items:center}
+.p-catband-eyebrow{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);margin:0 0 12px}
+.p-catband h1{font-family:var(--font-display);font-weight:500;font-size:clamp(1.8rem,3.4vw,2.6rem);line-height:1.1;color:#FBFAF6;margin:0 0 10px}
+.p-catband h1 span{color:var(--gold)}
+.p-catband-sub{color:rgba(251,250,246,.72);margin:0;max-width:46ch;font-size:.95rem;line-height:1.55}
+.p-catband-mapa{min-width:0}
+.p-catband-mapa .in{padding:8px 96px 8px 8px;max-width:760px;margin:0 auto}
+.p-catband .p-map-hint{color:rgba(251,250,246,.5);font-size:.72rem;letter-spacing:.04em;margin:8px 0 0;text-align:center}
+.p-results{grid-template-columns:1fr}
+@media(max-width:1023px){.p-catband{padding:26px 20px 22px}.p-catband-in{grid-template-columns:1fr;gap:16px}.p-catband-mapa{display:none}}
