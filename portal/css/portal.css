@@ -1199,7 +1199,7 @@ html body .p-searchbar .p-search .p-tab{color:#565E6E}
 
 
 /* ── Producción con IA y traducción en el formulario de publicar ── */
-.p-foto .mejorar{position:absolute;left:8px;bottom:8px;background:var(--navy-deeper,#131D2D);color:#FBFAF6;border:1px solid var(--gold);border-radius:999px;padding:6px 10px;font:500 .68rem/1 var(--font-body);letter-spacing:.08em;text-transform:uppercase;cursor:pointer;opacity:.92}
+.p-foto .mejorar{position:absolute;left:8px;top:40px;background:var(--navy-deeper,#131D2D);color:#FBFAF6;border:1px solid var(--gold);border-radius:999px;padding:6px 10px;font:500 .68rem/1 var(--font-body);letter-spacing:.08em;text-transform:uppercase;cursor:pointer;opacity:.92}
 .p-foto .mejorar:hover{opacity:1}.p-foto .mejorar[disabled]{opacity:.6;cursor:default}
 .p-iacmp{position:fixed;inset:0;z-index:1200;background:rgba(19,29,45,.82);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:12px}
 .p-iacmp .dos{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:1100px;width:100%}
