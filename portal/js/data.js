@@ -10,7 +10,7 @@
   D.PUBLICADORES = {
     'maxim-rentals': { id:'maxim-rentals', tipo:'inmobiliaria', nombre:'Maxim Rentals', responsable:'Maximiliano Matzkin', matricula:'CUCICBA 7527', colegio:'Colegio Único de Corredores Inmobiliarios de la Ciudad de Buenos Aires', badge:'Corredor inmobiliario matriculado', verificado:true, desde:'2026', inicial:'MR',
       whatsapp:null, email:null, telefono:null, zonas:['Recoleta','Palermo','Núñez','Puerto Madero','Belgrano'],
-      desc:'Oficina de corretaje a cargo de Maximiliano Matzkin. Intermedia y concluye cada operación que publica en BAIREN.' },
+      desc:'Oficina de corretaje a cargo de Maximiliano Matzkin, responsable de cada operación que publica en BAIREN.' },
     'inmobiliaria-ejemplo': { id:'inmobiliaria-ejemplo', tipo:'inmobiliaria', nombre:'Inmobiliaria Ejemplo', responsable:'Corredor de ejemplo', matricula:'CUCICBA 0000', badge:'Corredor inmobiliario matriculado', verificado:true, desde:'2026', inicial:'IE', demo:true,
       whatsapp:'5491100000000', email:'ejemplo@ejemplo.com', telefono:'+54 11 0000 0000', zonas:['Belgrano'], desc:'Publicador de ejemplo para mostrar cómo se ve una inmobiliaria con perfil propio. No es una empresa real.' },
     'desarrolladora-ejemplo': { id:'desarrolladora-ejemplo', tipo:'desarrolladora', nombre:'Desarrolladora Ejemplo', responsable:'Equipo comercial', matricula:null, badge:'Venta directa', verificado:true, desde:'2026', inicial:'DE', demo:true,
@@ -120,13 +120,13 @@
   };
 
   D.metaLine = a => [
-    a.m2 ? a.m2 + ' m² tot.' : null,
+    a.m2 ? a.m2 + ' m²' : null,
     a.amb ? (a.amb === 1 ? 'Monoamb.' : a.amb + ' amb.') : null,
     a.dorm ? a.dorm + ' dorm.' : null,
     a.banos ? a.banos + (a.banos === 1 ? ' baño' : ' baños') : null,
     a.cocheras ? a.cocheras + ' coch.' : null,
   ].filter(Boolean).join(' · ');
-  D.opTag = a => a.op === 'venta' ? 'Venta' : a.op === 'mediano' ? 'Mediano plazo' : 'Alquiler';
+  D.opTag = a => a.op === 'venta' ? 'Venta' : a.op === 'mediano' ? 'Alquiler, mediano plazo' : 'Alquiler';
   D.precioHTML = a => a.precio ? `${BP.fmtUSD(a.precio)}${a.periodo ? '<small>' + a.periodo + '</small>' : ''}` : 'Consultar precio';
   D.badgeHTML = pub => pub.tipo === 'dueno'
     ? `<span class="p-badge dueno">${BP.ico.shield} ${BP.esc(pub.badge || '')}</span>`

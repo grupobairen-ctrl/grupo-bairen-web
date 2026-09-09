@@ -23,7 +23,7 @@
   BP.urlFicha = function(a){ return BP.pretty ? 'propiedad-' + encodeURIComponent(a.id) : 'propiedad.html?id=' + encodeURIComponent(a.id); };
   BP.idFromPath = function(){ const seg = decodeURIComponent(location.pathname.split('/').pop() || ''); return /^propiedad-/.test(seg) ? seg.replace(/^propiedad-/, '') : null; };
   BP.OPS = { venta:{label:'Comprar', h:'en venta', per:''}, alquiler:{label:'Alquilar · largo plazo', h:'en alquiler', per:'/mes'}, mediano:{label:'Alquilar · mediano plazo', h:'en alquiler a mediano plazo', per:'/mes'} };
-  BP.LEYENDA_PLATAFORMA = 'BAIREN es una plataforma de propiedades y no ejerce el corretaje inmobiliario. Cada propiedad es publicada por su titular o por un corredor matriculado, responsable de la operación.';
+  BP.LEYENDA_PLATAFORMA = 'BAIREN es un portal de propiedades y no ejerce el corretaje inmobiliario. Cada propiedad es publicada por su titular o por un corredor matriculado, responsable de la operación.';
   BP.LEYENDA_ALQUILER = '"Para los casos de alquiler de vivienda, el monto máximo de comisión que se le puede requerir a los propietarios será el equivalente al cuatro con quince centésimos por ciento (4,15%) del valor total del respectivo contrato. Se encuentra prohibido cobrar a los inquilinos que sean personas físicas comisiones inmobiliarias y gastos de gestoría de informes".';
 
   BP.sbImg = function(u, w){
@@ -211,12 +211,12 @@
   </div>
     <div class="p-nav-menu">
       <div><button type="button" aria-haspopup="true" ${active==='venta'?'aria-current="page"':''}>Comprar <span class="car"></span></button>
-        <div class="p-dd">${dd('Por barrio', zonasLinks('venta'))}${dd('Otras operaciones', [['Emprendimientos, venta directa','emprendimientos.html']])}${dd('Servicios', [['Publicá tu propiedad para vender','publicar.html'],['Índice BAIREN por barrio','index.html#indice'],['Guía de barrios','index.html#guia']])}</div></div>
+        <div class="p-dd">${dd('Por barrio', zonasLinks('venta'))}${dd('También', [['Emprendimientos','emprendimientos.html']])}${dd('Servicios', [['Publicá tu propiedad','publicar.html'],['Índice BAIREN','index.html#indice'],['Guía de barrios','index.html#guia']])}</div></div>
       <div><button type="button" aria-haspopup="true" ${active==='alquiler'?'aria-current="page"':''}>Alquilar <span class="car"></span></button>
-        <div class="p-dd">${dd('Operación', [['Largo plazo', BP.urlBuscar({ op:'alquiler' })],['Mediano plazo, amoblado', BP.urlBuscar({ op:'mediano' })]])}${dd('Por barrio', zonasLinks('alquiler'))}</div></div>
+        <div class="p-dd">${dd('Plazo', [['Largo plazo', BP.urlBuscar({ op:'alquiler' })],['Mediano plazo, amoblado', BP.urlBuscar({ op:'mediano' })]])}${dd('Por barrio', zonasLinks('alquiler'))}</div></div>
       <a href="publicadores.html" ${active==='publicadores'?'aria-current="page"':''}>Publicadores</a>
       <div><button type="button" aria-haspopup="true">Servicios <span class="car"></span></button>
-        <div class="p-dd">${dd('Para quien publica', [['Publicá tu propiedad','publicar.html'],['Importá tu cartera por archivo','importar.html'],['Producción de fichas, fotos y video','publicar.html#produccion'],['Panel del propietario en Bairen OS','publicar.html#panel']])}${dd('Para quien busca', [['Guía de barrios','index.html#guia'],['Índice BAIREN','index.html#indice'],['Cómo evitar fraudes','legales.html#fraudes']])}</div></div>
+        <div class="p-dd">${dd('Para quien publica', [['Publicá tu propiedad','publicar.html'],['Importá tu cartera','importar.html'],['Producción de fichas','publicar.html#produccion'],['Panel del propietario','publicar.html#panel']])}${dd('Para quien busca', [['Guía de barrios','index.html#guia'],['Índice BAIREN','index.html#indice'],['Cómo evitar fraudes','legales.html#fraudes']])}</div></div>
     </div>
   <div class="p-nav-right">
     <button type="button" class="p-ghost p-bell" aria-label="Notificaciones" data-notif>${BP.ico.bell}<span class="dot" hidden></span></button>
@@ -230,7 +230,7 @@
 <div class="mobile-menu" id="mobileMenu">
   <a href="buscar.html?op=venta" class="m-link">Comprar</a>
   <a href="buscar.html?op=alquiler" class="m-link">Alquilar</a>
-  <a href="buscar.html?op=mediano" class="m-link">Mediano plazo</a>
+  <a href="buscar.html?op=mediano" class="m-link">Alquiler, mediano plazo</a>
   <a href="publicadores.html" class="m-link">Publicadores</a>
   <a href="index.html#guia" class="m-link">Guía de barrios</a>
   <div class="m-sep"></div>
@@ -292,11 +292,11 @@
     <div>
       <div><img src="../bairen_logo_96.png?v=1" alt="BAIREN" width="46" height="46" style="height:46px;width:46px;"></div>
       <div class="ft-brand-rule"></div>
-      <p class="ft-brand-tag">Propiedades seleccionadas en Buenos Aires. Para comprar, alquilar o publicar la tuya, en CABA y Zona Norte.</p>
+      <p class="ft-brand-tag">El portal de propiedades seleccionadas de Buenos Aires. Comprar, alquilar o publicar, en CABA y Zona Norte.</p>
       <p class="p-legend">${BP.LEYENDA_PLATAFORMA}</p>
     </div>
     <div class="ft-col"><div class="ft-col-ttl">Más BAIREN</div><ul>
-      <li><a href="buscar.html">Propiedades en Buenos Aires</a></li><li><a href="publicar.html">Publicar tu propiedad</a></li><li><a href="index.html#guia">Guía de barrios</a></li><li><a href="index.html#indice">Índice BAIREN</a></li><li><a href="legales.html#ayuda">Ayuda</a></li><li><a href="mailto:contacto@bairengroup.com">Contacto</a></li></ul></div>
+      <li><a href="buscar.html">Propiedades</a></li><li><a href="publicar.html">Publicar</a></li><li><a href="index.html#guia">Guía de barrios</a></li><li><a href="index.html#indice">Índice BAIREN</a></li><li><a href="legales.html#ayuda">Ayuda</a></li><li><a href="mailto:contacto@bairengroup.com">Contacto</a></li></ul></div>
     <div class="ft-col"><div class="ft-col-ttl">Publicadores</div><ul>
       <li><a href="publicadores.html">Inmobiliarias y corredores</a></li><li><a href="publicar.html#dueno">Dueños directos</a></li><li><a href="publicar.html#desarrolladora">Desarrolladoras</a></li><li><a href="criterios.html">Criterios de selección</a></li></ul></div>
     <div class="ft-col"><div class="ft-col-ttl">Barrios</div><ul>${zonas}</ul></div>
@@ -306,21 +306,21 @@
       <p class="ft-contact-txt">contacto@bairengroup.com<br>CABA · Zona Norte, Buenos Aires</p></div>
   </div>
   <div class="footer-bottom">
-    <span class="footer-copy">© 2026 Grupo Bairen. BAIREN es marca registrada.</span>
+    <span class="footer-copy">© 2026 BAIREN. Marca registrada.</span>
     <div class="footer-legal">
-      <a href="legales.html#terminos">Términos y condiciones de uso</a>
+      <a href="legales.html#terminos">Términos de uso</a>
       <a href="legales.html#contratacion">Términos de contratación</a>
       <a href="legales.html#privacidad">Política de privacidad</a>
     </div>
   </div>
 </footer>
 <div class="p-legal-strip"><div class="p-container">
-  <div><b>Botón de arrepentimiento</b><a href="legales.html#arrepentimiento">Solicitar la revocación de una contratación</a></div>
-  <div><b>Botón de baja de servicios</b><a href="legales.html#baja">Dar de baja un servicio contratado</a></div>
+  <div><b>Botón de arrepentimiento</b><a href="legales.html#arrepentimiento">Revocar una contratación</a></div>
+  <div><b>Botón de baja de servicios</b><a href="legales.html#baja">Dar de baja un servicio</a></div>
   <div><b>Defensa de las y los consumidores</b>Para reclamos, <a href="https://autogestion.produccion.gob.ar/consumidores" rel="noopener" target="_blank">ingresá acá</a>. Normativa: <a href="https://www.argentina.gob.ar/normativa/nacional/ley-24240-638/texto" rel="noopener" target="_blank">Ley 24.240</a>. Consultas: consultas@consumidor.gob.ar</div>
   <div><b>Alquileres de vivienda en CABA</b>En cada aviso de alquiler publicado por un corredor se muestra la leyenda del art. 10 inc. 8 de la Ley 2340.</div>
 </div></div>
-<div class="p-demo-banner">${window.BPStore && BPStore.demo ? '<b style="color:#E8B84B">MODO DEMO</b> · sesión de mentira para recorrer el panel · nada de lo que toques se guarda · salir con <code>?demo=0</code>' : '<b>Web de prueba</b> · rama portal · datos reales de BAIREN más dos avisos de ejemplo'}</div>`;
+<div class="p-demo-banner">${window.BPStore && BPStore.demo ? '<b style="color:#E8B84B">MODO DEMO</b> · sesión de mentira para recorrer el panel · nada de lo que toques se guarda · salir con <code>?demo=0</code>' : '<b>Web de prueba</b> · rama portal · datos reales de BAIREN más avisos de ejemplo'}</div>`;
     const host = document.getElementById('pFooter'); if (host) host.innerHTML = html;
   };
 
@@ -328,14 +328,14 @@
   BP.applySession = function(session, mode){
     const right = document.querySelector('.p-nav-right'); const mob = document.getElementById('mobileMenu');
     if (!right) return;
-    const modeTag = mode === 'local' ? '<span class="p-badge demo" style="margin-left:6px" title="Sin conexión con el esquema portal en Supabase: los datos quedan en este navegador">modo local</span>' : '';
+    const modeTag = mode === 'local' ? '<span class="p-badge demo" style="margin-left:6px" title="Sin base conectada: los datos quedan en este navegador">modo local</span>' : '';
     if (session) {
       right.innerHTML = `<button type="button" class="p-ghost p-bell" aria-label="Notificaciones" data-notif>${BP.ico.bell}<span class="dot" hidden></span></button>
         <a class="p-ghost" href="panel.html#interesados">${BP.ico.chat} Mis contactos</a>
         <a class="p-ghost" href="buscar.html?favs=1" aria-label="Favoritos">${BP.ico.heart}<span data-fav-count hidden></span></a>
         <a class="p-btn p-btn-sm" href="publicar-aviso.html">Publicar</a>
         <div class="p-nav-menu" style="display:flex"><div><button type="button" class="p-btn p-btn-sm p-btn-fill" aria-haspopup="true" style="padding:0 14px">${BP.ico.user} Mi cuenta <span class="car" style="border-color:var(--navy-deeper)"></span></button>
-          <div class="p-dd" style="left:auto;right:0"><div class="p-dd-ttl">${BP.esc(session.email)}${modeTag}</div><a href="panel.html#avisos">Mis avisos</a><a href="importar.html">Importar cartera</a><a href="panel.html#interesados">Interesados</a><a href="panel.html#contactos">Mis contactos</a><a href="buscar.html?favs=1">Favoritos</a><a href="panel.html#alertas">Búsquedas y alertas</a><a href="panel.html#cuenta">Mi cuenta</a><a href="curacion.html" data-curador hidden>Curación BAIREN</a><a href="#" data-logout>Cerrar sesión</a></div></div></div>`;
+          <div class="p-dd" style="left:auto;right:0"><div class="p-dd-ttl">${BP.esc(session.email)}${modeTag}</div><a href="panel.html#avisos">Mis avisos</a><a href="importar.html">Importar cartera</a><a href="panel.html#interesados">Interesados</a><a href="panel.html#contactos">Mis contactos</a><a href="buscar.html?favs=1">Favoritos</a><a href="panel.html#alertas">Búsquedas y alertas</a><a href="panel.html#cuenta">Mi cuenta</a><a href="curacion.html" data-curador hidden>Curación</a><a href="#" data-logout>Cerrar sesión</a></div></div></div>`;
       if (mob) { const cta = mob.querySelector('.m-cta'); if (cta) cta.innerHTML = `<a class="p-btn p-btn-sm" href="publicar-aviso.html">Publicar</a><a class="p-btn p-btn-sm p-btn-fill" href="panel.html">Mi cuenta</a>`; }
       right.querySelectorAll('[data-logout]').forEach(b => b.addEventListener('click', async e => { e.preventDefault(); await window.BPStore.signOut(); BP.toast('Sesión cerrada.'); setTimeout(() => location.href = 'index.html', 600); }));
       if (window.BPStore) window.BPStore.isCurador().then(ok => { right.querySelectorAll('[data-curador]').forEach(a => a.hidden = !ok); });

@@ -2,8 +2,8 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Propiedades en Buenos Aires — BAIREN</title>
-  <meta name="description" content="Departamentos en venta y en alquiler en los barrios seleccionados de Buenos Aires, publicados por corredores matriculados y dueños verificados.">
+  <title>Propiedades en Buenos Aires · BAIREN</title>
+  <meta name="description" content="Departamentos en venta y en alquiler en los barrios seleccionados de Buenos Aires. Publican corredores matriculados y dueños verificados.">
   <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#131D2D">
   <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,9 +18,9 @@
   <div class="p-catband-text">
     <p class="p-catband-eyebrow">BAIREN · Buenos Aires</p>
     <h1 id="resTitle">Propiedades en Buenos Aires</h1>
-    <p class="p-catband-sub">Propiedades seleccionadas. Publican corredores matriculados, dueños verificados y desarrolladoras; el contacto es directo con quien publica.</p>
+    <p class="p-catband-sub">Publican corredores matriculados, dueños verificados y desarrolladoras. El contacto va directo a quien publica.</p>
   </div>
-  <div class="p-catband-mapa"><div class="in"><div id="mapaResultados" role="group" aria-label="Mapa de barrios"></div><p class="p-map-hint">Tocá un barrio para filtrar. Los números son unidades publicadas.</p></div></div>
+  <div class="p-catband-mapa"><div class="in"><div id="mapaResultados" role="group" aria-label="Mapa de barrios"></div><p class="p-map-hint">Tocá un barrio para filtrar. El número es lo publicado hoy.</p></div></div>
 </div></div>
 
 <div class="p-filters" id="filters">
@@ -55,13 +55,13 @@
   <div class="panel" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
     <button type="button" class="x" data-close aria-label="Cerrar">×</button>
     <h3 id="drawerTitle">Más filtros</h3>
-    <p class="p-note" style="margin:0 0 6px">Todo lo que no entra en la barra.</p>
-    <div class="grp"><label class="t">Expensas, hasta (pesos por mes)</label><input type="number" id="expmax" class="p-fsel" style="width:100%;padding-left:12px;background-image:none" placeholder="Sin máximo"></div>
+    <p class="p-note" style="margin:0 0 6px">Afiná la búsqueda.</p>
+    <div class="grp"><label class="t">Expensas máximas, pesos por mes</label><input type="number" id="expmax" class="p-fsel" style="width:100%;padding-left:12px;background-image:none" placeholder="Sin máximo"></div>
     <div class="grp"><label class="t">Baños, mínimo</label><div class="seg" data-key="banos" style="display:flex;gap:6px;flex-wrap:wrap"><button type="button" class="p-fbtn" data-v="">Todos</button><button type="button" class="p-fbtn" data-v="1">1+</button><button type="button" class="p-fbtn" data-v="2">2+</button><button type="button" class="p-fbtn" data-v="3">3+</button></div></div>
     <div class="grp"><label class="t">Cocheras, mínimo</label><div class="seg" data-key="coch" style="display:flex;gap:6px;flex-wrap:wrap"><button type="button" class="p-fbtn" data-v="">Todas</button><button type="button" class="p-fbtn" data-v="1">1+</button><button type="button" class="p-fbtn" data-v="2">2+</button></div></div>
     <div class="grp"><label class="t">Superficie total, m²</label><div style="display:flex;gap:8px"><input type="number" id="m2min" class="p-fsel" style="flex:1;padding-left:12px;background-image:none" placeholder="Desde"><input type="number" id="m2max" class="p-fsel" style="flex:1;padding-left:12px;background-image:none" placeholder="Hasta"></div></div>
     <div class="grp"><label class="t">Antigüedad</label><select id="antig" class="p-fsel" style="width:100%"><option value="">Cualquiera</option><option value="0">A estrenar</option><option value="5">Hasta 5 años</option><option value="20">Hasta 20 años</option><option value="50">Hasta 50 años</option></select></div>
-    <div class="grp"><label class="t">Cualidades verificadas por BAIREN</label><p class="p-note" style="margin:0 0 8px">Solo aparecen las que alguien de BAIREN comprobó en la unidad.</p><div class="checks" id="cualChecks"></div></div>
+    <div class="grp"><label class="t">Cualidades verificadas por BAIREN</label><p class="p-note" style="margin:0 0 8px">Comprobadas por BAIREN en la unidad.</p><div class="checks" id="cualChecks"></div></div>
     <div class="grp"><label class="t">Amenities y características</label><div class="checks" id="amenChecks"></div></div>
     <div class="grp"><label class="t">Publicación</label><div class="checks"><label><input type="checkbox" id="reservadas"> Incluir reservadas</label><label><input type="checkbox" id="amoblado"> Amoblado</label><label><input type="checkbox" id="dueno"> Solo dueños directos</label><label><input type="checkbox" id="video"> Con video</label><label>Publicado hace <select id="hace" class="p-fsel" style="height:34px;padding:0 28px 0 8px;margin-left:6px"><option value="">cualquier fecha</option><option value="1">hoy</option><option value="7">7 días</option><option value="30">30 días</option></select></label></div></div>
     <div class="foot"><button type="button" class="lnk" id="clearAll" style="background:none;border:0;text-decoration:underline;color:var(--text-mid);cursor:pointer">Limpiar todo</button><button type="button" class="p-btn p-btn-navy" id="applyDrawer">Ver resultados</button></div>
@@ -127,17 +127,17 @@ document.addEventListener('DOMContentLoaded', function(){
     const ops = BPData.opsConUnidades(avisos, zona);
     const otras = Object.keys(ops).filter(o => o !== F.op).sort((a,b) => ops[b]-ops[a]);
     const donde = zona ? ' en ' + BP.zonaLabel(zona) : '';
-    let t = 'En BAIREN entran pocas unidades: cada una pasa un estándar de edificio, estado y presentación. ';
+    let t = 'Acá entran pocas unidades: cada una pasa un estándar de edificio, estado y presentación. ';
     if (otras.length) t += 'Hoy' + donde + ' hay ' + otras.map(o => `<a href="${BP.urlBuscar({ op: o, zona: zona || undefined })}" style="text-decoration:underline">${ops[o]} ${ops[o] === 1 ? 'unidad' : 'unidades'} ${BP.OPS[o].h}</a>`).join(' y ') + '.';
-    else t += 'Probá con otro barrio o sacá algún filtro.';
+    else t += 'Probá con otro barrio o sacá un filtro.';
     if (!F.reservadas) { const res = BPData.filter(avisos, Object.assign({}, F, { reservadas: true })).filter(a => a.reservado).length; if (res) t += ' También hay ' + res + (res === 1 ? ' reservada' : ' reservadas') + ', que podés incluir desde Más filtros.'; }
-    return t + ' Si tenés una propiedad así, <a href="publicar.html" style="text-decoration:underline">publicala</a>.';
+    return t + ' ¿Tenés una propiedad así? <a href="publicar.html" style="text-decoration:underline">Publicala</a>.';
   }
   function render(){
     let list = BPData.filter(avisos, F); list = BPData.sort(list, F.sort);
     const n = list.length; const pages = Math.max(1, Math.ceil(n / PER_PAGE)); if (F.page > pages) F.page = pages;
     const slice = list.slice((F.page-1)*PER_PAGE, F.page*PER_PAGE);
-    document.getElementById('resTitle').innerHTML = titulo(n); document.title = titulo(n).replace(/<[^>]+>/g,'') + ' — BAIREN';
+    document.getElementById('resTitle').innerHTML = titulo(n); document.title = titulo(n).replace(/<[^>]+>/g,'') + ' · BAIREN';
     const el = document.getElementById('list');
     el.innerHTML = n ? slice.map(BPData.cardH).join('') : `<div class="p-empty"><b style="display:block;color:var(--navy-deeper);font-family:var(--font-display);font-size:1.2rem;margin-bottom:6px">${F.favs ? 'Todavía no guardaste propiedades' : F.emp ? 'Todavía no hay emprendimientos publicados' : 'Todavía no hay unidades así'}</b>${F.favs ? 'Tocá el corazón en cualquier ficha y la vas a ver acá.' : F.emp ? 'Los emprendimientos tienen su propia página: <a href="emprendimientos.html" style="text-decoration:underline">ver emprendimientos</a>. Si sos desarrolladora, <a href="publicar.html#desarrolladora" style="text-decoration:underline">publicá el tuyo</a>.' : sugerencias()}</div>`;
     BPData.bindFavs(el);
@@ -184,7 +184,7 @@ document.addEventListener('DOMContentLoaded', function(){
   document.getElementById('applyDrawer').addEventListener('click', () => { F.expmax = Number(document.getElementById('expmax').value||0); F.m2min = Number(document.getElementById('m2min').value||0); F.m2max = Number(document.getElementById('m2max').value||0); F.antig = Number(document.getElementById('antig').value||0); F.hace = Number(document.getElementById('hace').value||0); F.reservadas = document.getElementById('reservadas').checked; F.amoblado = document.getElementById('amoblado').checked; F.dueno = document.getElementById('dueno').checked; F.video = document.getElementById('video').checked; F.amen = Array.from(document.querySelectorAll('[data-amen]:checked')).map(c => c.dataset.amen); F.cual = Array.from(document.querySelectorAll('[data-cual]:checked')).map(c => c.dataset.cual); openDrawer(false); apply(); });
   document.getElementById('clearAll').addEventListener('click', () => { Object.assign(F, { zonas:[], q:'', amb:0, dorm:0, banos:0, coch:0, pmin:0, pmax:0, expmax:0, m2min:0, m2max:0, antig:0, amen:[], cual:[], amoblado:false, dueno:false, video:false, hace:0, favs:false, reservadas:false }); openDrawer(false); apply(); });
   /* alerta */
-  document.getElementById('alertBtn').addEventListener('click', () => { const a = BP.alerts.get(); a.push({ creada: new Date().toISOString(), filtros: Object.assign({}, F), url: location.href }); BP.alerts.set(a); BP.toast('Alerta guardada en este navegador. Con tu cuenta te llega por mail.'); });
+  document.getElementById('alertBtn').addEventListener('click', () => { const a = BP.alerts.get(); a.push({ creada: new Date().toISOString(), filtros: Object.assign({}, F), url: location.href }); BP.alerts.set(a); BP.toast('Alerta guardada en este navegador. Con tu cuenta, te llega por mail.'); });
 
   syncControls();
   try { render(); } catch (err) { console.error(err); BP.estadoError(document.getElementById('list'), 'No pudimos cargar las propiedades.', () => location.reload()); }

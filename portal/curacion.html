@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Curación — BAIREN</title>
+  <title>Curación · BAIREN</title>
   <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#131D2D">
   <script>
 /* 6.5 · Cuatro páginas bajaban todo para terminar redirigiendo a Ingresar.
@@ -35,7 +35,7 @@
 <div class="p-band"><div class="p-container" style="max-width:980px">
   <span class="p-eyebrow">Panel BAIREN</span>
   <h1 class="p-h2">Curación</h1>
-  <p class="p-sub">Lo que entra, entra porque pasó el estándar. Cada rechazo lleva un motivo que el publicador ve en su panel.</p>
+  <p class="p-sub">Entra lo que pasa el estándar. Cada rechazo lleva un motivo que el publicador ve en su panel.</p>
   <div class="p-tabs2" role="tablist" style="margin-bottom:0;border-bottom:0"><button type="button" class="on" data-t="cola">Avisos en revisión</button><button type="button" data-t="pubs">Publicadores por verificar</button></div>
 </div></div>
 <section class="p-page after-band"><div class="p-container" style="max-width:980px">
@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function(){
   BP.header(); BP.footer();
   await BPStore.init();
   if (!BPStore.requireSession('curacion')) return;
-  if (!(await BPStore.isCurador())) { document.getElementById('out').innerHTML = '<div class="p-empty">Esta sección es solo para el equipo de curación de BAIREN.</div>'; return; }
+  if (!(await BPStore.isCurador())) { document.getElementById('out').innerHTML = '<div class="p-empty">Solo para el equipo de curación de BAIREN.</div>'; return; }
   const out = document.getElementById('out'); let t = 'cola';
   document.querySelectorAll('.p-tabs2 button').forEach(b => b.addEventListener('click', () => { document.querySelectorAll('.p-tabs2 button').forEach(x => x.classList.toggle('on', x === b)); t = b.dataset.t; render(); }));
   const ok = (c, txt) => `<span class="${c?'ok':'no'}">${c ? BP.ico.check : BP.ico.x} ${txt}</span>`;
@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function(){
     for (const a of cola) { const fotos = []; for (const f of (a.fotos||[]).slice().sort((x,y)=>(x.orden||0)-(y.orden||0))) fotos.push(await BPStore.resolveFoto(f.url)); const p = a.publicador || {};
       const enZona = BP.ZONAS.indexOf(a.zona) > -1; const descOk = (a.descripcion||'').length >= 150; const fotosOk = fotos.length >= 8 || a.quiero_produccion; const datosOk = !!(a.m2_total && a.ambientes && a.precio);
       html += `<div class="p-cur" data-id="${a.id}"><div><div class="ph">${fotos[0] ? `<img src="${fotos[0]}" alt="">` : ''}</div><div class="thumbs">${fotos.slice(1,9).map(u => `<img src="${u}" alt="">`).join('')}</div></div>
-        <div><b>${BP.esc(a.titulo || a.direccion)}</b><div class="m">${a.operacion === 'venta' ? 'Venta' : a.operacion === 'mediano' ? 'Mediano plazo' : 'Alquiler'} · ${BP.esc(a.tipo||'')} · ${BP.esc(a.direccion)} ${BP.esc(a.unidad||'')}, ${BP.esc(a.barrio||'')} (${BP.zonaLabel(a.zona||'')}) · ${BP.fmtUSD(Number(a.precio))}${a.operacion !== 'venta' ? '/mes' : ''}${a.expensas ? ' · expensas $ ' + BP.fmtN(a.expensas) : ''}</div>
+        <div><b>${BP.esc(a.titulo || a.direccion)}</b><div class="m">${a.operacion === 'venta' ? 'Venta' : a.operacion === 'mediano' ? 'Alquiler, mediano plazo' : 'Alquiler'} · ${BP.esc(a.tipo||'')} · ${BP.esc(a.direccion)} ${BP.esc(a.unidad||'')}, ${BP.esc(a.barrio||'')} (${BP.zonaLabel(a.zona||'')}) · ${BP.fmtUSD(Number(a.precio))}${a.operacion !== 'venta' ? '/mes' : ''}${a.expensas ? ' · expensas $ ' + BP.fmtN(a.expensas) : ''}</div>
         <div class="m" style="margin-top:4px">Publica: <b>${BP.esc(p.nombre||'?')}</b> · ${p.tipo === 'dueno' ? 'dueño directo' : BP.esc(p.matricula||p.tipo||'')} · ${p.verificado ? 'verificado' : '<span class="p-badge dueno">sin verificar</span>'} · ${a.codigo||''}</div>
         <div class="p-check">${ok(enZona,'Zona BAIREN')}${ok(datosOk,'Datos completos')}${ok(fotosOk, fotos.length + ' fotos' + (a.quiero_produccion ? ' (pide producción)' : ''))}${ok(descOk,'Descripción de 150 o más')}${ok((a.amenities||[]).length>0,'Amenities informados')}${ok(!!p.verificado,'Publicador verificado')}</div>
         <p class="p-text" style="font-size:.86rem;max-height:120px;overflow:auto">${BP.esc(a.descripcion||'')}</p>
