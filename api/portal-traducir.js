@@ -51,6 +51,38 @@ function trozos(texto, max = 440) {
   return out;
 }
 
+/* Glosario inmobiliario: MyMemory traduce literal ("mono-room", "environments"). Después de
+   traducir, se corrigen los términos del rubro con la forma que usa el mercado en cada idioma. */
+const GLOSARIO = {
+  'es|en': [
+    [/\bmono[- ]?(room|environment|ambient)s?\b/gi, 'studio'], [/\bstudio apartment\b/gi, 'studio'],
+    [/\benvironments?\b/gi, 'rooms'], [/\b(\d+)\s*rooms?\b/gi, '$1 rooms'],
+    [/\bexpenses\b/gi, 'building fees'], [/\bcommon expenses\b/gi, 'building fees'],
+    [/\bgarage\b/gi, 'parking space'], [/\bparking lot\b/gi, 'parking space'],
+    [/\b(counter[- ]?front|rear[- ]?front)\b/gi, 'rear-facing'], [/\bfront(-facing)? apartment\b/gi, 'street-facing apartment'],
+    [/\bto (be )?release(d)?\b/gi, 'brand new'], [/\bbrand[- ]?new to release\b/gi, 'brand new'],
+    [/\bfurnished and equipped\b/gi, 'furnished and fully equipped'],
+    [/\b(medium|mid)[- ]term rental\b/gi, 'mid-term rental'], [/\blong[- ]term rental\b/gi, 'long-term rental'],
+    [/\bowner guarantee\b/gi, 'guarantor'], [/\bproperty guarantee\b/gi, 'guarantor'],
+    [/\bcaution insurance\b/gi, 'rental guarantee insurance'],
+    [/\bdependence\b/gi, 'service room'], [/\btoilette\b/gi, 'guest toilet'],
+    [/\bbalcony run\b/gi, 'wraparound balcony'], [/\bterrace of its own\b/gi, 'private terrace'],
+    [/\bPH\b/g, 'PH (townhouse-style apartment)'],
+  ],
+  'es|pt-BR': [
+    [/\bmono[- ]?(sala|ambiente)s?\b/gi, 'estúdio'], [/\bkitnet\b/gi, 'estúdio'],
+    [/\bambientes\b/gi, 'cômodos'],
+    [/\bexpensas\b/gi, 'condomínio'], [/\bdespesas comuns\b/gi, 'condomínio'],
+    [/\bcochera\b/gi, 'vaga de garagem'], [/\bgaragem\b/gi, 'vaga de garagem'],
+    [/\bcontrafrente\b/gi, 'fundos'], [/\ba estrear\b/gi, 'novo, nunca habitado'],
+    [/\bmobiliado e equipado\b/gi, 'mobiliado e totalmente equipado'],
+    [/\baluguel de m[eé]dio prazo\b/gi, 'aluguel de médio prazo'],
+    [/\bgarantia propriet[aá]ria\b/gi, 'fiador'], [/\bseguro (de )?cau[cç][aã]o\b/gi, 'seguro fiança'],
+    [/\btoilette\b/gi, 'lavabo'],
+  ],
+};
+function glosar(texto, par) { let s = texto; for (const [re, rep] of (GLOSARIO[par] || [])) s = s.replace(re, rep); return s; }
+
 async function mymemory(texto, par, email) {
   if (!texto) return '';
   const partes = [];
@@ -63,7 +95,7 @@ async function mymemory(texto, par, email) {
     if (!ok) throw new Error((j.responseDetails || 'MyMemory') + ' (' + (j.responseStatus || r.status) + ')');
     partes.push(j.responseData.translatedText);
   }
-  return partes.join(' ').replace(/ ?\n ?/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
+  return glosar(partes.join(' ').replace(/ ?\n ?/g, '\n').replace(/\n{3,}/g, '\n\n').trim(), par);
 }
 
 async function deepl(key, textos, target) {
