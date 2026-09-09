@@ -31,8 +31,8 @@
 <div class="p-search" role="search" aria-label="Buscar propiedades">
       <div class="p-tabs" role="tablist">
         <button class="p-tab active" role="tab" data-op="venta" aria-selected="true">Comprar</button>
-        <button class="p-tab" role="tab" data-op="alquiler" aria-selected="false">Alquilar</button>
-        <button class="p-tab" role="tab" data-op="mediano" aria-selected="false">Mediano plazo</button>
+        <button class="p-tab" role="tab" data-op="alquiler" aria-selected="false" aria-controls="plazoSel">Alquilar</button>
+        <div class="p-plazo" id="plazoSel" role="group" aria-label="Plazo del alquiler" hidden><label><input type="radio" name="plazo" value="alquiler" checked><span>Largo plazo</span></label><label><input type="radio" name="plazo" value="mediano"><span>Mediano plazo</span></label></div>
         <button class="p-tab" role="tab" data-op="emprendimientos" aria-selected="false" title="Venta directa de desarrolladoras">Emprendimientos</button>
       </div>
       <form class="p-search-row" id="searchForm" action="buscar.html" method="get">
@@ -122,12 +122,20 @@ document.addEventListener('DOMContentLoaded', function(){
   BP.header('home'); BP.footer(); if (window.BPStore) BPStore.init(); BP.reveal();
   document.querySelector('#searchForm .p-btn .ic').innerHTML = BP.ico.arrow;
 
-  /* pestañas de operación */
-  const opInput = document.getElementById('opInput');
-  document.querySelectorAll('.p-tab').forEach(t => t.addEventListener('click', () => {
-    document.querySelectorAll('.p-tab').forEach(x => { x.classList.remove('active'); x.setAttribute('aria-selected','false'); });
-    t.classList.add('active'); t.setAttribute('aria-selected','true'); opInput.value = t.dataset.op;
-  }));
+  /* pestañas de operación: tres (Comprar, Alquilar, Emprendimientos). El plazo del alquiler
+     no es una operación aparte: es un sub-selector que aparece solo con Alquilar activa. */
+  const opInput = document.getElementById('opInput'), plazoSel = document.getElementById('plazoSel');
+  const plazoActual = () => (plazoSel.querySelector('input:checked') || {}).value || 'alquiler';
+  const opDeTab = t => t.dataset.op === 'alquiler' ? plazoActual() : t.dataset.op;
+  const activarTab = op => {
+    const tabOp = (op === 'mediano' || op === 'alquiler') ? 'alquiler' : op;
+    document.querySelectorAll('.p-tab').forEach(x => { const on = x.dataset.op === tabOp; x.classList.toggle('active', on); x.setAttribute('aria-selected', on ? 'true' : 'false'); });
+    plazoSel.hidden = tabOp !== 'alquiler';
+    if (tabOp === 'alquiler') { const r = plazoSel.querySelector(`input[value="${op}"]`); if (r) r.checked = true; }
+    opInput.value = op;
+  };
+  document.querySelectorAll('.p-tab').forEach(t => t.addEventListener('click', () => activarTab(opDeTab(t))));
+  plazoSel.querySelectorAll('input').forEach(r => r.addEventListener('change', () => activarTab(r.value)));
 
   /* sugerencias limitadas a las ocho zonas + características */
   const input = document.getElementById('zonaInput'), sugg = document.getElementById('sugg'), chips = document.getElementById('zonaChips');
@@ -148,11 +156,12 @@ document.addEventListener('DOMContentLoaded', function(){
   BP.anotarMenus(avisos);
   /* La pestaña por defecto es la operación con más inventario publicado, calculada de los datos */
   let opActiva = BPData.opConMasInventario(avisos);
-  document.querySelectorAll('.p-tab').forEach(t => { const on = t.dataset.op === opActiva; t.classList.toggle('active', on); t.setAttribute('aria-selected', on ? 'true' : 'false'); });
-  opInput.value = opActiva;
+  activarTab(opActiva);
   let counts = BPData.countsByZona(avisos, opActiva); window.__counts = counts;
   const pintarZonas = () => { document.getElementById('zonasGrid').innerHTML = BP.ZONAS.map(z => `<a class="p-zona ${counts[z]?'':'zero'}" href="${BP.urlBuscar({ op: opActiva, zona: z })}"><div><b>${BP.zonaLabel(z)}</b><br><span>${z==='GBA Norte'?'Vicente López · San Isidro · Tigre':'Capital Federal'}</span></div><span class="n ${counts[z]?'':'zero'}">${counts[z] ? counts[z] + (counts[z]===1?' unidad':' unidades') : 'Sin unidades hoy'}</span></a>`).join(''); if (window.__mapaHome) window.__mapaHome.setCounts(counts); };
-  document.querySelectorAll('.p-tab').forEach(t => t.addEventListener('click', () => { if (t.dataset.op === 'emprendimientos') return; opActiva = t.dataset.op; counts = BPData.countsByZona(avisos, opActiva); window.__counts = counts; pintarZonas(); }));
+  const cambiarOp = op => { if (op === 'emprendimientos') return; opActiva = op; counts = BPData.countsByZona(avisos, opActiva); window.__counts = counts; pintarZonas(); };
+  document.querySelectorAll('.p-tab').forEach(t => t.addEventListener('click', () => cambiarOp(opDeTab(t))));
+  plazoSel.querySelectorAll('input').forEach(r => r.addEventListener('change', () => cambiarOp(r.value)));
 
   /* zonas */
   pintarZonas();

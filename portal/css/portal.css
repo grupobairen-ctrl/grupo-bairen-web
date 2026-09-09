@@ -1102,3 +1102,21 @@ html body .p-searchbar .p-chips .p-chip{background:#fff;border:1px solid var(--p
 .p-msheet-list button.on span::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--gold);margin-right:10px;vertical-align:middle}
 .p-msheet-list button:active{opacity:.7}
 .p-msheet-wrap .p-msheet:focus-visible,.p-msheet-list button:focus-visible{outline-color:#DECDA0}
+
+/* ── Portada: tres operaciones. El plazo del alquiler es un sub-selector chico al lado de Alquilar ── */
+.p-plazo{display:inline-flex;align-items:center;gap:2px;margin:0 8px 0 2px;padding:3px;border:1px solid var(--p-line);border-radius:999px;background:#fff;flex-shrink:0;align-self:center}
+.p-plazo[hidden]{display:none}
+.p-plazo label{position:relative;display:inline-flex;cursor:pointer}
+.p-plazo input{position:absolute;opacity:0;width:1px;height:1px;margin:0;pointer-events:none}
+.p-plazo span{display:inline-flex;align-items:center;min-height:30px;padding:0 12px;border-radius:999px;font:500 .64rem/1 var(--font-body);letter-spacing:.12em;text-transform:uppercase;color:var(--text-mid);white-space:nowrap;transition:background-color .2s,color .2s}
+.p-plazo label:hover span{color:var(--navy-deeper)}
+.p-plazo input:checked+span{background:var(--navy-deeper);color:#FBFAF6}
+.p-plazo input:focus-visible+span{outline:3px solid var(--navy-deeper);outline-offset:2px}
+@media(max-width:820px){
+  .p-searchbar .p-tabs{flex-wrap:wrap;overflow:visible;gap:0 2px}
+  .p-plazo{order:9;flex-basis:100%;margin:2px 0 6px}
+  .p-plazo span{min-height:40px;padding:0 16px}
+}
+/* Menú del celular: mediano plazo cuelga de Alquilar, no es una entrada del mismo nivel */
+.mobile-menu a.m-sub{font-size:.95rem;padding-left:24px;position:relative;color:rgba(255,255,255,.62)}
+.mobile-menu a.m-sub::before{content:"";position:absolute;left:6px;top:50%;width:10px;height:1px;background:var(--gold)}

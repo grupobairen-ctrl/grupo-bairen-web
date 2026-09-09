@@ -230,7 +230,8 @@
 <div class="mobile-menu" id="mobileMenu">
   <a href="buscar.html?op=venta" class="m-link">Comprar</a>
   <a href="buscar.html?op=alquiler" class="m-link">Alquilar</a>
-  <a href="buscar.html?op=mediano" class="m-link">Mediano plazo</a>
+  <a href="buscar.html?op=mediano" class="m-link m-sub">Mediano plazo</a>
+  <a href="emprendimientos.html" class="m-link">Emprendimientos</a>
   <a href="publicadores.html" class="m-link">Publicadores</a>
   <a href="index.html#guia" class="m-link">Guía de barrios</a>
   <div class="m-sep"></div>
