@@ -1,19 +1,21 @@
 /**
  * BAIREN · Portal · traducción de textos de un aviso (función de Vercel)
  *
- * Traduce título y descripción del castellano al inglés y al portugués con
- * DeepL, que tiene un plan gratis de 500.000 caracteres por mes: alcanza para
- * cientos de avisos sin gastar nada (decisión de Tomás, 9/9/2026: "el que sea
- * más barato"). Sin DEEPL_API_KEY responde 501 y el portal sigue igual.
+ * Traduce título y descripción del castellano al inglés y al portugués.
+ * Motor por defecto: MyMemory, gratis sin tarjeta (decisión de Tomás, 9/9/2026:
+ * "usemos MyMemory, para probarla"). Con un mail en MYMEMORY_EMAIL el cupo es de
+ * 50.000 caracteres por día; sin mail, 5.000. Si algún día hay DEEPL_API_KEY,
+ * la función usa DeepL sola, sin tocar nada más.
  *
  * Variables en Vercel:
- *   DEEPL_API_KEY   clave del plan gratis de deepl.com (termina en ":fx")
+ *   MYMEMORY_EMAIL   opcional, sube el cupo diario de MyMemory (no se cobra nunca)
+ *   DEEPL_API_KEY    opcional, si existe se usa DeepL en lugar de MyMemory
  *   PORTAL_SUPABASE_URL / PORTAL_SUPABASE_KEY   para validar la sesión del publicador
  *
  * Uso (desde el navegador, con sesión):
  *   POST /api/portal-traducir  Authorization: Bearer <access_token>
- *   { titulo, descripcion, operacion }
- *   → { ok:true, en:{titulo,descripcion}, pt:{titulo,descripcion}, chars }
+ *   { titulo, descripcion }
+ *   → { ok:true, motor:'mymemory'|'deepl', en:{titulo,descripcion}, pt:{titulo,descripcion}, chars }
  *
  * La línea del corredor responsable no se traduce acá: la ficha la agrega sola
  * en cada idioma, a partir de la persona titular (migración 01).
@@ -31,13 +33,43 @@ async function usuarioDe(req) {
   return u && u.id ? u : null;
 }
 
+/* MyMemory acepta hasta 500 bytes por pedido: se parte el texto por oraciones,
+   respetando los párrafos, y se traduce de a un trozo. */
+function trozos(texto, max = 440) {
+  const out = [];
+  for (const parrafo of String(texto).split(/\n+/)) {
+    const p = parrafo.trim(); if (!p) { out.push(''); continue; }
+    let actual = '';
+    for (const oracion of p.match(/[^.!?]+[.!?]+(\s|$)|[^.!?]+$/g) || [p]) {
+      if (Buffer.byteLength(actual + oracion) > max && actual) { out.push(actual.trim()); actual = ''; }
+      if (Buffer.byteLength(oracion) > max) { for (let i = 0; i < oracion.length; i += 300) out.push(oracion.slice(i, i + 300).trim()); continue; }
+      actual += oracion;
+    }
+    if (actual.trim()) out.push(actual.trim());
+    out.push('\n');
+  }
+  return out;
+}
+
+async function mymemory(texto, par, email) {
+  if (!texto) return '';
+  const partes = [];
+  for (const t of trozos(texto)) {
+    if (t === '' || t === '\n') { partes.push(t); continue; }
+    const u = new URL('https://api.mymemory.translated.net/get');
+    u.searchParams.set('q', t); u.searchParams.set('langpair', par); if (email) u.searchParams.set('de', email);
+    const r = await fetch(u); const j = await r.json().catch(() => ({}));
+    const ok = r.ok && j.responseData && j.responseStatus === 200 && j.responseData.translatedText;
+    if (!ok) throw new Error((j.responseDetails || 'MyMemory') + ' (' + (j.responseStatus || r.status) + ')');
+    partes.push(j.responseData.translatedText);
+  }
+  return partes.join(' ').replace(/ ?\n ?/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
+}
+
 async function deepl(key, textos, target) {
   const host = key.endsWith(':fx') ? 'https://api-free.deepl.com' : 'https://api.deepl.com';
-  const r = await fetch(host + '/v2/translate', {
-    method: 'POST',
-    headers: { Authorization: 'DeepL-Auth-Key ' + key, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text: textos, source_lang: 'ES', target_lang: target, formality: 'prefer_less', preserve_formatting: true }),
-  });
+  const r = await fetch(host + '/v2/translate', { method: 'POST', headers: { Authorization: 'DeepL-Auth-Key ' + key, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text: textos, source_lang: 'ES', target_lang: target, formality: 'prefer_less', preserve_formatting: true }) });
   const j = await r.json().catch(() => ({}));
   if (!r.ok || !j.translations) throw new Error((j.message || 'DeepL') + ' (' + r.status + ')');
   return j.translations.map(t => t.text);
@@ -46,9 +78,6 @@ async function deepl(key, textos, target) {
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   if (req.method !== 'POST') { res.status(405).json({ ok: false, error: 'POST' }); return; }
-  const key = process.env.DEEPL_API_KEY;
-  if (!key) { res.status(501).json({ ok: false, configured: false, msg: 'Falta DEEPL_API_KEY en Vercel.' }); return; }
-
   const user = await usuarioDe(req);
   if (!user) { res.status(401).json({ ok: false, error: 'Hace falta una sesión de publicador.' }); return; }
 
@@ -56,11 +85,17 @@ module.exports = async (req, res) => {
   const titulo = String(b.titulo || '').trim().slice(0, 200);
   const descripcion = String(b.descripcion || '').trim().slice(0, 6000);
   if (!descripcion && !titulo) { res.status(400).json({ ok: false, error: 'No hay texto para traducir.' }); return; }
-  const textos = [titulo, descripcion];
+  const chars = (titulo.length + descripcion.length) * 2;
 
   try {
-    const [en, pt] = await Promise.all([deepl(key, textos, 'EN-US'), deepl(key, textos, 'PT-BR')]);
-    res.status(200).json({ ok: true, en: { titulo: en[0], descripcion: en[1] }, pt: { titulo: pt[0], descripcion: pt[1] }, chars: (titulo.length + descripcion.length) * 2 });
+    if (process.env.DEEPL_API_KEY) {
+      const [en, pt] = await Promise.all([deepl(process.env.DEEPL_API_KEY, [titulo, descripcion], 'EN-US'), deepl(process.env.DEEPL_API_KEY, [titulo, descripcion], 'PT-BR')]);
+      res.status(200).json({ ok: true, motor: 'deepl', en: { titulo: en[0], descripcion: en[1] }, pt: { titulo: pt[0], descripcion: pt[1] }, chars }); return;
+    }
+    const email = process.env.MYMEMORY_EMAIL || '';
+    const en = { titulo: await mymemory(titulo, 'es|en', email), descripcion: await mymemory(descripcion, 'es|en', email) };
+    const pt = { titulo: await mymemory(titulo, 'es|pt-BR', email), descripcion: await mymemory(descripcion, 'es|pt-BR', email) };
+    res.status(200).json({ ok: true, motor: 'mymemory', en, pt, chars });
   } catch (e) {
     console.error('[portal-traducir]', e.message);
     res.status(502).json({ ok: false, error: 'No se pudo traducir: ' + e.message });
