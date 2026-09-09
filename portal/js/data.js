@@ -45,7 +45,7 @@
       descripcion: p.descripcion || '', plazo: p.plazo || '',
       publicadoEn: p.created_at, estado: p.estado, reservado, fechaLiberacion: p.fecha_liberacion,
       publicadorId: 'maxim-rentals', destacado: false, demo: false, codigo: 'BA-' + (p.slug||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8) + (op==='venta'?'V':op==='alquiler'?'L':'M'),
-      apto: op === 'venta' ? ['Apto crédito'] : ['Contrato digital', 'Sin garantía propietaria'],
+      apto: op === 'mediano' ? ['Sin garantía propietaria'] : [],   /* lo único que el modelo de mediano plazo de Bairen garantiza */
     };
   }
 
@@ -71,7 +71,7 @@
       precio: r.precio == null ? null : Number(r.precio), moneda: r.moneda || 'USD', periodo: r.operacion === 'venta' ? '' : '/mes', expensas: r.expensas == null ? null : Number(r.expensas),
       m2: r.m2_total || null, m2cub: r.m2_cubierto || null, amb, dorm: r.dormitorios || null, banos: r.banos || null, cocheras: r.cocheras || 0, antiguedad: r.antiguedad == null ? null : Number(r.antiguedad),
       amoblado: !!r.amoblado, amenities: r.amenities || [], caracteristicas: r.caracteristicas || [], cualidades: r.cualidades_verificadas || [], fotos, video: r.video_url ? { tipo: r.video_tipo || 'youtube', url: r.video_url } : null,
-      descripcion: r.descripcion || '', plazo: r.plazo || '', emprendimiento: r.emprendimiento || null, etapa: r.etapa || null, entrega: r.entrega || null, propietarioEmail: r.propietario_email || null, publicadoEn: r.publicado_en || r.created_at, estado: r.estado, reservado: r.estado === 'reservado', publicadorId: pubId, destacado: !!(r.destacado_hasta && new Date(r.destacado_hasta) > new Date()), demo: false, codigo: r.codigo, apto: r.caracteristicas && r.caracteristicas.length ? r.caracteristicas.slice(0,2) : (r.operacion === 'venta' ? ['Apto crédito'] : []), fromStore: true };
+      descripcion: r.descripcion || '', plazo: r.plazo || '', emprendimiento: r.emprendimiento || null, etapa: r.etapa || null, entrega: r.entrega || null, propietarioEmail: r.propietario_email || null, publicadoEn: r.publicado_en || r.created_at, estado: r.estado, reservado: r.estado === 'reservado', publicadorId: pubId, destacado: !!(r.destacado_hasta && new Date(r.destacado_hasta) > new Date()), demo: false, codigo: r.codigo, apto: r.caracteristicas && r.caracteristicas.length ? r.caracteristicas.slice(0,3) : [], fromStore: true };
   };
 
   let cache = null;
