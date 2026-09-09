@@ -129,11 +129,25 @@ document.addEventListener('DOMContentLoaded', function(){
       ${fld('antiguedad','Antigüedad en años. A estrenar: 0','number',a.antiguedad,{attrs:'min="0" max="150"'})}
       ${fld('titulo','Título del aviso','text',a.titulo,{full:true,attrs:'maxlength="80" placeholder="Piso alto con vista al río y terraza propia"'},'Hasta 80 caracteres. Sin mayúsculas sostenidas ni signos de exclamación.')}
       ${fld('descripcion','Descripción','textarea',a.descripcion,{full:true,attrs:'required minlength="150" maxlength="4000"'},'Mínimo 150 caracteres. Luz, distribución, edificio, cuadra: contala como a alguien que la va a vivir.')}
-    </div>${navBtns()}`;
+    </div>
+      <div class="p-fld full p-trad" style="margin-top:6px">
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button type="button" class="p-btn p-btn-sm" id="btnTraducir">Traducir a inglés y portugués</button><span class="p-note" style="margin:0">Gratis. Revisá el resultado antes de publicar.</span></div>
+        <details id="tradBox" ${(a.descripcion_en || a.descripcion_pt) ? 'open' : ''} style="margin-top:10px"><summary class="p-note" style="cursor:pointer">Versiones en inglés y portugués</summary>
+          <div class="p-formgrid" style="margin-top:8px">${fld('descripcion_en','Descripción en inglés','textarea',a.descripcion_en,{full:true,attrs:'rows="5"'})}${fld('descripcion_pt','Descripción en portugués','textarea',a.descripcion_pt,{full:true,attrs:'rows="5"'})}</div>
+        </details>
+      </div>
+      ${navBtns()}`;
     const zs = document.getElementById('f-zona'), bs = document.getElementById('f-barrio');
     const fillBarrios = () => { const z = zs.value; bs.innerHTML = z ? BARRIOS[z].map(b => `<option value="${b}" ${b===a.barrio?'selected':''}>${b}</option>`).join('') : '<option value="">Elegí primero la zona</option>'; };
     fillBarrios(); zs.addEventListener('change', fillBarrios);
     bindNav(async () => { collect(); const req = REQ; let ok = true; req.forEach(k => { const f = document.querySelector(`[data-fld=${k}]`); const bad = !aviso[k] || (k === 'descripcion' && String(aviso[k]).length < 150); f.classList.toggle('err', bad); if (bad) ok = false; }); if (!ok) {
+    const bt = document.getElementById('btnTraducir'); if (bt) bt.addEventListener('click', async () => {
+      collect(); const desc = (a.descripcion || '').trim(); if (desc.length < 40) { BP.toast('Escribí primero la descripción en castellano.', 'error'); return; }
+      bt.disabled = true; const txt = bt.textContent; bt.textContent = 'Traduciendo…';
+      try { const r = await BPStore.traducir(a.titulo || a.direccion || '', desc); a.descripcion_en = r.en.descripcion; a.descripcion_pt = r.pt.descripcion; const en = el.querySelector('[name=descripcion_en]'), pt = el.querySelector('[name=descripcion_pt]'); if (en) en.value = a.descripcion_en; if (pt) pt.value = a.descripcion_pt; document.getElementById('tradBox').open = true; BP.toast('Traducido con ' + (r.motor === 'deepl' ? 'DeepL' : 'MyMemory') + '. Revisá y corregí lo que haga falta.'); }
+      catch (e) { BP.toast(e.message || 'No se pudo traducir.', 'error'); }
+      finally { bt.disabled = false; bt.textContent = txt; }
+    });
         const k = req.find(x => !aviso[x] || (x === 'descripcion' && String(aviso[x]).length < 150));
         const el = document.querySelector(`[data-fld=${k}]`);
         BP.errorCampo(el && (el.querySelector('input,select,textarea') || el), k === 'descripcion' ? 'La descripción necesita al menos 150 caracteres.' : 'Falta este dato.');
@@ -164,6 +178,7 @@ document.addEventListener('DOMContentLoaded', function(){
           </div>
           ${i===0?'':`<button type="button" class="portada" data-portada="${i}" aria-label="Usar la foto ${i+1} como portada">Portada</button>`}
           <button type="button" class="quitar" data-del="${i}" aria-label="Quitar la foto ${i+1}">×</button>
+          ${/^https?:/.test(a.fotos[i].url) ? `<button type="button" class="mejorar" data-ia="${i}" aria-label="Mejorar la foto ${i+1} con IA">Mejorar con IA</button>` : ''}
         </div>`);
       }
       grid.innerHTML = items.join('') + (a.fotos.length ? `<p class="p-note" style="grid-column:1/-1">${a.fotos.length} de 8 como mínimo. Ordenalas con las flechas. La primera es la portada.</p>` : '');
@@ -171,6 +186,19 @@ document.addEventListener('DOMContentLoaded', function(){
       grid.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => { a.fotos.splice(Number(b.dataset.del), 1); BP.anunciar('Foto quitada, quedan ' + a.fotos.length); draw(); }));
       grid.querySelectorAll('[data-mov]').forEach(b => b.addEventListener('click', () => { const i = Number(b.dataset.i); mover(i, i + Number(b.dataset.mov)); }));
       grid.querySelectorAll('[data-portada]').forEach(b => b.addEventListener('click', () => { mover(Number(b.dataset.portada), 0); }));
+      /* Producción con IA: la foto vuelta a sacar (GPT, prompt maestro). Se compara con la original y el que publica decide. */
+      grid.querySelectorAll('[data-ia]').forEach(b => b.addEventListener('click', async () => {
+        const i = Number(b.dataset.ia); const card = b.closest('.p-foto'); b.disabled = true; b.textContent = 'Produciendo… hasta un minuto';
+        try {
+          const r = await BPStore.producirFoto(a.fotos[i].url, { formato: 'apaisado' });
+          const cmp = document.createElement('div'); cmp.className = 'p-iacmp';
+          cmp.innerHTML = `<div class="dos"><figure><img src="${a.fotos[i].url}" alt="Original"><figcaption>Original</figcaption></figure><figure><img src="${r.image}" alt="Nueva, con IA"><figcaption>Nueva, con IA</figcaption></figure></div><p class="p-note">Es la misma propiedad, vuelta a fotografiar. Compará ventanas, muebles y textos antes de aceptar.</p><div class="acts"><button type="button" class="p-btn p-btn-sm p-btn-fill" data-usar>Usar la nueva</button><button type="button" class="p-btn p-btn-sm" data-cerrar>Descartar</button></div>`;
+          document.body.appendChild(cmp);
+          cmp.querySelector('[data-cerrar]').addEventListener('click', () => cmp.remove());
+          cmp.querySelector('[data-usar]').addEventListener('click', async () => { const u = cmp.querySelector('[data-usar]'); u.disabled = true; u.textContent = 'Guardando…'; try { const key = aviso.id || aviso.slug || ('nuevo-' + BPStore.session.id.slice(-4)); const url = await BPStore.subirDataUrl(r.image, key, Date.now() % 100000); a.fotos.splice(i + 1, 0, { url, ia: true }); cmp.remove(); BP.toast('Foto nueva agregada al lado de la original. Quitá la que no quieras.'); draw(); } catch (e) { u.disabled = false; u.textContent = 'Usar la nueva'; BP.toast('No se pudo guardar: ' + (e.message || e), 'error'); } });
+        } catch (e) { BP.toast(e.message || 'No se pudo producir la foto.', 'error'); }
+        finally { b.disabled = false; b.textContent = 'Mejorar con IA'; }
+      }));
       let from = null;
       grid.querySelectorAll('.p-foto').forEach(f => {
         f.addEventListener('dragstart', () => from = Number(f.dataset.i));

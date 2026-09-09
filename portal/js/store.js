@@ -334,6 +334,23 @@
     }
     const all = LV.get([]); const v = all.find(x => x.id === id); if (v) { v.feedback = feedback; v.estado = 'realizada'; LV.set(all); }
   };
+  /* ── funciones de servidor (Vercel /api): traducción y producción de fotos ── */
+  S.tokenAcceso = async function(){ if (S.mode !== 'supabase' || !S.sb) return null; try { const { data } = await S.sb.auth.getSession(); return data && data.session ? data.session.access_token : null; } catch (e) { return null; } };
+  async function apiPortal(ruta, body){
+    const token = await S.tokenAcceso(); if (!token) throw new Error(DEMO ? 'En modo demo no hay sesión real: esta función necesita una cuenta.' : 'Iniciá sesión para usar esta función.');
+    const r = await fetch(ruta, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }, body: JSON.stringify(body) });
+    let j = {}; try { j = await r.json(); } catch (e) { /* sin cuerpo */ }
+    if (r.status === 404) throw new Error('Esta función corre en la web publicada, no en el servidor local.');
+    if (r.status === 501) throw new Error(j.msg || 'La función todavía no está configurada.');
+    if (!r.ok || !j.ok) throw new Error(j.error || ('Error ' + r.status));
+    return j;
+  }
+  /* Título y descripción al inglés y al portugués. Gratis (MyMemory). Devuelve { en:{titulo,descripcion}, pt:{...} } */
+  S.traducir = (titulo, descripcion) => apiPortal('/api/portal-traducir', { titulo, descripcion });
+  /* La foto vuelta a sacar con IA (GPT, prompt maestro de Bairen). Devuelve una data URL; el que publica decide si la usa. */
+  S.producirFoto = (url, opts) => apiPortal('/api/portal-produccion', Object.assign({ url }, opts || {}));
+  /* Sube una data URL como foto del aviso y devuelve su URL pública. */
+  S.subirDataUrl = async function(dataUrl, avisoKey, i){ const b = await (await fetch(dataUrl)).blob(); const f = new File([b], 'ia.png', { type: b.type || 'image/png' }); return S.uploadFoto(f, avisoKey, i); };
   S.publicadoresPendientes = async function(){
     if (S.mode === 'supabase') { const { data } = await S.sb.schema('portal').from('publicadores').select('*, verificaciones(*)').eq('verificado', false); return data || []; }
     const v = L.verif.get([]); return L.pubs.get([]).filter(p => !p.verificado).map(p => Object.assign({}, p, { verificaciones: v.filter(x => x.publicador_id === p.id) }));
