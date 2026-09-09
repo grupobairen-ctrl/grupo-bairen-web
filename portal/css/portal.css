@@ -971,3 +971,31 @@ body:not(.p-product){--p-shadow-d:0 16px 40px rgba(0,0,0,.28)}
 }
 /* El oro lleno del botón lleva tinta navy, no blanco al 80 por ciento, que daba 2,29 */
 .p-btn-fill,.p-btn-fill span,.m-cta .p-btn-fill{color:var(--navy-deeper)}
+
+
+/* ── Ficha: hero a sangre, como la de bairengroup.com ────────────────────── */
+.p-fhero{position:relative;height:68vh;min-height:420px;overflow:hidden;display:flex;align-items:flex-end;background:var(--navy-deeper,#131D2D)}
+.p-fhero-slides{position:absolute;inset:0;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-behavior:smooth;scrollbar-width:none}
+.p-fhero-slides::-webkit-scrollbar{display:none}
+.p-fhero-slide{flex:0 0 100%;height:100%;background-size:cover;background-position:center;scroll-snap-align:start;scroll-snap-stop:always;cursor:zoom-in;display:block}
+.p-fhero-empty{display:flex;align-items:center;justify-content:center;color:rgba(251,250,246,.5);font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;cursor:default}
+.p-fhero-grad{position:absolute;left:0;right:0;bottom:0;height:58%;background:linear-gradient(to top,rgba(19,29,45,.97) 0%,rgba(19,29,45,.55) 45%,transparent 100%);z-index:1;pointer-events:none}
+.p-fhero-content{position:relative;z-index:2;width:100%;padding:40px 60px;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;pointer-events:none}
+.p-fhero-tag{display:inline-block;color:var(--gold-light,#DECDA0);border:1px solid rgba(194,169,104,.6);font-size:.58rem;letter-spacing:.25em;font-weight:700;text-transform:uppercase;padding:4px 13px;margin-bottom:14px}
+.p-product .p-fhero h1.p-fhero-address,.p-fhero-address{font-family:var(--font-display);font-size:clamp(2rem,5vw,3.4rem);font-weight:500;color:#FBFAF6;line-height:1.05;margin:0 0 6px;text-shadow:0 2px 24px rgba(0,0,0,.35)}
+.p-product .p-fhero .p-fhero-sub,.p-fhero-sub{font-size:.8rem;letter-spacing:.15em;color:var(--gold-light,#DECDA0)}
+.p-fhero-price-box{text-align:right;flex-shrink:0}
+.p-fhero-price-lbl{font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-light,#DECDA0);margin-bottom:6px}
+.p-fhero-price{font-family:var(--font-display);font-size:clamp(1.6rem,4vw,3rem);font-weight:700;color:var(--gold);line-height:1.05}
+.p-fhero-price .p-per{font-size:.45em;font-weight:400;color:rgba(255,255,255,.55)}
+.p-fhero-price-mo{font-size:.7rem;color:rgba(255,255,255,.5);margin-top:4px;letter-spacing:.08em}
+.p-fhero .cts{position:absolute;left:60px;top:22px;z-index:2;display:flex;gap:6px}
+.p-fhero .cts span{background:rgba(19,29,45,.6);color:#fff;font-size:.72rem;padding:5px 9px;border-radius:8px;display:inline-flex;gap:6px;align-items:center;backdrop-filter:blur(4px)}
+.p-strip{background:var(--navy-dark,#1E2A3F);padding:14px 60px;display:flex;gap:10px;overflow-x:auto;border-bottom:1px solid rgba(194,169,104,.12);scrollbar-width:thin}
+.p-strip::-webkit-scrollbar{height:3px}.p-strip::-webkit-scrollbar-thumb{background:var(--gold-dark,#8A7547)}
+.p-strip .thumb{flex:0 0 96px;height:64px;padding:0;border:1px solid rgba(194,169,104,.18);background:rgba(194,169,104,.07);cursor:pointer;overflow:hidden;transition:border-color .2s}
+.p-strip .thumb:hover{border-color:var(--gold)}.p-strip .thumb.active{border:2px solid var(--gold)}
+.p-strip .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.p-linkbtn{background:none;border:0;padding:0;font:inherit;color:inherit;text-decoration:underline;cursor:pointer;display:inline-flex;gap:4px;align-items:center;vertical-align:baseline}
+.p-ficha-head .p-kicker{margin-bottom:6px}
+@media (max-width:768px){.p-fhero{height:58vh;min-height:360px}.p-fhero-content{padding:22px 20px;flex-direction:column;align-items:flex-start;gap:12px}.p-fhero-price-box{text-align:left}.p-fhero .cts{left:20px;top:14px}.p-strip{padding:12px 20px}}

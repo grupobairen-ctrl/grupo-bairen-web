@@ -43,24 +43,28 @@ document.addEventListener('DOMContentLoaded', function(){
   document.title = `${a.titulo} · ${BPData.opTag(a)} en ${a.barrio} — BAIREN`;
 
   main.innerHTML = `
-<div class="p-ficha-top">
-  <div class="p-tray"><div class="p-gallery" id="gal">
-    ${fotos.slice(0,5).map((f,i) => `<a href="#" data-i="${i}"><img src="${BP.sbImg(f, i===0?1400:700)}" alt="${BP.esc(a.titulo)}, foto ${i+1}" ${i>0?'loading="lazy"':''}></a>`).join('')}
-    ${fotos.length < 5 ? Array.from({length: 5 - fotos.length}, () => '<a href="#" aria-hidden="true" tabindex="-1"></a>').join('') : ''}
-    <div class="cts"><span>${BP.ico.photo} ${fotos.length} fotos</span>${a.video ? `<span>${BP.ico.video} Video</span>` : ''}</div>
-    ${fotos.length ? '<button type="button" class="all" data-i="0">Ver todas las fotos</button>' : ''}
-  </div></div>
+<div class="p-fhero" id="gal">
+  <div class="p-fhero-slides" id="heroSlides">${fotos.length ? fotos.map((f,i) => `<a href="#" class="p-fhero-slide" data-i="${i}" style="background-image:url('${BP.sbImg(f, 1600)}')" aria-label="${BP.esc(a.titulo)}, foto ${i+1} de ${fotos.length}"></a>`).join('') : '<div class="p-fhero-slide p-fhero-empty">Fotos en producción</div>'}</div>
+  <div class="p-fhero-grad"></div>
+  <div class="p-fhero-content">
+    <div>
+      <div class="p-fhero-tag">${BPData.opTag(a)}${a.reservado ? ' · Reservada' : ''}</div>
+      <h1 class="p-fhero-address">${BP.esc(a.titulo)}</h1>
+      <div class="p-fhero-sub">${BP.esc(a.barrio)} · ${BP.esc(a.ciudad)}</div>
+    </div>
+    <div class="p-fhero-price-box">
+      <div class="p-fhero-price-lbl">${a.reservado ? 'Estado' : a.op === 'venta' ? 'Precio' : 'Precio mensual'}</div>
+      <div class="p-fhero-price">${a.reservado ? 'Reservada' : BP.fmtUSD(a.precio)}</div>
+      <div class="p-fhero-price-mo">${a.reservado ? 'no está tomando consultas' : (a.op === 'venta' ? '' : a.op === 'mediano' ? 'por mes · todo incluido' : 'por mes') + (a.expensas ? (a.op === 'venta' ? '' : ' · ') + 'más $ ' + BP.fmtN(a.expensas) + ' de expensas' : '')}</div>
+    </div>
+  </div>
+  <div class="cts"><span>${BP.ico.photo} ${fotos.length} fotos</span>${a.video ? `<span>${BP.ico.video} Video</span>` : ''}</div>
 </div>
+${fotos.length > 1 ? `<div class="p-strip" id="strip">${fotos.map((f,i) => `<button type="button" class="thumb ${i===0?'active':''}" data-t="${i}" aria-label="Ver foto ${i+1}"><img src="${BP.sbImg(f, 300)}" alt="" loading="lazy"></button>`).join('')}</div>` : ''}
 <div class="p-ficha">
   <div class="p-ficha-main">
     <div class="p-ficha-head">
-      <div class="p-kicker">${BPData.opTag(a)} · ${BP.esc(a.tipoProp)} · ${BP.esc(a.barrio)}, ${BP.esc(a.ciudad)}</div>
-      <h1>${BP.esc(a.titulo)}</h1>
-      <div class="p-price-row">
-        <span class="p-price-big">${a.reservado ? 'Reservada' : BPData.precioHTML(a)}</span>
-        ${a.expensas ? `<span class="p-expensas">más $ ${BP.fmtN(a.expensas)} de expensas</span>` : ''}
-        ${a.reservado ? '' : `<button type="button" class="p-btn p-btn-sm" id="bajaPrecio">${BP.ico.bell} Avisarme si baja</button>`}
-      </div>
+      <div class="p-kicker">${BP.esc(a.tipoProp)}${a.codigo ? ' · ' + BP.esc(a.codigo) : ''}${a.reservado ? '' : ` · <button type="button" class="p-linkbtn" id="bajaPrecio">${BP.ico.bell} Avisarme si baja</button>`}</div>
       ${a.reservado ? `<p class="p-reservada">${BP.ico.flag} Esta propiedad está reservada. Podés consultar por si se libera, o <a href="${BP.urlBuscar({ op: a.op, zona: a.zona })}">ver las disponibles en ${BP.zonaLabel(a.zona)}</a>.</p>` : ''}
       ${(a.apto.length || (a.cualidades||[]).length || a.demo) ? `<p class="p-tags">${(a.cualidades||[]).map(x => `<span class="p-badge" title="Verificada por BAIREN">${BP.ico.shield} ${BP.esc(x)}</span>`).join('')}${a.apto.map(x => `<span class="p-badge">${BP.esc(x)}</span>`).join('')}${a.demo ? '<span class="p-badge demo">Aviso de ejemplo</span>' : ''}</p>` : ''}
     </div>
@@ -162,6 +166,12 @@ document.addEventListener('DOMContentLoaded', function(){
   const closeLb = () => { if (soltarLb) { const f = soltarLb; soltarLb = null; f(); } else cerrarLbSolo(); };
   lb.querySelectorAll('button').forEach(x => x.tabIndex = -1);
   gal.querySelectorAll('[data-i]').forEach(el => el.addEventListener('click', e => { e.preventDefault(); showLb(Number(el.dataset.i)); }));
+  const heroSlides = document.getElementById('heroSlides'), strip = document.getElementById('strip');
+  if (heroSlides && strip) {
+    const setActive = i => strip.querySelectorAll('.thumb').forEach((th, n) => th.classList.toggle('active', n === i));
+    strip.querySelectorAll('[data-t]').forEach(th => th.addEventListener('click', () => { const i = Number(th.dataset.t); heroSlides.scrollTo({ left: i * heroSlides.clientWidth, behavior: 'smooth' }); setActive(i); }));
+    let tk; heroSlides.addEventListener('scroll', () => { clearTimeout(tk); tk = setTimeout(() => { const i = Math.round(heroSlides.scrollLeft / Math.max(1, heroSlides.clientWidth)); setActive(i); const th = strip.querySelectorAll('.thumb')[i]; if (th) th.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' }); }, 80); }, { passive: true });
+  }
   lb.querySelector('[data-lb-close]').addEventListener('click', closeLb); lb.querySelector('[data-lb-prev]').addEventListener('click', () => showLb(cur-1)); lb.querySelector('[data-lb-next]').addEventListener('click', () => showLb(cur+1));
   document.addEventListener('keydown', e => { if (!lb.classList.contains('open')) return; if (e.key === 'ArrowLeft') showLb(cur-1); if (e.key === 'ArrowRight') showLb(cur+1); });
   if (a.video) { const v = document.getElementById('video'); if (a.video.tipo === 'youtube') { const m = a.video.url.match(/(?:v=|be\/|embed\/)([A-Za-z0-9_-]{6,})/); v.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${m ? m[1] : ''}" title="Video de ${BP.esc(a.titulo)}" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>`; } else if (a.video.tipo === 'bunny') { v.innerHTML = `<iframe src="${BP.esc(a.video.url)}" title="Video de ${BP.esc(a.titulo)}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>`; } else { v.innerHTML = `<video src="${BP.esc(a.video.url)}" controls playsinline preload="metadata"></video>`; } }
