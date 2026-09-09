@@ -103,7 +103,7 @@
     if (!el) { BP.toast(msg, 'error'); return; }
     let id = el.id ? el.id + '-err' : 'err-' + Math.random().toString(36).slice(2, 8);
     let box = document.getElementById(id);
-    if (!box) { box = document.createElement('p'); box.id = id; box.className = 'p-err-campo'; (el.closest('.p-fld, .p-field, .cfield, label') || el.parentNode).appendChild(box); }
+    if (!box) { box = document.createElement('p'); box.id = id; box.className = 'p-err-campo'; const cont = el.closest('.p-fld, .p-field, .cfield, label'); if (cont) cont.appendChild(box); else el.insertAdjacentElement('afterend', box); /* pegado al campo, no al final del formulario */ }
     box.textContent = msg; box.hidden = false;
     el.setAttribute('aria-invalid', 'true'); el.setAttribute('aria-describedby', id);
     el.classList.add('p-invalido');
@@ -230,7 +230,8 @@
 <div class="mobile-menu" id="mobileMenu">
   <a href="buscar.html?op=venta" class="m-link">Comprar</a>
   <a href="buscar.html?op=alquiler" class="m-link">Alquilar</a>
-  <a href="buscar.html?op=mediano" class="m-link">Alquiler, mediano plazo</a>
+  <a href="buscar.html?op=mediano" class="m-link m-sub">Mediano plazo</a>
+  <a href="emprendimientos.html" class="m-link">Emprendimientos</a>
   <a href="publicadores.html" class="m-link">Publicadores</a>
   <a href="index.html#guia" class="m-link">Guía de barrios</a>
   <div class="m-sep"></div>

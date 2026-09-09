@@ -10,7 +10,7 @@
   <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260909a"><link rel="stylesheet" href="css/catalogo.css?v=20260909a"><link rel="stylesheet" href="css/portal.css?v=20260909a">
+  <link rel="stylesheet" href="css/base.css?v=20260909b"><link rel="stylesheet" href="css/catalogo.css?v=20260909b"><link rel="stylesheet" href="css/portal.css?v=20260909b">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"BAIREN","url":"https://www.bairengroup.com","logo":"https://www.bairengroup.com/bairen_logo.png","description":"El portal de propiedades seleccionadas de Buenos Aires. Alquileres a mediano y largo plazo y departamentos en venta, publicados por corredores matriculados y dueños verificados.","areaServed":[{"@type":"City","name":"Ciudad Autónoma de Buenos Aires"},{"@type":"AdministrativeArea","name":"Zona Norte, Buenos Aires"}]}</script>
 </head>
 <body>
@@ -31,8 +31,8 @@
 <div class="p-search" role="search" aria-label="Buscar propiedades">
       <div class="p-tabs" role="tablist">
         <button class="p-tab active" role="tab" data-op="venta" aria-selected="true">Comprar</button>
-        <button class="p-tab" role="tab" data-op="alquiler" aria-selected="false">Alquilar</button>
-        <button class="p-tab" role="tab" data-op="mediano" aria-selected="false">Mediano plazo</button>
+        <button class="p-tab" role="tab" data-op="alquiler" aria-selected="false" aria-controls="plazoSel">Alquilar</button>
+        <div class="p-plazo" id="plazoSel" role="group" aria-label="Plazo del alquiler" hidden><label><input type="radio" name="plazo" value="alquiler" checked><span>Largo plazo</span></label><label><input type="radio" name="plazo" value="mediano"><span>Mediano plazo</span></label></div>
         <button class="p-tab" role="tab" data-op="emprendimientos" aria-selected="false" title="Venta directa de desarrolladoras">Emprendimientos</button>
       </div>
       <form class="p-search-row" id="searchForm" action="buscar.html" method="get">
@@ -60,7 +60,7 @@
 <section class="p-section alt" id="seleccionadas">
   <div class="p-container">
     <div class="p-head-row" data-reveal><div><h2 class="p-h2">Seleccionadas de la semana</h2><p class="p-sub" style="margin:0">Las que vale la pena ver esta semana.</p></div><a class="p-link" href="buscar.html">Ver todas las propiedades</a></div>
-    <div class="p-grid" id="destacadasGrid" data-reveal></div>
+    <div class="p-grid" id="destacadasGrid" data-reveal aria-busy="true"><div class="p-skel-vcard" aria-hidden="true"></div><div class="p-skel-vcard" aria-hidden="true"></div><div class="p-skel-vcard" aria-hidden="true"></div></div>
   </div>
 </section>
 
@@ -113,8 +113,8 @@
 
 <script src="supabase-portal.js" defer></script>
 <script src="../mapa-barrios.js" defer></script>
-<script src="js/ui.js?v=20260909a" defer></script><script src="js/store.js?v=20260909a" defer></script>
-<script src="js/data.js?v=20260909a" defer></script>
+<script src="js/ui.js?v=20260909b" defer></script><script src="js/store.js?v=20260909b" defer></script>
+<script src="js/data.js?v=20260909b" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -122,12 +122,20 @@ document.addEventListener('DOMContentLoaded', function(){
   BP.header('home'); BP.footer(); if (window.BPStore) BPStore.init(); BP.reveal();
   document.querySelector('#searchForm .p-btn .ic').innerHTML = BP.ico.arrow;
 
-  /* pestañas de operación */
-  const opInput = document.getElementById('opInput');
-  document.querySelectorAll('.p-tab').forEach(t => t.addEventListener('click', () => {
-    document.querySelectorAll('.p-tab').forEach(x => { x.classList.remove('active'); x.setAttribute('aria-selected','false'); });
-    t.classList.add('active'); t.setAttribute('aria-selected','true'); opInput.value = t.dataset.op;
-  }));
+  /* pestañas de operación: tres (Comprar, Alquilar, Emprendimientos). El plazo del alquiler
+     no es una operación aparte: es un sub-selector que aparece solo con Alquilar activa. */
+  const opInput = document.getElementById('opInput'), plazoSel = document.getElementById('plazoSel');
+  const plazoActual = () => (plazoSel.querySelector('input:checked') || {}).value || 'alquiler';
+  const opDeTab = t => t.dataset.op === 'alquiler' ? plazoActual() : t.dataset.op;
+  const activarTab = op => {
+    const tabOp = (op === 'mediano' || op === 'alquiler') ? 'alquiler' : op;
+    document.querySelectorAll('.p-tab').forEach(x => { const on = x.dataset.op === tabOp; x.classList.toggle('active', on); x.setAttribute('aria-selected', on ? 'true' : 'false'); });
+    plazoSel.hidden = tabOp !== 'alquiler';
+    if (tabOp === 'alquiler') { const r = plazoSel.querySelector(`input[value="${op}"]`); if (r) r.checked = true; }
+    opInput.value = op;
+  };
+  document.querySelectorAll('.p-tab').forEach(t => t.addEventListener('click', () => activarTab(opDeTab(t))));
+  plazoSel.querySelectorAll('input').forEach(r => r.addEventListener('change', () => activarTab(r.value)));
 
   /* sugerencias limitadas a las ocho zonas + características */
   const input = document.getElementById('zonaInput'), sugg = document.getElementById('sugg'), chips = document.getElementById('zonaChips');
@@ -148,11 +156,12 @@ document.addEventListener('DOMContentLoaded', function(){
   BP.anotarMenus(avisos);
   /* La pestaña por defecto es la operación con más inventario publicado, calculada de los datos */
   let opActiva = BPData.opConMasInventario(avisos);
-  document.querySelectorAll('.p-tab').forEach(t => { const on = t.dataset.op === opActiva; t.classList.toggle('active', on); t.setAttribute('aria-selected', on ? 'true' : 'false'); });
-  opInput.value = opActiva;
+  activarTab(opActiva);
   let counts = BPData.countsByZona(avisos, opActiva); window.__counts = counts;
   const pintarZonas = () => { document.getElementById('zonasGrid').innerHTML = BP.ZONAS.map(z => `<a class="p-zona ${counts[z]?'':'zero'}" href="${BP.urlBuscar({ op: opActiva, zona: z })}"><div><b>${BP.zonaLabel(z)}</b><br><span>${z==='GBA Norte'?'Vicente López · San Isidro · Tigre':'Capital Federal'}</span></div><span class="n ${counts[z]?'':'zero'}">${counts[z] ? counts[z] + (counts[z]===1?' unidad':' unidades') : 'Sin unidades hoy'}</span></a>`).join(''); if (window.__mapaHome) window.__mapaHome.setCounts(counts); };
-  document.querySelectorAll('.p-tab').forEach(t => t.addEventListener('click', () => { if (t.dataset.op === 'emprendimientos') return; opActiva = t.dataset.op; counts = BPData.countsByZona(avisos, opActiva); window.__counts = counts; pintarZonas(); }));
+  const cambiarOp = op => { if (op === 'emprendimientos') return; opActiva = op; counts = BPData.countsByZona(avisos, opActiva); window.__counts = counts; pintarZonas(); };
+  document.querySelectorAll('.p-tab').forEach(t => t.addEventListener('click', () => cambiarOp(opDeTab(t))));
+  plazoSel.querySelectorAll('input').forEach(r => r.addEventListener('change', () => cambiarOp(r.value)));
 
   /* zonas */
   pintarZonas();
@@ -163,7 +172,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
   /* seleccionadas */
   const dest = BPData.sort(avisos.filter(a => a.destacado && !a.demo), 'relevancia').slice(0,6);
-  document.getElementById('destacadasGrid').innerHTML = dest.map(BPData.cardV).join('');
+  document.getElementById('destacadasGrid').innerHTML = dest.map(BPData.cardV).join(''); document.getElementById('destacadasGrid').removeAttribute('aria-busy');
 
   /* publicadores */
   document.getElementById('pubsRow').innerHTML = Object.values(BPData.PUBLICADORES).map(p => `<a class="p-pub-card" href="publicadores.html#${p.id}"><div class="p-pub-logo">${p.inicial}</div><div><b>${BP.esc(p.nombre)}</b><small>${p.tipo==='dueno'?'Dueño verificado':p.badge + ' · ' + p.matricula}${p.demo?' · ejemplo':''}</small></div></a>`).join('') + `<a class="p-pub-card" href="publicar.html#inmobiliaria" style="border-style:dashed"><div class="p-pub-logo" style="background:var(--p-tray);color:var(--gold-dark)">+</div><div><b>Tu inmobiliaria acá</b><small>Publicá tu cartera</small></div></a>`;

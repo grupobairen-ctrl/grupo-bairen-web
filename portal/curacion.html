@@ -18,7 +18,7 @@
   <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260909a"><link rel="stylesheet" href="css/catalogo.css?v=20260909a"><link rel="stylesheet" href="css/portal.css?v=20260909a">
+  <link rel="stylesheet" href="css/base.css?v=20260909b"><link rel="stylesheet" href="css/catalogo.css?v=20260909b"><link rel="stylesheet" href="css/portal.css?v=20260909b">
   <style>
     .p-cur{background:var(--p-card);border:1px solid var(--p-line);border-radius:var(--p-radius);padding:18px;margin-bottom:14px;display:grid;grid-template-columns:200px 1fr;gap:18px}
     .p-cur .ph{aspect-ratio:4/3;border-radius:8px;overflow:hidden;background:var(--p-tray)} .p-cur .ph img{width:100%;height:100%;object-fit:cover}
@@ -36,13 +36,13 @@
   <span class="p-eyebrow">Panel BAIREN</span>
   <h1 class="p-h2">Curación</h1>
   <p class="p-sub">Entra lo que pasa el estándar. Cada rechazo lleva un motivo que el publicador ve en su panel.</p>
-  <div class="p-tabs2" role="tablist" style="margin-bottom:0;border-bottom:0"><button type="button" class="on" data-t="cola">Avisos en revisión</button><button type="button" data-t="pubs">Publicadores por verificar</button></div>
+  <div class="p-tabs2" role="tablist" style="margin-bottom:0;border-bottom:0"><button type="button" class="on" data-t="cola" role="tab" aria-selected="true" aria-controls="out">Avisos en revisión</button><button type="button" data-t="pubs" role="tab" aria-selected="false" aria-controls="out" tabindex="-1">Publicadores por verificar</button></div>
 </div></div>
-<section class="p-page after-band"><div class="p-container" style="max-width:980px">
-  <div id="out"></div>
+<section class="p-page after-band" role="main"><div class="p-container" style="max-width:980px">
+  <div id="out" role="tabpanel" aria-busy="true"><div class="p-skel-panel" aria-hidden="true"><div class="p-skel-line row"></div><div class="p-skel-line row"></div></div></div>
 </div></section>
 <div id="pFooter"></div>
-<script src="supabase-portal.js" defer></script><script src="js/ui.js?v=20260909a" defer></script><script src="js/store.js?v=20260909a" defer></script><script src="js/data.js?v=20260909a" defer></script>
+<script src="supabase-portal.js" defer></script><script src="js/ui.js?v=20260909b" defer></script><script src="js/store.js?v=20260909b" defer></script><script src="js/data.js?v=20260909b" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -52,9 +52,11 @@ document.addEventListener('DOMContentLoaded', function(){
   if (!BPStore.requireSession('curacion')) return;
   if (!(await BPStore.isCurador())) { document.getElementById('out').innerHTML = '<div class="p-empty">Solo para el equipo de curación de BAIREN.</div>'; return; }
   const out = document.getElementById('out'); let t = 'cola';
-  document.querySelectorAll('.p-tabs2 button').forEach(b => b.addEventListener('click', () => { document.querySelectorAll('.p-tabs2 button').forEach(x => x.classList.toggle('on', x === b)); t = b.dataset.t; render(); }));
+  document.querySelectorAll('.p-tabs2 button').forEach(b => b.addEventListener('click', () => { document.querySelectorAll('.p-tabs2 button').forEach(x => { const on = x === b; x.classList.toggle('on', on); x.setAttribute('aria-selected', on ? 'true' : 'false'); x.tabIndex = on ? 0 : -1; }); t = b.dataset.t; render(); }));
   const ok = (c, txt) => `<span class="${c?'ok':'no'}">${c ? BP.ico.check : BP.ico.x} ${txt}</span>`;
-  async function render(){ t === 'cola' ? renderCola() : renderPubs(); }
+  /* Una acción de curación por vez: el botón queda ocupado y, si la base la rechaza (por ejemplo en demo), se avisa */
+  async function accion(btn, fn, okMsg){ if (btn.disabled) return; const card = btn.closest('.p-cur'); const btns = card.querySelectorAll('button'); btns.forEach(x => x.disabled = true); btn.setAttribute('aria-busy', 'true'); try { await fn(); BP.toast(okMsg); return true; } catch (e) { btns.forEach(x => x.disabled = false); btn.removeAttribute('aria-busy'); BP.toast(BPStore.demo ? 'En modo demo no se guarda.' : 'No se pudo: ' + (e.message || e), 'error'); return false; } }
+  async function render(){ out.setAttribute('aria-busy', 'true'); await (t === 'cola' ? renderCola() : renderPubs()); out.removeAttribute('aria-busy'); }
   async function renderCola(){
     const cola = await BPStore.colaCuracion();
     if (!cola.length) { out.innerHTML = '<div class="p-empty">No hay avisos esperando revisión.</div>'; return; }
@@ -67,13 +69,13 @@ document.addEventListener('DOMContentLoaded', function(){
         <div class="p-check">${ok(enZona,'Zona BAIREN')}${ok(datosOk,'Datos completos')}${ok(fotosOk, fotos.length + ' fotos' + (a.quiero_produccion ? ' (pide producción)' : ''))}${ok(descOk,'Descripción de 150 o más')}${ok((a.amenities||[]).length>0,'Amenities informados')}${ok(!!p.verificado,'Publicador verificado')}</div>
         <p class="p-text" style="font-size:.86rem;max-height:120px;overflow:auto">${BP.esc(a.descripcion||'')}</p>
         <div class="p-fld" style="margin:10px 0 6px"><label style="font-size:.8rem">Cualidades verificadas <span class="m">(el publicador declaró ${(a.cualidades||[]).length}; marcá solo lo que comprobaste)</span></label><div class="p-seg p-seg-sm">${BP.CUALIDADES.map(x => `<label><input type="checkbox" name="cv" value="${x}" ${((a.cualidades_verificadas&&a.cualidades_verificadas.length?a.cualidades_verificadas:(a.cualidades||[]))).indexOf(x)>-1?'checked':''}> ${x}</label>`).join('')}</div></div>
-        <textarea placeholder="Motivo si rechazás o pedís cambios (lo ve el publicador)"></textarea>
+        <textarea id="motivo-${BP.esc(a.id)}" placeholder="Motivo si rechazás o pedís cambios (lo ve el publicador)" aria-label="Motivo para el publicador"></textarea>
         <div class="acts"><button type="button" class="p-btn p-btn-sm p-btn-fill" data-ok>Aprobar y publicar</button><button type="button" class="p-btn p-btn-sm p-btn-dark" data-cambios>Pedir cambios</button><button type="button" class="p-btn p-btn-sm" data-no>Rechazar</button><a class="p-btn p-btn-sm" href="publicar-aviso.html?id=${encodeURIComponent(a.id)}">Abrir el aviso</a></div></div></div>`; }
     out.innerHTML = html;
     out.querySelectorAll('.p-cur').forEach(card => { const id = card.dataset.id, ta = card.querySelector('textarea');
-      card.querySelector('[data-ok]').addEventListener('click', async () => { const cv = Array.from(card.querySelectorAll('[name=cv]:checked')).map(x => x.value); await BPStore.setEstado(id, 'publicado', null, { cualidades_verificadas: cv, cualidades_verificadas_por: (BPStore.session && BPStore.session.email) || null, cualidades_verificadas_en: new Date().toISOString() }); BP.toast('Publicado con ' + cv.length + ' cualidades verificadas.'); renderCola(); });
-      card.querySelector('[data-cambios]').addEventListener('click', async () => { if (!ta.value.trim()) { BP.toast('Escribí qué hay que cambiar.'); return; } await BPStore.setEstado(id, 'borrador', ta.value.trim()); BP.toast('Devuelto al publicador con el motivo.'); renderCola(); });
-      card.querySelector('[data-no]').addEventListener('click', async () => { if (!ta.value.trim()) { BP.toast('Escribí el motivo del rechazo.'); return; } await BPStore.setEstado(id, 'rechazado', ta.value.trim()); BP.toast('Rechazado.'); renderCola(); }); });
+      card.querySelector('[data-ok]').addEventListener('click', async e => { const cv = Array.from(card.querySelectorAll('[name=cv]:checked')).map(x => x.value); if (await accion(e.currentTarget, () => BPStore.setEstado(id, 'publicado', null, { cualidades_verificadas: cv, cualidades_verificadas_por: (BPStore.session && BPStore.session.email) || null, cualidades_verificadas_en: new Date().toISOString() }), 'Publicado con ' + cv.length + ' cualidades verificadas.')) renderCola(); });
+      card.querySelector('[data-cambios]').addEventListener('click', async e => { if (!ta.value.trim()) { BP.errorCampo(ta, 'Escribí qué hay que cambiar.'); return; } if (await accion(e.currentTarget, () => BPStore.setEstado(id, 'borrador', ta.value.trim()), 'Devuelto al publicador con el motivo.')) renderCola(); });
+      card.querySelector('[data-no]').addEventListener('click', async e => { if (!ta.value.trim()) { BP.errorCampo(ta, 'Escribí el motivo del rechazo.'); return; } if (await accion(e.currentTarget, () => BPStore.setEstado(id, 'rechazado', ta.value.trim()), 'Rechazado.')) renderCola(); }); });
   }
   async function renderPubs(){
     const pubs = await BPStore.publicadoresPendientes();
@@ -84,9 +86,9 @@ document.addEventListener('DOMContentLoaded', function(){
       ${p.tipo !== 'dueno' ? `<div class="m" style="margin-top:8px;padding:8px 10px;border:1px dashed var(--p-line);border-radius:6px"><b>Corredor responsable:</b> ${p.titular ? `${BP.esc([p.titular.nombre, p.titular.apellido].filter(Boolean).join(' '))} · ${BP.esc(p.titular.colegio || 'CUCICBA')} ${BP.esc(p.titular.matricula || 'sin matrícula')}` : `${BP.esc(p.responsable || 'sin persona asociada')} · ${BP.esc(p.matricula || 'sin matrícula')}`}
         <br>La matrícula es de la persona, no de la inmobiliaria. Buscala en el <a href="https://www.colegioinmobiliario.org.ar/" target="_blank" rel="noopener" style="text-decoration:underline">registro público de CUCICBA</a> (buscador de matriculados) y dejá constancia:
         ${p.titular && p.titular.matricula_verificada_en ? `<span class="p-badge" style="margin-left:6px">${BP.ico.shield} ${p.titular.matricula_verificada_en === 'sí' ? 'verificada' : 'verificada el ' + new Date(p.titular.matricula_verificada_en).toLocaleDateString('es-AR')}</span>` : p.titular && p.titular.matricula ? `<button type="button" class="p-btn p-btn-sm" data-mat="${p.titular.id}" style="margin-left:6px">Marcar matrícula verificada</button>` : '<i>falta la persona con matrícula (se crea al registrarse)</i>'}</div>` : ''}
-      <textarea placeholder="Nota (opcional)"></textarea><div class="acts"><button type="button" class="p-btn p-btn-sm p-btn-fill" data-ok>Verificar</button><button type="button" class="p-btn p-btn-sm" data-no>Rechazar</button></div></div></div>`).join('');
+      <textarea placeholder="Nota (opcional)" aria-label="Nota de la verificación"></textarea><div class="acts"><button type="button" class="p-btn p-btn-sm p-btn-fill" data-ok>Verificar</button><button type="button" class="p-btn p-btn-sm" data-no>Rechazar</button></div></div></div>`).join('');
     out.querySelectorAll('[data-mat]').forEach(b => b.addEventListener('click', async () => { b.disabled = true; try { await BPStore.marcarMatricula(b.dataset.mat, true); BP.toast('Matrícula verificada.'); renderPubs(); } catch (e) { b.disabled = false; BP.toast(BPStore.demo ? 'En modo demo no se guarda.' : 'No se pudo: ' + (e.message || e), 'error'); } }));
-    out.querySelectorAll('.p-cur').forEach(card => { const id = card.dataset.id, ta = card.querySelector('textarea'); card.querySelector('[data-ok]').addEventListener('click', async () => { await BPStore.verificarPublicador(id, true, ta.value.trim()); BP.toast('Publicador verificado.'); renderPubs(); }); card.querySelector('[data-no]').addEventListener('click', async () => { await BPStore.verificarPublicador(id, false, ta.value.trim()); BP.toast('Rechazado.'); renderPubs(); }); });
+    out.querySelectorAll('.p-cur').forEach(card => { const id = card.dataset.id, ta = card.querySelector('textarea'); card.querySelector('[data-ok]').addEventListener('click', async e => { if (await accion(e.currentTarget, () => BPStore.verificarPublicador(id, true, ta.value.trim()), 'Publicador verificado.')) renderPubs(); }); card.querySelector('[data-no]').addEventListener('click', async e => { if (!ta.value.trim()) { BP.errorCampo(ta, 'Escribí el motivo: el publicador lo va a leer.'); return; } if (await accion(e.currentTarget, () => BPStore.verificarPublicador(id, false, ta.value.trim()), 'Rechazado.')) renderPubs(); }); });
   }
   render();
 })();

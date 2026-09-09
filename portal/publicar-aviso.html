@@ -18,7 +18,7 @@
   <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260909a"><link rel="stylesheet" href="css/catalogo.css?v=20260909a"><link rel="stylesheet" href="css/portal.css?v=20260909a">
+  <link rel="stylesheet" href="css/base.css?v=20260909b"><link rel="stylesheet" href="css/catalogo.css?v=20260909b"><link rel="stylesheet" href="css/portal.css?v=20260909b">
   <style>
     .p-stepper{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0 26px}
     .p-stepper button{display:flex;align-items:center;gap:8px;border:1px solid var(--p-line);background:var(--p-card);border-radius:999px;padding:8px 14px;font:500 .78rem var(--font-body);color:var(--text-mid);cursor:pointer;letter-spacing:.06em}
@@ -47,12 +47,12 @@
   <p class="p-sub" id="sub">Cinco pasos. Podés guardar y seguir después desde tu panel.</p>
   <div class="p-stepper" id="stepper" style="margin-bottom:0"></div>
 </div></div>
-<section class="p-page after-band"><div class="p-container" style="max-width:920px">
-  <div class="p-card-panel" id="panel"></div>
+<section class="p-page after-band" role="main"><div class="p-container" style="max-width:920px">
+  <div class="p-card-panel" id="panel"><div class="p-skel-form" aria-hidden="true"><div class="p-skel-line t"></div><div class="p-skel-line l"></div><div class="p-skel-line m"></div><div class="p-skel-line l"></div><div class="p-skel-line s"></div></div></div>
   <p class="p-note" id="modeNote" style="margin-top:12px"></p>
 </div></section>
 <div id="pFooter"></div>
-<script src="supabase-portal.js" defer></script><script src="js/ui.js?v=20260909a" defer></script><script src="js/store.js?v=20260909a" defer></script><script src="js/data.js?v=20260909a" defer></script>
+<script src="supabase-portal.js" defer></script><script src="js/ui.js?v=20260909b" defer></script><script src="js/store.js?v=20260909b" defer></script><script src="js/data.js?v=20260909b" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -70,12 +70,15 @@ document.addEventListener('DOMContentLoaded', function(){
   if (!aviso) aviso = { operacion: 'venta', tipo: 'Departamento', zona: '', barrio: '', amenities: [], caracteristicas: [], cualidades: [], fotos: [], mostrar_direccion: 'aproximada', estado_curacion: 'borrador' };
   if (!perfil && pub) perfil = pub.tipo;
   let step = pub ? 1 : 0;
+  if (qs.get('paso') === 'perfil') step = 0;   /* "Editar mi perfil de publicador" desde el panel */
   const STEPS = ['Tu perfil', 'Lo principal', 'Fotos y video', 'Extras', 'Revisar y enviar'];
   const el = document.getElementById('panel');
   const v = (o, k) => o && o[k] != null ? o[k] : '';
-  const fld = (name, label, type, val, extra, hint) => `<div class="p-fld ${extra && extra.full ? 'full' : ''}" data-fld="${name}"><label for="f-${name}">${label}</label>${type === 'textarea' ? `<textarea id="f-${name}" name="${name}" ${extra && extra.attrs || ''}>${BP.esc(val)}</textarea>` : type === 'select' ? `<select id="f-${name}" name="${name}" ${extra && extra.attrs || ''}>${(extra.opts||[]).map(o => `<option value="${o[0]}" ${String(o[0])===String(val)?'selected':''}>${o[1]}</option>`).join('')}</select>` : `<input id="f-${name}" name="${name}" type="${type}" value="${BP.esc(val)}" ${extra && extra.attrs || ''}>`}${hint ? `<div class="hint">${hint}</div>` : ''}</div>`;
+  /* Teclado correcto en el celular y autocompletado según el tipo de dato; la pista queda ligada al campo */
+  const modoTeclado = (name, type) => type === 'number' ? ' inputmode="numeric"' : type === 'tel' ? ' inputmode="tel" autocomplete="tel"' : type === 'email' ? ' inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false"' : type === 'url' ? ' inputmode="url" autocapitalize="off" spellcheck="false"' : (name === 'dni' || name === 'cuit') ? ' inputmode="numeric" autocomplete="off"' : name === 'responsable' ? ' autocomplete="name"' : '';
+  const fld = (name, label, type, val, extra, hint) => `<div class="p-fld ${extra && extra.full ? 'full' : ''}" data-fld="${name}"><label for="f-${name}">${label}</label>${type === 'textarea' ? `<textarea id="f-${name}" name="${name}" ${extra && extra.attrs || ''}${hint ? ` aria-describedby="h-${name}"` : ''}>${BP.esc(val)}</textarea>` : type === 'select' ? `<select id="f-${name}" name="${name}" ${extra && extra.attrs || ''}${hint ? ` aria-describedby="h-${name}"` : ''}>${(extra.opts||[]).map(o => `<option value="${o[0]}" ${String(o[0])===String(val)?'selected':''}>${o[1]}</option>`).join('')}</select>` : `<input id="f-${name}" name="${name}" type="${type}" value="${BP.esc(val)}" ${extra && extra.attrs || ''}${modoTeclado(name, type)}${hint ? ` aria-describedby="h-${name}"` : ''}>`}${hint ? `<div class="hint" id="h-${name}">${hint}</div>` : ''}</div>`;
 
-  function renderStepper(){ document.getElementById('stepper').innerHTML = STEPS.map((s, i) => `<button type="button" class="${i===step?'on':i<step?'done':''}" data-s="${i}"><i>${i<step?'✓':i+1}</i>${s}</button>`).join(''); document.querySelectorAll('#stepper button').forEach(b => b.addEventListener('click', () => { const i = Number(b.dataset.s); if (i <= step || pub) { if (step > 0) collect(); step = i; render(); } })); }
+  function renderStepper(){ document.getElementById('stepper').innerHTML = STEPS.map((s, i) => `<button type="button" class="${i===step?'on':i<step?'done':''}" data-s="${i}"${i===step?' aria-current="step"':''} aria-label="Paso ${i+1} de ${STEPS.length}: ${s}"><i aria-hidden="true">${i<step?'✓':i+1}</i>${s}</button>`).join(''); document.querySelectorAll('#stepper button').forEach(b => b.addEventListener('click', () => { const i = Number(b.dataset.s); if (i <= step || pub) { if (step > 0) collect(); step = i; render(); } })); }
 
   function render(){ renderStepper(); if (step === 0) renderPerfil(); else if (step === 1) renderPrincipales(); else if (step === 2) renderFotos(); else if (step === 3) renderExtras(); else renderRevision(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
   const navBtns = (backLabel, nextLabel) => `<div class="p-nav-steps"><div>${step > 0 ? `<button type="button" class="p-btn p-btn-dark" data-back>${backLabel||'Volver'}</button>` : ''}</div><div style="display:flex;gap:8px"><button type="button" class="p-btn" data-save>Guardar borrador</button><button type="button" class="p-btn p-btn-fill" data-next>${nextLabel||'Continuar'} <span class="ic">${BP.ico.arrow}</span></button></div></div>`;
@@ -130,7 +133,7 @@ document.addEventListener('DOMContentLoaded', function(){
     const zs = document.getElementById('f-zona'), bs = document.getElementById('f-barrio');
     const fillBarrios = () => { const z = zs.value; bs.innerHTML = z ? BARRIOS[z].map(b => `<option value="${b}" ${b===a.barrio?'selected':''}>${b}</option>`).join('') : '<option value="">Elegí primero la zona</option>'; };
     fillBarrios(); zs.addEventListener('change', fillBarrios);
-    bindNav(async () => { collect(); const req = ['zona','barrio','direccion','precio','m2_total','ambientes','descripcion']; let ok = true; req.forEach(k => { const f = document.querySelector(`[data-fld=${k}]`); const bad = !aviso[k] || (k === 'descripcion' && String(aviso[k]).length < 150); f.classList.toggle('err', bad); if (bad) ok = false; }); if (!ok) {
+    bindNav(async () => { collect(); const req = REQ; let ok = true; req.forEach(k => { const f = document.querySelector(`[data-fld=${k}]`); const bad = !aviso[k] || (k === 'descripcion' && String(aviso[k]).length < 150); f.classList.toggle('err', bad); if (bad) ok = false; }); if (!ok) {
         const k = req.find(x => !aviso[x] || (x === 'descripcion' && String(aviso[x]).length < 150));
         const el = document.querySelector(`[data-fld=${k}]`);
         BP.errorCampo(el && (el.querySelector('input,select,textarea') || el), k === 'descripcion' ? 'La descripción necesita al menos 150 caracteres.' : 'Falta este dato.');
@@ -141,7 +144,7 @@ document.addEventListener('DOMContentLoaded', function(){
   function renderFotos(){
     const a = aviso;
     el.innerHTML = `<h2 class="p-sec-t">Fotos y video</h2><p class="p-kicker" style="margin-bottom:16px">Mínimo ocho fotos horizontales. La primera es la portada. Si no tenés fotos producidas, marcá la casilla y seguí: las hace BAIREN.</p>
-      <button type="button" class="p-drop" id="drop"><b>Tocá para elegir las fotos, o arrastralas acá</b>JPG o PNG, hasta 10 MB cada una.</button><input type="file" id="fotosIn" multiple accept="image/*" capture="environment" hidden>
+      <button type="button" class="p-drop" id="drop"><b>Tocá para elegir las fotos, o arrastralas acá</b>JPG o PNG, hasta 10 MB cada una.</button><input type="file" id="fotosIn" multiple accept="image/*" hidden aria-label="Fotos de la propiedad">
       <div class="p-fotos" id="fotosGrid"></div>
       <div class="p-formgrid" style="margin-top:18px">${fld('video_url','Video, link de YouTube o Bunny','url',a.video_url,{full:true,attrs:'placeholder="https://"'})}<label class="full" style="display:flex;gap:10px;align-items:center;color:var(--navy-deeper)"><input type="checkbox" id="quieroProd" ${a.quiero_produccion?'checked':''}> Quiero que BAIREN produzca las fotos y el video de la unidad, sin costo.</label></div>
       ${navBtns()}`;
@@ -208,12 +211,30 @@ document.addEventListener('DOMContentLoaded', function(){
     (async () => { const m = await BPData.fromStore(Object.assign({}, a, { publicador: pub, id: a.id || 'prev', fotos: a.fotos.map((f, i) => ({ url: f.url, orden: i })) })); document.getElementById('prev').innerHTML = BPData.cardV(m).replace(/href="[^"]*"/, 'href="#"'); })();
     el.querySelector('[data-back]').addEventListener('click', () => { step = 3; render(); });
     el.querySelector('[data-save]').addEventListener('click', async () => { await save('borrador'); BP.toast('Borrador guardado en tu panel.'); });
-    document.getElementById('enviar').addEventListener('click', async () => { if (!document.getElementById('acepto').checked) { BP.errorCampo('acepto', 'Aceptá los términos para enviar.'); return; } if (a.fotos.length < 8 && !a.quiero_produccion) { BP.toast('Hacen falta ocho fotos y hay ' + a.fotos.length + '. O pedí la producción de BAIREN.', 'error'); return; } try { await save('en_revision'); BP.toast('Enviado. Te avisamos por mail cuando esté publicado.'); setTimeout(() => location.href = 'panel.html#avisos', 900); } catch (e) { BP.toast('No se pudo enviar: ' + (e.message || e), 'error'); } });
+    document.getElementById('enviar').addEventListener('click', async () => {
+      const btn = document.getElementById('enviar');
+      /* Antes de enviar se vuelve a mirar lo obligatorio de Principales: con el stepper se puede haber saltado el paso */
+      const falta = REQ.find(k => !a[k] || (k === 'descripcion' && String(a[k]).length < 150));
+      if (falta) { step = 1; render(); setTimeout(() => { const f = document.querySelector(`[data-fld=${falta}]`); if (f) { f.classList.add('err'); BP.errorCampo(f.querySelector('input,select,textarea') || f, falta === 'descripcion' ? 'La descripción tiene que tener al menos 150 caracteres.' : 'Falta este dato.'); } }, 350); return; }
+      if (a.fotos.length < 8 && !a.quiero_produccion) { step = 2; render(); BP.toast('Hacen falta ocho fotos y hay ' + a.fotos.length + '. O pedí la producción de BAIREN.', 'error'); return; }
+      if (!document.getElementById('acepto').checked) { BP.errorCampo('acepto', 'Aceptá los términos para enviar.'); return; }
+      ocupar(btn, true, 'Enviando…');
+      try { await save('en_revision'); BP.toast('Enviado. Te avisamos por mail cuando esté publicado.'); setTimeout(() => location.href = 'panel.html#avisos', 900); } catch (e) { ocupar(btn, false); BP.toast('No se pudo enviar: ' + (e.message || e), 'error'); }
+    });
   }
 
   function collect(){ el.querySelectorAll('input[name]:not([type=checkbox]):not([type=radio]):not([type=file]),select[name],textarea[name]').forEach(i => { const k = i.name; let val = i.value; if (i.type === 'number') val = val === '' ? null : Number(val); if (typeof val === 'string') val = val.trim(); aviso[k] = val; }); const am = el.querySelectorAll('[name=amen]:checked'); if (el.querySelector('[name=amen]')) aviso.amenities = Array.from(am).map(x => x.value); const ca = el.querySelectorAll('[name=car]:checked'); if (el.querySelector('[name=car]')) aviso.caracteristicas = Array.from(ca).map(x => x.value); const cu = el.querySelectorAll('[name=cual]:checked'); if (el.querySelector('[name=cual]')) aviso.cualidades = Array.from(cu).map(x => x.value); if (aviso.operacion === 'mediano') aviso.amoblado = true; else aviso.amoblado = aviso.amenities.indexOf('Amoblado') > -1; if (aviso.video_url) aviso.video_tipo = /youtu/.test(aviso.video_url) ? 'youtube' : /bunny|mediadelivery/.test(aviso.video_url) ? 'bunny' : 'mp4'; }
   async function save(estado){ collect(); const rec = Object.assign({}, aviso); rec.estado_curacion = estado; delete rec.publicador; if (estado === 'en_revision') rec.motivo_rechazo = null; const saved = await BPStore.saveAviso(rec); aviso.id = saved.id; aviso.codigo = saved.codigo; aviso.slug = saved.slug; aviso.estado_curacion = estado; return saved; }
-  function bindNav(validate){ const b = el.querySelector('[data-back]'); if (b) b.addEventListener('click', () => { if (step > 0) collect(); step = Math.max(0, step - 1); render(); }); el.querySelector('[data-save]').addEventListener('click', async () => { if (step === 0) { const ok = await validate(); if (!ok) return; } try { await save('borrador'); BP.toast('Borrador guardado.'); } catch (e) { BP.toast(e.message || 'No se pudo guardar.'); } }); el.querySelector('[data-next]').addEventListener('click', async () => { const ok = await validate(); if (!ok) return; if (step > 0) { try { await save(aviso.estado_curacion === 'publicado' ? 'publicado' : 'borrador'); } catch (e) { BP.toast(e.message || 'No se pudo guardar.'); return; } } step++; render(); }); }
+  /* Lo obligatorio del paso Principales; se revisa al avanzar y otra vez antes de enviar */
+  const REQ = ['zona','barrio','direccion','precio','m2_total','ambientes','descripcion'];
+  /* Un botón ocupado no se vuelve a apretar: queda deshabilitado y dice qué está haciendo */
+  function ocupar(btn, on, label){ if (!btn) return; if (on) { btn.dataset.label = btn.innerHTML; btn.disabled = true; btn.setAttribute('aria-busy', 'true'); btn.textContent = label || 'Guardando…'; } else { btn.disabled = false; btn.removeAttribute('aria-busy'); if (btn.dataset.label) btn.innerHTML = btn.dataset.label; } }
+  function bindNav(validate){
+    const b = el.querySelector('[data-back]'); if (b) b.addEventListener('click', () => { if (step > 0) collect(); step = Math.max(0, step - 1); render(); });
+    const bs = el.querySelector('[data-save]'), bn = el.querySelector('[data-next]');
+    bs.addEventListener('click', async () => { if (bs.disabled) return; if (step === 0) { const ok = await validate(); if (!ok) return; } ocupar(bs, true, 'Guardando…'); try { await save('borrador'); BP.toast('Borrador guardado.'); } catch (e) { BP.toast(e.message || 'No se pudo guardar.', 'error'); } ocupar(bs, false); });
+    bn.addEventListener('click', async () => { if (bn.disabled) return; ocupar(bn, true, step === 0 ? 'Guardando…' : 'Guardando…'); const ok = await validate(); if (!ok) { ocupar(bn, false); return; } if (step > 0) { try { await save(aviso.estado_curacion === 'publicado' ? 'publicado' : 'borrador'); } catch (e) { ocupar(bn, false); BP.toast(e.message || 'No se pudo guardar.', 'error'); return; } } step++; render(); });
+  }
 
   if (editId && aviso) document.getElementById('ttl').textContent = 'Editar aviso';
   render();

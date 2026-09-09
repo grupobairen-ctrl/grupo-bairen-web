@@ -7,23 +7,23 @@
   <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260909a"><link rel="stylesheet" href="css/catalogo.css?v=20260909a"><link rel="stylesheet" href="css/portal.css?v=20260909a">
+  <link rel="stylesheet" href="css/base.css?v=20260909b"><link rel="stylesheet" href="css/catalogo.css?v=20260909b"><link rel="stylesheet" href="css/portal.css?v=20260909b">
 </head>
 <body>
 <div id="pHeader"></div>
-<section class="p-page dark"><div class="p-container">
+<section class="p-page dark" role="main"><div class="p-container">
   <div class="p-login" data-reveal>
     <h1 id="ttl">Ingresar</h1>
     <p class="p-sub" id="sub" style="margin-bottom:18px">Favoritos, alertas, tus contactos y, si publicás, tu panel. Sin contraseña: te mandamos un código al mail.</p>
-    <form id="stepMail"><input type="email" name="email" id="email" placeholder="Tu mail" required autocomplete="email"><button type="submit" class="p-btn p-btn-fill" style="width:100%" id="btnMail">Continuar</button></form>
-    <form id="stepCode" hidden><p class="p-note" id="codeMsg" style="margin-bottom:10px"></p><input type="text" name="code" id="code" inputmode="numeric" pattern="[0-9]*" maxlength="8" placeholder="Código de seis dígitos" required autocomplete="one-time-code"><button type="submit" class="p-btn p-btn-fill" style="width:100%">Ingresar</button><p class="p-note" style="text-align:center;margin-top:10px"><a href="#" id="again" style="text-decoration:underline;color:var(--navy-deeper)">Reenviar código</a> · <a href="#" id="back" style="text-decoration:underline;color:var(--navy-deeper)">Cambiar mail</a></p></form>
+    <form id="stepMail" novalidate><label class="p-sr" for="email">Mail</label><input type="email" name="email" id="email" placeholder="Tu mail" required autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false"><button type="submit" class="p-btn p-btn-fill" style="width:100%" id="btnMail">Continuar</button></form>
+    <form id="stepCode" hidden novalidate><p class="p-note" id="codeMsg" style="margin-bottom:10px" role="status"></p><label class="p-sr" for="code">Código de seis dígitos</label><input type="text" name="code" id="code" inputmode="numeric" pattern="[0-9]*" maxlength="8" placeholder="Código de seis dígitos" required autocomplete="one-time-code" autocapitalize="off" spellcheck="false"><button type="submit" class="p-btn p-btn-fill" style="width:100%" id="btnCode">Ingresar</button><p class="p-note" style="text-align:center;margin-top:10px"><a href="#" id="again" style="text-decoration:underline">Reenviar código</a> · <a href="#" id="back" style="text-decoration:underline">Cambiar mail</a></p></form>
     <div id="social"><div class="or">o</div><button type="button" class="soc" data-soc="google">Continuar con Google</button><button type="button" class="soc" data-soc="apple">Continuar con Apple</button></div>
     <p class="p-note" style="margin-top:14px">Al continuar aceptás los <a href="legales.html#terminos" style="text-decoration:underline">Términos y condiciones</a> y la <a href="legales.html#privacidad" style="text-decoration:underline">Política de privacidad</a>. Una cuenta por persona.</p>
     <p class="p-note" id="modeNote" style="margin-top:8px"></p>
   </div>
 </div></section>
 <div id="pFooter"></div>
-<script src="supabase-portal.js" defer></script><script src="js/ui.js?v=20260909a" defer></script><script src="js/store.js?v=20260909a" defer></script><script src="js/data.js?v=20260909a" defer></script>
+<script src="supabase-portal.js" defer></script><script src="js/ui.js?v=20260909b" defer></script><script src="js/store.js?v=20260909b" defer></script><script src="js/data.js?v=20260909b" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -38,11 +38,18 @@ document.addEventListener('DOMContentLoaded', function(){
   document.getElementById('modeNote').textContent = mode === 'local' ? 'Modo local: sin base conectada, la sesión y los datos quedan en este navegador.' : '';
   if (BPStore.session) { location.replace(destino()); return; }
   let mail = '';
-  async function send(){ const b = document.getElementById('btnMail'); b.disabled = true; b.textContent = 'Enviando…'; await BPStore.init(); const r = await BPStore.sendCode(email.value); b.disabled = false; b.textContent = 'Continuar'; if (!r.ok) { BP.errorCampo('email', r.msg); return; } mail = email.value.trim().toLowerCase(); document.getElementById('codeMsg').textContent = r.msg; fm.hidden = true; document.getElementById('social').hidden = true; fc.hidden = false; document.getElementById('code').focus(); }
+  async function send(){ const b = document.getElementById('btnMail'); if (b.disabled) return; if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.value.trim())) { BP.errorCampo('email', 'Revisá el mail, por ejemplo nombre@dominio.com.'); return; } b.disabled = true; b.textContent = 'Enviando…'; await BPStore.init(); let r; try { r = await BPStore.sendCode(email.value); } catch (err) { r = { ok: false, msg: err.message || 'No se pudo enviar el código.' }; } b.disabled = false; b.textContent = 'Continuar'; if (!r.ok) { BP.errorCampo('email', r.msg); return; } mail = email.value.trim().toLowerCase(); document.getElementById('codeMsg').textContent = r.msg; fm.hidden = true; document.getElementById('social').hidden = true; fc.hidden = false; const c = document.getElementById('code'); c.value = ''; c.focus(); }
   fm.addEventListener('submit', e => { e.preventDefault(); send(); });
   document.getElementById('again').addEventListener('click', e => { e.preventDefault(); send(); });
   document.getElementById('back').addEventListener('click', e => { e.preventDefault(); fc.hidden = true; fm.hidden = false; document.getElementById('social').hidden = false; });
-  fc.addEventListener('submit', async e => { e.preventDefault(); const r = await BPStore.verifyCode(mail, document.getElementById('code').value); if (!r.ok) { BP.errorCampo('code', r.msg); return; } BP.toast('Listo, entraste.'); setTimeout(() => location.href = destino(), 500); });
+  fc.addEventListener('submit', async e => {
+    e.preventDefault(); const code = document.getElementById('code'), b = document.getElementById('btnCode');
+    if (!/^\d{6,8}$/.test(code.value.trim())) { BP.errorCampo('code', 'El código tiene seis dígitos.'); return; }
+    b.disabled = true; b.textContent = 'Verificando…';
+    let r; try { r = await BPStore.verifyCode(mail, code.value); } catch (err) { r = { ok: false, msg: err.message || 'No se pudo verificar.' }; }
+    if (!r.ok) { b.disabled = false; b.textContent = 'Ingresar'; BP.errorCampo('code', r.msg); code.select(); return; }
+    b.textContent = 'Entrando…'; BP.toast('Listo, entraste.'); setTimeout(() => location.href = destino(), 500);
+  });
   document.querySelectorAll('[data-soc]').forEach(b => b.addEventListener('click', async () => { if (mode === 'supabase') { const { error } = await BPStore.sb.auth.signInWithOAuth({ provider: b.dataset.soc, options: { redirectTo: location.origin + location.pathname.replace(/[^/]*$/, '') + destino() } }); if (error) BP.toast(error.message, 'error'); } else { BP.toast('Google y Apple todavía no están activos. Usá el mail.'); } }));
 })();
 });

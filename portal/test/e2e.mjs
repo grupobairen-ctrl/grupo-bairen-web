@@ -113,10 +113,11 @@ try {
   const href = await evalJs('(() => { const c = Array.from(document.querySelectorAll(".p-card-h")).find(x => x.textContent.includes("Honduras")); return c ? c.querySelector(".p-addr").getAttribute("href") : null; })()');
   await goto(BASE + href);
   await waitFor('!!document.getElementById("contactForm")', 'ficha');
-  const ficha = await evalJs('({ h1: document.querySelector("h1").textContent, fotos: document.querySelectorAll("#gal img").length, pub: document.querySelector(".p-pub-block b").textContent, badge: !!document.querySelector(".p-pub-block .p-badge.dueno") })');
+  const ficha = await evalJs('({ h1: document.querySelector("h1").textContent, fotos: document.querySelectorAll("#gal .p-fhero-slide[data-i], #gal img").length, pub: document.querySelector(".p-pub-block b").textContent, badge: !!document.querySelector(".p-pub-block .p-badge.dueno") })');
   await shot('09-ficha-nueva');
   ok('Ficha: título, fotos y publicador verificado', ficha.fotos >= 4 && ficha.badge, JSON.stringify(ficha));
-  await evalJs('const f = document.getElementById("contactForm"); f.nombre.value = "Interesada Prueba"; f.email.value = "interesada@bairen.test"; f.telefono.value = "1144445555"; f.querySelectorAll("input[type=checkbox]").forEach(c => c.checked = true); window.__loc = null; f.dispatchEvent(new Event("submit", { cancelable: true })); true');
+  /* Se acepta solo la casilla de términos: la de visita exige día y hora, y sin fecha el formulario avisa y no envía */
+  await evalJs('const f = document.getElementById("contactForm"); f.nombre.value = "Interesada Prueba"; f.email.value = "interesada@bairen.test"; f.telefono.value = "1144445555"; (f.querySelector("#cfAcepto") || f.querySelector("input[type=checkbox][required]")).checked = true; window.__loc = null; f.dispatchEvent(new Event("submit", { cancelable: true })); true');
   await sleep(600);
   const consultas = await evalJs('JSON.parse(localStorage.getItem("bp_consultas_db") || "[]").length');
   ok('Ficha: la consulta queda registrada para el publicador', consultas >= 1, consultas + ' consulta(s)');
@@ -172,7 +173,9 @@ try {
   if (pretty) { await goto(BASE + 'departamentos-venta-palermo'); await waitFor('document.querySelectorAll(".p-card-h").length > 0', 'resultados por ruta limpia'); const t = await evalJs('document.getElementById("resTitle").textContent'); const link = await evalJs('document.querySelector(".p-card-h .p-addr").getAttribute("href")'); ok('Rutas limpias: resultados y links de ficha', /Palermo/.test(t) && /^propiedad-/.test(link), t + ' · ' + link); await goto(BASE + link); await waitFor('!!document.getElementById("contactForm")', 'ficha por ruta limpia'); ok('Rutas limpias: la ficha abre desde su URL', true, await evalJs('document.querySelector("h1").textContent')); }
   else ok('Rutas limpias: servidor sin reescritura (se usan parámetros)', true);
 
-  /* 9. Estado de error: si la carga falla hay mensaje y reintento, no esqueleto eterno */
+  /* 9. Estado de error: si la carga falla hay mensaje y reintento, no esqueleto eterno.
+     En modo local los avisos publicados del navegador alcanzan para no leer el JSON, así que se apartan un momento. */
+  await evalJs('sessionStorage.setItem("__bpAvisos", localStorage.getItem("bp_avisos") || "[]"); localStorage.setItem("bp_avisos", "[]"); true');
   await send('Network.setBlockedURLs', { urls: ['*avisos-src.json*'] });
   await goto(BASE + 'buscar.html?op=mediano');
   await waitFor('!!document.querySelector(".p-error")', 'estado de error', 12000);
@@ -180,6 +183,7 @@ try {
   await shot('16-estado-error');
   ok('Estado de error: mensaje con reintento cuando los datos no cargan', /alert/.test(err) && /Reintentar/.test(err), err);
   await send('Network.setBlockedURLs', { urls: [] });
+  await evalJs('localStorage.setItem("bp_avisos", sessionStorage.getItem("__bpAvisos") || "[]"); sessionStorage.removeItem("__bpAvisos"); true');
 
   /* 10. Teclado en el buscador: flechas, Enter y Escape */
   await goto(BASE + 'buscar.html?op=mediano');
