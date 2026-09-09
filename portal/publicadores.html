@@ -32,7 +32,7 @@ BPData.load().then(function(d){
       '<div class="badges">' + BPData.badgeHTML(p) + (p.demo ? '<span class="p-badge demo">Ejemplo</span>' : '') + '</div>' +
       '<p class="p-text" style="margin:12px 0;font-size:.92rem">' + BP.esc(p.desc) + '</p>' +
       '<p class="p-codes">Publica desde ' + p.desde + ' · ' + venta + ' en venta · ' + alq + ' en alquiler · Zonas: ' + p.zonas.map(BP.zonaLabel).join(', ') + '</p>' +
-      '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><a class="p-btn p-btn-sm p-btn-navy" href="mailto:' + p.email + '">Enviar consulta</a><a class="p-btn p-btn-sm" href="buscar.html?pub=' + p.id + '&op=">Ver sus ' + mine.length + ' propiedades</a></div>' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center">' + (p.email ? '<a class="p-btn p-btn-sm p-btn-navy" href="mailto:' + BP.esc(p.email) + '">Enviar consulta</a>' : '<span class="p-sincontacto">Contacto pendiente</span>') + '<a class="p-btn p-btn-sm" href="buscar.html?pub=' + p.id + '&op=">Ver sus ' + mine.length + ' propiedades</a></div>' +
       '<div class="p-grid" style="margin-top:18px">' + mine.slice(0,3).map(BPData.cardV).join('') + '</div></article>';
   }).join('');
 });

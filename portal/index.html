@@ -60,7 +60,7 @@
 <section class="p-section alt" id="seleccionadas">
   <div class="p-container">
     <div class="p-head-row" data-reveal><div><h2 class="p-h2">Seleccionadas de la semana</h2><p class="p-sub" style="margin:0">Las unidades que más vale la pena ver ahora.</p></div><a class="p-link" href="buscar.html">Ver todas las propiedades</a></div>
-    <div class="p-grid" id="destacadasGrid" data-reveal></div>
+    <div class="p-grid" id="destacadasGrid" data-reveal aria-busy="true"><div class="p-skel-vcard" aria-hidden="true"></div><div class="p-skel-vcard" aria-hidden="true"></div><div class="p-skel-vcard" aria-hidden="true"></div></div>
   </div>
 </section>
 
@@ -172,7 +172,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
   /* seleccionadas */
   const dest = BPData.sort(avisos.filter(a => a.destacado && !a.demo), 'relevancia').slice(0,6);
-  document.getElementById('destacadasGrid').innerHTML = dest.map(BPData.cardV).join('');
+  document.getElementById('destacadasGrid').innerHTML = dest.map(BPData.cardV).join(''); document.getElementById('destacadasGrid').removeAttribute('aria-busy');
 
   /* publicadores */
   document.getElementById('pubsRow').innerHTML = Object.values(BPData.PUBLICADORES).map(p => `<a class="p-pub-card" href="publicadores.html#${p.id}"><div class="p-pub-logo">${p.inicial}</div><div><b>${BP.esc(p.nombre)}</b><small>${p.tipo==='dueno'?'Dueño verificado':p.badge + ' · ' + p.matricula}${p.demo?' · ejemplo':''}</small></div></a>`).join('') + `<a class="p-pub-card" href="publicar.html#inmobiliaria" style="border-style:dashed"><div class="p-pub-logo" style="background:var(--p-tray);color:var(--gold-dark)">+</div><div><b>Tu inmobiliaria acá</b><small>Publicá tu cartera de los ocho barrios</small></div></a>`;

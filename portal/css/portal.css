@@ -1156,6 +1156,23 @@ html body .p-searchbar .p-chips .p-chip{background:#fff;border:1px solid var(--p
   .p-product .p-tbl td:empty{display:none}
   .p-product .p-tbl td .p-btn{margin-top:4px}
 }
+/* Portada: esqueleto de las seleccionadas mientras llegan los datos */
+.p-skel-vcard{height:380px;border-radius:var(--p-r-md);background:linear-gradient(90deg,#E4DCC8 25%,#EEE7D6 50%,#E4DCC8 75%);background-size:200% 100%;animation:sk 1.2s infinite}
+/* Objetivos táctiles de 44 px en lo que quedaba chico en el celular: enlaces del pie, migas, "ver más", corazón de la tarjeta, puertas del hero */
+@media(max-width:900px){
+  .footer .ft-col ul li a,.footer-legal a,.p-legal-strip a{display:inline-block;padding:8px 0;margin:-8px 0}
+  .footer .ft-col ul li{margin-bottom:6px}
+  .p-breadcrumb a{display:inline-block;padding:10px 2px;margin:-10px 0}
+  .p-link{display:inline-block;padding:10px 0;margin:-10px 0}
+  .p-more,.p-linkbtn{min-height:44px;display:inline-flex;align-items:center}
+  .p-card-h .p-fav,.p-card-h .acts .p-icon-btn{width:44px;height:44px}
+  .p-doors a{padding:12px 6px}
+  .p-seo a{display:inline-block;padding:8px 0}
+  .p-quick button,.p-report .chips button,.p-tabs2 button{min-height:44px}
+}
+/* Contraste: las pestañas inactivas y el sub-selector de la barra de papel quedaban en 4,0:1 con el gris del sitio; pasan a 5,6:1 */
+html body .p-searchbar .p-search .p-tab{color:#565E6E}
+.p-plazo span{color:#565E6E}
 /* Menú del celular: mediano plazo cuelga de Alquilar, no es una entrada del mismo nivel */
 .mobile-menu a.m-sub{font-size:.95rem;padding-left:24px;position:relative;color:rgba(255,255,255,.62)}
 .mobile-menu a.m-sub::before{content:"";position:absolute;left:6px;top:50%;width:10px;height:1px;background:var(--gold)}
