@@ -1117,6 +1117,45 @@ html body .p-searchbar .p-chips .p-chip{background:#fff;border:1px solid var(--p
   .p-plazo{order:9;flex-basis:100%;margin:2px 0 6px}
   .p-plazo span{min-height:40px;padding:0 16px}
 }
+/* Formularios: botón ocupado, error dentro de la grilla de dos columnas, estado de éxito de la consulta, esqueleto del asistente */
+.p-btn[disabled],.p-fbtn[disabled]{opacity:.55;cursor:default;pointer-events:none}
+.p-btn[aria-busy="true"]{opacity:.75}
+.p-form .r2 .p-err-campo{grid-column:1/-1;margin-top:-4px}
+.p-form-ok p{color:var(--p-ink-2);font-size:.9rem;line-height:1.55;margin:0 0 12px}
+.p-form-ok p a{color:var(--p-ink);text-decoration:underline}
+.p-form-ok .p-btn{width:100%;margin-bottom:10px}
+.p-form-ok .p-linkbtn{color:var(--p-ink-2);font-size:.84rem;min-height:44px}
+.p-form-ok:focus{outline:none}
+.p-skel-form{display:grid;gap:16px;padding:10px 0 20px}
+.p-skel-form .p-skel-line{height:46px;border-radius:8px}
+.p-skel-form .p-skel-line.t{height:26px;width:40%}
+.p-skel-form .p-skel-line.s{height:42px;width:180px;border-radius:999px}
+/* Panel y curación: esqueleto mientras cargan, riel horizontal y tablas apiladas en el celular */
+.p-skel-panel{display:grid;gap:12px;padding:4px 0 24px}
+.p-skel-panel .p-skel-line.row{height:132px;border-radius:var(--p-r-md)}
+.p-skel-panel .p-skel-line.t{height:30px;width:38%}
+.p-skel-panel .p-skel-line.s{width:52%;margin-bottom:8px}
+.p-fb{flex-wrap:wrap}
+@media(max-width:900px){
+  .p-product .p-panel .p-side-nav{display:flex;gap:4px;overflow-x:auto;padding:8px;scrollbar-width:none;-webkit-overflow-scrolling:touch;border-radius:12px;position:static}
+  .p-product .p-panel .p-side-nav::-webkit-scrollbar{display:none}
+  .p-product .p-panel .p-side-nav .who{display:none}
+  .p-product .p-panel .p-side-nav a{flex:0 0 auto;white-space:nowrap;padding:10px 14px;font-size:.84rem;border-radius:999px;border:1px solid transparent;min-height:44px}
+  .p-product .p-panel .p-side-nav a.on{border-color:rgba(194,169,104,.55)}
+  .p-product .p-visita-form .p-fsel,.p-product .p-visita-form .p-btn{flex:1 1 100%;min-width:0}
+  .p-product .p-fb input{width:100%;flex:1 1 100%}
+  .p-aviso-row .acts .p-btn{flex:1 1 auto;justify-content:center}
+}
+@media(max-width:760px){
+  .p-product .p-tbl{display:block;border:0;background:transparent}
+  .p-product .p-tbl thead{display:none}
+  .p-product .p-tbl tbody,.p-product .p-tbl tr,.p-product .p-tbl td{display:block}
+  .p-product .p-tbl tr{background:var(--p-card-w);border:1px solid var(--p-hair);border-radius:var(--p-r-md);padding:8px 14px;margin-bottom:10px}
+  .p-product .p-tbl td{border:0;padding:6px 0;font-size:.9rem}
+  .p-product .p-tbl td[data-th]::before{content:attr(data-th);display:block;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--p-gold-ink);margin-bottom:2px}
+  .p-product .p-tbl td:empty{display:none}
+  .p-product .p-tbl td .p-btn{margin-top:4px}
+}
 /* Menú del celular: mediano plazo cuelga de Alquilar, no es una entrada del mismo nivel */
 .mobile-menu a.m-sub{font-size:.95rem;padding-left:24px;position:relative;color:rgba(255,255,255,.62)}
 .mobile-menu a.m-sub::before{content:"";position:absolute;left:6px;top:50%;width:10px;height:1px;background:var(--gold)}
