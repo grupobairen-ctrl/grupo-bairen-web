@@ -1144,7 +1144,21 @@ html body .p-searchbar .p-chips .p-chip{background:#fff;border:1px solid var(--p
   .p-product .p-panel .p-side-nav a.on{border-color:rgba(194,169,104,.55)}
   .p-product .p-visita-form .p-fsel,.p-product .p-visita-form .p-btn{flex:1 1 100%;min-width:0}
   .p-product .p-fb input{width:100%;flex:1 1 100%}
-  .p-aviso-row .acts .p-btn{flex:1 1 auto;justify-content:center}
+  /* El contenido del panel no puede ser más ancho que la pantalla: la cabecera y las cifras envuelven */
+  .p-product .p-panel>*{min-width:0}
+  .p-product #content .p-head-row{flex-wrap:wrap;align-items:flex-start}
+  .p-product #content .p-head-row>div:last-child{display:flex;flex-wrap:wrap;gap:8px;width:100%}
+  .p-product #content .p-head-row>div:last-child .p-btn{flex:1 1 auto;justify-content:center}
+  .p-product .p-kpis{flex-wrap:wrap;gap:10px 22px}
+  /* La fila del aviso no se apila: foto chica a la izquierda, datos a la derecha, acciones abajo a lo ancho */
+  .p-product .p-aviso-row{grid-template-columns:88px minmax(0,1fr);gap:12px;align-items:start}
+  .p-product .p-aviso-row>div:nth-child(2){min-width:0}
+  .p-product .p-aviso-row .ph{aspect-ratio:1;border-radius:8px}
+  .p-product .p-aviso-row .stats{flex-wrap:wrap;gap:6px 14px}
+  .p-product .p-aviso-row .acts{grid-column:1/-1;flex-direction:row;flex-wrap:wrap;align-items:center;gap:8px}
+  .p-product .p-aviso-row .acts .p-btn{flex:1 1 auto;justify-content:center;white-space:normal;height:auto;min-height:44px;padding:8px 14px;line-height:1.2}
+  .p-product .p-visita-form,.p-product .p-fb{max-width:100%}
+  .p-product .p-visitas ul{overflow-wrap:anywhere}
 }
 @media(max-width:760px){
   .p-product .p-tbl{display:block;border:0;background:transparent}

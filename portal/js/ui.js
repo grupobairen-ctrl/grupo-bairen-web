@@ -103,7 +103,7 @@
     if (!el) { BP.toast(msg, 'error'); return; }
     let id = el.id ? el.id + '-err' : 'err-' + Math.random().toString(36).slice(2, 8);
     let box = document.getElementById(id);
-    if (!box) { box = document.createElement('p'); box.id = id; box.className = 'p-err-campo'; (el.closest('.p-fld, .p-field, .cfield, label') || el.parentNode).appendChild(box); }
+    if (!box) { box = document.createElement('p'); box.id = id; box.className = 'p-err-campo'; const cont = el.closest('.p-fld, .p-field, .cfield, label'); if (cont) cont.appendChild(box); else el.insertAdjacentElement('afterend', box); /* pegado al campo, no al final del formulario */ }
     box.textContent = msg; box.hidden = false;
     el.setAttribute('aria-invalid', 'true'); el.setAttribute('aria-describedby', id);
     el.classList.add('p-invalido');
