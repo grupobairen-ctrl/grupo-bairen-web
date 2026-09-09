@@ -16,9 +16,9 @@
 /* El portal vive en su propio proyecto, separado del de bairengroup.com.
    Se configuran como variables de entorno en Vercel para no repetir el dato
    en dos lugares; si faltan, cae al proyecto del sitio y avisa. */
-const SUPABASE_URL = process.env.PORTAL_SUPABASE_URL || 'https://nmrjyyrhwjroonrppnka.supabase.co';
-const SUPABASE_ANON_KEY = process.env.PORTAL_SUPABASE_KEY || 'sb_publishable_D0YwiSL5Hm3GyOSx2r1lug_ZV7v46_n';
-if (!process.env.PORTAL_SUPABASE_URL) console.warn('[portal-notify] sin PORTAL_SUPABASE_URL: usando el proyecto del sitio');
+const SUPABASE_URL = process.env.PORTAL_SUPABASE_URL || 'https://dahusnnbyrvltcuaelxj.supabase.co';   // BAIREN PORTAL (proyecto propio desde el 4/9/2026)
+const SUPABASE_ANON_KEY = process.env.PORTAL_SUPABASE_KEY || 'sb_publishable_tSRRvyBksexYaiuwJ5YTQw_R_4VNp-0';
+if (!process.env.PORTAL_SUPABASE_URL) console.warn('[portal-notify] sin PORTAL_SUPABASE_URL en Vercel: usando el proyecto del portal por defecto');
 const SITE = 'https://www.bairengroup.com/portal/';
 const TIPOS = ['consulta', 'aprobado', 'rechazado', 'cambios', 'verificado', 'verificacion_rechazada'];
 // Límite de frecuencia por instancia. En un entorno sin estado cada instancia tiene el suyo,
