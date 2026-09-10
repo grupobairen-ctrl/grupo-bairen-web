@@ -10,7 +10,7 @@
   <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260911t"><link rel="stylesheet" href="css/catalogo.css?v=20260911t"><link rel="stylesheet" href="css/portal.css?v=20260911t">
+  <link rel="stylesheet" href="css/base.css?v=20260911v"><link rel="stylesheet" href="css/catalogo.css?v=20260911v"><link rel="stylesheet" href="css/portal.css?v=20260911v">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"BAIREN","url":"https://www.bairengroup.com","logo":"https://www.bairengroup.com/bairen_logo.png","description":"El portal de propiedades seleccionadas de Buenos Aires. Alquileres a mediano y largo plazo y departamentos en venta, publicados por corredores matriculados y dueños verificados.","areaServed":[{"@type":"City","name":"Ciudad Autónoma de Buenos Aires"},{"@type":"AdministrativeArea","name":"Zona Norte, Buenos Aires"}]}</script>
 </head>
 <body>
@@ -62,7 +62,7 @@
     <div data-reveal>
       <span class="p-eyebrow">Dónde empezamos</span>
       <h2 class="p-h2">Los barrios</h2>
-      <p class="p-sub">Cada unidad pasó un estándar de edificio, estado y presentación. Elegí un barrio y mirá lo publicado hoy.</p>
+      <p class="p-sub">Elegí un barrio y mirá lo que hay publicado hoy.</p>
       <div class="p-zonas" id="zonasGrid"></div>
       <p class="p-zonas-vacias" id="zonasVacias" hidden></p>
     </div>
@@ -72,25 +72,11 @@
 
 <section class="p-section alt" id="seleccionadas">
   <div class="p-container">
-    <div class="p-head-row" data-reveal><div><h2 class="p-h2">Seleccionadas de la semana</h2><p class="p-sub" style="margin:0">Las que vale la pena ver esta semana.</p></div><a class="p-link" href="buscar.html">Ver todas las propiedades</a></div>
+    <div class="p-head-row" data-reveal><div><h2 class="p-h2">Seleccionadas de la semana</h2><p class="p-sub" style="margin:0">Elegidas a mano entre lo publicado esta semana.</p></div><a class="p-link" href="buscar.html">Ver todas las propiedades</a></div>
     <div class="p-grid" id="destacadasGrid" data-reveal aria-busy="true"><div class="p-skel-vcard" aria-hidden="true"></div><div class="p-skel-vcard" aria-hidden="true"></div><div class="p-skel-vcard" aria-hidden="true"></div></div>
   </div>
 </section>
 
-<section class="p-section" id="publicar">
-  <div class="p-container">
-    <div class="p-publica" data-reveal>
-      <img src="../hero-poster.jpg?v=2" alt="" aria-hidden="true">
-      <div>
-        <h3>Publicá tu propiedad</h3>
-        <p>Si tu unidad está en uno de los barrios seleccionados y cumple el estándar, la producimos y la mostramos a quien la está buscando. La operación es tuya: BAIREN no interviene.</p>
-        <ul><li>Fotos producidas sin costo, ficha completa y verificada</li><li>Contacto directo con los interesados</li><li>Vistas, consultas y visitas en tu panel de Bairen OS</li></ul>
-        <div class="p-cta-row"><a class="p-btn p-btn-fill" href="publicar.html#dueno">Soy dueño directo</a><a class="p-btn" href="publicar.html#inmobiliaria">Soy inmobiliaria o corredor</a><a class="p-btn" href="publicar.html#desarrolladora">Soy desarrolladora</a></div>
-      </div>
-      <div><p class="p-cond-ttl">Condiciones de ingreso</p><ul class="p-cond"><li>Palermo, Recoleta, Retiro, Belgrano, Núñez, Colegiales, Villa Crespo, Puerto Madero, Saavedra o Zona Norte</li><li>Edificio de categoría o con amenities. Unidad en estado impecable</li><li>Ficha completa: metros, expensas, orientación, planos</li><li>Fotos profesionales, mínimo ocho. Si no las tenés, las hacemos</li><li>Publicador verificado: titularidad, matrícula o CUIT</li></ul></div>
-    </div>
-  </div>
-</section>
 
 <section class="p-section" id="publicadores">
   <div class="p-container">
@@ -115,6 +101,21 @@
   </div>
 </section>
 
+<section class="p-section alt" id="publicar">
+  <div class="p-container">
+    <div class="p-publica" data-reveal>
+      <img src="../hero-poster.jpg?v=2" alt="" aria-hidden="true">
+      <div>
+        <p class="p-eyebrow">Para quien publica</p><h2 class="p-h2">Publicá tu propiedad</h2>
+        <p>Si tu unidad cumple el estándar, la producimos sin costo y la mostramos a quien la está buscando. La operación es tuya: BAIREN no vende, no alquila y no cobra comisión.</p>
+        <ul><li>Fotos producidas sin costo, ficha completa y verificada</li><li>Contacto directo con los interesados</li><li>Vistas, consultas y visitas en tu panel de Bairen OS</li></ul>
+        <div class="p-cta-row"><a class="p-btn p-btn-fill" href="publicar.html#dueno">Soy dueño directo</a><a class="p-btn" href="publicar.html#inmobiliaria">Soy inmobiliaria o corredor</a><a class="p-btn" href="publicar.html#desarrolladora">Soy desarrolladora</a></div>
+      </div>
+      <div><p class="p-cond-ttl">Condiciones de ingreso</p><ul class="p-cond"><li>Palermo, Recoleta, Retiro, Belgrano, Núñez, Colegiales, Villa Crespo, Puerto Madero, Saavedra o Zona Norte</li><li>Edificio de categoría o con amenities. Unidad en estado impecable</li><li>Ficha completa: metros, expensas, orientación, planos</li><li>Fotos profesionales, mínimo ocho. Si no las tenés, las hacemos</li><li>Publicador verificado: titularidad, matrícula o CUIT</li></ul></div>
+    </div>
+  </div>
+</section>
+
 <section class="p-section" id="busquedas">
   <div class="p-container">
     <h2 class="p-h2" data-reveal>Búsquedas frecuentes</h2>
@@ -127,8 +128,8 @@
 
 <script src="supabase-portal.js" defer></script>
 <script src="../mapa-barrios.js" defer></script>
-<script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260911t" defer></script><script src="js/ui.js?v=20260911t" defer></script><script src="js/store.js?v=20260911t" defer></script>
-<script src="js/data.js?v=20260911t" defer></script>
+<script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260911v" defer></script><script src="js/ui.js?v=20260911v" defer></script><script src="js/store.js?v=20260911v" defer></script>
+<script src="js/data.js?v=20260911v" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
