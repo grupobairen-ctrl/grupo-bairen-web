@@ -317,6 +317,7 @@
     root = root || document;
     BPM.tacto(root); BPM.sellos(root); BPM.contar(root); BPM.rodar(root);
     if (window.BP && BP.crear) BP.crear(root); // el header se vuelve a dibujar al abrir sesión
+    if (window.BP && BP.desplegables) BP.desplegables(root);
   };
 
   window.BPM = BPM;

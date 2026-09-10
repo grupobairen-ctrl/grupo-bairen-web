@@ -342,7 +342,11 @@
       if (cols.length) Motion.animate(cols, { opacity: [0, 1], transform: ['translateY(6px)', 'translateY(0px)'] },
         { duration: BPM.DUR.normal, ease: BPM.CURVA, delay: Motion.stagger(0.035) });
     };
-    document.querySelectorAll('.p-nav-menu .p-dd, .p-nav-right .p-dd').forEach(dd => {
+    /* Se puede volver a llamar: al abrir sesión el header se dibuja de nuevo
+       y los desplegables nuevos necesitan su enganche. */
+    BP.desplegables = function (root) { (root || document).querySelectorAll('.p-nav-menu .p-dd, .p-nav-right .p-dd').forEach(engancharDD); };
+    function engancharDD(dd) {
+      if (dd._dd) return; dd._dd = true;
       cerrarDD(dd);
       const cont = dd.parentNode, bt = cont.querySelector('button[aria-haspopup],button');
       cont.addEventListener('mouseenter', () => abrirDD(dd));
@@ -355,7 +359,8 @@
       });
       cont.addEventListener('keydown', e => { if (e.key === 'ArrowDown') { e.preventDefault(); abrirDD(dd); } });
       cont.addEventListener('focusout', () => setTimeout(() => { if (!cont.contains(document.activeElement)) cerrarDD(dd); }, 0));
-    });
+    }
+    BP.desplegables(document);
     const b=document.getElementById('burger'), m=document.getElementById('mobileMenu');
     if (b && m) {
       m.querySelectorAll('a,button').forEach(x => x.tabIndex = -1);
@@ -423,7 +428,7 @@
         <a class="p-ghost" href="buscar.html?favs=1" aria-label="Favoritos">${BP.ico.heart}<span data-fav-count hidden></span></a>
         <div class="p-crear"><a class="p-btn p-btn-sm" href="publicar-aviso.html" data-crear>Publicar</a><div class="p-crear-pop" hidden><p class="t">¿Quién publica?</p><a href="publicar-aviso.html?perfil=dueno">Soy dueño directo</a><a href="publicar-aviso.html?perfil=inmobiliaria">Soy inmobiliaria o corredor</a><a href="publicar-aviso.html?perfil=desarrolladora">Soy desarrolladora</a></div></div>
         <div class="p-nav-menu" style="display:flex"><div><button type="button" class="p-btn p-btn-sm p-btn-fill" aria-haspopup="true" style="padding:0 14px">${BP.ico.user} Mi cuenta <span class="car" style="border-color:var(--navy-deeper)"></span></button>
-          <div class="p-dd" style="left:auto;right:0"><div class="p-dd-ttl">${BP.esc(session.email)}${modeTag}</div><a href="panel.html#avisos">Mis avisos</a><a href="importar.html">Importar cartera</a><a href="panel.html#interesados">Interesados</a><a href="panel.html#contactos">Mis contactos</a><a href="buscar.html?favs=1">Favoritos</a><a href="panel.html#alertas">Búsquedas y alertas</a><a href="panel.html#cuenta">Mi cuenta</a><a href="curacion.html" data-curador hidden>Curación</a><a href="#" data-logout>Cerrar sesión</a></div></div></div>`;
+          <div class="p-dd p-dd-cuenta" style="left:auto;right:0"><div class="p-dd-ttl">${BP.esc(session.email)}${modeTag}</div><a href="panel.html#avisos">Mis avisos</a><a href="importar.html">Importar cartera</a><a href="panel.html#interesados">Interesados</a><a href="panel.html#contactos">Mis contactos</a><a href="buscar.html?favs=1">Favoritos</a><a href="panel.html#alertas">Búsquedas y alertas</a><a href="panel.html#cuenta">Mi cuenta</a><a href="curacion.html" data-curador hidden>Curación</a><a href="#" data-logout>Cerrar sesión</a></div></div></div>`;
       if (mob) { const cta = mob.querySelector('.m-cta'); if (cta) cta.innerHTML = `<a class="p-btn p-btn-sm" href="publicar-aviso.html">Publicar</a><a class="p-btn p-btn-sm p-btn-fill" href="panel.html">Mi cuenta</a>`; }
       right.querySelectorAll('[data-logout]').forEach(b => b.addEventListener('click', async e => { e.preventDefault(); await window.BPStore.signOut(); BP.toast('Sesión cerrada.'); setTimeout(() => location.href = 'index.html', 600); }));
       if (window.BPStore) window.BPStore.isCurador().then(ok => { right.querySelectorAll('[data-curador]').forEach(a => a.hidden = !ok); });
