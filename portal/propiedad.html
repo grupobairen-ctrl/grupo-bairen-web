@@ -8,18 +8,18 @@
   <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260910b"><link rel="stylesheet" href="css/catalogo.css?v=20260910b"><link rel="stylesheet" href="css/portal.css?v=20260910b">
+  <link rel="stylesheet" href="css/base.css?v=20260910f"><link rel="stylesheet" href="css/catalogo.css?v=20260910f"><link rel="stylesheet" href="css/portal.css?v=20260910f">
   <style>body{padding-top:0}#ficha>.p-ficha-top,#ficha>.p-ficha,#ficha>section{max-width:var(--p-max);margin:0 auto;padding-left:24px;padding-right:24px}#ficha>.p-ficha-top{padding-top:88px}@media(max-width:900px){#ficha>.p-ficha-top{padding-top:76px}}.p-video{aspect-ratio:16/9;background:#0b1220;border-radius:16px;overflow:hidden}.p-video iframe,.p-video video{width:100%;height:100%;border:0;display:block}</style>
 </head>
 <body class="p-product p-ficha-page">
 <div id="pHeader"></div>
 <main id="ficha"><div class="p-ficha-top"><div class="p-skel-ficha" aria-hidden="true"><div class="gal"></div><div class="cols"><div><div class="p-skel-line t"></div><div class="p-skel-line s"></div><div class="p-skel-line l"></div><div class="p-skel-line l"></div><div class="p-skel-line m"></div><div class="p-skel-line l"></div><div class="p-skel-line m"></div></div><div><div class="p-skel-line t"></div><div class="p-skel-line m"></div><div class="p-skel-line l"></div><div class="p-skel-line s"></div></div></div></div></div></main>
-<div class="p-lb" id="lb" aria-hidden="true"><button type="button" class="x" data-lb-close aria-label="Cerrar">×</button><img id="lbImg" alt=""><div class="ctl"><button type="button" data-lb-prev aria-label="Anterior">‹</button><span id="lbCount"></span><button type="button" data-lb-next aria-label="Siguiente">›</button></div></div>
+<div class="p-lb" id="lb" aria-hidden="true"><div class="velo" data-lb-close></div><button type="button" class="x" data-lb-close aria-label="Cerrar las fotos">Cerrar</button><div class="marco" id="lbMarco"><img id="lbImg" alt="" draggable="false"></div><button type="button" class="nav prev" data-lb-prev aria-label="Foto anterior"></button><button type="button" class="nav next" data-lb-next aria-label="Foto siguiente"></button><div class="pie"><span class="cuenta" id="lbCount"></span><div class="tiras" id="lbTiras"></div></div></div>
 <div id="pFooter"></div>
 
 <script src="supabase-portal.js" defer></script>
-<script src="js/iconos-amenities.js?v=20260910b" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260910b" defer></script><script src="js/ui.js?v=20260910b" defer></script><script src="js/store.js?v=20260910b" defer></script>
-<script src="js/data.js?v=20260910b" defer></script>
+<script src="js/iconos-amenities.js?v=20260910f" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260910f" defer></script><script src="js/ui.js?v=20260910f" defer></script><script src="js/store.js?v=20260910f" defer></script>
+<script src="js/data.js?v=20260910f" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -160,29 +160,68 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip">${fotos.map((f,i) => `<but
   BPData.bindFavs(main);
   const gal = document.getElementById('gal'); const lb = document.getElementById('lb'), lbImg = document.getElementById('lbImg'), lbCount = document.getElementById('lbCount'); let cur = 0;
   let soltarLb = null, abridorLb = null;
-  const showLb = i => {
+  const lbTiras = document.getElementById('lbTiras'), lbMarco = document.getElementById('lbMarco');
+  let origenLb = null;
+  const pintarTiras = () => {
+    if (!lbTiras) return;
+    if (lbTiras.childElementCount !== fotos.length) {
+      lbTiras.innerHTML = fotos.map((f, i) => `<button type="button" class="t" data-lbt="${i}" aria-label="Ver foto ${i+1}"><img src="${BP.sbImg(f, 200)}" alt="" loading="lazy"></button>`).join('');
+      lbTiras.querySelectorAll('[data-lbt]').forEach(b => b.addEventListener('click', () => showLb(Number(b.dataset.lbt))));
+    }
+    lbTiras.querySelectorAll('.t').forEach((b, i) => { const on = i === cur; b.classList.toggle('on', on); b.setAttribute('aria-current', on ? 'true' : 'false'); if (on) b.scrollIntoView({ block:'nearest', inline:'center', behavior:'smooth' }); });
+  };
+  const showLb = (i, dir) => {
     if (!fotos.length) return;
     const abriendo = !lb.classList.contains('open');
-    cur = (i + fotos.length) % fotos.length; lbImg.src = BP.sbImg(fotos[cur], 1800); lbImg.alt = a.titulo + ', foto ' + (cur+1);
-    lbCount.textContent = (cur+1) + ' / ' + fotos.length;
+    cur = (i + fotos.length) % fotos.length;
+    const chica = BP.sbImg(fotos[cur], 1600), grande = BP.sbImg(fotos[cur], 1800);
+    lbImg.src = chica; lbImg.alt = a.titulo + ', foto ' + (cur+1);
+    if (grande !== chica) { const alta = new Image(); alta.onload = () => { if (lbImg.src === chica) lbImg.src = grande; }; alta.src = grande; }
+    lbCount.textContent = (cur+1) + ' de ' + fotos.length;
     lb.classList.add('open'); lb.setAttribute('aria-hidden','false'); lb.setAttribute('role','dialog'); lb.setAttribute('aria-modal','true');
     lb.setAttribute('aria-label', 'Fotos de ' + a.titulo); document.body.style.overflow = 'hidden';
     lb.querySelectorAll('button').forEach(x => x.removeAttribute('tabindex'));
-    if (abriendo) { abridorLb = document.activeElement; soltarLb = BP.focoAtrapado(lb, { devolverA: abridorLb, primero: lb.querySelector('[data-lb-close]'), alCerrar: () => cerrarLbSolo() }); }
+    pintarTiras();
+    if (abriendo) {
+      abridorLb = document.activeElement;
+      if (window.BPM && BPM.ok) {
+        BPM.entrar(lb.querySelector('.velo'));
+        BPM.entrar(lb.querySelector('.pie'), 'abajo');
+        const listo = () => { if (lbImg.getBoundingClientRect().width > 0) BPM.abrirDesde(lbImg, origenLb); };
+        if (lbImg.complete && lbImg.naturalWidth) requestAnimationFrame(listo);
+        else lbImg.addEventListener('load', () => requestAnimationFrame(listo), { once: true });
+      }
+      soltarLb = BP.focoAtrapado(lb, { devolverA: abridorLb, primero: lb.querySelector('[data-lb-close]'), alCerrar: () => cerrarLbSolo() });
+    } else if (dir && window.BPM && BPM.pasarFoto) BPM.pasarFoto(lbImg, dir);
     BP.anunciar('Foto ' + (cur+1) + ' de ' + fotos.length);
   };
-  const cerrarLbSolo = () => { lb.classList.remove('open'); lb.setAttribute('aria-hidden','true'); document.body.style.overflow = ''; lb.querySelectorAll('button').forEach(x => x.tabIndex = -1); };
+  const cerrarLbSolo = () => {
+    const fin = () => { lb.classList.remove('open'); lb.setAttribute('aria-hidden','true'); document.body.style.overflow = ''; lb.querySelectorAll('button').forEach(x => x.tabIndex = -1); lbImg.style.transform = ''; lbImg.style.opacity = ''; };
+    let cerrado = false; const unaVez = () => { if (cerrado) return; cerrado = true; fin(); };
+    if (window.BPM && BPM.ok) { BPM.salir(lb.querySelector('.velo')); BPM.cerrarHacia(lbImg, origenLb).then(unaVez, unaVez); setTimeout(unaVez, 400); } else unaVez();
+  };
   const closeLb = () => { if (soltarLb) { const f = soltarLb; soltarLb = null; f(); } else cerrarLbSolo(); };
+  /* Arrastrar con el dedo para pasar de foto */
+  if (lbMarco) {
+    let x0 = null;
+    lbMarco.addEventListener('pointerdown', e => { x0 = e.clientX; });
+    lbMarco.addEventListener('pointerup', e => {
+      if (x0 === null) return; const d = e.clientX - x0; x0 = null;
+      if (Math.abs(d) > 55) showLb(cur + (d < 0 ? 1 : -1), d < 0 ? 1 : -1);
+    });
+    lbMarco.addEventListener('pointercancel', () => { x0 = null; });
+  }
   lb.querySelectorAll('button').forEach(x => x.tabIndex = -1);
-  gal.querySelectorAll('[data-i]').forEach(el => el.addEventListener('click', e => { e.preventDefault(); showLb(Number(el.dataset.i)); }));
+  gal.querySelectorAll('[data-i]').forEach(el => el.addEventListener('click', e => { e.preventDefault(); origenLb = el; showLb(Number(el.dataset.i)); }));
+  document.querySelectorAll('#strip [data-t]').forEach(th => th.addEventListener('dblclick', () => { origenLb = th; showLb(Number(th.dataset.t)); }));
   const heroSlides = document.getElementById('heroSlides'), strip = document.getElementById('strip');
   if (heroSlides && strip) {
     const setActive = i => strip.querySelectorAll('.thumb').forEach((th, n) => th.classList.toggle('active', n === i));
     strip.querySelectorAll('[data-t]').forEach(th => th.addEventListener('click', () => { const i = Number(th.dataset.t); heroSlides.scrollTo({ left: i * heroSlides.clientWidth, behavior: 'smooth' }); setActive(i); }));
     let tk; heroSlides.addEventListener('scroll', () => { clearTimeout(tk); tk = setTimeout(() => { const i = Math.round(heroSlides.scrollLeft / Math.max(1, heroSlides.clientWidth)); setActive(i); const th = strip.querySelectorAll('.thumb')[i]; if (th) th.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' }); }, 80); }, { passive: true });
   }
-  lb.querySelector('[data-lb-close]').addEventListener('click', closeLb); lb.querySelector('[data-lb-prev]').addEventListener('click', () => showLb(cur-1)); lb.querySelector('[data-lb-next]').addEventListener('click', () => showLb(cur+1));
-  document.addEventListener('keydown', e => { if (!lb.classList.contains('open')) return; if (e.key === 'ArrowLeft') showLb(cur-1); if (e.key === 'ArrowRight') showLb(cur+1); });
+  lb.querySelectorAll('[data-lb-close]').forEach(b => b.addEventListener('click', closeLb)); lb.querySelector('[data-lb-prev]').addEventListener('click', () => showLb(cur-1, -1)); lb.querySelector('[data-lb-next]').addEventListener('click', () => showLb(cur+1, 1));
+  document.addEventListener('keydown', e => { if (!lb.classList.contains('open')) return; if (e.key === 'ArrowLeft') showLb(cur-1, -1); if (e.key === 'ArrowRight') showLb(cur+1, 1); });
   if (a.video) { const v = document.getElementById('video'); if (a.video.tipo === 'youtube') { const m = a.video.url.match(/(?:v=|be\/|embed\/)([A-Za-z0-9_-]{6,})/); v.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${m ? m[1] : ''}" title="Video de ${BP.esc(a.titulo)}" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>`; } else if (a.video.tipo === 'bunny') { v.innerHTML = `<iframe src="${BP.esc(a.video.url)}" title="Video de ${BP.esc(a.titulo)}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>`; } else { v.innerHTML = `<video src="${BP.esc(a.video.url)}" controls playsinline preload="metadata"></video>`; } }
   const desc = document.getElementById('desc'), more = document.getElementById('descMore'); if (desc.scrollHeight <= desc.clientHeight + 4) more.hidden = true; more.addEventListener('click', () => { desc.classList.toggle('clamp'); more.textContent = desc.classList.contains('clamp') ? 'Leer más' : 'Leer menos'; });
   /* pestañas de características: rol de pestaña, flechas para moverse, un solo tab en el orden de tabulación */

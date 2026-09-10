@@ -21,7 +21,7 @@
   /* Vocabulario: duraciones en segundos, una sola curva, un solo resorte */
   var CURVA = [0.22, 1, 0.36, 1];
   var DUR = { toque: 0.18, rapido: 0.28, normal: 0.55, lento: 0.9 };
-  var RESORTE = { type: 'spring', stiffness: 320, damping: 34, mass: 0.9 };
+  var RESORTE = { type: 'spring', stiffness: 220, damping: 40, mass: 1 }; // sólo para lo que se arrastra: hojas y cajones. Amortiguado, no rebota.
   var SUBE = 20;      // cuánto sube algo al aparecer
   var PASO = 0.055;   // demora entre hermanos
   var TOPE = 8;       // a partir de acá el escalonado no crece más, para no hacer esperar
@@ -81,14 +81,14 @@
     el = lista(el)[0]; if (!el || !ok) return Promise.resolve();
     var de = desde === 'abajo' ? { transform: ['translateY(24px)', 'translateY(0px)'], opacity: [0, 1] }
            : desde === 'derecha' ? { transform: ['translateX(28px)', 'translateX(0px)'], opacity: [0, 1] }
-           : { transform: ['scale(.97)', 'scale(1)'], opacity: [0, 1] };
+           : { transform: ['translateY(10px)', 'translateY(0px)'], opacity: [0, 1] };
     return M.animate(el, de, { duration: DUR.rapido, ease: CURVA }).finished;
   };
   BPM.salir = function (el, desde) {
     el = lista(el)[0]; if (!el || !ok) return Promise.resolve();
     var a = desde === 'abajo' ? { transform: 'translateY(16px)', opacity: 0 }
           : desde === 'derecha' ? { transform: 'translateX(20px)', opacity: 0 }
-          : { transform: 'scale(.98)', opacity: 0 };
+          : { transform: 'translateY(6px)', opacity: 0 };
     return M.animate(el, a, { duration: DUR.toque, ease: 'easeIn' }).finished;
   };
 
@@ -113,8 +113,8 @@
     lista((root || document).querySelectorAll('.p-badge, .p-cta-verif, .amenity')).forEach(function (el, i) {
       if (el._sello) return; el._sello = true;
       M.inView(el, function () {
-        M.animate(el, { opacity: [0, 1], transform: ['scale(.94)', 'scale(1)'] },
-          { duration: DUR.rapido, ease: CURVA, delay: escalonado(i % 6) });
+        M.animate(el, { opacity: [0, 1], transform: ['translateY(6px)', 'translateY(0px)'] },
+          { duration: DUR.normal, ease: CURVA, delay: escalonado(i % 6) });
       }, { amount: 0.6 });
     });
   };
@@ -142,9 +142,10 @@
     });
   };
 
-  /* ── El dedo y el cursor: todo lo que se toca responde ───────────────────
-     Hundido de 1,5 % al apretar, con resorte al soltar. Es lo que separa
-     una página de un producto, y no se nota conscientemente. */
+  /* ── El dedo y el cursor ────────────────────────────────────────────────
+     Nada de hundidos ni de resortes: eso lee a aplicación, no a inmobiliaria.
+     Lo que se aprieta baja un punto de luz durante un instante y vuelve.
+     Es lo que hace una marca cara: se siente, no se ve. */
   BPM.tacto = function (root) {
     if (!ok || !M.press) return;
     var sel = '.p-btn, .p-btn-fill, .p-fbtn, .p-icon-btn, .card-cta, .camino, .p-tab, .p-chip, .p-quick button, .p-report .chips button, .p-ac-link, .soc, button.p-linkbtn';
@@ -152,11 +153,73 @@
       if (el._tacto) return; el._tacto = true;
       try {
         M.press(el, function () {
-          M.animate(el, { transform: 'scale(.985)' }, { duration: DUR.toque, ease: CURVA });
-          return function () { M.animate(el, { transform: 'scale(1)' }, RESORTE); };
+          M.animate(el, { opacity: 0.82 }, { duration: 0.08, ease: 'linear' });
+          return function () { M.animate(el, { opacity: 1 }, { duration: 0.22, ease: CURVA }); };
         });
       } catch (e) { el._tacto = false; }
     });
+  };
+
+  /* ── Abrir desde: el elemento crece desde donde estaba, no aparece de la nada.
+     Es la transición que usan las casas de subastas para mostrar una obra:
+     el ojo no pierde de vista la foto que eligió. */
+  BPM.abrirDesde = function (destino, origen) {
+    destino = lista(destino)[0]; origen = lista(origen)[0];
+    if (!ok || !destino || !origen) return Promise.resolve();
+    var o = origen.getBoundingClientRect(), d = destino.getBoundingClientRect();
+    if (!o.width || !d.width) return Promise.resolve();
+    var sx = o.width / d.width, sy = o.height / d.height;
+    var dx = (o.left + o.width / 2) - (d.left + d.width / 2);
+    var dy = (o.top + o.height / 2) - (d.top + d.height / 2);
+    return M.animate(destino, {
+      transform: ['translate(' + dx + 'px,' + dy + 'px) scale(' + sx.toFixed(4) + ',' + sy.toFixed(4) + ')', 'translate(0px,0px) scale(1,1)'],
+      opacity: [0.55, 1]
+    }, { duration: DUR.normal, ease: CURVA }).finished;
+  };
+  BPM.cerrarHacia = function (origenDelViaje, destinoFisico) {
+    var el = lista(origenDelViaje)[0], dst = lista(destinoFisico)[0];
+    if (!ok || !el) return Promise.resolve();
+    if (!dst) return M.animate(el, { opacity: 0 }, { duration: DUR.toque, ease: 'easeIn' }).finished;
+    var o = dst.getBoundingClientRect(), d = el.getBoundingClientRect();
+    if (!o.width || !d.width) return M.animate(el, { opacity: 0 }, { duration: DUR.toque }).finished;
+    var sx = o.width / d.width, sy = o.height / d.height;
+    var dx = (o.left + o.width / 2) - (d.left + d.width / 2);
+    var dy = (o.top + o.height / 2) - (d.top + d.height / 2);
+    return M.animate(el, {
+      transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + sx.toFixed(4) + ',' + sy.toFixed(4) + ')',
+      opacity: 0.4
+    }, { duration: DUR.rapido, ease: CURVA }).finished;
+  };
+
+  /* ── Cambiar de foto: la que sale se va para un lado, la que entra llega del otro. */
+  BPM.pasarFoto = function (el, direccion) {
+    el = lista(el)[0]; if (!ok || !el) return;
+    var d = direccion < 0 ? -1 : 1;
+    M.animate(el, {
+      transform: ['translateX(' + (26 * d) + 'px)', 'translateX(0px)'],
+      opacity: [0, 1]
+    }, { duration: DUR.rapido, ease: CURVA });
+  };
+
+  /* ── Copiar: el ícono se cambia por una tilde y el rótulo lo dice. Sin festejos. */
+  BPM.copiar = function (boton, texto, rotulo) {
+    if (!boton) return Promise.resolve(false);
+    var previo = boton.getAttribute('data-copiado') === '1';
+    if (previo) return Promise.resolve(true);
+    var hacer = navigator.clipboard && navigator.clipboard.writeText
+      ? navigator.clipboard.writeText(texto)
+      : new Promise(function (res, rej) {
+          try { var t = document.createElement('textarea'); t.value = texto; t.style.position = 'fixed'; t.style.opacity = '0';
+            document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); res(); } catch (e) { rej(e); }
+        });
+    return hacer.then(function () {
+      var original = boton.innerHTML;
+      boton.setAttribute('data-copiado', '1');
+      boton.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>' + (rotulo || 'Copiado');
+      if (ok) M.animate(boton.firstChild, { opacity: [0, 1], transform: ['translateY(4px)', 'translateY(0px)'] }, { duration: DUR.rapido, ease: CURVA });
+      setTimeout(function () { boton.innerHTML = original; boton.removeAttribute('data-copiado'); }, 2000);
+      return true;
+    }, function () { return false; });
   };
 
   /* ── Puesta en marcha ───────────────────────────────────────────────────── */

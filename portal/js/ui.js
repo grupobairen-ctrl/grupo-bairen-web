@@ -208,8 +208,8 @@
 
   /* ── Header ─────────────────────────────────────────────── */
   BP.header = function(active){ BP._active = active;
-    const dd = (ttl, items) => `<div class="p-dd-ttl">${ttl}</div>` + items.map(i=>`<a href="${i[1]}"${i[2]?` data-op="${i[2]}" data-zona="${BP.esc(i[3])}"`:''}>${i[0]}<span class="p-dd-n" hidden></span></a>`).join('');
-    const zonasLinks = op => BP.ZONAS.map(z=>[`Departamentos ${BP.OPS[op].h} en ${BP.zonaLabel(z)}`, BP.urlBuscar({ op, zona: z }), op, z]);
+    const dd = (ttl, items, ancha) => `<div class="col${ancha ? ' ancha' : ''}"><div class="p-dd-ttl">${ttl}</div>` + items.map(i=>`<a href="${i[1]}"${i[2]?` data-op="${i[2]}" data-zona="${BP.esc(i[3])}"`:''}>${i[0]}<span class="p-dd-n" hidden></span></a>`).join('') + `</div>`;
+    const zonasLinks = op => BP.ZONAS.map(z=>[BP.zonaLabel(z), BP.urlBuscar({ op, zona: z }), op, z]);
     const html = `
 <nav class="navbar p-navbar" aria-label="Principal">
   <div class="p-nav-left">
@@ -217,9 +217,9 @@
   </div>
     <div class="p-nav-menu">
       <div><button type="button" aria-haspopup="true" ${active==='venta'?'aria-current="page"':''}>Comprar <span class="car"></span></button>
-        <div class="p-dd">${dd('Por barrio', zonasLinks('venta'))}${dd('También', [['Emprendimientos','emprendimientos.html']])}${dd('Servicios', [['Publicá tu propiedad','publicar.html'],['Índice BAIREN','index.html#indice'],['Guía de barrios','index.html#guia']])}</div></div>
+        <div class="p-dd">${dd('Comprar por barrio', zonasLinks('venta'), true)}${dd('También', [['Emprendimientos','emprendimientos.html']])}${dd('Servicios', [['Publicá tu propiedad','publicar.html'],['Índice BAIREN','index.html#indice'],['Guía de barrios','index.html#guia']])}</div></div>
       <div><button type="button" aria-haspopup="true" ${active==='alquiler'?'aria-current="page"':''}>Alquilar <span class="car"></span></button>
-        <div class="p-dd">${dd('Plazo', [['Largo plazo', BP.urlBuscar({ op:'alquiler' })],['Mediano plazo, amoblado', BP.urlBuscar({ op:'mediano' })]])}${dd('Por barrio', zonasLinks('alquiler'))}</div></div>
+        <div class="p-dd">${dd('Plazo', [['Largo plazo', BP.urlBuscar({ op:'alquiler' })],['Mediano plazo, amoblado', BP.urlBuscar({ op:'mediano' })]])}${dd('Alquilar por barrio', zonasLinks('alquiler'), true)}</div></div>
       <a href="publicadores.html" ${active==='publicadores'?'aria-current="page"':''}>Publicadores</a>
       <div><button type="button" aria-haspopup="true">Servicios <span class="car"></span></button>
         <div class="p-dd">${dd('Para quien publica', [['Publicá tu propiedad','publicar.html'],['Importá tu cartera','importar.html'],['Producción de fichas','publicar.html#produccion'],['Panel del propietario','publicar.html#panel']])}${dd('Para quien busca', [['Guía de barrios','index.html#guia'],['Índice BAIREN','index.html#indice'],['Cómo evitar fraudes','legales.html#fraudes']])}</div></div>
@@ -259,8 +259,20 @@
       if (d && !document.getElementById('contenido') && !d.id) d.id = 'contenido';
       if (d && d.id && d.id !== 'contenido') sk.href = '#' + d.id;
     }
-    const cerrarDD = dd => { dd.classList.remove('abierto'); dd.querySelectorAll('a,button').forEach(x => x.tabIndex = -1); const bt = dd.parentNode.querySelector('button[aria-haspopup]'); if (bt) bt.setAttribute('aria-expanded','false'); };
-    const abrirDD = dd => { dd.querySelectorAll('a,button').forEach(x => x.removeAttribute('tabindex')); dd.classList.add('abierto'); const bt = dd.parentNode.querySelector('button[aria-haspopup]'); if (bt) bt.setAttribute('aria-expanded','true'); };
+    const cerrarDD = dd => { dd.classList.remove('abierto'); dd.style.height = ''; dd.style.opacity = ''; dd.querySelectorAll('a,button').forEach(x => x.tabIndex = -1); const bt = dd.parentNode.querySelector('button[aria-haspopup]'); if (bt) bt.setAttribute('aria-expanded','false'); };
+    const abrirDD = dd => {
+      if (dd.classList.contains('abierto')) return;
+      dd.querySelectorAll('a,button').forEach(x => x.removeAttribute('tabindex'));
+      dd.classList.add('abierto');
+      const bt = dd.parentNode.querySelector('button[aria-haspopup]'); if (bt) bt.setAttribute('aria-expanded','true');
+      if (!(window.BPM && BPM.ok)) return;
+      const cols = dd.querySelectorAll('.col');
+      const alto = dd.scrollHeight;
+      Motion.animate(dd, { height: ['0px', alto + 'px'], opacity: [0, 1] }, { duration: BPM.DUR.rapido, ease: BPM.CURVA })
+        .finished.then(() => { dd.style.height = 'auto'; }, () => {});
+      if (cols.length) Motion.animate(cols, { opacity: [0, 1], transform: ['translateY(6px)', 'translateY(0px)'] },
+        { duration: BPM.DUR.normal, ease: BPM.CURVA, delay: Motion.stagger(0.035) });
+    };
     document.querySelectorAll('.p-nav-menu .p-dd, .p-nav-right .p-dd').forEach(dd => {
       cerrarDD(dd);
       const cont = dd.parentNode, bt = cont.querySelector('button[aria-haspopup],button');
