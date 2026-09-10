@@ -1649,12 +1649,14 @@ body .p-nav-menu .p-dd-cuenta.abierto{display:block}
 /* ── La barra de arriba, en vidrio, con dos luces ───────────────────────────
    Traslúcida con desenfoque, hairline de oro y dos focos: uno sigue al cursor
    desde abajo y un haz baja sobre la sección en la que estás. */
-.p-navbar,.navbar{--foco-x:50%;--ambiente-x:50%;overflow:hidden;transition:background .35s cubic-bezier(.22,1,.36,1),box-shadow .35s cubic-bezier(.22,1,.36,1),border-color .35s cubic-bezier(.22,1,.36,1)}
+.p-navbar,.navbar{--foco-x:50%;--ambiente-x:50%;--ambiente-w:80px;overflow:hidden;transition:background .35s cubic-bezier(.22,1,.36,1),box-shadow .35s cubic-bezier(.22,1,.36,1),border-color .35s cubic-bezier(.22,1,.36,1)}
 /* Arriba de todo es navy pleno. Al bajar se vuelve vidrio y el contenido pasa por debajo. */
 .p-navbar.bajado,.navbar.bajado{background:rgba(19,29,45,.78) !important;backdrop-filter:saturate(160%) blur(20px);-webkit-backdrop-filter:saturate(160%) blur(20px);border-bottom-color:rgba(194,169,104,.42);box-shadow:0 14px 40px rgba(10,14,22,.32)}
 .p-foco,.p-ambiente{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:0;transition:opacity .35s cubic-bezier(.22,1,.36,1)}
 .p-foco{background:radial-gradient(180px 60px at var(--foco-x) 100%,rgba(194,169,104,.2) 0%,rgba(194,169,104,.07) 46%,transparent 74%)}
-.p-ambiente{background:radial-gradient(56px 26px at var(--ambiente-x) 0%,rgba(222,205,160,.85) 0%,rgba(194,169,104,.26) 42%,transparent 76%)}
+/* El haz de la sección activa: línea de oro abajo y halo encima, del ancho del ítem */
+.p-ambiente{background:linear-gradient(to top,rgba(194,169,104,.22) 0%,transparent 62%);-webkit-mask-image:linear-gradient(to right,transparent calc(var(--ambiente-x) - 10px),#000 var(--ambiente-x),#000 calc(var(--ambiente-x) + var(--ambiente-w,80px)),transparent calc(var(--ambiente-x) + var(--ambiente-w,80px) + 10px));mask-image:linear-gradient(to right,transparent calc(var(--ambiente-x) - 10px),#000 var(--ambiente-x),#000 calc(var(--ambiente-x) + var(--ambiente-w,80px)),transparent calc(var(--ambiente-x) + var(--ambiente-w,80px) + 10px))}
+.p-ambiente::after{content:'';position:absolute;left:var(--ambiente-x);bottom:0;width:var(--ambiente-w,80px);height:2px;background:var(--gold,#C2A968);box-shadow:0 -6px 18px rgba(194,169,104,.6)}
 .p-navbar > *:not(.p-foco):not(.p-ambiente),.navbar > *:not(.p-foco):not(.p-ambiente){position:relative;z-index:1}
 .p-nav-menu .p-dd{backdrop-filter:none;-webkit-backdrop-filter:none}
 @media(prefers-reduced-motion:reduce){.p-foco{display:none}}
@@ -1690,3 +1692,8 @@ body .p-nav-menu .p-dd-cuenta.abierto{display:block}
 .p-gen svg{opacity:.35}
 @keyframes p-gen-luz{0%{background-position:120% 0}100%{background-position:-120% 0}}
 @media(prefers-reduced-motion:reduce){.p-gen{animation:none;color:var(--s-navy,#2A3A52) !important;background-image:none}}
+/* El haz de la sección activa, en el menú del celular */
+.mobile-menu{--haz-y:0px;--haz-h:48px}
+.p-ambiente-m{position:absolute;left:0;right:0;top:var(--haz-y);height:var(--haz-h);z-index:0;pointer-events:none;opacity:0;transition:opacity .35s cubic-bezier(.22,1,.36,1);background:linear-gradient(to right,rgba(194,169,104,.16) 0%,rgba(194,169,104,.04) 55%,transparent 88%)}
+.p-ambiente-m::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--gold,#C2A968);box-shadow:6px 0 18px rgba(194,169,104,.5)}
+.mobile-menu > *:not(.p-ambiente-m){position:relative;z-index:1}

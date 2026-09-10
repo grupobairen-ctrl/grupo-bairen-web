@@ -337,47 +337,48 @@
       { duration: 0.6, ease: CURVA, delay: M.stagger(0.05, { startDelay: opts.demora || 0 }) });
   };
 
-  /* ── La barra de arriba con dos luces, como el spotlight navbar:
-     una que sigue al cursor desde abajo, y un haz de oro que baja sobre la
-     sección en la que estás y viaja con resorte cuando cambia. */
+  /* ── La barra de arriba con las dos luces del spotlight navbar:
+     una sigue al cursor desde abajo; la otra marca dónde estás con una línea
+     de oro que se desliza de una sección a la otra, con su halo encima. */
   BPM.foco = function (nav) {
     nav = lista(nav)[0]; if (!nav || nav._foco) return; nav._foco = true;
     var luz = nav.querySelector('.p-foco'), haz = nav.querySelector('.p-ambiente');
     if (!luz) { luz = document.createElement('span'); luz.className = 'p-foco'; luz.setAttribute('aria-hidden', 'true'); nav.insertBefore(luz, nav.firstChild); }
     if (!haz) { haz = document.createElement('span'); haz.className = 'p-ambiente'; haz.setAttribute('aria-hidden', 'true'); nav.insertBefore(haz, nav.firstChild); }
-    var centroDe = function (el) { if (!el) return null; var r = el.getBoundingClientRect(), n = nav.getBoundingClientRect(); if (!r.width) return null; return r.left - n.left + r.width / 2; };
-    var activo = function () {
-      var a = nav.querySelector('.p-nav-menu [aria-expanded="true"]')
-           || nav.querySelector('.p-nav-menu [aria-current="page"]')
-           || nav.querySelector('.p-nav-menu > div > button, .p-nav-menu > a');
-      return centroDe(a);
+    var items = function () { return nav.querySelectorAll('.p-nav-menu > div > button, .p-nav-menu > a'); };
+    var medir = function (el) { if (!el) return null; var r = el.getBoundingClientRect(), n = nav.getBoundingClientRect(); if (!r.width) return null; return { x: r.left - n.left, w: r.width }; };
+    var elActivo = function () {
+      return nav.querySelector('.p-nav-menu [aria-expanded="true"]')
+          || nav.querySelector('.p-nav-menu [aria-current="page"]')
+          || items()[0];
     };
-    var ponerHaz = function (x) { nav.style.setProperty('--ambiente-x', x + 'px'); };
-    var ubicarHaz = function () {
-      var d = activo(); if (d == null) { haz.style.opacity = '0'; return; }
+    var poner = function (x, w) { nav.style.setProperty('--ambiente-x', x + 'px'); nav.style.setProperty('--ambiente-w', w + 'px'); };
+    var mover = function (el, rapido) {
+      var m = medir(el); if (!m) { haz.style.opacity = '0'; return; }
       haz.style.opacity = '1';
-      var actual = parseFloat(nav.style.getPropertyValue('--ambiente-x'));
-      if (!ok || isNaN(actual)) { ponerHaz(d); return; }
-      M.animate(actual, d, { type: 'spring', stiffness: 200, damping: 32, onUpdate: ponerHaz });
+      var x0 = parseFloat(nav.style.getPropertyValue('--ambiente-x'));
+      var w0 = parseFloat(nav.style.getPropertyValue('--ambiente-w'));
+      if (!ok || isNaN(x0)) { poner(m.x, m.w); return; }
+      var cfg = { type: 'spring', stiffness: rapido ? 300 : 200, damping: 32 };
+      M.animate(x0, m.x, Object.assign({ onUpdate: function (v) { nav.style.setProperty('--ambiente-x', v + 'px'); } }, cfg));
+      M.animate(isNaN(w0) ? m.w : w0, m.w, Object.assign({ onUpdate: function (v) { nav.style.setProperty('--ambiente-w', v + 'px'); } }, cfg));
     };
-    if (!ok) { ubicarHaz(); return; }
+    var alActivo = function () { mover(elActivo()); };
+    alActivo();
+    window.addEventListener('resize', alActivo);
+    setTimeout(alActivo, 400);
+    if (!ok) return;
     nav.addEventListener('pointermove', function (e) {
       if (e.pointerType === 'touch') return;
       var n = nav.getBoundingClientRect();
       nav.style.setProperty('--foco-x', (e.clientX - n.left) + 'px');
       luz.style.opacity = '1';
     });
-    nav.addEventListener('pointerleave', function () { luz.style.opacity = '0'; });
     nav.addEventListener('pointerover', function (e) {
       var it = e.target.closest && e.target.closest('.p-nav-menu > div > button, .p-nav-menu > a');
-      if (!it) return; var c = centroDe(it); if (c == null) return;
-      haz.style.opacity = '1';
-      var actual = parseFloat(nav.style.getPropertyValue('--ambiente-x')) || c;
-      M.animate(actual, c, { type: 'spring', stiffness: 260, damping: 30, onUpdate: ponerHaz });
+      if (it) mover(it, true);
     });
-    nav.addEventListener('pointerleave', ubicarHaz);
-    ubicarHaz();
-    window.addEventListener('resize', ubicarHaz);
+    nav.addEventListener('pointerleave', function () { luz.style.opacity = '0'; alActivo(); });
     /* Arriba de todo la barra es navy pleno; apenas se baja pasa a vidrio */
     var marcar = function () { nav.classList.toggle('bajado', (window.scrollY || 0) > 8); };
     marcar(); window.addEventListener('scroll', marcar, { passive: true });
@@ -418,6 +419,42 @@
     b.setAttribute('aria-busy', encendido ? 'true' : 'false');
     if (!encendido || !ok) return;
     M.animate(b, { opacity: [1, 1] }, { duration: 0.01 });
+  };
+
+  /* ── El mismo foco, en el menú del celular. Sin cursor, la luz marca dónde
+     estás y viaja al ítem que tocás; los enlaces entran escalonados al abrir. */
+  BPM.focoMovil = function (menu) {
+    menu = lista(menu)[0]; if (!menu || menu._focoM) return; menu._focoM = true;
+    var haz = document.createElement('span'); haz.className = 'p-ambiente-m'; haz.setAttribute('aria-hidden', 'true');
+    menu.insertBefore(haz, menu.firstChild);
+    var links = function () { return menu.querySelectorAll('.m-link'); };
+    var actual = location.pathname.split('/').pop() + location.search;
+    var activo = function () {
+      var l = links(); for (var i = 0; i < l.length; i++) { var h = l[i].getAttribute('href') || ''; if (h && actual.indexOf(h) === 0) return l[i]; }
+      return l[0];
+    };
+    var poner = function (y, h) { menu.style.setProperty('--haz-y', y + 'px'); menu.style.setProperty('--haz-h', h + 'px'); };
+    var mover = function (el, rapido) {
+      if (!el) { haz.style.opacity = '0'; return; }
+      var r = el.getBoundingClientRect(), n = menu.getBoundingClientRect();
+      if (!r.height) { haz.style.opacity = '0'; return; }
+      haz.style.opacity = '1';
+      var y = r.top - n.top + menu.scrollTop, y0 = parseFloat(menu.style.getPropertyValue('--haz-y'));
+      if (!ok || isNaN(y0)) { poner(y, r.height); return; }
+      poner(y0, r.height);
+      M.animate(y0, y, { type: 'spring', stiffness: rapido ? 320 : 210, damping: 32, onUpdate: function (v) { menu.style.setProperty('--haz-y', v + 'px'); } });
+    };
+    BPM.abrirMenuMovil = function () {
+      mover(activo());
+      if (!ok) return;
+      var l = Array.prototype.slice.call(links());
+      M.animate(l, { opacity: [0, 1], transform: ['translateX(-14px)', 'translateX(0px)'] },
+        { duration: DUR.normal, ease: CURVA, delay: M.stagger(Math.min(0.045, 0.36 / Math.max(1, l.length - 1))) });
+    };
+    menu.addEventListener('pointerdown', function (e) {
+      var it = e.target.closest && e.target.closest('.m-link');
+      if (it) mover(it, true);
+    });
   };
 
   /* ── Puesta en marcha ───────────────────────────────────────────────────── */

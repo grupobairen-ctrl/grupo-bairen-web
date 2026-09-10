@@ -330,6 +330,7 @@
     const cerrarDD = dd => { dd.classList.remove('abierto'); dd.style.height = ''; dd.style.opacity = ''; dd.querySelectorAll('a,button').forEach(x => x.tabIndex = -1); const bt = dd.parentNode.querySelector('button[aria-haspopup]'); if (bt) bt.setAttribute('aria-expanded','false'); };
     BP.crear(document);
     if (window.BPM && BPM.foco) BPM.foco(document.querySelector('.p-navbar'));
+    if (window.BPM && BPM.focoMovil) BPM.focoMovil(document.getElementById('mobileMenu'));
     const abrirDD = dd => {
       if (dd.classList.contains('abierto')) return;
       dd.querySelectorAll('a,button').forEach(x => x.removeAttribute('tabindex'));
@@ -368,6 +369,7 @@
       let soltar = null;
       b.addEventListener('click', () => {
         const o = m.classList.toggle('open'); b.classList.toggle('open', o); b.setAttribute('aria-expanded', o ? 'true' : 'false');
+        if (o && window.BPM && BPM.abrirMenuMovil) BPM.abrirMenuMovil();
         m.querySelectorAll('a,button').forEach(x => { if (o) x.removeAttribute('tabindex'); else x.tabIndex = -1; });
         if (o) soltar = BP.focoAtrapado(m, { devolverA: b, alCerrar: () => { m.classList.remove('open'); b.classList.remove('open'); b.setAttribute('aria-expanded','false'); m.querySelectorAll('a,button').forEach(x => x.tabIndex = -1); } });
         else if (soltar) { soltar(); soltar = null; }
