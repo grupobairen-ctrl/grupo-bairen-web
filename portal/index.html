@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://dahusnnbyrvltcuaelxj.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260913y"><link rel="stylesheet" href="css/catalogo.css?v=20260913y"><link rel="stylesheet" href="css/portal.css?v=20260913y">
+  <link rel="stylesheet" href="css/base.css?v=20260913zc"><link rel="stylesheet" href="css/catalogo.css?v=20260913zc"><link rel="stylesheet" href="css/portal.css?v=20260913zc">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"BAIREN","url":"https://www.bairengroup.com","logo":"https://www.bairengroup.com/bairen_logo.png","description":"El portal de propiedades seleccionadas de Buenos Aires. Alquileres a mediano y largo plazo y departamentos en venta, seleccionados uno por uno antes de entrar al portal.","areaServed":[{"@type":"City","name":"Ciudad Autónoma de Buenos Aires"},{"@type":"AdministrativeArea","name":"Zona Norte, Buenos Aires"}]}</script>
 </head>
 <body class="p-home">
@@ -113,7 +113,7 @@
 
 <section class="h-sec h-navy h-anuncio" id="psi">
   <div class="h-in h-anuncio-top"><p class="h-eyebrow">PSI · Personal Shopper Inmobiliario</p></div>
-  <figure class="h-anuncio-foto" id="psiFoto" aria-hidden="true"><img src="img/psi-terraza.jpg" alt="" loading="lazy" onerror="this.remove()"><span class="h-anuncio-fade" aria-hidden="true"></span></figure>
+  <figure class="h-anuncio-foto" id="psiFoto" aria-hidden="true"><img src="img/psi-terraza.jpg" alt="" onerror="this.remove()"><span class="h-anuncio-fade" aria-hidden="true"></span></figure>
   <div class="h-anuncio-velo" aria-hidden="true"></div>
   <div class="h-in h-anuncio-txt">
     <h2 class="h-h2">¿Buscando invertir en una propiedad?</h2>
@@ -127,10 +127,10 @@
 
 <script src="../mapa-barrios.js" defer></script><script src="supabase-portal.js" defer></script>
 <script src="js/motion.js" defer></script>
-<script src="js/bairen-motion.js?v=20260913y" defer></script>
-<script src="js/ui.js?v=20260913y" defer></script>
-<script src="js/store.js?v=20260913y" defer></script>
-<script src="js/data.js?v=20260913y" defer></script>
+<script src="js/bairen-motion.js?v=20260913zc" defer></script>
+<script src="js/ui.js?v=20260913zc" defer></script>
+<script src="js/store.js?v=20260913zc" defer></script>
+<script src="js/data.js?v=20260913zc" defer></script>
 <script>
 document.addEventListener('DOMContentLoaded', function(){
 (async function(){
@@ -233,13 +233,8 @@ document.addEventListener('DOMContentLoaded', function(){
   (function(){
     const propia = psiFig.querySelector('img');
     if (!propia) return ponerUnidad();
-    if (propia.complete) return propia.naturalWidth ? null : ponerUnidad();
-    let listo = false;
-    const ok = () => { listo = true; };
-    const mal = () => { if (!listo) { listo = true; propia.remove(); ponerUnidad(); } };
-    propia.addEventListener('load', ok);
-    propia.addEventListener('error', mal);
-    setTimeout(() => { if (!propia.naturalWidth) mal(); }, 2500);
+    if (propia.complete && !propia.naturalWidth) return ponerUnidad();
+    propia.addEventListener('error', () => { propia.remove(); ponerUnidad(); });
   })();
   function ponerUnidad(){
     if (!conFoto || psiFig.querySelector('img')) return;
