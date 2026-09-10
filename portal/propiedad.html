@@ -7,8 +7,10 @@
   <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#131D2D">
   <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://dahusnnbyrvltcuaelxj.supabase.co" crossorigin>
+  <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260912r"><link rel="stylesheet" href="css/catalogo.css?v=20260912r"><link rel="stylesheet" href="css/portal.css?v=20260912r">
+  <link rel="stylesheet" href="css/base.css?v=20260912w"><link rel="stylesheet" href="css/catalogo.css?v=20260912w"><link rel="stylesheet" href="css/portal.css?v=20260912w">
   <style>body{padding-top:0}#ficha>.p-ficha-top,#ficha>.p-ficha,#ficha>section{max-width:var(--p-max);margin:0 auto;padding-left:24px;padding-right:24px}#ficha>.p-ficha-top{padding-top:88px}@media(max-width:900px){#ficha>.p-ficha-top{padding-top:76px}}.p-video{aspect-ratio:16/9;background:#0b1220;border-radius:16px;overflow:hidden}.p-video iframe,.p-video video{width:100%;height:100%;border:0;display:block}</style>
 </head>
 <body class="p-product p-ficha-page">
@@ -18,15 +20,23 @@
 <div id="pFooter"></div>
 
 <script src="supabase-portal.js" defer></script>
-<script src="js/iconos-amenities.js?v=20260912r" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260912r" defer></script><script src="js/ui.js?v=20260912r" defer></script><script src="js/store.js?v=20260912r" defer></script>
-<script src="js/data.js?v=20260912r" defer></script>
+<script src="js/iconos-amenities.js?v=20260912w" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260912w" defer></script><script src="js/ui.js?v=20260912w" defer></script><script src="js/store.js?v=20260912w" defer></script>
+<script src="js/data.js?v=20260912w" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
 (async function(){
   BP.header(); BP.footer();
-  const _datos = BPData.load(); await BP.probePretty(); const id = BP.qs().get('id') || BP.idFromPath();
+  /* Mientras llegan los datos se dibuja el hueso de la ficha, no una página en blanco */
   const main = document.getElementById('ficha');
+  main.innerHTML = `<div class="p-fhero p-fhero-skel" aria-hidden="true"></div>
+    <div class="p-ficha"><div class="p-ficha-main">
+      <div class="p-skel-line t"></div><div class="p-skel-line s"></div>
+      <div class="p-skel-bloque"></div>
+      <div class="p-skel-line l"></div><div class="p-skel-line l"></div><div class="p-skel-line m"></div>
+    </div><aside class="p-side"><div class="p-skel-cta"></div></aside></div>`;
+  main.setAttribute('aria-busy', 'true');
+  const _datos = BPData.load(); await BP.probePretty(); const id = BP.qs().get('id') || BP.idFromPath();
   let avisos;
   try { ({ avisos } = await _datos); }
   catch (err) { console.error(err); BP.estadoError(main, 'No pudimos cargar esta propiedad.'); return; }
@@ -43,6 +53,7 @@ document.addEventListener('DOMContentLoaded', function(){
   const msgDefault = `Hola, vi ${a.titulo} (${a.codigo}) en BAIREN y quiero más información.`;
   document.title = `${a.titulo} · ${BPData.opTag(a)} en ${a.barrio} · BAIREN`;
 
+  main.removeAttribute('aria-busy');
   main.innerHTML = `
 <div class="p-fhero" id="gal">
   <div class="p-fhero-slides" id="heroSlides">${fotos.length ? fotos.map((f,i) => `<a href="#" class="p-fhero-slide" data-i="${i}" style="background-image:url('${BP.sbImg(f, 1600)}')" aria-label="${BP.esc(a.titulo)}, foto ${i+1} de ${fotos.length}"></a>`).join('') : '<div class="p-fhero-slide p-fhero-empty">Fotos en producción</div>'}</div>
@@ -85,9 +96,8 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip">${fotos.map((f,i) => `<but
       <button type="button" class="p-more" id="descMore">Leer más</button>
     </div>
     <div>
-      <h2 class="p-sec-t">Características</h2>
-      <div class="amenities-grid p-amen-grid">${tiles([a.op !== 'venta' && a.plazo ? 'Plazo ' + a.plazo : null, a.amoblado ? 'Amoblado' : 'Sin amoblar', ...((a.caracteristicas && a.caracteristicas.length) ? a.caracteristicas : []), a.amb ? (a.amb === 1 ? 'Monoambiente' : a.amb + ' ambientes') : null, a.dorm ? a.dorm + (a.dorm === 1 ? ' dormitorio' : ' dormitorios') : null, a.banos ? a.banos + (a.banos === 1 ? ' baño' : ' baños') : null, a.cocheras ? 'Cochera' : null].filter(Boolean))}</div>
-      ${a.amenities.length ? `<h2 class="p-sec-t">Amenities del edificio</h2><div class="amenities-grid p-amen-grid">${tiles(a.amenities)}</div>` : ''}
+      <h2 class="p-sec-t">La unidad en detalle</h2>
+      <div class="amenities-grid p-amen-grid">${tiles([a.op !== 'venta' && a.plazo ? 'Plazo ' + a.plazo : null, a.amoblado ? 'Amoblado' : 'Sin amoblar', a.amb ? (a.amb === 1 ? 'Monoambiente' : a.amb + ' ambientes') : null, a.dorm ? a.dorm + (a.dorm === 1 ? ' dormitorio' : ' dormitorios') : null, a.banos ? a.banos + (a.banos === 1 ? ' baño' : ' baños') : null, a.cocheras ? 'Cochera' : null, ...((a.caracteristicas && a.caracteristicas.length) ? a.caracteristicas : []), ...a.amenities].filter(Boolean))}</div>
     </div>
     <div>
       <h2 class="p-sec-t">Ubicación</h2>
@@ -107,14 +117,12 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip">${fotos.map((f,i) => `<but
       <a class="p-link" href="publicadores.html#${pub.id}">Ver todas sus propiedades</a>
       <p class="p-codes" style="margin-top:14px">Publica en BAIREN desde ${pub.desde}</p>
     </div>
-    <div class="p-report">
-      <b>${BP.ico.flag} ¿Algún problema con este aviso?</b>
+    <details class="p-report-min"><summary>Reportar un problema con este aviso</summary>
       <div class="chips"><button type="button" data-rep="vendida">Está vendida o reservada</button><button type="button" data-rep="contacto">No logro contactarme</button><button type="button" data-rep="otro">Otro motivo</button></div>
-      <p class="p-note" style="margin-top:10px"><a href="legales.html#fraudes" style="text-decoration:underline">Cómo evitar fraudes</a></p>
-    </div>
+      <p class="p-note" style="margin-top:10px"><a href="legales.html#fraudes">Cómo evitar fraudes</a></p>
+    </details>
     <div class="p-meta-line"><span>${BP.hace(a.publicadoEn)}</span><span>·</span><span id="vistas"></span></div>
-    ${esAlqCorredor ? `<p class="p-legend">${BP.LEYENDA_ALQUILER} (Ley 2340, art. 10 inc. 8)</p>` : ''}
-    <p class="p-legend">${BP.LEYENDA_PLATAFORMA}</p>
+    <details class="p-legal-min"><summary>Información legal</summary>${esAlqCorredor ? `<p>${BP.LEYENDA_ALQUILER} (Ley 2340, art. 10 inc. 8)</p>` : ''}<p>${BP.LEYENDA_PLATAFORMA}</p></details>
   </div>
   <aside class="p-side" id="contacto">
     <div class="p-cta" id="ctaCard">

@@ -414,7 +414,7 @@
       <p class="p-legend">BAIREN selecciona, produce y publica propiedades. Las operaciones son concluidas por Maximiliano Matzkin, corredor matriculado CUCICBA 7527.</p>
     </div>
     <div class="ft-col"><div class="ft-col-ttl">Navegación</div><ul>
-      <li><a href="${BP.urlBuscar({ op:'mediano' })}">Alquilar</a></li><li><a href="${BP.urlBuscar({ op:'venta' })}">Comprar</a></li><li><a href="../psi.html">PSI</a></li><li><a href="index.html#indice">Índice BAIREN</a></li><li><a href="publicar.html">Publicar</a></li></ul></div>
+      <li><a href="${BP.urlBuscar({ op:'mediano' })}">Alquilar</a></li><li><a href="${BP.urlBuscar({ op:'venta' })}">Comprar</a></li><li><a href="psi.html">PSI</a></li><li><a href="index.html#indice">Índice BAIREN</a></li><li><a href="publicar.html">Publicar</a></li></ul></div>
     <div class="ft-col"><div class="ft-col-ttl">Zonas</div><ul>${zonas}</ul></div>
     <div class="ft-col"><div class="ft-col-ttl">Más</div><ul>
       <li><a href="publicadores.html">Publicadores</a></li><li><a href="emprendimientos.html">Emprendimientos</a></li><li><a href="criterios.html">Criterios de selección</a></li><li><a href="legales.html">Términos y privacidad</a></li><li><a href="mailto:contacto@bairengroup.com">contacto@bairengroup.com</a></li></ul></div>

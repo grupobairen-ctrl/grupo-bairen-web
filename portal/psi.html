@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PSI · Personal Shopper Inmobiliario · BAIREN</title>
+  <meta name="description" content="PSI, Personal Shopper Inmobiliario de BAIREN. En una compra, el comprador también necesita representación."><meta name="theme-color" content="#131D2D">
+  <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://dahusnnbyrvltcuaelxj.supabase.co" crossorigin>
+  <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css?v=20260912w"><link rel="stylesheet" href="css/catalogo.css?v=20260912w"><link rel="stylesheet" href="css/portal.css?v=20260912w">
+</head>
+<body class="p-product p-psi">
+<div id="pHeader"></div>
+<main id="contenido">
+
+<section class="psi-hero">
+  <figure class="psi-hero-foto" id="psiHeroFoto" aria-hidden="true"></figure>
+  <div class="psi-velo" aria-hidden="true"></div>
+  <div class="psi-in">
+    <p class="psi-eyebrow">Personal Shopper Inmobiliario</p>
+    <h1>En una compra, el comprador también necesita representación.</h1>
+    <p class="psi-sub">La parte vendedora llega acompañada. PSI ocupa el lado del comprador.</p>
+    <a class="psi-btn psi-btn-oro" href="#hablemos">Quiero que me representen</a>
+  </div>
+</section>
+
+<section class="psi-sec psi-crema">
+  <div class="psi-in">
+    <p class="psi-eyebrow psi-oscuro">Qué hacemos</p>
+    <h2 class="psi-h2">Definimos la búsqueda y la llevamos hasta la escritura.</h2>
+    <div class="psi-pasos">
+      <div class="psi-paso"><b>Definimos la búsqueda</b><p>Zona, tipo, presupuesto y objetivo: vivienda, renta o inversión.</p></div>
+      <div class="psi-paso"><b>Filtramos alternativas</b><p>Buscamos en todo el mercado, incluso unidades que todavía no se publicaron.</p></div>
+      <div class="psi-paso"><b>Analizamos cada propiedad</b><p>Títulos, deudas, estado real de la unidad y del edificio, y precio contra la zona.</p></div>
+      <div class="psi-paso"><b>Acompañamos la negociación</b><p>Precio, condiciones y el proceso de compra hasta la escritura.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="psi-sec psi-navy" id="hablemos">
+  <div class="psi-in psi-centro">
+    <p class="psi-eyebrow">Hablemos</p>
+    <h2 class="psi-h2">Contanos qué estás buscando.</h2>
+    <p class="psi-copy">Te respondemos con una primera lectura del mercado para lo que necesitás, sin cargo y sin compromiso.</p>
+    <div class="psi-acciones">
+      <a class="psi-btn psi-btn-oro" href="https://wa.me/5491123106629?text=Hola%2C%20quiero%20saber%20m%C3%A1s%20sobre%20PSI" target="_blank" rel="noopener">Escribir por WhatsApp</a>
+      <a class="psi-btn psi-btn-linea" href="mailto:contacto@bairengroup.com?subject=PSI%20%C2%B7%20Personal%20Shopper%20Inmobiliario">Escribir por mail</a>
+    </div>
+    <p class="psi-legal">PSI es un servicio de representación del comprador. Las operaciones son concluidas por Maximiliano Matzkin, corredor matriculado CUCICBA 7527.</p>
+  </div>
+</section>
+
+</main>
+<div id="pFooter"></div>
+
+<script src="supabase-portal.js" defer></script>
+<script src="js/motion.js" defer></script>
+<script src="js/bairen-motion.js?v=20260912w" defer></script>
+<script src="js/ui.js?v=20260912w" defer></script>
+<script src="js/store.js?v=20260912w" defer></script>
+<script src="js/data.js?v=20260912w" defer></script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+(async function(){
+  BP.header('psi'); BP.footer(); if (window.BPStore) BPStore.init(); BP.reveal();
+  if (window.BPM && BPM.titular) BPM.titular(document.querySelector('.psi-hero h1'), { demora: 0.1 });
+  /* La foto es de una unidad real de BAIREN, nunca stock */
+  try {
+    const { avisos } = await BPData.load();
+    const reales = avisos.filter(a => !a.demo && a.fotos && a.fotos.length);
+    const a = reales.find(x => x.op === 'venta') || reales[0];
+    if (a) document.getElementById('psiHeroFoto').innerHTML = `<img src="${BP.sbImg(a.fotos[0], 1800)}" alt="" loading="eager">`;
+  } catch (e) {}
+})();
+});
+</script>
+</body>
+</html>

@@ -2047,3 +2047,61 @@ body.p-home .h-edif.sin img{filter:grayscale(.5) brightness(.8)}
 body.p-home .h-edif.sin em{color:rgba(251,250,246,.6)}
 /* Edificio sin foto: el nombre sobre navy, nunca un hueco */
 body.p-home .h-edif{background:linear-gradient(160deg,#1E2A3F,#131D2D)}
+/* Esqueleto de la ficha: la página no queda en blanco mientras llegan los datos */
+.p-fhero-skel{height:68svh;min-height:420px;background:linear-gradient(100deg,#1A2538 30%,#22314a 50%,#1A2538 70%);background-size:220% 100%;animation:p-skel 1.4s linear infinite}
+.p-skel-bloque{height:96px;margin:0 0 34px;border:1px solid rgba(42,58,82,.1);background:linear-gradient(100deg,#F1EDE3 30%,#F8F5EE 50%,#F1EDE3 70%);background-size:220% 100%;animation:p-skel 1.4s linear infinite}
+.p-skel-cta{height:420px;border:1px solid rgba(42,58,82,.1);background:linear-gradient(100deg,#F1EDE3 30%,#F8F5EE 50%,#F1EDE3 70%);background-size:220% 100%;animation:p-skel 1.4s linear infinite}
+.p-ficha .p-skel-line{height:14px;margin:0 0 12px;border-radius:2px;background:linear-gradient(100deg,#EDE8DC 30%,#F6F2E8 50%,#EDE8DC 70%);background-size:220% 100%;animation:p-skel 1.4s linear infinite}
+.p-ficha .p-skel-line.t{height:34px;width:62%;margin-bottom:16px}
+.p-ficha .p-skel-line.s{width:38%;margin-bottom:30px}
+.p-ficha .p-skel-line.l{width:100%}
+.p-ficha .p-skel-line.m{width:74%}
+@keyframes p-skel{0%{background-position:140% 0}100%{background-position:-40% 0}}
+@media(prefers-reduced-motion:reduce){.p-fhero-skel,.p-skel-bloque,.p-skel-cta,.p-ficha .p-skel-line{animation:none}}
+
+/* ── PSI dentro del portal: mismo header, mismo pie, misma lengua ─────────── */
+body.p-psi{background:#F6F2E8}
+.psi-in{max-width:1080px;margin:0 auto;padding:0 20px;width:100%;box-sizing:border-box}
+.psi-hero{position:relative;min-height:min(92dvh,760px);display:flex;align-items:flex-end;overflow:hidden;background:#131D2D;padding:88px 0 clamp(44px,8vw,84px)}
+.psi-hero-foto{position:absolute;inset:0;margin:0}
+.psi-hero-foto img{width:100%;height:100%;object-fit:cover;display:block}
+.psi-velo{position:absolute;inset:0;background:linear-gradient(to top,rgba(19,29,45,.96) 14%,rgba(19,29,45,.7) 52%,rgba(19,29,45,.4) 100%)}
+.psi-hero .psi-in{position:relative;z-index:1}
+.psi-eyebrow{margin:0 0 14px;font:500 .6rem/1 var(--font-body);letter-spacing:.32em;text-transform:uppercase;color:#C2A968}
+.psi-eyebrow.psi-oscuro{color:#6F5C32}
+.psi-hero h1{margin:0 0 14px;font-family:var(--font-display);font-weight:400;font-size:clamp(2rem,6vw,3.4rem);line-height:1.08;color:#FBFAF6;max-width:17ch}
+.psi-sub{margin:0 0 26px;font:300 1.05rem/1.55 var(--font-body);color:rgba(251,250,246,.82);max-width:48ch}
+.psi-btn{display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:0 24px;border-radius:8px;font:600 .68rem/1 var(--font-body);letter-spacing:.16em;text-transform:uppercase;text-decoration:none;border:1px solid transparent;cursor:pointer;transition:background .3s cubic-bezier(.22,1,.36,1),color .3s cubic-bezier(.22,1,.36,1)}
+.psi-btn-oro{background:#C2A968;color:#131D2D;border-color:#C2A968}
+.psi-btn-oro:hover{background:#DECDA0;border-color:#DECDA0}
+.psi-btn-linea{background:transparent;color:#FBFAF6;border-color:rgba(255,255,255,.32)}
+.psi-btn-linea:hover{border-color:#C2A968;color:#DECDA0}
+.psi-sec{padding:clamp(64px,9vw,110px) 0}
+.psi-crema{background:#F6F2E8;color:#1A2538}
+.psi-navy{background:#131D2D;color:#FBFAF6}
+.psi-h2{margin:0 0 18px;font-family:var(--font-display);font-weight:400;font-size:clamp(1.7rem,4.4vw,2.6rem);line-height:1.14;max-width:22ch}
+.psi-centro .psi-h2,.psi-centro .psi-copy{margin-left:auto;margin-right:auto}
+.psi-copy{margin:0 0 12px;font:300 1rem/1.62 var(--font-body);max-width:56ch;color:inherit;opacity:.86}
+.psi-centro{text-align:center;display:flex;flex-direction:column;align-items:center}
+.psi-pasos{display:grid;gap:12px;margin-top:30px}
+.psi-paso{padding:22px 20px;border-radius:16px;background:#fff;border:1px solid rgba(42,58,82,.08)}
+.psi-paso b{display:block;margin-bottom:6px;font-family:var(--font-display);font-weight:400;font-size:1.2rem;color:#131D2D}
+.psi-paso p{margin:0;font:300 .9rem/1.6 var(--font-body);color:#565E6E}
+.psi-acciones{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:24px}
+.psi-legal{margin:26px 0 0;font:300 .74rem/1.6 var(--font-body);color:rgba(251,250,246,.55);max-width:62ch}
+@media(min-width:900px){.psi-pasos{grid-template-columns:repeat(2,1fr);gap:16px}.psi-in{padding:0 24px}}
+/* Ficha: lo secundario se pliega, la página deja de ser una tira larga */
+.p-report-min,.p-legal-min{margin:0 0 28px;border-top:1px solid rgba(42,58,82,.1);padding-top:16px}
+.p-report-min summary,.p-legal-min summary{cursor:pointer;list-style:none;font:500 .62rem/1 var(--font-body);letter-spacing:.16em;text-transform:uppercase;color:var(--s-mid,#565E6E);padding:6px 0}
+.p-report-min summary::-webkit-details-marker{display:none}
+.p-report-min summary::after,.p-legal-min summary::after{content:' +';color:var(--s-gold-dark,#6F5C32)}
+.p-report-min[open] summary::after,.p-legal-min[open] summary::after{content:' −'}
+.p-report-min summary:hover,.p-legal-min summary:hover{color:var(--navy-deeper,#131D2D)}
+.p-report-min .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.p-legal-min p{margin:12px 0 0;font:300 .76rem/1.6 var(--font-body);color:var(--s-mid,#565E6E);max-width:70ch}
+.p-ficha .p-ficha-main > div{margin-bottom:36px}
+/* PSI: en las bandas navy la tinta es crema; heredaba la oscura del portal */
+.psi-navy,.psi-navy .psi-h2,.psi-navy .psi-copy,.psi-navy p,.psi-navy b{color:#FBFAF6}
+.psi-navy .psi-copy{color:rgba(251,250,246,.82)}
+.psi-crema,.psi-crema .psi-h2,.psi-crema .psi-paso b{color:#1A2538}
+.psi-crema .psi-copy,.psi-crema .psi-paso p{color:#565E6E}
