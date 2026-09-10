@@ -1646,10 +1646,18 @@ body .p-nav-menu .p-dd-cuenta.abierto{display:block}
 /* Titular por palabras: cada palabra dentro de su máscara */
 .p-msk{display:inline-block;overflow:hidden;vertical-align:top}
 .p-msk-in{display:inline-block;will-change:transform}
-/* Foco cálido que sigue al cursor en la barra de arriba */
-.p-navbar{--foco-x:50%}
-.p-foco{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:0;transition:opacity .35s cubic-bezier(.22,1,.36,1);background:radial-gradient(200px 64px at var(--foco-x) 100%,rgba(194,169,104,.22) 0%,rgba(194,169,104,.08) 45%,transparent 72%)}
-.p-navbar > *:not(.p-foco){position:relative;z-index:1}
+/* ── La barra de arriba, en vidrio, con dos luces ───────────────────────────
+   Traslúcida con desenfoque, hairline de oro y dos focos: uno sigue al cursor
+   desde abajo y un haz baja sobre la sección en la que estás. */
+.p-navbar,.navbar{--foco-x:50%;--ambiente-x:50%;overflow:hidden;transition:background .35s cubic-bezier(.22,1,.36,1),box-shadow .35s cubic-bezier(.22,1,.36,1),border-color .35s cubic-bezier(.22,1,.36,1)}
+/* Arriba de todo es navy pleno. Al bajar se vuelve vidrio y el contenido pasa por debajo. */
+.p-navbar.bajado,.navbar.bajado{background:rgba(19,29,45,.78) !important;backdrop-filter:saturate(160%) blur(20px);-webkit-backdrop-filter:saturate(160%) blur(20px);border-bottom-color:rgba(194,169,104,.42);box-shadow:0 14px 40px rgba(10,14,22,.32)}
+.p-foco,.p-ambiente{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:0;transition:opacity .35s cubic-bezier(.22,1,.36,1)}
+.p-foco{background:radial-gradient(180px 60px at var(--foco-x) 100%,rgba(194,169,104,.2) 0%,rgba(194,169,104,.07) 46%,transparent 74%)}
+.p-ambiente{background:radial-gradient(56px 26px at var(--ambiente-x) 0%,rgba(222,205,160,.85) 0%,rgba(194,169,104,.26) 42%,transparent 76%)}
+.p-navbar > *:not(.p-foco):not(.p-ambiente),.navbar > *:not(.p-foco):not(.p-ambiente){position:relative;z-index:1}
+.p-nav-menu .p-dd{backdrop-filter:none;-webkit-backdrop-filter:none}
+@media(prefers-reduced-motion:reduce){.p-foco{display:none}}
 
 /* Cómo funciona: las tarjetas del sitio, con el paso y una explicación */
 .caminos-hd .p-eyebrow{display:block;margin-bottom:12px;color:var(--s-gold-dark,#6F5C32)}

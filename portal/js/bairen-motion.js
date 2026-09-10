@@ -337,29 +337,50 @@
       { duration: 0.6, ease: CURVA, delay: M.stagger(0.05, { startDelay: opts.demora || 0 }) });
   };
 
-  /* ── Foco que sigue al cursor en la barra de arriba.
-     Una luz cálida y baja, no un reflector: la casa es navy, no un escenario. */
+  /* ── La barra de arriba con dos luces, como el spotlight navbar:
+     una que sigue al cursor desde abajo, y un haz de oro que baja sobre la
+     sección en la que estás y viaja con resorte cuando cambia. */
   BPM.foco = function (nav) {
-    nav = lista(nav)[0]; if (!nav || !ok || nav._foco) return; nav._foco = true;
-    var luz = document.createElement('span'); luz.className = 'p-foco'; luz.setAttribute('aria-hidden', 'true');
-    nav.insertBefore(luz, nav.firstChild);
-    var activo = function () { var a = nav.querySelector('[aria-current="page"], .p-nav-menu > div > button[aria-expanded="true"]'); if (!a) return null; var r = a.getBoundingClientRect(), n = nav.getBoundingClientRect(); return r.left - n.left + r.width / 2; };
-    var poner = function (x) { nav.style.setProperty('--foco-x', x + 'px'); };
-    var vuelta = null;
+    nav = lista(nav)[0]; if (!nav || nav._foco) return; nav._foco = true;
+    var luz = nav.querySelector('.p-foco'), haz = nav.querySelector('.p-ambiente');
+    if (!luz) { luz = document.createElement('span'); luz.className = 'p-foco'; luz.setAttribute('aria-hidden', 'true'); nav.insertBefore(luz, nav.firstChild); }
+    if (!haz) { haz = document.createElement('span'); haz.className = 'p-ambiente'; haz.setAttribute('aria-hidden', 'true'); nav.insertBefore(haz, nav.firstChild); }
+    var centroDe = function (el) { if (!el) return null; var r = el.getBoundingClientRect(), n = nav.getBoundingClientRect(); if (!r.width) return null; return r.left - n.left + r.width / 2; };
+    var activo = function () {
+      var a = nav.querySelector('.p-nav-menu [aria-expanded="true"]')
+           || nav.querySelector('.p-nav-menu [aria-current="page"]')
+           || nav.querySelector('.p-nav-menu > div > button, .p-nav-menu > a');
+      return centroDe(a);
+    };
+    var ponerHaz = function (x) { nav.style.setProperty('--ambiente-x', x + 'px'); };
+    var ubicarHaz = function () {
+      var d = activo(); if (d == null) { haz.style.opacity = '0'; return; }
+      haz.style.opacity = '1';
+      var actual = parseFloat(nav.style.getPropertyValue('--ambiente-x'));
+      if (!ok || isNaN(actual)) { ponerHaz(d); return; }
+      M.animate(actual, d, { type: 'spring', stiffness: 200, damping: 32, onUpdate: ponerHaz });
+    };
+    if (!ok) { ubicarHaz(); return; }
     nav.addEventListener('pointermove', function (e) {
       if (e.pointerType === 'touch') return;
-      if (vuelta) { vuelta.stop(); vuelta = null; }
       var n = nav.getBoundingClientRect();
-      poner(e.clientX - n.left); luz.style.opacity = '1';
+      nav.style.setProperty('--foco-x', (e.clientX - n.left) + 'px');
+      luz.style.opacity = '1';
     });
-    nav.addEventListener('pointerleave', function () {
-      var destino = activo();
-      if (destino == null) { luz.style.opacity = '0'; return; }
-      var actual = parseFloat(getComputedStyle(nav).getPropertyValue('--foco-x')) || destino;
-      vuelta = M.animate(actual, destino, { type: 'spring', stiffness: 180, damping: 34, onUpdate: poner });
-      M.animate(luz, { opacity: 0.55 }, { duration: 0.4, ease: CURVA });
+    nav.addEventListener('pointerleave', function () { luz.style.opacity = '0'; });
+    nav.addEventListener('pointerover', function (e) {
+      var it = e.target.closest && e.target.closest('.p-nav-menu > div > button, .p-nav-menu > a');
+      if (!it) return; var c = centroDe(it); if (c == null) return;
+      haz.style.opacity = '1';
+      var actual = parseFloat(nav.style.getPropertyValue('--ambiente-x')) || c;
+      M.animate(actual, c, { type: 'spring', stiffness: 260, damping: 30, onUpdate: ponerHaz });
     });
-    var d = activo(); if (d != null) { poner(d); luz.style.opacity = '0.55'; }
+    nav.addEventListener('pointerleave', ubicarHaz);
+    ubicarHaz();
+    window.addEventListener('resize', ubicarHaz);
+    /* Arriba de todo la barra es navy pleno; apenas se baja pasa a vidrio */
+    var marcar = function () { nav.classList.toggle('bajado', (window.scrollY || 0) > 8); };
+    marcar(); window.addEventListener('scroll', marcar, { passive: true });
   };
 
   /* ── Muro de publicadores: cuadrícula con líneas de separación y una luz que
