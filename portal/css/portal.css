@@ -2270,4 +2270,4 @@ body.p-home .h-m2-pie .h-link:hover{color:var(--h-oro2)}
 body.p-home #publicar{background:var(--h-navy) !important}
 body.p-home #publicar::before{content:none !important;display:none !important}
 body.p-home #barrios,body.p-home #indice{background:var(--h-crema)}
-body.p-home .h-copy em{font-style:italic;color:var(--h-oro2);font-weight:400}
+body.p-home .h-copy em{font-family:inherit;font-size:inherit;font-weight:inherit;line-height:inherit;font-style:italic;color:var(--h-oro2)}
