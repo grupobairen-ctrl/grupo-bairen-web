@@ -284,13 +284,12 @@
     <a class="nav-logo" href="index.html" aria-label="BAIREN, inicio"><img src="../bairen_logo_96.png?v=1" alt="BAIREN" width="44" height="44" style="height:44px;width:44px;"></a>
   </div>
     <div class="p-nav-menu">
-      <div><button type="button" aria-haspopup="true" ${active==='venta'?'aria-current="page"':''}>Comprar <span class="car"></span></button>
-        <div class="p-dd">${dd('Comprar por barrio', zonasLinks('venta'), true)}${dd('También', [['Emprendimientos','emprendimientos.html']])}${dd('Servicios', [['Publicá tu propiedad','publicar.html'],['Índice BAIREN','index.html#indice'],['Guía de barrios','index.html#guia']])}</div></div>
       <div><button type="button" aria-haspopup="true" ${active==='alquiler'?'aria-current="page"':''}>Alquilar <span class="car"></span></button>
-        <div class="p-dd">${dd('Plazo', [['Largo plazo', BP.urlBuscar({ op:'alquiler' })],['Mediano plazo, amoblado', BP.urlBuscar({ op:'mediano' })]])}${dd('Alquilar por barrio', zonasLinks('alquiler'), true)}</div></div>
-      <a href="publicadores.html" ${active==='publicadores'?'aria-current="page"':''}>Publicadores</a>
-      <div><button type="button" aria-haspopup="true">Servicios <span class="car"></span></button>
-        <div class="p-dd">${dd('Para quien publica', [['Publicá tu propiedad','publicar.html'],['Importá tu cartera','importar.html'],['Producción de fichas','publicar.html#produccion'],['Panel del propietario','publicar.html#panel']])}${dd('Para quien busca', [['Guía de barrios','index.html#guia'],['Índice BAIREN','index.html#indice'],['Cómo evitar fraudes','legales.html#fraudes']])}</div></div>
+        <div class="p-dd">${dd('Plazo', [['Mediano plazo, amoblado', BP.urlBuscar({ op:'mediano' })],['Largo plazo', BP.urlBuscar({ op:'alquiler' })]])}${dd('Alquilar por barrio', zonasLinks('alquiler'), true)}${dd('Más', [['Publicadores','publicadores.html'],['Guía de barrios','index.html#zonas'],['Publicá tu propiedad','publicar.html']])}</div></div>
+      <div><button type="button" aria-haspopup="true" ${active==='venta'?'aria-current="page"':''}>Comprar <span class="car"></span></button>
+        <div class="p-dd">${dd('Comprar por barrio', zonasLinks('venta'), true)}${dd('También', [['Emprendimientos','emprendimientos.html'],['Publicadores','publicadores.html']])}${dd('Para quien publica', [['Publicá tu propiedad','publicar.html'],['Importá tu cartera','importar.html'],['Criterios de selección','criterios.html']])}</div></div>
+      <a href="../psi.html" ${active==='psi'?'aria-current="page"':''}>PSI</a>
+      <a href="index.html#indice" ${active==='indice'?'aria-current="page"':''}>Índice</a>
     </div>
   <div class="p-nav-right">
     <button type="button" class="p-ghost p-bell" aria-label="Notificaciones" data-notif>${BP.ico.bell}<span class="dot" hidden></span></button>

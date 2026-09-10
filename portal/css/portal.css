@@ -1734,3 +1734,46 @@ body .p-nav-menu .p-dd-cuenta.abierto{display:block}
 .p-gen svg{opacity:.35}
 @keyframes p-gen-luz{0%{background-position:120% 0}100%{background-position:-120% 0}}
 @media(prefers-reduced-motion:reduce){.p-gen{animation:none;color:var(--s-navy,#2A3A52) !important;background-image:none}}
+
+/* ── La cápsula también en celular ───────────────────────────────────────────
+   Cuatro ítems cortos entran en 390 px, como los cinco del ejemplo. En celular
+   va entre el logo y el botón de menú; los paneles cuelgan a todo el ancho. */
+.p-nav-menu{display:flex !important}
+@media(max-width:820px){
+  .p-navbar,.navbar{padding-left:12px;padding-right:12px;gap:8px}
+  .p-navbar > .p-nav-menu{padding:3px 4px;gap:0}
+  .p-navbar > .p-nav-menu > div > button,.p-navbar > .p-nav-menu > a{padding:8px 9px;font-size:.56rem;letter-spacing:.08em}
+  .p-navbar > .p-nav-menu .car{display:none}
+  .p-nav-menu .p-ambiente::after{bottom:3px}
+  .p-nav-menu .p-dd:not(.p-dd-cuenta){width:calc(100vw - 24px);top:64px}
+  .p-nav-menu .p-dd.abierto:not(.p-dd-cuenta){grid-template-columns:1fr 1fr;padding:22px 18px 24px;gap:0 18px}
+  .p-nav-menu .p-dd .col.ancha{grid-column:span 2}
+}
+@media(max-width:360px){.p-navbar > .p-nav-menu > div > button,.p-navbar > .p-nav-menu > a{padding:8px 7px;font-size:.52rem;letter-spacing:.06em}}
+/* En celular el header tiene tres columnas: logo, cápsula, botón de menú. La barra derecha no va. */
+@media(max-width:820px){
+  .p-navbar,.navbar{grid-template-columns:auto minmax(0,1fr) auto}
+  .p-navbar > .p-nav-right{display:none !important}
+  .p-navbar > .burger,.navbar > .burger{display:flex;justify-self:end}
+  .p-navbar > .p-nav-menu{justify-self:center}
+  /* El panel se ancla a los bordes de la pantalla, sin cálculos de centro */
+  .p-nav-menu .p-dd:not(.p-dd-cuenta){left:12px;right:12px;width:auto;transform:none;max-height:calc(100dvh - 76px);overflow:auto}
+}
+/* ── Celular: nada puede ser más ancho que la pantalla ─────────────────────
+   Chrome ensancha el viewport al ancho del contenido y los elementos fijos
+   (header, botón de menú, paneles) quedan afuera. La fila de resultados del
+   catálogo medía 469 px por el nowrap; se achica, y el html recorta de más. */
+@media(max-width:820px){
+  html,body{overflow-x:clip}
+  body.p-catalogo .p-results-head{flex-wrap:nowrap !important;gap:8px;min-width:0}
+  body.p-catalogo .p-results-count{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis}
+  body.p-catalogo .p-results-head .acts{flex:1 1 auto;min-width:0;justify-content:flex-end}
+  body.p-catalogo .p-results-head .acts .p-fbtn{flex:0 0 auto;padding:0 10px !important}
+  body.p-catalogo .p-results-head .acts .p-fsel{flex:0 1 150px;min-width:0;max-width:150px}
+  /* El panel del menú en celular: una columna por sección, filas completas, conteo corto */
+  .p-nav-menu .p-dd .col.ancha > a{width:100%;margin-right:0;display:flex}
+  .p-nav-menu .p-dd .p-dd-n{font-size:.5rem;letter-spacing:.08em;white-space:nowrap}
+  .p-nav-menu .p-dd.abierto:not(.p-dd-cuenta){grid-template-columns:1fr;padding:18px 16px 22px}
+  .p-nav-menu .p-dd .col.ancha{grid-column:auto}
+  .p-nav-menu .p-dd a{padding:7px 0;font-size:.86rem}
+}
