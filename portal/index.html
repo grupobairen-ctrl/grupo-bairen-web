@@ -10,7 +10,7 @@
   <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260912m"><link rel="stylesheet" href="css/catalogo.css?v=20260912m"><link rel="stylesheet" href="css/portal.css?v=20260912m">
+  <link rel="stylesheet" href="css/base.css?v=20260912r"><link rel="stylesheet" href="css/catalogo.css?v=20260912r"><link rel="stylesheet" href="css/portal.css?v=20260912r">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"BAIREN","url":"https://www.bairengroup.com","logo":"https://www.bairengroup.com/bairen_logo.png","description":"El portal de propiedades seleccionadas de Buenos Aires. Alquileres a mediano y largo plazo y departamentos en venta, publicados por corredores matriculados y dueños verificados.","areaServed":[{"@type":"City","name":"Ciudad Autónoma de Buenos Aires"},{"@type":"AdministrativeArea","name":"Zona Norte, Buenos Aires"}]}</script>
 </head>
 <body class="p-home">
@@ -33,7 +33,7 @@
         <button type="button" class="on" data-plazo="mediano" aria-pressed="true">Mediano plazo</button>
         <button type="button" data-plazo="alquiler" aria-pressed="false">Largo plazo</button>
       </div>
-      <p class="h-ctx" id="ctxPlazo" hidden>Amoblado · 3 a 12 meses · todo incluido · sin garantía ni caución</p>
+      <p class="h-ctx" id="ctxPlazo" hidden></p>
       <div class="h-field">
         <input type="text" id="zonaInput" name="q" placeholder="Barrio, edificio o zona" autocomplete="off" aria-label="Barrio, edificio o zona" aria-autocomplete="list" aria-controls="sugg" enterkeyhint="search">
         <div class="p-sugg" id="sugg" role="listbox" aria-label="Sugerencias"></div>
@@ -60,17 +60,15 @@
 <section class="h-sec h-crema h-borde" id="zonas">
   <div class="h-in">
     <p class="h-eyebrow">Zonas</p>
-    <h2 class="h-h2" id="zonasTitulo">Ocho zonas. Ahí concentramos la selección.</h2>
-    <p class="h-copy h-copy-fuerte" id="zonasLista"></p>
-    <p class="h-copy">No publicamos fuera de estas zonas. Concentrar la búsqueda nos permite leer cada propiedad con contexto.</p>
-    <div class="h-zonas" id="zonasGrid"></div>
+    <h2 class="h-h2" id="zonasTitulo">10 zonas.</h2>
+    <div class="h-mapa"><div id="mapaHome" role="group" aria-label="Mapa de zonas de BAIREN"></div><p class="h-mapa-pie">Tocá una zona para ver lo publicado ahí.</p></div>
   </div>
 </section>
 
 <section class="h-sec h-crema h-borde" id="edificios" hidden>
   <div class="h-in">
     <p class="h-eyebrow">Edificios</p>
-    <h2 class="h-h2">Hay búsquedas que empiezan por un nombre propio.</h2>
+    <h2 class="h-h2">Edificios, complejos y tipologías de primera línea.</h2>
     <p class="h-copy" id="edificiosCopy"></p>
   </div>
   <div class="h-track h-track-edif" id="edificiosTrack"></div>
@@ -85,27 +83,29 @@
   </div>
 </section>
 
-<section class="h-sec h-navy" id="psi">
-  <div class="h-in h-dos">
-    <figure class="h-foto" id="psiFoto" aria-hidden="true"></figure>
-    <div class="h-texto">
-      <p class="h-eyebrow">PSI · Personal Shopper Inmobiliario</p>
-      <h2 class="h-h2">En una compra, el comprador también necesita representación.</h2>
-      <p class="h-copy">La parte vendedora llega acompañada. PSI ocupa el lado del comprador.</p>
-      <p class="h-copy">Definimos la búsqueda, filtramos alternativas, analizamos propiedades y acompañamos la negociación y el proceso de compra.</p>
-      <a class="h-btn h-btn-oro" href="../psi.html">Conocer PSI</a>
-    </div>
+<section class="h-sec h-navy h-anuncio" id="psi">
+  <figure class="h-anuncio-foto" id="psiFoto" aria-hidden="true"></figure>
+  <div class="h-anuncio-velo" aria-hidden="true"></div>
+  <div class="h-in h-anuncio-txt">
+    <p class="h-eyebrow">Personal Shopper Inmobiliario</p>
+    <h2 class="h-h2">En una compra, el comprador también necesita representación.</h2>
+    <p class="h-copy">La parte vendedora llega acompañada. PSI ocupa el lado del comprador: definimos la búsqueda, filtramos alternativas, analizamos las propiedades y acompañamos la negociación.</p>
+    <a class="h-btn h-btn-oro" href="psi.html">Conocer PSI</a>
   </div>
 </section>
 
 <section class="h-sec h-crema" id="indice">
   <div class="h-in">
     <p class="h-eyebrow">Índice BAIREN</p>
-    <h2 class="h-h2">El precio necesita contexto.</h2>
-    <p class="h-copy">Consultá valores de referencia por barrio y compará zonas antes de decidir dónde seguir buscando.</p>
+    <h2 class="h-h2">Cuánto vale el metro cuadrado, barrio por barrio.</h2>
+    <p class="h-copy">Es el precio que hoy piden las propiedades publicadas en BAIREN, dividido por sus metros. Sirve para comparar zonas antes de decidir dónde seguir buscando.</p>
+    <div class="h-ind-dest" id="indiceDest" hidden>
+      <span class="et">Alquiler, promedio de las <b id="indiceN">0</b> unidades publicadas</span>
+      <span class="cifra"><em>USD</em> <b data-countup id="indiceAvg">0</b> <em>por m² y por mes</em></span>
+    </div>
     <div class="h-indice" id="indiceLista" aria-live="polite"></div>
-    <div class="h-acciones h-izq"><button type="button" class="h-btn h-btn-navy" id="indiceMas" aria-expanded="false" aria-controls="indiceLista">Ver el Índice completo</button><a class="h-link" href="#metodologia">Metodología</a></div>
-    <p class="h-nota" id="metodologia"><b>Metodología.</b> Promedio simple del precio pedido por metro cuadrado de las unidades publicadas hoy en BAIREN, por zona, separando venta de alquiler. No es una tasación y no incluye operaciones cerradas.</p>
+    <div class="h-acciones h-izq"><button type="button" class="h-btn h-btn-navy" id="indiceMas" aria-expanded="false" aria-controls="indiceLista">Ver todas las zonas</button><a class="h-link" href="#metodologia">Cómo se calcula</a></div>
+    <p class="h-nota" id="metodologia"><b>Cómo se calcula.</b> Tomamos las unidades publicadas hoy en BAIREN con metros y precio informados, dividimos el precio por los metros y promediamos por zona. Venta y alquiler se calculan por separado. Es una referencia de lo que se pide, no una tasación, y no incluye operaciones cerradas.</p>
   </div>
 </section>
 
@@ -115,19 +115,19 @@
     <h2 class="h-h2">¿Tu propiedad encaja en BAIREN?</h2>
     <p class="h-copy">Trabajamos únicamente en nuestras zonas y revisamos cada unidad antes de incorporarla al portal.</p>
     <p class="h-copy">Si encaja con la selección, producimos el contenido y la publicamos.</p>
-    <a class="h-btn h-btn-oro" href="publicar.html">Publicar una propiedad</a>
+    <a class="h-btn h-btn-oro" href="publicar-aviso.html">Publicar una propiedad</a><a class="h-link h-link-claro" href="criterios.html">Ver los criterios de ingreso</a>
   </div>
 </section>
 
 </main>
 <div id="pFooter"></div>
 
-<script src="supabase-portal.js" defer></script>
+<script src="../mapa-barrios.js" defer></script><script src="supabase-portal.js" defer></script>
 <script src="js/motion.js" defer></script>
-<script src="js/bairen-motion.js?v=20260912m" defer></script>
-<script src="js/ui.js?v=20260912m" defer></script>
-<script src="js/store.js?v=20260912m" defer></script>
-<script src="js/data.js?v=20260912m" defer></script>
+<script src="js/bairen-motion.js?v=20260912r" defer></script>
+<script src="js/ui.js?v=20260912r" defer></script>
+<script src="js/store.js?v=20260912r" defer></script>
+<script src="js/data.js?v=20260912r" defer></script>
 <script>
 document.addEventListener('DOMContentLoaded', function(){
 (async function(){
@@ -144,7 +144,10 @@ document.addEventListener('DOMContentLoaded', function(){
     segOp.forEach(b => { const on = b.dataset.op === opActiva; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
     plazoSel.hidden = opActiva !== 'alquiler';
     plazoSel.querySelectorAll('button').forEach(b => { const on = b.dataset.plazo === plazo; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
-    ctx.hidden = !(opActiva === 'alquiler' && plazo === 'mediano');
+    ctx.hidden = opActiva !== 'alquiler';
+    ctx.textContent = plazo === 'mediano'
+      ? 'Amoblado · 3 a 12 meses · todo incluido · sin garantía ni caución'
+      : 'Sin muebles · desde 2 años · contrato en pesos · con garantía';
     opInput.value = opActiva === 'venta' ? 'venta' : plazo;
   };
   segOp.forEach(b => b.addEventListener('click', () => { const abre = b.dataset.op === 'alquiler' && opActiva !== 'alquiler'; opActiva = b.dataset.op; pintarBuscador(); if (abre && window.BPM && BPM.ok) BPM.entrar(plazoSel, 'abajo'); }));
@@ -192,22 +195,37 @@ document.addEventListener('DOMContentLoaded', function(){
   document.querySelectorAll('.h-flecha').forEach(b => b.addEventListener('click', () => { const c = track.querySelector('.h-foto-card'); const paso = c ? c.getBoundingClientRect().width + 14 : 360; track.scrollBy({ left: paso * Number(b.dataset.dir), behavior: 'smooth' }); }));
   track.removeAttribute('aria-busy');
 
-  /* ── Zonas: todas, con conteo real, en cuadrícula compacta ── */
+  /* ── Zonas: el mapa de BAIREN, el mismo del catálogo ── */
   const counts = BPData.countsByZona(avisos, null); window.__counts = counts;
-  const NUM = { 6:'Seis', 7:'Siete', 8:'Ocho', 9:'Nueve', 10:'Diez', 11:'Once', 12:'Doce' };
-  document.getElementById('zonasTitulo').textContent = (NUM[BP.ZONAS.length] || BP.ZONAS.length) + ' zonas. Ahí concentramos la selección.';
-  document.getElementById('zonasLista').textContent = BP.ZONAS.map(BP.zonaLabel).join(', ').replace(/, ([^,]*)$/, ' y $1') + '.';
-  document.getElementById('zonasGrid').innerHTML = BP.ZONAS.slice().sort((a, b) => (counts[b] || 0) - (counts[a] || 0)).map(z => { const n = counts[z] || 0; return `<a class="h-zona${n ? '' : ' sin'}" href="${BP.urlBuscar({ zona: z })}"><b>${BP.zonaLabel(z)}</b><span>${n === 1 ? '1 propiedad' : n + ' propiedades'}</span></a>`; }).join('');
+  const NUM = { 6:'Seis', 7:'Siete', 8:'Ocho', 9:'Nueve', 10:'10', 11:'11', 12:'12' };
+  document.getElementById('zonasTitulo').textContent = (NUM[BP.ZONAS.length] || BP.ZONAS.length) + ' zonas.';
+  if (window.BairenMapa) {
+    const el = document.getElementById('mapaHome');
+    try { window.__mapaHome = window.BairenMapa.mount(el, { counts, modo: 'completo', onSelect: z => { location.href = BP.urlBuscar({ zona: z }); } }); }
+    catch (e) { el.innerHTML = '<p class="h-nota">El mapa no se pudo montar en este navegador.</p>'; }
+  }
 
   /* ── Edificios con nombre propio: sólo los que tienen unidades hoy ── */
-  const EDIF = [{ nombre: 'Huergo 475', re: /huergo\s*475/i }, { nombre: 'Palacio Alcorta', re: /alcorta/i }, { nombre: 'Lumière', re: /lumi[eè]re/i }];
+  const EDIF = [
+    { nombre: 'Huergo 475', re: /huergo\s*475/i, zona: 'Puerto Madero', fachada: 'img/edificio-huergo-475.jpg' },
+    { nombre: 'Palacio Alcorta', re: /alcorta/i, zona: 'Palermo', fachada: 'img/edificio-palacio-alcorta.jpg' },
+    { nombre: 'Lumière', re: /lumi[eè]re/i, zona: 'Puerto Madero', fachada: 'img/edificio-lumiere.jpg' }
+  ];
   const texto = a => [a.dir, a.titulo, a.emprendimiento].filter(Boolean).join(' ');
   reales.forEach(a => { if (a.emprendimiento && !EDIF.some(e => e.re.test(a.emprendimiento))) EDIF.push({ nombre: a.emprendimiento, re: new RegExp(a.emprendimiento.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') }); });
-  edificios = EDIF.map(e => { const us = reales.filter(a => e.re.test(texto(a))); return Object.assign({}, e, { unidades: us, foto: (us.find(a => a.fotos && a.fotos.length) || {}).fotos }); }).filter(e => e.unidades.length);
+  edificios = EDIF.map(e => { const us = reales.filter(a => e.re.test(texto(a))); return Object.assign({}, e, { unidades: us, foto: (us.find(a => a.fotos && a.fotos.length) || {}).fotos }); });
   if (edificios.length) {
-    const sec = document.getElementById('edificios'); sec.hidden = false;
-    document.getElementById('edificiosCopy').textContent = edificios.map(e => e.nombre).join(', ').replace(/, ([^,]*)$/, ' y $1') + (edificios.length > 1 ? ' tienen' : ' tiene') + ' su propio acceso dentro de BAIREN para comparar las unidades disponibles en cada edificio.';
-    document.getElementById('edificiosTrack').innerHTML = edificios.map(e => `<a class="h-slide h-edif" href="${e.unidades.length === 1 ? BP.urlFicha(e.unidades[0]) : 'buscar.html?q=' + encodeURIComponent(e.nombre)}">${e.foto ? `<img src="${BP.sbImg(e.foto[0], 1200)}" alt="" loading="lazy">` : ''}<div class="h-edif-txt"><b>${BP.esc(e.nombre)}</b><span>${e.unidades.length === 1 ? '1 unidad' : e.unidades.length + ' unidades'} en BAIREN</span><em>Ver unidades</em></div></a>`).join('');
+    document.getElementById('edificios').hidden = false;
+    document.getElementById('edificiosCopy').textContent = edificios.map(e => e.nombre).join(', ').replace(/, ([^,]*)$/, ' y $1') + ' tienen su propio acceso dentro de BAIREN para comparar las unidades de cada edificio.';
+    document.getElementById('edificiosTrack').innerHTML = edificios.map(e => {
+      const n = e.unidades.length;
+      /* Si todavía no cargamos la fachada, mostramos una foto real del edificio */
+      const alt = e.foto ? BP.sbImg(e.foto[0], 1200) : '';
+      const src = e.fachada || alt;
+      const href = n === 1 ? BP.urlFicha(e.unidades[0]) : (n ? 'buscar.html?q=' + encodeURIComponent(e.nombre) : 'publicar.html');
+      const pie = n === 0 ? 'Sin unidades disponibles hoy' : (n === 1 ? '1 unidad' : n + ' unidades') + ' en BAIREN';
+      return `<a class="h-slide h-edif${n ? '' : ' sin'}" href="${href}"><img src="${src}" alt="Fachada de ${BP.esc(e.nombre)}" loading="lazy" data-alt="${alt}" onerror="if(this.dataset.alt&&this.src!==this.dataset.alt){this.src=this.dataset.alt}else{this.remove()}"><div class="h-edif-txt"><b>${BP.esc(e.nombre)}</b><span>${BP.esc(e.zona)} · ${pie}</span><em>${n ? 'Ver unidades' : 'Avisarme cuando haya'}</em></div></a>`;
+    }).join('');
   }
 
   /* ── Tipologías menos comunes: sólo las que existen hoy ── */
@@ -223,15 +241,23 @@ document.addEventListener('DOMContentLoaded', function(){
 
   /* ── PSI: fotografía real de una unidad, nunca stock ── */
   const conFoto = reales.find(a => a.op === 'venta' && a.fotos && a.fotos.length) || reales.find(a => a.fotos && a.fotos.length) || avisos.find(a => a.fotos && a.fotos.length);
-  if (conFoto) document.getElementById('psiFoto').innerHTML = `<img src="${BP.sbImg(conFoto.fotos[0], 1200)}" alt="" loading="lazy">`;
+  if (conFoto) document.getElementById('psiFoto').innerHTML = `<img src="${BP.sbImg(conFoto.fotos[0], 1800)}" alt="" loading="lazy">`;
 
-  /* ── Índice: por zona, venta y alquiler por m². En celular, cuatro filas y el resto plegado ── */
+  /* ── Índice: sólo zonas con datos, la cifra grande cuenta al aparecer ── */
   const avg = l => l.length ? Math.round(l.reduce((s, a) => s + a.precio / a.m2, 0) / l.length) : null;
-  const filas = BP.ZONAS.map(z => { const zs = reales.filter(a => a.zona === z && a.m2 && a.precio); return { z, v: avg(zs.filter(a => a.op === 'venta')), r: avg(zs.filter(a => a.op !== 'venta')), n: zs.length }; }).sort((a, b) => b.n - a.n);
-  const fmt = n => n ? 'USD ' + BP.fmtN(n) : '—';
-  document.getElementById('indiceLista').innerHTML = `<div class="h-ind-cab"><span>Zona</span><span>Venta, por m²</span><span>Alquiler, por m² y mes</span></div>` + filas.map((f, i) => `<div class="h-ind-fila${i >= 4 ? ' plegada' : ''}${f.n ? '' : ' sin'}"><span>${BP.zonaLabel(f.z)}</span><span>${fmt(f.v)}</span><span>${fmt(f.r)}</span></div>`).join('');
+  const conDato = reales.filter(a => a.m2 && a.precio);
+  const filas = BP.ZONAS.map(z => { const zs = conDato.filter(a => a.zona === z); return { z, v: avg(zs.filter(a => a.op === 'venta')), r: avg(zs.filter(a => a.op !== 'venta')), n: zs.length }; }).filter(f => f.n).sort((a, b) => b.n - a.n);
+  const alq = conDato.filter(a => a.op !== 'venta');
+  if (alq.length) {
+    document.getElementById('indiceDest').hidden = false;
+    document.getElementById('indiceN').textContent = alq.length;
+    document.getElementById('indiceAvg').textContent = BP.fmtN(avg(alq));
+  }
+  const fmt = n => n ? 'USD ' + BP.fmtN(n) : 'sin datos';
+  document.getElementById('indiceLista').innerHTML = `<div class="h-ind-cab"><span>Zona</span><span>Venta, por m²</span><span>Alquiler, por m² y mes</span></div>` + filas.map((f, i) => `<div class="h-ind-fila${i >= 4 ? ' plegada' : ''}"><span>${BP.zonaLabel(f.z)}</span><span class="${f.v ? '' : 'vacio'}">${fmt(f.v)}</span><span class="${f.r ? '' : 'vacio'}">${fmt(f.r)}</span></div>`).join('');
   const mas = document.getElementById('indiceMas');
-  mas.addEventListener('click', () => { const abierto = mas.getAttribute('aria-expanded') === 'true'; document.querySelectorAll('.h-ind-fila.plegada').forEach(f => f.classList.toggle('abierta', !abierto)); mas.setAttribute('aria-expanded', abierto ? 'false' : 'true'); mas.textContent = abierto ? 'Ver el Índice completo' : 'Ver menos'; });
+  if (filas.length <= 4) mas.hidden = true;
+  mas.addEventListener('click', () => { const abierto = mas.getAttribute('aria-expanded') === 'true'; document.querySelectorAll('.h-ind-fila.plegada').forEach(f => f.classList.toggle('abierta', !abierto)); mas.setAttribute('aria-expanded', abierto ? 'false' : 'true'); mas.textContent = abierto ? 'Ver todas las zonas' : 'Ver menos'; });
 
   if (window.BPM && BPM.init) BPM.init(document);
 })();
