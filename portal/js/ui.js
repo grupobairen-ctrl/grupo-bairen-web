@@ -263,9 +263,9 @@
 
   BP.reveal = () => { const els=document.querySelectorAll('[data-reveal]:not(.in)'); if(!('IntersectionObserver' in window)){ els.forEach(e=>e.classList.add('in')); return; }
     /* Se juntan los que entran en la misma tanda para que suban escalonados, no de a uno */
-    let tanda=[], t=null;
-    const soltar=()=>{ const g=tanda; tanda=[]; t=null; if(!g.length) return; if(window.BPM && BPM.ok) BPM.aparecer(g); else g.forEach(e=>e.classList.add('in')); };
-    const io=new IntersectionObserver(en=>{ en.forEach(e=>{ if(e.isIntersecting){ io.unobserve(e.target); tanda.push(e.target); } }); if(tanda.length){ clearTimeout(t); t=setTimeout(soltar,40); } },{rootMargin:'0px 0px -8% 0px'});
+    let tanda=[], t=null, t0=0;
+    const soltar=()=>{ const g=tanda; tanda=[]; t=null; t0=0; if(!g.length) return; if(window.BPM && BPM.ok) BPM.aparecer(g); else g.forEach(e=>e.classList.add('in')); };
+    const io=new IntersectionObserver(en=>{ en.forEach(e=>{ if(e.isIntersecting){ io.unobserve(e.target); tanda.push(e.target); } }); if(tanda.length){ if(!t0) t0=Date.now(); clearTimeout(t); if(Date.now()-t0>120) soltar(); else t=setTimeout(soltar,40); } },{rootMargin:'0px 0px -8% 0px'});
     els.forEach(e=>io.observe(e)); };
 
   /* El destino del enlace de salto: la etiqueta main si existe, si no la primera

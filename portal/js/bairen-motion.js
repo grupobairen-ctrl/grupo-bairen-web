@@ -46,7 +46,7 @@
     els.forEach(function (e) { e.style.transition = 'none'; e.classList.add('in'); });
     M.animate(els,
       { opacity: [0, 1], transform: ['translateY(' + (opts.sube || SUBE) + 'px)', 'translateY(0px)'] },
-      { duration: opts.duracion || DUR.normal, ease: CURVA, delay: M.stagger ? M.stagger(opts.paso || PASO) : 0 }
+      { duration: opts.duracion || DUR.normal, ease: CURVA, delay: M.stagger ? M.stagger(Math.min(opts.paso || PASO, 0.4 / Math.max(1, els.length - 1))) : 0 }
     ).finished.then(function () { els.forEach(function (e) { e.style.transition = ''; }); }, function () {});
   };
 
@@ -310,6 +310,56 @@
       }
     })(t0);
     setTimeout(function () { if (capa.parentNode) capa.remove(); }, TOPE + 1400);
+  };
+
+  /* ── Titular por palabras: cada una sube desde abajo detrás de una máscara.
+     Es el gesto de las casas de moda y de las galerías. No aparece: entra. */
+  BPM.titular = function (el, opts) {
+    el = lista(el)[0]; if (!el) return;
+    if (el._titular) return; el._titular = true;
+    opts = opts || {};
+    var lineas = el.querySelectorAll('.hline');
+    var fuentes = lineas.length ? lineas : [el];
+    var piezas = [];
+    Array.prototype.forEach.call(fuentes, function (ln) {
+      var palabras = (ln.textContent || '').trim().split(/\s+/);
+      ln.textContent = '';
+      palabras.forEach(function (w, i) {
+        var caja = document.createElement('span'); caja.className = 'p-msk';
+        var dentro = document.createElement('span'); dentro.className = 'p-msk-in';
+        dentro.textContent = w + (i < palabras.length - 1 ? '\u00A0' : '');
+        caja.appendChild(dentro); ln.appendChild(caja); piezas.push(dentro);
+      });
+    });
+    if (!ok) { piezas.forEach(function (x) { x.style.transform = 'none'; }); return; }
+    piezas.forEach(function (x) { x.style.transform = 'translateY(110%)'; });
+    M.animate(piezas, { transform: ['translateY(110%)', 'translateY(0%)'] },
+      { duration: 0.6, ease: CURVA, delay: M.stagger(0.05, { startDelay: opts.demora || 0 }) });
+  };
+
+  /* ── Foco que sigue al cursor en la barra de arriba.
+     Una luz cálida y baja, no un reflector: la casa es navy, no un escenario. */
+  BPM.foco = function (nav) {
+    nav = lista(nav)[0]; if (!nav || !ok || nav._foco) return; nav._foco = true;
+    var luz = document.createElement('span'); luz.className = 'p-foco'; luz.setAttribute('aria-hidden', 'true');
+    nav.insertBefore(luz, nav.firstChild);
+    var activo = function () { var a = nav.querySelector('[aria-current="page"], .p-nav-menu > div > button[aria-expanded="true"]'); if (!a) return null; var r = a.getBoundingClientRect(), n = nav.getBoundingClientRect(); return r.left - n.left + r.width / 2; };
+    var poner = function (x) { nav.style.setProperty('--foco-x', x + 'px'); };
+    var vuelta = null;
+    nav.addEventListener('pointermove', function (e) {
+      if (e.pointerType === 'touch') return;
+      if (vuelta) { vuelta.stop(); vuelta = null; }
+      var n = nav.getBoundingClientRect();
+      poner(e.clientX - n.left); luz.style.opacity = '1';
+    });
+    nav.addEventListener('pointerleave', function () {
+      var destino = activo();
+      if (destino == null) { luz.style.opacity = '0'; return; }
+      var actual = parseFloat(getComputedStyle(nav).getPropertyValue('--foco-x')) || destino;
+      vuelta = M.animate(actual, destino, { type: 'spring', stiffness: 180, damping: 34, onUpdate: poner });
+      M.animate(luz, { opacity: 0.55 }, { duration: 0.4, ease: CURVA });
+    });
+    var d = activo(); if (d != null) { poner(d); luz.style.opacity = '0.55'; }
   };
 
   /* ── Puesta en marcha ───────────────────────────────────────────────────── */

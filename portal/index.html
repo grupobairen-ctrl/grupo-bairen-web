@@ -10,7 +10,7 @@
   <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260910l"><link rel="stylesheet" href="css/catalogo.css?v=20260910l"><link rel="stylesheet" href="css/portal.css?v=20260910l">
+  <link rel="stylesheet" href="css/base.css?v=20260911c"><link rel="stylesheet" href="css/catalogo.css?v=20260911c"><link rel="stylesheet" href="css/portal.css?v=20260911c">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"BAIREN","url":"https://www.bairengroup.com","logo":"https://www.bairengroup.com/bairen_logo.png","description":"El portal de propiedades seleccionadas de Buenos Aires. Alquileres a mediano y largo plazo y departamentos en venta, publicados por corredores matriculados y dueños verificados.","areaServed":[{"@type":"City","name":"Ciudad Autónoma de Buenos Aires"},{"@type":"AdministrativeArea","name":"Zona Norte, Buenos Aires"}]}</script>
 </head>
 <body>
@@ -46,13 +46,13 @@
     </div>
 </div></div>
 
-<section class="caminos" id="caminos">
+<section class="caminos" id="como">
   <div class="caminos-in">
-    <div class="caminos-hd"><h2>Lo que ofrecemos:</h2></div>
+    <div class="caminos-hd"><p class="p-eyebrow">Cómo funciona</p><h2>Todo lo que ves acá pasó por una persona.</h2></div>
     <div class="caminos-grid">
-      <a class="camino" href="buscar.html?op=venta"><div class="camino-name">Comprar</div><div class="camino-kicker">Unidades en venta</div><span class="go">Ver más</span></a>
-      <a class="camino" href="buscar.html?op=alquiler"><div class="camino-name">Alquilar</div><div class="camino-kicker">Mediano y largo plazo</div><span class="go">Ver más</span></a>
-      <a class="camino" href="publicar.html"><div class="camino-name">Publicar</div><div class="camino-kicker">Inmobiliarias, dueños y desarrolladoras</div><span class="go">Cómo publicar</span></a>
+      <a class="camino" href="criterios.html"><div class="camino-kicker">Paso 1</div><div class="camino-name">Se elige</div><p class="camino-txt">Cada unidad cumple un estándar de edificio, estado, luz y fotos. Si no lo cumple, no entra.</p><span class="go">Ver los criterios</span></a>
+      <a class="camino" href="publicadores.html"><div class="camino-kicker">Paso 2</div><div class="camino-name">Se verifica</div><p class="camino-txt">Publican corredores con matrícula, dueños con titularidad comprobada y desarrolladoras. La ficha dice quién.</p><span class="go">Ver quiénes publican</span></a>
+      <a class="camino" href="legales.html"><div class="camino-kicker">Paso 3</div><div class="camino-name">Hablás directo</div><p class="camino-txt">Tu consulta le llega a quien publica. BAIREN no vende, no alquila y no cobra comisión.</p><span class="go">Cómo trabajamos</span></a>
     </div>
   </div>
 </section>
@@ -64,6 +64,7 @@
       <h2 class="p-h2">Los barrios</h2>
       <p class="p-sub">Cada unidad pasó un estándar de edificio, estado y presentación. Elegí un barrio y mirá lo publicado hoy.</p>
       <div class="p-zonas" id="zonasGrid"></div>
+      <p class="p-zonas-vacias" id="zonasVacias" hidden></p>
     </div>
     <div class="p-map-home" data-reveal><div class="in"><div id="mapaHome" role="group" aria-label="Mapa de barrios"></div></div></div>
   </div>
@@ -126,13 +127,14 @@
 
 <script src="supabase-portal.js" defer></script>
 <script src="../mapa-barrios.js" defer></script>
-<script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260910l" defer></script><script src="js/ui.js?v=20260910l" defer></script><script src="js/store.js?v=20260910l" defer></script>
-<script src="js/data.js?v=20260910l" defer></script>
+<script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260911c" defer></script><script src="js/ui.js?v=20260911c" defer></script><script src="js/store.js?v=20260911c" defer></script>
+<script src="js/data.js?v=20260911c" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
 (async function(){
   if (window.BPM && BPM.entrada) BPM.entrada('BAIREN');
+  if (window.BPM && BPM.titular) BPM.titular(document.querySelector('.p-hero-site h1'), { demora: 0.15 });
   BP.header('home'); BP.footer(); if (window.BPStore) BPStore.init(); BP.reveal();
   (function(){ const hv = document.querySelector('.p-hero-site video'); if (hv && matchMedia('(prefers-reduced-motion: reduce)').matches) { hv.removeAttribute('autoplay'); hv.pause(); } })();
   document.querySelector('#searchForm .p-btn .ic').innerHTML = BP.ico.arrow;
@@ -173,7 +175,16 @@ document.addEventListener('DOMContentLoaded', function(){
   let opActiva = BPData.opConMasInventario(avisos);
   activarTab(opActiva);
   let counts = BPData.countsByZona(avisos, opActiva); window.__counts = counts;
-  const pintarZonas = () => { document.getElementById('zonasGrid').innerHTML = BP.ZONAS.map(z => `<a class="p-zona ${counts[z]?'':'zero'}" href="${BP.urlBuscar({ op: opActiva, zona: z })}"><div><b>${BP.zonaLabel(z)}</b><br><span>${z==='GBA Norte'?'Vicente López · San Isidro · Tigre':'Capital Federal'}</span></div><span class="n ${counts[z]?'':'zero'}">${counts[z] ? counts[z] + (counts[z]===1?' unidad':' unidades') : 'Sin unidades hoy'}</span></a>`).join(''); if (window.__mapaHome) window.__mapaHome.setCounts(counts); };
+  const pintarZonas = () => {
+    const sub = z => z === 'GBA Norte' ? 'Vicente López · San Isidro · Tigre' : 'Capital Federal';
+    const con = BP.ZONAS.filter(z => counts[z]).sort((a, b) => counts[b] - counts[a]);
+    const sin = BP.ZONAS.filter(z => !counts[z]);
+    const tarjeta = z => `<a class="p-zona" href="${BP.urlBuscar({ op: opActiva, zona: z })}"><div><b>${BP.zonaLabel(z)}</b><br><span>${sub(z)}</span></div><span class="n">${counts[z] + (counts[z] === 1 ? ' unidad' : ' unidades')}</span></a>`;
+    document.getElementById('zonasGrid').innerHTML = con.map(tarjeta).join('');
+    const nota = document.getElementById('zonasVacias');
+    if (nota) { nota.innerHTML = sin.length ? 'También cubrimos ' + sin.map(z => `<a href="${BP.urlBuscar({ op: opActiva, zona: z })}">${BP.zonaLabel(z)}</a>`).join(', ').replace(/, ([^,]*)$/, ' y $1') + '. Hoy no hay unidades publicadas ahí.' : ''; nota.hidden = !sin.length; }
+    if (window.__mapaHome) window.__mapaHome.setCounts(counts);
+  };
   const cambiarOp = op => { if (op === 'emprendimientos') return; opActiva = op; counts = BPData.countsByZona(avisos, opActiva); window.__counts = counts; pintarZonas(); };
   document.querySelectorAll('.p-tab').forEach(t => t.addEventListener('click', () => cambiarOp(opDeTab(t))));
   plazoSel.querySelectorAll('input').forEach(r => r.addEventListener('change', () => cambiarOp(r.value)));
