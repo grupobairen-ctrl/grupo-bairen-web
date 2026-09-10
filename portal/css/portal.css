@@ -1950,3 +1950,8 @@ body.p-home .h-flecha:hover{background:#fff;border-color:var(--h-oro)}
 /* Portada sin cápsula: el logo a la izquierda y las acciones pegadas a la derecha */
 body.p-home .p-navbar,body.p-home .navbar{grid-template-columns:auto 1fr auto}
 body.p-home .p-navbar > .p-nav-right{grid-column:3;justify-self:end}
+/* Menú de celular: los dos botones de abajo, chicos, en Jost y en una fila */
+.mobile-menu .m-cta{display:flex;gap:10px;margin-top:22px;padding:0}
+.mobile-menu .m-cta .p-btn,.mobile-menu .m-cta a{flex:1 1 0;min-height:46px;height:46px;padding:0 14px;display:inline-flex;align-items:center;justify-content:center;font:600 .64rem/1 var(--font-body) !important;letter-spacing:.16em;text-transform:uppercase;border-radius:8px !important;border:1px solid rgba(194,169,104,.7);color:var(--gold-light,#DECDA0);background:transparent;text-decoration:none}
+.mobile-menu .m-cta .p-btn-fill{background:var(--gold,#C2A968);border-color:var(--gold,#C2A968);color:var(--navy-deeper,#131D2D)}
+.mobile-menu .m-link{font-size:1.25rem}
