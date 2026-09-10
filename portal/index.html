@@ -30,11 +30,11 @@
 </section>
 <div class="p-searchbar"><div class="p-container">
 <div class="p-search" role="search" aria-label="Buscar propiedades">
-      <div class="p-tabs" role="tablist">
-        <button class="p-tab active" role="tab" data-op="venta" aria-selected="true">Comprar</button>
-        <button class="p-tab" role="tab" data-op="alquiler" aria-selected="false" aria-controls="plazoSel">Alquilar</button>
+      <div class="p-tabs" role="group" aria-label="Operación">
+        <button class="p-tab active" data-op="venta" aria-pressed="true">Comprar</button>
+        <button class="p-tab" data-op="alquiler" aria-pressed="false" aria-controls="plazoSel">Alquilar</button>
         <div class="p-plazo" id="plazoSel" role="group" aria-label="Plazo del alquiler" hidden><label><input type="radio" name="plazo" value="alquiler" checked><span>Largo plazo</span></label><label><input type="radio" name="plazo" value="mediano"><span>Mediano plazo</span></label></div>
-        <button class="p-tab" role="tab" data-op="emprendimientos" aria-selected="false" title="Venta directa de desarrolladoras">Emprendimientos</button>
+        <button class="p-tab" data-op="emprendimientos" aria-pressed="false" title="Venta directa de desarrolladoras">Emprendimientos</button>
       </div>
       <form class="p-search-row" id="searchForm" action="buscar.html" method="get">
         <input type="hidden" name="op" id="opInput" value="venta">
@@ -45,6 +45,17 @@
       <div class="p-chips" id="zonaChips" aria-live="polite"></div>
     </div>
 </div></div>
+
+<section class="caminos" id="caminos">
+  <div class="caminos-in">
+    <div class="caminos-hd"><h2>Lo que ofrecemos:</h2></div>
+    <div class="caminos-grid">
+      <a class="camino" href="buscar.html?op=venta"><div class="camino-name">Comprar</div><div class="camino-kicker">Unidades en venta</div><span class="go">Ver más</span></a>
+      <a class="camino" href="buscar.html?op=alquiler"><div class="camino-name">Alquilar</div><div class="camino-kicker">Mediano y largo plazo</div><span class="go">Ver más</span></a>
+      <a class="camino" href="publicar.html"><div class="camino-name">Publicar</div><div class="camino-kicker">Inmobiliarias, dueños y desarrolladoras</div><span class="go">Cómo publicar</span></a>
+    </div>
+  </div>
+</section>
 
 <section class="p-section" id="barrios">
   <div class="p-container p-zonas-wrap">
@@ -92,7 +103,7 @@
     <div data-reveal>
       <h2 class="p-h2">Índice BAIREN</h2>
       <p class="p-sub">Precio por metro cuadrado de lo publicado hoy, por barrio.</p>
-      <table class="p-index" id="indiceTabla"><thead><tr><th>Barrio</th><th class="num">Venta, USD/m²</th><th class="num">Alquiler, USD/m² por mes</th><th class="num">Unidades</th></tr></thead><tbody></tbody></table>
+      <div class="p-table-wrap"><table class="p-index" id="indiceTabla"><thead><tr><th>Barrio</th><th class="num">Venta, USD/m²</th><th class="num">Alquiler, USD/m² por mes</th><th class="num">Unidades</th></tr></thead><tbody></tbody></table></div>
       <p class="p-note">Calculado sobre lo publicado en BAIREN. No es una tasación.</p>
     </div>
     <div data-reveal id="guia">
@@ -122,6 +133,7 @@
 document.addEventListener('DOMContentLoaded', function(){
 (async function(){
   BP.header('home'); BP.footer(); if (window.BPStore) BPStore.init(); BP.reveal();
+  (function(){ const hv = document.querySelector('.p-hero-site video'); if (hv && matchMedia('(prefers-reduced-motion: reduce)').matches) { hv.removeAttribute('autoplay'); hv.pause(); } })();
   document.querySelector('#searchForm .p-btn .ic').innerHTML = BP.ico.arrow;
 
   /* pestañas de operación: tres (Comprar, Alquilar, Emprendimientos). El plazo del alquiler
@@ -131,7 +143,7 @@ document.addEventListener('DOMContentLoaded', function(){
   const opDeTab = t => t.dataset.op === 'alquiler' ? plazoActual() : t.dataset.op;
   const activarTab = op => {
     const tabOp = (op === 'mediano' || op === 'alquiler') ? 'alquiler' : op;
-    document.querySelectorAll('.p-tab').forEach(x => { const on = x.dataset.op === tabOp; x.classList.toggle('active', on); x.setAttribute('aria-selected', on ? 'true' : 'false'); });
+    document.querySelectorAll('.p-tab').forEach(x => { const on = x.dataset.op === tabOp; x.classList.toggle('active', on); x.setAttribute('aria-pressed', on ? 'true' : 'false'); });
     plazoSel.hidden = tabOp !== 'alquiler';
     if (tabOp === 'alquiler') { const r = plazoSel.querySelector(`input[value="${op}"]`); if (r) r.checked = true; }
     opInput.value = op;

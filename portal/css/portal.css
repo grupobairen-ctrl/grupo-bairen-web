@@ -1394,3 +1394,68 @@ body.p-product .p-page.after-band,body .p-page.after-band,body.p-product .p-page
 .prop-card .p-card-pub{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font:300 .68rem/1.3 var(--font-body);color:var(--s-mid);margin-top:12px}
 .prop-card .p-card-pub b{font:500 .74rem/1.3 var(--font-body);color:var(--s-navy)}
 .prop-card .p-card-pub .p-badge{font-size:.58rem}
+/* Celular: la fila de cabecera envuelve en vez de desbordar; la foto del emprendimiento no supera su columna */
+@media(max-width:820px){.p-head-row{flex-wrap:wrap;align-items:flex-start}.p-head-row > *{max-width:100%}.p-head-row .p-btn{white-space:normal;text-align:center}}
+.p-emp .ph{max-width:100%;overflow:hidden}.p-emp .ph img{max-width:100%;height:100%;object-fit:cover}
+/* Catálogo: conteo a la izquierda como results-count del sitio */
+body.p-catalogo .p-results-head{justify-content:space-between}
+body.p-catalogo .p-results-count{font:300 .7rem/1 var(--font-body);letter-spacing:.1em;text-transform:uppercase;color:var(--s-mid)}
+/* Portada: la sección "Lo que ofrecemos" del sitio, con sus clases de base.css */
+.caminos{background:#EEE5D0}
+.caminos .camino{border-radius:0}
+/* Ficha, segunda pasada contra la ficha del sitio: cuerpo 1200/360, hero, fila de datos, mosaicos, filas del card */
+.p-ficha{max-width:1200px;margin:0 auto;padding:60px 40px 40px;grid-template-columns:1fr 360px;gap:0}
+.p-ficha-main{padding-right:60px;min-width:0}
+@media(max-width:900px){.p-ficha{grid-template-columns:1fr;padding:32px 20px}.p-ficha-main{padding-right:0}}
+.p-fhero-address{font-size:clamp(2rem,5vw,3.4rem);font-weight:500;line-height:1.05;margin-bottom:6px}
+.p-fhero-sub{font-size:.8rem;letter-spacing:.15em;color:var(--s-gold-light)}
+.p-fhero-price-lbl{font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--s-gold-light);margin-bottom:6px}
+.p-fhero-price{font-family:var(--font-display);font-size:clamp(1.6rem,4vw,3rem);font-weight:700;color:var(--s-gold);line-height:1.05}
+.p-fhero-price-mo{font-size:.7rem;color:rgba(255,255,255,.4);margin-top:4px;letter-spacing:.08em}
+.p-ficha .p-ficha-head{margin-bottom:28px}
+.p-ficha .p-icons{display:flex;flex-wrap:wrap;gap:0;border:1px solid rgba(42,58,82,.1);padding:0;margin:0 0 44px;background:transparent}
+.p-ficha .p-icons > div{flex:1 1 0;min-width:90px;padding:22px 12px;text-align:center;border-right:1px solid rgba(42,58,82,.1);font-family:var(--font-display);font-size:1.4rem;font-weight:700;color:var(--s-navy);line-height:1.1}
+.p-ficha .p-icons > div:last-child{border-right:0}
+.p-ficha .p-icons svg{display:none}
+.p-ficha .p-icons small{display:block;font:400 .58rem/1.2 var(--font-body);letter-spacing:.15em;text-transform:uppercase;color:var(--s-mid);margin-top:4px}
+.p-ficha #desc::first-letter{font-size:1.5em;color:var(--s-gold-dark);font-weight:500}
+.p-amen-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:44px}
+@media(max-width:600px){.p-amen-grid{grid-template-columns:repeat(2,1fr)}}
+.p-amen-grid .amenity{padding:22px 14px 18px;text-align:center;background:#ECE9E1;border:1px solid rgba(42,58,82,.04)}
+.p-amen-grid .amenity-icon{display:flex;align-items:center;justify-content:center;color:var(--s-gold-dark);margin-bottom:10px}
+.p-amen-grid .amenity-name{font-size:.66rem;letter-spacing:.14em;font-weight:500;color:var(--s-navy);text-transform:uppercase}
+.p-ficha .p-ac-rows{margin:-4px 0 6px}
+.p-ficha .ac-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(42,58,82,.07);gap:14px}
+.p-ficha .ac-lbl{font:500 .62rem/1 var(--font-body);letter-spacing:.1em;text-transform:uppercase;color:var(--s-mid);flex:0 0 auto}
+.p-ficha .ac-val{font:600 .82rem/1.3 var(--font-body);color:var(--s-navy);text-align:right}
+.p-ficha .p-cta-pub{padding-top:10px}
+.p-ficha .p-ac-links{display:flex;gap:18px;justify-content:center;margin:2px 0 6px}
+.p-ficha .p-ac-link{background:none;border:0;padding:6px 0;font:500 .64rem/1 var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:var(--s-navy);text-decoration:underline;text-underline-offset:3px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.p-ficha .p-ac-link svg{width:13px;height:13px}
+.p-ficha .p-quick button{border:1px solid rgba(42,58,82,.25);background:transparent;color:var(--s-navy);font:600 .62rem/1 var(--font-body);letter-spacing:.12em;text-transform:uppercase;padding:10px 12px}
+.p-ficha .p-quick button.on{background:var(--s-navy);color:var(--s-white);border-color:var(--s-navy)}
+.p-ficha .p-pub-block{background:transparent;border:0;border-top:1px solid rgba(42,58,82,.1);padding:28px 0 0}
+.p-ficha .p-report{background:transparent;border:0;border-top:1px solid rgba(42,58,82,.1);padding:24px 0 0}
+.p-ficha .p-report b{display:block;font:500 .6rem/1 var(--font-body);letter-spacing:.35em;text-transform:uppercase;color:var(--s-gold-dark);margin-bottom:14px}
+.p-ficha .p-report b svg{display:none}
+.p-ficha .p-report .chips button{border:1px solid rgba(42,58,82,.25);background:transparent;color:var(--s-navy);font:600 .62rem/1 var(--font-body);letter-spacing:.12em;text-transform:uppercase;padding:10px 12px}
+body.p-ficha-page .p-head-row .p-h2{font:500 .6rem/1 var(--font-body);letter-spacing:.35em;text-transform:uppercase;color:var(--s-gold-dark);margin:0}
+.p-ficha .p-legend{background:transparent;border:0;border-top:1px solid rgba(42,58,82,.1);padding:16px 0 0;color:var(--s-mid);font-size:.72rem}
+.p-ficha .p-meta-line{color:var(--s-mid);font-size:.72rem}
+/* Auditoría Web Interface Guidelines (10/9/2026): contraste, foco, táctil, anclas, desbordes. Sin cambiar la gramática. */
+:root{--s-gold-dark:#6F5C32;--s-mid:#565E6E}
+.p-ficha .p-cta-price small{color:rgba(255,255,255,.72)}
+body.p-catalogo .p-fchip:focus-within{box-shadow:0 0 0 2px #FBFAF6,0 0 0 4px #131D2D;border-color:#2A3A52}
+.p-fchip input:focus-visible{outline:0}
+.p-fld :is(input,select,textarea):focus-visible{outline:3px solid #131D2D;outline-offset:2px}
+.p-searchbar .p-search{overflow:visible}
+.p-drawer .panel,.p-iacmp,.p-msheet-wrap .sheet{overscroll-behavior:contain}
+.p-head-row{flex-wrap:wrap}
+.p-chip button{min-width:28px;min-height:28px;display:inline-flex;align-items:center;justify-content:center;margin:-6px -8px -6px 0}
+@media(pointer:coarse){.p-chip button{min-width:44px;min-height:44px}}
+#indice,#guia,#barrios,#publicar,#publicadores,#contacto,#seleccionadas,#caminos,.p-pub-block[id],article[id]{scroll-margin-top:84px}
+.p-fhero{height:68svh}
+a,button,[role="button"],summary{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+/* Desbordes en celular: tabla del índice con scroll propio; tarjeta de emprendimiento dentro de su columna */
+.p-index-wrap,.p-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+@media(max-width:820px){.p-emp{grid-template-columns:minmax(0,1fr);width:100%;max-width:100%;min-width:0}.p-emp > *{min-width:0}}

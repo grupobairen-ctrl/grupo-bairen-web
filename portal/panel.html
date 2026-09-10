@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function(){
   });
   let tab = (location.hash || '#avisos').slice(1); if (!TABS.some(t => t[0] === tab)) tab = 'avisos';
   function renderNav(){ nav.innerHTML = `<div class="who">${BP.esc(BPStore.session.email)}${mode === 'local' ? '<br><span class="p-badge demo" style="margin-top:6px">modo local</span>' : ''}</div>` + TABS.map(t => `<a href="#${t[0]}" class="${t[0]===tab?'on':''}">${BP.ico[t[2]]} ${t[1]}</a>`).join('') + (curador ? `<a href="curacion.html">${BP.ico.shield} Curación</a>` : '') + `<a href="#" data-logout>${BP.ico.x} Cerrar sesión</a>`; nav.querySelector('[data-logout]').addEventListener('click', async e => { e.preventDefault(); await BPStore.signOut(); location.href = 'index.html'; }); }
-  window.addEventListener('hashchange', () => { tab = (location.hash || '#avisos').slice(1); renderNav(); render(); });
+  window.addEventListener('hashchange', () => { tab = (location.hash || '#avisos').slice(1); nav.querySelectorAll('a[href^="#"]').forEach(a => { const on = a.getAttribute('href') === '#' + tab; a.classList.toggle('on', on); if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); }); render(); });
 
   async function render(){
     renderNav();

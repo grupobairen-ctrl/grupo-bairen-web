@@ -31,6 +31,7 @@
     return u.replace('/storage/v1/object/public/','/storage/v1/render/image/public/') + (u.indexOf('?')>-1?'&':'?') + 'width=' + w + '&quality=75';
   };
   BP.fmtUSD = n => n == null ? 'Consultar' : 'USD ' + Math.round(n).toLocaleString('es-AR');
+  BP.isoLocal = d => { const x = new Date(d); x.setMinutes(x.getMinutes() - x.getTimezoneOffset()); return x.toISOString().slice(0, 16); };
   BP.fmtN = n => n == null ? '' : Number(n).toLocaleString('es-AR');
   BP.esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   BP.qs = () => new URLSearchParams(location.search);
@@ -105,7 +106,7 @@
     let box = document.getElementById(id);
     if (!box) { box = document.createElement('p'); box.id = id; box.className = 'p-err-campo'; const cont = el.closest('.p-fld, .p-field, .cfield, label'); if (cont) cont.appendChild(box); else el.insertAdjacentElement('afterend', box); /* pegado al campo, no al final del formulario */ }
     box.textContent = msg; box.hidden = false;
-    el.setAttribute('aria-invalid', 'true'); el.setAttribute('aria-describedby', id);
+    el.setAttribute('aria-invalid', 'true'); el.setAttribute('aria-describedby', ((el.getAttribute('aria-describedby') || '').split(' ').filter(x => x && x !== id).concat(id)).join(' '));
     el.classList.add('p-invalido');
     const limpiar = () => { box.hidden = true; el.removeAttribute('aria-invalid'); el.classList.remove('p-invalido'); el.removeEventListener('input', limpiar); el.removeEventListener('change', limpiar); };
     el.addEventListener('input', limpiar); el.addEventListener('change', limpiar);
@@ -266,7 +267,7 @@
         document.querySelectorAll('.p-dd.abierto').forEach(cerrarDD);
         if (!abierto) { abrirDD(dd); BP.focoAtrapado(dd, { disparador: bt, cerrarAlClicFuera: true, devolverA: bt, alCerrar: () => cerrarDD(dd) }); }
       });
-      cont.addEventListener('focusin', () => abrirDD(dd));
+      cont.addEventListener('keydown', e => { if (e.key === 'ArrowDown') { e.preventDefault(); abrirDD(dd); } });
       cont.addEventListener('focusout', () => setTimeout(() => { if (!cont.contains(document.activeElement)) cerrarDD(dd); }, 0));
     });
     const b=document.getElementById('burger'), m=document.getElementById('mobileMenu');

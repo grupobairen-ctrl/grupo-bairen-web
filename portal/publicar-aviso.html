@@ -27,7 +27,7 @@
     .p-formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px} .p-formgrid .full{grid-column:1/-1}
     .p-fld label{display:block;font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-dark);margin:0 0 6px}
     .p-fld input,.p-fld select,.p-fld textarea{width:100%;height:46px;border:1px solid var(--p-line);border-radius:8px;padding:0 12px;font:400 .95rem var(--font-body);color:var(--navy-deeper);background:var(--p-card)}
-    .p-fld textarea{height:auto;min-height:150px;padding:12px;resize:vertical} .p-fld input:focus,.p-fld select:focus,.p-fld textarea:focus{outline:0;border-color:var(--gold)}
+    .p-fld textarea{height:auto;min-height:150px;padding:12px;resize:vertical} .p-fld input:focus,.p-fld select:focus,.p-fld textarea:focus{border-color:var(--gold)}
     .p-fld .hint{font-size:.76rem;color:var(--text-mid);margin-top:4px}
     .p-fld.err input,.p-fld.err select,.p-fld.err textarea{border-color:#B3423C}
     .p-card-panel{background:var(--p-card);border:1px solid var(--p-line);border-radius:var(--p-radius);padding:26px}
@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', function(){
     const form = document.getElementById('perfilForm');
     const draw = t => { form.innerHTML = (t === 'dueno' ? fld('nombre','Nombre y apellido','text',v(p,'nombre'),{attrs:'required'}) + fld('dni','DNI','text',v(p,'dni'),{attrs:'inputmode="numeric"'}) : t === 'inmobiliaria' ? fld('nombre','Inmobiliaria o corredor','text',v(p,'nombre'),{attrs:'required'}) + fld('responsable','Corredor responsable, nombre y apellido','text',v(p,'responsable'),{attrs:'required'}) + fld('matricula','Matrícula','text',v(p,'matricula'),{attrs:'required placeholder="CUCICBA 7527"'},'Se valida contra el registro público del colegio.') + fld('colegio','Colegio','select',v(p,'colegio')||'CUCICBA',{opts:[['CUCICBA','CUCICBA, Ciudad de Buenos Aires'],['CMCPSI','San Isidro, Provincia de Buenos Aires'],['CMCPLZ','Lomas de Zamora, Provincia de Buenos Aires'],['Otro','Otro colegio de Provincia']]}) + fld('cuit','CUIT','text',v(p,'cuit')) : fld('nombre','Razón social','text',v(p,'nombre'),{attrs:'required'}) + fld('cuit','CUIT','text',v(p,'cuit'),{attrs:'required'}) + fld('responsable','Responsable comercial','text',v(p,'responsable')))
       + fld('telefono','Teléfono','tel',v(p,'telefono'),{attrs:'required'}) + fld('whatsapp','WhatsApp, solo números, con 54 9 11','tel',v(p,'whatsapp'),{attrs:'required placeholder="5491123456789"'}) + fld('email','Mail de contacto','email',v(p,'email')||BPStore.session.email,{attrs:'required'}) + fld('descripcion','Presentación corta','textarea',v(p,'descripcion'),{full:true,attrs:'maxlength="400" style="min-height:90px"'},'Dos líneas. Aparece en tu perfil.')
-      + `<div class="p-fld full"><label>Verificación</label><div class="p-note" style="margin-bottom:8px">${t === 'dueno' ? 'Subí tu DNI y un comprobante de titularidad: escritura, ABL o expensas a tu nombre. Lo revisamos y lo borramos.' : t === 'inmobiliaria' ? 'Con la matrícula alcanza: la validamos contra el registro público. Si querés, sumá el certificado.' : 'Subí constancia de CUIT y un documento de la sociedad.'}</div><input type="file" id="docs" multiple accept="image/*,.pdf"></div>`; };
+      + `<div class="p-fld full"><label for="docs">Verificación</label><div class="p-note" style="margin-bottom:8px">${t === 'dueno' ? 'Subí tu DNI y un comprobante de titularidad: escritura, ABL o expensas a tu nombre. Lo revisamos y lo borramos.' : t === 'inmobiliaria' ? 'Con la matrícula alcanza: la validamos contra el registro público. Si querés, sumá el certificado.' : 'Subí constancia de CUIT y un documento de la sociedad.'}</div><input type="file" id="docs" multiple accept="image/*,.pdf"></div>`; };
     draw(tipo); form.querySelectorAll('[name=tipo]').length; document.querySelectorAll('[name=tipo]').forEach(r => r.addEventListener('change', () => draw(r.value)));
     bindNav(async () => {
       const t = document.querySelector('[name=tipo]:checked').value; const data = { tipo: t }; form.querySelectorAll('input:not([type=file]),select,textarea').forEach(i => data[i.name] = i.value.trim());
@@ -140,7 +140,6 @@ document.addEventListener('DOMContentLoaded', function(){
     const zs = document.getElementById('f-zona'), bs = document.getElementById('f-barrio');
     const fillBarrios = () => { const z = zs.value; bs.innerHTML = z ? BARRIOS[z].map(b => `<option value="${b}" ${b===a.barrio?'selected':''}>${b}</option>`).join('') : '<option value="">Elegí primero la zona</option>'; };
     fillBarrios(); zs.addEventListener('change', fillBarrios);
-    bindNav(async () => { collect(); const req = REQ; let ok = true; req.forEach(k => { const f = document.querySelector(`[data-fld=${k}]`); const bad = !aviso[k] || (k === 'descripcion' && String(aviso[k]).length < 150); f.classList.toggle('err', bad); if (bad) ok = false; }); if (!ok) {
     const bt = document.getElementById('btnTraducir'); if (bt) bt.addEventListener('click', async () => {
       collect(); const desc = (a.descripcion || '').trim(); if (desc.length < 40) { BP.toast('Escribí primero la descripción en castellano.', 'error'); return; }
       bt.disabled = true; const txt = bt.textContent; bt.textContent = 'Traduciendo…';
@@ -148,6 +147,7 @@ document.addEventListener('DOMContentLoaded', function(){
       catch (e) { BP.toast(e.message || 'No se pudo traducir.', 'error'); }
       finally { bt.disabled = false; bt.textContent = txt; }
     });
+    bindNav(async () => { collect(); const req = REQ; let ok = true; req.forEach(k => { const f = document.querySelector(`[data-fld=${k}]`); const bad = !aviso[k] || (k === 'descripcion' && String(aviso[k]).length < 150); f.classList.toggle('err', bad); if (bad) ok = false; }); if (!ok) {
         const k = req.find(x => !aviso[x] || (x === 'descripcion' && String(aviso[x]).length < 150));
         const el = document.querySelector(`[data-fld=${k}]`);
         BP.errorCampo(el && (el.querySelector('input,select,textarea') || el), k === 'descripcion' ? 'La descripción necesita al menos 150 caracteres.' : 'Falta este dato.');
@@ -193,8 +193,11 @@ document.addEventListener('DOMContentLoaded', function(){
           const r = await BPStore.producirFoto(a.fotos[i].url, { formato: 'apaisado' });
           const cmp = document.createElement('div'); cmp.className = 'p-iacmp';
           cmp.innerHTML = `<div class="dos"><figure><img src="${a.fotos[i].url}" alt="Original"><figcaption>Original</figcaption></figure><figure><img src="${r.image}" alt="Nueva, con IA"><figcaption>Nueva, con IA</figcaption></figure></div><p class="p-note">Es la misma propiedad, vuelta a fotografiar. Compará ventanas, muebles y textos antes de aceptar.</p><div class="acts"><button type="button" class="p-btn p-btn-sm p-btn-fill" data-usar>Usar la nueva</button><button type="button" class="p-btn p-btn-sm" data-cerrar>Descartar</button></div>`;
+          cmp.setAttribute('role', 'dialog'); cmp.setAttribute('aria-modal', 'true'); cmp.setAttribute('aria-label', 'Comparar foto original y nueva'); cmp.tabIndex = -1;
           document.body.appendChild(cmp);
-          cmp.querySelector('[data-cerrar]').addEventListener('click', () => cmp.remove());
+          const focoPrevio = document.activeElement; const escCmp = e => { if (e.key === 'Escape') cerrarCmp(); }; const cerrarCmp = () => { cmp.remove(); document.removeEventListener('keydown', escCmp); if (focoPrevio && focoPrevio.focus) focoPrevio.focus(); };
+          document.addEventListener('keydown', escCmp); (cmp.querySelector('[data-usar]') || cmp).focus();
+          cmp.querySelector('[data-cerrar]').addEventListener('click', cerrarCmp);
           cmp.querySelector('[data-usar]').addEventListener('click', async () => { const u = cmp.querySelector('[data-usar]'); u.disabled = true; u.textContent = 'Guardando…'; try { const key = aviso.id || aviso.slug || ('nuevo-' + BPStore.session.id.slice(-4)); const url = await BPStore.subirDataUrl(r.image, key, Date.now() % 100000); a.fotos.splice(i + 1, 0, { url, ia: true }); cmp.remove(); BP.toast('Foto nueva agregada al lado de la original. Quitá la que no quieras.'); draw(); } catch (e) { u.disabled = false; u.textContent = 'Usar la nueva'; BP.toast('No se pudo guardar: ' + (e.message || e), 'error'); } });
         } catch (e) { BP.toast(e.message || 'No se pudo producir la foto.', 'error'); }
         finally { b.disabled = false; b.textContent = 'Mejorar con IA'; }

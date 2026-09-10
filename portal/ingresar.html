@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function(){
 (async function(){
   BP.header(); BP.footer(); BP.reveal();
   const qs = BP.qs(); const volver = qs.get('volver') || 'panel'; const perfil = qs.get('perfil') || '';
-  const destino = () => { if (volver === 'publicar') return 'publicar-aviso.html' + (perfil ? '?perfil=' + perfil : ''); if (volver === 'contactos') return 'panel.html#contactos'; if (volver === 'curacion') return 'curacion.html'; if (/\.html/.test(volver)) return volver; return 'panel.html'; };
+  const destino = () => { if (volver === 'publicar') return 'publicar-aviso.html' + (perfil ? '?perfil=' + perfil : ''); if (volver === 'contactos') return 'panel.html#contactos'; if (volver === 'curacion') return 'curacion.html'; if (/^[a-z0-9-]+\.html(#[\w-]*)?$/i.test(volver)) return volver; return 'panel.html'; };
   const fm = document.getElementById('stepMail'), fc = document.getElementById('stepCode'), email = document.getElementById('email');
   fm.addEventListener('submit', e => e.preventDefault()); fc.addEventListener('submit', e => e.preventDefault());
   if (volver === 'publicar') { document.getElementById('ttl').textContent = 'Creá tu cuenta para publicar'; document.getElementById('sub').textContent = 'Un mail y un código. Después completás tu perfil y cargás la propiedad.'; }
@@ -40,7 +40,8 @@ document.addEventListener('DOMContentLoaded', function(){
   let mail = '';
   async function send(){ const b = document.getElementById('btnMail'); if (b.disabled) return; if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.value.trim())) { BP.errorCampo('email', 'Revisá el mail, por ejemplo nombre@dominio.com.'); return; } b.disabled = true; b.textContent = 'Enviando…'; await BPStore.init(); let r; try { r = await BPStore.sendCode(email.value); } catch (err) { r = { ok: false, msg: err.message || 'No se pudo enviar el código.' }; } b.disabled = false; b.textContent = 'Continuar'; if (!r.ok) { BP.errorCampo('email', r.msg); return; } mail = email.value.trim().toLowerCase(); document.getElementById('codeMsg').textContent = r.msg; fm.hidden = true; document.getElementById('social').hidden = true; fc.hidden = false; const c = document.getElementById('code'); c.value = ''; c.focus(); }
   fm.addEventListener('submit', e => { e.preventDefault(); send(); });
-  document.getElementById('again').addEventListener('click', e => { e.preventDefault(); send(); });
+  let reenviando = false;
+  document.getElementById('again').addEventListener('click', e => { e.preventDefault(); const ag = e.currentTarget; if (reenviando) return; reenviando = true; ag.setAttribute('aria-disabled', 'true'); send(); const t0 = ag.textContent; let seg = 30; ag.textContent = 'Reenviar en 30 s'; const iv = setInterval(() => { seg--; if (seg <= 0) { clearInterval(iv); reenviando = false; ag.textContent = t0; ag.removeAttribute('aria-disabled'); } else ag.textContent = 'Reenviar en ' + seg + ' s'; }, 1000); });
   document.getElementById('back').addEventListener('click', e => { e.preventDefault(); fc.hidden = true; fm.hidden = false; document.getElementById('social').hidden = false; });
   fc.addEventListener('submit', async e => {
     e.preventDefault(); const code = document.getElementById('code'), b = document.getElementById('btnCode');
