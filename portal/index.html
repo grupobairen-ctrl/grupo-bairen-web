@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://dahusnnbyrvltcuaelxj.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260913a"><link rel="stylesheet" href="css/catalogo.css?v=20260913a"><link rel="stylesheet" href="css/portal.css?v=20260913a">
+  <link rel="stylesheet" href="css/base.css?v=20260913b"><link rel="stylesheet" href="css/catalogo.css?v=20260913b"><link rel="stylesheet" href="css/portal.css?v=20260913b">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"BAIREN","url":"https://www.bairengroup.com","logo":"https://www.bairengroup.com/bairen_logo.png","description":"El portal de propiedades seleccionadas de Buenos Aires. Alquileres a mediano y largo plazo y departamentos en venta, publicados por corredores matriculados y dueños verificados.","areaServed":[{"@type":"City","name":"Ciudad Autónoma de Buenos Aires"},{"@type":"AdministrativeArea","name":"Zona Norte, Buenos Aires"}]}</script>
 </head>
 <body class="p-home">
@@ -45,27 +45,35 @@
   </div>
 </section>
 
-<section class="h-sec h-crema" id="seleccion">
+<section class="h-sec h-navy h-estandar" id="estandar">
   <div class="h-in">
     <p class="h-eyebrow">Selección BAIREN</p>
     <h2 class="h-h2">Seguimos un estándar.</h2>
     <p class="h-copy">Antes de incorporar cada propiedad al portal, corroboramos ubicación, estado, distribución y calidad constructiva.</p>
+    <div class="h-camino" id="camino">
+      <svg class="h-camino-linea" aria-hidden="true" preserveAspectRatio="none"><path class="guia"/><path class="trazo"/></svg>
+      <ol class="h-hitos">
+        <li class="h-hito" data-hito>
+          <span class="pt" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.1 7-11a7 7 0 1 0-14 0c0 4.9 7 11 7 11Z"/><circle cx="12" cy="10" r="2.4"/></svg></span>
+          <b>Ubicación</b><span class="det">En qué cuadra está, qué tiene alrededor y cómo se llega.</span>
+        </li>
+        <li class="h-hito" data-hito>
+          <span class="pt" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6.4"/><path d="m16 16 4.5 4.5"/><path d="M8.6 11.2l1.7 1.7 3.3-3.5"/></svg></span>
+          <b>Estado</b><span class="det">Cómo está hoy la unidad, no cómo estaba en fotos viejas.</span>
+        </li>
+        <li class="h-hito" data-hito>
+          <span class="pt" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.2" y="3.2" width="17.6" height="17.6"/><path d="M3.2 13.4h9.2M12.4 3.2v17.6M12.4 9h8.4"/></svg></span>
+          <b>Distribución</b><span class="det">Si los metros están bien usados y los ambientes funcionan.</span>
+        </li>
+        <li class="h-hito" data-hito>
+          <span class="pt" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 19.5h18"/><path d="M6.2 19.5V8.2L12 4l5.8 4.2v11.3"/><path d="M9.6 19.5v-4.3h4.8v4.3M9.6 10.6h1.6M12.8 10.6h1.6"/></svg></span>
+          <b>Calidad constructiva</b><span class="det">Materiales, terminaciones y el estado del edificio.</span>
+        </li>
+      </ol>
+    </div>
   </div>
-  <div class="h-carrusel">
-    <button type="button" class="h-flecha prev" data-dir="-1" aria-label="Foto anterior"></button>
-    <div class="h-track h-track-fotos" id="seleccionTrack" aria-busy="true" tabindex="0" aria-label="Propiedades seleccionadas"></div>
-    <button type="button" class="h-flecha next" data-dir="1" aria-label="Foto siguiente"></button>
-  </div>
-  <div class="h-in h-acciones"><a class="h-btn h-btn-navy" href="buscar.html">Ver todas las propiedades</a></div>
 </section>
 
-<section class="h-sec h-crema h-borde" id="zonas">
-  <div class="h-in">
-    <p class="h-eyebrow">Zonas</p>
-    <h2 class="h-h2" id="zonasTitulo">10 zonas.</h2>
-    <div class="h-mapa"><div id="mapaHome" role="group" aria-label="Mapa de zonas de BAIREN"></div><p class="h-mapa-pie">Tocá una zona para ver lo publicado ahí.</p></div>
-  </div>
-</section>
 
 <section class="h-sec h-crema h-borde" id="edificios" hidden>
   <div class="h-in">
@@ -126,10 +134,10 @@
 
 <script src="../mapa-barrios.js" defer></script><script src="supabase-portal.js" defer></script>
 <script src="js/motion.js" defer></script>
-<script src="js/bairen-motion.js?v=20260913a" defer></script>
-<script src="js/ui.js?v=20260913a" defer></script>
-<script src="js/store.js?v=20260913a" defer></script>
-<script src="js/data.js?v=20260913a" defer></script>
+<script src="js/bairen-motion.js?v=20260913b" defer></script>
+<script src="js/ui.js?v=20260913b" defer></script>
+<script src="js/store.js?v=20260913b" defer></script>
+<script src="js/data.js?v=20260913b" defer></script>
 <script>
 document.addEventListener('DOMContentLoaded', function(){
 (async function(){
@@ -187,25 +195,8 @@ document.addEventListener('DOMContentLoaded', function(){
   const reales = avisos.filter(a => !a.demo);
   const base = reales.length >= 4 ? reales : avisos;
 
-  /* ── Selección BAIREN: propiedades reales, la primera protagonista ── */
-  const dest = BPData.sort(base.filter(a => a.destacado), 'relevancia');
-  const resto = BPData.sort(base.filter(a => !a.destacado && !a.reservado), 'relevancia');
-  const seleccion = dest.concat(resto).slice(0, 8);
-  const track = document.getElementById('seleccionTrack');
-  const conFotos = seleccion.filter(a => a.fotos && a.fotos.length);
-  track.innerHTML = conFotos.map(a => `<a class="h-foto-card" href="${BP.urlFicha(a)}"><img src="${BP.sbImg(a.fotos[0], 1200)}" alt="${BP.esc(a.dir)}, ${BP.esc(a.barrio)}" loading="lazy"><div class="h-foto-txt"><b>${BP.esc(a.dir)}</b><span>${BP.esc(a.barrio)}</span></div></a>`).join('');
-  document.querySelectorAll('.h-flecha').forEach(b => b.addEventListener('click', () => { const c = track.querySelector('.h-foto-card'); const paso = c ? c.getBoundingClientRect().width + 14 : 360; track.scrollBy({ left: paso * Number(b.dataset.dir), behavior: 'smooth' }); }));
-  track.removeAttribute('aria-busy');
 
-  /* ── Zonas: el mapa de BAIREN, el mismo del catálogo ── */
   const counts = BPData.countsByZona(avisos, null); window.__counts = counts;
-  const NUM = { 6:'Seis', 7:'Siete', 8:'Ocho', 9:'Nueve', 10:'10', 11:'11', 12:'12' };
-  document.getElementById('zonasTitulo').textContent = (NUM[BP.ZONAS.length] || BP.ZONAS.length) + ' zonas.';
-  if (window.BairenMapa) {
-    const el = document.getElementById('mapaHome');
-    try { window.__mapaHome = window.BairenMapa.mount(el, { counts, modo: 'completo', onSelect: z => { location.href = BP.urlBuscar({ zona: z }); } }); }
-    catch (e) { el.innerHTML = '<p class="h-nota">El mapa no se pudo montar en este navegador.</p>'; }
-  }
 
   /* ── Edificios con nombre propio: sólo los que tienen unidades hoy ── */
   const EDIF = [
@@ -261,6 +252,7 @@ document.addEventListener('DOMContentLoaded', function(){
   if (filas.length <= 4) mas.hidden = true;
   mas.addEventListener('click', () => { const abierto = mas.getAttribute('aria-expanded') === 'true'; document.querySelectorAll('.h-ind-fila.plegada').forEach(f => f.classList.toggle('abierta', !abierto)); mas.setAttribute('aria-expanded', abierto ? 'false' : 'true'); mas.textContent = abierto ? 'Ver todas las zonas' : 'Ver menos'; });
 
+  if (window.BPM && BPM.camino) BPM.camino(document.getElementById('camino'));
   if (window.BPM && BPM.init) BPM.init(document);
 })();
 });

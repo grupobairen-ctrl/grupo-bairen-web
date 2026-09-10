@@ -458,6 +458,72 @@
     });
   };
 
+  /* ── El camino del estándar ─────────────────────────────────────────────
+     Una línea de oro que se dibuja mientras bajás y va encendiendo cada
+     criterio al pasar. No es una infografía con cajas: es un trazo, como el
+     de un plano. La línea se calcula sobre las posiciones reales de los
+     hitos, así funciona en cualquier ancho. */
+  BPM.camino = function (cont) {
+    cont = lista(cont)[0]; if (!cont || cont._camino) return; cont._camino = true;
+    var svg = cont.querySelector('.h-camino-linea');
+    var guia = svg && svg.querySelector('.guia');
+    var trazo = svg && svg.querySelector('.trazo');
+    var hitos = lista(cont.querySelectorAll('[data-hito]'));
+    if (!svg || !trazo || hitos.length < 2) return;
+    var control = null;
+
+    function puntos() {
+      var c = cont.getBoundingClientRect();
+      return hitos.map(function (h) {
+        var pt = h.querySelector('.pt') || h;
+        var r = pt.getBoundingClientRect();
+        return { x: r.left - c.left + r.width / 2, y: r.top - c.top + r.height / 2 };
+      });
+    }
+    function curva(ps) {
+      if (!ps.length) return '';
+      var d = 'M ' + ps[0].x.toFixed(1) + ' ' + ps[0].y.toFixed(1);
+      for (var i = 1; i < ps.length; i++) {
+        var a = ps[i - 1], b = ps[i];
+        var mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+        d += ' Q ' + a.x.toFixed(1) + ' ' + my.toFixed(1) + ' ' + mx.toFixed(1) + ' ' + my.toFixed(1);
+        d += ' Q ' + b.x.toFixed(1) + ' ' + my.toFixed(1) + ' ' + b.x.toFixed(1) + ' ' + b.y.toFixed(1);
+      }
+      return d;
+    }
+    function dibujar() {
+      var c = cont.getBoundingClientRect();
+      if (!c.width) return;
+      svg.setAttribute('viewBox', '0 0 ' + Math.round(c.width) + ' ' + Math.round(c.height));
+      svg.style.width = c.width + 'px'; svg.style.height = c.height + 'px';
+      var d = curva(puntos());
+      trazo.setAttribute('d', d); if (guia) guia.setAttribute('d', d);
+      var largo = trazo.getTotalLength ? trazo.getTotalLength() : 1000;
+      trazo.style.strokeDasharray = largo; trazo.style.strokeDashoffset = ok ? largo : 0;
+      return largo;
+    }
+    var largo = dibujar();
+    if (!ok || !M.scroll) { hitos.forEach(function (h) { h.classList.add('on'); }); return; }
+
+    /* Cada hito se enciende cuando el trazo llega a su altura */
+    function marcar(p) {
+      hitos.forEach(function (h, i) {
+        var umbral = hitos.length === 1 ? 0 : (i / (hitos.length - 1)) * 0.86;
+        h.classList.toggle('on', p >= umbral - 0.02);
+      });
+    }
+    control = M.scroll(function (p) {
+      trazo.style.strokeDashoffset = largo * (1 - Math.min(1, p / 0.86));
+      marcar(p);
+    }, { target: cont, offset: ['start 0.82', 'end 0.55'] });
+
+    var t = null;
+    window.addEventListener('resize', function () {
+      clearTimeout(t);
+      t = setTimeout(function () { largo = dibujar() || largo; }, 160);
+    });
+  };
+
   /* ── Puesta en marcha ───────────────────────────────────────────────────── */
   BPM.init = function (root) {
     root = root || document;

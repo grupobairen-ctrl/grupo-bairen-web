@@ -2127,3 +2127,35 @@ footer .p-legend,.footer .p-legend{color:rgba(251,250,246,.7);background:rgba(25
 .p-btn-navy,.p-btn-fill,.p-product .p-btn-fill,.p-drawer .p-btn-navy{color:#FBFAF6}
 body .p-page.after-band .p-btn-navy,body .p-page.after-band .p-btn-fill{color:#FBFAF6}
 .p-btn-navy:hover,.p-btn-fill:hover{color:#FBFAF6}
+
+/* ── El camino del estándar ────────────────────────────────────────────────
+   Trazo de oro sobre navy, hitos que se encienden al pasar. Vertical en
+   celular, en zigzag suave en escritorio. Sin cajas ni tarjetas. */
+body.p-home .h-estandar{padding-bottom:clamp(72px,10vw,120px)}
+body.p-home .h-estandar .h-copy{max-width:54ch;margin-bottom:6px}
+body.p-home .h-camino{position:relative;margin-top:clamp(38px,6vw,64px)}
+body.p-home .h-camino-linea{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:visible}
+body.p-home .h-camino-linea .guia{fill:none;stroke:rgba(194,169,104,.16);stroke-width:1.5;stroke-linecap:round}
+body.p-home .h-camino-linea .trazo{fill:none;stroke:var(--h-oro);stroke-width:1.5;stroke-linecap:round;filter:drop-shadow(0 0 8px rgba(194,169,104,.45))}
+body.p-home .h-hitos{position:relative;z-index:1;list-style:none;margin:0;padding:0;display:grid;gap:clamp(30px,5vw,44px)}
+body.p-home .h-hito{display:grid;grid-template-columns:56px 1fr;column-gap:18px;row-gap:4px;align-items:start;opacity:.32;transform:translateY(10px);transition:opacity .6s cubic-bezier(.22,1,.36,1),transform .6s cubic-bezier(.22,1,.36,1)}
+body.p-home .h-hito.on{opacity:1;transform:translateY(0)}
+body.p-home .h-hito .pt{grid-row:1 / span 2;display:flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:50%;border:1px solid rgba(194,169,104,.4);background:rgba(19,29,45,.9);color:rgba(222,205,160,.6);transition:color .5s cubic-bezier(.22,1,.36,1),border-color .5s cubic-bezier(.22,1,.36,1),box-shadow .5s cubic-bezier(.22,1,.36,1)}
+body.p-home .h-hito .pt svg{width:24px;height:24px}
+body.p-home .h-hito.on .pt{color:var(--h-oro);border-color:var(--h-oro);box-shadow:0 0 0 6px rgba(194,169,104,.08),0 0 26px rgba(194,169,104,.28)}
+body.p-home .h-hito b{align-self:center;font-family:var(--font-display);font-weight:400;font-size:clamp(1.24rem,3.4vw,1.6rem);color:#FBFAF6;line-height:1.15}
+body.p-home .h-hito .det{font:300 .9rem/1.55 var(--font-body);color:rgba(251,250,246,.7);max-width:44ch}
+@media(min-width:900px){
+  body.p-home .h-hitos{grid-template-columns:repeat(4,1fr);gap:0 26px;align-items:start}
+  body.p-home .h-hito{grid-template-columns:1fr;text-align:center;justify-items:center;row-gap:12px}
+  body.p-home .h-hito .pt{grid-row:auto;width:66px;height:66px}
+  body.p-home .h-hito .pt svg{width:28px;height:28px}
+  body.p-home .h-hito .det{max-width:26ch}
+  /* El zigzag del boceto: cada hito con su propia altura */
+  body.p-home .h-hito:nth-child(1){margin-top:0}
+  body.p-home .h-hito:nth-child(2){margin-top:64px}
+  body.p-home .h-hito:nth-child(3){margin-top:22px}
+  body.p-home .h-hito:nth-child(4){margin-top:88px}
+  body.p-home .h-camino{padding-bottom:40px}
+}
+@media(prefers-reduced-motion:reduce){body.p-home .h-hito{opacity:1;transform:none}}
