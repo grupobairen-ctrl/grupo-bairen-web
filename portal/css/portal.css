@@ -1210,3 +1210,83 @@ html body .p-searchbar .p-search .p-tab{color:#565E6E}
 .p-iacmp .acts{display:flex;gap:10px}
 .p-trad textarea{min-height:110px}
 @media(max-width:760px){.p-iacmp .dos{grid-template-columns:1fr}.p-iacmp img{max-height:34vh}}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Pasada final (10/9/2026, decisión de Tomás): las páginas de herramienta con
+   la gramática de bairengroup.com. Sin registro de app: sin barra lateral, sin
+   tarjetas contenedoras, sin esquinas redondeadas; bandas centradas, secciones
+   con aire, formularios sobre navy como el de contacto de la web.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* 1 · Bandas de cabecera centradas, como comprar.html */
+.p-band{padding:128px 0 64px;background:radial-gradient(ellipse at 50% 0%, #1E2A3F 0%, #131D2D 62%)}
+.p-band .p-container{text-align:center}
+.p-band .p-container > div{margin-left:auto;margin-right:auto}
+.p-band .p-eyebrow{border:0;padding:0;border-radius:0;font-size:.6rem;font-weight:600;letter-spacing:.38em;color:var(--gold-light,#DECDA0);margin:0 0 16px}
+.p-band h1,.p-band .p-h2{font-weight:400;font-size:clamp(2.2rem,4.6vw,3.6rem);line-height:1.1;margin:0 auto 12px;max-width:20ch;letter-spacing:.005em}
+.p-band .p-sub{margin:0 auto;max-width:60ch;font-size:1rem}
+.p-band .p-stepper{justify-content:center;margin-top:26px}
+.p-band .p-btn{margin-top:18px}
+
+/* 2 · Esquinas rectas en todo, como la web */
+.p-btn,.p-btn-fill,.p-fsel,.p-fbtn,.p-tab,.p-badge,.p-chip,.p-drop,.p-pop,.p-fwrap .p-pop{border-radius:2px}
+.p-card-h,.prop-card,.p-aviso-row,.p-form,.p-cta,.p-step,.p-map-card,.p-map-card .in,.p-tbl,.p-kpi,.p-login,.p-card-panel,.p-pub-block,.p-fhero .cts span,.p-gallery .cts span,.p-tray{border-radius:0}
+.p-field select,.p-field input,.p-fld input,.p-fld select,.p-fld textarea,.p-form input,.p-form textarea,.p-form select{border-radius:0}
+.p-card-h .p-card-photo img,.prop-card .card-img img{border-radius:0}
+.p-icon-btn{border-radius:0}
+
+/* 3 · El cuerpo después de la banda es la hoja crema de la web, sin caja adentro */
+body.p-product .p-page.after-band,.p-page.after-band{background:var(--p-tray,#F4F0E6);padding-top:56px}
+body .p-card-panel{background:transparent;border:0;box-shadow:none;padding:0}
+body .p-pub-block{background:transparent;border:0;box-shadow:none;padding:26px 0;border-top:1px solid rgba(19,29,45,.12)}
+body .p-pub-block:first-child{border-top:0;padding-top:0}
+
+/* 4 · Panel y curación: sin barra lateral; una fila de secciones bajo la banda, como la tira de filtros de la web */
+body .p-panel{grid-template-columns:1fr;gap:22px}
+body .p-panel .p-side-nav{position:static;display:flex;flex-wrap:wrap;gap:4px;align-items:center;background:transparent;border:0;border-bottom:1px solid rgba(19,29,45,.12);border-radius:0;padding:0 0 10px}
+body .p-panel .p-side-nav .who{flex:0 0 100%;font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--text-mid);padding:0 0 10px;border:0}
+body .p-panel .p-side-nav a{border-radius:0;padding:10px 14px;min-height:40px;color:var(--navy-deeper);font:500 .74rem/1 var(--font-body);letter-spacing:.14em;text-transform:uppercase;background:transparent;display:inline-flex;align-items:center;gap:8px}
+body .p-panel .p-side-nav a svg{display:none}
+body .p-panel .p-side-nav a.on{background:var(--navy-deeper);color:#FBFAF6}
+body .p-panel .p-side-nav a:hover{color:var(--gold-dark)}
+body .p-panel .p-side-nav a.on:hover{color:#FBFAF6}
+body .p-panel .p-side-nav [data-logout]{margin-left:auto;color:var(--text-mid)}
+body .p-aviso-row,body .p-tbl{background:#fff;border:1px solid rgba(19,29,45,.1)}
+
+/* 5 · Ingresar: el formulario de contacto de la web, sobre navy */
+body .p-login{max-width:560px;background:transparent;border:0;box-shadow:none;padding:0}
+body .p-login h1{font-family:var(--font-display);font-weight:400;font-size:clamp(2rem,4.2vw,3rem);color:#FBFAF6;text-align:center;margin:0 0 10px;line-height:1.1}
+body .p-login .p-sub{color:rgba(251,250,246,.72);text-align:center;margin:0 auto 30px;max-width:44ch}
+body .p-login label.p-sr{position:absolute;left:-9999px}
+body .p-login input{height:54px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);color:#FBFAF6;padding:0 16px;font-size:1rem;margin-bottom:12px}
+body .p-login input::placeholder{color:rgba(251,250,246,.45)}
+body .p-login input:focus{outline:none;border-color:var(--gold)}
+body .p-login .p-btn-fill{height:54px;background:var(--gold);color:var(--navy-deeper);border:0;font-size:.72rem;letter-spacing:.24em;font-weight:700}
+body .p-login .p-btn-fill:hover{background:var(--gold-light,#DECDA0)}
+body .p-login .or{color:rgba(251,250,246,.5)}
+body .p-login .or::before,body .p-login .or::after{background:rgba(255,255,255,.15)}
+body .p-login .soc{background:transparent;border:1px solid rgba(255,255,255,.18);color:#FBFAF6;height:50px}
+body .p-login .soc:hover{border-color:var(--gold)}
+body .p-login .p-note,body .p-login .p-note a{color:rgba(251,250,246,.62)}
+body .p-login .p-note a{color:var(--gold-light,#DECDA0);text-decoration:underline}
+body .p-login .p-err,body .p-login [role=alert]{color:#E8B9B9}
+
+@media(max-width:820px){.p-band{padding:104px 0 44px}.p-band h1,.p-band .p-h2{font-size:clamp(1.8rem,7vw,2.4rem)}body .p-panel .p-side-nav{overflow-x:auto;flex-wrap:nowrap;padding-bottom:8px}body .p-panel .p-side-nav .who{flex:0 0 auto;padding:0 12px 0 0}body .p-panel .p-side-nav a{white-space:nowrap}}
+
+/* El asistente de publicar sin caja: el papel es la página, no un recuadro adentro del papel */
+body #panel.p-card-panel,body.p-product .p-page.after-band .p-card-panel{background:transparent;border:0;box-shadow:none;border-radius:0;padding:0}
+
+/* Esquinas rectas en todo el portal, como la web. Lo único redondo: puntos de aviso, pines y avatares circulares. */
+[class^="p-"],[class*=" p-"],.prop-card,.card-img,.thumb,.tag,.card-tag,.card-status{border-radius:0 !important}
+.p-bell .dot,.p-fav .dot,[data-fav-count],.p-hero-site .p-doors,.p-zona-pin,.p-map-home svg *,.p-catband svg *{border-radius:50% !important}
+.p-doors,.p-doors a{border-radius:0 !important}
+.p-toast,.p-lb .x,.p-lb .ctl button{border-radius:0 !important}
+/* La banda centra a sus hijos aunque traigan márgenes en línea */
+.p-band .p-container{display:flex;flex-direction:column;align-items:center}
+.p-band .p-container > *{max-width:100%}
+.p-band.p-band-sm{padding:104px 0 40px}
+.p-band.p-band-sm .p-h2{font-size:clamp(1.8rem,3.4vw,2.6rem) !important}
+/* Las pestañas del panel siguen rectas también en móvil (gana a la regla de 820px) */
+body.p-product .p-panel .p-side-nav a,body .p-panel .p-side-nav a,body .p-panel .p-side-nav a.on{border-radius:0 !important}
+/* Botones sueltos dentro de bloques p- (preguntas sugeridas, denuncias, controles) también rectos */
+[class^="p-"] button,[class*=" p-"] button,.p-quick button,.p-report .chips button,.p-fb button{border-radius:0 !important}

@@ -36,3 +36,6 @@ node_modules/
 out.mp4
 out*.mp4
 copy_*.MOV
+
+# grafo local de graphify (no se despliega)
+graphify-out/
