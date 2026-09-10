@@ -306,7 +306,7 @@
   <a href="buscar.html?op=mediano" class="m-link m-sub">Mediano plazo</a>
   <a href="emprendimientos.html" class="m-link">Emprendimientos</a>
   <a href="publicadores.html" class="m-link">Publicadores</a>
-  <a href="index.html#guia" class="m-link">Guía de barrios</a>
+  <a href="index.html#zonas" class="m-link">Zonas</a>
   <div class="m-sep"></div>
   <a href="buscar.html?favs=1" class="m-link">Favoritos</a>
   <a href="ingresar.html?volver=contactos" class="m-link">Mis contactos</a>

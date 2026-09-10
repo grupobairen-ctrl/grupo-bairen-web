@@ -7,7 +7,7 @@
   <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260912b"><link rel="stylesheet" href="css/catalogo.css?v=20260912b"><link rel="stylesheet" href="css/portal.css?v=20260912b">
+  <link rel="stylesheet" href="css/base.css?v=20260912c"><link rel="stylesheet" href="css/catalogo.css?v=20260912c"><link rel="stylesheet" href="css/portal.css?v=20260912c">
 </head>
 <body>
 <div id="pHeader"></div>
@@ -17,13 +17,28 @@
   <div class="p-prose" style="margin-top:44px" data-reveal><div class="box"><b>¿Sos inmobiliaria o corredor de estos barrios?</b> Publicá tu cartera gratis durante el lanzamiento, con importación desde Tokko. <a href="publicar.html#inmobiliaria" style="text-decoration:underline">Empezar</a>.</div></div>
 </div></section>
 <div id="pFooter"></div>
-<script src="supabase-portal.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260912b" defer></script><script src="js/ui.js?v=20260912b" defer></script><script src="js/store.js?v=20260912b" defer></script><script src="js/data.js?v=20260912b" defer></script>
+<script src="supabase-portal.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260912c" defer></script><script src="js/ui.js?v=20260912c" defer></script><script src="js/store.js?v=20260912c" defer></script><script src="js/data.js?v=20260912c" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
 BP.header('publicadores'); BP.footer(); if (window.BPStore) BPStore.init(); BP.reveal();
 BPData.load().then(function(d){
   var av = d.avisos;
+  /* Muro de publicadores: cuadrícula con líneas y luz que sigue al cursor. Sólo los reales;
+     los de ejemplo van marcados y sólo mientras no haya al menos tres reales. */
+  (function(){
+    var todos = Object.values(d.publicadores), reales = todos.filter(function(p){ return !p.demo; });
+    var lista = reales.length >= 3 ? reales : todos;
+    var tile = function(p){ return '<a class="tile" href="#' + p.id + '" title="' + BP.esc(p.nombre) + '"><span class="mono">' + p.inicial + '</span><span class="nom">' + BP.esc(p.nombre) + '</span><span class="tip">' + (p.tipo === 'dueno' ? 'Dueño verificado' : p.tipo === 'desarrolladora' ? 'Desarrolladora' : BP.esc(p.matricula || p.badge || '')) + (p.demo ? ' · ejemplo' : '') + '</span></a>'; };
+    var tandas = []; for (var k = 0; k < lista.length; k += 4) tandas.push(lista.slice(k, k + 4));
+    var ultima = tandas[tandas.length - 1]; if (ultima && ultima.length < 4) ultima.push(null);
+    var hueco = '<a class="tile vacio" href="publicar.html#inmobiliaria"><span class="mono">+</span><span class="nom">Tu inmobiliaria</span><span class="tip">Publicar en BAIREN</span></a>';
+    var host = document.getElementById('pubs');
+    var muro = document.createElement('div'); muro.className = 'p-muro'; muro.id = 'muroPubs'; muro.style.marginBottom = '40px';
+    muro.innerHTML = tandas.map(function(t, n){ return '<div class="tanda"' + (n ? ' style="opacity:0"' : '') + '>' + t.map(function(x){ return x ? tile(x) : hueco; }).join('') + '</div>'; }).join('');
+    host.parentNode.insertBefore(muro, host);
+    if (window.BPM && BPM.muro) BPM.muro(muro);
+  })();
   document.getElementById('pubs').innerHTML = Object.values(d.publicadores).map(function(p){
     var mine = av.filter(function(a){ return a.publicadorId === p.id; });
     var venta = mine.filter(function(a){ return a.op === 'venta'; }).length, alq = mine.length - venta;
