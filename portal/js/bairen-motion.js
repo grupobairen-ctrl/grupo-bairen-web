@@ -362,6 +362,43 @@
     var d = activo(); if (d != null) { poner(d); luz.style.opacity = '0.55'; }
   };
 
+  /* ── Muro de publicadores: cuadrícula con líneas de separación y una luz que
+     sigue al cursor. Si son más de los que entran, las tandas se alternan.
+     Nunca inventa: sólo entran los publicadores reales. */
+  BPM.muro = function (cont, opts) {
+    cont = lista(cont)[0]; if (!cont || cont._muro) return; cont._muro = true;
+    opts = opts || {};
+    var tandas = cont.querySelectorAll('.tanda');
+    cont.addEventListener('pointermove', function (e) {
+      if (e.pointerType === 'touch') return;
+      var r = cont.getBoundingClientRect();
+      cont.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+      cont.style.setProperty('--my', (e.clientY - r.top) + 'px');
+      cont.classList.add('con-luz');
+    });
+    cont.addEventListener('pointerleave', function () { cont.classList.remove('con-luz'); });
+    if (!ok || tandas.length < 2) return;
+    var i = 0;
+    setInterval(function () {
+      if (document.hidden) return;
+      var sale = tandas[i], entra = tandas[(i + 1) % tandas.length];
+      M.animate(sale, { opacity: [1, 0], transform: ['translateY(0px)', 'translateY(-10px)'] }, { duration: DUR.normal, ease: CURVA });
+      entra.style.zIndex = '2'; sale.style.zIndex = '1';
+      M.animate(entra, { opacity: [0, 1], transform: ['translateY(10px)', 'translateY(0px)'] }, { duration: DUR.normal, ease: CURVA, delay: 0.08 });
+      i = (i + 1) % tandas.length;
+    }, (opts.cada || 4.2) * 1000);
+  };
+
+  /* ── Botón de producción con IA: mientras trabaja, una luz de oro recorre el
+     rótulo. Sin destellos de neón: acá la IA vuelve a sacar una foto, no hace magia. */
+  BPM.produciendo = function (b, encendido) {
+    b = lista(b)[0]; if (!b) return;
+    b.classList.toggle('p-gen', !!encendido);
+    b.setAttribute('aria-busy', encendido ? 'true' : 'false');
+    if (!encendido || !ok) return;
+    M.animate(b, { opacity: [1, 1] }, { duration: 0.01 });
+  };
+
   /* ── Puesta en marcha ───────────────────────────────────────────────────── */
   BPM.init = function (root) {
     root = root || document;

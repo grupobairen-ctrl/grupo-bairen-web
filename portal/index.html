@@ -10,7 +10,7 @@
   <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260911c"><link rel="stylesheet" href="css/catalogo.css?v=20260911c"><link rel="stylesheet" href="css/portal.css?v=20260911c">
+  <link rel="stylesheet" href="css/base.css?v=20260911d"><link rel="stylesheet" href="css/catalogo.css?v=20260911d"><link rel="stylesheet" href="css/portal.css?v=20260911d">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"BAIREN","url":"https://www.bairengroup.com","logo":"https://www.bairengroup.com/bairen_logo.png","description":"El portal de propiedades seleccionadas de Buenos Aires. Alquileres a mediano y largo plazo y departamentos en venta, publicados por corredores matriculados y dueños verificados.","areaServed":[{"@type":"City","name":"Ciudad Autónoma de Buenos Aires"},{"@type":"AdministrativeArea","name":"Zona Norte, Buenos Aires"}]}</script>
 </head>
 <body>
@@ -127,8 +127,8 @@
 
 <script src="supabase-portal.js" defer></script>
 <script src="../mapa-barrios.js" defer></script>
-<script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260911c" defer></script><script src="js/ui.js?v=20260911c" defer></script><script src="js/store.js?v=20260911c" defer></script>
-<script src="js/data.js?v=20260911c" defer></script>
+<script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260911d" defer></script><script src="js/ui.js?v=20260911d" defer></script><script src="js/store.js?v=20260911d" defer></script>
+<script src="js/data.js?v=20260911d" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -201,7 +201,22 @@ document.addEventListener('DOMContentLoaded', function(){
   document.getElementById('destacadasGrid').innerHTML = dest.map(BPData.cardV).join(''); document.getElementById('destacadasGrid').removeAttribute('aria-busy');
 
   /* publicadores */
-  document.getElementById('pubsRow').innerHTML = Object.values(BPData.PUBLICADORES).map(p => `<a class="p-pub-card" href="publicadores.html#${p.id}"><div class="p-pub-logo">${p.inicial}</div><div><b>${BP.esc(p.nombre)}</b><small>${p.tipo==='dueno'?'Dueño verificado':p.badge + ' · ' + p.matricula}${p.demo?' · ejemplo':''}</small></div></a>`).join('') + `<a class="p-pub-card" href="publicar.html#inmobiliaria" style="border-style:dashed"><div class="p-pub-logo" style="background:var(--p-tray);color:var(--gold-dark)">+</div><div><b>Tu inmobiliaria acá</b><small>Publicá tu cartera</small></div></a>`;
+  /* Muro de publicadores: sólo los reales, en cuadrícula. Los de ejemplo no cuentan
+     como prueba social, así que van aparte y sólo si todavía no hay suficientes reales. */
+  (function () {
+    const todos = Object.values(BPData.PUBLICADORES);
+    const reales = todos.filter(p => !p.demo);
+    const lista = (reales.length >= 3 ? reales : todos);
+    const tile = p => `<a class="tile" href="publicadores.html#${p.id}" title="${BP.esc(p.nombre)}"><span class="mono">${p.inicial}</span><span class="nom">${BP.esc(p.nombre)}</span><span class="tip">${p.tipo === 'dueno' ? 'Dueño verificado' : p.tipo === 'desarrolladora' ? 'Desarrolladora' : BP.esc(p.matricula || p.badge || '')}${p.demo ? ' · ejemplo' : ''}</span></a>`;
+    const POR_TANDA = 4;
+    const tandas = [];
+    for (let k = 0; k < lista.length; k += POR_TANDA) tandas.push(lista.slice(k, k + POR_TANDA));
+    const ultima = tandas[tandas.length - 1];
+    if (ultima && ultima.length < POR_TANDA) ultima.push(null);
+    const hueco = '<a class="tile vacio" href="publicar.html#inmobiliaria"><span class="mono">+</span><span class="nom">Tu inmobiliaria</span><span class="tip">Publicar en BAIREN</span></a>';
+    document.getElementById('pubsRow').outerHTML = `<div class="p-muro" id="muroPubs">${tandas.map((t, n) => `<div class="tanda"${n ? ' style="opacity:0"' : ''}>${t.map(x => x ? tile(x) : hueco).join('')}</div>`).join('')}</div>`;
+    if (window.BPM && BPM.muro) BPM.muro(document.getElementById('muroPubs'));
+  })();
 
   /* índice */
   const tb = document.querySelector('#indiceTabla tbody');

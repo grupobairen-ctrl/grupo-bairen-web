@@ -329,6 +329,7 @@
     }
     const cerrarDD = dd => { dd.classList.remove('abierto'); dd.style.height = ''; dd.style.opacity = ''; dd.querySelectorAll('a,button').forEach(x => x.tabIndex = -1); const bt = dd.parentNode.querySelector('button[aria-haspopup]'); if (bt) bt.setAttribute('aria-expanded','false'); };
     BP.crear(document);
+    if (window.BPM && BPM.foco) BPM.foco(document.querySelector('.p-navbar'));
     const abrirDD = dd => {
       if (dd.classList.contains('abierto')) return;
       dd.querySelectorAll('a,button').forEach(x => x.removeAttribute('tabindex'));

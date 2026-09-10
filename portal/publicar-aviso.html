@@ -18,7 +18,7 @@
   <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260911c"><link rel="stylesheet" href="css/catalogo.css?v=20260911c"><link rel="stylesheet" href="css/portal.css?v=20260911c">
+  <link rel="stylesheet" href="css/base.css?v=20260911d"><link rel="stylesheet" href="css/catalogo.css?v=20260911d"><link rel="stylesheet" href="css/portal.css?v=20260911d">
   <style>
     .p-stepper{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0 26px}
     .p-stepper button{display:flex;align-items:center;gap:8px;border:1px solid var(--p-line);background:var(--p-card);border-radius:999px;padding:8px 14px;font:500 .78rem var(--font-body);color:var(--text-mid);cursor:pointer;letter-spacing:.06em}
@@ -52,7 +52,7 @@
   <p class="p-note" id="modeNote" style="margin-top:12px"></p>
 </div></section>
 <div id="pFooter"></div>
-<script src="supabase-portal.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260911c" defer></script><script src="js/ui.js?v=20260911c" defer></script><script src="js/store.js?v=20260911c" defer></script><script src="js/data.js?v=20260911c" defer></script>
+<script src="supabase-portal.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260911d" defer></script><script src="js/ui.js?v=20260911d" defer></script><script src="js/store.js?v=20260911d" defer></script><script src="js/data.js?v=20260911d" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -188,7 +188,7 @@ document.addEventListener('DOMContentLoaded', function(){
       grid.querySelectorAll('[data-portada]').forEach(b => b.addEventListener('click', () => { mover(Number(b.dataset.portada), 0); }));
       /* Producción con IA: la foto vuelta a sacar (GPT, prompt maestro). Se compara con la original y el que publica decide. */
       grid.querySelectorAll('[data-ia]').forEach(b => b.addEventListener('click', async () => {
-        const i = Number(b.dataset.ia); const card = b.closest('.p-foto'); b.disabled = true; b.textContent = 'Produciendo… hasta un minuto';
+        const i = Number(b.dataset.ia); const card = b.closest('.p-foto'); b.disabled = true; b.textContent = 'Produciendo la foto'; if (window.BPM && BPM.produciendo) BPM.produciendo(b, true);
         try {
           const r = await BPStore.producirFoto(a.fotos[i].url, { formato: 'apaisado' });
           const cmp = document.createElement('div'); cmp.className = 'p-iacmp';
@@ -200,7 +200,7 @@ document.addEventListener('DOMContentLoaded', function(){
           cmp.querySelector('[data-cerrar]').addEventListener('click', cerrarCmp);
           cmp.querySelector('[data-usar]').addEventListener('click', async () => { const u = cmp.querySelector('[data-usar]'); u.disabled = true; u.textContent = 'Guardando…'; try { const key = aviso.id || aviso.slug || ('nuevo-' + BPStore.session.id.slice(-4)); const url = await BPStore.subirDataUrl(r.image, key, Date.now() % 100000); a.fotos.splice(i + 1, 0, { url, ia: true }); cmp.remove(); BP.toast('Foto nueva agregada al lado de la original. Quitá la que no quieras.'); draw(); } catch (e) { u.disabled = false; u.textContent = 'Usar la nueva'; BP.toast('No se pudo guardar: ' + (e.message || e), 'error'); } });
         } catch (e) { BP.toast(e.message || 'No se pudo producir la foto.', 'error'); }
-        finally { b.disabled = false; b.textContent = 'Mejorar con IA'; }
+        finally { if (window.BPM && BPM.produciendo) BPM.produciendo(b, false); b.disabled = false; b.textContent = 'Mejorar con IA'; }
       }));
       let from = null;
       grid.querySelectorAll('.p-foto').forEach(f => {
