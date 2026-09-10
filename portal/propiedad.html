@@ -8,7 +8,7 @@
   <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260912h"><link rel="stylesheet" href="css/catalogo.css?v=20260912h"><link rel="stylesheet" href="css/portal.css?v=20260912h">
+  <link rel="stylesheet" href="css/base.css?v=20260912m"><link rel="stylesheet" href="css/catalogo.css?v=20260912m"><link rel="stylesheet" href="css/portal.css?v=20260912m">
   <style>body{padding-top:0}#ficha>.p-ficha-top,#ficha>.p-ficha,#ficha>section{max-width:var(--p-max);margin:0 auto;padding-left:24px;padding-right:24px}#ficha>.p-ficha-top{padding-top:88px}@media(max-width:900px){#ficha>.p-ficha-top{padding-top:76px}}.p-video{aspect-ratio:16/9;background:#0b1220;border-radius:16px;overflow:hidden}.p-video iframe,.p-video video{width:100%;height:100%;border:0;display:block}</style>
 </head>
 <body class="p-product p-ficha-page">
@@ -18,8 +18,8 @@
 <div id="pFooter"></div>
 
 <script src="supabase-portal.js" defer></script>
-<script src="js/iconos-amenities.js?v=20260912h" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260912h" defer></script><script src="js/ui.js?v=20260912h" defer></script><script src="js/store.js?v=20260912h" defer></script>
-<script src="js/data.js?v=20260912h" defer></script>
+<script src="js/iconos-amenities.js?v=20260912m" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260912m" defer></script><script src="js/ui.js?v=20260912m" defer></script><script src="js/store.js?v=20260912m" defer></script>
+<script src="js/data.js?v=20260912m" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -65,7 +65,7 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip">${fotos.map((f,i) => `<but
 <div class="p-ficha">
   <div class="p-ficha-main">
     <div class="p-ficha-head">
-      <div class="p-kicker">${BP.esc(a.tipoProp)}${a.codigo ? ' · ' + BP.esc(a.codigo) : ''}${a.reservado ? '' : ` · <button type="button" class="p-linkbtn" id="bajaPrecio">${BP.ico.bell} Avisarme si baja</button>`}</div>
+      <div class="p-kicker">${BP.esc(a.tipoProp)}${a.amb ? ' · ' + (a.amb === 1 ? 'monoambiente' : a.amb + ' ambientes') : ''}${a.m2 ? ' · ' + a.m2 + ' m²' : ''}</div>
       ${a.reservado ? `<p class="p-reservada">${BP.ico.flag} Esta propiedad está reservada y por ahora no toma consultas. <a href="${BP.urlBuscar({ op: a.op, zona: a.zona })}">Ver las disponibles en ${BP.zonaLabel(a.zona)}</a>.</p>` : ''}
       ${(a.apto.length || (a.cualidades||[]).length || a.demo) ? `<p class="p-tags">${(a.cualidades||[]).map(x => `<span class="p-badge" title="Verificada por BAIREN">${BP.ico.shield} ${BP.esc(x)}</span>`).join('')}${a.apto.map(x => `<span class="p-badge">${BP.esc(x)}</span>`).join('')}${a.demo ? '<span class="p-badge demo">Aviso de ejemplo</span>' : ''}</p>` : ''}
     </div>
@@ -81,7 +81,7 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip">${fotos.map((f,i) => `<but
     ].filter(Boolean).map(x => icon(x[0], x[1], x[2])).join('')}</div>
     ${a.video ? `<div><h2 class="p-sec-t">Recorrido en video</h2><div class="p-video" id="video"></div></div>` : ''}
     <div>
-      <p class="p-text clamp" id="desc">${BP.esc(a.descripcion || 'Descripción en producción.')}</p>
+      <p class="p-text clamp" id="desc">${BP.esc((BP.lang === 'en' && a.descripcion_en) || (BP.lang === 'pt' && a.descripcion_pt) || a.descripcion || 'Descripción en producción.')}</p>
       <button type="button" class="p-more" id="descMore">Leer más</button>
     </div>
     <div>
@@ -105,7 +105,7 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip">${fotos.map((f,i) => `<but
       <div class="badges">${BPData.badgeHTML(pub)}<span class="p-badge">${BP.ico.check} Ficha verificada por BAIREN</span>${pub.demo ? '<span class="p-badge demo">Publicador de ejemplo</span>' : ''}</div>
       <p class="p-text" style="margin:12px 0 10px;font-size:.9rem">${BP.esc(pub.desc)} ${pub.tipo !== 'dueno' ? 'De la operación responde ' + BP.esc(pub.responsable) + ', ' + BP.esc(pub.matricula) + '.' : ''}</p>
       <a class="p-link" href="publicadores.html#${pub.id}">Ver todas sus propiedades</a>
-      <p class="p-codes" style="margin-top:14px">Cód. BAIREN: ${a.codigo} · Publica desde ${pub.desde}</p>
+      <p class="p-codes" style="margin-top:14px">Publica en BAIREN desde ${pub.desde}</p>
     </div>
     <div class="p-report">
       <b>${BP.ico.flag} ¿Algún problema con este aviso?</b>
@@ -128,6 +128,7 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip">${fotos.map((f,i) => `<but
       <div class="p-ac-links">
       ${BPData.waLink(a, pub) ? `<a class="p-ac-link" id="waBtn" href="${BPData.waLink(a, pub)}" target="_blank" rel="noopener" data-wa data-aviso="${BP.esc(a.id)}" data-pub="${BP.esc(pub.storeId || pub.id)}">${BP.ico.wa} WhatsApp</a>` : ''}
       ${pub.telefono ? `<button type="button" class="p-ac-link" id="verTel">${BP.ico.phone} Ver teléfono</button>` : ''}</div>`}
+      ${a.reservado ? '' : `<button type="button" class="p-alerta" id="bajaPrecio">${BP.ico.bell} Avisarme si baja de precio</button>`}
       <div class="p-cta-acts"><button type="button" class="p-icon-btn ${BP.isFav(a.id)?'on':''}" data-fav="${BP.esc(a.id)}" aria-label="Guardar en favoritos">${BP.isFav(a.id)?BP.ico.heartFill:BP.ico.heart}</button><button type="button" class="p-icon-btn" id="share" aria-label="Compartir">${BP.ico.share}</button></div>
       <div class="p-cta-foot">Contacto directo con quien publica · BAIREN no interviene en la operación</div>
     </div>

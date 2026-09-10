@@ -261,6 +261,36 @@
     });
   };
 
+  /* ── Idioma: ES, PT, EN. Cambia las descripciones de las propiedades, que son
+     lo único traducido hoy, y recuerda la elección. La interfaz sigue en
+     castellano hasta que se traduzcan sus textos. */
+  BP.lang = (function(){ try { return localStorage.getItem('bairen_lang') || 'es'; } catch (e) { return 'es'; } })();
+  BP.idioma = function (root) {
+    /* La barra derecha se vuelve a dibujar al abrir sesión, así que el selector
+       se crea si falta en vez de vivir sólo en la plantilla. */
+    (root || document).querySelectorAll('.p-nav-right').forEach(function (r) {
+      if (r.querySelector('.p-lang')) return;
+      var g = document.createElement('div');
+      g.className = 'p-lang'; g.setAttribute('role', 'group'); g.setAttribute('aria-label', 'Idioma');
+      g.innerHTML = '<button type="button" data-lang="es">ES</button><button type="button" data-lang="pt">PT</button><button type="button" data-lang="en">EN</button>';
+      r.insertBefore(g, r.firstChild);
+    });
+    (root || document).querySelectorAll('.p-lang').forEach(function (g) {
+      if (g._lang) return; g._lang = true;
+      g.querySelectorAll('button').forEach(function (b) {
+        b.setAttribute('aria-pressed', b.dataset.lang === BP.lang ? 'true' : 'false');
+        b.classList.toggle('on', b.dataset.lang === BP.lang);
+        b.addEventListener('click', function () {
+          BP.lang = b.dataset.lang;
+          try { localStorage.setItem('bairen_lang', BP.lang); } catch (e) {}
+          window.BAIREN_LANG = BP.lang;
+          location.reload();
+        });
+      });
+    });
+    window.BAIREN_LANG = BP.lang;
+  };
+
   BP.reveal = () => { const els=document.querySelectorAll('[data-reveal]:not(.in)'); if(!('IntersectionObserver' in window)){ els.forEach(e=>e.classList.add('in')); return; }
     /* Se juntan los que entran en la misma tanda para que suban escalonados, no de a uno */
     let tanda=[], t=null, t0=0;
@@ -283,15 +313,8 @@
   <div class="p-nav-left">
     <a class="nav-logo" href="index.html" aria-label="BAIREN, inicio"><img src="../bairen_logo_96.png?v=1" alt="BAIREN" width="44" height="44" style="height:44px;width:44px;"></a>
   </div>
-    <div class="p-nav-menu">
-      <div><button type="button" aria-haspopup="true" ${active==='alquiler'?'aria-current="page"':''}>Alquilar <span class="car"></span></button>
-        <div class="p-dd">${dd('Plazo', [['Mediano plazo, amoblado', BP.urlBuscar({ op:'mediano' })],['Largo plazo', BP.urlBuscar({ op:'alquiler' })]])}${dd('Alquilar por barrio', zonasLinks('alquiler'), true)}${dd('Más', [['Publicadores','publicadores.html'],['Guía de barrios','index.html#zonas'],['Publicá tu propiedad','publicar.html']])}</div></div>
-      <div><button type="button" aria-haspopup="true" ${active==='venta'?'aria-current="page"':''}>Comprar <span class="car"></span></button>
-        <div class="p-dd">${dd('Comprar por barrio', zonasLinks('venta'), true)}${dd('También', [['Emprendimientos','emprendimientos.html'],['Publicadores','publicadores.html']])}${dd('Para quien publica', [['Publicá tu propiedad','publicar.html'],['Importá tu cartera','importar.html'],['Criterios de selección','criterios.html']])}</div></div>
-      <a href="../psi.html" ${active==='psi'?'aria-current="page"':''}>PSI</a>
-      <a href="index.html#indice" ${active==='indice'?'aria-current="page"':''}>Índice</a>
-    </div>
   <div class="p-nav-right">
+    <div class="p-lang" role="group" aria-label="Idioma"><button type="button" data-lang="es">ES</button><button type="button" data-lang="pt">PT</button><button type="button" data-lang="en">EN</button></div>
     <button type="button" class="p-ghost p-bell" aria-label="Notificaciones" data-notif>${BP.ico.bell}<span class="dot" hidden></span></button>
     <a class="p-ghost" href="ingresar.html?volver=contactos">${BP.ico.chat} Mis contactos</a>
     <a class="p-ghost" href="buscar.html?favs=1" aria-label="Favoritos">${BP.ico.heart}<span data-fav-count hidden></span></a>
@@ -310,6 +333,7 @@
   <div class="m-sep"></div>
   <a href="buscar.html?favs=1" class="m-link">Favoritos</a>
   <a href="ingresar.html?volver=contactos" class="m-link">Mis contactos</a>
+  <div class="p-lang" role="group" aria-label="Idioma"><button type="button" data-lang="es">ES</button><button type="button" data-lang="pt">PT</button><button type="button" data-lang="en">EN</button></div>
   <div class="m-cta"><a class="p-btn p-btn-sm" href="publicar.html">Publicar</a><a class="p-btn p-btn-sm p-btn-fill" href="ingresar.html">Ingresar</a></div>
 </div>`;
     const host = document.getElementById('pHeader'); if (host) host.innerHTML = html;
@@ -328,8 +352,7 @@
     }
     const cerrarDD = dd => { dd.classList.remove('abierto'); dd.style.height = ''; dd.style.opacity = ''; dd.querySelectorAll('a,button').forEach(x => x.tabIndex = -1); const bt = dd.parentNode.querySelector('button[aria-haspopup]'); if (bt) bt.setAttribute('aria-expanded','false'); };
     BP.crear(document);
-    if (window.BPM && BPM.foco) BPM.foco(document.querySelector('.p-navbar'));
-    if (window.BPM && BPM.focoMovil) BPM.focoMovil(document.getElementById('mobileMenu'));
+    BP.idioma(document);
     const abrirDD = dd => {
       if (dd.classList.contains('abierto')) return;
       dd.querySelectorAll('a,button').forEach(x => x.removeAttribute('tabindex'));

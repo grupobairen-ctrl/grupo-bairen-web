@@ -464,6 +464,7 @@
     BPM.tacto(root); BPM.sellos(root); BPM.contar(root); BPM.rodar(root);
     if (window.BP && BP.crear) BP.crear(root); // el header se vuelve a dibujar al abrir sesión
     if (window.BP && BP.desplegables) BP.desplegables(root);
+    if (window.BP && BP.idioma) BP.idioma(root);
   };
 
   window.BPM = BPM;
