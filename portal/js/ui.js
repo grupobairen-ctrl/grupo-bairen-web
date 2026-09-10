@@ -380,42 +380,24 @@
 
   /* ── Footer ─────────────────────────────────────────────── */
   BP.footer = function(){
-    const zonas = BP.ZONAS.map(z=>`<li><a href="buscar.html?zona=${encodeURIComponent(z)}">${BP.zonaLabel(z)}</a></li>`).join('');
+    const zonas = BP.ZONAS.map(z=>`<li><a href="${BP.urlBuscar({ op:'mediano', zona:z })}">${BP.zonaLabel(z)}</a></li>`).join('');
     const html = `
 <footer class="footer">
   <div class="footer-grid">
     <div>
       <div><img src="../bairen_logo_96.png?v=1" alt="BAIREN" width="46" height="46" style="height:46px;width:46px;"></div>
       <div class="ft-brand-rule"></div>
-      <p class="ft-brand-tag">El portal de propiedades seleccionadas de Buenos Aires. Comprar, alquilar o publicar, en CABA y Zona Norte.</p>
-      <p class="p-legend">${BP.LEYENDA_PLATAFORMA}</p>
+      <p class="ft-brand-tag">Portal de propiedades seleccionadas en Buenos Aires.</p>
+      <p class="p-legend">BAIREN selecciona, produce y publica propiedades. Las operaciones son concluidas por Maximiliano Matzkin, corredor matriculado CUCICBA 7527.</p>
     </div>
-    <div class="ft-col"><div class="ft-col-ttl">Más BAIREN</div><ul>
-      <li><a href="buscar.html">Propiedades</a></li><li><a href="publicar.html">Publicar</a></li><li><a href="index.html#guia">Guía de barrios</a></li><li><a href="index.html#indice">Índice BAIREN</a></li><li><a href="legales.html#ayuda">Ayuda</a></li><li><a href="mailto:contacto@bairengroup.com">Contacto</a></li></ul></div>
-    <div class="ft-col"><div class="ft-col-ttl">Publicadores</div><ul>
-      <li><a href="publicadores.html">Inmobiliarias y corredores</a></li><li><a href="publicar.html#dueno">Dueños directos</a></li><li><a href="publicar.html#desarrolladora">Desarrolladoras</a></li><li><a href="criterios.html">Criterios de selección</a></li></ul></div>
-    <div class="ft-col"><div class="ft-col-ttl">Barrios</div><ul>${zonas}</ul></div>
-    <div class="ft-col"><div class="ft-col-ttl">Seguinos</div><ul>
-      <li><a href="https://www.instagram.com/" rel="noopener" target="_blank">Instagram</a></li><li><a href="https://www.tiktok.com/" rel="noopener" target="_blank">TikTok</a></li><li><a href="https://www.youtube.com/" rel="noopener" target="_blank">YouTube</a></li></ul>
-      <div class="ft-col-ttl" style="margin-top:18px">Contacto</div>
-      <p class="ft-contact-txt">contacto@bairengroup.com<br>CABA · Zona Norte, Buenos Aires</p></div>
+    <div class="ft-col"><div class="ft-col-ttl">Navegación</div><ul>
+      <li><a href="${BP.urlBuscar({ op:'mediano' })}">Alquilar</a></li><li><a href="${BP.urlBuscar({ op:'venta' })}">Comprar</a></li><li><a href="../psi.html">PSI</a></li><li><a href="index.html#indice">Índice BAIREN</a></li><li><a href="publicar.html">Publicar</a></li></ul></div>
+    <div class="ft-col"><div class="ft-col-ttl">Zonas</div><ul>${zonas}</ul></div>
+    <div class="ft-col"><div class="ft-col-ttl">Más</div><ul>
+      <li><a href="publicadores.html">Publicadores</a></li><li><a href="emprendimientos.html">Emprendimientos</a></li><li><a href="criterios.html">Criterios de selección</a></li><li><a href="legales.html">Términos y privacidad</a></li><li><a href="mailto:contacto@bairengroup.com">contacto@bairengroup.com</a></li></ul></div>
   </div>
-  <div class="footer-bottom">
-    <span class="footer-copy">© 2026 BAIREN. Marca registrada.</span>
-    <div class="footer-legal">
-      <a href="legales.html#terminos">Términos de uso</a>
-      <a href="legales.html#contratacion">Términos de contratación</a>
-      <a href="legales.html#privacidad">Política de privacidad</a>
-    </div>
-  </div>
-</footer>
-<div class="p-legal-strip"><div class="p-container">
-  <div><b>Botón de arrepentimiento</b><a href="legales.html#arrepentimiento">Revocar una contratación</a></div>
-  <div><b>Botón de baja de servicios</b><a href="legales.html#baja">Dar de baja un servicio</a></div>
-  <div><b>Defensa de las y los consumidores</b>Para reclamos, <a href="https://autogestion.produccion.gob.ar/consumidores" rel="noopener" target="_blank">ingresá acá</a>. Normativa: <a href="https://www.argentina.gob.ar/normativa/nacional/ley-24240-638/texto" rel="noopener" target="_blank">Ley 24.240</a>. Consultas: consultas@consumidor.gob.ar</div>
-  <div><b>Alquileres de vivienda en CABA</b>En cada aviso de alquiler publicado por un corredor se muestra la leyenda del art. 10 inc. 8 de la Ley 2340.</div>
-</div></div>
-<div class="p-demo-banner">${window.BPStore && BPStore.demo ? '<b style="color:#E8B84B">MODO DEMO</b> · sesión de mentira para recorrer el panel · nada de lo que toques se guarda · salir con <code>?demo=0</code>' : '<b>Web de prueba</b> · rama portal · datos reales de BAIREN más avisos de ejemplo'}</div>`;
+  <div class="footer-bottom"><span>© ${new Date().getFullYear()} BAIREN</span><span><a href="legales.html">Términos de uso</a> · <a href="legales.html#privacidad">Política de privacidad</a></span></div>
+</footer>`;
     const host = document.getElementById('pFooter'); if (host) host.innerHTML = html;
   };
 

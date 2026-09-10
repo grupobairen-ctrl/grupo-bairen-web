@@ -10,116 +10,108 @@
   <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260911y"><link rel="stylesheet" href="css/catalogo.css?v=20260911y"><link rel="stylesheet" href="css/portal.css?v=20260911y">
+  <link rel="stylesheet" href="css/base.css?v=20260912b"><link rel="stylesheet" href="css/catalogo.css?v=20260912b"><link rel="stylesheet" href="css/portal.css?v=20260912b">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"BAIREN","url":"https://www.bairengroup.com","logo":"https://www.bairengroup.com/bairen_logo.png","description":"El portal de propiedades seleccionadas de Buenos Aires. Alquileres a mediano y largo plazo y departamentos en venta, publicados por corredores matriculados y dueños verificados.","areaServed":[{"@type":"City","name":"Ciudad Autónoma de Buenos Aires"},{"@type":"AdministrativeArea","name":"Zona Norte, Buenos Aires"}]}</script>
 </head>
-<body>
+<body class="p-home">
 <div id="pHeader"></div>
-
 <main id="contenido">
-<section class="p-hero p-hero-site">
+
+<section class="h-hero" id="inicio">
   <video autoplay muted loop playsinline preload="metadata" poster="../hero-poster.jpg?v=2" aria-hidden="true"><source src="../hero.mp4?v=2" type="video/mp4"></video>
-  <div class="p-hero-in">
-    <h1><span class="hline">Buenos Aires</span><span class="hline">en su máximo esplendor.</span></h1>
-    <div class="p-doors" role="navigation" aria-label="Operaciones">
-      <a href="buscar.html?op=venta">Comprar</a><span class="sep" aria-hidden="true">·</span>
-      <a href="buscar.html?op=alquiler">Alquilar</a><span class="sep" aria-hidden="true">·</span>
-      <a href="publicar.html">Publicar</a>
-    </div>
-  </div>
-</section>
-<div class="p-searchbar"><div class="p-container">
-<div class="p-search" role="search" aria-label="Buscar propiedades">
-      <div class="p-tabs" role="group" aria-label="Operación">
-        <button class="p-tab active" data-op="venta" aria-pressed="true">Comprar</button>
-        <button class="p-tab" data-op="alquiler" aria-pressed="false" aria-controls="plazoSel">Alquilar</button>
-        <div class="p-plazo" id="plazoSel" role="group" aria-label="Plazo del alquiler" hidden><label><input type="radio" name="plazo" value="alquiler" checked><span>Largo plazo</span></label><label><input type="radio" name="plazo" value="mediano"><span>Mediano plazo</span></label></div>
-        <button class="p-tab" data-op="emprendimientos" aria-pressed="false" title="Venta directa de desarrolladoras">Emprendimientos</button>
+  <div class="h-hero-velo" aria-hidden="true"></div>
+  <div class="h-hero-in">
+    <h1><span class="hline">Propiedades seleccionadas</span><span class="hline">en Buenos Aires.</span></h1>
+    <p class="h-hero-sub">Alquiler y venta en las zonas que conocemos de cerca.</p>
+    <form class="h-search" id="searchForm" action="buscar.html" method="get" role="search" aria-label="Buscar propiedades">
+      <input type="hidden" name="op" id="opInput" value="mediano">
+      <div class="h-seg" role="group" aria-label="Operación">
+        <button type="button" class="on" data-op="alquiler" aria-pressed="true">Alquilar</button>
+        <button type="button" data-op="venta" aria-pressed="false">Comprar</button>
       </div>
-      <form class="p-search-row" id="searchForm" action="buscar.html" method="get">
-        <input type="hidden" name="op" id="opInput" value="venta">
-        <div class="p-field"><select name="tipo" aria-label="Tipo de propiedad"><option value="departamento">Departamento</option><option value="piso">Piso</option><option value="ph">PH</option><option value="casa">Casa</option><option value="todos">Todos los tipos</option></select></div>
-        <div class="p-field"><input type="text" id="zonaInput" name="q" placeholder="Barrio, calle o característica" autocomplete="off" aria-label="Ubicación o característica" aria-autocomplete="list" aria-controls="sugg"><div class="p-sugg" id="sugg" role="listbox"></div></div>
-        <button class="p-btn p-btn-fill" type="submit">Buscar <span class="ic"></span></button>
-      </form>
-      <div class="p-chips" id="zonaChips" aria-live="polite"></div>
-    </div>
-</div></div>
-
-<section class="caminos" id="como">
-  <div class="caminos-in">
-    <div class="caminos-hd"><p class="p-eyebrow">Cómo funciona</p><h2>Todo lo que ves acá pasó por una persona.</h2></div>
-    <div class="caminos-grid">
-      <a class="camino" href="criterios.html"><div class="camino-kicker">Paso 1</div><div class="camino-name">Se elige</div><p class="camino-txt">Cada unidad cumple un estándar de edificio, estado, luz y fotos. Si no lo cumple, no entra.</p><span class="go">Ver los criterios</span></a>
-      <a class="camino" href="publicadores.html"><div class="camino-kicker">Paso 2</div><div class="camino-name">Se verifica</div><p class="camino-txt">Publican corredores con matrícula, dueños con titularidad comprobada y desarrolladoras. La ficha dice quién.</p><span class="go">Ver quiénes publican</span></a>
-      <a class="camino" href="legales.html"><div class="camino-kicker">Paso 3</div><div class="camino-name">Hablás directo</div><p class="camino-txt">Tu consulta le llega a quien publica. BAIREN no vende, no alquila y no cobra comisión.</p><span class="go">Cómo trabajamos</span></a>
-    </div>
-  </div>
-</section>
-
-<section class="p-section" id="barrios">
-  <div class="p-container p-zonas-wrap">
-    <div data-reveal>
-      <span class="p-eyebrow">Dónde empezamos</span>
-      <h2 class="p-h2">Los barrios</h2>
-      <p class="p-sub">Elegí un barrio y mirá lo que hay publicado hoy.</p>
-      <div class="p-zonas" id="zonasGrid"></div>
-      <p class="p-zonas-vacias" id="zonasVacias" hidden></p>
-    </div>
-    <div class="p-map-home" data-reveal><div class="in"><div id="mapaHome" role="group" aria-label="Mapa de barrios"></div></div></div>
-  </div>
-</section>
-
-<section class="p-section alt" id="seleccionadas">
-  <div class="p-container">
-    <div class="p-head-row" data-reveal><div><h2 class="p-h2">Seleccionadas de la semana</h2><p class="p-sub" style="margin:0">Elegidas a mano entre lo publicado esta semana.</p></div><a class="p-link" href="buscar.html">Ver todas las propiedades</a></div>
-    <div class="p-grid" id="destacadasGrid" data-reveal aria-busy="true"><div class="p-skel-vcard" aria-hidden="true"></div><div class="p-skel-vcard" aria-hidden="true"></div><div class="p-skel-vcard" aria-hidden="true"></div></div>
-  </div>
-</section>
-
-
-<section class="p-section" id="publicadores">
-  <div class="p-container">
-    <div class="p-head-row" data-reveal><div><h2 class="p-h2">Quiénes publican</h2><p class="p-sub" style="margin:0">Corredores matriculados, dueños verificados y desarrolladoras. Cada ficha dice quién publica.</p></div><a class="p-link" href="publicadores.html">Ver todos los publicadores</a></div>
-    <div class="p-pubs" id="pubsRow" data-reveal></div>
-  </div>
-</section>
-
-<section class="p-section" id="indice">
-  <div class="p-container p-two">
-    <div data-reveal>
-      <h2 class="p-h2">Índice BAIREN</h2>
-      <p class="p-sub">Precio por metro cuadrado de lo publicado hoy, por barrio.</p>
-      <div class="p-table-wrap"><table class="p-index" id="indiceTabla"><thead><tr><th>Barrio</th><th class="num">Venta, USD/m²</th><th class="num">Alquiler, USD/m² por mes</th><th class="num">Unidades</th></tr></thead><tbody></tbody></table></div>
-      <p class="p-note">Calculado sobre lo publicado en BAIREN. No es una tasación.</p>
-    </div>
-    <div data-reveal id="guia">
-      <h2 class="p-h2">Cómo es vivir en cada barrio</h2>
-      <p class="p-sub">Escrita por gente que camina esos barrios todos los días.</p>
-      <div class="p-zonas" id="guiaGrid"></div>
-    </div>
-  </div>
-</section>
-
-<section class="p-section alt" id="publicar">
-  <div class="p-container">
-    <div class="p-publica" data-reveal>
-      <img src="../hero-poster.jpg?v=2" alt="" aria-hidden="true">
-      <div>
-        <p class="p-eyebrow">Para quien publica</p><h2 class="p-h2">Publicá tu propiedad</h2>
-        <p>Si tu unidad cumple el estándar, la producimos sin costo y la mostramos a quien la está buscando. La operación es tuya: BAIREN no vende, no alquila y no cobra comisión.</p>
-        <ul><li>Fotos producidas sin costo, ficha completa y verificada</li><li>Contacto directo con los interesados</li><li>Vistas, consultas y visitas en tu panel de Bairen OS</li></ul>
-        <div class="p-cta-row"><a class="p-btn p-btn-fill" href="publicar.html#dueno">Soy dueño directo</a><a class="p-btn" href="publicar.html#inmobiliaria">Soy inmobiliaria o corredor</a><a class="p-btn" href="publicar.html#desarrolladora">Soy desarrolladora</a></div>
+      <div class="h-seg h-seg-plazo" id="plazoSel" role="group" aria-label="Plazo del alquiler">
+        <button type="button" class="on" data-plazo="mediano" aria-pressed="true">Mediano plazo</button>
+        <button type="button" data-plazo="alquiler" aria-pressed="false">Largo plazo</button>
       </div>
-      <div><p class="p-cond-ttl">Condiciones de ingreso</p><ul class="p-cond"><li>Palermo, Recoleta, Retiro, Belgrano, Núñez, Colegiales, Villa Crespo, Puerto Madero, Saavedra o Zona Norte</li><li>Edificio de categoría o con amenities. Unidad en estado impecable</li><li>Ficha completa: metros, expensas, orientación, planos</li><li>Fotos profesionales, mínimo ocho. Si no las tenés, las hacemos</li><li>Publicador verificado: titularidad, matrícula o CUIT</li></ul></div>
+      <p class="h-ctx" id="ctxPlazo">Amoblado · 3 a 12 meses · todo incluido · sin garantía ni caución</p>
+      <div class="h-field">
+        <input type="text" id="zonaInput" name="q" placeholder="Barrio, edificio o zona" autocomplete="off" aria-label="Barrio, edificio o zona" aria-autocomplete="list" aria-controls="sugg" enterkeyhint="search">
+        <div class="p-sugg" id="sugg" role="listbox" aria-label="Sugerencias"></div>
+      </div>
+      <button class="h-cta" type="submit">Ver propiedades</button>
+    </form>
+  </div>
+</section>
+
+<section class="h-sec h-crema" id="seleccion">
+  <div class="h-in">
+    <p class="h-eyebrow">Selección BAIREN</p>
+    <h2 class="h-h2">Todo lo que ves acá pasó por una persona.</h2>
+    <p class="h-copy">No publicamos todo lo que llega. Revisamos cada unidad antes de incorporarla al portal, con foco en ubicación, estado, distribución y relación entre precio y producto.</p>
+  </div>
+  <div class="h-track" id="seleccionTrack" aria-busy="true"></div>
+  <div class="h-in h-acciones"><a class="h-btn h-btn-navy" href="buscar.html">Ver todas las propiedades</a></div>
+</section>
+
+<section class="h-sec h-crema h-borde" id="zonas">
+  <div class="h-in">
+    <p class="h-eyebrow">Zonas</p>
+    <h2 class="h-h2" id="zonasTitulo">Ocho zonas. Ahí concentramos la selección.</h2>
+    <p class="h-copy h-copy-fuerte" id="zonasLista"></p>
+    <p class="h-copy">No publicamos fuera de estas zonas. Concentrar la búsqueda nos permite leer cada propiedad con contexto.</p>
+    <div class="h-zonas" id="zonasGrid"></div>
+  </div>
+</section>
+
+<section class="h-sec h-crema h-borde" id="edificios" hidden>
+  <div class="h-in">
+    <p class="h-eyebrow">Edificios</p>
+    <h2 class="h-h2">Hay búsquedas que empiezan por un nombre propio.</h2>
+    <p class="h-copy" id="edificiosCopy"></p>
+  </div>
+  <div class="h-track h-track-edif" id="edificiosTrack"></div>
+</section>
+
+<section class="h-sec h-crema h-borde" id="tipologias" hidden>
+  <div class="h-in">
+    <p class="h-eyebrow">Tipologías</p>
+    <h2 class="h-h2">Buscás algo menos común.</h2>
+    <p class="h-copy">Los agrupamos para que no tengas que encontrarlos entre cientos de resultados.</p>
+    <div class="h-tipos" id="tiposGrid"></div>
+  </div>
+</section>
+
+<section class="h-sec h-navy" id="psi">
+  <div class="h-in h-dos">
+    <figure class="h-foto" id="psiFoto" aria-hidden="true"></figure>
+    <div class="h-texto">
+      <p class="h-eyebrow">PSI · Personal Shopper Inmobiliario</p>
+      <h2 class="h-h2">En una compra, el comprador también necesita representación.</h2>
+      <p class="h-copy">La parte vendedora llega acompañada. PSI ocupa el lado del comprador.</p>
+      <p class="h-copy">Definimos la búsqueda, filtramos alternativas, analizamos propiedades y acompañamos la negociación y el proceso de compra.</p>
+      <a class="h-btn h-btn-oro" href="../psi.html">Conocer PSI</a>
     </div>
   </div>
 </section>
 
-<section class="p-section" id="busquedas">
-  <div class="p-container">
-    <h2 class="p-h2" data-reveal>Búsquedas frecuentes</h2>
-    <div class="p-seo" id="seoLinks" data-reveal></div>
+<section class="h-sec h-crema" id="indice">
+  <div class="h-in">
+    <p class="h-eyebrow">Índice BAIREN</p>
+    <h2 class="h-h2">El precio necesita contexto.</h2>
+    <p class="h-copy">Consultá valores de referencia por barrio y compará zonas antes de decidir dónde seguir buscando.</p>
+    <div class="h-indice" id="indiceLista" aria-live="polite"></div>
+    <div class="h-acciones h-izq"><button type="button" class="h-btn h-btn-navy" id="indiceMas" aria-expanded="false" aria-controls="indiceLista">Ver el Índice completo</button><a class="h-link" href="#metodologia">Metodología</a></div>
+    <p class="h-nota" id="metodologia"><b>Metodología.</b> Promedio simple del precio pedido por metro cuadrado de las unidades publicadas hoy en BAIREN, por zona, separando venta de alquiler. No es una tasación y no incluye operaciones cerradas.</p>
+  </div>
+</section>
+
+<section class="h-sec h-navy" id="publicar">
+  <div class="h-in h-centro">
+    <p class="h-eyebrow">Publicar</p>
+    <h2 class="h-h2">¿Tu propiedad encaja en BAIREN?</h2>
+    <p class="h-copy">Trabajamos únicamente en nuestras zonas y revisamos cada unidad antes de incorporarla al portal.</p>
+    <p class="h-copy">Si encaja con la selección, producimos el contenido y la publicamos.</p>
+    <a class="h-btn h-btn-oro" href="publicar.html">Publicar una propiedad</a>
   </div>
 </section>
 
@@ -127,108 +119,115 @@
 <div id="pFooter"></div>
 
 <script src="supabase-portal.js" defer></script>
-<script src="../mapa-barrios.js" defer></script>
-<script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260911y" defer></script><script src="js/ui.js?v=20260911y" defer></script><script src="js/store.js?v=20260911y" defer></script>
-<script src="js/data.js?v=20260911y" defer></script>
+<script src="js/motion.js" defer></script>
+<script src="js/bairen-motion.js?v=20260912b" defer></script>
+<script src="js/ui.js?v=20260912b" defer></script>
+<script src="js/store.js?v=20260912b" defer></script>
+<script src="js/data.js?v=20260912b" defer></script>
 <script>
-/* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
 (async function(){
   if (window.BPM && BPM.entrada) BPM.entrada('BAIREN');
-  if (window.BPM && BPM.titular) BPM.titular(document.querySelector('.p-hero-site h1'), { demora: 0.15 });
+  if (window.BPM && BPM.titular) BPM.titular(document.querySelector('.h-hero h1'), { demora: 0.15 });
   BP.header('home'); BP.footer(); if (window.BPStore) BPStore.init(); BP.reveal();
-  (function(){ const hv = document.querySelector('.p-hero-site video'); if (hv && matchMedia('(prefers-reduced-motion: reduce)').matches) { hv.removeAttribute('autoplay'); hv.pause(); } })();
-  document.querySelector('#searchForm .p-btn .ic').innerHTML = BP.ico.arrow;
+  (function(){ const hv = document.querySelector('.h-hero video'); if (hv && matchMedia('(prefers-reduced-motion: reduce)').matches) { hv.removeAttribute('autoplay'); hv.pause(); } })();
 
-  /* pestañas de operación: tres (Comprar, Alquilar, Emprendimientos). El plazo del alquiler
-     no es una operación aparte: es un sub-selector que aparece solo con Alquilar activa. */
-  const opInput = document.getElementById('opInput'), plazoSel = document.getElementById('plazoSel');
-  const plazoActual = () => (plazoSel.querySelector('input:checked') || {}).value || 'alquiler';
-  const opDeTab = t => t.dataset.op === 'alquiler' ? plazoActual() : t.dataset.op;
-  const activarTab = op => {
-    const tabOp = (op === 'mediano' || op === 'alquiler') ? 'alquiler' : op;
-    document.querySelectorAll('.p-tab').forEach(x => { const on = x.dataset.op === tabOp; x.classList.toggle('active', on); x.setAttribute('aria-pressed', on ? 'true' : 'false'); });
-    plazoSel.hidden = tabOp !== 'alquiler';
-    if (tabOp === 'alquiler') { const r = plazoSel.querySelector(`input[value="${op}"]`); if (r) r.checked = true; }
-    opInput.value = op;
+  /* ── Buscador: una intención (Alquilar | Comprar); dentro de Alquilar, el plazo ── */
+  const opInput = document.getElementById('opInput'), plazoSel = document.getElementById('plazoSel'), ctx = document.getElementById('ctxPlazo');
+  const segOp = document.querySelectorAll('.h-seg:not(.h-seg-plazo) button');
+  let opActiva = 'alquiler', plazo = 'mediano';
+  const pintarBuscador = () => {
+    segOp.forEach(b => { const on = b.dataset.op === opActiva; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+    plazoSel.hidden = opActiva !== 'alquiler';
+    plazoSel.querySelectorAll('button').forEach(b => { const on = b.dataset.plazo === plazo; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+    ctx.hidden = !(opActiva === 'alquiler' && plazo === 'mediano');
+    opInput.value = opActiva === 'venta' ? 'venta' : plazo;
   };
-  document.querySelectorAll('.p-tab').forEach(t => t.addEventListener('click', () => activarTab(opDeTab(t))));
-  plazoSel.querySelectorAll('input').forEach(r => r.addEventListener('change', () => activarTab(r.value)));
+  segOp.forEach(b => b.addEventListener('click', () => { opActiva = b.dataset.op; pintarBuscador(); }));
+  plazoSel.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { plazo = b.dataset.plazo; pintarBuscador(); }));
+  pintarBuscador();
 
-  /* sugerencias limitadas a las ocho zonas + características */
-  const input = document.getElementById('zonaInput'), sugg = document.getElementById('sugg'), chips = document.getElementById('zonaChips');
-  const zonasSel = [];
-  const CARACT = ['Terraza o jardín','Pileta','Cochera','Amoblado','Pet friendly','Gimnasio','Seguridad 24hs'];
-  function renderChips(){ chips.innerHTML = zonasSel.map(z => `<span class="p-chip">${BP.zonaLabel(z)}<button type="button" data-z="${z}" aria-label="Quitar ${BP.zonaLabel(z)}">×</button></span>`).join(''); chips.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { zonasSel.splice(zonasSel.indexOf(b.dataset.z),1); renderChips(); })); }
-  function showSugg(){ const q = input.value.trim().toLowerCase(); const zs = BP.ZONAS.filter(z => zonasSel.indexOf(z)===-1 && (!q || BP.zonaLabel(z).toLowerCase().indexOf(q)>-1)); const cs = CARACT.filter(c => q && c.toLowerCase().indexOf(q)>-1); const items = zs.map(z => `<button type="button" data-z="${z}">${BP.ico.pin} ${BP.zonaLabel(z)}<small>${(window.__counts||{})[z] || 'sin unidades'}</small></button>`).concat(cs.map(c => `<button type="button" data-c="${c}">${BP.ico.search} ${c}<small>característica</small></button>`)); sugg.innerHTML = items.join(''); sugg.classList.toggle('open', items.length>0); sugg.querySelectorAll('button').forEach(b => b.addEventListener('mousedown', e => { e.preventDefault(); if (b.dataset.z) { zonasSel.push(b.dataset.z); input.value=''; renderChips(); } else { input.value = b.dataset.c; } sugg.classList.remove('open'); })); }
-  BP.sugerenciasTeclado(input, sugg, el => { if (el.dataset.z) { zonasSel.push(el.dataset.z); input.value=''; renderChips(); } else if (el.dataset.c) { input.value = el.dataset.c; } sugg.classList.remove('open'); });
-  input.addEventListener('focus', showSugg); input.addEventListener('input', showSugg);
+  /* Sugerencias: zonas y edificios con nombre propio. Nada más. */
+  const input = document.getElementById('zonaInput'), sugg = document.getElementById('sugg');
+  let zonaElegida = null, edificios = [];
+  function showSugg(){
+    const q = input.value.trim().toLowerCase();
+    const zs = BP.ZONAS.filter(z => !q || BP.zonaLabel(z).toLowerCase().indexOf(q) > -1).map(z => `<button type="button" role="option" data-z="${z}">${BP.ico.pin} ${BP.zonaLabel(z)}</button>`);
+    const es = edificios.filter(e => q && e.nombre.toLowerCase().indexOf(q) > -1).map(e => `<button type="button" role="option" data-e="${BP.esc(e.nombre)}">${BP.ico.building || ''} ${BP.esc(e.nombre)} <small>edificio</small></button>`);
+    const items = es.concat(zs).slice(0, 9);
+    sugg.innerHTML = items.join(''); sugg.classList.toggle('open', items.length > 0);
+  }
+  BP.sugerenciasTeclado(input, sugg, el => { if (el.dataset.z) { zonaElegida = el.dataset.z; input.value = BP.zonaLabel(el.dataset.z); } else if (el.dataset.e) { zonaElegida = null; input.value = el.dataset.e; } sugg.classList.remove('open'); });
+  input.addEventListener('focus', showSugg); input.addEventListener('input', () => { zonaElegida = null; showSugg(); });
   input.addEventListener('blur', () => setTimeout(() => { if (!sugg.contains(document.activeElement)) sugg.classList.remove('open'); }, 120));
-  document.getElementById('searchForm').addEventListener('submit', e => { e.preventDefault(); const p = new URLSearchParams(); p.set('op', opInput.value === 'emprendimientos' ? 'venta' : opInput.value); const tipo = e.target.tipo.value; if (tipo && tipo !== 'departamento') p.set('tipo', tipo); zonasSel.forEach(z => p.append('zona', z)); if (input.value.trim()) p.set('q', input.value.trim()); if (opInput.value === 'emprendimientos') p.set('emp', '1'); const zs = zonasSel.slice(); if (opInput.value === 'emprendimientos') { location.href = 'emprendimientos.html' + (zs[0] ? '?zona=' + encodeURIComponent(zs[0]) : ''); return; } location.href = (zs.length <= 1 && !input.value.trim() && opInput.value !== 'emprendimientos') ? BP.urlBuscar({ op: opInput.value, tipo, zonas: zs }) : 'buscar.html?' + p.toString(); });
+  document.getElementById('searchForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const p = new URLSearchParams(); p.set('op', opInput.value);
+    const txt = input.value.trim();
+    const z = zonaElegida || BP.ZONAS.find(x => BP.zonaLabel(x).toLowerCase() === txt.toLowerCase());
+    if (z) p.append('zona', z); else if (txt) p.set('q', txt);
+    location.href = 'buscar.html?' + p.toString();
+  });
 
-  /* datos */
+  /* ── Datos ── */
   await BP.probePretty();
   let avisos;
   try { ({ avisos } = await BPData.load()); }
-  catch (err) { console.error(err); const h = document.getElementById('destacadasGrid') || document.querySelector('main'); BP.estadoError(h, 'No pudimos cargar las propiedades.'); return; }
+  catch (err) { console.error(err); BP.estadoError(document.getElementById('seleccionTrack'), 'No pudimos cargar las propiedades.'); return; }
   BP.anotarMenus(avisos);
-  /* La pestaña por defecto es la operación con más inventario publicado, calculada de los datos */
-  let opActiva = BPData.opConMasInventario(avisos);
-  activarTab(opActiva);
-  let counts = BPData.countsByZona(avisos, opActiva); window.__counts = counts;
-  const pintarZonas = () => {
-    const sub = z => z === 'GBA Norte' ? 'Vicente López · San Isidro · Tigre' : 'Capital Federal';
-    const con = BP.ZONAS.filter(z => counts[z]).sort((a, b) => counts[b] - counts[a]);
-    const sin = BP.ZONAS.filter(z => !counts[z]);
-    const tarjeta = z => `<a class="p-zona" href="${BP.urlBuscar({ op: opActiva, zona: z })}"><div><b>${BP.zonaLabel(z)}</b><br><span>${sub(z)}</span></div><span class="n">${counts[z] + (counts[z] === 1 ? ' unidad' : ' unidades')}</span></a>`;
-    document.getElementById('zonasGrid').innerHTML = con.map(tarjeta).join('');
-    const nota = document.getElementById('zonasVacias');
-    if (nota) { nota.innerHTML = sin.length ? 'También cubrimos ' + sin.map(z => `<a href="${BP.urlBuscar({ op: opActiva, zona: z })}">${BP.zonaLabel(z)}</a>`).join(', ').replace(/, ([^,]*)$/, ' y $1') + '. Hoy no hay unidades publicadas ahí.' : ''; nota.hidden = !sin.length; }
-    if (window.__mapaHome) window.__mapaHome.setCounts(counts);
-  };
-  const cambiarOp = op => { if (op === 'emprendimientos') return; opActiva = op; counts = BPData.countsByZona(avisos, opActiva); window.__counts = counts; pintarZonas(); };
-  document.querySelectorAll('.p-tab').forEach(t => t.addEventListener('click', () => cambiarOp(opDeTab(t))));
-  plazoSel.querySelectorAll('input').forEach(r => r.addEventListener('change', () => cambiarOp(r.value)));
+  const reales = avisos.filter(a => !a.demo);
+  const base = reales.length >= 4 ? reales : avisos;
 
-  /* zonas */
-  pintarZonas();
-  if (window.BairenMapa && window.innerWidth >= 960) {
-    const el = document.getElementById('mapaHome');
-    try { window.__mapaHome = window.BairenMapa.mount(el, { counts, modo:'completo', onSelect: z => { location.href = BP.urlBuscar({ op: opActiva, zona: z }); } }); } catch (e) { el.innerHTML = '<p class="p-note">El mapa no se pudo montar en este navegador.</p>'; }
+  /* ── Selección BAIREN: propiedades reales, la primera protagonista ── */
+  const dest = BPData.sort(base.filter(a => a.destacado), 'relevancia');
+  const resto = BPData.sort(base.filter(a => !a.destacado && !a.reservado), 'relevancia');
+  const seleccion = dest.concat(resto).slice(0, 8);
+  const track = document.getElementById('seleccionTrack');
+  track.innerHTML = seleccion.map(a => `<div class="h-slide">${BPData.cardV(a)}</div>`).join('');
+  track.removeAttribute('aria-busy');
+
+  /* ── Zonas: todas, con conteo real, en cuadrícula compacta ── */
+  const counts = BPData.countsByZona(avisos, null); window.__counts = counts;
+  const NUM = { 6:'Seis', 7:'Siete', 8:'Ocho', 9:'Nueve', 10:'Diez', 11:'Once', 12:'Doce' };
+  document.getElementById('zonasTitulo').textContent = (NUM[BP.ZONAS.length] || BP.ZONAS.length) + ' zonas. Ahí concentramos la selección.';
+  document.getElementById('zonasLista').textContent = BP.ZONAS.map(BP.zonaLabel).join(', ').replace(/, ([^,]*)$/, ' y $1') + '.';
+  document.getElementById('zonasGrid').innerHTML = BP.ZONAS.slice().sort((a, b) => (counts[b] || 0) - (counts[a] || 0)).map(z => { const n = counts[z] || 0; return `<a class="h-zona${n ? '' : ' sin'}" href="${BP.urlBuscar({ zona: z })}"><b>${BP.zonaLabel(z)}</b><span>${n === 1 ? '1 propiedad' : n + ' propiedades'}</span></a>`; }).join('');
+
+  /* ── Edificios con nombre propio: sólo los que tienen unidades hoy ── */
+  const EDIF = [{ nombre: 'Huergo 475', re: /huergo\s*475/i }, { nombre: 'Palacio Alcorta', re: /alcorta/i }, { nombre: 'Lumière', re: /lumi[eè]re/i }];
+  const texto = a => [a.dir, a.titulo, a.emprendimiento].filter(Boolean).join(' ');
+  reales.forEach(a => { if (a.emprendimiento && !EDIF.some(e => e.re.test(a.emprendimiento))) EDIF.push({ nombre: a.emprendimiento, re: new RegExp(a.emprendimiento.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') }); });
+  edificios = EDIF.map(e => { const us = reales.filter(a => e.re.test(texto(a))); return Object.assign({}, e, { unidades: us, foto: (us.find(a => a.fotos && a.fotos.length) || {}).fotos }); }).filter(e => e.unidades.length);
+  if (edificios.length) {
+    const sec = document.getElementById('edificios'); sec.hidden = false;
+    document.getElementById('edificiosCopy').textContent = edificios.map(e => e.nombre).join(', ').replace(/, ([^,]*)$/, ' y $1') + (edificios.length > 1 ? ' tienen' : ' tiene') + ' su propio acceso dentro de BAIREN para comparar las unidades disponibles en cada edificio.';
+    document.getElementById('edificiosTrack').innerHTML = edificios.map(e => `<a class="h-slide h-edif" href="${e.unidades.length === 1 ? BP.urlFicha(e.unidades[0]) : 'buscar.html?q=' + encodeURIComponent(e.nombre)}">${e.foto ? `<img src="${BP.sbImg(e.foto[0], 1200)}" alt="" loading="lazy">` : ''}<div class="h-edif-txt"><b>${BP.esc(e.nombre)}</b><span>${e.unidades.length === 1 ? '1 unidad' : e.unidades.length + ' unidades'} en BAIREN</span><em>Ver unidades</em></div></a>`).join('');
   }
 
-  /* seleccionadas */
-  const dest = BPData.sort(avisos.filter(a => a.destacado && !a.demo), 'relevancia').slice(0,6);
-  document.getElementById('destacadasGrid').innerHTML = dest.map(BPData.cardV).join(''); document.getElementById('destacadasGrid').removeAttribute('aria-busy');
+  /* ── Tipologías menos comunes: sólo las que existen hoy ── */
+  const TIPOS = [
+    { nombre: 'Dúplex', test: a => /d[uú]plex/i.test(texto(a) + ' ' + (a.caracteristicas || []).join(' ')), href: 'buscar.html?q=d%C3%BAplex' },
+    { nombre: 'PHs', test: a => /^ph$/i.test(a.tipoProp || ''), href: 'buscar.html?tipo=ph' },
+    { nombre: 'Casas en barrios cerrados', test: a => /^casa$/i.test(a.tipoProp || '') && a.zona === 'GBA Norte', href: 'buscar.html?tipo=casa&zona=GBA%20Norte' }
+  ].map(t => Object.assign({}, t, { n: reales.filter(t.test).length })).filter(t => t.n);
+  if (TIPOS.length) {
+    document.getElementById('tipologias').hidden = false;
+    document.getElementById('tiposGrid').innerHTML = TIPOS.map(t => `<a class="h-tipo" href="${t.href}"><b>${t.nombre}</b><span>${t.n === 1 ? '1 propiedad' : t.n + ' propiedades'}</span></a>`).join('');
+  }
 
-  /* publicadores */
-  /* Muro de publicadores: sólo los reales, en cuadrícula. Los de ejemplo no cuentan
-     como prueba social, así que van aparte y sólo si todavía no hay suficientes reales. */
-  (function () {
-    const todos = Object.values(BPData.PUBLICADORES);
-    const reales = todos.filter(p => !p.demo);
-    const lista = (reales.length >= 3 ? reales : todos);
-    const tile = p => `<a class="tile" href="publicadores.html#${p.id}" title="${BP.esc(p.nombre)}"><span class="mono">${p.inicial}</span><span class="nom">${BP.esc(p.nombre)}</span><span class="tip">${p.tipo === 'dueno' ? 'Dueño verificado' : p.tipo === 'desarrolladora' ? 'Desarrolladora' : BP.esc(p.matricula || p.badge || '')}${p.demo ? ' · ejemplo' : ''}</span></a>`;
-    const POR_TANDA = 4;
-    const tandas = [];
-    for (let k = 0; k < lista.length; k += POR_TANDA) tandas.push(lista.slice(k, k + POR_TANDA));
-    const ultima = tandas[tandas.length - 1];
-    if (ultima && ultima.length < POR_TANDA) ultima.push(null);
-    const hueco = '<a class="tile vacio" href="publicar.html#inmobiliaria"><span class="mono">+</span><span class="nom">Tu inmobiliaria</span><span class="tip">Publicar en BAIREN</span></a>';
-    document.getElementById('pubsRow').outerHTML = `<div class="p-muro" id="muroPubs">${tandas.map((t, n) => `<div class="tanda"${n ? ' style="opacity:0"' : ''}>${t.map(x => x ? tile(x) : hueco).join('')}</div>`).join('')}</div>`;
-    if (window.BPM && BPM.muro) BPM.muro(document.getElementById('muroPubs'));
-  })();
+  /* ── PSI: fotografía real de una unidad, nunca stock ── */
+  const conFoto = reales.find(a => a.op === 'venta' && a.fotos && a.fotos.length) || reales.find(a => a.fotos && a.fotos.length) || avisos.find(a => a.fotos && a.fotos.length);
+  if (conFoto) document.getElementById('psiFoto').innerHTML = `<img src="${BP.sbImg(conFoto.fotos[0], 1200)}" alt="" loading="lazy">`;
 
-  /* índice */
-  const tb = document.querySelector('#indiceTabla tbody');
-  tb.innerHTML = BP.ZONAS.map(z => { const zs = avisos.filter(a => a.zona===z && !a.demo && a.m2 && a.precio); const v = zs.filter(a=>a.op==='venta'); const r = zs.filter(a=>a.op!=='venta'); const avg = l => l.length ? Math.round(l.reduce((s,a)=>s+a.precio/a.m2,0)/l.length) : null; return `<tr><td>${BP.zonaLabel(z)}</td><td class="num">${avg(v)?BP.fmtUSD(avg(v)):'—'}</td><td class="num">${avg(r)?'USD '+avg(r):'—'}</td><td class="num">${counts[z]||0}</td></tr>`; }).join('');
+  /* ── Índice: por zona, venta y alquiler por m². En celular, cuatro filas y el resto plegado ── */
+  const avg = l => l.length ? Math.round(l.reduce((s, a) => s + a.precio / a.m2, 0) / l.length) : null;
+  const filas = BP.ZONAS.map(z => { const zs = reales.filter(a => a.zona === z && a.m2 && a.precio); return { z, v: avg(zs.filter(a => a.op === 'venta')), r: avg(zs.filter(a => a.op !== 'venta')), n: zs.length }; }).sort((a, b) => b.n - a.n);
+  const fmt = n => n ? 'USD ' + BP.fmtN(n) : '—';
+  document.getElementById('indiceLista').innerHTML = `<div class="h-ind-cab"><span>Zona</span><span>Venta, por m²</span><span>Alquiler, por m² y mes</span></div>` + filas.map((f, i) => `<div class="h-ind-fila${i >= 4 ? ' plegada' : ''}${f.n ? '' : ' sin'}"><span>${BP.zonaLabel(f.z)}</span><span>${fmt(f.v)}</span><span>${fmt(f.r)}</span></div>`).join('');
+  const mas = document.getElementById('indiceMas');
+  mas.addEventListener('click', () => { const abierto = mas.getAttribute('aria-expanded') === 'true'; document.querySelectorAll('.h-ind-fila.plegada').forEach(f => f.classList.toggle('abierta', !abierto)); mas.setAttribute('aria-expanded', abierto ? 'false' : 'true'); mas.textContent = abierto ? 'Ver el Índice completo' : 'Ver menos'; });
 
-  /* guía */
-  document.getElementById('guiaGrid').innerHTML = BP.ZONAS.map(z => `<a class="p-zona p-zona-guia" href="${BP.urlBuscar({ op: opActiva, zona: z })}"><div><b>${BP.zonaLabel(z)}</b><br><span>${(window.BairenZonas && window.BairenZonas.desc(z,'es')) ? BP.esc(window.BairenZonas.desc(z,'es')).slice(0,70) + '…' : 'Guía en producción'}</span></div>${BP.ico.arrow}</a>`).join('');
-
-  /* SEO */
-  const seo = []; ['venta','alquiler','mediano'].forEach(op => BP.ZONAS.forEach(z => { const n = avisos.filter(a => a.op === op && a.zona === z && !a.reservado).length; if (n) seo.push(`<a href="${BP.urlBuscar({ op, zona: z })}">Departamentos ${BP.OPS[op].h} en ${BP.zonaLabel(z)} <small style="color:var(--gold-dark)">${n}</small></a>`); })); [1,2,3].forEach(n => seo.push(`<a href="buscar.html?op=venta&amb=${n}">Departamentos de ${n===1?'un ambiente':n+' ambientes'} en venta</a>`)); seo.push('<a href="buscar.html?op=mediano&amoblado=1">Departamentos en alquiler a mediano plazo, amoblados</a>','<a href="buscar.html?dueno=1">Propiedades de dueño directo</a>','<a href="buscar.html?video=1">Propiedades con video</a>');
-  document.getElementById('seoLinks').innerHTML = seo.join('');
+  if (window.BPM && BPM.init) BPM.init(document);
 })();
 });
 </script>
