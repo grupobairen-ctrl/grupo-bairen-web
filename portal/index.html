@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://dahusnnbyrvltcuaelxj.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260913b"><link rel="stylesheet" href="css/catalogo.css?v=20260913b"><link rel="stylesheet" href="css/portal.css?v=20260913b">
+  <link rel="stylesheet" href="css/base.css?v=20260913f"><link rel="stylesheet" href="css/catalogo.css?v=20260913f"><link rel="stylesheet" href="css/portal.css?v=20260913f">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"BAIREN","url":"https://www.bairengroup.com","logo":"https://www.bairengroup.com/bairen_logo.png","description":"El portal de propiedades seleccionadas de Buenos Aires. Alquileres a mediano y largo plazo y departamentos en venta, publicados por corredores matriculados y dueños verificados.","areaServed":[{"@type":"City","name":"Ciudad Autónoma de Buenos Aires"},{"@type":"AdministrativeArea","name":"Zona Norte, Buenos Aires"}]}</script>
 </head>
 <body class="p-home">
@@ -55,19 +55,19 @@
       <ol class="h-hitos">
         <li class="h-hito" data-hito>
           <span class="pt" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.1 7-11a7 7 0 1 0-14 0c0 4.9 7 11 7 11Z"/><circle cx="12" cy="10" r="2.4"/></svg></span>
-          <b>Ubicación</b><span class="det">En qué cuadra está, qué tiene alrededor y cómo se llega.</span>
+          <b>Ubicación</b><span class="det">En qué barrio está. Su accesibilidad, seguridad y proyección.</span>
         </li>
         <li class="h-hito" data-hito>
           <span class="pt" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6.4"/><path d="m16 16 4.5 4.5"/><path d="M8.6 11.2l1.7 1.7 3.3-3.5"/></svg></span>
-          <b>Estado</b><span class="det">Cómo está hoy la unidad, no cómo estaba en fotos viejas.</span>
+          <b>Estado</b><span class="det">Cómo está <b>hoy</b> la unidad.</span>
         </li>
         <li class="h-hito" data-hito>
           <span class="pt" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.2" y="3.2" width="17.6" height="17.6"/><path d="M3.2 13.4h9.2M12.4 3.2v17.6M12.4 9h8.4"/></svg></span>
-          <b>Distribución</b><span class="det">Si los metros están bien usados y los ambientes funcionan.</span>
+          <b>Distribución</b><span class="det">Si los m² funcionan con sus ambientes.</span>
         </li>
         <li class="h-hito" data-hito>
           <span class="pt" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 19.5h18"/><path d="M6.2 19.5V8.2L12 4l5.8 4.2v11.3"/><path d="M9.6 19.5v-4.3h4.8v4.3M9.6 10.6h1.6M12.8 10.6h1.6"/></svg></span>
-          <b>Calidad constructiva</b><span class="det">Materiales, terminaciones y el estado del edificio.</span>
+          <b>Calidad constructiva</b><span class="det">Estado del edificio.</span>
         </li>
       </ol>
     </div>
@@ -97,9 +97,9 @@
   <figure class="h-anuncio-foto" id="psiFoto" aria-hidden="true"></figure>
   <div class="h-anuncio-velo" aria-hidden="true"></div>
   <div class="h-in h-anuncio-txt">
-    <p class="h-eyebrow">Personal Shopper Inmobiliario</p>
-    <h2 class="h-h2">En una compra, el comprador también necesita representación.</h2>
-    <p class="h-copy">La parte vendedora llega acompañada. PSI ocupa el lado del comprador: definimos la búsqueda, filtramos alternativas, analizamos las propiedades y acompañamos la negociación.</p>
+    <p class="h-eyebrow">Servicio de Asesoramiento</p>
+    <h2 class="h-h2">Personal Shopper Inmobiliario</h2>
+    <p class="h-copy">Buscamos, negociamos y compramos juntos tu próxima mejor inversión en Buenos Aires.</p>
     <a class="h-btn h-btn-oro" href="psi.html">Conocer PSI</a>
   </div>
 </section>
@@ -107,15 +107,16 @@
 <section class="h-sec h-crema" id="indice">
   <div class="h-in">
     <p class="h-eyebrow">Índice BAIREN</p>
-    <h2 class="h-h2">Cuánto vale el metro cuadrado, barrio por barrio.</h2>
-    <p class="h-copy">Es el precio que hoy piden las propiedades publicadas en BAIREN, dividido por sus metros. Sirve para comparar zonas antes de decidir dónde seguir buscando.</p>
-    <div class="h-ind-dest" id="indiceDest" hidden>
-      <span class="et">Alquiler, promedio de las <b id="indiceN">0</b> unidades publicadas</span>
-      <span class="cifra"><em>USD</em> <b data-countup id="indiceAvg">0</b> <em>por m² y por mes</em></span>
+    <h2 class="h-h2">Cuánto rinde cada barrio.</h2>
+    <p class="h-copy">Cruzamos el precio de venta del metro cuadrado en el mercado con lo que se paga de alquiler en las unidades publicadas en BAIREN. El resultado es la renta anual antes de gastos.</p>
+    <div class="h-rent" id="rentDest" hidden>
+      <span class="et">Renta anual promedio de lo publicado en BAIREN</span>
+      <span class="cifra"><b data-countup id="rentAvg">0</b><em>%</em></span>
+      <span class="pie" id="rentPie"></span>
     </div>
     <div class="h-indice" id="indiceLista" aria-live="polite"></div>
-    <div class="h-acciones h-izq"><button type="button" class="h-btn h-btn-navy" id="indiceMas" aria-expanded="false" aria-controls="indiceLista">Ver todas las zonas</button><a class="h-link" href="#metodologia">Cómo se calcula</a></div>
-    <p class="h-nota" id="metodologia"><b>Cómo se calcula.</b> Tomamos las unidades publicadas hoy en BAIREN con metros y precio informados, dividimos el precio por los metros y promediamos por zona. Venta y alquiler se calculan por separado. Es una referencia de lo que se pide, no una tasación, y no incluye operaciones cerradas.</p>
+    <div class="h-acciones h-izq"><button type="button" class="h-btn h-btn-navy" id="indiceMas" aria-expanded="false" aria-controls="indiceLista">Ver todos los barrios</button><a class="h-link" href="#metodologia">Cómo se calcula</a></div>
+    <p class="h-nota" id="metodologia"><b>Cómo se calcula.</b> La venta por metro cuadrado es el valor de mercado del barrio según Mudafy, julio de 2026. El alquiler por metro cuadrado sale de las unidades publicadas hoy en BAIREN, dividiendo el precio pedido por los metros. La renta anual es el alquiler por doce, sobre el precio de venta. Es renta bruta: no descuenta expensas, servicios, impuestos ni períodos sin inquilino, y en mediano plazo el precio ya incluye expensas y servicios, así que el número real es menor. Es una referencia para comparar barrios, no una proyección de rendimiento.</p>
   </div>
 </section>
 
@@ -129,15 +130,32 @@
   </div>
 </section>
 
+<section class="h-sec h-crema h-borde" id="os">
+  <div class="h-in">
+    <p class="h-eyebrow">Bairen OS</p>
+    <h2 class="h-h2">El panel de quien publica.</h2>
+    <p class="h-copy">Publicar en BAIREN abre un panel donde ves lo tuyo sin pedirle nada a nadie. Es el mismo para un dueño con una unidad que para una inmobiliaria con cien.</p>
+    <div class="h-os">
+      <div class="h-os-item"><b>Tus unidades</b><span>Publicadas, en revisión y pausadas, cada una con su estado.</span></div>
+      <div class="h-os-item"><b>Quién preguntó</b><span>Cada consulta con nombre, teléfono y qué unidad miró.</span></div>
+      <div class="h-os-item"><b>Visitas</b><span>Pedidas desde la ficha. Las confirmás y quedan agendadas.</span></div>
+      <div class="h-os-item"><b>Vistas y favoritos</b><span>Cuánta gente la vio y cuántos la guardaron, por unidad.</span></div>
+      <div class="h-os-item"><b>Producción de fotos</b><span>Pedís que produzcamos las fotos desde el mismo panel.</span></div>
+      <div class="h-os-item"><b>Importar cartera</b><span>Subís tu planilla y las unidades entran a revisión.</span></div>
+    </div>
+    <div class="h-acciones h-izq"><a class="h-btn h-btn-navy" href="publicar-aviso.html">Abrir mi panel</a><a class="h-link" href="publicar.html">Cómo funciona</a></div>
+  </div>
+</section>
+
 </main>
 <div id="pFooter"></div>
 
 <script src="../mapa-barrios.js" defer></script><script src="supabase-portal.js" defer></script>
 <script src="js/motion.js" defer></script>
-<script src="js/bairen-motion.js?v=20260913b" defer></script>
-<script src="js/ui.js?v=20260913b" defer></script>
-<script src="js/store.js?v=20260913b" defer></script>
-<script src="js/data.js?v=20260913b" defer></script>
+<script src="js/bairen-motion.js?v=20260913f" defer></script>
+<script src="js/ui.js?v=20260913f" defer></script>
+<script src="js/store.js?v=20260913f" defer></script>
+<script src="js/data.js?v=20260913f" defer></script>
 <script>
 document.addEventListener('DOMContentLoaded', function(){
 (async function(){
@@ -209,7 +227,7 @@ document.addEventListener('DOMContentLoaded', function(){
   edificios = EDIF.map(e => { const us = reales.filter(a => e.re.test(texto(a))); return Object.assign({}, e, { unidades: us, foto: (us.find(a => a.fotos && a.fotos.length) || {}).fotos }); });
   if (edificios.length) {
     document.getElementById('edificios').hidden = false;
-    document.getElementById('edificiosCopy').textContent = edificios.map(e => e.nombre).join(', ').replace(/, ([^,]*)$/, ' y $1') + ' tienen su propio acceso dentro de BAIREN para comparar las unidades de cada edificio.';
+    document.getElementById('edificiosCopy').textContent = 'Hoy encuentran su espacio en BAIREN.';
     document.getElementById('edificiosTrack').innerHTML = edificios.map(e => {
       const n = e.unidades.length;
       /* Si todavía no cargamos la fachada, mostramos una foto real del edificio */
@@ -233,24 +251,37 @@ document.addEventListener('DOMContentLoaded', function(){
   }
 
   /* ── PSI: fotografía real de una unidad, nunca stock ── */
-  const conFoto = reales.find(a => a.op === 'venta' && a.fotos && a.fotos.length) || reales.find(a => a.fotos && a.fotos.length) || avisos.find(a => a.fotos && a.fotos.length);
+  /* Foto de PSI: la unidad en venta mejor producida, que es la que habla de una compra */
+  const conFotos = reales.filter(a => a.fotos && a.fotos.length);
+  const conFoto = conFotos.filter(a => a.op === 'venta').sort((x, y) => y.fotos.length - x.fotos.length)[0]
+    || conFotos.sort((x, y) => y.fotos.length - x.fotos.length)[0]
+    || avisos.find(a => a.fotos && a.fotos.length);
   if (conFoto) document.getElementById('psiFoto').innerHTML = `<img src="${BP.sbImg(conFoto.fotos[0], 1800)}" alt="" loading="lazy">`;
 
-  /* ── Índice: sólo zonas con datos, la cifra grande cuenta al aparecer ── */
+  /* ── Índice: venta de mercado por barrio y alquiler propio, para la renta anual.
+     La venta es un dato publicado de terceros, con fuente y fecha a la vista. */
+  const VENTA_M2 = { 'Palermo':2631, 'Recoleta':2459, 'Retiro':1882, 'Belgrano':2526, 'Núñez':2569, 'Colegiales':2334, 'Villa Crespo':2085, 'Puerto Madero':4681, 'Saavedra':1991 };
   const avg = l => l.length ? Math.round(l.reduce((s, a) => s + a.precio / a.m2, 0) / l.length) : null;
-  const conDato = reales.filter(a => a.m2 && a.precio);
-  const filas = BP.ZONAS.map(z => { const zs = conDato.filter(a => a.zona === z); return { z, v: avg(zs.filter(a => a.op === 'venta')), r: avg(zs.filter(a => a.op !== 'venta')), n: zs.length }; }).filter(f => f.n).sort((a, b) => b.n - a.n);
-  const alq = conDato.filter(a => a.op !== 'venta');
-  if (alq.length) {
-    document.getElementById('indiceDest').hidden = false;
-    document.getElementById('indiceN').textContent = alq.length;
-    document.getElementById('indiceAvg').textContent = BP.fmtN(avg(alq));
+  const conDato = reales.filter(a => a.m2 && a.precio && a.op !== 'venta');
+  const filas = Object.keys(VENTA_M2).map(z => {
+    const zs = conDato.filter(a => BP.zonaLabel(a.zona) === z || a.zona === z);
+    const alq = avg(zs);
+    return { z, venta: VENTA_M2[z], alq, n: zs.length, rent: alq ? +((alq * 12 / VENTA_M2[z]) * 100).toFixed(1) : null };
+  }).sort((a, b) => (b.rent || -1) - (a.rent || -1));
+  const conRenta = filas.filter(f => f.rent);
+  if (conRenta.length) {
+    const unidades = conRenta.reduce((s, f) => s + f.n, 0);
+    const media = Math.round(conRenta.reduce((s, f) => s + f.rent * f.n, 0) / unidades);
+    document.getElementById('rentDest').hidden = false;
+    document.getElementById('rentAvg').textContent = media;
+    document.getElementById('rentPie').textContent = unidades + (unidades === 1 ? ' unidad en ' : ' unidades en ') + conRenta.length + (conRenta.length === 1 ? ' barrio' : ' barrios') + ' · renta bruta, antes de gastos';
   }
-  const fmt = n => n ? 'USD ' + BP.fmtN(n) : 'sin datos';
-  document.getElementById('indiceLista').innerHTML = `<div class="h-ind-cab"><span>Zona</span><span>Venta, por m²</span><span>Alquiler, por m² y mes</span></div>` + filas.map((f, i) => `<div class="h-ind-fila${i >= 4 ? ' plegada' : ''}"><span>${BP.zonaLabel(f.z)}</span><span class="${f.v ? '' : 'vacio'}">${fmt(f.v)}</span><span class="${f.r ? '' : 'vacio'}">${fmt(f.r)}</span></div>`).join('');
+  document.getElementById('indiceLista').innerHTML =
+    `<div class="h-ind-cab"><span>Barrio</span><span>Venta, por m²</span><span>Alquiler, por m² y mes</span><span>Renta anual</span></div>` +
+    filas.map((f, i) => `<div class="h-ind-fila${i >= 4 ? ' plegada' : ''}"><span>${f.z}</span><span>USD ${BP.fmtN(f.venta)}</span><span class="${f.alq ? '' : 'vacio'}">${f.alq ? 'USD ' + BP.fmtN(f.alq) : 'sin unidades'}</span><span class="${f.rent ? 'rent' : 'vacio'}">${f.rent ? f.rent.toString().replace('.', ',') + ' %' : '—'}</span></div>`).join('');
   const mas = document.getElementById('indiceMas');
   if (filas.length <= 4) mas.hidden = true;
-  mas.addEventListener('click', () => { const abierto = mas.getAttribute('aria-expanded') === 'true'; document.querySelectorAll('.h-ind-fila.plegada').forEach(f => f.classList.toggle('abierta', !abierto)); mas.setAttribute('aria-expanded', abierto ? 'false' : 'true'); mas.textContent = abierto ? 'Ver todas las zonas' : 'Ver menos'; });
+  mas.addEventListener('click', () => { const abierto = mas.getAttribute('aria-expanded') === 'true'; document.querySelectorAll('.h-ind-fila.plegada').forEach(f => f.classList.toggle('abierta', !abierto)); mas.setAttribute('aria-expanded', abierto ? 'false' : 'true'); mas.textContent = abierto ? 'Ver todos los barrios' : 'Ver menos'; });
 
   if (window.BPM && BPM.camino) BPM.camino(document.getElementById('camino'));
   if (window.BPM && BPM.init) BPM.init(document);
