@@ -1592,3 +1592,46 @@ body .p-nav-menu .p-dd.abierto{display:grid}
 .p-nav-menu .p-dd .col.ancha{display:block}
 .p-nav-menu .p-dd .col.ancha > a{width:calc(50% - 20px);display:inline-flex;margin-right:40px}
 .p-nav-menu .p-dd .col.ancha > a:nth-child(2n+1){margin-right:0}
+
+/* El sello de una operación asentada: oro, versalitas, ligeramente torcido */
+.p-sello{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-8deg);z-index:5;pointer-events:none;opacity:0;padding:9px 20px;border:2px solid var(--gold,#C2A968);color:var(--gold-dark,#8A7547);background:rgba(251,250,246,.9);font:700 .68rem/1 var(--font-body);letter-spacing:.3em;text-transform:uppercase;white-space:nowrap}
+.p-aviso-row.sellado{opacity:.62;transition:opacity .5s cubic-bezier(.22,1,.36,1)}
+
+/* ── Compartir: hoja que sube en el celular, panel centrado en escritorio ──── */
+.p-compartir{position:fixed;inset:0;z-index:3200;display:flex;align-items:center;justify-content:center}
+.p-compartir .velo{position:absolute;inset:0;background:#131D2D;opacity:.62}
+.p-compartir .hoja{position:relative;z-index:2;width:min(420px,92vw);background:#FBFAF6;border:1px solid rgba(42,58,82,.12);border-top:2px solid var(--gold,#C2A968);padding:30px 30px 24px;box-shadow:0 30px 80px rgba(19,29,45,.3)}
+.p-compartir .tirador{display:none}
+.p-compartir .ttl{margin:0 0 4px;font:500 .58rem/1 var(--font-body);letter-spacing:.3em;text-transform:uppercase;color:var(--s-gold-dark,#6F5C32)}
+.p-compartir .sub{margin:0 0 20px;font-family:var(--font-display);font-weight:400;font-size:1.16rem;line-height:1.25;color:var(--navy-deeper,#131D2D)}
+.p-compartir .ops{display:grid;gap:8px}
+.p-compartir .op{display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 16px;background:transparent;border:1px solid rgba(42,58,82,.22);color:var(--navy-deeper,#131D2D);font:600 .64rem/1 var(--font-body);letter-spacing:.16em;text-transform:uppercase;cursor:pointer;text-decoration:none;position:relative;overflow:hidden;isolation:isolate}
+.p-compartir .op::before{content:'';position:absolute;inset:0;z-index:-1;background:var(--s-navy,#2A3A52);transform:scaleY(0);transform-origin:50% 100%;transition:transform .42s cubic-bezier(.22,1,.36,1)}
+.p-compartir .op:hover{color:#FBFAF6;border-color:var(--s-navy,#2A3A52)}
+.p-compartir .op:hover::before{transform:scaleY(1)}
+.p-compartir .cerrar{margin:18px auto 0;display:block;background:none;border:0;padding:8px 4px;font:500 .6rem/1 var(--font-body);letter-spacing:.22em;text-transform:uppercase;color:var(--s-mid,#565E6E);cursor:pointer}
+.p-compartir .cerrar:hover{color:var(--navy-deeper,#131D2D)}
+@media(max-width:820px){
+  .p-compartir{align-items:flex-end}
+  .p-compartir .hoja{width:100%;max-width:none;padding:14px 20px calc(24px + env(safe-area-inset-bottom));border-left:0;border-right:0;border-bottom:0}
+  .p-compartir .tirador{display:block;width:44px;height:3px;margin:0 auto 16px;background:rgba(42,58,82,.22)}
+  .p-compartir .op{min-height:52px}
+}
+
+/* El rótulo que rueda: una copia debajo, un solo giro */
+[data-rueda]{overflow:hidden}
+[data-rueda] .rd{display:flex;flex-direction:column;line-height:1}
+[data-rueda] .rd .a,[data-rueda] .rd .b{display:block;padding:.15em 0}
+/* La entrada: el nombre sobre el navy de la casa */
+.p-entrada{position:fixed;inset:0;z-index:5000;background:#131D2D;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.p-entrada .w{font:400 clamp(1.6rem,5vw,2.6rem)/1 var(--font-body);letter-spacing:.42em;text-indent:.42em;color:#FBFAF6;font-variant-numeric:tabular-nums}
+@media(prefers-reduced-motion:reduce){.p-entrada{display:none}}
+
+/* Publicar se abre en las tres puertas antes de mandar al asistente */
+.p-crear{position:relative}
+.p-crear-pop{position:absolute;top:calc(100% + 10px);right:0;z-index:1200;min-width:250px;background:#FBFAF6;border:1px solid rgba(42,58,82,.14);border-top:2px solid var(--gold,#C2A968);box-shadow:0 24px 56px rgba(19,29,45,.22);padding:16px 18px 12px}
+.p-crear-pop .t{margin:0 0 12px;font:500 .56rem/1 var(--font-body);letter-spacing:.28em;text-transform:uppercase;color:var(--s-gold-dark,#6F5C32)}
+.p-crear-pop a{display:block;padding:10px 0;font:300 .9rem/1.3 var(--font-body);color:var(--navy-deeper,#131D2D);border-bottom:1px solid rgba(42,58,82,.08);position:relative;text-transform:none;letter-spacing:0}
+.p-crear-pop a:last-child{border-bottom:0}
+.p-crear-pop a::after{content:'';position:absolute;left:0;bottom:6px;width:0;height:1px;background:var(--gold,#C2A968);transition:width .3s cubic-bezier(.22,1,.36,1)}
+.p-crear-pop a:hover::after{width:100%}

@@ -222,10 +222,101 @@
     }, function () { return false; });
   };
 
+  /* ── Cambio de paso: la tarjeta cambia de alto y el contenido cruza de lado.
+     Es lo que separa un formulario de un producto: el paso no salta, se corre. */
+  BPM.cambioDePaso = function (cont, cambiar, dir) {
+    cont = lista(cont)[0];
+    if (!cont || typeof cambiar !== 'function') return;
+    if (!ok) { cambiar(); return; }
+    var h0 = cont.getBoundingClientRect().height;
+    cambiar();
+    var h1 = cont.getBoundingClientRect().height;
+    cont.style.overflow = 'hidden';
+    M.animate(cont, { height: [h0 + 'px', h1 + 'px'] }, { duration: DUR.rapido, ease: CURVA })
+      .finished.then(function () { cont.style.height = ''; cont.style.overflow = ''; },
+                     function () { cont.style.height = ''; cont.style.overflow = ''; });
+    var visible = cont.querySelector('form:not([hidden]), [data-paso]:not([hidden])');
+    if (visible) M.animate(visible,
+      { opacity: [0, 1], transform: ['translateX(' + (14 * (dir === -1 ? -1 : 1)) + 'px)', 'translateX(0px)'] },
+      { duration: DUR.normal, ease: CURVA });
+  };
+
+  /* ── Sello: BAIREN no festeja una operación, la deja asentada.
+     Una palabra en oro se estampa sobre la unidad y después la fila se apaga.
+     Es un registro, no una fiesta: la operación es de quien publica, no nuestra. */
+  BPM.sello = function (destino, texto) {
+    destino = lista(destino)[0];
+    if (!destino) return Promise.resolve();
+    if (getComputedStyle(destino).position === 'static') destino.style.position = 'relative';
+    var el = document.createElement('span');
+    el.className = 'p-sello'; el.textContent = texto || 'Reservada'; el.setAttribute('aria-hidden', 'true');
+    destino.appendChild(el);
+    var sacar = function () { el.remove(); destino.classList.add('sellado'); };
+    if (!ok) { setTimeout(sacar, 1400); return Promise.resolve(); }
+    return M.animate(el,
+      { opacity: [0, 1], transform: ['rotate(-8deg) scale(1.3)', 'rotate(-8deg) scale(1)'] },
+      { duration: 0.34, ease: CURVA }
+    ).finished.then(function () {
+      return M.animate(el, { opacity: 0 }, { duration: 0.5, delay: 1.1, ease: 'easeIn' }).finished;
+    }).then(sacar, sacar);
+  };
+
+  /* ── Rodar: el rótulo sube y una copia llega desde abajo. Un solo giro,
+     nunca en bucle: en bucle deja de ser un botón y pasa a ser una marquesina. */
+  BPM.rodar = function (root) {
+    if (!ok) return;
+    lista((root || document).querySelectorAll('[data-rueda]')).forEach(function (b) {
+      if (b._rueda) return; b._rueda = true;
+      var txt = b.getAttribute('data-rueda') || b.textContent.trim();
+      b.innerHTML = '<span class="rd"><span class="a">' + txt + '</span><span class="b" aria-hidden="true">' + txt + '</span></span>';
+      var caja = b.querySelector('.rd');
+      var girando = false;
+      var girar = function () {
+        if (girando) return; girando = true;
+        M.animate(caja, { transform: ['translateY(0%)', 'translateY(-50%)'] }, { duration: 0.42, ease: CURVA })
+          .finished.then(function () { caja.style.transform = 'translateY(0%)'; girando = false; }, function () { girando = false; });
+      };
+      b.addEventListener('mouseenter', girar);
+      b.addEventListener('focus', girar);
+    });
+  };
+
+  /* ── Entrada: el nombre se arma desde el ruido y queda. Una vez por sesión,
+     sólo en la portada, con tope de tiempo. Una intro es un peaje: se cobra
+     una sola vez y barato, o no se cobra. */
+  BPM.entrada = function (palabra, opts) {
+    opts = opts || {};
+    try { if (sessionStorage.getItem('bairen-entrada') === '1') return; sessionStorage.setItem('bairen-entrada', '1'); } catch (e) {}
+    if (!ok) return;
+    palabra = (palabra || 'BAIREN').toUpperCase();
+    var capa = document.createElement('div');
+    capa.className = 'p-entrada'; capa.setAttribute('aria-hidden', 'true');
+    capa.innerHTML = '<span class="w"></span>';
+    document.body.appendChild(capa);
+    var w = capa.querySelector('.w');
+    var glifos = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    var fijas = 0, t0 = performance.now(), TOPE = opts.tope || 780;
+    (function tick(now) {
+      var t = Math.min((now - t0) / TOPE, 1);
+      fijas = Math.floor(t * t * palabra.length);
+      var out = '';
+      for (var i = 0; i < palabra.length; i++) out += i < fijas ? palabra[i] : glifos[(Math.random() * glifos.length) | 0];
+      w.textContent = out;
+      if (t < 1) requestAnimationFrame(tick);
+      else {
+        w.textContent = palabra;
+        M.animate(capa, { opacity: 0 }, { duration: 0.5, delay: 0.32, ease: CURVA })
+          .finished.then(function () { capa.remove(); }, function () { capa.remove(); });
+      }
+    })(t0);
+    setTimeout(function () { if (capa.parentNode) capa.remove(); }, TOPE + 1400);
+  };
+
   /* ── Puesta en marcha ───────────────────────────────────────────────────── */
   BPM.init = function (root) {
     root = root || document;
-    BPM.tacto(root); BPM.sellos(root); BPM.contar(root);
+    BPM.tacto(root); BPM.sellos(root); BPM.contar(root); BPM.rodar(root);
+    if (window.BP && BP.crear) BP.crear(root); // el header se vuelve a dibujar al abrir sesión
   };
 
   window.BPM = BPM;

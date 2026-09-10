@@ -193,6 +193,74 @@
     if (b) setTimeout(() => { try { b.focus(); } catch (e) {} }, 60);
   };
 
+  /* ── Compartir: hoja que sube en el celular, panel centrado en escritorio.
+     Cuatro salidas y nada más: WhatsApp, mail, copiar el enlace y el compartir
+     del sistema si existe. Lo que se comparte es una propiedad, no una app. */
+  BP.compartir = function (datos) {
+    datos = datos || {};
+    var url = datos.url || location.href;
+    var titulo = datos.titulo || document.title;
+    var texto = (datos.texto || titulo) + ' ' + url;
+    var previo = document.querySelector('.p-compartir'); if (previo) previo.remove();
+    var w = document.createElement('div');
+    w.className = 'p-compartir'; w.setAttribute('role', 'dialog'); w.setAttribute('aria-modal', 'true'); w.setAttribute('aria-label', 'Compartir esta propiedad');
+    w.innerHTML = '<div class="velo" data-cerrar></div><div class="hoja">'
+      + '<div class="tirador" aria-hidden="true"></div>'
+      + '<p class="ttl">Compartir</p>'
+      + '<p class="sub">' + BP.esc(titulo) + '</p>'
+      + '<div class="ops">'
+      + '<a class="op" target="_blank" rel="noopener" href="https://wa.me/?text=' + encodeURIComponent(texto) + '">WhatsApp</a>'
+      + '<a class="op" href="mailto:?subject=' + encodeURIComponent(titulo) + '&body=' + encodeURIComponent(texto) + '">Por mail</a>'
+      + '<button type="button" class="op" data-copiar>Copiar el enlace</button>'
+      + (navigator.share ? '<button type="button" class="op" data-sistema>Otras aplicaciones</button>' : '')
+      + '</div><button type="button" class="cerrar" data-cerrar>Cerrar</button></div>';
+    document.body.appendChild(w);
+    document.body.style.overflow = 'hidden';
+    var hoja = w.querySelector('.hoja');
+    var movil = window.matchMedia('(max-width: 820px)').matches;
+    if (window.BPM && BPM.ok) { BPM.entrar(w.querySelector('.velo')); BPM.entrar(hoja, movil ? 'abajo' : null); }
+    var soltar = BP.focoAtrapado ? BP.focoAtrapado(w, { devolverA: document.activeElement, primero: w.querySelector('.op'), alCerrar: function () { quitar(); } }) : null;
+    function quitar() {
+      document.body.style.overflow = '';
+      var fin = function () { w.remove(); };
+      if (window.BPM && BPM.ok) { BPM.salir(w.querySelector('.velo')); BPM.salir(hoja, movil ? 'abajo' : null).then(fin, fin); setTimeout(fin, 400); } else fin();
+    }
+    function cerrar() { if (soltar) { var f = soltar; soltar = null; f(); } else quitar(); }
+    w.querySelectorAll('[data-cerrar]').forEach(function (b) { b.addEventListener('click', cerrar); });
+    var bc = w.querySelector('[data-copiar]');
+    if (bc) bc.addEventListener('click', function () {
+      if (window.BPM && BPM.copiar) BPM.copiar(bc, url, 'Copiado').then(function (ok) { if (ok) { BP.toast('Enlace copiado.'); setTimeout(cerrar, 900); } });
+    });
+    var bs = w.querySelector('[data-sistema]');
+    if (bs) bs.addEventListener('click', function () { navigator.share({ title: titulo, url: url }).catch(function () {}); cerrar(); });
+    w.querySelectorAll('a.op').forEach(function (a) { a.addEventListener('click', function () { setTimeout(cerrar, 200); }); });
+    return cerrar;
+  };
+
+  /* El botón Publicar se abre en las tres puertas antes de mandar al asistente */
+  BP.crear = function (root) {
+    (root || document).querySelectorAll('.p-crear').forEach(function (c) {
+      if (c._crear) return; c._crear = true;
+      var bt = c.querySelector('[data-crear]'), pop = c.querySelector('.p-crear-pop');
+      if (!bt || !pop) return;
+      bt.setAttribute('aria-haspopup', 'true'); bt.setAttribute('aria-expanded', 'false');
+      var cerrar = function () {
+        if (pop.hidden) return;
+        var fin = function () { pop.hidden = true; };
+        if (window.BPM && BPM.ok) { BPM.salir(pop, 'abajo').then(fin, fin); setTimeout(fin, 350); } else fin();
+        bt.setAttribute('aria-expanded', 'false');
+      };
+      bt.addEventListener('click', function (e) {
+        if (!pop.hidden) return;
+        e.preventDefault(); pop.hidden = false; bt.setAttribute('aria-expanded', 'true');
+        if (window.BPM && BPM.ok) BPM.entrar(pop, 'abajo');
+        var links = pop.querySelectorAll('a'); if (links[0]) links[0].focus();
+      });
+      document.addEventListener('click', function (e) { if (!c.contains(e.target)) cerrar(); });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { cerrar(); bt.focus(); } });
+    });
+  };
+
   BP.reveal = () => { const els=document.querySelectorAll('[data-reveal]:not(.in)'); if(!('IntersectionObserver' in window)){ els.forEach(e=>e.classList.add('in')); return; }
     /* Se juntan los que entran en la misma tanda para que suban escalonados, no de a uno */
     let tanda=[], t=null;
@@ -260,6 +328,7 @@
       if (d && d.id && d.id !== 'contenido') sk.href = '#' + d.id;
     }
     const cerrarDD = dd => { dd.classList.remove('abierto'); dd.style.height = ''; dd.style.opacity = ''; dd.querySelectorAll('a,button').forEach(x => x.tabIndex = -1); const bt = dd.parentNode.querySelector('button[aria-haspopup]'); if (bt) bt.setAttribute('aria-expanded','false'); };
+    BP.crear(document);
     const abrirDD = dd => {
       if (dd.classList.contains('abierto')) return;
       dd.querySelectorAll('a,button').forEach(x => x.removeAttribute('tabindex'));
@@ -352,7 +421,7 @@
       right.innerHTML = `<button type="button" class="p-ghost p-bell" aria-label="Notificaciones" data-notif>${BP.ico.bell}<span class="dot" hidden></span></button>
         <a class="p-ghost" href="panel.html#interesados">${BP.ico.chat} Mis contactos</a>
         <a class="p-ghost" href="buscar.html?favs=1" aria-label="Favoritos">${BP.ico.heart}<span data-fav-count hidden></span></a>
-        <a class="p-btn p-btn-sm" href="publicar-aviso.html">Publicar</a>
+        <div class="p-crear"><a class="p-btn p-btn-sm" href="publicar-aviso.html" data-crear>Publicar</a><div class="p-crear-pop" hidden><p class="t">¿Quién publica?</p><a href="publicar-aviso.html?perfil=dueno">Soy dueño directo</a><a href="publicar-aviso.html?perfil=inmobiliaria">Soy inmobiliaria o corredor</a><a href="publicar-aviso.html?perfil=desarrolladora">Soy desarrolladora</a></div></div>
         <div class="p-nav-menu" style="display:flex"><div><button type="button" class="p-btn p-btn-sm p-btn-fill" aria-haspopup="true" style="padding:0 14px">${BP.ico.user} Mi cuenta <span class="car" style="border-color:var(--navy-deeper)"></span></button>
           <div class="p-dd" style="left:auto;right:0"><div class="p-dd-ttl">${BP.esc(session.email)}${modeTag}</div><a href="panel.html#avisos">Mis avisos</a><a href="importar.html">Importar cartera</a><a href="panel.html#interesados">Interesados</a><a href="panel.html#contactos">Mis contactos</a><a href="buscar.html?favs=1">Favoritos</a><a href="panel.html#alertas">Búsquedas y alertas</a><a href="panel.html#cuenta">Mi cuenta</a><a href="curacion.html" data-curador hidden>Curación</a><a href="#" data-logout>Cerrar sesión</a></div></div></div>`;
       if (mob) { const cta = mob.querySelector('.m-cta'); if (cta) cta.innerHTML = `<a class="p-btn p-btn-sm" href="publicar-aviso.html">Publicar</a><a class="p-btn p-btn-sm p-btn-fill" href="panel.html">Mi cuenta</a>`; }

@@ -8,7 +8,7 @@
   <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260910f"><link rel="stylesheet" href="css/catalogo.css?v=20260910f"><link rel="stylesheet" href="css/portal.css?v=20260910f">
+  <link rel="stylesheet" href="css/base.css?v=20260910i"><link rel="stylesheet" href="css/catalogo.css?v=20260910i"><link rel="stylesheet" href="css/portal.css?v=20260910i">
   <style>body{padding-top:0}#ficha>.p-ficha-top,#ficha>.p-ficha,#ficha>section{max-width:var(--p-max);margin:0 auto;padding-left:24px;padding-right:24px}#ficha>.p-ficha-top{padding-top:88px}@media(max-width:900px){#ficha>.p-ficha-top{padding-top:76px}}.p-video{aspect-ratio:16/9;background:#0b1220;border-radius:16px;overflow:hidden}.p-video iframe,.p-video video{width:100%;height:100%;border:0;display:block}</style>
 </head>
 <body class="p-product p-ficha-page">
@@ -18,8 +18,8 @@
 <div id="pFooter"></div>
 
 <script src="supabase-portal.js" defer></script>
-<script src="js/iconos-amenities.js?v=20260910f" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260910f" defer></script><script src="js/ui.js?v=20260910f" defer></script><script src="js/store.js?v=20260910f" defer></script>
-<script src="js/data.js?v=20260910f" defer></script>
+<script src="js/iconos-amenities.js?v=20260910i" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260910i" defer></script><script src="js/ui.js?v=20260910i" defer></script><script src="js/store.js?v=20260910i" defer></script>
+<script src="js/data.js?v=20260910i" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -259,10 +259,16 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip">${fotos.map((f,i) => `<but
     BP.toast('Tu consulta va directo a ' + pub.nombre + '.');
   });
   document.getElementById('contactOtra').addEventListener('click', () => { contactOk.hidden = true; openForm(); });
-  const btnTel = document.getElementById('verTel'); if (btnTel) btnTel.addEventListener('click', e => { e.target.closest('button').outerHTML = `<a class="p-btn p-btn-sm" href="tel:${BP.esc(String(pub.telefono || '').replace(/\s/g,''))}">${BP.ico.phone} ${BP.esc(pub.telefono || '')}</a>`; });
+  const btnTel = document.getElementById('verTel');
+  if (btnTel) btnTel.addEventListener('click', e => {
+    const b = e.target.closest('button'); const tel = String(pub.telefono || '');
+    if (b.dataset.visible !== '1') { b.dataset.visible = '1'; b.innerHTML = BP.ico.phone + ' ' + BP.esc(tel); if (window.BPM && BPM.ok) Motion.animate(b, { opacity: [0, 1] }, { duration: BPM.DUR.rapido, ease: BPM.CURVA }); BPStore.evento && BPStore.evento('ver_telefono', { aviso: a.id }); return; }
+    const marcar = () => { location.href = 'tel:' + tel.replace(/\s/g, ''); };
+    if (window.BPM && BPM.copiar) BPM.copiar(b, tel, 'Copiado').then(o => { if (o) BP.toast('Teléfono copiado.'); else marcar(); }); else marcar();
+  });
   const btnBaja = document.getElementById('bajaPrecio'); if (btnBaja) btnBaja.addEventListener('click', () => { if (btnBaja.disabled) return; btnBaja.disabled = true; btnBaja.textContent = 'Alerta creada'; const al = BP.alerts.get(); al.push({ tipo: 'precio', avisoId: a.id, creada: new Date().toISOString() }); BP.alerts.set(al); BP.toast('Te avisamos si baja de precio. Con tu cuenta, por mail.'); });
   document.querySelectorAll('[data-rep]').forEach(b => b.addEventListener('click', async () => { if (b.disabled) return; document.querySelectorAll('[data-rep]').forEach(x => { x.disabled = true; }); b.textContent = 'Enviado, gracias'; const r = BP.reportes.get(); r.push({ avisoId: a.id, motivo: b.dataset.rep, fecha: new Date().toISOString() }); BP.reportes.set(r); await BPStore.addDenuncia(a.id, b.dataset.rep); BP.toast('Gracias. Revisamos el aviso en menos de 24 horas.'); }));
-  document.getElementById('share').addEventListener('click', async () => { const data = { title: a.titulo + ' · BAIREN', url: location.href }; if (navigator.share) { try { await navigator.share(data); } catch (e) {} } else { try { await navigator.clipboard.writeText(location.href); BP.toast('Link copiado.'); } catch (e) { BP.toast(location.href); } } });
+  document.getElementById('share').addEventListener('click', () => BP.compartir({ titulo: a.titulo, texto: a.titulo + ' en BAIREN', url: location.href }));
   /* vistas (contador local de prueba) */
   try { const n = await BPStore.addVista(a.id); document.getElementById('vistas').textContent = n + (n === 1 ? ' vista' : ' vistas'); } catch (e) {}
   /* mapa: el mismo embed de Google Maps que usa la ficha de bairengroup.com */

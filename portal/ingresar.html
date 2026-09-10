@@ -7,7 +7,7 @@
   <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260910f"><link rel="stylesheet" href="css/catalogo.css?v=20260910f"><link rel="stylesheet" href="css/portal.css?v=20260910f">
+  <link rel="stylesheet" href="css/base.css?v=20260910i"><link rel="stylesheet" href="css/catalogo.css?v=20260910i"><link rel="stylesheet" href="css/portal.css?v=20260910i">
 </head>
 <body>
 <div id="pHeader"></div>
@@ -23,7 +23,7 @@
   </div>
 </div></section>
 <div id="pFooter"></div>
-<script src="supabase-portal.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260910f" defer></script><script src="js/ui.js?v=20260910f" defer></script><script src="js/store.js?v=20260910f" defer></script><script src="js/data.js?v=20260910f" defer></script>
+<script src="supabase-portal.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260910i" defer></script><script src="js/ui.js?v=20260910i" defer></script><script src="js/store.js?v=20260910i" defer></script><script src="js/data.js?v=20260910i" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -38,11 +38,11 @@ document.addEventListener('DOMContentLoaded', function(){
   document.getElementById('modeNote').textContent = mode === 'local' ? 'Modo local: sin base conectada, la sesión y los datos quedan en este navegador.' : '';
   if (BPStore.session) { location.replace(destino()); return; }
   let mail = '';
-  async function send(){ const b = document.getElementById('btnMail'); if (b.disabled) return; if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.value.trim())) { BP.errorCampo('email', 'Revisá el mail, por ejemplo nombre@dominio.com.'); return; } b.disabled = true; b.textContent = 'Enviando…'; await BPStore.init(); let r; try { r = await BPStore.sendCode(email.value); } catch (err) { r = { ok: false, msg: err.message || 'No se pudo enviar el código.' }; } b.disabled = false; b.textContent = 'Continuar'; if (!r.ok) { BP.errorCampo('email', r.msg); return; } mail = email.value.trim().toLowerCase(); document.getElementById('codeMsg').textContent = r.msg; fm.hidden = true; document.getElementById('social').hidden = true; fc.hidden = false; const c = document.getElementById('code'); c.value = ''; c.focus(); }
+  async function send(){ const b = document.getElementById('btnMail'); if (b.disabled) return; if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.value.trim())) { BP.errorCampo('email', 'Revisá el mail, por ejemplo nombre@dominio.com.'); return; } b.disabled = true; b.textContent = 'Enviando…'; await BPStore.init(); let r; try { r = await BPStore.sendCode(email.value); } catch (err) { r = { ok: false, msg: err.message || 'No se pudo enviar el código.' }; } b.disabled = false; b.textContent = 'Continuar'; if (!r.ok) { BP.errorCampo('email', r.msg); return; } mail = email.value.trim().toLowerCase(); document.getElementById('codeMsg').textContent = r.msg; const _paso = () => { fm.hidden = true; document.getElementById('social').hidden = true; fc.hidden = false; }; if (window.BPM && BPM.cambioDePaso) BPM.cambioDePaso(document.querySelector('.p-login'), _paso, 1); else _paso(); const c = document.getElementById('code'); c.value = ''; c.focus(); }
   fm.addEventListener('submit', e => { e.preventDefault(); send(); });
   let reenviando = false;
   document.getElementById('again').addEventListener('click', e => { e.preventDefault(); const ag = e.currentTarget; if (reenviando) return; reenviando = true; ag.setAttribute('aria-disabled', 'true'); send(); const t0 = ag.textContent; let seg = 30; ag.textContent = 'Reenviar en 30 s'; const iv = setInterval(() => { seg--; if (seg <= 0) { clearInterval(iv); reenviando = false; ag.textContent = t0; ag.removeAttribute('aria-disabled'); } else ag.textContent = 'Reenviar en ' + seg + ' s'; }, 1000); });
-  document.getElementById('back').addEventListener('click', e => { e.preventDefault(); fc.hidden = true; fm.hidden = false; document.getElementById('social').hidden = false; });
+  document.getElementById('back').addEventListener('click', e => { e.preventDefault(); const volver = () => { fc.hidden = true; fm.hidden = false; document.getElementById('social').hidden = false; }; if (window.BPM && BPM.cambioDePaso) BPM.cambioDePaso(document.querySelector('.p-login'), volver, -1); else volver(); });
   fc.addEventListener('submit', async e => {
     e.preventDefault(); const code = document.getElementById('code'), b = document.getElementById('btnCode');
     if (!/^\d{6,8}$/.test(code.value.trim())) { BP.errorCampo('code', 'El código tiene seis dígitos.'); return; }
