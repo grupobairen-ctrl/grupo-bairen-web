@@ -193,7 +193,12 @@
     if (b) setTimeout(() => { try { b.focus(); } catch (e) {} }, 60);
   };
 
-  BP.reveal = () => { const els=document.querySelectorAll('[data-reveal]'); if(!('IntersectionObserver' in window)){ els.forEach(e=>e.classList.add('in')); return; } const io=new IntersectionObserver(en=>{ en.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} }); },{rootMargin:'0px 0px -8% 0px'}); els.forEach(e=>io.observe(e)); };
+  BP.reveal = () => { const els=document.querySelectorAll('[data-reveal]:not(.in)'); if(!('IntersectionObserver' in window)){ els.forEach(e=>e.classList.add('in')); return; }
+    /* Se juntan los que entran en la misma tanda para que suban escalonados, no de a uno */
+    let tanda=[], t=null;
+    const soltar=()=>{ const g=tanda; tanda=[]; t=null; if(!g.length) return; if(window.BPM && BPM.ok) BPM.aparecer(g); else g.forEach(e=>e.classList.add('in')); };
+    const io=new IntersectionObserver(en=>{ en.forEach(e=>{ if(e.isIntersecting){ io.unobserve(e.target); tanda.push(e.target); } }); if(tanda.length){ clearTimeout(t); t=setTimeout(soltar,40); } },{rootMargin:'0px 0px -8% 0px'});
+    els.forEach(e=>io.observe(e)); };
 
   /* El destino del enlace de salto: la etiqueta main si existe, si no la primera
      sección de contenido después del header. La home no usa main. */

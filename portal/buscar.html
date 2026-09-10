@@ -8,7 +8,7 @@
   <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260910a"><link rel="stylesheet" href="css/catalogo.css?v=20260910a"><link rel="stylesheet" href="css/portal.css?v=20260910a">
+  <link rel="stylesheet" href="css/base.css?v=20260910b"><link rel="stylesheet" href="css/catalogo.css?v=20260910b"><link rel="stylesheet" href="css/portal.css?v=20260910b">
   <style>body{padding-top:64px}</style>
 </head>
 <body class="p-product p-catalogo">
@@ -83,8 +83,8 @@
 
 <script src="supabase-portal.js" defer></script>
 <script src="../mapa-barrios.js" defer></script>
-<script src="js/ui.js?v=20260910a" defer></script><script src="js/store.js?v=20260910a" defer></script>
-<script src="js/data.js?v=20260910a" defer></script>
+<script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260910b" defer></script><script src="js/ui.js?v=20260910b" defer></script><script src="js/store.js?v=20260910b" defer></script>
+<script src="js/data.js?v=20260910b" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -150,7 +150,8 @@ document.addEventListener('DOMContentLoaded', function(){
     const slice = list.slice((F.page-1)*PER_PAGE, F.page*PER_PAGE);
     document.getElementById('resTitle').innerHTML = titulo(n); document.title = titulo(n).replace(/<[^>]+>/g,'') + ' · BAIREN';
     const el = document.getElementById('list');
-    el.innerHTML = n ? slice.map(BPData.cardV).join('') : `<div class="p-empty"><b style="display:block;color:var(--navy-deeper);font-family:var(--font-display);font-size:1.2rem;margin-bottom:6px">${F.favs ? 'Todavía no guardaste propiedades' : F.emp ? 'Todavía no hay emprendimientos publicados' : 'Todavía no hay unidades así'}</b>${F.favs ? 'Tocá el corazón en cualquier ficha y la vas a ver acá.' : F.emp ? 'Los emprendimientos tienen su propia página: <a href="emprendimientos.html" style="text-decoration:underline">ver emprendimientos</a>. Si sos desarrolladora, <a href="publicar.html#desarrolladora" style="text-decoration:underline">publicá el tuyo</a>.' : sugerencias()}</div>`;
+    const pintar = () => { el.innerHTML = n ? slice.map(BPData.cardV).join('') : `<div class="p-empty"><b style="display:block;color:var(--navy-deeper);font-family:var(--font-display);font-size:1.2rem;margin-bottom:6px">${F.favs ? 'Todavía no guardaste propiedades' : F.emp ? 'Todavía no hay emprendimientos publicados' : 'Todavía no hay unidades así'}</b>${F.favs ? 'Tocá el corazón en cualquier ficha y la vas a ver acá.' : F.emp ? 'Los emprendimientos tienen su propia página: <a href="emprendimientos.html" style="text-decoration:underline">ver emprendimientos</a>. Si sos desarrolladora, <a href="publicar.html#desarrolladora" style="text-decoration:underline">publicá el tuyo</a>.' : sugerencias()}</div>`; };
+    if (window.BPM && BPM.reacomodar) BPM.reacomodar(el, pintar); else pintar();
     const rc = document.getElementById('resCount'); if (rc) rc.textContent = n === 1 ? '1 propiedad' : n + ' propiedades';
     BPData.bindFavs(el);
     el.setAttribute('aria-busy','false');

@@ -163,7 +163,7 @@
     const href = BP.urlFicha(a);
     const foto = a.fotos[0] ? `<img src="${BP.sbImg(a.fotos[0], 700)}" alt="${BP.esc(a.titulo)}, ${BP.esc(a.barrio)}" loading="lazy">` : '<span class="card-img-placeholder">Fotos en producción</span>';
     return `
-<a class="prop-card" href="${href}" aria-label="Ver ${BP.esc(a.titulo)} en ${BP.esc(a.barrio)}">
+<a class="prop-card" data-flip="${BP.esc(a.id)}" href="${href}" aria-label="Ver ${BP.esc(a.titulo)} en ${BP.esc(a.barrio)}">
   <div class="card-img">${foto}<span class="card-tag tag-${a.op}">${D.opTag(a)}</span>${a.reservado?'<span class="card-status status-reservado">Reservada</span>':''}</div>
   <div class="card-body">
     <div class="card-address">${BP.esc(a.titulo)}</div>
