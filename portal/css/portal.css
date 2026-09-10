@@ -1974,7 +1974,7 @@ body .p-page.after-band .p-perfil b,body .p-page.after-band .p-step b{color:#131
 body .p-page.after-band .p-perfil span,body .p-page.after-band .p-step span{color:#565E6E}
 body .p-page.after-band a:not(.p-btn):not(.p-btn-fill){color:#131D2D}
 body .p-page.after-band .p-btn-fill{background:#2A3A52;border-color:#2A3A52;color:#FBFAF6}
-body .p-page.after-band .p-btn:not(.p-btn-fill){color:#131D2D;border-color:rgba(42,58,82,.25)}
+body .p-page.after-band .p-btn:not(.p-btn-fill):not(.p-btn-navy):not(.p-btn-dark){color:#131D2D;border-color:rgba(42,58,82,.25)}
 body .p-page.after-band .p-perfil,body .p-page.after-band .p-step,body .p-page.after-band .box{background:#fff;border-color:rgba(42,58,82,.1)}
 body .p-page.after-band .ico-w,body .p-page.after-band .ico-w svg{color:#6F5C32}
 /* Pie: la línea final quedó con tinta oscura sobre navy al reescribir el footer */
@@ -2105,3 +2105,25 @@ body.p-psi{background:#F6F2E8}
 .psi-navy .psi-copy{color:rgba(251,250,246,.82)}
 .psi-crema,.psi-crema .psi-h2,.psi-crema .psi-paso b{color:#1A2538}
 .psi-crema .psi-copy,.psi-crema .psi-paso p{color:#565E6E}
+/* Buscador en escritorio: el plazo baja a una segunda fila. En la misma línea
+   se comía el campo de búsqueda, que quedaba en 48 px. */
+@media(min-width:900px){
+  body.p-home .h-search{grid-template-columns:auto minmax(220px,1fr) auto;row-gap:8px;border-radius:28px;padding:14px}
+  body.p-home .h-search .h-seg{grid-column:1;grid-row:1}
+  body.p-home .h-search .h-field{grid-column:2;grid-row:1;min-width:0}
+  body.p-home .h-search .h-cta{grid-column:3;grid-row:1}
+  body.p-home .h-search .h-seg-plazo{grid-column:1;grid-row:2;margin:0;justify-self:start}
+  body.p-home .h-search .h-ctx{grid-column:2 / -1;grid-row:2;margin:0;align-self:center;text-align:left}
+  body.p-home .h-search .h-seg-plazo button{min-height:36px;padding:0 14px;font-size:.68rem}
+}
+/* Leyenda legal sobre navy: era casi invisible */
+.p-legend{color:rgba(251,250,246,.66)}
+body .p-page.after-band .p-legend,body.p-home .p-legend{color:#565E6E}
+footer .p-legend,.footer .p-legend{color:rgba(251,250,246,.7);background:rgba(255,255,255,.05);border-left:2px solid rgba(194,169,104,.5);padding:10px 12px}
+/* Botón sobre navy en publicadores: crema, no navy sobre navy */
+.p-product .p-pub-block .p-btn,.p-pub-card .p-btn,body .p-btn.p-btn-oro{color:#FBFAF6}
+/* El botón navy usaba --p-ink, que en las bandejas claras pasó a ser oscuro:
+   quedaba navy sobre navy. El relleno oscuro siempre lleva tinta crema. */
+.p-btn-navy,.p-btn-fill,.p-product .p-btn-fill,.p-drawer .p-btn-navy{color:#FBFAF6}
+body .p-page.after-band .p-btn-navy,body .p-page.after-band .p-btn-fill{color:#FBFAF6}
+.p-btn-navy:hover,.p-btn-fill:hover{color:#FBFAF6}
