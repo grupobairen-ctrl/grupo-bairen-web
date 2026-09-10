@@ -10,7 +10,7 @@
   <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260912c"><link rel="stylesheet" href="css/catalogo.css?v=20260912c"><link rel="stylesheet" href="css/portal.css?v=20260912c">
+  <link rel="stylesheet" href="css/base.css?v=20260912f"><link rel="stylesheet" href="css/catalogo.css?v=20260912f"><link rel="stylesheet" href="css/portal.css?v=20260912f">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"BAIREN","url":"https://www.bairengroup.com","logo":"https://www.bairengroup.com/bairen_logo.png","description":"El portal de propiedades seleccionadas de Buenos Aires. Alquileres a mediano y largo plazo y departamentos en venta, publicados por corredores matriculados y dueños verificados.","areaServed":[{"@type":"City","name":"Ciudad Autónoma de Buenos Aires"},{"@type":"AdministrativeArea","name":"Zona Norte, Buenos Aires"}]}</script>
 </head>
 <body class="p-home">
@@ -22,18 +22,18 @@
   <div class="h-hero-velo" aria-hidden="true"></div>
   <div class="h-hero-in">
     <h1><span class="hline">Propiedades seleccionadas</span><span class="hline">en Buenos Aires.</span></h1>
-    <p class="h-hero-sub">Alquiler y venta en las zonas que conocemos de cerca.</p>
+    <p class="h-hero-sub">Experimentá Buenos Aires en su máximo esplendor.</p>
     <form class="h-search" id="searchForm" action="buscar.html" method="get" role="search" aria-label="Buscar propiedades">
-      <input type="hidden" name="op" id="opInput" value="mediano">
+      <input type="hidden" name="op" id="opInput" value="venta">
       <div class="h-seg" role="group" aria-label="Operación">
-        <button type="button" class="on" data-op="alquiler" aria-pressed="true">Alquilar</button>
-        <button type="button" data-op="venta" aria-pressed="false">Comprar</button>
+        <button type="button" class="on" data-op="venta" aria-pressed="true">Comprar</button>
+        <button type="button" data-op="alquiler" aria-pressed="false">Alquilar</button>
       </div>
-      <div class="h-seg h-seg-plazo" id="plazoSel" role="group" aria-label="Plazo del alquiler">
+      <div class="h-seg h-seg-plazo" id="plazoSel" role="group" aria-label="Plazo del alquiler" hidden>
         <button type="button" class="on" data-plazo="mediano" aria-pressed="true">Mediano plazo</button>
         <button type="button" data-plazo="alquiler" aria-pressed="false">Largo plazo</button>
       </div>
-      <p class="h-ctx" id="ctxPlazo">Amoblado · 3 a 12 meses · todo incluido · sin garantía ni caución</p>
+      <p class="h-ctx" id="ctxPlazo" hidden>Amoblado · 3 a 12 meses · todo incluido · sin garantía ni caución</p>
       <div class="h-field">
         <input type="text" id="zonaInput" name="q" placeholder="Barrio, edificio o zona" autocomplete="off" aria-label="Barrio, edificio o zona" aria-autocomplete="list" aria-controls="sugg" enterkeyhint="search">
         <div class="p-sugg" id="sugg" role="listbox" aria-label="Sugerencias"></div>
@@ -46,10 +46,14 @@
 <section class="h-sec h-crema" id="seleccion">
   <div class="h-in">
     <p class="h-eyebrow">Selección BAIREN</p>
-    <h2 class="h-h2">Todo lo que ves acá pasó por una persona.</h2>
-    <p class="h-copy">No publicamos todo lo que llega. Revisamos cada unidad antes de incorporarla al portal, con foco en ubicación, estado, distribución y relación entre precio y producto.</p>
+    <h2 class="h-h2">Seguimos un estándar.</h2>
+    <p class="h-copy">Antes de incorporar cada propiedad al portal, corroboramos ubicación, estado, distribución y calidad constructiva.</p>
   </div>
-  <div class="h-track" id="seleccionTrack" aria-busy="true"></div>
+  <div class="h-carrusel">
+    <button type="button" class="h-flecha prev" data-dir="-1" aria-label="Foto anterior"></button>
+    <div class="h-track h-track-fotos" id="seleccionTrack" aria-busy="true" tabindex="0" aria-label="Propiedades seleccionadas"></div>
+    <button type="button" class="h-flecha next" data-dir="1" aria-label="Foto siguiente"></button>
+  </div>
   <div class="h-in h-acciones"><a class="h-btn h-btn-navy" href="buscar.html">Ver todas las propiedades</a></div>
 </section>
 
@@ -120,10 +124,10 @@
 
 <script src="supabase-portal.js" defer></script>
 <script src="js/motion.js" defer></script>
-<script src="js/bairen-motion.js?v=20260912c" defer></script>
-<script src="js/ui.js?v=20260912c" defer></script>
-<script src="js/store.js?v=20260912c" defer></script>
-<script src="js/data.js?v=20260912c" defer></script>
+<script src="js/bairen-motion.js?v=20260912f" defer></script>
+<script src="js/ui.js?v=20260912f" defer></script>
+<script src="js/store.js?v=20260912f" defer></script>
+<script src="js/data.js?v=20260912f" defer></script>
 <script>
 document.addEventListener('DOMContentLoaded', function(){
 (async function(){
@@ -135,7 +139,7 @@ document.addEventListener('DOMContentLoaded', function(){
   /* ── Buscador: una intención (Alquilar | Comprar); dentro de Alquilar, el plazo ── */
   const opInput = document.getElementById('opInput'), plazoSel = document.getElementById('plazoSel'), ctx = document.getElementById('ctxPlazo');
   const segOp = document.querySelectorAll('.h-seg:not(.h-seg-plazo) button');
-  let opActiva = 'alquiler', plazo = 'mediano';
+  let opActiva = 'venta', plazo = 'mediano';
   const pintarBuscador = () => {
     segOp.forEach(b => { const on = b.dataset.op === opActiva; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
     plazoSel.hidden = opActiva !== 'alquiler';
@@ -143,7 +147,7 @@ document.addEventListener('DOMContentLoaded', function(){
     ctx.hidden = !(opActiva === 'alquiler' && plazo === 'mediano');
     opInput.value = opActiva === 'venta' ? 'venta' : plazo;
   };
-  segOp.forEach(b => b.addEventListener('click', () => { opActiva = b.dataset.op; pintarBuscador(); }));
+  segOp.forEach(b => b.addEventListener('click', () => { const abre = b.dataset.op === 'alquiler' && opActiva !== 'alquiler'; opActiva = b.dataset.op; pintarBuscador(); if (abre && window.BPM && BPM.ok) BPM.entrar(plazoSel, 'abajo'); }));
   plazoSel.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { plazo = b.dataset.plazo; pintarBuscador(); }));
   pintarBuscador();
 
@@ -183,7 +187,9 @@ document.addEventListener('DOMContentLoaded', function(){
   const resto = BPData.sort(base.filter(a => !a.destacado && !a.reservado), 'relevancia');
   const seleccion = dest.concat(resto).slice(0, 8);
   const track = document.getElementById('seleccionTrack');
-  track.innerHTML = seleccion.map(a => `<div class="h-slide">${BPData.cardV(a)}</div>`).join('');
+  const conFotos = seleccion.filter(a => a.fotos && a.fotos.length);
+  track.innerHTML = conFotos.map(a => `<a class="h-foto-card" href="${BP.urlFicha(a)}"><img src="${BP.sbImg(a.fotos[0], 1200)}" alt="${BP.esc(a.dir)}, ${BP.esc(a.barrio)}" loading="lazy"><div class="h-foto-txt"><b>${BP.esc(a.dir)}</b><span>${BP.esc(a.barrio)}</span></div></a>`).join('');
+  document.querySelectorAll('.h-flecha').forEach(b => b.addEventListener('click', () => { const c = track.querySelector('.h-foto-card'); const paso = c ? c.getBoundingClientRect().width + 14 : 360; track.scrollBy({ left: paso * Number(b.dataset.dir), behavior: 'smooth' }); }));
   track.removeAttribute('aria-busy');
 
   /* ── Zonas: todas, con conteo real, en cuadrícula compacta ── */

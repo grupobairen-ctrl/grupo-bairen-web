@@ -1918,3 +1918,35 @@ body.p-home #publicar .h-btn{margin-top:12px}
 body.p-home .h-sec[hidden]{display:none !important}
 /* Edificios en escritorio: tarjetas de hasta 380 px, alineadas a la izquierda; una sola no se estira */
 @media(min-width:900px){body.p-home .h-track-edif{grid-template-columns:repeat(auto-fit,minmax(300px,380px));justify-content:start}}
+
+/* ── Portada: sin cápsula de menú; selección como carrusel de fotos ────────────
+   En la landing el header queda con el logo y las acciones. El plazo aparece
+   debajo al tocar Alquilar. La selección muestra sólo la foto, la dirección y
+   el barrio: una imagen grande por vez en celular, tres y media en escritorio. */
+body.p-home .p-navbar > .p-nav-menu{display:none !important}
+body.p-home .h-seg-plazo[hidden],body.p-home .h-ctx[hidden]{display:none !important}
+body.p-home .h-carrusel{position:relative;max-width:1400px;margin:0 auto}
+body.p-home .h-track-fotos{display:flex !important;grid-template-columns:none !important;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding:28px 20px 10px;scrollbar-width:none;max-width:none}
+body.p-home .h-track-fotos::-webkit-scrollbar{display:none}
+body.p-home .h-foto-card{position:relative;flex:0 0 82vw;max-width:440px;aspect-ratio:4/5;scroll-snap-align:center;border-radius:16px;overflow:hidden;background:var(--h-navy2);text-decoration:none;color:#FBFAF6;box-shadow:var(--h-sombra);isolation:isolate}
+body.p-home .h-foto-card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 1.1s cubic-bezier(.22,1,.36,1)}
+body.p-home .h-foto-card:hover img{transform:scale(1.04)}
+body.p-home .h-foto-card::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(19,29,45,.82) 0%,rgba(19,29,45,.25) 38%,transparent 62%);pointer-events:none}
+body.p-home .h-foto-txt{position:absolute;left:0;right:0;bottom:0;z-index:1;padding:22px 20px;display:grid;gap:5px}
+body.p-home .h-foto-txt b{font-family:var(--font-display);font-weight:400;font-size:1.35rem;line-height:1.15;color:#FBFAF6}
+body.p-home .h-foto-txt span{font:500 .62rem/1 var(--font-body);letter-spacing:.22em;text-transform:uppercase;color:var(--h-oro2)}
+body.p-home .h-flecha{display:none;position:absolute;top:50%;transform:translateY(-50%);z-index:2;width:52px;height:52px;border:1px solid rgba(42,58,82,.18);border-radius:999px !important;background:rgba(251,250,246,.92);cursor:pointer;transition:background .3s cubic-bezier(.22,1,.36,1),border-color .3s cubic-bezier(.22,1,.36,1);box-shadow:var(--h-sombra)}
+body.p-home .h-flecha::before{content:'';position:absolute;top:50%;left:50%;width:11px;height:11px;border-left:1px solid var(--h-navy);border-bottom:1px solid var(--h-navy)}
+body.p-home .h-flecha.prev{left:8px}body.p-home .h-flecha.prev::before{transform:translate(-35%,-50%) rotate(45deg)}
+body.p-home .h-flecha.next{right:8px}body.p-home .h-flecha.next::before{transform:translate(-65%,-50%) rotate(-135deg)}
+body.p-home .h-flecha:hover{background:#fff;border-color:var(--h-oro)}
+@media(min-width:900px){
+  body.p-home .h-track-fotos{gap:18px;padding:34px 64px 12px}
+  body.p-home .h-foto-card{flex-basis:380px;max-width:380px;scroll-snap-align:start}
+  body.p-home .h-flecha{display:block}
+  body.p-home .h-foto-txt{padding:26px 24px}
+  body.p-home .h-foto-txt b{font-size:1.5rem}
+}
+/* Portada sin cápsula: el logo a la izquierda y las acciones pegadas a la derecha */
+body.p-home .p-navbar,body.p-home .navbar{grid-template-columns:auto 1fr auto}
+body.p-home .p-navbar > .p-nav-right{grid-column:3;justify-self:end}
