@@ -8,19 +8,18 @@
   <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260909b"><link rel="stylesheet" href="css/catalogo.css?v=20260909b"><link rel="stylesheet" href="css/portal.css?v=20260909b">
+  <link rel="stylesheet" href="css/base.css?v=20260910a"><link rel="stylesheet" href="css/catalogo.css?v=20260910a"><link rel="stylesheet" href="css/portal.css?v=20260910a">
   <style>body{padding-top:0}#ficha>.p-ficha-top,#ficha>.p-ficha,#ficha>section{max-width:var(--p-max);margin:0 auto;padding-left:24px;padding-right:24px}#ficha>.p-ficha-top{padding-top:88px}@media(max-width:900px){#ficha>.p-ficha-top{padding-top:76px}}.p-video{aspect-ratio:16/9;background:#0b1220;border-radius:16px;overflow:hidden}.p-video iframe,.p-video video{width:100%;height:100%;border:0;display:block}</style>
 </head>
-<body class="p-product">
+<body class="p-product p-ficha-page">
 <div id="pHeader"></div>
 <main id="ficha"><div class="p-ficha-top"><div class="p-skel-ficha" aria-hidden="true"><div class="gal"></div><div class="cols"><div><div class="p-skel-line t"></div><div class="p-skel-line s"></div><div class="p-skel-line l"></div><div class="p-skel-line l"></div><div class="p-skel-line m"></div><div class="p-skel-line l"></div><div class="p-skel-line m"></div></div><div><div class="p-skel-line t"></div><div class="p-skel-line m"></div><div class="p-skel-line l"></div><div class="p-skel-line s"></div></div></div></div></div></main>
 <div class="p-lb" id="lb" aria-hidden="true"><button type="button" class="x" data-lb-close aria-label="Cerrar">×</button><img id="lbImg" alt=""><div class="ctl"><button type="button" data-lb-prev aria-label="Anterior">‹</button><span id="lbCount"></span><button type="button" data-lb-next aria-label="Siguiente">›</button></div></div>
 <div id="pFooter"></div>
 
 <script src="supabase-portal.js" defer></script>
-<script src="../mapa-barrios.js" defer></script>
-<script src="js/ui.js?v=20260909b" defer></script><script src="js/store.js?v=20260909b" defer></script>
-<script src="js/data.js?v=20260909b" defer></script>
+<script src="js/ui.js?v=20260910a" defer></script><script src="js/store.js?v=20260910a" defer></script>
+<script src="js/data.js?v=20260910a" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -99,7 +98,7 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip">${fotos.map((f,i) => `<but
     <div>
       <h2 class="p-sec-t">Dónde queda</h2>
       <div class="p-addr-line">${BP.ico.pin} ${BP.esc(a.dir)}${a.unidad ? ' · ' + BP.esc(a.unidad) : ''}, ${BP.esc(a.barrio)}</div>
-      <div class="p-map-ficha"><div id="mapaFicha"></div><p class="p-note" style="margin:6px 8px 2px">Ubicación aproximada por barrio. La dirección exacta la confirma quien publica.</p></div>
+      <div class="p-map-wrap"><iframe id="mapFrame" src="" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Mapa de la ubicación de la propiedad"></iframe></div>${a.dirAprox ? '<p class="p-note" style="margin:8px 0 0">Ubicación aproximada. La dirección exacta la confirma quien publica.</p>' : ''}
     </div>
     <div class="p-pub-block">
       <h2 class="p-sec-t">Quién publica</h2>
@@ -120,13 +119,15 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip">${fotos.map((f,i) => `<but
   </div>
   <aside class="p-side" id="contacto">
     <div class="p-cta" id="ctaCard">
-      <div class="p-cta-price">${a.reservado ? '<span class="p-cta-res">Reservada</span>' : BPData.precioHTML(a)}</div>
-      <div class="p-cta-pub">Publica <b>${BP.esc(pub.nombre)}</b><span>${pub.tipo === 'dueno' ? 'Dueño verificado' : pub.tipo === 'desarrolladora' ? 'Venta directa' : 'Corredor responsable: ' + BP.esc(pub.responsable || '') + (pub.matricula ? ', ' + BP.esc(pub.matricula) : ', matrícula pendiente')}</span></div>
+      <div class="p-cta-price" data-lbl="${a.op === 'venta' ? 'Precio de venta' : 'Precio mensual'}">${a.reservado ? '<span class="p-cta-res">Reservada</span>' : BPData.precioHTML(a)}</div>
+      <div class="p-cta-pub"><span class="lbl">Publica</span><b>${BP.esc(pub.nombre)}</b><span>${pub.tipo === 'dueno' ? 'Dueño verificado' : pub.tipo === 'desarrolladora' ? 'Venta directa' : 'Corredor responsable: ' + BP.esc(pub.responsable || '') + (pub.matricula ? ', ' + BP.esc(pub.matricula) : ', matrícula pendiente')}</span></div>
+      ${(a.cualidades||[]).length ? `<div class="p-cta-verif">${BP.ico.check} ${(a.cualidades||[]).length === 1 ? 'Una cualidad verificada' : (a.cualidades||[]).length + ' cualidades verificadas'} por BAIREN</div>` : `<div class="p-cta-verif">${BP.ico.check} Ficha revisada por BAIREN antes de publicarse</div>`}
       ${a.reservado ? `<p class="p-sincontacto-box">Reservada: por ahora no toma consultas. Si se libera, vuelve a publicarse acá.</p>` : BPData.sinContacto(pub) ? `<p class="p-sincontacto-box">Contacto pendiente: ${BP.esc(pub.nombre)} todavía no cargó su WhatsApp ni su mail. BAIREN no interviene en la operación, así que el único contacto válido es el de quien publica.</p>` : `
       <button type="button" class="p-btn p-btn-fill" id="abrirForm">${BP.ico.mail} Contactar</button>
       ${BPData.waLink(a, pub) ? `<a class="p-btn" id="waBtn" href="${BPData.waLink(a, pub)}" target="_blank" rel="noopener" data-wa data-aviso="${BP.esc(a.id)}" data-pub="${BP.esc(pub.storeId || pub.id)}">${BP.ico.wa} WhatsApp</a>` : ''}
       ${pub.telefono ? `<button type="button" class="p-btn p-btn-sm" id="verTel">${BP.ico.phone} Ver teléfono</button>` : ''}`}
       <div class="p-cta-acts"><button type="button" class="p-icon-btn ${BP.isFav(a.id)?'on':''}" data-fav="${BP.esc(a.id)}" aria-label="Guardar en favoritos">${BP.isFav(a.id)?BP.ico.heartFill:BP.ico.heart}</button><button type="button" class="p-icon-btn" id="share" aria-label="Compartir">${BP.ico.share}</button></div>
+      <div class="p-cta-foot">Contacto directo con quien publica · BAIREN no interviene en la operación</div>
     </div>
     <form class="p-form" id="contactForm" hidden novalidate>
       <h3>Escribile a ${BP.esc(pub.nombre)}</h3>
@@ -220,8 +221,8 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip">${fotos.map((f,i) => `<but
   document.getElementById('share').addEventListener('click', async () => { const data = { title: a.titulo + ' · BAIREN', url: location.href }; if (navigator.share) { try { await navigator.share(data); } catch (e) {} } else { try { await navigator.clipboard.writeText(location.href); BP.toast('Link copiado.'); } catch (e) { BP.toast(location.href); } } });
   /* vistas (contador local de prueba) */
   try { const n = await BPStore.addVista(a.id); document.getElementById('vistas').textContent = n + (n === 1 ? ' vista' : ' vistas'); } catch (e) {}
-  /* mapa por barrio */
-  if (window.BairenMapa) { try { const counts = {}; counts[a.zona] = 1; window.BairenMapa.mount(document.getElementById('mapaFicha'), { counts, modo: 'lite', active: a.zona, onSelect: z => { location.href = 'buscar.html?op=' + a.op + '&zona=' + encodeURIComponent(z); } }); } catch (e) {} }
+  /* mapa: el mismo embed de Google Maps que usa la ficha de bairengroup.com */
+  try { const dirQ = String(a.dir || '').replace(/\bal\s+(\d)/i, '$1'); const mapsQ = encodeURIComponent(dirQ + (a.unidad && !a.dirAprox ? ' ' + a.unidad : '') + ', ' + (a.barrio || '') + ', Buenos Aires, Argentina'); const mf = document.getElementById('mapFrame'); if (mf) mf.src = 'https://www.google.com/maps?q=' + mapsQ + '&output=embed&z=' + (a.dirAprox ? 15 : 16) + '&hl=es'; } catch (e) {}
   /* JSON-LD */
   const ld = { '@context':'https://schema.org', '@type':'RealEstateListing', name: a.titulo, description: (a.descripcion||'').slice(0,300), url: location.href, image: fotos.slice(0,3), datePosted: a.publicadoEn, offers: { '@type':'Offer', price: a.precio, priceCurrency: 'USD', availability: a.reservado ? 'https://schema.org/LimitedAvailability' : 'https://schema.org/InStock', offeredBy: { '@type': pub.tipo === 'dueno' ? 'Person' : 'RealEstateAgent', name: pub.nombre, identifier: pub.matricula || 'Dueño verificado' } }, address: { '@type':'PostalAddress', streetAddress: a.dir, addressLocality: a.barrio, addressRegion: a.ciudad, addressCountry: 'AR' } };
   const s = document.createElement('script'); s.type = 'application/ld+json'; s.textContent = JSON.stringify(ld); document.head.appendChild(s);

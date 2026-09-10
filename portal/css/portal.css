@@ -1290,3 +1290,107 @@ body #panel.p-card-panel,body.p-product .p-page.after-band .p-card-panel{backgro
 body.p-product .p-panel .p-side-nav a,body .p-panel .p-side-nav a,body .p-panel .p-side-nav a.on{border-radius:0 !important}
 /* Botones sueltos dentro de bloques p- (preguntas sugeridas, denuncias, controles) también rectos */
 [class^="p-"] button,[class*=" p-"] button,.p-quick button,.p-report .chips button,.p-fb button{border-radius:0 !important}
+
+/* ===== Fidelidad a bairengroup.com, medida en vivo el 10/9/2026 =====
+   Catálogo: cuerpo #EEE5D0, barra de filtros blanca de 52 px con controles de 34 px en versalitas,
+   fila de resultados con hairline, grilla de cuatro tarjetas blancas con borde rgba(42,58,82,.07).
+   Ficha: cuerpo #FBFAF6, etiquetas de sección en oro (.6rem, .35em), descripción en Playfair 1.08rem,
+   mapa de Google de 320 px con borde rgba(42,58,82,.1), card lateral con cabecera navy y pie #EEE5D0. */
+:root{--s-navy:#2A3A52;--s-navy-dark:#1E2A3F;--s-gold:#C2A968;--s-gold-dark:#8A7547;--s-gold-light:#DECDA0;--s-white:#FBFAF6;--s-off:#EEE5D0;--s-mid:#6B7589}
+body.p-product,body.p-product .p-page,body .p-page.after-band,.p-page.after-band{background:var(--s-white)}
+body.p-catalogo{background:var(--s-off)}
+
+/* Catálogo: barra de filtros blanca */
+body.p-catalogo .p-filters{background:#fff;border-top:0;border-bottom:1px solid rgba(42,58,82,.1);box-shadow:none}
+body.p-catalogo .p-filters-in{padding:8px 28px;min-height:52px;gap:8px}
+body.p-catalogo .p-filters .p-fbtn{height:34px;border:1px solid rgba(42,58,82,.2);background:transparent;color:var(--s-navy);font:500 .66rem/1 var(--font-body);letter-spacing:.1em;text-transform:uppercase;padding:0 14px;border-radius:0;box-shadow:none}
+body.p-catalogo .p-filters .p-fsel{height:34px;border:1px solid rgba(42,58,82,.18);background-color:transparent;color:var(--s-navy);font:500 .66rem/1 var(--font-body);letter-spacing:.1em;text-transform:uppercase;padding:0 30px 0 14px;border-radius:0;box-shadow:none}
+body.p-catalogo .p-filters .p-fbtn:hover,body.p-catalogo .p-filters .p-fsel:hover{border-color:rgba(42,58,82,.45);background-color:transparent;color:var(--s-navy)}
+body.p-catalogo .p-filters .p-fbtn[aria-pressed="true"],body.p-catalogo .p-filters .p-fbtn.on,body.p-catalogo .p-filters .p-fbtn[aria-expanded="true"]{background:var(--s-navy);color:var(--s-white);border-color:var(--s-navy)}
+body.p-catalogo .p-filters .p-fbtn .cnt{background:var(--s-gold);color:var(--s-navy)}
+body.p-catalogo .p-fchip{height:34px;min-height:34px;border:1px solid rgba(42,58,82,.18);background:#fff;border-radius:0;color:var(--s-navy);box-shadow:none}
+body.p-catalogo .p-fchip input{font:300 .78rem var(--font-body);color:var(--s-navy);background:transparent;height:32px}
+body.p-catalogo .p-fchip input::placeholder{color:var(--s-mid)}
+body.p-catalogo .p-fchip .p-chip,body.p-catalogo #zonaChips .p-chip{background:var(--s-navy);color:var(--s-white);border-color:var(--s-navy);font-size:.66rem;letter-spacing:.06em;text-transform:uppercase}
+body.p-catalogo .p-pop,body.p-catalogo .p-dd,body.p-catalogo .p-sugg{background:#fff;border:1px solid rgba(42,58,82,.15);box-shadow:0 12px 32px rgba(19,29,45,.12);color:var(--s-navy)}
+body.p-catalogo .p-pop label,body.p-catalogo .p-dd .p-dd-ttl{color:var(--s-gold-dark)}
+body.p-catalogo .p-pop .seg button{color:var(--s-navy);border-color:rgba(42,58,82,.18);background:transparent}
+body.p-catalogo .p-pop .seg button.on{background:var(--s-navy);border-color:var(--s-navy);color:var(--s-white)}
+body.p-catalogo .p-pop input,body.p-catalogo .p-drawer input,body.p-catalogo .p-drawer select{background:#fff;color:var(--s-navy);border:1px solid rgba(42,58,82,.18)}
+body.p-catalogo .p-sugg button{color:var(--s-navy)} body.p-catalogo .p-sugg button:hover{background:var(--s-off)}
+body.p-catalogo .p-drawer .panel,body.p-catalogo .p-drawer .foot{background:#fff;color:var(--s-navy)} body.p-catalogo .p-drawer h3,body.p-catalogo .p-drawer .grp label.t{color:var(--s-navy)}
+
+/* Catálogo: fila de resultados y grilla de cuatro, como catalogo.html */
+body.p-catalogo main.p-container{padding:0 !important;max-width:none}
+body.p-catalogo .p-results-head{margin:0;padding:12px 28px;border-bottom:1px solid rgba(42,58,82,.06);justify-content:flex-end}
+body.p-catalogo .p-results-head .acts{display:flex;gap:8px;align-items:center}
+body.p-catalogo .p-results-head .acts .p-fbtn,body.p-catalogo .p-results-head .acts .p-fsel{height:32px;border:1px solid rgba(42,58,82,.15);background-color:var(--s-white);color:var(--s-navy);font:400 .72rem/1 var(--font-body);letter-spacing:.06em;text-transform:none;border-radius:0;padding:0 12px;box-shadow:none}
+body.p-catalogo .p-results-head .acts .p-fsel{padding-right:30px}
+body.p-catalogo .p-results-head .acts .p-fbtn[aria-pressed="true"]{background:var(--s-navy);color:var(--s-white);border-color:var(--s-navy)}
+body.p-catalogo .p-results{grid-template-columns:1fr;padding:32px 28px 72px;gap:0}
+body.p-catalogo .p-list{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:30px;margin:0}
+body.p-catalogo .p-list .prop-card{margin:0}
+body.p-catalogo .p-skel-card{grid-template-columns:1fr;height:auto;margin:0;background:#fff;border:1px solid rgba(42,58,82,.07)}
+body.p-catalogo .p-skel-card .ph{aspect-ratio:16/10;height:auto}
+body.p-catalogo .p-pager{margin-top:40px}
+body.p-catalogo .p-empty{grid-column:1/-1;background:#fff;border:1px solid rgba(42,58,82,.07)}
+@media(max-width:1200px){body.p-catalogo .p-list{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:860px){body.p-catalogo .p-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}}
+@media(max-width:560px){body.p-catalogo .p-list{grid-template-columns:1fr}body.p-catalogo .p-results{padding:20px 16px 56px}body.p-catalogo .p-results-head,body.p-catalogo .p-filters-in{padding-left:16px;padding-right:16px}}
+/* la tarjeta del sitio, tal cual: blanca, borde fino, sin sombra */
+body.p-catalogo .prop-card,body.p-product .prop-card{background:#fff;border:1px solid rgba(42,58,82,.07);box-shadow:none;border-radius:0;color:var(--s-navy)}
+body.p-catalogo .prop-card .card-img{background:var(--s-navy)}
+body.p-catalogo .prop-card .card-tag{background:var(--s-navy);color:var(--s-white);font:700 .56rem/1 var(--font-body);letter-spacing:.2em;text-transform:uppercase;padding:5px 11px;border-radius:0}
+body.p-catalogo .prop-card .card-tag.tag-venta{background:var(--s-gold);color:var(--s-navy)}
+body.p-catalogo .prop-card .card-body{padding:22px 22px 18px}
+body.p-catalogo .prop-card .card-address{font-family:var(--font-display);font-weight:400;font-size:1.22rem;color:var(--s-navy);line-height:1.25}
+body.p-catalogo .prop-card .card-barrio{font:500 .62rem/1 var(--font-body);letter-spacing:.16em;text-transform:uppercase;color:var(--s-gold-dark);margin:6px 0 14px}
+body.p-catalogo .prop-card .card-meta{font-size:.76rem;color:var(--s-mid);letter-spacing:.03em;margin-bottom:16px;font-weight:300}
+body.p-catalogo .prop-card .card-divider{border-top:1px solid rgba(42,58,82,.1);margin-bottom:14px}
+body.p-catalogo .prop-card .card-price{font-family:var(--font-display);font-size:1.35rem;color:var(--s-navy);font-weight:400}
+body.p-catalogo .prop-card .card-price small{display:block;font:300 .68rem/1.2 var(--font-body);color:var(--s-mid);letter-spacing:.04em;margin-top:3px}
+body.p-catalogo .prop-card .card-cta{border:1px solid rgba(42,58,82,.25);padding:9px 14px;font:600 .6rem/1 var(--font-body);letter-spacing:.16em;text-transform:uppercase;color:var(--s-navy);border-radius:0;background:transparent}
+body.p-catalogo .prop-card .card-cta::after{content:' →'}
+body.p-catalogo .prop-card .p-card-pub{font-size:.68rem;color:var(--s-mid);margin-top:12px;font-weight:300}
+body.p-catalogo .prop-card .p-card-pub b{font-weight:500;color:var(--s-navy)}
+
+/* Ficha: cuerpo claro del sitio, etiquetas de sección en oro, descripción en Playfair */
+body.p-ficha-page{background:var(--s-white)}
+.p-ficha .p-sec-t{font:500 .6rem/1 var(--font-body);letter-spacing:.35em;text-transform:uppercase;color:var(--s-gold-dark);margin:0 0 18px}
+.p-ficha #desc{font-family:var(--font-display);font-size:1.08rem;line-height:1.7;color:var(--s-navy);font-weight:400;max-width:62ch;padding-top:26px;border-top:1px solid rgba(138,117,71,.35)}
+.p-ficha .p-more{font:500 .66rem/1 var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:var(--s-gold-dark)}
+.p-ficha .p-icons{border:1px solid rgba(42,58,82,.1);background:#fff;padding:16px 0}
+.p-ficha .p-ficha-main > div{margin-bottom:44px}
+.p-ficha .p-addr-line{font-weight:500;color:var(--s-navy);margin-bottom:12px}
+.p-map-wrap{border:1px solid rgba(42,58,82,.1);overflow:hidden;background:#fff}
+.p-map-wrap iframe{display:block;width:100%;height:320px;border:0;filter:grayscale(20%) contrast(1.05)}
+@media(max-width:820px){.p-map-wrap iframe{height:240px}}
+
+/* Ficha: card lateral con cabecera navy, filas, botones y pie del sitio */
+.p-ficha .p-cta{background:#fff;border:1px solid rgba(42,58,82,.1);border-radius:0;box-shadow:none;padding:0 26px 22px;gap:0;overflow:hidden}
+.p-ficha .p-cta-price{margin:0 -26px 18px;padding:26px 26px 22px;background:var(--s-navy);color:var(--s-gold);font-family:var(--font-display);font-weight:700;font-size:2.6rem;line-height:1;display:flex;flex-direction:column;gap:8px;font-variant-numeric:normal}
+.p-ficha .p-cta-price::before{content:attr(data-lbl);font:300 .6rem/1 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:var(--s-gold-light)}
+.p-ficha .p-cta-price small{font:300 .7rem/1.2 var(--font-body);letter-spacing:.08em;color:rgba(255,255,255,.45);margin-left:6px}
+.p-ficha .p-cta-price .p-cta-res{font:500 .9rem/1 var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:var(--s-gold-light)}
+.p-ficha .p-cta-pub{display:grid;gap:3px;font-size:.82rem;color:var(--s-navy);line-height:1.45;padding:0 0 14px;border-bottom:1px solid rgba(42,58,82,.08);margin-bottom:14px}
+.p-ficha .p-cta-pub .lbl{font:500 .62rem/1 var(--font-body);letter-spacing:.1em;text-transform:uppercase;color:var(--s-mid)}
+.p-ficha .p-cta-pub b{font-weight:600;font-size:.86rem}
+.p-ficha .p-cta-pub span:not(.lbl){color:var(--s-mid);font-size:.78rem}
+.p-ficha .p-cta-verif{display:flex;align-items:center;gap:8px;background:rgba(194,169,104,.18);border:1px solid rgba(194,169,104,.35);padding:10px 12px;font:600 .66rem/1.3 var(--font-body);color:var(--s-navy);margin-bottom:14px}
+.p-ficha .p-cta-verif svg{color:var(--s-gold-dark);flex:0 0 auto}
+.p-ficha .p-cta .p-btn-fill,.p-product .p-ficha .p-cta .p-btn-fill{background:var(--s-navy);border:1px solid var(--s-navy);color:var(--s-white);font:700 .66rem/1 var(--font-body);letter-spacing:.18em;text-transform:uppercase;padding:15px;border-radius:0;margin-bottom:8px;width:100%;justify-content:center}
+.p-ficha .p-cta .p-btn-fill:hover{background:var(--s-navy-dark)}
+.p-ficha .p-cta .p-btn:not(.p-btn-fill){background:transparent;border:1px solid rgba(42,58,82,.25);color:var(--s-navy);font:600 .62rem/1 var(--font-body);letter-spacing:.14em;text-transform:uppercase;padding:11px;border-radius:0;margin-bottom:8px;width:100%;justify-content:center}
+.p-ficha .p-cta .p-btn:not(.p-btn-fill):hover{border-color:var(--s-navy)}
+.p-ficha .p-sincontacto-box{margin-bottom:12px}
+.p-ficha .p-cta-acts{justify-content:center;padding-top:8px;gap:10px}
+.p-ficha .p-cta-acts .p-icon-btn{border:1px solid rgba(42,58,82,.2);color:var(--s-navy);background:transparent}
+.p-ficha .p-cta-foot{margin:16px -26px -22px;padding:13px 26px;background:var(--s-off);border-top:1px solid rgba(42,58,82,.07);font:300 .6rem/1.4 var(--font-body);letter-spacing:.06em;color:var(--s-mid);text-align:center}
+.p-ficha .p-form{background:#fff;border:1px solid rgba(42,58,82,.1);border-radius:0;box-shadow:none}
+body.p-product .p-page.after-band,body .p-page.after-band,body.p-product .p-page{background:var(--s-white)}
+.p-ficha .p-cta-verif svg{width:14px;height:14px;flex:0 0 14px}
+.p-ficha .p-cta-pub svg{width:12px;height:12px}
+/* Línea "Publica" de la tarjeta del sitio, en todas las páginas del portal */
+.prop-card .p-card-pub{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font:300 .68rem/1.3 var(--font-body);color:var(--s-mid);margin-top:12px}
+.prop-card .p-card-pub b{font:500 .74rem/1.3 var(--font-body);color:var(--s-navy)}
+.prop-card .p-card-pub .p-badge{font-size:.58rem}
