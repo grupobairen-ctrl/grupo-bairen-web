@@ -1459,3 +1459,45 @@ a,button,[role="button"],summary{touch-action:manipulation;-webkit-tap-highlight
 /* Desbordes en celular: tabla del índice con scroll propio; tarjeta de emprendimiento dentro de su columna */
 .p-index-wrap,.p-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
 @media(max-width:820px){.p-emp{grid-template-columns:minmax(0,1fr);width:100%;max-width:100%;min-width:0}.p-emp > *{min-width:0}}
+/* Catálogo en celular, medido en bairengroup.com a 430 px: banda de 101 px con título de 24.8 px; barra blanca con
+   Barrios (44 px) arriba, selects de 34 px en versalitas, buscador de 44 px al final; fila de resultados con conteo y orden */
+@media(max-width:820px){
+  body.p-catalogo .p-catband{padding:26px 20px 22px}
+  body.p-catalogo .p-catband-in{display:block}
+  body.p-catalogo .p-catband-eyebrow{display:none}
+  body.p-catalogo .p-catband h1,body.p-catalogo #resTitle{font-size:1.55rem;line-height:1.15;margin:0 0 6px}
+  body.p-catalogo .p-catband-sub{font-size:.78rem;margin:0;opacity:.75}
+  body.p-catalogo .p-catband-mapa{display:none}
+  body.p-catalogo .p-filters-in{display:flex !important;flex-wrap:wrap;gap:8px;padding:12px 16px;grid-template-columns:none}
+  body.p-catalogo .p-filters-in > *{width:auto;flex:0 0 auto}
+  body.p-catalogo .p-filters #barriosBtn{order:1;flex:0 0 auto;height:44px;font-size:.7rem;letter-spacing:.12em;padding:0 16px;border-color:rgba(42,58,82,.2)}
+  body.p-catalogo .p-filters #barriosBtn::after{content:'';width:6px;height:6px;border-right:1px solid currentColor;border-bottom:1px solid currentColor;transform:rotate(45deg);margin:-3px 0 0 8px}
+  body.p-catalogo .p-filters #opSel{order:2;flex:1 1 40%}
+  body.p-catalogo .p-filters #tipoSel{order:3;flex:1 1 40%}
+  body.p-catalogo .p-filters .p-fsel{height:34px;font-size:.6rem;letter-spacing:.1em;padding:0 26px 0 10px}
+  body.p-catalogo .p-filters #ambBtn,body.p-catalogo .p-filters #precioBtn,body.p-catalogo .p-filters #moreBtn{height:34px;font-size:.6rem;letter-spacing:.1em;padding:0 12px}
+  body.p-catalogo .p-filters .p-fwrap{order:4;flex:0 0 auto}
+  body.p-catalogo .p-filters #moreBtn{order:5}
+  body.p-catalogo .p-filters #zonaBox{order:6;flex:1 1 100%;width:100%;height:44px;min-height:44px}
+  body.p-catalogo .p-fchip input{font-size:.92rem;height:42px}
+  body.p-catalogo .p-results-head{padding:10px 16px;flex-wrap:nowrap;gap:8px}
+  body.p-catalogo .p-results-head .acts .p-fbtn,body.p-catalogo .p-results-head .acts .p-fsel{height:40px;font-size:.72rem}
+  body.p-catalogo .p-results-head .acts .p-fbtn svg{display:none}
+  body.p-catalogo .p-results{padding:16px 16px 56px}
+  body.p-catalogo .p-list{grid-template-columns:1fr;gap:18px}
+}
+@media(max-width:820px){
+  body.p-catalogo .p-catband h1,body.p-catalogo #resTitle{font-size:1.55rem !important;line-height:1.15 !important}
+  body.p-catalogo .p-catband-sub{font-size:.8rem !important;line-height:1.4}
+  body.p-catalogo .p-filters .p-fsel{height:34px !important;font-size:.6rem !important;letter-spacing:.1em !important;padding:0 26px 0 10px !important;min-height:0 !important;width:auto !important}
+  body.p-catalogo .p-filters .p-fbtn{height:34px !important;min-height:0 !important;font-size:.6rem !important;letter-spacing:.1em !important;padding:0 12px !important;width:auto !important}
+  body.p-catalogo .p-filters #barriosBtn{height:44px !important;font-size:.7rem !important;letter-spacing:.12em !important;padding:0 16px !important;flex:0 0 100% !important;max-width:150px}
+  body.p-catalogo .p-filters #opSel,body.p-catalogo .p-filters #tipoSel{flex:1 1 40% !important}
+  body.p-catalogo .p-results-head{flex-wrap:nowrap !important}
+  body.p-catalogo .p-results-count{white-space:nowrap;font-size:.66rem}
+  body.p-catalogo .p-results-head .acts{flex:0 0 auto;gap:6px}
+  body.p-catalogo .p-results-head .acts .p-fbtn{height:40px !important;min-height:0 !important;font-size:.66rem !important;padding:0 10px !important;width:auto !important}
+  body.p-catalogo .p-results-head .acts .p-fsel{height:40px !important;min-height:0 !important;font-size:.7rem !important;padding:0 26px 0 10px !important;width:auto !important;max-width:150px}
+}
+/* Ficha en celular: la fila de datos en una sola línea con scroll, como stats-row del sitio */
+@media(max-width:820px){.p-ficha .p-icons{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch}.p-ficha .p-icons > div{flex:0 0 auto;min-width:88px}}
