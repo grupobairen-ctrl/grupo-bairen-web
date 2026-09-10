@@ -1646,54 +1646,57 @@ body .p-nav-menu .p-dd-cuenta.abierto{display:block}
 /* Titular por palabras: cada palabra dentro de su máscara */
 .p-msk{display:inline-block;overflow:hidden;vertical-align:top}
 .p-msk-in{display:inline-block;will-change:transform}
-/* ── La barra de arriba, en vidrio, con dos luces ───────────────────────────
-   Traslúcida con desenfoque, hairline de oro y dos focos: uno sigue al cursor
-   desde abajo y un haz baja sobre la sección en la que estás. */
-.p-navbar,.navbar{--foco-x:50%;--ambiente-x:50%;--ambiente-w:80px;overflow:hidden;transition:background .35s cubic-bezier(.22,1,.36,1),box-shadow .35s cubic-bezier(.22,1,.36,1),border-color .35s cubic-bezier(.22,1,.36,1)}
-/* Arriba de todo es navy pleno. Al bajar se vuelve vidrio y el contenido pasa por debajo. */
+/* ── El menú de arriba, en cápsula flotante (spotlight navbar) ──────────────
+   El componente que pidió Tomás, en la lengua de la casa: cápsula navy
+   translúcida con hairline de oro, ítems en versalitas, una luz que sigue al
+   cursor y una línea de oro que se desliza bajo la sección activa. */
+.p-navbar,.navbar{overflow:visible;transition:background .35s cubic-bezier(.22,1,.36,1),box-shadow .35s cubic-bezier(.22,1,.36,1),border-color .35s cubic-bezier(.22,1,.36,1)}
 .p-navbar.bajado,.navbar.bajado{background:rgba(19,29,45,.78) !important;backdrop-filter:saturate(160%) blur(20px);-webkit-backdrop-filter:saturate(160%) blur(20px);border-bottom-color:rgba(194,169,104,.42);box-shadow:0 14px 40px rgba(10,14,22,.32)}
-.p-foco,.p-ambiente{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:0;transition:opacity .35s cubic-bezier(.22,1,.36,1)}
-.p-foco{background:radial-gradient(180px 60px at var(--foco-x) 100%,rgba(194,169,104,.2) 0%,rgba(194,169,104,.07) 46%,transparent 74%)}
-/* El haz de la sección activa: línea de oro abajo y halo encima, del ancho del ítem */
-.p-ambiente{background:linear-gradient(to top,rgba(194,169,104,.22) 0%,transparent 62%);-webkit-mask-image:linear-gradient(to right,transparent calc(var(--ambiente-x) - 10px),#000 var(--ambiente-x),#000 calc(var(--ambiente-x) + var(--ambiente-w,80px)),transparent calc(var(--ambiente-x) + var(--ambiente-w,80px) + 10px));mask-image:linear-gradient(to right,transparent calc(var(--ambiente-x) - 10px),#000 var(--ambiente-x),#000 calc(var(--ambiente-x) + var(--ambiente-w,80px)),transparent calc(var(--ambiente-x) + var(--ambiente-w,80px) + 10px))}
-.p-ambiente::after{content:'';position:absolute;left:var(--ambiente-x);bottom:0;width:var(--ambiente-w,80px);height:2px;background:var(--gold,#C2A968);box-shadow:0 -6px 18px rgba(194,169,104,.6)}
-.p-navbar > *:not(.p-foco):not(.p-ambiente),.navbar > *:not(.p-foco):not(.p-ambiente){position:relative;z-index:1}
-.p-nav-menu .p-dd{backdrop-filter:none;-webkit-backdrop-filter:none}
-@media(prefers-reduced-motion:reduce){.p-foco{display:none}}
-
-/* Cómo funciona: las tarjetas del sitio, con el paso y una explicación */
-.caminos-hd .p-eyebrow{display:block;margin-bottom:12px;color:var(--s-gold-dark,#6F5C32)}
-.camino-txt{margin:0 0 22px;font:300 .88rem/1.6 var(--font-body);color:var(--s-mid,#565E6E)}
-.camino .camino-kicker{order:-1}
-/* Barrios: la línea con los que todavía no tienen unidades */
-.p-zonas-vacias{margin:16px 0 0;font:300 .82rem/1.6 var(--font-body);color:rgba(251,250,246,.6)}
-.p-zonas-vacias a{color:rgba(251,250,246,.86);text-decoration:underline;text-underline-offset:3px}
-.p-zonas-vacias a:hover{color:var(--gold-light,#DECDA0)}
-/* Cómo funciona: en celular, una tarjeta por fila */
-@media(max-width:820px){.caminos-grid{grid-template-columns:1fr !important;gap:14px}.caminos{padding-left:16px;padding-right:16px}}
-
-/* ── Muro de publicadores: cuadrícula con líneas, monograma en oro y una luz
-   cálida que sigue al cursor. Las tandas se alternan si hay más de cuatro. */
-.p-muro{position:relative;display:grid;isolation:isolate;border:1px solid rgba(42,58,82,.1);background:#fff;overflow:hidden;min-height:168px}
-.p-muro::after{content:'';position:absolute;inset:0;z-index:3;pointer-events:none;opacity:0;transition:opacity .35s cubic-bezier(.22,1,.36,1);background:radial-gradient(220px circle at var(--mx,50%) var(--my,50%),rgba(194,169,104,.16) 0%,rgba(194,169,104,.05) 42%,transparent 70%)}
-.p-muro.con-luz::after{opacity:1}
-.p-muro .tanda{grid-area:1/1;display:grid;grid-template-columns:repeat(4,1fr)}
-.p-muro .tile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:168px;padding:22px 16px;text-align:center;border-right:1px solid rgba(42,58,82,.1);color:var(--navy-deeper,#131D2D);transition:background .35s cubic-bezier(.22,1,.36,1)}
-.p-muro .tile:last-child{border-right:0}
-.p-muro .tile:hover{background:rgba(194,169,104,.06)}
-.p-muro .mono{display:flex;align-items:center;justify-content:center;width:46px;height:46px;border:1px solid rgba(194,169,104,.55);color:var(--s-gold-dark,#6F5C32);font-family:var(--font-display);font-size:1.02rem;letter-spacing:.04em}
-.p-muro .nom{font:500 .84rem/1.25 var(--font-body);color:var(--navy-deeper,#131D2D)}
-.p-muro .tip{font:400 .58rem/1.2 var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:var(--s-mid,#565E6E)}
-.p-muro .tile.vacio{border-style:dashed;border-color:rgba(42,58,82,.18)}
-.p-muro .tile.vacio .mono{border-style:dashed;font-size:1.3rem}
-@media(max-width:820px){.p-muro .tanda{grid-template-columns:repeat(2,1fr)}.p-muro .tile{min-height:140px;border-bottom:1px solid rgba(42,58,82,.1)}.p-muro .tile:nth-child(2n){border-right:0}}
-/* Botón de producción con IA: mientras trabaja, una luz de oro recorre el rótulo */
-.p-gen{position:relative;color:transparent !important;background-image:linear-gradient(90deg,var(--s-navy,#2A3A52) 0%,var(--s-navy,#2A3A52) 38%,var(--gold,#C2A968) 50%,var(--s-navy,#2A3A52) 62%,var(--s-navy,#2A3A52) 100%);background-size:280% 100%;-webkit-background-clip:text;background-clip:text;animation:p-gen-luz 1.7s linear infinite}
-.p-gen svg{opacity:.35}
-@keyframes p-gen-luz{0%{background-position:120% 0}100%{background-position:-120% 0}}
-@media(prefers-reduced-motion:reduce){.p-gen{animation:none;color:var(--s-navy,#2A3A52) !important;background-image:none}}
+.p-nav-menu{--foco-x:50%;--ambiente-x:0px;--ambiente-w:80px;position:relative;gap:2px;padding:5px 7px;border-radius:999px;background:transparent;border:1px solid rgba(194,169,104,.34);box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 10px 26px rgba(10,14,22,.28)}
+/* El vidrio va en una capa interna: si lo lleva la cápsula, se vuelve el marco
+   de los elementos fijos y el panel del mega menú deja de centrarse en la página. */
+.p-nav-menu::before{content:'';position:absolute;inset:0;z-index:0;border-radius:inherit;background:rgba(255,255,255,.055);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.p-nav-menu .p-foco,.p-nav-menu .p-ambiente{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:0;border-radius:inherit;overflow:hidden;transition:opacity .35s cubic-bezier(.22,1,.36,1)}
+.p-nav-menu .p-foco{background:radial-gradient(120px 46px at var(--foco-x) 100%,rgba(194,169,104,.3) 0%,rgba(194,169,104,.1) 48%,transparent 76%)}
+.p-nav-menu .p-ambiente{background:none}
+.p-nav-menu .p-ambiente::after{content:'';position:absolute;left:var(--ambiente-x);bottom:5px;width:var(--ambiente-w,80px);height:2px;border-radius:2px;background:var(--gold,#C2A968);box-shadow:0 -7px 20px rgba(194,169,104,.65)}
+.p-nav-menu > div,.p-nav-menu > a{position:relative;z-index:1}
+.p-nav-menu > div > button,.p-nav-menu > a{padding:9px 16px;border-radius:999px;color:rgba(251,250,246,.7);transition:color .25s cubic-bezier(.22,1,.36,1),background .25s cubic-bezier(.22,1,.36,1)}
+.p-nav-menu > div > button:hover,.p-nav-menu > a:hover{color:#FBFAF6;background:rgba(255,255,255,.05)}
+.p-nav-menu > div > button[aria-expanded="true"],.p-nav-menu > a[aria-current="page"]{color:#FBFAF6}
+/* El panel del mega menú cuelga de la cápsula, centrado y con su ancho */
+.p-nav-menu .p-dd:not(.p-dd-cuenta){border-radius:0}
+.p-nav-menu .p-dd.abierto:not(.p-dd-cuenta){padding:32px 36px 36px}
+@media(prefers-reduced-motion:reduce){.p-nav-menu .p-foco{display:none}}
 /* El haz de la sección activa, en el menú del celular */
 .mobile-menu{--haz-y:0px;--haz-h:48px}
 .p-ambiente-m{position:absolute;left:0;right:0;top:var(--haz-y);height:var(--haz-h);z-index:0;pointer-events:none;opacity:0;transition:opacity .35s cubic-bezier(.22,1,.36,1);background:linear-gradient(to right,rgba(194,169,104,.16) 0%,rgba(194,169,104,.04) 55%,transparent 88%)}
 .p-ambiente-m::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--gold,#C2A968);box-shadow:6px 0 18px rgba(194,169,104,.5)}
 .mobile-menu > *:not(.p-ambiente-m){position:relative;z-index:1}
+/* La cápsula del menú es la excepción a las esquinas rectas: el componente es una píldora */
+.p-nav-menu,.p-nav-menu .p-foco,.p-nav-menu .p-ambiente,.p-nav-menu > div > button,.p-nav-menu > a{border-radius:999px !important}
+.p-nav-menu .p-ambiente::after{border-radius:2px !important}
+.p-nav-menu .p-dd,.p-nav-menu .p-dd *{border-radius:0 !important}
+/* Se encoge a su contenido y queda centrada, como en el componente */
+.p-navbar .p-nav-menu{justify-self:center;width:max-content;max-width:100%;flex:0 0 auto}
+/* El panel del mega menú se ancla a la ventana, no a la cápsula: así queda
+   centrado en la página sin importar dónde esté la cápsula. */
+.p-nav-menu .p-dd:not(.p-dd-cuenta){position:fixed;top:64px;left:50%;right:auto;transform:translateX(-50%);width:min(1080px,calc(100vw - 48px))}
+/* En sesión iniciada, "Mi cuenta" usa la misma clase que el menú del centro.
+   La cápsula es sólo la del centro; la de la derecha vuelve a ser un grupo suelto. */
+.p-nav-right .p-nav-menu{position:static !important;left:auto !important;right:auto !important;top:auto !important;margin:0 !important;width:auto !important;padding:0 !important;gap:0 !important;background:transparent !important;border:0 !important;box-shadow:none !important;border-radius:0 !important}
+.p-nav-right .p-nav-menu::before{display:none}
+.p-nav-right .p-nav-menu > div > button{padding:0 14px;border-radius:2px !important}
+.p-nav-right .p-nav-menu .p-foco,.p-nav-right .p-nav-menu .p-ambiente{display:none}
+
+/* ── La cápsula, centrada por la grilla ────────────────────────────────────
+   Columnas simétricas: el logo a la izquierda, las acciones a la derecha y la
+   cápsula exactamente en el medio. Cuando no hay lugar, las tres se achican
+   juntas y nunca se pisan, con sesión abierta o sin ella. */
+.p-navbar{grid-template-columns:minmax(max-content,1fr) auto minmax(max-content,1fr);gap:18px}
+.p-navbar > :first-child{justify-self:start}
+.p-navbar > .p-nav-menu{justify-self:center;width:max-content;min-width:0}
+.p-navbar > .p-nav-right{justify-self:end;min-width:0}
+/* Cuando el ancho no da, la cápsula se compacta antes que pisar las acciones */
+@media(max-width:1560px){.p-navbar{gap:10px}.p-navbar > .p-nav-menu{gap:0}.p-navbar > .p-nav-menu > div > button,.p-navbar > .p-nav-menu > a{padding:9px 12px;letter-spacing:.13em;font-size:.66rem}}
+@media(max-width:1340px){.p-navbar > .p-nav-menu > div > button,.p-navbar > .p-nav-menu > a{padding:9px 9px;letter-spacing:.09em;font-size:.62rem}.p-navbar > .p-nav-menu{padding:4px 5px}}

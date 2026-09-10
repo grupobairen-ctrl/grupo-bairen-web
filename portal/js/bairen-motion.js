@@ -340,16 +340,17 @@
   /* ── La barra de arriba con las dos luces del spotlight navbar:
      una sigue al cursor desde abajo; la otra marca dónde estás con una línea
      de oro que se desliza de una sección a la otra, con su halo encima. */
-  BPM.foco = function (nav) {
-    nav = lista(nav)[0]; if (!nav || nav._foco) return; nav._foco = true;
+  BPM.foco = function (barra) {
+    barra = lista(barra)[0]; if (!barra || barra._foco) return; barra._foco = true;
+    var nav = barra.querySelector(':scope > .p-nav-menu') || barra.querySelector('.p-nav-menu:not(.p-nav-right .p-nav-menu)') || barra;
     var luz = nav.querySelector('.p-foco'), haz = nav.querySelector('.p-ambiente');
     if (!luz) { luz = document.createElement('span'); luz.className = 'p-foco'; luz.setAttribute('aria-hidden', 'true'); nav.insertBefore(luz, nav.firstChild); }
     if (!haz) { haz = document.createElement('span'); haz.className = 'p-ambiente'; haz.setAttribute('aria-hidden', 'true'); nav.insertBefore(haz, nav.firstChild); }
-    var items = function () { return nav.querySelectorAll('.p-nav-menu > div > button, .p-nav-menu > a'); };
+    var items = function () { return nav.querySelectorAll(':scope > div > button, :scope > a'); };
     var medir = function (el) { if (!el) return null; var r = el.getBoundingClientRect(), n = nav.getBoundingClientRect(); if (!r.width) return null; return { x: r.left - n.left, w: r.width }; };
     var elActivo = function () {
-      return nav.querySelector('.p-nav-menu [aria-expanded="true"]')
-          || nav.querySelector('.p-nav-menu [aria-current="page"]')
+      return nav.querySelector('[aria-expanded="true"]')
+          || nav.querySelector('[aria-current="page"]')
           || items()[0];
     };
     var poner = function (x, w) { nav.style.setProperty('--ambiente-x', x + 'px'); nav.style.setProperty('--ambiente-w', w + 'px'); };
@@ -375,12 +376,12 @@
       luz.style.opacity = '1';
     });
     nav.addEventListener('pointerover', function (e) {
-      var it = e.target.closest && e.target.closest('.p-nav-menu > div > button, .p-nav-menu > a');
-      if (it) mover(it, true);
+      var it = e.target.closest && e.target.closest('button, a');
+      if (it && nav.contains(it)) mover(it, true);
     });
     nav.addEventListener('pointerleave', function () { luz.style.opacity = '0'; alActivo(); });
     /* Arriba de todo la barra es navy pleno; apenas se baja pasa a vidrio */
-    var marcar = function () { nav.classList.toggle('bajado', (window.scrollY || 0) > 8); };
+    var marcar = function () { barra.classList.toggle('bajado', (window.scrollY || 0) > 8); };
     marcar(); window.addEventListener('scroll', marcar, { passive: true });
   };
 
