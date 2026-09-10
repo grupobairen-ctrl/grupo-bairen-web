@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://dahusnnbyrvltcuaelxj.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260913j"><link rel="stylesheet" href="css/catalogo.css?v=20260913j"><link rel="stylesheet" href="css/portal.css?v=20260913j">
+  <link rel="stylesheet" href="css/base.css?v=20260913l"><link rel="stylesheet" href="css/catalogo.css?v=20260913l"><link rel="stylesheet" href="css/portal.css?v=20260913l">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"BAIREN","url":"https://www.bairengroup.com","logo":"https://www.bairengroup.com/bairen_logo.png","description":"El portal de propiedades seleccionadas de Buenos Aires. Alquileres a mediano y largo plazo y departamentos en venta, publicados por corredores matriculados y dueños verificados.","areaServed":[{"@type":"City","name":"Ciudad Autónoma de Buenos Aires"},{"@type":"AdministrativeArea","name":"Zona Norte, Buenos Aires"}]}</script>
 </head>
 <body class="p-home">
@@ -49,7 +49,7 @@
   <div class="h-in">
     <p class="h-eyebrow">Selección BAIREN</p>
     <h2 class="h-h2">Seguimos un estándar.</h2>
-    <p class="h-copy">Antes de incorporar cada propiedad al portal, corroboramos ubicación, estado, distribución y calidad constructiva.</p>
+    <p class="h-copy">Antes de incorporar cada propiedad corroboramos:</p>
     <div class="h-camino" id="camino">
       <svg class="h-camino-linea" aria-hidden="true" preserveAspectRatio="none"><path class="guia"/><path class="trazo"/></svg>
       <ol class="h-hitos">
@@ -99,9 +99,9 @@
 <section class="h-sec h-navy h-encaja" id="publicar">
   <div class="h-in h-centro">
     <h2 class="h-h2">¿Tu propiedad encaja en BAIREN?</h2>
-    <p class="h-copy">Publicar es gratis. Revisamos la unidad, y si entra producimos las fotos sin costo. La operación sigue siendo tuya: BAIREN no vende, no alquila y no cobra comisión.</p>
+    <p class="h-copy">Revisamos la propiedad. Si cumple con los requisitos se sube al portal, y desde <em>OS</em> la gestionás y le hacés seguimiento.</p>
     <a class="h-btn h-btn-oro" href="publicar-aviso.html">Publicá tu propiedad ahora</a>
-    <p class="h-mini">Primero creás tu cuenta con un mail y un código. Después cargás la propiedad y queda en revisión.</p>
+    <p class="h-mini">Publicar no tiene costo. Creás tu cuenta con un mail y un código, cargás la propiedad y queda en revisión. La operación sigue siendo tuya.</p>
   </div>
 </section>
 
@@ -112,7 +112,7 @@
       <h2 class="h-h2">¿Cuánto vale el m²?</h2>
       <p class="h-m2-fecha">Los cinco barrios más caros donde trabajamos. Septiembre de 2026.</p>
       <ol class="h-m2-lista" id="m2Lista"></ol>
-      <p class="h-m2-pie">Promedio de publicación de Zonaprop. <a class="h-link" href="buscar.html?op=venta">Ver lo que hay en venta</a></p>
+      <p class="h-m2-pie">Promedio de publicación del mercado. <a class="h-link" href="buscar.html?op=venta">Ver lo que hay en venta</a></p>
     </div>
   </div>
 </section>
@@ -133,10 +133,10 @@
 
 <script src="../mapa-barrios.js" defer></script><script src="supabase-portal.js" defer></script>
 <script src="js/motion.js" defer></script>
-<script src="js/bairen-motion.js?v=20260913j" defer></script>
-<script src="js/ui.js?v=20260913j" defer></script>
-<script src="js/store.js?v=20260913j" defer></script>
-<script src="js/data.js?v=20260913j" defer></script>
+<script src="js/bairen-motion.js?v=20260913l" defer></script>
+<script src="js/ui.js?v=20260913l" defer></script>
+<script src="js/store.js?v=20260913l" defer></script>
+<script src="js/data.js?v=20260913l" defer></script>
 <script>
 document.addEventListener('DOMContentLoaded', function(){
 (async function(){
@@ -240,7 +240,7 @@ document.addEventListener('DOMContentLoaded', function(){
   if (conFoto) document.getElementById('psiFoto').innerHTML = `<img src="${BP.sbImg(conFoto.fotos[0], 1800)}" alt="" loading="lazy">`;
 
   /* ── Índice: el valor del m² de los cinco barrios más caros donde trabajamos.
-     Fuente: promedio de publicación de Zonaprop, septiembre de 2026. */
+     Promedio de publicación del mercado, septiembre de 2026. */
   const VENTA_M2 = { 'Puerto Madero':6122, 'Palermo':3431, 'Núñez':3387, 'Belgrano':3273, 'Colegiales':3075, 'Saavedra':2894, 'Recoleta':2795, 'Retiro':2616, 'Villa Crespo':2542 };
   const top = Object.entries(VENTA_M2).sort((a, b) => b[1] - a[1]).slice(0, 5);
   document.getElementById('m2Lista').innerHTML = top.map(([z, v]) => `<li><a href="${BP.urlBuscar({ op: 'venta', zona: z })}"><span class="b">${z}</span><span class="v">USD ${BP.fmtN(v)}</span></a></li>`).join('');

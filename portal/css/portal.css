@@ -2264,3 +2264,10 @@ body.p-home .h-m2-pie{margin:16px 0 0;font:300 .72rem/1.5 var(--font-body);color
 body.p-home .h-m2-pie .h-link{color:rgba(251,250,246,.8);margin-left:6px;font-size:.62rem}
 body.p-home .h-m2-pie .h-link:hover{color:var(--h-oro2)}
 @media(min-width:900px){body.p-home .h-m2-caja{width:min(100%,440px)}}
+/* Reglas de la portada vieja que todavía pintaban sobre las secciones nuevas.
+   #publicar tenía una foto de fondo y un velo navy al 84 % que tapaba el
+   título y el botón. En la portada nueva no corren. */
+body.p-home #publicar{background:var(--h-navy) !important}
+body.p-home #publicar::before{content:none !important;display:none !important}
+body.p-home #barrios,body.p-home #indice{background:var(--h-crema)}
+body.p-home .h-copy em{font-style:italic;color:var(--h-oro2);font-weight:400}
