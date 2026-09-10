@@ -411,7 +411,7 @@
       <div><img src="../bairen_logo_96.png?v=1" alt="BAIREN" width="46" height="46" style="height:46px;width:46px;"></div>
       <div class="ft-brand-rule"></div>
       <p class="ft-brand-tag">Portal de propiedades seleccionadas en Buenos Aires.</p>
-      <p class="p-legend">BAIREN selecciona, produce y publica propiedades. Las operaciones son concluidas por Maximiliano Matzkin, corredor matriculado CUCICBA 7527.</p>
+      <p class="p-legend">BAIREN selecciona y publica propiedades, y da la gestión para administrarlas. Cada aviso es responsabilidad de quien lo publica.</p>
     </div>
     <div class="ft-col"><div class="ft-col-ttl">Navegación</div><ul>
       <li><a href="${BP.urlBuscar({ op:'mediano' })}">Alquilar</a></li><li><a href="${BP.urlBuscar({ op:'venta' })}">Comprar</a></li><li><a href="psi.html">PSI</a></li><li><a href="index.html#indice">Índice BAIREN</a></li><li><a href="publicar.html">Publicar</a></li></ul></div>

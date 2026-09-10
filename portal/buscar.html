@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Propiedades en Buenos Aires · BAIREN</title>
-  <meta name="description" content="Departamentos en venta y en alquiler en los barrios seleccionados de Buenos Aires. Publican corredores matriculados y dueños verificados.">
+  <meta name="description" content="Departamentos en venta y en alquiler en los barrios seleccionados de Buenos Aires. Cada propiedad pasa por el filtro de BAIREN antes de entrar al portal.">
   <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#131D2D">
   <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://dahusnnbyrvltcuaelxj.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260913n"><link rel="stylesheet" href="css/catalogo.css?v=20260913n"><link rel="stylesheet" href="css/portal.css?v=20260913n">
+  <link rel="stylesheet" href="css/base.css?v=20260913y"><link rel="stylesheet" href="css/catalogo.css?v=20260913y"><link rel="stylesheet" href="css/portal.css?v=20260913y">
   <style>body{padding-top:64px}</style>
 </head>
 <body class="p-product p-catalogo">
@@ -20,7 +20,7 @@
   <div class="p-catband-text">
     <p class="p-catband-eyebrow">BAIREN · Buenos Aires</p>
     <h1 id="resTitle">Propiedades en Buenos Aires</h1>
-    <p class="p-catband-sub">Publican corredores matriculados, dueños verificados y desarrolladoras. El contacto va directo a quien publica.</p>
+    <p class="p-catband-sub">Cada propiedad pasa por el filtro de BAIREN antes de entrar. El contacto va directo a quien publica.</p>
   </div>
   <div class="p-catband-mapa"><div class="in"><div id="mapaResultados" role="group" aria-label="Mapa de barrios"></div><p class="p-map-hint">Tocá un barrio para filtrar. El número es lo publicado hoy.</p></div></div>
 </div></div>
@@ -85,8 +85,8 @@
 
 <script src="supabase-portal.js" defer></script>
 <script src="../mapa-barrios.js" defer></script>
-<script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260913n" defer></script><script src="js/ui.js?v=20260913n" defer></script><script src="js/store.js?v=20260913n" defer></script>
-<script src="js/data.js?v=20260913n" defer></script>
+<script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260913y" defer></script><script src="js/ui.js?v=20260913y" defer></script><script src="js/store.js?v=20260913y" defer></script>
+<script src="js/data.js?v=20260913y" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -161,7 +161,7 @@ document.addEventListener('DOMContentLoaded', function(){
     /* Paginación con anterior y siguiente; al cambiar de página se vuelve al inicio de la lista, no de la página */
     const pg = document.getElementById('pager'); pg.innerHTML = pages > 1 ? `<button type="button" class="nav" data-p="${F.page-1}" ${F.page<=1?'disabled':''} aria-label="Página anterior">‹</button>` + Array.from({length: pages}, (_, i) => `<button type="button" class="${i+1===F.page?'on':''}" data-p="${i+1}" aria-label="Página ${i+1}"${i+1===F.page?' aria-current="page"':''}>${i+1}</button>`).join('') + `<button type="button" class="nav" data-p="${F.page+1}" ${F.page>=pages?'disabled':''} aria-label="Página siguiente">›</button>` : '';
     pg.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { F.page = Number(b.dataset.p); pushURL(); render(); const top = document.querySelector('.p-results-head') || document.getElementById('list'); top.scrollIntoView({ behavior: 'smooth', block: 'start' }); const primero = el.querySelector('.prop-card'); if (primero) primero.focus({ preventScroll: true }); }));
-    const ley = document.getElementById('leyendaAlq'); const hayAlqCorredor = F.op !== 'venta' && list.some(a => BPData.pub(a.publicadorId).tipo !== 'dueno'); ley.hidden = !hayAlqCorredor; ley.textContent = 'Avisos de alquiler de vivienda publicados por corredores matriculados (Ley 2340, art. 10 inc. 8): ' + BP.LEYENDA_ALQUILER;
+    const ley = document.getElementById('leyendaAlq'); const hayAlqCorredor = F.op !== 'venta' && list.some(a => { const p = BPData.pub(a.publicadorId); return p.tipo !== 'dueno' && !!p.matricula; }); ley.hidden = !hayAlqCorredor; ley.textContent = 'Avisos de alquiler de vivienda publicados por corredores matriculados (Ley 2340, art. 10 inc. 8): ' + BP.LEYENDA_ALQUILER;
     document.getElementById('crumbs').innerHTML = ['<a href="index.html">BAIREN</a>', F.tipo === 'todos' ? 'Propiedades' : 'Departamentos', F.op ? BP.OPS[F.op].label.split(' ·')[0] : 'Todas las operaciones', 'Buenos Aires'].concat(F.zonas.map(BP.zonaLabel)).join(' › ');
     const counts = BPData.countsByZona(BPData.filter(avisos, Object.assign({}, F, {zonas: []})));
     if (window.BairenMapa && window.innerWidth >= 1024) { const mel = document.getElementById('mapaResultados'); if (!mapa) { try { mapa = window.BairenMapa.mount(mel, { counts, modo:'lite', active: F.zonas[0] || null, onSelect: z => { F.zonas = F.zonas.indexOf(z) > -1 ? [] : [z]; apply(); } }); } catch (e) { mel.innerHTML = '<p class="p-note">Mapa no disponible.</p>'; } } else { mapa.setCounts(counts); mapa.setActive(F.zonas[0] || null); mapa.refresh && mapa.refresh(); } }
