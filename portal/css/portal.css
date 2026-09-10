@@ -1955,3 +1955,8 @@ body.p-home .p-navbar > .p-nav-right{grid-column:3;justify-self:end}
 .mobile-menu .m-cta .p-btn,.mobile-menu .m-cta a{flex:1 1 0;min-height:46px;height:46px;padding:0 14px;display:inline-flex;align-items:center;justify-content:center;font:600 .64rem/1 var(--font-body) !important;letter-spacing:.16em;text-transform:uppercase;border-radius:8px !important;border:1px solid rgba(194,169,104,.7);color:var(--gold-light,#DECDA0);background:transparent;text-decoration:none}
 .mobile-menu .m-cta .p-btn-fill{background:var(--gold,#C2A968);border-color:var(--gold,#C2A968);color:var(--navy-deeper,#131D2D)}
 .mobile-menu .m-link{font-size:1.25rem}
+/* El carrusel medía 1400 px en celular: dentro de la sección (flex en columna) el margen auto
+   lo dejaba a su ancho de contenido. Ahora ocupa el ancho de la pantalla y desliza adentro. */
+body.p-home .h-carrusel{width:100%;max-width:1400px;min-width:0;margin:0 auto;overflow:hidden}
+body.p-home .h-track-fotos{width:100%;min-width:0;box-sizing:border-box}
+body.p-home .h-sec{align-items:stretch}
