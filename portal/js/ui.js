@@ -23,7 +23,7 @@
   BP.urlFicha = function(a){ return BP.pretty ? 'propiedad-' + encodeURIComponent(a.id) : 'propiedad.html?id=' + encodeURIComponent(a.id); };
   BP.idFromPath = function(){ const seg = decodeURIComponent(location.pathname.split('/').pop() || ''); return /^propiedad-/.test(seg) ? seg.replace(/^propiedad-/, '') : null; };
   BP.OPS = { venta:{label:'Comprar', h:'en venta', per:''}, alquiler:{label:'Alquilar · largo plazo', h:'en alquiler', per:'/mes'}, mediano:{label:'Alquilar · mediano plazo', h:'en alquiler a mediano plazo', per:'/mes'} };
-  BP.LEYENDA_PLATAFORMA = 'BAIREN es un portal de propiedades y no ejerce el corretaje inmobiliario. Cada propiedad es publicada por su titular o por un corredor matriculado, responsable de la operación.';
+  BP.LEYENDA_PLATAFORMA = 'BAIREN es un portal de propiedades y no ejerce el corretaje inmobiliario. Cada propiedad es publicada por su titular, por un corredor matriculado o por la desarrolladora, responsables de la operación.';
   BP.LEYENDA_ALQUILER = '"Para los casos de alquiler de vivienda, el monto máximo de comisión que se le puede requerir a los propietarios será el equivalente al cuatro con quince centésimos por ciento (4,15%) del valor total del respectivo contrato. Se encuentra prohibido cobrar a los inquilinos que sean personas físicas comisiones inmobiliarias y gastos de gestoría de informes".';
 
   BP.sbImg = function(u, w){
