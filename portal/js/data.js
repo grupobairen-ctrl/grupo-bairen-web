@@ -93,15 +93,24 @@
       }
     } catch (e) { console.warn('store', e); }
 
-    if (!publicados.length) {
+    /* Sin Supabase, el JSON es la fuente. Con Supabase, del JSON entran sólo las
+       unidades que la web cargó después del último seed (JSON_DESDE) y que el
+       portal todavía no tiene: así los lofts del Palacio Alcorta se ven aunque no
+       haya corrido seed-avisos-2026-09-10.sql. Al correr un seed nuevo, subir la
+       fecha. Nunca se duplica una unidad que el portal ya publica. */
+    const JSON_DESDE = '2026-09-03T18:22:31Z';
+    const ya = new Set(publicados.map(a => a.slug + '|' + a.op));
+    const soloNuevas = publicados.length > 0;
+    try {
       const src = new URL('data/avisos-src.json', document.baseURI).href;
       const res = await fetch(src); const units = await res.json();
       units.forEach(p => {
-        if (p.precio_venta) publicados.push(fromUnit(p, 'venta', Number(p.precio_venta)));
-        if (p.precio_tradicional) publicados.push(fromUnit(p, 'alquiler', Number(p.precio_tradicional)));
-        if (p.precio_temporal) publicados.push(fromUnit(p, 'mediano', Number(p.precio_temporal)));
+        if (soloNuevas && !(p.created_at > JSON_DESDE)) return;
+        if (p.precio_venta && !ya.has(p.slug + '|venta')) publicados.push(fromUnit(p, 'venta', Number(p.precio_venta)));
+        if (p.precio_tradicional && !ya.has(p.slug + '|alquiler')) publicados.push(fromUnit(p, 'alquiler', Number(p.precio_tradicional)));
+        if (p.precio_temporal && !ya.has(p.slug + '|mediano')) publicados.push(fromUnit(p, 'mediano', Number(p.precio_temporal)));
       });
-    }
+    } catch (e) { if (!publicados.length) throw e; console.warn('avisos-src.json', e); }
 
     /* El nicho es el filtro: lo que cae fuera de BP.ZONAS no se publica (hoy, Centro
        y Almagro). zonaDe() vive en mapa-barrios.js y sabe que Palermo Hollywood es

@@ -39,7 +39,8 @@ La tabla actual no tiene dormitorios, baños, cocheras, expensas ni antigüedad.
 2. Authentication → Providers → Email: habilitado, con código por mail (OTP). En la plantilla "Magic Link" usar `{{ .Token }}`.
 3. SQL Editor: correr `schema-portal.sql` completo (crea esquema, migra las unidades actuales como avisos de Maxim Rentals, permisos, curadores, buckets).
 4. En `js/data.js`, cuando la migración esté verificada, se puede dejar de leer `data/avisos-src.json`.
-5. Unidades cargadas en la web después del 4/9: `seed-avisos-2026-09-10.sql` (Húsares 1080, los dos lofts del Palacio Alcorta, Las Heras 2371). **Subir el archivo en el SQL Editor, no pegarlo**: pegado rompe los acentos (ver `reparar-textos.sql`). Se puede correr más de una vez.
+5. Mientras el seed no corra, las unidades de la web creadas después del último seed entran a la home y al catálogo desde `data/avisos-src.json` (constante `JSON_DESDE` en `js/data.js`; subirla al correr un seed nuevo). Para refrescar ese JSON desde la web: `node portal/test/exportar-avisos.mjs` y subir la versión de los assets.
+6. Unidades cargadas en la web después del 4/9: `seed-avisos-2026-09-10.sql` (Húsares 1080, los dos lofts del Palacio Alcorta, Las Heras 2371). **Subir el archivo en el SQL Editor, no pegarlo**: pegado rompe los acentos (ver `reparar-textos.sql`). Se puede correr más de una vez.
 
 ## Fase 4 (hecha)
 - **Mails al publicador** (`api/portal-notify.js`, función de Vercel): consulta recibida, aviso aprobado, cambios pedidos, rechazo, verificación. El destinatario se busca en Supabase del lado del servidor (nunca viene del cliente) y se envía por Resend por HTTP, sin dependencias. Variables en Vercel: `RESEND_API_KEY` y `PORTAL_MAIL_FROM` (remitente con dominio verificado en Resend). Sin la clave responde 501 y la web sigue con el mailto. En modo local no hay envío.
