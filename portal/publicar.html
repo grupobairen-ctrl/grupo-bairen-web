@@ -27,9 +27,9 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://dahusnnbyrvltcuaelxj.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260911y"><link rel="stylesheet" href="css/catalogo.css?v=20260911y"><link rel="stylesheet" href="css/portal.css?v=20260911y">
+  <link rel="stylesheet" href="css/base.css?v=20260911z"><link rel="stylesheet" href="css/catalogo.css?v=20260911z"><link rel="stylesheet" href="css/portal.css?v=20260911z">
 </head>
-<body>
+<body class="p-publicar-landing">
 <div class="p-velo" aria-hidden="true"><span class="w">BAIREN</span></div>
 <div id="pHeader"></div>
 <div class="p-band"><div class="p-container"><div style="max-width:720px"><span class="p-eyebrow">Publicar</span><h1 class="p-h2" style="font-size:clamp(1.8rem,3.4vw,2.6rem)">¿Quién publica?</h1><p class="p-sub" style="margin-bottom:0">Elegí tu perfil. En los tres casos la operación es tuya: BAIREN selecciona y muestra.</p></div></div></div>
@@ -39,17 +39,17 @@
     <a class="p-perfil" href="ingresar.html?volver=publicar&perfil=inmobiliaria" id="inmobiliaria" data-perfil="inmobiliaria"><span class="ico-w"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M17 6l2 2M14 9l2 2"/></svg></span><b>Inmobiliaria o corredor</b><span>Tu cartera, con tu nombre y matrícula en cada ficha. Carga manual o importación desde tu sistema.</span></a>
     <a class="p-perfil" href="ingresar.html?volver=publicar&perfil=desarrolladora" id="desarrolladora" data-perfil="desarrolladora"><span class="ico-w"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M8 7h2M14 7h2M8 11h2M14 11h2M8 15h2M14 15h2M10 21v-3h4v3"/></svg></span><b>Desarrolladora</b><span>Venta directa de tus unidades, con página del emprendimiento y etapa de obra.</span></a>
   </div>
-  <div style="margin-top:56px" data-reveal><h2 class="p-h2">Cómo funciona</h2><p class="p-sub">Cuatro pasos.</p>
-  <div class="p-steps"><div class="p-step"><i>1</i><b>Creás tu cuenta</b><span>Mail y código. Sin contraseña.</span></div><div class="p-step"><i>2</i><b>Te verificamos</b><span>DNI y titularidad si sos dueño. Matrícula contra el registro de CUCICBA si sos corredor. CUIT si sos desarrolladora. El documento se revisa y se borra.</span></div><div class="p-step"><i>3</i><b>Cargás el aviso</b><span>Operación, dirección, características y mínimo ocho fotos. Si no las tenés, las hacemos.</span></div><div class="p-step"><i>4</i><b>Curación y publicación</b><span>Revisamos en menos de 48 horas. Si entra, sale con tu nombre. Si no, te decimos por qué.</span></div></div></div>
-  <div style="margin-top:56px;display:grid;grid-template-columns:1fr 1fr;gap:28px" data-reveal id="produccion">
-    <div class="p-prose"><h2>Producción de fichas</h2><p>Fotos, video, descripción y placas hechas por BAIREN, en el estándar con el que mostramos todo. Sin costo para quien publica.</p></div>
-    <div class="p-prose" id="panel"><h2>Panel del propietario</h2><p>Vistas, consultas, visitas y reservas de tu unidad, en Bairen OS. Las carga quien opera; vos las ves.</p></div>
+  <div class="p-pl-sec" data-reveal><h2 class="p-h2">Cómo funciona</h2>
+  <ol class="p-pasos"><li><i>1</i><b>Creás tu cuenta</b><span>Mail y código. Sin contraseña.</span></li><li><i>2</i><b>Te verificamos</b><span>DNI y titularidad si sos dueño. Matrícula contra el registro de CUCICBA si sos corredor. CUIT si sos desarrolladora. El documento se revisa y se borra.</span></li><li><i>3</i><b>Cargás el aviso</b><span>Operación, dirección, características y mínimo ocho fotos. Si no las tenés, las hacemos.</span></li><li><i>4</i><b>Curación y publicación</b><span>Revisamos en menos de 48 horas. Si entra, sale con tu nombre. Si no, te decimos por qué.</span></li></ol></div>
+  <div class="p-pl-sec p-pl-incluye" data-reveal id="produccion">
+    <div><h2 class="p-h2">Producción de fichas</h2><p>Fotos, video, descripción y placas hechas por BAIREN, en el estándar con el que mostramos todo. Sin costo para quien publica.</p></div>
+    <div id="panel"><h2 class="p-h2">Panel del propietario</h2><p>Vistas, consultas, visitas y reservas de tu unidad, en Bairen OS. Las carga quien opera; vos las ves.</p></div>
   </div>
-  <div class="p-prose" style="margin-top:44px" data-reveal id="criterios"><div class="box"><b>Condiciones de ingreso.</b> Palermo, Recoleta, Retiro, Belgrano, Núñez, Colegiales, Villa Crespo, Puerto Madero, Saavedra o Zona Norte. Edificio de categoría o con amenities, unidad impecable, ficha completa y fotos producidas. Lo que no cumple se rechaza, con el motivo.</div></div>
-  <div style="margin-top:40px" data-reveal><a class="p-btn p-btn-fill" href="ingresar.html?volver=publicar" data-rueda="Crear mi cuenta">Crear mi cuenta</a> <span class="p-note" style="margin-left:14px">Mail y código, sin contraseña. Si ya tenés cuenta, vas directo a cargar.</span></div>
+  <div class="p-pl-sec p-pl-cond" data-reveal id="criterios"><h2 class="p-h2">Condiciones de ingreso</h2><p>Palermo, Recoleta, Retiro, Belgrano, Núñez, Colegiales, Villa Crespo, Puerto Madero, Saavedra o Zona Norte. Edificio de categoría o con amenities, unidad impecable, ficha completa y fotos producidas. Lo que no cumple se rechaza, con el motivo.</p><a class="p-link" href="criterios.html">Cómo seleccionamos</a></div>
+  <div class="p-pl-cta" data-reveal><a class="p-btn p-btn-fill" href="ingresar.html?volver=publicar">Crear mi cuenta</a><span class="p-note">Mail y código, sin contraseña. Si ya tenés cuenta, vas directo a cargar.</span></div>
 </div></section>
 <div id="pFooter"></div>
-<script src="supabase-portal.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260911y" defer></script><script src="js/i18n-portal.js?v=20260911y" defer></script><script src="js/ui.js?v=20260911y" defer></script><script src="js/store.js?v=20260911y" defer></script><script src="js/data.js?v=20260911y" defer></script>
+<script src="supabase-portal.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260911z" defer></script><script src="js/i18n-portal.js?v=20260911z" defer></script><script src="js/ui.js?v=20260911z" defer></script><script src="js/store.js?v=20260911z" defer></script><script src="js/data.js?v=20260911z" defer></script>
 <script>document.addEventListener('DOMContentLoaded', function(){BP.header("publicar"); BP.footer(); BP.reveal(); if (window.BPStore) BPStore.init().then(function(){ if (BPStore.session) document.querySelectorAll("[data-perfil]").forEach(function(a){ a.href = "publicar-aviso.html?perfil=" + a.dataset.perfil; }); });});</script>
 </body>
 </html>
