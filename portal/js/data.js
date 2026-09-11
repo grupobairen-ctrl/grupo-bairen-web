@@ -135,7 +135,10 @@
     a.banos ? a.banos + (a.banos === 1 ? ' baño' : ' baños') : null,
     a.cocheras ? a.cocheras + ' coch.' : null,
   ].filter(Boolean).join(' · ');
-  D.opTag = a => a.op === 'venta' ? 'Venta' : a.op === 'mediano' ? 'Alquiler, mediano plazo' : 'Alquiler';
+  D.opTag = a => a.op === 'venta' ? 'Venta' : a.op === 'mediano' ? 'Alquiler, mediano plazo' : 'Alquiler, largo plazo';
+  /* Operación como filtro (decisión de Tomás, 10/9/2026): "alquiler" abarca mediano y largo
+     plazo; "largo" es sólo largo (los avisos de largo plazo llevan op 'alquiler'). */
+  D.opMatch = (a, op) => !op || (op === 'alquiler' ? a.op !== 'venta' : op === 'largo' ? a.op === 'alquiler' : a.op === op);
   D.precioHTML = a => a.precio ? `${BP.fmtUSD(a.precio)}${a.periodo ? '<small>' + a.periodo + '</small>' : ''}` : 'Consultar precio';
   D.badgeHTML = pub => !pub.matricula && pub.tipo !== 'dueno' ? `<span class="p-badge">${BP.ico.check} ${BP.esc(pub.badge || 'Selección BAIREN')}</span>`
     : pub.tipo === 'dueno'
@@ -192,7 +195,7 @@
     return avisos.filter(a => {
       if (f.favs && !BP.isFav(a.id)) return false;
       if (!f.reservadas && a.reservado) return false;
-      if (f.op && a.op !== f.op) return false;
+      if (f.op && !D.opMatch(a, f.op)) return false;
       if (f.tipo && f.tipo !== 'todos' && a.tipoProp.toLowerCase() !== f.tipo) return false;
       if (f.zonas && f.zonas.length && f.zonas.indexOf(a.zona) === -1) return false;
       if (f.pmin && (a.precio||0) < f.pmin) return false;
@@ -228,7 +231,7 @@
     return l;
   };
   D.emprendimientos = avisos => { const g = {}; avisos.forEach(a => { if (!a.emprendimiento) return; const k = a.publicadorId + '|' + a.emprendimiento; (g[k] = g[k] || { key: k, nombre: a.emprendimiento, publicadorId: a.publicadorId, zona: a.zona, barrio: a.barrio, dir: a.dir, etapa: a.etapa, entrega: a.entrega, unidades: [] }).unidades.push(a); }); return Object.values(g).map(e => { const p = e.unidades.map(u => u.precio).filter(Boolean), m = e.unidades.map(u => u.m2).filter(Boolean), am = e.unidades.map(u => u.amb).filter(Boolean); e.desde = p.length ? Math.min.apply(null, p) : null; e.m2min = m.length ? Math.min.apply(null, m) : null; e.m2max = m.length ? Math.max.apply(null, m) : null; e.ambmin = am.length ? Math.min.apply(null, am) : null; e.ambmax = am.length ? Math.max.apply(null, am) : null; e.foto = (e.unidades.find(u => u.fotos.length) || {}).fotos; e.foto = e.foto ? e.foto[0] : null; return e; }); };
-  D.countsByZona = (avisos, op) => { const c={}; avisos.forEach(a=>{ if (op && a.op !== op) return; if (a.reservado) return; c[a.zona]=(c[a.zona]||0)+1; }); return c; };
+  D.countsByZona = (avisos, op) => { const c={}; avisos.forEach(a=>{ if (op && !D.opMatch(a, op)) return; if (a.reservado) return; c[a.zona]=(c[a.zona]||0)+1; }); return c; };
   D.countsByOp = avisos => { const c={ venta:0, alquiler:0, mediano:0 }; avisos.forEach(a => { if (!a.reservado && c[a.op] != null) c[a.op]++; }); return c; };
   D.opConMasInventario = avisos => { const c = D.countsByOp(avisos); return Object.keys(c).sort((a,b) => c[b]-c[a])[0]; };
   D.opsConUnidades = (avisos, zona) => { const r = {}; avisos.forEach(a => { if (a.reservado) return; if (zona && a.zona !== zona) return; r[a.op] = (r[a.op]||0)+1; }); return r; };

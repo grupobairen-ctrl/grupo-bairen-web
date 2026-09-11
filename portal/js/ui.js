@@ -15,14 +15,14 @@
   BP.pretty = false;
   BP.probePretty = async function(){ try { const k = sessionStorage.getItem('bp_pretty'); if (k !== null) { BP.pretty = k === '1'; return BP.pretty; } const r = await fetch(new URL('_rewrite-probe', document.baseURI).href, { method: 'HEAD', cache: 'no-store' }); BP.pretty = r.ok && (r.headers.get('x-bp-rewrite') === '1'); sessionStorage.setItem('bp_pretty', BP.pretty ? '1' : '0'); if (BP.pretty && document.getElementById('pHeader') && document.querySelector('.navbar')) { BP.header(BP._active); if (window.BPStore && window.BPStore.ready) window.BPStore.ready.then(() => BP.applySession(window.BPStore.session, window.BPStore.mode)); } } catch (e) { BP.pretty = false; } return BP.pretty; };
   const TIPO_PLURAL = { departamento:'departamentos', piso:'pisos', ph:'ph', casa:'casas', todos:'propiedades' };
-  const OP_SLUG = { venta:'venta', alquiler:'alquiler', mediano:'alquiler-mediano-plazo' };
+  const OP_SLUG = { venta:'venta', alquiler:'alquiler', mediano:'alquiler-mediano-plazo', largo:'alquiler-largo-plazo' };
   BP.urlBuscar = function(f){ f = f || {}; const p = new URLSearchParams(); if (f.op) p.set('op', f.op); if (f.tipo && f.tipo !== 'departamento') p.set('tipo', f.tipo); (f.zonas || (f.zona ? [f.zona] : [])).forEach(z => p.append('zona', z)); Object.keys(f).forEach(k => { if (['op','tipo','zona','zonas'].indexOf(k) === -1 && f[k] != null && f[k] !== '' && f[k] !== false) p.set(k, f[k] === true ? '1' : f[k]); });
     if (BP.pretty && f.op && (!f.zonas || f.zonas.length <= 1) && !f.q && !f.pub) { const zona = f.zona || (f.zonas && f.zonas[0]); const rest = new URLSearchParams(p); rest.delete('op'); rest.delete('tipo'); rest.delete('zona'); const path = TIPO_PLURAL[f.tipo || 'departamento'] + '-' + OP_SLUG[f.op] + (zona ? '-' + BP.zonaSlug(zona) : '-buenos-aires'); return path + (rest.toString() ? '?' + rest.toString() : ''); }
     return 'buscar.html' + (p.toString() ? '?' + p.toString() : ''); };
-  BP.parsePretty = function(){ const m = location.pathname.match(/\/(departamentos|pisos|ph|casas|propiedades)-(venta|alquiler-mediano-plazo|alquiler)-([a-z0-9-]+)$/); if (!m) return null; const tipo = { departamentos:'departamento', pisos:'piso', ph:'ph', casas:'casa', propiedades:'todos' }[m[1]]; const op = m[2] === 'alquiler-mediano-plazo' ? 'mediano' : m[2]; const zona = m[3] === 'buenos-aires' ? null : BP.zonaFromSlug(m[3]); return { tipo, op, zona }; };
+  BP.parsePretty = function(){ const m = location.pathname.match(/\/(departamentos|pisos|ph|casas|propiedades)-(venta|alquiler-mediano-plazo|alquiler-largo-plazo|alquiler)-([a-z0-9-]+)$/); if (!m) return null; const tipo = { departamentos:'departamento', pisos:'piso', ph:'ph', casas:'casa', propiedades:'todos' }[m[1]]; const op = m[2] === 'alquiler-mediano-plazo' ? 'mediano' : m[2] === 'alquiler-largo-plazo' ? 'largo' : m[2]; const zona = m[3] === 'buenos-aires' ? null : BP.zonaFromSlug(m[3]); return { tipo, op, zona }; };
   BP.urlFicha = function(a){ return BP.pretty ? 'propiedad-' + encodeURIComponent(a.id) : 'propiedad.html?id=' + encodeURIComponent(a.id); };
   BP.idFromPath = function(){ const seg = decodeURIComponent(location.pathname.split('/').pop() || ''); return /^propiedad-/.test(seg) ? seg.replace(/^propiedad-/, '') : null; };
-  BP.OPS = { venta:{label:'Comprar', h:'en venta', per:''}, alquiler:{label:'Alquilar · largo plazo', h:'en alquiler', per:'/mes'}, mediano:{label:'Alquilar · mediano plazo', h:'en alquiler a mediano plazo', per:'/mes'} };
+  BP.OPS = { venta:{label:'Comprar', h:'en venta', per:''}, alquiler:{label:'Alquilar', h:'en alquiler', per:'/mes'}, mediano:{label:'Alquilar · mediano plazo', h:'en alquiler a mediano plazo', per:'/mes'}, largo:{label:'Alquilar · largo plazo', h:'en alquiler a largo plazo', per:'/mes'} };
   BP.LEYENDA_PLATAFORMA = 'BAIREN es un portal de propiedades y no ejerce el corretaje inmobiliario. Cada propiedad es publicada por su titular, por un corredor matriculado o por la desarrolladora, responsables de la operación.';
   BP.LEYENDA_ALQUILER = '"Para los casos de alquiler de vivienda, el monto máximo de comisión que se le puede requerir a los propietarios será el equivalente al cuatro con quince centésimos por ciento (4,15%) del valor total del respectivo contrato. Se encuentra prohibido cobrar a los inquilinos que sean personas físicas comisiones inmobiliarias y gastos de gestoría de informes".';
 
@@ -78,7 +78,8 @@
   BP.favs = store('bp_favs'); BP.alerts = store('bp_alertas'); BP.consultas = store('bp_consultas'); BP.reportes = store('bp_reportes');
   BP.isFav = id => BP.favs.get().indexOf(id) > -1;
   BP.toggleFav = id => { const f=BP.favs.get(); const i=f.indexOf(id); if(i>-1) f.splice(i,1); else f.push(id); BP.favs.set(f); BP.syncFavCount(); if (window.BPStore && BPStore.syncFavorito) BPStore.syncFavorito(id, i===-1); return i===-1; };
-  BP.syncFavCount = () => { const n=BP.favs.get().length; document.querySelectorAll('[data-fav-count]').forEach(el=>{ el.textContent=n||''; el.hidden=!n; }); };
+  /* Sin sesión, el corazón del header aparece recién cuando hay algo guardado: el header anónimo no anuncia funciones que todavía no sirven */
+  BP.syncFavCount = () => { const n=BP.favs.get().length; document.querySelectorAll('[data-fav-count]').forEach(el=>{ el.textContent=n||''; el.hidden=!n; }); document.querySelectorAll('.p-fav-anon').forEach(el=>{ el.hidden=!n; }); };
 
   /* 5.6 Un aviso flotante que no anuncia nada no existe para quien usa lector de pantalla.
      Rol de alerta y region activa; el texto se reescribe en dos tiempos para que se relea aunque repita. */
@@ -315,9 +316,9 @@
   </div>
   <div class="p-nav-right">
     <div class="p-lang" role="group" aria-label="Idioma"><button type="button" data-lang="es">ES</button><button type="button" data-lang="pt">PT</button><button type="button" data-lang="en">EN</button></div>
-    <button type="button" class="p-ghost p-bell" aria-label="Notificaciones" data-notif>${BP.ico.bell}<span class="dot" hidden></span></button>
-    <a class="p-ghost" href="ingresar.html?volver=contactos">${BP.ico.chat} Mis contactos</a>
-    <a class="p-ghost" href="buscar.html?favs=1" aria-label="Favoritos">${BP.ico.heart}<span data-fav-count hidden></span></a>
+    <button type="button" class="p-ghost p-bell p-solo-sesion" aria-label="Notificaciones" data-notif hidden>${BP.ico.bell}<span class="dot" hidden></span></button>
+    <a class="p-ghost p-solo-sesion" href="ingresar.html?volver=contactos" hidden>${BP.ico.chat} Mis contactos</a>
+    <a class="p-ghost p-fav-anon" href="buscar.html?favs=1" aria-label="Favoritos" hidden>${BP.ico.heart}<span data-fav-count hidden></span></a>
     <a class="p-btn p-btn-sm" href="publicar.html">Publicar</a>
     <a class="p-btn p-btn-sm p-btn-fill" href="ingresar.html">Ingresar</a>
   </div>
@@ -327,9 +328,9 @@
   <a href="buscar.html?op=venta" class="m-link">Comprar</a>
   <a href="buscar.html?op=alquiler" class="m-link">Alquilar</a>
   <a href="buscar.html?op=mediano" class="m-link m-sub">Mediano plazo</a>
+  <a href="buscar.html?op=largo" class="m-link m-sub">Largo plazo</a>
   <a href="emprendimientos.html" class="m-link">Emprendimientos</a>
   <a href="publicadores.html" class="m-link">Publicadores</a>
-  <a href="index.html#zonas" class="m-link">Zonas</a>
   <div class="m-sep"></div>
   <a href="buscar.html?favs=1" class="m-link">Favoritos</a>
   <a href="ingresar.html?volver=contactos" class="m-link">Mis contactos</a>
@@ -403,7 +404,7 @@
 
   /* ── Footer ─────────────────────────────────────────────── */
   BP.footer = function(){
-    const zonas = BP.ZONAS.map(z=>`<li><a href="${BP.urlBuscar({ op:'mediano', zona:z })}">${BP.zonaLabel(z)}</a></li>`).join('');
+    const zonas = BP.ZONAS.map(z=>`<li><a href="${BP.urlBuscar({ op:'alquiler', zona:z })}">${BP.zonaLabel(z)}</a></li>`).join('');
     const html = `
 <footer class="footer">
   <div class="footer-grid">
@@ -414,7 +415,7 @@
       <p class="p-legend">BAIREN selecciona y publica propiedades, y da la gestión para administrarlas. Cada aviso es responsabilidad de quien lo publica.</p>
     </div>
     <div class="ft-col"><div class="ft-col-ttl">Navegación</div><ul>
-      <li><a href="${BP.urlBuscar({ op:'mediano' })}">Alquilar</a></li><li><a href="${BP.urlBuscar({ op:'venta' })}">Comprar</a></li><li><a href="psi.html">PSI</a></li><li><a href="index.html#indice">Índice BAIREN</a></li><li><a href="publicar.html">Publicar</a></li></ul></div>
+      <li><a href="${BP.urlBuscar({ op:'alquiler' })}">Alquilar</a></li><li><a href="${BP.urlBuscar({ op:'venta' })}">Comprar</a></li><li><a href="psi.html">PSI</a></li><li><a href="index.html#indice">Índice BAIREN</a></li><li><a href="publicar.html">Publicar</a></li></ul></div>
     <div class="ft-col"><div class="ft-col-ttl">Zonas</div><ul>${zonas}</ul></div>
     <div class="ft-col"><div class="ft-col-ttl">Más</div><ul>
       <li><a href="publicadores.html">Publicadores</a></li><li><a href="emprendimientos.html">Emprendimientos</a></li><li><a href="criterios.html">Criterios de selección</a></li><li><a href="legales.html">Términos y privacidad</a></li><li><a href="mailto:contacto@bairengroup.com">contacto@bairengroup.com</a></li></ul></div>

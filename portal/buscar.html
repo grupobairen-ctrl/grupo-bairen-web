@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://dahusnnbyrvltcuaelxj.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260910nm"><link rel="stylesheet" href="css/catalogo.css?v=20260910nm"><link rel="stylesheet" href="css/portal.css?v=20260910nm">
+  <link rel="stylesheet" href="css/base.css?v=20260911a"><link rel="stylesheet" href="css/catalogo.css?v=20260911a"><link rel="stylesheet" href="css/portal.css?v=20260911a">
   <style>body{padding-top:64px}</style>
 </head>
 <body class="p-product p-catalogo">
@@ -28,7 +28,7 @@
 <div class="p-filters" id="filters">
   <div class="p-filters-in">
     <div class="p-fchip" id="zonaBox"><span style="color:var(--gold-dark);display:inline-flex"></span><span id="zonaChips" style="display:flex;gap:6px;flex-wrap:wrap"></span><input type="text" id="qInput" placeholder="Barrio, calle o característica" aria-label="Ubicación o característica"><div class="p-sugg" id="sugg" role="listbox"></div></div>
-    <select class="p-fsel" id="opSel" aria-label="Operación"><option value="venta">Comprar</option><optgroup label="Alquilar"><option value="alquiler">Alquilar · largo plazo</option><option value="mediano">Alquilar · mediano plazo</option></optgroup><option value="">Todas las operaciones</option></select>
+    <select class="p-fsel" id="opSel" aria-label="Operación"><option value="venta">Comprar</option><optgroup label="Alquilar"><option value="alquiler">Alquilar · mediano y largo plazo</option><option value="mediano">Alquilar · mediano plazo</option><option value="largo">Alquilar · largo plazo</option></optgroup><option value="">Todas las operaciones</option></select>
     <select class="p-fsel" id="tipoSel" aria-label="Tipo de propiedad"><option value="departamento">Departamento</option><option value="piso">Piso</option><option value="ph">PH</option><option value="casa">Casa</option><option value="todos">Todos los tipos</option></select>
     <div class="p-fwrap"><button type="button" class="p-fbtn" id="ambBtn" aria-haspopup="dialog" aria-controls="ambPop" aria-expanded="false">Amb | Dorm</button>
       <div class="p-pop" id="ambPop"><label>Ambientes, mínimo</label><div class="seg" data-key="amb"><button type="button" data-v="">Todos</button><button type="button" data-v="1">1+</button><button type="button" data-v="2">2+</button><button type="button" data-v="3">3+</button><button type="button" data-v="4">4+</button></div><label>Dormitorios, mínimo</label><div class="seg" data-key="dorm"><button type="button" data-v="">Todos</button><button type="button" data-v="1">1+</button><button type="button" data-v="2">2+</button><button type="button" data-v="3">3+</button></div><div class="acts"><button type="button" class="lnk" data-clear="amb,dorm">Limpiar</button><button type="button" class="p-btn p-btn-sm p-btn-navy" data-apply>Aplicar</button></div></div></div>
@@ -85,8 +85,8 @@
 
 <script src="supabase-portal.js" defer></script>
 <script src="../mapa-barrios.js" defer></script>
-<script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260910nm" defer></script><script src="js/ui.js?v=20260910nm" defer></script><script src="js/store.js?v=20260910nm" defer></script>
-<script src="js/data.js?v=20260910nm" defer></script>
+<script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260911a" defer></script><script src="js/ui.js?v=20260911a" defer></script><script src="js/store.js?v=20260911a" defer></script>
+<script src="js/data.js?v=20260911a" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -138,10 +138,12 @@ document.addEventListener('DOMContentLoaded', function(){
   function sugerencias(){
     const zona = F.zonas[0] || null;
     const ops = BPData.opsConUnidades(avisos, zona);
-    const otras = Object.keys(ops).filter(o => o !== F.op).sort((a,b) => ops[b]-ops[a]);
+    /* Las claves de ops son las del aviso (venta, alquiler = largo, mediano); se traducen al filtro */
+    const comoFiltro = o => o === 'alquiler' ? 'largo' : o;
+    const otras = Object.keys(ops).map(comoFiltro).filter(o => o !== F.op && !(F.op === 'alquiler' && o !== 'venta')).sort((a,b) => (ops[b === 'largo' ? 'alquiler' : b]||0)-(ops[a === 'largo' ? 'alquiler' : a]||0));
     const donde = zona ? ' en ' + BP.zonaLabel(zona) : '';
     let t = 'Acá entran pocas unidades: cada una pasa un estándar de edificio, estado y presentación. ';
-    if (otras.length) t += 'Hoy' + donde + ' hay ' + otras.map(o => `<a href="${BP.urlBuscar({ op: o, zona: zona || undefined })}" style="text-decoration:underline">${ops[o]} ${ops[o] === 1 ? 'unidad' : 'unidades'} ${BP.OPS[o].h}</a>`).join(' y ') + '.';
+    if (otras.length) t += 'Hoy' + donde + ' hay ' + otras.map(o => { const n = ops[o === 'largo' ? 'alquiler' : o]; return `<a href="${BP.urlBuscar({ op: o, zona: zona || undefined })}" style="text-decoration:underline">${n} ${n === 1 ? 'unidad' : 'unidades'} ${BP.OPS[o].h}</a>`; }).join(' y ') + '.';
     else t += 'Probá con otro barrio o sacá un filtro.';
     if (!F.reservadas) { const res = BPData.filter(avisos, Object.assign({}, F, { reservadas: true })).filter(a => a.reservado).length; if (res) t += ' También hay ' + res + (res === 1 ? ' reservada' : ' reservadas') + ', que podés incluir desde Más filtros.'; }
     return t + ' ¿Tenés una propiedad así? <a href="publicar.html" style="text-decoration:underline">Publicala</a>.';
@@ -238,6 +240,8 @@ document.addEventListener('DOMContentLoaded', function(){
 
   syncControls();
   try { render(); pintarAlerta(); } catch (err) { console.error(err); BP.estadoError(document.getElementById('list'), 'No pudimos cargar las propiedades.', () => location.reload()); }
+  /* ?alerta=1 (desde "Avisarme" en la portada): se crea la alerta de esta búsqueda al llegar, una sola vez */
+  if (qs.get('alerta') === '1') { try { const u = new URL(location.href); u.searchParams.delete('alerta'); history.replaceState(null, '', u); } catch (e) {} if (alertaIdx() === -1) alertBtn.click(); }
 })();
 });
 </script>

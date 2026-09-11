@@ -2753,3 +2753,36 @@ body.p-home .h-esq{background:#1B2739}
 body.p-home .h-hito .det,body.p-home .h-camino-cierre{display:none !important}
 @media(min-width:900px){body.p-home .h-hito{gap:14px}}
 body.p-home .h-camino-linea .punta,body.p-home .h-camino-linea .halo{transition:opacity .35s cubic-bezier(.22,1,.36,1)}
+
+/* ══ 11/9/2026 · Arreglos de la auditoría (impeccable critique + audit) ═══════
+   Piso de legibilidad real en celular, pie compacto, la puerta a los criterios
+   junto al estándar, header anónimo sin controles que no sirven todavía. ════ */
+/* Celular: nada visible por debajo de 11 px; el cuerpo, 14 px */
+@media(max-width:899px){
+  body.p-home .h-eyebrow{font-size:.6875rem;letter-spacing:.2em}
+  body.p-home .h-copy{font-size:.875rem;line-height:1.55}
+  body.p-home .h-hero-sub{font-size:.9rem}
+  body.p-home .h-cta{font-size:.6875rem}
+  body.p-home .h-edif-txt em{font-size:.6875rem;letter-spacing:.12em}
+  body.p-home .h-encaja-txt .h-copy,body.p-home .h-anuncio-txt .h-copy{font-size:.875rem}
+  body.p-home .h-encaja .h-btn,body.p-home .h-anuncio-txt .h-btn{font-size:.6875rem;letter-spacing:.12em;padding:0 14px}
+  body.p-home .h-m2-fecha{font-size:.8125rem}
+  body.p-home .h-m2-lista .b,body.p-home .h-m2-lista .v{font-size:.875rem}
+  body.p-home .h-m2-mas{font-size:.8125rem}
+  body.p-home .h-hito b{font-size:.6875rem}
+  /* Pie: las zonas en dos columnas, así el pie deja de ser un tercio de la página */
+  body.p-home .footer .ft-col ul{columns:2;column-gap:18px}
+  body.p-home .footer .ft-col li{break-inside:avoid}
+}
+/* Estándar: el copy y la puerta a los criterios en la misma línea */
+body.p-home .h-estandar-linea{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap}
+body.p-home .h-estandar-linea .h-copy{margin:0}
+body.p-home .h-criterios{font:500 .78rem/1.3 var(--font-body);letter-spacing:.02em;color:var(--h-oro2);text-decoration:none;white-space:nowrap;border-bottom:1px solid rgba(222,205,160,.35);padding-bottom:2px;transition:border-color .3s cubic-bezier(.22,1,.36,1),color .3s cubic-bezier(.22,1,.36,1)}
+body.p-home .h-criterios em{font-style:normal}
+body.p-home .h-criterios:hover{color:#FBFAF6;border-color:var(--h-oro)}
+@media(max-width:899px){body.p-home .h-criterios{font-size:.75rem}}
+/* Índice: el enlace sin ícono, alineado con el texto */
+body.p-home .h-m2-mas span{flex:1}
+/* Idioma en el header: targets de al menos 28 px (WCAG 2.2 pide 24) */
+.p-lang button{min-width:30px;min-height:28px}
+@media(max-width:899px){body.p-home .h-criterios{display:inline-flex;align-items:center;min-height:40px;border-bottom:0;text-decoration:underline;text-underline-offset:4px;text-decoration-color:rgba(222,205,160,.45)}}

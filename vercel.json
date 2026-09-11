@@ -41,7 +41,7 @@
       "destination": "/portal/propiedad.html"
     },
     {
-      "source": "/portal/:tipo(departamentos|pisos|ph|casas|propiedades)-:op(venta|alquiler-mediano-plazo|alquiler)-:zona",
+      "source": "/portal/:tipo(departamentos|pisos|ph|casas|propiedades)-:op(venta|alquiler-mediano-plazo|alquiler-largo-plazo|alquiler)-:zona",
       "destination": "/portal/buscar.html"
     },
     {

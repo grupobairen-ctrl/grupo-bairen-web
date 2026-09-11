@@ -8,7 +8,7 @@ const MIME = { '.html':'text/html; charset=utf-8', '.css':'text/css; charset=utf
 const REWRITES = [
   [/^\/portal\/_rewrite-probe$/, () => ({ probe: true })],
   [/^\/portal\/propiedad-[^/]+$/, () => ({ file: '/portal/propiedad.html' })],
-  [/^\/portal\/(departamentos|pisos|ph|casas|propiedades)-(venta|alquiler-mediano-plazo|alquiler)-([a-z0-9-]+)$/, () => ({ file: '/portal/buscar.html' })],
+  [/^\/portal\/(departamentos|pisos|ph|casas|propiedades)-(venta|alquiler-mediano-plazo|alquiler-largo-plazo|alquiler)-([a-z0-9-]+)$/, () => ({ file: '/portal/buscar.html' })],
   [/^\/portal\/(publicar|ingresar|panel|curacion|legales|publicadores|buscar|importar|emprendimientos|publicar-aviso)$/, (m) => ({ file: '/portal/' + m[1] + '.html' })],
 ];
 createServer(async (req, res) => {
