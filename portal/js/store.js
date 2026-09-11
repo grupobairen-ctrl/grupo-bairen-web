@@ -173,6 +173,7 @@
     }
     S.track(rec.estado_curacion === 'en_revision' ? 'aviso_enviado' : 'aviso_creado', { aviso_id: rec.id || null, publicador_id: pub.id, datos: { operacion: rec.operacion, zona: rec.zona } });
     const all = L.avisos.get([]); const i = all.findIndex(x => x.id === rec.id); rec.fotos = fotos.map((f, i2) => ({ url: f.url, orden: i2 }));
+    rec.updated_at = now();   /* en local también queda cuándo se editó: el panel ordena por eso */
     if (i > -1) { rec.created_at = all[i].created_at; all[i] = rec; } else { rec.id = rec.id || uid(); rec.created_at = now(); all.push(rec); } L.avisos.set(all); return rec;
   };
   S.uploadFoto = async function(file, avisoKey, i){

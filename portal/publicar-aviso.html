@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://dahusnnbyrvltcuaelxj.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260911g"><link rel="stylesheet" href="css/catalogo.css?v=20260911g"><link rel="stylesheet" href="css/portal.css?v=20260911g">
+  <link rel="stylesheet" href="css/base.css?v=20260911m"><link rel="stylesheet" href="css/catalogo.css?v=20260911m"><link rel="stylesheet" href="css/portal.css?v=20260911m">
   <style>
     .p-stepper{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0 26px}
     .p-stepper button{display:flex;align-items:center;gap:8px;border:1px solid var(--p-line);background:var(--p-card);border-radius:999px;padding:8px 14px;font:500 .78rem var(--font-body);color:var(--text-mid);cursor:pointer;letter-spacing:.06em}
@@ -41,7 +41,7 @@
     @media(max-width:700px){.p-formgrid{grid-template-columns:1fr}}
   </style>
 </head>
-<body>
+<body class="p-herramienta">
 <div id="pHeader"></div>
 <div class="p-band"><div class="p-container" style="max-width:920px">
   <span class="p-eyebrow">Publicar</span>
@@ -54,7 +54,7 @@
   <p class="p-note" id="modeNote" style="margin-top:12px"></p>
 </div></section>
 <div id="pFooter"></div>
-<script src="supabase-portal.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260911g" defer></script><script src="js/i18n-portal.js?v=20260911g" defer></script><script src="js/ui.js?v=20260911g" defer></script><script src="js/store.js?v=20260911g" defer></script><script src="js/data.js?v=20260911g" defer></script>
+<script src="supabase-portal.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260911m" defer></script><script src="js/i18n-portal.js?v=20260911m" defer></script><script src="js/ui.js?v=20260911m" defer></script><script src="js/store.js?v=20260911m" defer></script><script src="js/data.js?v=20260911m" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function(){
   const modoTeclado = (name, type) => type === 'number' ? ' inputmode="numeric"' : type === 'tel' ? ' inputmode="tel" autocomplete="tel"' : type === 'email' ? ' inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false"' : type === 'url' ? ' inputmode="url" autocapitalize="off" spellcheck="false"' : (name === 'dni' || name === 'cuit') ? ' inputmode="numeric" autocomplete="off"' : name === 'responsable' ? ' autocomplete="name"' : '';
   const fld = (name, label, type, val, extra, hint) => `<div class="p-fld ${extra && extra.full ? 'full' : ''}" data-fld="${name}"><label for="f-${name}">${label}</label>${type === 'textarea' ? `<textarea id="f-${name}" name="${name}" ${extra && extra.attrs || ''}${hint ? ` aria-describedby="h-${name}"` : ''}>${BP.esc(val)}</textarea>` : type === 'select' ? `<select id="f-${name}" name="${name}" ${extra && extra.attrs || ''}${hint ? ` aria-describedby="h-${name}"` : ''}>${(extra.opts||[]).map(o => `<option value="${o[0]}" ${String(o[0])===String(val)?'selected':''}>${o[1]}</option>`).join('')}</select>` : `<input id="f-${name}" name="${name}" type="${type}" value="${BP.esc(val)}" ${extra && extra.attrs || ''}${modoTeclado(name, type)}${hint ? ` aria-describedby="h-${name}"` : ''}>`}${hint ? `<div class="hint" id="h-${name}">${hint}</div>` : ''}</div>`;
 
-  function renderStepper(){ document.getElementById('stepper').innerHTML = STEPS.map((s, i) => `<button type="button" class="${i===step?'on':i<step?'done':''}" data-s="${i}"${i===step?' aria-current="step"':''} aria-label="Paso ${i+1} de ${STEPS.length}: ${s}"><i aria-hidden="true">${i<step?'✓':i+1}</i>${s}</button>`).join(''); document.querySelectorAll('#stepper button').forEach(b => b.addEventListener('click', () => { const i = Number(b.dataset.s); if (i <= step || pub) { if (step > 0) collect(); step = i; render(); } })); }
+  function renderStepper(){ document.getElementById('stepper').innerHTML = `<p class="p-paso-txt" aria-hidden="true">Paso ${step+1} de ${STEPS.length} · ${STEPS[step]}</p>` + STEPS.map((s, i) => `<button type="button" class="${i===step?'on':i<step?'done':''}" data-s="${i}"${i===step?' aria-current="step"':''} aria-label="Paso ${i+1} de ${STEPS.length}: ${s}"><i aria-hidden="true">${i<step?'✓':i+1}</i>${s}</button>`).join(''); document.querySelectorAll('#stepper button').forEach(b => b.addEventListener('click', () => { const i = Number(b.dataset.s); if (i <= step || pub) { if (step > 0) collect(); step = i; render(); } })); }
 
   function render(){ renderStepper(); if (step === 0) renderPerfil(); else if (step === 1) renderPrincipales(); else if (step === 2) renderFotos(); else if (step === 3) renderExtras(); else renderRevision(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
   const navBtns = (backLabel, nextLabel) => `<div class="p-nav-steps"><div>${step > 0 ? `<button type="button" class="p-btn p-btn-dark" data-back>${backLabel||'Volver'}</button>` : ''}</div><div style="display:flex;gap:8px"><button type="button" class="p-btn" data-save>Guardar borrador</button><button type="button" class="p-btn p-btn-fill" data-next>${nextLabel||'Continuar'} <span class="ic">${BP.ico.arrow}</span></button></div></div>`;

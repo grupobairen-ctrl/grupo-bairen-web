@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://dahusnnbyrvltcuaelxj.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260911g"><link rel="stylesheet" href="css/catalogo.css?v=20260911g"><link rel="stylesheet" href="css/portal.css?v=20260911g">
+  <link rel="stylesheet" href="css/base.css?v=20260911m"><link rel="stylesheet" href="css/catalogo.css?v=20260911m"><link rel="stylesheet" href="css/portal.css?v=20260911m">
   <style>
     .p-cur{background:var(--p-card);border:1px solid var(--p-line);border-radius:var(--p-radius);padding:18px;margin-bottom:14px;display:grid;grid-template-columns:200px 1fr;gap:18px}
     .p-cur .ph{aspect-ratio:4/3;border-radius:8px;overflow:hidden;background:var(--p-tray)} .p-cur .ph img{width:100%;height:100%;object-fit:cover}
@@ -32,7 +32,7 @@
     @media(max-width:700px){.p-cur{grid-template-columns:1fr}.p-check{grid-template-columns:1fr}}
   </style>
 </head>
-<body class="p-product">
+<body class="p-product p-herramienta">
 <div id="pHeader"></div>
 <div class="p-band"><div class="p-container" style="max-width:980px">
   <span class="p-eyebrow">Panel BAIREN</span>
@@ -44,7 +44,7 @@
   <div id="out" role="tabpanel" aria-busy="true"><div class="p-skel-panel" aria-hidden="true"><div class="p-skel-line row"></div><div class="p-skel-line row"></div></div></div>
 </div></section>
 <div id="pFooter"></div>
-<script src="supabase-portal.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260911g" defer></script><script src="js/i18n-portal.js?v=20260911g" defer></script><script src="js/ui.js?v=20260911g" defer></script><script src="js/store.js?v=20260911g" defer></script><script src="js/data.js?v=20260911g" defer></script>
+<script src="supabase-portal.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260911m" defer></script><script src="js/i18n-portal.js?v=20260911m" defer></script><script src="js/ui.js?v=20260911m" defer></script><script src="js/store.js?v=20260911m" defer></script><script src="js/data.js?v=20260911m" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function(){
   async function render(){ out.setAttribute('aria-busy', 'true'); await (t === 'cola' ? renderCola() : renderPubs()); out.removeAttribute('aria-busy'); }
   async function renderCola(){
     const cola = await BPStore.colaCuracion();
-    if (!cola.length) { out.innerHTML = '<div class="p-empty">No hay avisos esperando revisión.</div>'; return; }
+    if (!cola.length) { out.innerHTML = '<div class="p-empty p-ensena"><b>No hay avisos esperando revisión.</b><p>Cuando un publicador envíe uno, aparece acá con sus fotos y datos para aprobarlo, pedir cambios o rechazarlo con un motivo.</p></div>'; return; }
     let html = '';
     for (const a of cola) { const fotos = []; for (const f of (a.fotos||[]).slice().sort((x,y)=>(x.orden||0)-(y.orden||0))) fotos.push(await BPStore.resolveFoto(f.url)); const p = a.publicador || {};
       const enZona = BP.ZONAS.indexOf(a.zona) > -1; const descOk = (a.descripcion||'').length >= 150; const fotosOk = fotos.length >= 8 || a.quiero_produccion; const datosOk = !!(a.m2_total && a.ambientes && a.precio);
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function(){
   }
   async function renderPubs(){
     const pubs = await BPStore.publicadoresPendientes();
-    if (!pubs.length) { out.innerHTML = '<div class="p-empty">No hay publicadores esperando verificación.</div>'; return; }
+    if (!pubs.length) { out.innerHTML = '<div class="p-empty p-ensena"><b>No hay publicadores esperando verificación.</b><p>Cuando alguien cree su perfil y suba la documentación, aparece acá para verificarlo.</p></div>'; return; }
     for (const p of pubs) p.titular = await BPStore.titularDe(p.id);
     out.innerHTML = pubs.map(p => `<div class="p-cur" data-id="${p.id}" style="grid-template-columns:1fr"><div><b>${BP.esc(p.nombre)}</b> <span class="p-badge dueno">${p.tipo === 'dueno' ? 'Dueño directo' : p.tipo}</span><div class="m">${BP.esc(p.responsable||'')} ${p.matricula ? '· ' + BP.esc(p.matricula) + ' (' + BP.esc(p.colegio||'') + ')' : ''} ${p.dni ? '· DNI ' + BP.esc(p.dni) : ''} ${p.cuit ? '· CUIT ' + BP.esc(p.cuit) : ''} · ${BP.esc(p.email||'')} · ${BP.esc(p.telefono||'')}</div>
       <div class="m" style="margin-top:6px">${(p.verificaciones||[]).length ? (p.verificaciones||[]).map(v => `${v.tipo}: ${v.resultado}${v.nota ? ' · ' + BP.esc(v.nota) : ''}`).join('<br>') : 'Sin documentos cargados'}</div>

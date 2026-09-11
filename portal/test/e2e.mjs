@@ -1,5 +1,6 @@
 /* Prueba de punta a punta del portal en modo local, con Chrome headless por CDP.
    Uso: (1) servidor local en :8080, (2) Chrome con --remote-debugging-port=9222, (3) node portal/test/e2e.mjs
+   Con la base del portal conectada, correrla con LOCAL=1 (bloquea Supabase y el portal cae a modo local).
    Recorre: ingresar con código → publicar en 5 pasos con 8 fotos → panel (en revisión) → curación (aprobar) → resultados y ficha. */
 const BASE = process.env.BASE || 'http://127.0.0.1:8080/portal/';
 const FOTOS = Array.from({length: 8}, (_, i) => `/tmp/bp-e2e/foto-${i+1}.jpg`);
@@ -19,7 +20,9 @@ const step = (n, msg) => console.log(`  ${n}. ${msg}`);
 import { mkdirSync, writeFileSync, readFileSync } from 'node:fs';
 mkdirSync('/tmp/bp-e2e/shots', { recursive: true });
 const shot = async (name) => { try { await send('Emulation.setDeviceMetricsOverride', { width: 1440, height: 1000, deviceScaleFactor: 1, mobile: false }); const r = await send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true }); writeFileSync('/tmp/bp-e2e/shots/' + name + '.png', Buffer.from(r.result.data, 'base64')); } catch (e) { console.log('   (sin captura ' + name + ')'); } };
-await send('Page.enable'); await send('Runtime.enable'); await send('DOM.enable'); await send('Network.enable'); await send('Network.clearBrowserCache'); await send('Network.setCacheDisabled', { cacheDisabled: true });
+await send('Page.enable'); await send('Runtime.enable'); await send('DOM.enable'); await send('Network.enable');
+/* LOCAL=1: bloquea Supabase para que el portal caiga a modo local aunque la base responda (la prueba está escrita para modo local) */
+if (process.env.LOCAL === '1') await send('Network.setBlockedURLs', { urls: ['*supabase.co*', '*supabase-js*'] }); await send('Network.clearBrowserCache'); await send('Network.setCacheDisabled', { cacheDisabled: true });
 const results = [];
 const ok = (name, cond, detail) => { results.push({ name, ok: !!cond, detail }); console.log(`${cond ? 'OK ' : 'FALLA'} ${name}${detail ? ' · ' + detail : ''}`); };
 
@@ -106,11 +109,11 @@ try {
 
   /* 4. Resultados y ficha */
   await goto(BASE + 'buscar.html?op=venta&zona=Palermo');
-  await waitFor('document.querySelectorAll(".p-card-h").length > 0', 'tarjetas');
-  const card = await evalJs('(() => { const c = Array.from(document.querySelectorAll(".p-card-h")).find(x => x.textContent.includes("Honduras")); return c ? c.querySelector(".p-publine").textContent.replace(/\\s+/g," ").trim() : null; })()');
+  await waitFor('document.querySelectorAll(".prop-card, .p-card-h").length > 0', 'tarjetas');
+  const card = await evalJs('(() => { const c = Array.from(document.querySelectorAll(".prop-card, .p-card-h")).find(x => x.textContent.includes("Honduras")); return c ? (c.querySelector(".p-publine, .card-pub, .card-address") || c).textContent.replace(/\\s+/g," ").trim() : null; })()');
   await shot('08-resultados-palermo');
   ok('Resultados: el aviso nuevo aparece con su publicador', !!card, card);
-  const href = await evalJs('(() => { const c = Array.from(document.querySelectorAll(".p-card-h")).find(x => x.textContent.includes("Honduras")); return c ? c.querySelector(".p-addr").getAttribute("href") : null; })()');
+  const href = await evalJs('(() => { const c = Array.from(document.querySelectorAll(".prop-card, .p-card-h")).find(x => x.textContent.includes("Honduras")); return c ? (c.querySelector(".p-addr") || c).getAttribute("href") : null; })()');
   await goto(BASE + href);
   await waitFor('!!document.getElementById("contactForm")', 'ficha');
   const ficha = await evalJs('({ h1: document.querySelector("h1").textContent, fotos: document.querySelectorAll("#gal .p-fhero-slide[data-i], #gal img").length, pub: document.querySelector(".p-pub-block b").textContent, badge: !!document.querySelector(".p-pub-block .p-badge.dueno") })');
@@ -150,7 +153,7 @@ try {
   await evalJs('(async () => { const a = (await BPStore.myAvisos()).find(x => x.estado_curacion === "publicado"); const rec = Object.assign({}, a); delete rec.publicador; rec.propietario_email = "duenio@bairen.test"; await BPStore.saveAviso(rec); })()');
   await goto(BASE + 'panel.html#avisos');
   await waitFor('!!document.querySelector("#content .p-visita-form")', 'formulario de visita');
-  await evalJs('(() => { const f = Array.from(document.querySelectorAll("#content .p-visita-form")).find(x => x.closest(".p-aviso-row").textContent.includes("Honduras")); f.tipo.value = "visita"; f.fecha.value = "2026-09-05T15:30"; f.nota.value = "Pareja joven, volvería con los padres"; f.requestSubmit(); return true; })()');
+  await evalJs('(() => { const f = Array.from(document.querySelectorAll("#content .p-visita-form")).find(x => x.closest(".p-aviso-row").textContent.includes("4800")); f.tipo.value = "visita"; f.fecha.value = "2026-09-05T15:30"; f.nota.value = "Pareja joven, volvería con los padres"; f.requestSubmit(); return true; })()');
   await waitFor('document.querySelector("#content").textContent.includes("Pareja joven")', 'visita registrada');
   await shot('13-panel-visitas');
   ok('Visitas: la inmobiliaria registra una visita en el aviso', true);
@@ -170,24 +173,24 @@ try {
   ok('Emprendimientos: la página agrupa las unidades de la desarrolladora', /Torre Ejemplo/.test(emp) && /Venta directa/.test(emp), emp);
   /* 8. Rutas limpias */
   const pretty = await evalJs('BP.probePretty()');
-  if (pretty) { await goto(BASE + 'departamentos-venta-palermo'); await waitFor('document.querySelectorAll(".p-card-h").length > 0', 'resultados por ruta limpia'); const t = await evalJs('document.getElementById("resTitle").textContent'); const link = await evalJs('document.querySelector(".p-card-h .p-addr").getAttribute("href")'); ok('Rutas limpias: resultados y links de ficha', /Palermo/.test(t) && /^propiedad-/.test(link), t + ' · ' + link); await goto(BASE + link); await waitFor('!!document.getElementById("contactForm")', 'ficha por ruta limpia'); ok('Rutas limpias: la ficha abre desde su URL', true, await evalJs('document.querySelector("h1").textContent')); }
+  if (pretty) { await goto(BASE + 'departamentos-venta-palermo'); await waitFor('document.querySelectorAll(".prop-card, .p-card-h").length > 0', 'resultados por ruta limpia'); const t = await evalJs('document.getElementById("resTitle").textContent'); const link = await evalJs('(document.querySelector(".p-card-h .p-addr") || document.querySelector(".prop-card")).getAttribute("href")'); ok('Rutas limpias: resultados y links de ficha', /Palermo/.test(t) && /^propiedad-/.test(link), t + ' · ' + link); await goto(BASE + link); await waitFor('!!document.getElementById("contactForm")', 'ficha por ruta limpia'); ok('Rutas limpias: la ficha abre desde su URL', true, await evalJs('document.querySelector("h1").textContent')); }
   else ok('Rutas limpias: servidor sin reescritura (se usan parámetros)', true);
 
   /* 9. Estado de error: si la carga falla hay mensaje y reintento, no esqueleto eterno.
      En modo local los avisos publicados del navegador alcanzan para no leer el JSON, así que se apartan un momento. */
   await evalJs('sessionStorage.setItem("__bpAvisos", localStorage.getItem("bp_avisos") || "[]"); localStorage.setItem("bp_avisos", "[]"); true');
-  await send('Network.setBlockedURLs', { urls: ['*avisos-src.json*'] });
+  await send('Network.setBlockedURLs', { urls: ['*avisos-src.json*'].concat(process.env.LOCAL === '1' ? ['*supabase.co*', '*supabase-js*'] : []) });
   await goto(BASE + 'buscar.html?op=mediano');
   await waitFor('!!document.querySelector(".p-error")', 'estado de error', 12000);
   const err = await evalJs('(() => { const e = document.querySelector(".p-error"); return e.getAttribute("role") + " · " + e.querySelector("b").textContent + " · " + e.querySelector("button").textContent; })()');
   await shot('16-estado-error');
   ok('Estado de error: mensaje con reintento cuando los datos no cargan', /alert/.test(err) && /Reintentar/.test(err), err);
-  await send('Network.setBlockedURLs', { urls: [] });
+  await send('Network.setBlockedURLs', { urls: process.env.LOCAL === '1' ? ['*supabase.co*', '*supabase-js*'] : [] });
   await evalJs('localStorage.setItem("bp_avisos", sessionStorage.getItem("__bpAvisos") || "[]"); sessionStorage.removeItem("__bpAvisos"); true');
 
   /* 10. Teclado en el buscador: flechas, Enter y Escape */
   await goto(BASE + 'buscar.html?op=mediano');
-  await waitFor('document.querySelectorAll(".p-card-h").length > 0', 'resultados');
+  await waitFor('document.querySelectorAll(".prop-card, .p-card-h").length > 0', 'resultados');
   const tecla = async (k, code, vk) => { for (const type of ['keyDown', 'keyUp']) await send('Input.dispatchKeyEvent', { type, key: k, code, windowsVirtualKeyCode: vk, nativeVirtualKeyCode: vk }); };
   await evalJs('(() => { const q = document.getElementById("qInput"); q.focus(); q.dispatchEvent(new Event("input")); return true; })()');
   await waitFor('document.querySelectorAll("#sugg button").length > 0', 'sugerencias');
@@ -203,8 +206,8 @@ try {
 
   /* 11. Consulta: queda registrada con su canal y el publicador correcto */
   await goto(BASE + 'buscar.html?op=venta');
-  await waitFor('document.querySelectorAll(".p-card-h .p-addr").length > 0', 'una ficha para consultar');
-  const fichaHref = await evalJs('document.querySelector(".p-card-h .p-addr").getAttribute("href")');
+  await waitFor('document.querySelectorAll(".prop-card, .p-card-h .p-addr").length > 0', 'una ficha para consultar');
+  const fichaHref = await evalJs('(document.querySelector(".p-card-h .p-addr") || document.querySelector(".prop-card")).getAttribute("href")');
   await goto(BASE + fichaHref);
   await waitFor('!!document.getElementById("contactForm")', 'formulario de consulta');
   const antesC = await evalJs('JSON.parse(localStorage.getItem("bp_consultas_db") || "[]").length');
