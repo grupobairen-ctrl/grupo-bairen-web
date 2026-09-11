@@ -7,12 +7,16 @@
   <meta name="description" content="El portal de propiedades seleccionadas de Buenos Aires. Departamentos en venta y en alquiler en Palermo, Recoleta, Retiro, Belgrano, Núñez, Colegiales, Villa Crespo, Puerto Madero, Saavedra y Zona Norte, seleccionados uno por uno antes de entrar al portal.">
   <meta name="robots" content="noindex,nofollow">
   <meta name="theme-color" content="#131D2D">
+  <meta property="og:type" content="website"><meta property="og:site_name" content="BAIREN">
+  <meta property="og:title" content="BAIREN · Propiedades seleccionadas en Buenos Aires">
+  <meta property="og:description" content="Departamentos en venta y en alquiler, seleccionados uno por uno antes de entrar al portal.">
+  <meta property="og:image" content="https://www.bairengroup.com/hero-poster.jpg"><meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://dahusnnbyrvltcuaelxj.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260913zc"><link rel="stylesheet" href="css/catalogo.css?v=20260913zc"><link rel="stylesheet" href="css/portal.css?v=20260913zc">
+  <link rel="stylesheet" href="css/base.css?v=20260910nd"><link rel="stylesheet" href="css/catalogo.css?v=20260910nd"><link rel="stylesheet" href="css/portal.css?v=20260910nd">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"BAIREN","url":"https://www.bairengroup.com","logo":"https://www.bairengroup.com/bairen_logo.png","description":"El portal de propiedades seleccionadas de Buenos Aires. Alquileres a mediano y largo plazo y departamentos en venta, seleccionados uno por uno antes de entrar al portal.","areaServed":[{"@type":"City","name":"Ciudad Autónoma de Buenos Aires"},{"@type":"AdministrativeArea","name":"Zona Norte, Buenos Aires"}]}</script>
 </head>
 <body class="p-home">
@@ -78,12 +82,16 @@
 
 <section class="h-sec h-crema h-borde" id="edificios">
   <div class="h-in">
-    <h2 class="h-h2">Edificios, complejos y tipologías de primera línea.</h2>
+    <h2 class="h-h2">Edificios, complejos y unidades de primera línea.</h2>
     <p class="h-copy" id="edificiosCopy">Hoy encuentran su espacio en BAIREN.</p>
-    <div class="h-edificios" id="edificiosTrack"></div>
-    <div class="h-puntos" id="edificiosPuntos" aria-hidden="true"><i></i><i></i><i></i></div>
-    <div class="h-tipos" id="tiposGrid"></div>
+    <div class="h-edificios" id="edificiosTrack" aria-busy="true"><span class="h-edif h-esq" aria-hidden="true"></span><span class="h-edif h-esq" aria-hidden="true"></span><span class="h-edif h-esq" aria-hidden="true"></span></div>
   </div>
+  <div class="h-carrusel" id="seleccion">
+    <button type="button" class="h-flecha prev" data-dir="-1" aria-label="Unidad anterior"></button>
+    <div class="h-track h-track-fotos" id="seleccionTrack" aria-busy="true" tabindex="0" aria-label="Unidades seleccionadas, deslizá para ver más"><span class="h-foto-card h-esq" aria-hidden="true"></span><span class="h-foto-card h-esq" aria-hidden="true"></span><span class="h-foto-card h-esq" aria-hidden="true"></span><span class="h-foto-card h-esq" aria-hidden="true"></span></div>
+    <button type="button" class="h-flecha next" data-dir="1" aria-label="Unidad siguiente"></button>
+  </div>
+  <div class="h-puntos" id="seleccionPuntos" aria-hidden="true"></div>
 </section>
 
 
@@ -127,10 +135,10 @@
 
 <script src="../mapa-barrios.js" defer></script><script src="supabase-portal.js" defer></script>
 <script src="js/motion.js" defer></script>
-<script src="js/bairen-motion.js?v=20260913zc" defer></script>
-<script src="js/ui.js?v=20260913zc" defer></script>
-<script src="js/store.js?v=20260913zc" defer></script>
-<script src="js/data.js?v=20260913zc" defer></script>
+<script src="js/bairen-motion.js?v=20260910nd" defer></script>
+<script src="js/ui.js?v=20260910nd" defer></script>
+<script src="js/store.js?v=20260910nd" defer></script>
+<script src="js/data.js?v=20260910nd" defer></script>
 <script>
 document.addEventListener('DOMContentLoaded', function(){
 (async function(){
@@ -210,16 +218,35 @@ document.addEventListener('DOMContentLoaded', function(){
     return `<a class="h-edif${n ? '' : ' sin'}" href="${href}"><img src="${e.fachada}" alt="Fachada de ${BP.esc(e.nombre)}" loading="lazy" data-alt="${alt}" onerror="if(this.dataset.alt&&this.src!==this.dataset.alt){this.src=this.dataset.alt}else{this.remove()}"><div class="h-edif-txt"><b>${BP.esc(e.nombre)}</b><em>${n ? 'Ver unidades' : 'Avisarme'} <span aria-hidden="true">→</span></em></div></a>`;
   }).join('');
 
-  /* ── Tipologías: siempre navegables. El conteo aparece cuando hay. ── */
-  const TIPOS = [
-    { nombre: 'Dúplex', img: 'img/tipologia-duplex.jpg', href: 'buscar.html?q=d%C3%BAplex', test: a => /d[uú]plex/i.test(texto(a) + ' ' + (a.caracteristicas || []).join(' ')) },
-    { nombre: 'PHs', img: 'img/tipologia-ph.jpg', href: 'buscar.html?tipo=ph', test: a => /^ph$/i.test(a.tipoProp || '') },
-    { nombre: 'Casas en barrios cerrados', img: 'img/tipologia-casa-barrio-cerrado.jpg', href: 'buscar.html?tipo=casa&zona=GBA%20Norte', test: a => /^casa$/i.test(a.tipoProp || '') }
-  ];
-  document.getElementById('tiposGrid').innerHTML = TIPOS.map(t => {
-    const n = reales.filter(t.test).length;
-    return `<a class="h-tipo" href="${t.href}"${n ? ` title="${n === 1 ? '1 propiedad' : n + ' propiedades'}"` : ''}><span class="h-tipo-foto"><img src="${t.img}" alt="" loading="lazy" onerror="this.closest('.h-tipo-foto').classList.add('vacia')"></span><span class="h-tipo-txt"><b>${t.nombre}</b><em aria-hidden="true">→</em></span></a>`;
-  }).join('');
+  document.getElementById('edificiosTrack').removeAttribute('aria-busy');
+
+  /* ── Unidades seleccionadas: una foto por unidad, deslizable. Primero las
+     seleccionadas de la semana, después el resto disponible; nunca reservadas. ── */
+  const dest = BPData.sort(base.filter(a => a.destacado && !a.reservado), 'relevancia');
+  const resto = BPData.sort(base.filter(a => !a.destacado && !a.reservado), 'relevancia');
+  const seleccion = dest.concat(resto).filter(a => a.fotos && a.fotos.length).slice(0, 8);
+  const track = document.getElementById('seleccionTrack'), puntos = document.getElementById('seleccionPuntos');
+  track.innerHTML = seleccion.map(a => `<a class="h-foto-card" href="${BP.urlFicha(a)}"><img src="${BP.sbImg(a.fotos[0], 1200)}" alt="${BP.esc(a.dir)}, ${BP.esc(a.barrio)}" loading="lazy"><div class="h-foto-txt"><b>${BP.esc(a.dir)}</b><span>${BP.esc(a.barrio)}</span></div></a>`).join('');
+  track.removeAttribute('aria-busy');
+  const tarjetas = Array.from(track.querySelectorAll('.h-foto-card'));
+  puntos.innerHTML = tarjetas.map(() => '<i></i>').join('');
+  /* El punto encendido es la primera tarjeta que se ve entera por la izquierda;
+     las flechas se apagan en los extremos. Se mide al desplazar el riel, un cuadro por vez. */
+  const flechas = document.querySelectorAll('#seleccion .h-flecha');
+  const marcar = () => {
+    const izq = track.getBoundingClientRect().left + parseFloat(getComputedStyle(track).paddingLeft || 0);
+    let i = tarjetas.findIndex(c => c.getBoundingClientRect().right > izq + c.offsetWidth * .5); if (i < 0) i = 0;
+    puntos.querySelectorAll('i').forEach((p, j) => p.classList.toggle('on', j === i));
+    flechas.forEach(b => { b.disabled = b.dataset.dir === '-1' ? track.scrollLeft <= 2 : track.scrollLeft + track.clientWidth >= track.scrollWidth - 2; });
+  };
+  marcar();
+  let cuadro = 0;
+  track.addEventListener('scroll', () => { if (cuadro) return; cuadro = requestAnimationFrame(() => { cuadro = 0; marcar(); }); }, { passive: true });
+  addEventListener('resize', marcar, { passive: true });
+  flechas.forEach(b => b.addEventListener('click', () => {
+    const c = tarjetas[0]; const paso = c ? c.getBoundingClientRect().width + parseFloat(getComputedStyle(track).columnGap || getComputedStyle(track).gap || 18) : 380;
+    track.scrollBy({ left: paso * Number(b.dataset.dir), behavior: 'smooth' });
+  }));
 
 
   /* ── PSI: fotografía real de una unidad, nunca stock ── */

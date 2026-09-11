@@ -2529,3 +2529,117 @@ body.p-home .h-anuncio-foto img{object-position:62% 46%}
   body.p-home .h-anuncio-top,body.p-home .h-anuncio-txt{width:100%;max-width:1180px;margin:0 auto;padding-left:24px;padding-right:24px}
   body.p-home .h-anuncio-top{padding-bottom:8px}
 }
+
+/* ══ 10/9/2026 (noche) · Pasada de diseño sobre la portada con las skills de
+   taste, redesign y frontend-design. Qué cambia: piso de legibilidad y targets
+   de 44 px en celular; el estándar sin medio viewport vacío en escritorio; el
+   carrusel de unidades seleccionadas en lugar de las tipologías (pedido de
+   Tomás); el índice como tres cifras en escritorio; esqueletos de carga para
+   que nada salte. Se agrega al final; nada se reemplaza. ═══════════════════ */
+
+/* Títulos sin viudas, párrafos con cortes parejos */
+body.p-home .h-h2,body.p-home .h-hero h1{text-wrap:balance}
+body.p-home .h-copy,body.p-home .h-hero-sub{text-wrap:pretty}
+
+/* Celular: nada por debajo de 11 px, nada tocable por debajo de 44 px.
+   La composición del mockup se conserva; sólo se sube el piso. */
+@media(max-width:899px){
+  body.p-home .h-eyebrow{font-size:.56rem;letter-spacing:.24em}
+  body.p-home .h-copy{font-size:.8rem;line-height:1.55}
+  body.p-home .h-hero-sub{font-size:.84rem}
+  body.p-home .h-seg button{min-height:44px;font-size:.78rem}
+  body.p-home .h-seg-plazo button{min-height:40px;font-size:.74rem}
+  body.p-home .h-field input{height:48px;font-size:.9rem}
+  body.p-home .h-cta{min-height:46px;font-size:.66rem}
+  body.p-home .h-hito b{font-size:.7rem;line-height:1.2}
+  body.p-home .h-edif-txt b{font-size:.84rem}
+  body.p-home .h-edif-txt em{font-size:.56rem;letter-spacing:.12em}
+  body.p-home .h-encaja-txt .h-copy{font-size:.76rem}
+  body.p-home .h-encaja .h-btn,body.p-home .h-anuncio-txt .h-btn{min-height:44px;padding:0 16px;font-size:.62rem;letter-spacing:.14em}
+  body.p-home .h-m2-fecha{font-size:.76rem}
+  body.p-home .h-m2-lista a{padding:12px 0}
+  body.p-home .h-m2-lista .b,body.p-home .h-m2-lista .v{font-size:.8rem}
+  body.p-home .h-m2-mas{min-height:44px;font-size:.76rem}
+  body.p-home .h-anuncio-txt .h-copy{font-size:.8rem;max-width:32ch}
+}
+
+/* Escritorio: el estándar mide lo que mide su contenido; publicar respira */
+@media(min-width:900px){
+  body.p-home .h-estandar{min-height:0;padding:clamp(56px,7vw,88px) 0}
+  body.p-home .h-camino{padding-bottom:0}
+  body.p-home .h-encaja{padding:clamp(56px,7vw,88px) 0}
+  body.p-home .h-encaja-txt .h-h2{font-size:clamp(1.7rem,2.6vw,2.3rem);max-width:18ch}
+  body.p-home .h-encaja-txt .h-copy{font-size:.94rem}
+}
+
+/* Edificios cierra con aire después del carrusel */
+body.p-home #edificios{padding-bottom:clamp(28px,5vw,64px)}
+
+/* ── Carrusel de unidades seleccionadas ──────────────────────────────────
+   Una foto por unidad, la dirección y el barrio. La primera tarjeta alinea
+   con el margen del contenido y el resto sangra hacia la derecha: se ve que
+   hay más. En celular se desliza; en escritorio además hay flechas. */
+body.p-home .h-carrusel{position:relative;width:100%;max-width:none;min-width:0;margin:0;overflow:visible}
+body.p-home .h-track-fotos{display:flex !important;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:14px 18px 6px;scroll-padding-left:18px;scrollbar-width:none;max-width:none;margin:0;overscroll-behavior-x:contain}
+body.p-home .h-track-fotos::-webkit-scrollbar{display:none}
+body.p-home .h-foto-card{flex:0 0 78vw;max-width:420px;aspect-ratio:4/5;scroll-snap-align:start;border-radius:12px}
+body.p-home .h-foto-txt{padding:16px}
+body.p-home .h-foto-txt b{font-size:1.15rem}
+body.p-home .h-foto-txt span{font-size:.6rem;letter-spacing:.18em}
+body.p-home .h-flecha[disabled]{opacity:.3;cursor:default;pointer-events:none}
+@media(min-width:900px){
+  body.p-home .h-track-fotos{gap:18px;padding:26px 24px 8px max(24px,calc((100vw - 1180px)/2 + 24px));scroll-padding-left:max(24px,calc((100vw - 1180px)/2 + 24px))}
+  body.p-home .h-foto-card{flex-basis:372px;max-width:372px;border-radius:14px}
+  body.p-home .h-foto-txt{padding:22px}
+  body.p-home .h-foto-txt b{font-size:1.4rem}
+  body.p-home .h-foto-txt span{font-size:.62rem}
+  body.p-home .h-flecha{display:block}
+  body.p-home .h-flecha.prev{left:max(12px,calc((100vw - 1180px)/2 - 2px))}
+  body.p-home .h-flecha.next{right:24px}
+}
+/* Los puntos ahora son de verdad: uno por unidad, encendido el que se ve */
+body.p-home .h-puntos{margin:12px 0 0;gap:6px}
+body.p-home .h-puntos i,body.p-home .h-puntos i:first-child{width:6px;height:6px;opacity:.28;transform:none;transition:opacity .4s cubic-bezier(.22,1,.36,1),transform .4s cubic-bezier(.22,1,.36,1)}
+body.p-home .h-puntos i.on{opacity:.95;transform:scale(1.2)}
+@media(min-width:900px){body.p-home .h-puntos{margin-top:16px}}
+
+/* Esqueletos: fachadas y unidades ocupan su lugar antes de que lleguen los
+   datos, así la página no salta. Un brillo lento; ninguno si se pidió calma. */
+body.p-home .h-esq{position:relative;overflow:hidden;display:block;background:linear-gradient(160deg,#1E2A3F,#131D2D);pointer-events:none}
+body.p-home .h-esq::after{content:none}
+body.p-home .h-esq::before{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(251,250,246,.07) 50%,transparent 70%);transform:translateX(-100%);animation:h-brillo 1.8s cubic-bezier(.22,1,.36,1) infinite}
+@keyframes h-brillo{to{transform:translateX(100%)}}
+@media(prefers-reduced-motion:reduce){body.p-home .h-esq::before{animation:none}}
+
+/* ── Índice en escritorio: tres cifras, no una tabla de 1180 px de ancho ──
+   El ojo no viaja un metro entre el barrio y su valor. El precio sigue quieto. */
+@media(min-width:900px){
+  body.p-home .h-m2-caja{padding:6px clamp(20px,3vw,32px)}
+  body.p-home .h-m2-lista{display:grid;grid-template-columns:repeat(3,1fr);gap:0}
+  body.p-home .h-m2-lista li,body.p-home .h-m2-lista li:last-child{border-bottom:0;border-left:1px solid rgba(255,255,255,.1)}
+  body.p-home .h-m2-lista li:first-child{border-left:0}
+  body.p-home .h-m2-lista a{flex-direction:column;align-items:flex-start;gap:8px;padding:24px clamp(18px,2.4vw,30px)}
+  body.p-home .h-m2-lista li:first-child a{padding-left:2px}
+  body.p-home .h-m2-lista .b{font:400 .92rem/1.3 var(--font-body);color:rgba(251,250,246,.72)}
+  body.p-home .h-m2-lista .v{font:400 clamp(1.7rem,2.4vw,2.2rem)/1.05 var(--font-display);color:var(--h-oro);letter-spacing:-.01em}
+  body.p-home .h-m2-lista a:hover .b{color:#FBFAF6}
+  /* La puerta al índice completo es un enlace, no una segunda caja */
+  body.p-home .h-m2-mas{display:inline-flex;width:auto;margin-top:18px;padding:0;border:0;background:transparent;color:var(--h-tinta);font:500 .9rem/1.3 var(--font-body);gap:10px}
+  body.p-home .h-m2-mas span{flex:none;text-decoration:underline;text-underline-offset:5px;text-decoration-color:rgba(194,169,104,.7);transition:text-decoration-color .3s cubic-bezier(.22,1,.36,1)}
+  body.p-home .h-m2-mas:hover{color:var(--h-tinta);border-color:transparent}
+  body.p-home .h-m2-mas:hover span{text-decoration-color:var(--h-navy)}
+  body.p-home .h-m2-mas em{color:var(--h-oro);font-size:1.1rem}
+}
+
+/* El relleno oro lleva tinta navy (7,4:1). Una regla del 10/9 (línea ~2127)
+   puso crema sobre todo .p-btn-fill y el "Ingresar" del header quedó en 2,2:1.
+   El relleno navy de las páginas de producto sigue en crema, como estaba. */
+.p-btn-fill,.p-btn-fill:hover{color:var(--navy-deeper)}
+.p-product .p-btn-fill,.p-product .p-btn-fill:hover{color:#FBFAF6}
+.p-product .p-form .p-btn-fill,.p-product .p-form .p-btn-fill:hover,.p-product #pHeader .p-btn-fill,.p-product .navbar .p-btn-fill,.p-product .mobile-menu .p-btn-fill{color:var(--navy-deeper)}
+
+/* Índice en escritorio: el ícono y el chevrón del enlace, en oro oscuro (3,6:1) */
+@media(min-width:900px){body.p-home .h-m2-mas svg,body.p-home .h-m2-mas em{color:#8A7547}}
+/* Un poco más de aire entre las fachadas y el carrusel */
+body.p-home .h-track-fotos{padding-top:18px}
+@media(min-width:900px){body.p-home .h-track-fotos{padding-top:36px}}
