@@ -2792,3 +2792,6 @@ body.p-home .h-m2-mas span{flex:1}
   body.p-home .h-criterios{display:inline-block;min-height:0;font-size:.78rem;text-decoration:none;border-bottom:1px solid rgba(222,205,160,.35);position:relative}
   body.p-home .h-criterios::after{content:"";position:absolute;left:-8px;right:-8px;top:-12px;bottom:-12px}
 }
+/* Lo oculto del header (campana, Mis contactos, corazón sin favoritos) no se muestra aunque
+   .p-ghost tenga display propio: el atributo hidden manda. */
+.p-nav-right [hidden],.p-navbar [hidden]{display:none !important}
