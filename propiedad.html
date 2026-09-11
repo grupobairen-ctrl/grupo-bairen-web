@@ -369,7 +369,6 @@ footer{background:var(--navy-dark);border-top:1px solid var(--gold);padding:40px
 <footer>
   <div class="ft-logo"><img src="/bairen_logo.png?v=3" alt="BAIREN"/></div>
   <div class="ft-copy" data-i18n="cat_copy">© 2026 Grupo Bairen · Todos los derechos reservados</div>
-  <div class="ft-copy" style="margin-top:5px;">Corredor Responsable: Maxim Rentals · Maximiliano Matzkin · Matrícula CUCICBA Nº 7527</div>
 </footer>
 
 <!-- WHATSAPP -->
@@ -630,7 +629,22 @@ function showNotFound(customMsg) {
   document.title = 'Propiedad no encontrada — BAIREN';
 }
 
+// Sin corredor en la web (11/9/2026): si una descripción cargada todavía trae
+// la línea "Corredor responsable: Maximiliano Matzkin, CUCICBA 7527, Maxim
+// Rentals" (en cualquiera de los tres idiomas), esa línea no se muestra ni va
+// a los metadatos. La base se limpia con sin-corredor.sql; esto es el resguardo.
+const LINEA_CORREDOR = /^[^\n]*(Corredor responsable|Responsible broker|Corretor respons[aá]vel|Matzkin|CUCICBA|Maxim Rentals)[^\n]*$/gim;
+function sinLineaCorredor(t) {
+  if (!t || !LINEA_CORREDOR.test(t)) return t;
+  LINEA_CORREDOR.lastIndex = 0;
+  return t.replace(LINEA_CORREDOR, '').replace(/\n{3,}/g, '\n\n').trim();
+}
+
 function renderProperty(p) {
+  p.descripcion    = sinLineaCorredor(p.descripcion);
+  p.descripcion_en = sinLineaCorredor(p.descripcion_en);
+  p.descripcion_pt = sinLineaCorredor(p.descripcion_pt);
+
   // ─── Datos derivados ───
   const titleFull = p.dir + (p.unidad ? ' ' + p.unidad : '');
   const unidadLbl = p.unidad ? ', ' + p.unidad : '';
