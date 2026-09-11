@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://dahusnnbyrvltcuaelxj.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260910nd"><link rel="stylesheet" href="css/catalogo.css?v=20260910nd"><link rel="stylesheet" href="css/portal.css?v=20260910nd">
+  <link rel="stylesheet" href="css/base.css?v=20260910nf"><link rel="stylesheet" href="css/catalogo.css?v=20260910nf"><link rel="stylesheet" href="css/portal.css?v=20260910nf">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"BAIREN","url":"https://www.bairengroup.com","logo":"https://www.bairengroup.com/bairen_logo.png","description":"El portal de propiedades seleccionadas de Buenos Aires. Alquileres a mediano y largo plazo y departamentos en venta, seleccionados uno por uno antes de entrar al portal.","areaServed":[{"@type":"City","name":"Ciudad Autónoma de Buenos Aires"},{"@type":"AdministrativeArea","name":"Zona Norte, Buenos Aires"}]}</script>
 </head>
 <body class="p-home">
@@ -82,16 +82,15 @@
 
 <section class="h-sec h-crema h-borde" id="edificios">
   <div class="h-in">
-    <h2 class="h-h2">Edificios, complejos y unidades de primera línea.</h2>
+    <h2 class="h-h2">Edificios y complejos de primera línea.</h2>
     <p class="h-copy" id="edificiosCopy">Hoy encuentran su espacio en BAIREN.</p>
-    <div class="h-edificios" id="edificiosTrack" aria-busy="true"><span class="h-edif h-esq" aria-hidden="true"></span><span class="h-edif h-esq" aria-hidden="true"></span><span class="h-edif h-esq" aria-hidden="true"></span></div>
   </div>
-  <div class="h-carrusel" id="seleccion">
-    <button type="button" class="h-flecha prev" data-dir="-1" aria-label="Unidad anterior"></button>
-    <div class="h-track h-track-fotos" id="seleccionTrack" aria-busy="true" tabindex="0" aria-label="Unidades seleccionadas, deslizá para ver más"><span class="h-foto-card h-esq" aria-hidden="true"></span><span class="h-foto-card h-esq" aria-hidden="true"></span><span class="h-foto-card h-esq" aria-hidden="true"></span><span class="h-foto-card h-esq" aria-hidden="true"></span></div>
-    <button type="button" class="h-flecha next" data-dir="1" aria-label="Unidad siguiente"></button>
+  <div class="h-carrusel" id="edifCarrusel">
+    <button type="button" class="h-flecha prev" data-dir="-1" aria-label="Edificio anterior"></button>
+    <div class="h-edificios h-track-fotos" id="edificiosTrack" aria-busy="true" tabindex="0" aria-label="Edificios, deslizá para ver más"><span class="h-edif h-esq" aria-hidden="true"></span><span class="h-edif h-esq" aria-hidden="true"></span><span class="h-edif h-esq" aria-hidden="true"></span></div>
+    <button type="button" class="h-flecha next" data-dir="1" aria-label="Edificio siguiente"></button>
   </div>
-  <div class="h-puntos" id="seleccionPuntos" aria-hidden="true"></div>
+  <div class="h-puntos" id="edifPuntos" aria-hidden="true"></div>
 </section>
 
 
@@ -135,10 +134,10 @@
 
 <script src="../mapa-barrios.js" defer></script><script src="supabase-portal.js" defer></script>
 <script src="js/motion.js" defer></script>
-<script src="js/bairen-motion.js?v=20260910nd" defer></script>
-<script src="js/ui.js?v=20260910nd" defer></script>
-<script src="js/store.js?v=20260910nd" defer></script>
-<script src="js/data.js?v=20260910nd" defer></script>
+<script src="js/bairen-motion.js?v=20260910nf" defer></script>
+<script src="js/ui.js?v=20260910nf" defer></script>
+<script src="js/store.js?v=20260910nf" defer></script>
+<script src="js/data.js?v=20260910nf" defer></script>
 <script>
 document.addEventListener('DOMContentLoaded', function(){
 (async function(){
@@ -191,7 +190,7 @@ document.addEventListener('DOMContentLoaded', function(){
   await BP.probePretty();
   let avisos;
   try { ({ avisos } = await BPData.load()); }
-  catch (err) { console.error(err); BP.estadoError(document.getElementById('seleccionTrack'), 'No pudimos cargar las propiedades.'); return; }
+  catch (err) { console.error(err); BP.estadoError(document.getElementById('edificiosTrack'), 'No pudimos cargar las propiedades.'); return; }
   BP.anotarMenus(avisos);
   const reales = avisos.filter(a => !a.demo);
   const base = reales.length >= 4 ? reales : avisos;
@@ -220,34 +219,30 @@ document.addEventListener('DOMContentLoaded', function(){
 
   document.getElementById('edificiosTrack').removeAttribute('aria-busy');
 
-  /* ── Unidades seleccionadas: una foto por unidad, deslizable. Primero las
-     seleccionadas de la semana, después el resto disponible; nunca reservadas. ── */
-  const dest = BPData.sort(base.filter(a => a.destacado && !a.reservado), 'relevancia');
-  const resto = BPData.sort(base.filter(a => !a.destacado && !a.reservado), 'relevancia');
-  const seleccion = dest.concat(resto).filter(a => a.fotos && a.fotos.length).slice(0, 8);
-  const track = document.getElementById('seleccionTrack'), puntos = document.getElementById('seleccionPuntos');
-  track.innerHTML = seleccion.map(a => `<a class="h-foto-card" href="${BP.urlFicha(a)}"><img src="${BP.sbImg(a.fotos[0], 1200)}" alt="${BP.esc(a.dir)}, ${BP.esc(a.barrio)}" loading="lazy"><div class="h-foto-txt"><b>${BP.esc(a.dir)}</b><span>${BP.esc(a.barrio)}</span></div></a>`).join('');
-  track.removeAttribute('aria-busy');
-  const tarjetas = Array.from(track.querySelectorAll('.h-foto-card'));
-  puntos.innerHTML = tarjetas.map(() => '<i></i>').join('');
-  /* El punto encendido es la primera tarjeta que se ve entera por la izquierda;
-     las flechas se apagan en los extremos. Se mide al desplazar el riel, un cuadro por vez. */
-  const flechas = document.querySelectorAll('#seleccion .h-flecha');
-  const marcar = () => {
-    const izq = track.getBoundingClientRect().left + parseFloat(getComputedStyle(track).paddingLeft || 0);
-    let i = tarjetas.findIndex(c => c.getBoundingClientRect().right > izq + c.offsetWidth * .5); if (i < 0) i = 0;
-    puntos.querySelectorAll('i').forEach((p, j) => p.classList.toggle('on', j === i));
-    flechas.forEach(b => { b.disabled = b.dataset.dir === '-1' ? track.scrollLeft <= 2 : track.scrollLeft + track.clientWidth >= track.scrollWidth - 2; });
-  };
-  marcar();
-  let cuadro = 0;
-  track.addEventListener('scroll', () => { if (cuadro) return; cuadro = requestAnimationFrame(() => { cuadro = 0; marcar(); }); }, { passive: true });
-  addEventListener('resize', marcar, { passive: true });
-  flechas.forEach(b => b.addEventListener('click', () => {
-    const c = tarjetas[0]; const paso = c ? c.getBoundingClientRect().width + parseFloat(getComputedStyle(track).columnGap || getComputedStyle(track).gap || 18) : 380;
-    track.scrollBy({ left: paso * Number(b.dataset.dir), behavior: 'smooth' });
-  }));
-
+  /* ── El riel de edificios se desliza hacia la derecha. El punto encendido es
+     la primera fachada que se ve entera por la izquierda; las flechas se apagan
+     en los extremos. Se mide al desplazar, un cuadro por vez. ── */
+  (function(){
+    const track = document.getElementById('edificiosTrack'), puntos = document.getElementById('edifPuntos');
+    const tarjetas = Array.from(track.querySelectorAll('.h-edif')), flechas = document.querySelectorAll('#edifCarrusel .h-flecha');
+    puntos.innerHTML = tarjetas.map(() => '<i></i>').join('');
+    const marcar = () => {
+      const izq = track.getBoundingClientRect().left + parseFloat(getComputedStyle(track).paddingLeft || 0);
+      let i = tarjetas.findIndex(c => c.getBoundingClientRect().right > izq + c.offsetWidth * .5); if (i < 0) i = 0;
+      puntos.querySelectorAll('i').forEach((p, j) => p.classList.toggle('on', j === i));
+      const cabe = track.scrollWidth <= track.clientWidth + 2;
+      puntos.hidden = cabe;
+      flechas.forEach(b => { b.hidden = cabe; b.disabled = b.dataset.dir === '-1' ? track.scrollLeft <= 2 : track.scrollLeft + track.clientWidth >= track.scrollWidth - 2; });
+    };
+    marcar();
+    let cuadro = 0;
+    track.addEventListener('scroll', () => { if (cuadro) return; cuadro = requestAnimationFrame(() => { cuadro = 0; marcar(); }); }, { passive: true });
+    addEventListener('resize', marcar, { passive: true });
+    flechas.forEach(b => b.addEventListener('click', () => {
+      const c = tarjetas[0]; const paso = c ? c.getBoundingClientRect().width + parseFloat(getComputedStyle(track).columnGap || getComputedStyle(track).gap || 18) : 400;
+      track.scrollBy({ left: paso * Number(b.dataset.dir), behavior: 'smooth' });
+    }));
+  })();
 
   /* ── PSI: fotografía real de una unidad, nunca stock ── */
   /* Foto de PSI: la unidad en venta mejor producida, que es la que habla de una compra */

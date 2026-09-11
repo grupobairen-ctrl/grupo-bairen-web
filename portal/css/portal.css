@@ -2643,3 +2643,50 @@ body.p-home .h-esq::before{content:"";position:absolute;inset:0;background:linea
 /* Un poco más de aire entre las fachadas y el carrusel */
 body.p-home .h-track-fotos{padding-top:18px}
 @media(min-width:900px){body.p-home .h-track-fotos{padding-top:36px}}
+
+/* ══ 10/9/2026 (noche, 2) · Fuera el carrusel de unidades: la sección muestra
+   los tres edificios premium, grandes. En escritorio la grilla se ensancha
+   más allá del texto y las tarjetas crecen; en celular van una debajo de la
+   otra, a todo el ancho, con la foto en 4:3. ══════════════════════════════ */
+body.p-home #edificios{padding-bottom:clamp(40px,7vw,96px)}
+body.p-home .h-edif-txt b{text-wrap:balance}
+@media(min-width:900px){
+  body.p-home .h-edificios{gap:22px;margin:34px auto 0;width:calc(100% + 140px);max-width:1320px;margin-left:-70px}
+  body.p-home .h-edif{aspect-ratio:3 / 4;border-radius:16px}
+  body.p-home .h-edif-txt{padding:26px 26px 28px;gap:8px}
+  body.p-home .h-edif-txt b{font-size:clamp(1.5rem,2vw,1.9rem)}
+  body.p-home .h-edif-txt em{font-size:.64rem;letter-spacing:.18em}
+}
+@media(min-width:1320px){body.p-home .h-edificios{width:1320px;margin-left:calc((1132px - 1320px) / 2)}}
+@media(max-width:899px){
+  body.p-home .h-edificios{grid-template-columns:1fr;gap:12px;margin-top:16px}
+  body.p-home .h-edif{aspect-ratio:4 / 3;border-radius:12px}
+  body.p-home .h-edif-txt{padding:16px 16px 17px;gap:5px}
+  body.p-home .h-edif-txt b{font-size:1.3rem}
+  body.p-home .h-edif-txt em{font-size:.6rem;letter-spacing:.16em}
+}
+/* La primera pantalla es sólo el hero, también en celular: "Selección BAIREN"
+   arranca debajo del pliegue y no asoma al entrar. */
+@media(max-width:899px){body.p-home .h-hero{min-height:100dvh;min-height:100svh;padding-bottom:30px}}
+
+/* ══ 10/9/2026 (noche, 3) · Los edificios premium en carrusel hacia la derecha,
+   grandes: en celular una fachada casi a todo el ancho y la siguiente asomando;
+   en escritorio dos y media, con flechas. La primera alinea con el margen. ══ */
+body.p-home .h-edificios{display:flex !important;grid-template-columns:none !important;width:auto;max-width:none;margin:0;gap:12px;padding:16px 18px 6px;scroll-padding-left:18px}
+body.p-home .h-edificios .h-edif{flex:0 0 82vw;max-width:520px;aspect-ratio:4 / 5;border-radius:12px;scroll-snap-align:start}
+body.p-home .h-edificios .h-edif-txt{padding:18px 18px 19px;gap:6px}
+body.p-home .h-edificios .h-edif-txt b{font-size:1.4rem}
+body.p-home .h-edificios .h-edif-txt em{font-size:.6rem;letter-spacing:.16em}
+@media(min-width:900px){
+  body.p-home .h-edificios{gap:22px;padding:34px 24px 8px max(24px,calc((100vw - 1180px)/2 + 24px));scroll-padding-left:max(24px,calc((100vw - 1180px)/2 + 24px));margin:0}
+  body.p-home .h-edificios .h-edif{flex-basis:520px;max-width:520px;border-radius:16px}
+  body.p-home .h-edificios .h-edif-txt{padding:26px 26px 28px;gap:8px}
+  body.p-home .h-edificios .h-edif-txt b{font-size:clamp(1.5rem,2vw,1.9rem)}
+  body.p-home .h-edificios .h-edif-txt em{font-size:.64rem;letter-spacing:.18em}
+  body.p-home #edifCarrusel .h-flecha{display:block}
+  body.p-home #edifCarrusel .h-flecha.prev{left:max(12px,calc((100vw - 1180px)/2 - 2px))}
+  body.p-home #edifCarrusel .h-flecha.next{right:24px}
+}
+@media(min-width:1320px){body.p-home .h-edificios{width:auto;margin-left:0}}
+body.p-home #edifCarrusel .h-flecha[hidden],body.p-home .h-puntos[hidden]{display:none !important}
+body.p-home #edificios{padding-bottom:clamp(28px,5vw,64px)}
