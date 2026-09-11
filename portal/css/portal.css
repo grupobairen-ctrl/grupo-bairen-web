@@ -2690,3 +2690,18 @@ body.p-home .h-edificios .h-edif-txt em{font-size:.6rem;letter-spacing:.16em}
 @media(min-width:1320px){body.p-home .h-edificios{width:auto;margin-left:0}}
 body.p-home #edifCarrusel .h-flecha[hidden],body.p-home .h-puntos[hidden]{display:none !important}
 body.p-home #edificios{padding-bottom:clamp(28px,5vw,64px)}
+
+/* ══ 10/9/2026 (noche, 4) · "Puerto Madero" al lado de Lumière, y al final del
+   riel de edificios una caja con "+" que lleva a publicar. ═══════════════════ */
+body.p-home .h-edif-sub{font:300 .8rem/1 var(--font-body);letter-spacing:.02em;color:rgba(251,250,246,.78);margin-left:10px;white-space:nowrap}
+@media(min-width:900px){body.p-home .h-edif-sub{font-size:.92rem;margin-left:12px}}
+body.p-home .h-edif.h-edif-mas{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;background:rgba(42,58,82,.05);border:1px solid rgba(42,58,82,.16);color:var(--h-tinta);text-align:center;transition:border-color .3s cubic-bezier(.22,1,.36,1),background .3s cubic-bezier(.22,1,.36,1)}
+body.p-home .h-edif.h-edif-mas::after{content:none}
+body.p-home .h-edif.h-edif-mas .h-mas-ic{display:flex;align-items:center;justify-content:center;width:60px;height:60px;border:1px solid rgba(42,58,82,.4);border-radius:10px;font:300 2rem/1 var(--font-body);color:var(--h-navy2);transition:border-color .3s cubic-bezier(.22,1,.36,1),color .3s cubic-bezier(.22,1,.36,1),background .3s cubic-bezier(.22,1,.36,1)}
+body.p-home .h-edif.h-edif-mas b{font-family:var(--font-display);font-weight:400;font-size:1.3rem;line-height:1.2;max-width:12ch;text-wrap:balance;color:var(--h-tinta)}
+body.p-home .h-edif.h-edif-mas:hover{border-color:var(--h-oro);background:rgba(194,169,104,.08)}
+body.p-home .h-edif.h-edif-mas:hover .h-mas-ic{border-color:var(--h-oro);color:var(--h-navy);background:rgba(194,169,104,.14)}
+@media(min-width:900px){
+  body.p-home .h-edif.h-edif-mas .h-mas-ic{width:72px;height:72px;font-size:2.4rem;border-radius:12px}
+  body.p-home .h-edif.h-edif-mas b{font-size:1.6rem}
+}
