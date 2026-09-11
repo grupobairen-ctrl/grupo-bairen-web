@@ -1,5 +1,5 @@
 /* BAIREN · Portal (prueba) · capa de datos.
-   Lee las unidades reales publicadas (data/avisos-src.json, exportadas de Supabase el 3/9/2026)
+   Lee las unidades reales publicadas (data/avisos-src.json, exportadas de Supabase el 10/9/2026)
    y las convierte al modelo de aviso del portal, con su publicador. Cuando exista el esquema
    `portal` en Supabase, esta capa se reemplaza por consultas a portal.avisos y portal.publicadores. */
 (function(){

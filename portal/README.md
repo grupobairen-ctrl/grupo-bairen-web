@@ -22,7 +22,7 @@ Recorre ingresar con código, publicar en cinco pasos con ocho fotos, panel, cur
 - `propiedad.html?id=` ficha: galería con lightbox, precio y "avisarme si baja", mapa por barrio, fila de datos, video, descripción, preguntas rápidas, pestañas de características, bloque del publicador con matrícula y "Ficha verificada", denuncia, similares, migas, formulario fijo ruteado al publicador (mailto y WhatsApp), leyendas legales, JSON-LD.
 - `publicar.html` (perfil, pasos, criterios), `ingresar.html` (mail y código, Google, Apple), `publicadores.html` (directorio y perfiles), `legales.html` (términos de intermediario, contratación, privacidad, arrepentimiento, baja, consumidor, criterios, fraudes).
 - `css/base.css`, `css/catalogo.css`, `css/ficha.css`: extraídos automáticamente de las páginas actuales. `css/portal.css`: componentes nuevos. `js/ui.js`: header, footer, íconos, favoritos y alertas locales. `js/data.js`: capa de datos y plantillas de tarjeta.
-- `data/avisos-src.json`: las 38 unidades publicadas, exportadas de Supabase el 3/9/2026 con la clave pública. Más dos avisos de ejemplo (Inmobiliaria Ejemplo y Dueño directo) para ver los badges y la neutralidad.
+- `data/avisos-src.json`: las 42 unidades publicadas, exportadas de Supabase el 10/9/2026 con la clave pública. Más dos avisos de ejemplo (Inmobiliaria Ejemplo y Dueño directo) para ver los badges y la neutralidad.
 - `schema-portal.sql`: esquema `portal` para Supabase, con la migración de las unidades actuales como avisos de Maxim Rentals. No se ejecutó: correrlo desde el SQL Editor cuando Tomás lo apruebe.
 
 ## Datos inferidos hasta que exista el esquema portal
@@ -39,6 +39,7 @@ La tabla actual no tiene dormitorios, baños, cocheras, expensas ni antigüedad.
 2. Authentication → Providers → Email: habilitado, con código por mail (OTP). En la plantilla "Magic Link" usar `{{ .Token }}`.
 3. SQL Editor: correr `schema-portal.sql` completo (crea esquema, migra las unidades actuales como avisos de Maxim Rentals, permisos, curadores, buckets).
 4. En `js/data.js`, cuando la migración esté verificada, se puede dejar de leer `data/avisos-src.json`.
+5. Unidades cargadas en la web después del 4/9: `seed-avisos-2026-09-10.sql` (Húsares 1080, los dos lofts del Palacio Alcorta, Las Heras 2371). **Subir el archivo en el SQL Editor, no pegarlo**: pegado rompe los acentos (ver `reparar-textos.sql`). Se puede correr más de una vez.
 
 ## Fase 4 (hecha)
 - **Mails al publicador** (`api/portal-notify.js`, función de Vercel): consulta recibida, aviso aprobado, cambios pedidos, rechazo, verificación. El destinatario se busca en Supabase del lado del servidor (nunca viene del cliente) y se envía por Resend por HTTP, sin dependencias. Variables en Vercel: `RESEND_API_KEY` y `PORTAL_MAIL_FROM` (remitente con dominio verificado en Resend). Sin la clave responde 501 y la web sigue con el mailto. En modo local no hay envío.

@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://dahusnnbyrvltcuaelxj.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260910nf"><link rel="stylesheet" href="css/catalogo.css?v=20260910nf"><link rel="stylesheet" href="css/portal.css?v=20260910nf">
+  <link rel="stylesheet" href="css/base.css?v=20260910ng"><link rel="stylesheet" href="css/catalogo.css?v=20260910ng"><link rel="stylesheet" href="css/portal.css?v=20260910ng">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"BAIREN","url":"https://www.bairengroup.com","logo":"https://www.bairengroup.com/bairen_logo.png","description":"El portal de propiedades seleccionadas de Buenos Aires. Alquileres a mediano y largo plazo y departamentos en venta, seleccionados uno por uno antes de entrar al portal.","areaServed":[{"@type":"City","name":"Ciudad Autónoma de Buenos Aires"},{"@type":"AdministrativeArea","name":"Zona Norte, Buenos Aires"}]}</script>
 </head>
 <body class="p-home">
@@ -134,10 +134,10 @@
 
 <script src="../mapa-barrios.js" defer></script><script src="supabase-portal.js" defer></script>
 <script src="js/motion.js" defer></script>
-<script src="js/bairen-motion.js?v=20260910nf" defer></script>
-<script src="js/ui.js?v=20260910nf" defer></script>
-<script src="js/store.js?v=20260910nf" defer></script>
-<script src="js/data.js?v=20260910nf" defer></script>
+<script src="js/bairen-motion.js?v=20260910ng" defer></script>
+<script src="js/ui.js?v=20260910ng" defer></script>
+<script src="js/store.js?v=20260910ng" defer></script>
+<script src="js/data.js?v=20260910ng" defer></script>
 <script>
 document.addEventListener('DOMContentLoaded', function(){
 (async function(){
@@ -200,12 +200,16 @@ document.addEventListener('DOMContentLoaded', function(){
 
   /* ── Edificios: los tres de siempre, con su fachada. Si hoy no hay unidades,
      la tarjeta lo dice y ofrece avisar. ── */
+  /* Cada edificio se reconoce por su nombre o por su dirección, también en la
+     descripción: los lofts del Palacio Alcorta están cargados como "Figueroa
+     Alcorta 3000/3300" y Lumière Boulevard Madero como "Juana Manso 1551"
+     (no confundir con Lumière Puerto Madero, Olga Cossettini 1540). */
   const EDIF = [
-    { nombre: 'Huergo 475', re: /huergo\s*475/i, zona: 'Puerto Madero', fachada: 'img/edificio-huergo-475.jpg' },
-    { nombre: 'Palacio Alcorta', re: /alcorta/i, zona: 'Palermo', fachada: 'img/edificio-palacio-alcorta.jpg' },
-    { nombre: 'Lumière', re: /lumi[eè]re/i, zona: 'Puerto Madero', fachada: 'img/edificio-lumiere.jpg' }
+    { nombre: 'Huergo 475', re: /huergo\s*475/i, q: 'Huergo 475', zona: 'Puerto Madero', fachada: 'img/edificio-huergo-475.jpg' },
+    { nombre: 'Palacio Alcorta', re: /palacio\s+alcorta|figueroa\s+alcorta\s+3[03]\d\d/i, q: 'Palacio Alcorta', zona: 'Palermo', fachada: 'img/edificio-palacio-alcorta.jpg' },
+    { nombre: 'Lumière', re: /lumi[eè]re|juana\s+manso\s+1551/i, q: 'Juana Manso 1551', zona: 'Puerto Madero', fachada: 'img/edificio-lumiere.jpg' }
   ];
-  const texto = a => [a.dir, a.titulo, a.emprendimiento].filter(Boolean).join(' ');
+  const texto = a => [a.dir, a.titulo, a.emprendimiento, a.descripcion].filter(Boolean).join(' ');
   edificios = EDIF.map(e => {
     const us = reales.filter(a => e.re.test(texto(a)));
     return Object.assign({}, e, { unidades: us, foto: (us.find(a => a.fotos && a.fotos.length) || {}).fotos });
@@ -213,7 +217,8 @@ document.addEventListener('DOMContentLoaded', function(){
   document.getElementById('edificiosTrack').innerHTML = edificios.map(e => {
     const n = e.unidades.length;
     const alt = e.foto ? BP.sbImg(e.foto[0], 1200) : '';
-    const href = n === 1 ? BP.urlFicha(e.unidades[0]) : (n ? 'buscar.html?q=' + encodeURIComponent(e.nombre) : 'publicar.html');
+    /* Con varias unidades, el catálogo con todas las operaciones (op vacío) y el término del edificio */
+    const href = n === 1 ? BP.urlFicha(e.unidades[0]) : (n ? 'buscar.html?op=&q=' + encodeURIComponent(e.q || e.nombre) : 'publicar.html');
     return `<a class="h-edif${n ? '' : ' sin'}" href="${href}"><img src="${e.fachada}" alt="Fachada de ${BP.esc(e.nombre)}" loading="lazy" data-alt="${alt}" onerror="if(this.dataset.alt&&this.src!==this.dataset.alt){this.src=this.dataset.alt}else{this.remove()}"><div class="h-edif-txt"><b>${BP.esc(e.nombre)}</b><em>${n ? 'Ver unidades' : 'Avisarme'} <span aria-hidden="true">→</span></em></div></a>`;
   }).join('');
 
