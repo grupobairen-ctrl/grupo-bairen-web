@@ -2795,3 +2795,15 @@ body.p-home .h-m2-mas span{flex:1}
 /* Lo oculto del header (campana, Mis contactos, corazón sin favoritos) no se muestra aunque
    .p-ghost tenga display propio: el atributo hidden manda. */
 .p-nav-right [hidden],.p-navbar [hidden]{display:none !important}
+
+/* ══ 11/9/2026 · "Cómo seleccionamos" debajo de los hitos: chico, sin negrita, y aparece
+   recién cuando el cuarto hito se encendió (clase .completo que pone BPM.camino).
+   Los hitos suben un poco. ═══════════════════════════════════════════════════ */
+body.p-home .h-camino{margin-top:clamp(16px,2.6vw,26px)}
+@media(max-width:899px){body.p-home .h-camino{margin-top:12px}}
+body.p-home .h-criterios{display:inline-block;margin:clamp(18px,3vw,28px) 0 0;font:300 .72rem/1.3 var(--font-body);letter-spacing:.02em;color:rgba(222,205,160,.72);text-decoration:none;border-bottom:1px solid rgba(222,205,160,.28);padding-bottom:2px;white-space:nowrap;opacity:0;visibility:hidden;transform:translateY(4px);transition:opacity .7s cubic-bezier(.22,1,.36,1) .45s,transform .7s cubic-bezier(.22,1,.36,1) .45s,visibility 0s linear 1.2s,color .3s cubic-bezier(.22,1,.36,1),border-color .3s cubic-bezier(.22,1,.36,1)}
+body.p-home .h-camino.completo ~ .h-criterios{opacity:1;visibility:visible;transform:none;transition-delay:.45s,.45s,0s,0s,0s}
+body.p-home .h-criterios:hover{color:#FBFAF6;border-color:var(--h-oro)}
+body.p-home .h-criterios em{font-style:normal}
+@media(max-width:899px){body.p-home .h-criterios{font-size:.7rem;margin-top:16px;position:relative;min-height:0}body.p-home .h-criterios::after{content:"";position:absolute;left:-8px;right:-8px;top:-12px;bottom:-12px}}
+@media(prefers-reduced-motion:reduce){body.p-home .h-criterios{transition:none}}
