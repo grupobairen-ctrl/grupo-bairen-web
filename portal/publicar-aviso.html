@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>/* El velo de carga: navy desde el primer byte, se retira cuando la página está lista (load). Si carga en menos de 250 ms nadie lo ve; si se vio, se queda hasta los 600 ms para no titilar; a los 2,5 s se va pase lo que pase. Inline y sin dependencias: si un script no carga, el velo se va igual. */(function(h){h.classList.add('cargando');var V=window.BPVelo={retenido:false};V.soltar=function(){if(!h.classList.contains('cargando'))return;V.retenido=false;h.classList.remove('cargando');try{document.dispatchEvent(new Event('bairen:velo'))}catch(e){}};V.retener=function(){V.retenido=true};var fin=function(){if(V.retenido)return;var t=performance.now(),e=t>250?Math.max(0,600-t):0;setTimeout(function(){if(!V.retenido)V.soltar()},e)};addEventListener('load',fin);setTimeout(fin,2500)})(document.documentElement);</script>
   <title>Publicar una propiedad · BAIREN</title>
   <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#131D2D">
   <script>
@@ -20,7 +21,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://dahusnnbyrvltcuaelxj.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260911m"><link rel="stylesheet" href="css/catalogo.css?v=20260911m"><link rel="stylesheet" href="css/portal.css?v=20260911m">
+  <link rel="stylesheet" href="css/base.css?v=20260911q"><link rel="stylesheet" href="css/catalogo.css?v=20260911q"><link rel="stylesheet" href="css/portal.css?v=20260911q">
   <style>
     .p-stepper{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0 26px}
     .p-stepper button{display:flex;align-items:center;gap:8px;border:1px solid var(--p-line);background:var(--p-card);border-radius:999px;padding:8px 14px;font:500 .78rem var(--font-body);color:var(--text-mid);cursor:pointer;letter-spacing:.06em}
@@ -42,6 +43,7 @@
   </style>
 </head>
 <body class="p-herramienta">
+<div class="p-velo" aria-hidden="true"><span class="w">BAIREN</span></div>
 <div id="pHeader"></div>
 <div class="p-band"><div class="p-container" style="max-width:920px">
   <span class="p-eyebrow">Publicar</span>
@@ -54,7 +56,7 @@
   <p class="p-note" id="modeNote" style="margin-top:12px"></p>
 </div></section>
 <div id="pFooter"></div>
-<script src="supabase-portal.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260911m" defer></script><script src="js/i18n-portal.js?v=20260911m" defer></script><script src="js/ui.js?v=20260911m" defer></script><script src="js/store.js?v=20260911m" defer></script><script src="js/data.js?v=20260911m" defer></script>
+<script src="supabase-portal.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260911q" defer></script><script src="js/i18n-portal.js?v=20260911q" defer></script><script src="js/ui.js?v=20260911q" defer></script><script src="js/store.js?v=20260911q" defer></script><script src="js/data.js?v=20260911q" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){

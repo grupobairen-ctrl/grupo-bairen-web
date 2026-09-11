@@ -285,15 +285,17 @@
      sólo en la portada, con tope de tiempo. Una intro es un peaje: se cobra
      una sola vez y barato, o no se cobra. */
   BPM.entrada = function (palabra, opts) {
+    /* Usa el velo de carga del <head> (una sola capa navy, no dos): lo retiene,
+       arma la palabra letra por letra en su .w, y lo suelta. Si el velo ya se
+       fue (carga lentísima, lo soltó la salvaguarda), no hay entrada. */
     opts = opts || {};
+    var V = window.BPVelo, w = document.querySelector('.p-velo .w');
+    if (!V || !w || !document.documentElement.classList.contains('cargando')) return;
     try { if (sessionStorage.getItem('bairen-entrada') === '1') return; sessionStorage.setItem('bairen-entrada', '1'); } catch (e) {}
     if (!ok) return;
+    V.retener();
     palabra = (palabra || 'BAIREN').toUpperCase();
-    var capa = document.createElement('div');
-    capa.className = 'p-entrada'; capa.setAttribute('aria-hidden', 'true');
-    capa.innerHTML = '<span class="w"></span>';
-    document.body.appendChild(capa);
-    var w = capa.querySelector('.w');
+    w.style.animation = 'none'; w.style.opacity = '1';
     var glifos = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     var fijas = 0, t0 = performance.now(), TOPE = opts.tope || 780;
     (function tick(now) {
@@ -303,13 +305,9 @@
       for (var i = 0; i < palabra.length; i++) out += i < fijas ? palabra[i] : glifos[(Math.random() * glifos.length) | 0];
       w.textContent = out;
       if (t < 1) requestAnimationFrame(tick);
-      else {
-        w.textContent = palabra;
-        M.animate(capa, { opacity: 0 }, { duration: 0.5, delay: 0.32, ease: CURVA })
-          .finished.then(function () { capa.remove(); }, function () { capa.remove(); });
-      }
+      else { w.textContent = palabra; setTimeout(V.soltar, 320); }
     })(t0);
-    setTimeout(function () { if (capa.parentNode) capa.remove(); }, TOPE + 1400);
+    setTimeout(V.soltar, TOPE + 1400);
   };
 
   /* ── Titular por palabras: cada una sube desde abajo detrás de una máscara.

@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>/* El velo de carga: navy desde el primer byte, se retira cuando la página está lista (load). Si carga en menos de 250 ms nadie lo ve; si se vio, se queda hasta los 600 ms para no titilar; a los 2,5 s se va pase lo que pase. Inline y sin dependencias: si un script no carga, el velo se va igual. */(function(h){h.classList.add('cargando');var V=window.BPVelo={retenido:false};V.soltar=function(){if(!h.classList.contains('cargando'))return;V.retenido=false;h.classList.remove('cargando');try{document.dispatchEvent(new Event('bairen:velo'))}catch(e){}};V.retener=function(){V.retenido=true};var fin=function(){if(V.retenido)return;var t=performance.now(),e=t>250?Math.max(0,600-t):0;setTimeout(function(){if(!V.retenido)V.soltar()},e)};addEventListener('load',fin);setTimeout(fin,2500)})(document.documentElement);</script>
   <title>Panel · BAIREN</title>
   <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#131D2D">
   <script>
@@ -20,7 +21,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://dahusnnbyrvltcuaelxj.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260911m"><link rel="stylesheet" href="css/catalogo.css?v=20260911m"><link rel="stylesheet" href="css/portal.css?v=20260911m">
+  <link rel="stylesheet" href="css/base.css?v=20260911q"><link rel="stylesheet" href="css/catalogo.css?v=20260911q"><link rel="stylesheet" href="css/portal.css?v=20260911q">
   <style>
     .p-panel{display:grid;grid-template-columns:240px 1fr;gap:28px;align-items:start}
     .p-side-nav{background:var(--p-card);border:1px solid var(--p-line);border-radius:var(--p-radius);padding:10px;position:sticky;top:84px}
@@ -35,13 +36,14 @@
   </style>
 </head>
 <body class="p-product p-panel-page">
+<div class="p-velo" aria-hidden="true"><span class="w">BAIREN</span></div>
 <div id="pHeader"></div>
 <section class="p-page after-band" role="main"><div class="p-container p-panel">
   <div class="p-side-nav" role="navigation" aria-label="Mi cuenta" id="sideNav"></div>
   <div id="content" aria-busy="true"><div class="p-skel-panel" aria-hidden="true"><div class="p-skel-line t"></div><div class="p-skel-line s"></div><div class="p-skel-line row"></div><div class="p-skel-line row"></div><div class="p-skel-line row"></div></div></div>
 </div></section>
 <div id="pFooter"></div>
-<script src="supabase-portal.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260911m" defer></script><script src="js/i18n-portal.js?v=20260911m" defer></script><script src="js/ui.js?v=20260911m" defer></script><script src="js/store.js?v=20260911m" defer></script><script src="js/data.js?v=20260911m" defer></script>
+<script src="supabase-portal.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260911q" defer></script><script src="js/i18n-portal.js?v=20260911q" defer></script><script src="js/ui.js?v=20260911q" defer></script><script src="js/store.js?v=20260911q" defer></script><script src="js/data.js?v=20260911q" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -75,7 +77,23 @@ document.addEventListener('DOMContentLoaded', function(){
   const contador = k => cuenta[k] != null && cuenta[k] > 0 ? `<span class="n">${cuenta[k]}</span>` : '';
   function renderNav(){ nav.innerHTML = `<div class="who"><span class="q">${BP.esc(BPStore.session.email)}</span>${mode === 'local' ? '<span class="p-badge demo">modo local</span>' : ''}</div><div class="p-rail">` + TABS.map(t => `<a href="#${t[0]}" class="${t[0]===tab?'on':''}"${t[0]===tab?' aria-current="page"':''}>${BP.ico[t[2]]}<span>${t[1]}</span>${contador(t[0])}</a>`).join('') + `</div><div class="p-rail p-rail-pie">` + (curador ? `<a href="curacion.html">${BP.ico.shield}<span>Curación</span></a>` : '') + `<a href="#" data-logout>${BP.ico.x}<span>Cerrar sesión</span></a></div>`; nav.querySelector('[data-logout]').addEventListener('click', async e => { e.preventDefault(); await BPStore.signOut(); location.href = 'index.html'; }); }
   function actualizarContador(k, n){ cuenta[k] = n; const a = nav.querySelector(`a[href="#${k}"]`); if (!a) return; let sp = a.querySelector('.n'); if (n > 0) { if (!sp) { sp = document.createElement('span'); sp.className = 'n'; a.appendChild(sp); } sp.textContent = n; } else if (sp) sp.remove(); }
-  window.addEventListener('hashchange', () => { tab = (location.hash || '#avisos').slice(1); nav.querySelectorAll('a[href^="#"]').forEach(a => { const on = a.getAttribute('href') === '#' + tab; a.classList.toggle('on', on); if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); }); render(); });
+  /* Cambiar de vista lleva siempre al título de esa vista, justo debajo del riel (en celular,
+     debajo de las pastillas pegadas al header). Sin la navegación por ancla del navegador,
+     que con un #id inexistente dejaba el scroll en cualquier lado. */
+  const irAlContenido = () => { const rail = nav.getBoundingClientRect(); const pegado = getComputedStyle(nav).position === 'sticky' && window.innerWidth < 1024 ? rail.height : 0; const top = content.getBoundingClientRect().top + window.scrollY - 64 - pegado - 12; const raiz = document.documentElement; const antes = raiz.style.scrollBehavior; raiz.style.scrollBehavior = 'auto'; window.scrollTo(0, Math.max(0, top)); raiz.style.scrollBehavior = antes; };
+  const ESQUELETO = content.innerHTML;   /* el de la carga inicial, se reutiliza al cambiar de vista */
+  let vistaEnCurso = 0;
+  const cambiarVista = async (nuevo, empujar) => {
+    const mia = ++vistaEnCurso; tab = nuevo; if (empujar) history.pushState(null, '', '#' + tab);
+    nav.querySelectorAll('a[href^="#"]').forEach(a => { const on = a.getAttribute('href') === '#' + tab; a.classList.toggle('on', on); if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+    content.innerHTML = ESQUELETO; content.setAttribute('aria-busy', 'true'); irAlContenido();   /* respuesta inmediata: esqueleto en su lugar */
+    await render(); if (mia !== vistaEnCurso) return;   /* si tocaron otra pestaña mientras cargaba, gana la última */
+    irAlContenido(); requestAnimationFrame(irAlContenido);
+    const h = content.querySelector('h1'); if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
+  };
+  nav.addEventListener('click', e => { const a = e.target.closest('a[href^="#"]'); if (!a) return; e.preventDefault(); const nuevo = a.getAttribute('href').slice(1); if (!TABS.some(t => t[0] === nuevo)) return; if (nuevo === tab) { irAlContenido(); return; } cambiarVista(nuevo, true); });
+  const desdeUrl = () => { const nuevo = (location.hash || '#avisos').slice(1); if (TABS.some(t => t[0] === nuevo) && nuevo !== tab) cambiarVista(nuevo, false); };
+  window.addEventListener('hashchange', desdeUrl); window.addEventListener('popstate', desdeUrl);
 
   async function render(){
     renderNav();

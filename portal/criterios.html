@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>/* El velo de carga: navy desde el primer byte, se retira cuando la página está lista (load). Si carga en menos de 250 ms nadie lo ve; si se vio, se queda hasta los 600 ms para no titilar; a los 2,5 s se va pase lo que pase. Inline y sin dependencias: si un script no carga, el velo se va igual. */(function(h){h.classList.add('cargando');var V=window.BPVelo={retenido:false};V.soltar=function(){if(!h.classList.contains('cargando'))return;V.retenido=false;h.classList.remove('cargando');try{document.dispatchEvent(new Event('bairen:velo'))}catch(e){}};V.retener=function(){V.retenido=true};var fin=function(){if(V.retenido)return;var t=performance.now(),e=t>250?Math.max(0,600-t):0;setTimeout(function(){if(!V.retenido)V.soltar()},e)};addEventListener('load',fin);setTimeout(fin,2500)})(document.documentElement);</script>
   <title>Criterios de selección · BAIREN</title>
   <meta name="description" content="Qué entra a BAIREN y qué no. Seleccionamos por cualidades verificadas, no por código postal."><meta name="theme-color" content="#131D2D">
   <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
@@ -9,9 +10,10 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://dahusnnbyrvltcuaelxj.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260911m"><link rel="stylesheet" href="css/catalogo.css?v=20260911m"><link rel="stylesheet" href="css/portal.css?v=20260911m">
+  <link rel="stylesheet" href="css/base.css?v=20260911q"><link rel="stylesheet" href="css/catalogo.css?v=20260911q"><link rel="stylesheet" href="css/portal.css?v=20260911q">
 </head>
 <body>
+<div class="p-velo" aria-hidden="true"><span class="w">BAIREN</span></div>
 <div id="pHeader"></div>
 <div class="p-band"><div class="p-container" style="max-width:820px"><h1 class="p-h2" style="font-size:clamp(1.8rem,3.4vw,2.4rem);margin:0 0 8px">Criterios de selección</h1><p class="p-sub" style="margin-bottom:0">BAIREN es creíble porque rechaza. Qué entra, qué no, y cómo lo comprobamos.</p></div></div>
 <section class="p-page after-band"><div class="p-container p-prose">
@@ -49,7 +51,7 @@
   <p>Publican corredores matriculados, dueños verificados y desarrolladoras. Las mismas reglas y el mismo lugar para todos. BAIREN no interviene en la operación: elige y muestra.</p>
 </div></section>
 <div id="pFooter"></div>
-<script src="supabase-portal.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260911m" defer></script><script src="js/i18n-portal.js?v=20260911m" defer></script><script src="js/ui.js?v=20260911m" defer></script><script src="js/store.js?v=20260911m" defer></script><script src="js/data.js?v=20260911m" defer></script>
+<script src="supabase-portal.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260911q" defer></script><script src="js/i18n-portal.js?v=20260911q" defer></script><script src="js/ui.js?v=20260911q" defer></script><script src="js/store.js?v=20260911q" defer></script><script src="js/data.js?v=20260911q" defer></script>
 <script>document.addEventListener('DOMContentLoaded', function(){BP.header("criterios"); BP.footer(); if (window.BPStore) BPStore.init(); BP.reveal(); });</script>
 </body>
 </html>

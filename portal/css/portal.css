@@ -3031,3 +3031,29 @@ body.p-herramienta .p-empty.p-ensena{display:flex;flex-direction:column;align-it
 body.p-herramienta .p-empty.p-ensena b{font:500 1rem/1.3 var(--font-body);color:var(--navy-deeper)}
 body.p-herramienta .p-empty.p-ensena p{margin:0;max-width:56ch;font:400 .9rem/1.55 var(--font-body);color:var(--text-mid)}
 body.p-herramienta .p-band .p-tabs2{justify-content:flex-start;width:100%}
+
+/* ── El velo de carga (11/9): cubre cada página desde el primer byte hasta que
+   está lista. Mismo navy que el fondo del html, así en una carga rápida no se
+   nota: la palabra recién aparece a los 250 ms (animación, no transición, para
+   que no se pinte de entrada). pointer-events:none: nunca bloquea. La clase
+   html.cargando la pone y la saca el script inline del <head> de cada página.
+   La entrada de la primera visita (BPM.entrada) usa esta misma capa. ─────── */
+.p-velo{position:fixed;inset:0;z-index:5001;background:var(--navy-deeper);display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;visibility:hidden;transition:opacity .45s cubic-bezier(.22,1,.36,1),visibility 0s .45s}
+html.cargando .p-velo{opacity:1;visibility:visible;transition:none}
+.p-velo .w{font:400 clamp(1.6rem,5vw,2.6rem)/1 var(--font-body);letter-spacing:.42em;text-indent:.42em;color:#FBFAF6;opacity:0;transition:opacity .3s cubic-bezier(.22,1,.36,1)}
+html.cargando .p-velo .w{animation:p-velo-palabra .3s cubic-bezier(.22,1,.36,1) .25s both}
+@keyframes p-velo-palabra{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){.p-velo,.p-velo .w{transition:none}html.cargando .p-velo .w{animation:none;opacity:1}}
+
+/* ══ 11/9/2026 · Panel: geometría angular, como el sitio y como el resto de las
+   páginas de herramienta (botones y filas a 0 px). Nada redondo: ni buscador,
+   ni "···", ni fotos, ni pastillas, ni contadores. ═══════════════════════════ */
+body.p-panel-page .p-herr-q input,body.p-panel-page .p-herr .p-fsel,body.p-panel-page details.p-mas summary,body.p-panel-page .p-mas-menu,body.p-panel-page .p-mas-menu a,body.p-panel-page .p-mas-menu button,body.p-panel-page .p-aviso-row.v2,body.p-panel-page .p-aviso-row.v2 .ph,body.p-panel-page .p-empty.p-ensena,body.p-panel-page .p-ficha-cuenta,body.p-panel-page .p-visitas summary .n,body.p-panel-page .p-side-nav a .n,body.p-panel-page .p-side-nav a,body.p-panel-page .p-panel .p-side-nav a,body.p-panel-page .p-panel .p-side-nav a.on,body.p-herramienta .p-empty.p-ensena,body.p-herramienta .p-band .p-stepper button{border-radius:0 !important}
+body.p-panel-page .p-side-nav a .n{min-width:20px;height:18px;line-height:18px;padding:0 5px}
+@media(max-width:1023px){
+  body.p-panel-page .p-side-nav a,body.p-panel-page .p-panel .p-side-nav a,body.p-panel-page .p-panel .p-side-nav a.on{border-radius:0 !important}
+  body.p-herramienta .p-band .p-stepper button{border-radius:0}
+}
+/* El navegador no "ancla" el scroll cuando cambia la vista: el panel decide dónde queda */
+body.p-panel-page .p-page,body.p-panel-page #content{overflow-anchor:none}
+body.p-panel-page,html:has(body.p-panel-page){overflow-anchor:none}
