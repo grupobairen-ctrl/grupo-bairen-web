@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://dahusnnbyrvltcuaelxj.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260911a"><link rel="stylesheet" href="css/catalogo.css?v=20260911a"><link rel="stylesheet" href="css/portal.css?v=20260911a">
+  <link rel="stylesheet" href="css/base.css?v=20260911b"><link rel="stylesheet" href="css/catalogo.css?v=20260911b"><link rel="stylesheet" href="css/portal.css?v=20260911b">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"BAIREN","url":"https://www.bairengroup.com","logo":"https://www.bairengroup.com/bairen_logo.png","description":"El portal de propiedades seleccionadas de Buenos Aires. Alquileres a mediano y largo plazo y departamentos en venta, seleccionados uno por uno antes de entrar al portal.","areaServed":[{"@type":"City","name":"Ciudad Autónoma de Buenos Aires"},{"@type":"AdministrativeArea","name":"Zona Norte, Buenos Aires"}]}</script>
 </head>
 <body class="p-home">
@@ -27,47 +27,47 @@
   <video autoplay muted loop playsinline preload="metadata" poster="../hero-poster.jpg?v=2" aria-hidden="true"><source src="../hero.mp4?v=2" type="video/mp4"></video>
   <div class="h-hero-velo" aria-hidden="true"></div>
   <div class="h-hero-in">
-    <h1><span class="hline">Propiedades seleccionadas</span><span class="hline">en Buenos Aires.</span></h1>
-    <p class="h-hero-sub">Viví Buenos Aires en su máximo esplendor.</p>
-    <form class="h-search" id="searchForm" action="buscar.html" method="get" role="search" aria-label="Buscar propiedades">
+    <h1><span class="hline" data-i18n="hero_h1a">Propiedades seleccionadas</span><span class="hline" data-i18n="hero_h1b">en Buenos Aires.</span></h1>
+    <p class="h-hero-sub" data-i18n="hero_sub">Viví Buenos Aires en su máximo esplendor.</p>
+    <form class="h-search" id="searchForm" action="buscar.html" method="get" role="search" aria-label="Buscar propiedades" data-i18n-aria="buscar_aria">
       <input type="hidden" name="op" id="opInput" value="venta">
       <div class="h-seg" role="group" aria-label="Operación">
-        <button type="button" class="on" data-op="venta" aria-pressed="true">Comprar</button>
-        <button type="button" data-op="alquiler" aria-pressed="false">Alquilar</button>
+        <button type="button" class="on" data-op="venta" aria-pressed="true" data-i18n="comprar">Comprar</button>
+        <button type="button" data-op="alquiler" aria-pressed="false" data-i18n="alquilar">Alquilar</button>
       </div>
       <div class="h-field h-field-lupa">
         <svg class="lupa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.6"/><path d="m16.2 16.2 4.3 4.3"/></svg>
-        <input type="text" id="zonaInput" name="q" placeholder="Barrio, edificio o zona" autocomplete="off" aria-label="Barrio, edificio o zona" aria-autocomplete="list" aria-controls="sugg" enterkeyhint="search">
+        <input type="text" id="zonaInput" name="q" placeholder="Barrio, edificio o zona" data-i18n-ph="ph_zona" autocomplete="off" aria-label="Barrio, edificio o zona" data-i18n-aria="ph_zona" aria-autocomplete="list" aria-controls="sugg" enterkeyhint="search">
         <div class="p-sugg" id="sugg" role="listbox" aria-label="Sugerencias"></div>
       </div>
-      <button class="h-cta" type="submit">Ver propiedades</button>
+      <button class="h-cta" type="submit" data-i18n="ver_props">Ver propiedades</button>
     </form>
   </div>
 </section>
 
 <section class="h-sec h-navy h-estandar" id="estandar">
   <div class="h-in">
-    <p class="h-eyebrow">Selección BAIREN</p>
-    <h2 class="h-h2">Seguimos un estándar.</h2>
-    <div class="h-estandar-linea"><p class="h-copy">Antes de incorporar cada propiedad corroboramos:</p><a class="h-criterios" href="criterios.html">Cómo seleccionamos <em aria-hidden="true">›</em></a></div>
+    <p class="h-eyebrow" data-i18n="est_eyebrow">Selección BAIREN</p>
+    <h2 class="h-h2" data-i18n="est_h2">Seguimos un estándar.</h2>
+    <div class="h-estandar-linea"><p class="h-copy" data-i18n="est_copy">Antes de incorporar cada propiedad corroboramos:</p><a class="h-criterios" href="criterios.html"><span data-i18n="criterios">Cómo seleccionamos</span> <em aria-hidden="true">›</em></a></div>
     <div class="h-camino" id="camino">
       <svg class="h-camino-linea" aria-hidden="true" preserveAspectRatio="none"><path class="guia"/><path class="trazo"/></svg>
       <ol class="h-hitos">
         <li class="h-hito" data-hito>
           <span class="pt" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.1 7-11a7 7 0 1 0-14 0c0 4.9 7 11 7 11Z"/><circle cx="12" cy="10" r="2.4"/></svg></span>
-          <b>Ubicación</b>
+          <b data-i18n="hito_ubicacion">Ubicación</b>
         </li>
         <li class="h-hito" data-hito>
           <span class="pt" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h8.5L19 7.5V21H6z"/><path d="M14.2 3v4.6H19"/><path d="M9 12h6M9 15.4h6M9 18.8h3.4"/></svg></span>
-          <b>Estado</b>
+          <b data-i18n="hito_estado">Estado</b>
         </li>
         <li class="h-hito" data-hito>
           <span class="pt" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.2" y="3.2" width="17.6" height="17.6"/><path d="M3.2 13.4h9.2M12.4 3.2v17.6M12.4 9h8.4"/></svg></span>
-          <b>Distribución</b>
+          <b data-i18n="hito_distribucion">Distribución</b>
         </li>
         <li class="h-hito" data-hito>
           <span class="pt" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.2 5 6v6c0 4.3 3 7.6 7 8.8 4-1.2 7-4.5 7-8.8V6l-7-2.8Z"/><path d="m9 12.1 2.1 2.1L15.2 10"/></svg></span>
-          <b>Calidad constructiva</b>
+          <b data-i18n="hito_calidad">Calidad constructiva</b>
         </li>
       </ol>
     </div>
@@ -77,13 +77,13 @@
 
 <section class="h-sec h-crema h-borde" id="edificios">
   <div class="h-in">
-    <h2 class="h-h2">Edificios y complejos de primera línea.</h2>
-    <p class="h-copy" id="edificiosCopy">Hoy encuentran su espacio en BAIREN.</p>
+    <h2 class="h-h2" data-i18n="edif_h2">Edificios y complejos de primera línea.</h2>
+    <p class="h-copy" id="edificiosCopy" data-i18n="edif_copy">Hoy encuentran su espacio en BAIREN.</p>
   </div>
   <div class="h-carrusel" id="edifCarrusel">
-    <button type="button" class="h-flecha prev" data-dir="-1" aria-label="Edificio anterior"></button>
-    <div class="h-edificios h-track-fotos" id="edificiosTrack" aria-busy="true" tabindex="0" aria-label="Edificios, deslizá para ver más"><span class="h-edif h-esq" aria-hidden="true"></span><span class="h-edif h-esq" aria-hidden="true"></span><span class="h-edif h-esq" aria-hidden="true"></span></div>
-    <button type="button" class="h-flecha next" data-dir="1" aria-label="Edificio siguiente"></button>
+    <button type="button" class="h-flecha prev" data-dir="-1" aria-label="Edificio anterior" data-i18n-aria="edif_ant"></button>
+    <div class="h-edificios h-track-fotos" id="edificiosTrack" aria-busy="true" tabindex="0" aria-label="Edificios, deslizá para ver más" data-i18n-aria="edif_riel"><span class="h-edif h-esq" aria-hidden="true"></span><span class="h-edif h-esq" aria-hidden="true"></span><span class="h-edif h-esq" aria-hidden="true"></span></div>
+    <button type="button" class="h-flecha next" data-dir="1" aria-label="Edificio siguiente" data-i18n-aria="edif_sig"></button>
   </div>
   <div class="h-puntos" id="edifPuntos" aria-hidden="true"></div>
 </section>
@@ -94,33 +94,33 @@
 <section class="h-sec h-navy h-encaja" id="publicar">
   <div class="h-in h-encaja-fila">
     <div class="h-encaja-txt">
-      <h2 class="h-h2">¿Tu propiedad encaja en BAIREN?</h2>
-      <p class="h-copy">Revisamos la propiedad. Se sube al portal si cumple con los requisitos. Desde <em>OS</em> la gestionás y le hacés seguimiento.</p>
+      <h2 class="h-h2" data-i18n="pub_h2">¿Tu propiedad encaja en BAIREN?</h2>
+      <p class="h-copy" data-i18n-html="pub_copy">Revisamos la propiedad. Se sube al portal si cumple con los requisitos. Desde <em>OS</em> la gestionás y le hacés seguimiento.</p>
     </div>
-    <a class="h-btn h-btn-oro" href="publicar-aviso.html">Publicar propiedad</a>
+    <a class="h-btn h-btn-oro" href="publicar-aviso.html" data-i18n="pub_btn">Publicar propiedad</a>
   </div>
 </section>
 
 <section class="h-sec h-crema h-m2" id="indice">
   <div class="h-in">
-    <p class="h-eyebrow">Índice BAIREN</p>
-    <h2 class="h-h2">¿Cuánto vale el m²?</h2>
-    <p class="h-m2-fecha">USD por m² en venta. Promedio de publicación, septiembre de 2026.</p>
+    <p class="h-eyebrow" data-i18n="idx_eyebrow">Índice BAIREN</p>
+    <h2 class="h-h2" data-i18n="idx_h2">¿Cuánto vale el m²?</h2>
+    <p class="h-m2-fecha" data-i18n="idx_fecha">USD por m² en venta. Promedio de publicación, septiembre de 2026.</p>
     <div class="h-m2-caja">
       <ol class="h-m2-lista" id="m2Lista"></ol>
     </div>
-    <a class="h-m2-mas" href="buscar.html?op=venta"><span>Ver las propiedades en venta</span><em aria-hidden="true">›</em></a>
+    <a class="h-m2-mas" href="buscar.html?op=venta"><span data-i18n="idx_mas">Ver las propiedades en venta</span><em aria-hidden="true">›</em></a>
   </div>
 </section>
 
 <section class="h-sec h-navy h-anuncio" id="psi">
-  <div class="h-in h-anuncio-top"><p class="h-eyebrow">PSI · Personal Shopper Inmobiliario</p></div>
+  <div class="h-in h-anuncio-top"><p class="h-eyebrow" data-i18n="psi_eyebrow">PSI · Personal Shopper Inmobiliario</p></div>
   <figure class="h-anuncio-foto" id="psiFoto" aria-hidden="true"><img src="img/psi-terraza.jpg" alt="" onerror="this.remove()"><span class="h-anuncio-fade" aria-hidden="true"></span></figure>
   <div class="h-anuncio-velo" aria-hidden="true"></div>
   <div class="h-in h-anuncio-txt">
-    <h2 class="h-h2">¿Buscando invertir en una propiedad?</h2>
-    <p class="h-copy">Adquirimos juntos tu próxima mejor inversión en Buenos Aires.</p>
-    <a class="h-btn h-btn-oro" href="psi.html">Conocer PSI</a>
+    <h2 class="h-h2" data-i18n="psi_h2">¿Buscando invertir en una propiedad?</h2>
+    <p class="h-copy" data-i18n="psi_copy">Adquirimos juntos tu próxima mejor inversión en Buenos Aires.</p>
+    <a class="h-btn h-btn-oro" href="psi.html" data-i18n="psi_btn">Conocer PSI</a>
   </div>
 </section>
 
@@ -129,13 +129,14 @@
 
 <script src="../mapa-barrios.js" defer></script><script src="supabase-portal.js" defer></script>
 <script src="js/motion.js" defer></script>
-<script src="js/bairen-motion.js?v=20260911a" defer></script>
-<script src="js/ui.js?v=20260911a" defer></script>
-<script src="js/store.js?v=20260911a" defer></script>
-<script src="js/data.js?v=20260911a" defer></script>
+<script src="js/bairen-motion.js?v=20260911b" defer></script>
+<script src="js/i18n-portal.js?v=20260911b" defer></script><script src="js/ui.js?v=20260911b" defer></script>
+<script src="js/store.js?v=20260911b" defer></script>
+<script src="js/data.js?v=20260911b" defer></script>
 <script>
 document.addEventListener('DOMContentLoaded', function(){
 (async function(){
+  if (BP.i18n) BP.i18n.apply(document);   /* antes de que el titular se parta en palabras */
   if (window.BPM && BPM.entrada) BPM.entrada('BAIREN');
   if (window.BPM && BPM.titular) BPM.titular(document.querySelector('.h-hero h1'), { demora: 0.15 });
   BP.header('home'); BP.footer(); if (window.BPStore) BPStore.init(); BP.reveal();
@@ -222,10 +223,10 @@ document.addEventListener('DOMContentLoaded', function(){
     const alt = e.foto ? BP.sbImg(e.foto[0], 1200) : '';
     /* Con varias unidades, el catálogo con todas las operaciones (op vacío) y el término del edificio */
     const href = n === 1 ? BP.urlFicha(e.unidades[0]) : 'buscar.html?op=&q=' + encodeURIComponent(e.q || e.nombre) + (n ? '' : '&alerta=1');   /* sin unidades: la búsqueda del edificio con la alerta creada */
-    return `<a class="h-edif${n ? '' : ' sin'}" href="${href}"><img src="${e.fachada}" alt="Fachada de ${BP.esc(e.nombre)}" loading="lazy" data-alt="${alt}" onerror="if(this.dataset.alt&&this.src!==this.dataset.alt){this.src=this.dataset.alt}else{this.remove()}"><div class="h-edif-txt"><b>${BP.esc(e.nombre)}${e.sub ? ` <span class="h-edif-sub">${BP.esc(e.sub)}</span>` : ''}</b><em>${n ? 'Ver unidades' : 'Avisarme'} <span aria-hidden="true">→</span></em></div></a>`;
+    return `<a class="h-edif${n ? '' : ' sin'}" href="${href}"><img src="${e.fachada}" alt="${BP.t('fachada_de', 'Fachada de')} ${BP.esc(e.nombre)}" loading="lazy" data-alt="${alt}" onerror="if(this.dataset.alt&&this.src!==this.dataset.alt){this.src=this.dataset.alt}else{this.remove()}"><div class="h-edif-txt"><b>${BP.esc(e.nombre)}${e.sub ? ` <span class="h-edif-sub">${BP.esc(e.sub)}</span>` : ''}</b><em>${n ? BP.t('ver_unidades', 'Ver unidades') : BP.t('avisarme', 'Avisarme')} <span aria-hidden="true">→</span></em></div></a>`;
   }).join('')
   /* Al final del riel, la puerta para publicar: una caja con "+" */
-  + `<a class="h-edif h-edif-mas" href="publicar.html"><span class="h-mas-ic" aria-hidden="true">+</span><b>Publicá tu propiedad o desarrollo</b></a>`;
+  + `<a class="h-edif h-edif-mas" href="publicar.html"><span class="h-mas-ic" aria-hidden="true">+</span><b>${BP.t('publica_mas', 'Publicá tu propiedad o desarrollo')}</b></a>`;
 
   document.getElementById('edificiosTrack').removeAttribute('aria-busy');
 

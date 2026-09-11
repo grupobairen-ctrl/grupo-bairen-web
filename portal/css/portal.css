@@ -2786,3 +2786,9 @@ body.p-home .h-m2-mas span{flex:1}
 /* Idioma en el header: targets de al menos 28 px (WCAG 2.2 pide 24) */
 .p-lang button{min-width:30px;min-height:28px}
 @media(max-width:899px){body.p-home .h-criterios{display:inline-flex;align-items:center;min-height:40px;border-bottom:0;text-decoration:underline;text-underline-offset:4px;text-decoration-color:rgba(222,205,160,.45)}}
+/* "Cómo seleccionamos": igual que en escritorio también en celular (chico, oro, línea fina);
+   el área táctil de 40 px la da un pseudo-elemento invisible, no la caja visible. */
+@media(max-width:899px){
+  body.p-home .h-criterios{display:inline-block;min-height:0;font-size:.78rem;text-decoration:none;border-bottom:1px solid rgba(222,205,160,.35);position:relative}
+  body.p-home .h-criterios::after{content:"";position:absolute;left:-8px;right:-8px;top:-12px;bottom:-12px}
+}

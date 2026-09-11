@@ -266,6 +266,23 @@
      lo único traducido hoy, y recuerda la elección. La interfaz sigue en
      castellano hasta que se traduzcan sus textos. */
   BP.lang = (function(){ try { return localStorage.getItem('bairen_lang') || 'es'; } catch (e) { return 'es'; } })();
+  /* Traducción de la interfaz: el diccionario vive en js/i18n-portal.js (window.BP_I18N).
+     apply() traduce los elementos marcados con data-i18n (texto), data-i18n-html,
+     data-i18n-ph (placeholder) y data-i18n-aria (aria-label). t() sirve para lo
+     que se dibuja desde JS. En castellano no hace nada. */
+  BP.i18n = {
+    t: function (key) { const d = window.BP_I18N && window.BP_I18N[BP.lang]; return d && d[key] != null ? d[key] : null; },
+    apply: function (root) {
+      if (BP.lang === 'es' || !window.BP_I18N || !window.BP_I18N[BP.lang]) return;
+      root = root || document;
+      document.documentElement.lang = BP.lang;
+      root.querySelectorAll('[data-i18n]').forEach(n => { const v = BP.i18n.t(n.dataset.i18n); if (v != null) n.textContent = v; });
+      root.querySelectorAll('[data-i18n-html]').forEach(n => { const v = BP.i18n.t(n.dataset.i18nHtml); if (v != null) n.innerHTML = v; });
+      root.querySelectorAll('[data-i18n-ph]').forEach(n => { const v = BP.i18n.t(n.dataset.i18nPh); if (v != null) n.setAttribute('placeholder', v); });
+      root.querySelectorAll('[data-i18n-aria]').forEach(n => { const v = BP.i18n.t(n.dataset.i18nAria); if (v != null) n.setAttribute('aria-label', v); });
+    }
+  };
+  BP.t = (key, es) => { const v = BP.i18n.t(key); return v != null ? v : es; };
   BP.idioma = function (root) {
     /* La barra derecha se vuelve a dibujar al abrir sesión, así que el selector
        se crea si falta en vez de vivir sólo en la plantilla. */
@@ -316,32 +333,32 @@
   </div>
   <div class="p-nav-right">
     <div class="p-lang" role="group" aria-label="Idioma"><button type="button" data-lang="es">ES</button><button type="button" data-lang="pt">PT</button><button type="button" data-lang="en">EN</button></div>
-    <button type="button" class="p-ghost p-bell p-solo-sesion" aria-label="Notificaciones" data-notif hidden>${BP.ico.bell}<span class="dot" hidden></span></button>
-    <a class="p-ghost p-solo-sesion" href="ingresar.html?volver=contactos" hidden>${BP.ico.chat} Mis contactos</a>
-    <a class="p-ghost p-fav-anon" href="buscar.html?favs=1" aria-label="Favoritos" hidden>${BP.ico.heart}<span data-fav-count hidden></span></a>
-    <a class="p-btn p-btn-sm" href="publicar.html">Publicar</a>
-    <a class="p-btn p-btn-sm p-btn-fill" href="ingresar.html">Ingresar</a>
+    <button type="button" class="p-ghost p-bell p-solo-sesion" aria-label="Notificaciones" data-i18n-aria="notificaciones" data-notif hidden>${BP.ico.bell}<span class="dot" hidden></span></button>
+    <a class="p-ghost p-solo-sesion" href="ingresar.html?volver=contactos" hidden>${BP.ico.chat} <span data-i18n="mis_contactos">Mis contactos</span></a>
+    <a class="p-ghost p-fav-anon" href="buscar.html?favs=1" aria-label="Favoritos" data-i18n-aria="favoritos" hidden>${BP.ico.heart}<span data-fav-count hidden></span></a>
+    <a class="p-btn p-btn-sm" href="publicar.html" data-i18n="publicar">Publicar</a>
+    <a class="p-btn p-btn-sm p-btn-fill" href="ingresar.html" data-i18n="ingresar">Ingresar</a>
   </div>
-  <button class="burger" id="burger" type="button" aria-label="Menú" aria-expanded="false" aria-controls="mobileMenu"><span></span><span></span><span></span></button>
+  <button class="burger" id="burger" type="button" aria-label="Menú" data-i18n-aria="menu" aria-expanded="false" aria-controls="mobileMenu"><span></span><span></span><span></span></button>
 </nav>
 <div class="mobile-menu" id="mobileMenu">
-  <a href="buscar.html?op=venta" class="m-link">Comprar</a>
-  <a href="buscar.html?op=alquiler" class="m-link">Alquilar</a>
-  <a href="buscar.html?op=mediano" class="m-link m-sub">Mediano plazo</a>
-  <a href="buscar.html?op=largo" class="m-link m-sub">Largo plazo</a>
-  <a href="emprendimientos.html" class="m-link">Emprendimientos</a>
-  <a href="publicadores.html" class="m-link">Publicadores</a>
+  <a href="buscar.html?op=venta" class="m-link" data-i18n="comprar">Comprar</a>
+  <a href="buscar.html?op=alquiler" class="m-link" data-i18n="alquilar">Alquilar</a>
+  <a href="buscar.html?op=mediano" class="m-link m-sub" data-i18n="mediano">Mediano plazo</a>
+  <a href="buscar.html?op=largo" class="m-link m-sub" data-i18n="largo">Largo plazo</a>
+  <a href="emprendimientos.html" class="m-link" data-i18n="emprendimientos">Emprendimientos</a>
+  <a href="publicadores.html" class="m-link" data-i18n="publicadores">Publicadores</a>
   <div class="m-sep"></div>
-  <a href="buscar.html?favs=1" class="m-link">Favoritos</a>
-  <a href="ingresar.html?volver=contactos" class="m-link">Mis contactos</a>
+  <a href="buscar.html?favs=1" class="m-link" data-i18n="favoritos">Favoritos</a>
+  <a href="ingresar.html?volver=contactos" class="m-link" data-i18n="mis_contactos">Mis contactos</a>
   <div class="p-lang" role="group" aria-label="Idioma"><button type="button" data-lang="es">ES</button><button type="button" data-lang="pt">PT</button><button type="button" data-lang="en">EN</button></div>
-  <div class="m-cta"><a class="p-btn p-btn-sm" href="publicar.html">Publicar</a><a class="p-btn p-btn-sm p-btn-fill" href="ingresar.html">Ingresar</a></div>
+  <div class="m-cta"><a class="p-btn p-btn-sm" href="publicar.html" data-i18n="publicar">Publicar</a><a class="p-btn p-btn-sm p-btn-fill" href="ingresar.html" data-i18n="ingresar">Ingresar</a></div>
 </div>`;
     const host = document.getElementById('pHeader'); if (host) host.innerHTML = html;
     /* 5.8 Cuarenta tabulaciones para pasar el header. Un enlace de salto y los desplegables fuera del orden. */
     if (host && !document.getElementById('pSkip')) {
       const sk = document.createElement('a'); sk.id = 'pSkip'; sk.className = 'p-skip';
-      sk.href = '#contenido'; sk.textContent = 'Saltar al contenido';
+      sk.href = '#contenido'; sk.textContent = BP.t('skip', 'Saltar al contenido');
       sk.addEventListener('click', e => {
         const d = document.getElementById('contenido') || BP._destino();
         if (d) { e.preventDefault(); d.setAttribute('tabindex', '-1'); d.focus(); d.scrollIntoView(); }
@@ -354,6 +371,7 @@
     const cerrarDD = dd => { dd.classList.remove('abierto'); dd.style.height = ''; dd.style.opacity = ''; dd.querySelectorAll('a,button').forEach(x => x.tabIndex = -1); const bt = dd.parentNode.querySelector('button[aria-haspopup]'); if (bt) bt.setAttribute('aria-expanded','false'); };
     BP.crear(document);
     BP.idioma(document);
+    if (BP.i18n) BP.i18n.apply(document);   /* header y menú recién dibujados, y lo estático de la página */
     const abrirDD = dd => {
       if (dd.classList.contains('abierto')) return;
       dd.querySelectorAll('a,button').forEach(x => x.removeAttribute('tabindex'));
@@ -399,11 +417,11 @@
       });
     }
     document.querySelectorAll('[data-notif]').forEach(el=>el.addEventListener('click',()=>BP.toast('Ingresá para ver tus notificaciones.')));
-    BP.syncFavCount();
+    BP.syncFavCount(); if (BP.i18n) BP.i18n.apply(document);
   };
 
   /* ── Footer ─────────────────────────────────────────────── */
-  BP.footer = function(){
+  BP.footer = function(){ setTimeout(() => { if (BP.i18n) BP.i18n.apply(document); }, 0);
     const zonas = BP.ZONAS.map(z=>`<li><a href="${BP.urlBuscar({ op:'alquiler', zona:z })}">${BP.zonaLabel(z)}</a></li>`).join('');
     const html = `
 <footer class="footer">
@@ -411,16 +429,16 @@
     <div>
       <div><img src="../bairen_logo_96.png?v=1" alt="BAIREN" width="46" height="46" style="height:46px;width:46px;"></div>
       <div class="ft-brand-rule"></div>
-      <p class="ft-brand-tag">Portal de propiedades seleccionadas en Buenos Aires.</p>
-      <p class="p-legend">BAIREN selecciona y publica propiedades, y da la gestión para administrarlas. Cada aviso es responsabilidad de quien lo publica.</p>
+      <p class="ft-brand-tag" data-i18n="ft_tag">Portal de propiedades seleccionadas en Buenos Aires.</p>
+      <p class="p-legend" data-i18n="ft_legend">BAIREN selecciona y publica propiedades, y da la gestión para administrarlas. Cada aviso es responsabilidad de quien lo publica.</p>
     </div>
-    <div class="ft-col"><div class="ft-col-ttl">Navegación</div><ul>
-      <li><a href="${BP.urlBuscar({ op:'alquiler' })}">Alquilar</a></li><li><a href="${BP.urlBuscar({ op:'venta' })}">Comprar</a></li><li><a href="psi.html">PSI</a></li><li><a href="index.html#indice">Índice BAIREN</a></li><li><a href="publicar.html">Publicar</a></li></ul></div>
-    <div class="ft-col"><div class="ft-col-ttl">Zonas</div><ul>${zonas}</ul></div>
-    <div class="ft-col"><div class="ft-col-ttl">Más</div><ul>
-      <li><a href="publicadores.html">Publicadores</a></li><li><a href="emprendimientos.html">Emprendimientos</a></li><li><a href="criterios.html">Criterios de selección</a></li><li><a href="legales.html">Términos y privacidad</a></li><li><a href="mailto:contacto@bairengroup.com">contacto@bairengroup.com</a></li></ul></div>
+    <div class="ft-col"><div class="ft-col-ttl" data-i18n="ft_nav">Navegación</div><ul>
+      <li><a href="${BP.urlBuscar({ op:'alquiler' })}" data-i18n="alquilar">Alquilar</a></li><li><a href="${BP.urlBuscar({ op:'venta' })}" data-i18n="comprar">Comprar</a></li><li><a href="psi.html">PSI</a></li><li><a href="index.html#indice" data-i18n="ft_indice">Índice BAIREN</a></li><li><a href="publicar.html" data-i18n="publicar">Publicar</a></li></ul></div>
+    <div class="ft-col"><div class="ft-col-ttl" data-i18n="ft_zonas">Zonas</div><ul>${zonas}</ul></div>
+    <div class="ft-col"><div class="ft-col-ttl" data-i18n="ft_mas">Más</div><ul>
+      <li><a href="publicadores.html" data-i18n="publicadores">Publicadores</a></li><li><a href="emprendimientos.html" data-i18n="emprendimientos">Emprendimientos</a></li><li><a href="criterios.html" data-i18n="ft_criterios">Criterios de selección</a></li><li><a href="legales.html" data-i18n="ft_terminos">Términos y privacidad</a></li><li><a href="mailto:contacto@bairengroup.com">contacto@bairengroup.com</a></li></ul></div>
   </div>
-  <div class="footer-bottom"><span>© ${new Date().getFullYear()} BAIREN</span><span><a href="legales.html">Términos de uso</a> · <a href="legales.html#privacidad">Política de privacidad</a></span></div>
+  <div class="footer-bottom"><span>© ${new Date().getFullYear()} BAIREN</span><span><a href="legales.html" data-i18n="ft_uso">Términos de uso</a> · <a href="legales.html#privacidad" data-i18n="ft_priv">Política de privacidad</a></span></div>
 </footer>`;
     const host = document.getElementById('pFooter'); if (host) host.innerHTML = html;
   };
@@ -444,7 +462,7 @@
       const ing = right.querySelector('a[href="ingresar.html"]'); if (ing && !ing.dataset.tagged) { ing.dataset.tagged = '1'; ing.insertAdjacentHTML('afterend', modeTag); }
     }
     document.querySelectorAll('[data-notif]').forEach(el => el.addEventListener('click', () => BP.toast(session ? 'No tenés notificaciones nuevas.' : 'Ingresá para ver tus notificaciones.')));
-    BP.syncFavCount();
+    BP.syncFavCount(); if (BP.i18n) BP.i18n.apply(document);
   };
   /* Después de cargar los datos: cada enlace de barrio dice cuántas unidades tiene,
      y las combinaciones sin inventario quedan marcadas en vez de prometer en falso. */
