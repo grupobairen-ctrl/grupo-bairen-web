@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://dahusnnbyrvltcuaelxj.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260911b"><link rel="stylesheet" href="css/catalogo.css?v=20260911b"><link rel="stylesheet" href="css/portal.css?v=20260911b">
+  <link rel="stylesheet" href="css/base.css?v=20260911c"><link rel="stylesheet" href="css/catalogo.css?v=20260911c"><link rel="stylesheet" href="css/portal.css?v=20260911c">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"BAIREN","url":"https://www.bairengroup.com","logo":"https://www.bairengroup.com/bairen_logo.png","description":"El portal de propiedades seleccionadas de Buenos Aires. Alquileres a mediano y largo plazo y departamentos en venta, seleccionados uno por uno antes de entrar al portal.","areaServed":[{"@type":"City","name":"Ciudad Autónoma de Buenos Aires"},{"@type":"AdministrativeArea","name":"Zona Norte, Buenos Aires"}]}</script>
 </head>
 <body class="p-home">
@@ -24,7 +24,8 @@
 <main id="contenido">
 
 <section class="h-hero" id="inicio">
-  <video autoplay muted loop playsinline preload="metadata" poster="../hero-poster.jpg?v=2" aria-hidden="true"><source src="../hero.mp4?v=2" type="video/mp4"></video>
+  <video autoplay muted loop playsinline preload="metadata" poster="../hero-poster.jpg?v=2" aria-hidden="true"></video>
+  <script>/* El video del hero: 1,5 MB en celular (720p), 5,5 MB en escritorio. Se elige antes de que empiece a bajar. */(function(){var v=document.currentScript.previousElementSibling;if(v&&v.tagName==='VIDEO'){v.src=window.innerWidth<900?'../hero-m.mp4?v=1':'../hero.mp4?v=2';}})();</script>
   <div class="h-hero-velo" aria-hidden="true"></div>
   <div class="h-hero-in">
     <h1><span class="hline" data-i18n="hero_h1a">Propiedades seleccionadas</span><span class="hline" data-i18n="hero_h1b">en Buenos Aires.</span></h1>
@@ -115,7 +116,7 @@
 
 <section class="h-sec h-navy h-anuncio" id="psi">
   <div class="h-in h-anuncio-top"><p class="h-eyebrow" data-i18n="psi_eyebrow">PSI · Personal Shopper Inmobiliario</p></div>
-  <figure class="h-anuncio-foto" id="psiFoto" aria-hidden="true"><img src="img/psi-terraza.jpg" alt="" onerror="this.remove()"><span class="h-anuncio-fade" aria-hidden="true"></span></figure>
+  <figure class="h-anuncio-foto" id="psiFoto" aria-hidden="true"><img src="img/psi-terraza.webp" alt="" onerror="this.remove()"><span class="h-anuncio-fade" aria-hidden="true"></span></figure>
   <div class="h-anuncio-velo" aria-hidden="true"></div>
   <div class="h-in h-anuncio-txt">
     <h2 class="h-h2" data-i18n="psi_h2">¿Buscando invertir en una propiedad?</h2>
@@ -129,10 +130,10 @@
 
 <script src="../mapa-barrios.js" defer></script><script src="supabase-portal.js" defer></script>
 <script src="js/motion.js" defer></script>
-<script src="js/bairen-motion.js?v=20260911b" defer></script>
-<script src="js/i18n-portal.js?v=20260911b" defer></script><script src="js/ui.js?v=20260911b" defer></script>
-<script src="js/store.js?v=20260911b" defer></script>
-<script src="js/data.js?v=20260911b" defer></script>
+<script src="js/bairen-motion.js?v=20260911c" defer></script>
+<script src="js/i18n-portal.js?v=20260911c" defer></script><script src="js/ui.js?v=20260911c" defer></script>
+<script src="js/store.js?v=20260911c" defer></script>
+<script src="js/data.js?v=20260911c" defer></script>
 <script>
 document.addEventListener('DOMContentLoaded', function(){
 (async function(){
@@ -209,9 +210,9 @@ document.addEventListener('DOMContentLoaded', function(){
      Alcorta 3000/3300" y Lumière Boulevard Madero como "Juana Manso 1551"
      (no confundir con Lumière Puerto Madero, Olga Cossettini 1540). */
   const EDIF = [
-    { nombre: 'Huergo 475', re: /huergo\s*475/i, q: 'Huergo 475', zona: 'Puerto Madero', fachada: 'img/edificio-huergo-475.jpg' },
-    { nombre: 'Palacio Alcorta', re: /palacio\s+alcorta|figueroa\s+alcorta\s+3[03]\d\d/i, q: 'Palacio Alcorta', zona: 'Palermo', fachada: 'img/edificio-palacio-alcorta.jpg' },
-    { nombre: 'Lumière', re: /lumi[eè]re|juana\s+manso\s+1551/i, q: 'Juana Manso 1551', zona: 'Puerto Madero', fachada: 'img/edificio-lumiere.jpg' }
+    { nombre: 'Huergo 475', re: /huergo\s*475/i, q: 'Huergo 475', zona: 'Puerto Madero', fachada: 'img/edificio-huergo-475.webp' },
+    { nombre: 'Palacio Alcorta', re: /palacio\s+alcorta|figueroa\s+alcorta\s+3[03]\d\d/i, q: 'Palacio Alcorta', zona: 'Palermo', fachada: 'img/edificio-palacio-alcorta.webp' },
+    { nombre: 'Lumière', re: /lumi[eè]re|juana\s+manso\s+1551/i, q: 'Juana Manso 1551', zona: 'Puerto Madero', fachada: 'img/edificio-lumiere.webp' }
   ];
   const texto = a => [a.dir, a.titulo, a.emprendimiento, a.descripcion].filter(Boolean).join(' ');
   edificios = EDIF.map(e => {
