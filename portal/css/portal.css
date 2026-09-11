@@ -3147,3 +3147,14 @@ body.p-catalogo .p-results-head .acts .p-fbtn svg{width:15px;height:15px}
   body.p-catalogo .p-plazo-pills button{padding:0 10px;letter-spacing:.08em}
   body.p-catalogo .p-filters #opSel{width:auto;max-width:150px}
 }
+
+/* ══ 11/9/2026 · Ficha, con la coherencia del panel ══════════════════════════
+   Las características van de a seis (el resto se despliega) y sin repetir lo
+   que ya dice la fila de cifras. Las cajas de aviso sin línea punteada. ══════ */
+.p-amen-mas{margin-top:-32px}
+.p-amen-mas[hidden]{display:none !important}
+.p-amen-toggle{display:inline-block;margin:-30px 0 44px;background:none;border:0;padding:0;font:500 .8rem/1.3 var(--font-body);color:var(--navy-deeper);text-decoration:underline;text-underline-offset:4px;text-decoration-color:rgba(19,29,45,.35);cursor:pointer;min-height:40px}
+.p-amen-toggle:hover{text-decoration-color:var(--navy-deeper)}
+.p-amen-toggle:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.p-sincontacto-box,.p-sincontacto,.p-empty{border-style:solid !important}
+.p-product .p-sincontacto-box{background:#F4F0E6;border-color:rgba(19,29,45,.12)}

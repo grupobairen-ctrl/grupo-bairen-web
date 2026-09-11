@@ -28,7 +28,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://dahusnnbyrvltcuaelxj.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260911x"><link rel="stylesheet" href="css/catalogo.css?v=20260911x"><link rel="stylesheet" href="css/portal.css?v=20260911x">
+  <link rel="stylesheet" href="css/base.css?v=20260911y"><link rel="stylesheet" href="css/catalogo.css?v=20260911y"><link rel="stylesheet" href="css/portal.css?v=20260911y">
   <style>body{padding-top:0}#ficha>.p-ficha-top,#ficha>.p-ficha,#ficha>section{max-width:var(--p-max);margin:0 auto;padding-left:24px;padding-right:24px}#ficha>.p-ficha-top{padding-top:88px}@media(max-width:900px){#ficha>.p-ficha-top{padding-top:76px}}.p-video{aspect-ratio:16/9;background:#0b1220;border-radius:16px;overflow:hidden}.p-video iframe,.p-video video{width:100%;height:100%;border:0;display:block}</style>
 </head>
 <body class="p-product p-ficha-page">
@@ -39,8 +39,8 @@
 <div id="pFooter"></div>
 
 <script src="supabase-portal.js" defer></script>
-<script src="js/iconos-amenities.js?v=20260911x" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260911x" defer></script><script src="js/i18n-portal.js?v=20260911x" defer></script><script src="js/ui.js?v=20260911x" defer></script><script src="js/store.js?v=20260911x" defer></script>
-<script src="js/data.js?v=20260911x" defer></script>
+<script src="js/iconos-amenities.js?v=20260911y" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260911y" defer></script><script src="js/i18n-portal.js?v=20260911y" defer></script><script src="js/ui.js?v=20260911y" defer></script><script src="js/store.js?v=20260911y" defer></script>
+<script src="js/data.js?v=20260911y" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -116,7 +116,13 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip">${fotos.map((f,i) => `<but
     </div>
     <div>
       <h2 class="p-sec-t">La unidad en detalle</h2>
-      <div class="amenities-grid p-amen-grid">${tiles([a.op !== 'venta' && a.plazo ? 'Plazo ' + a.plazo : null, a.amoblado ? 'Amoblado' : 'Sin amoblar', a.amb ? (a.amb === 1 ? 'Monoambiente' : a.amb + ' ambientes') : null, a.dorm ? a.dorm + (a.dorm === 1 ? ' dormitorio' : ' dormitorios') : null, a.banos ? a.banos + (a.banos === 1 ? ' baño' : ' baños') : null, a.cocheras ? 'Cochera' : null, ...((a.caracteristicas && a.caracteristicas.length) ? a.caracteristicas : []), ...a.amenities].filter(Boolean))}</div>
+      ${(() => {
+        /* Lo que ya está en la fila de cifras (m², ambientes, dormitorios, baños, cocheras) no se repite como tile.
+           Sin duplicados, y de a seis: el resto se despliega. */
+        const vistos = new Set(); const lista = [a.op !== 'venta' && a.plazo ? 'Plazo ' + a.plazo : null, a.amoblado ? 'Amoblado' : 'Sin amoblar', ...((a.caracteristicas && a.caracteristicas.length) ? a.caracteristicas : []), ...a.amenities].filter(Boolean).filter(x => { const k = String(x).trim().toLowerCase(); if (vistos.has(k)) return false; vistos.add(k); return true; });
+        const primeros = lista.slice(0, 6), resto = lista.slice(6);
+        return `<div class="amenities-grid p-amen-grid">${tiles(primeros)}</div>` + (resto.length ? `<div class="amenities-grid p-amen-grid p-amen-mas" id="amenMas" hidden>${tiles(resto)}</div><button type="button" class="p-link p-amen-toggle" id="amenToggle" aria-expanded="false" aria-controls="amenMas">Ver las ${lista.length} características</button>` : '');
+      })()}
     </div>
     <div>
       <h2 class="p-sec-t">Ubicación</h2>
@@ -251,6 +257,7 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip">${fotos.map((f,i) => `<but
   lb.querySelectorAll('[data-lb-close]').forEach(b => b.addEventListener('click', closeLb)); lb.querySelector('[data-lb-prev]').addEventListener('click', () => showLb(cur-1, -1)); lb.querySelector('[data-lb-next]').addEventListener('click', () => showLb(cur+1, 1));
   document.addEventListener('keydown', e => { if (!lb.classList.contains('open')) return; if (e.key === 'ArrowLeft') showLb(cur-1, -1); if (e.key === 'ArrowRight') showLb(cur+1, 1); });
   if (a.video) { const v = document.getElementById('video'); if (a.video.tipo === 'youtube') { const m = a.video.url.match(/(?:v=|be\/|embed\/)([A-Za-z0-9_-]{6,})/); v.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${m ? m[1] : ''}" title="Video de ${BP.esc(a.titulo)}" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>`; } else if (a.video.tipo === 'bunny') { v.innerHTML = `<iframe src="${BP.esc(a.video.url)}" title="Video de ${BP.esc(a.titulo)}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>`; } else { v.innerHTML = `<video src="${BP.esc(a.video.url)}" controls playsinline preload="metadata"></video>`; } }
+  (() => { const t = document.getElementById('amenToggle'), m = document.getElementById('amenMas'); if (!t || !m) return; t.addEventListener('click', () => { const abre = m.hidden; m.hidden = !abre; t.setAttribute('aria-expanded', abre ? 'true' : 'false'); t.textContent = abre ? 'Ver menos' : 'Ver las ' + (6 + m.children.length) + ' características'; }); })();
   const desc = document.getElementById('desc'), more = document.getElementById('descMore'); if (desc.scrollHeight <= desc.clientHeight + 4) more.hidden = true; more.addEventListener('click', () => { desc.classList.toggle('clamp'); more.textContent = desc.classList.contains('clamp') ? 'Leer más' : 'Leer menos'; });
   /* pestañas de características: rol de pestaña, flechas para moverse, un solo tab en el orden de tabulación */
   /* La foto del hero se retira más lento que el scroll y el titular se apaga: profundidad, no efecto */
