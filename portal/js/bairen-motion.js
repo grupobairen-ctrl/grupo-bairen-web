@@ -286,8 +286,9 @@
      una sola vez y barato, o no se cobra. */
   BPM.entrada = function (palabra, opts) {
     /* Usa el velo de carga del <head> (una sola capa navy, no dos): lo retiene,
-       arma la palabra letra por letra en su .w, y lo suelta. Si el velo ya se
-       fue (carga lentísima, lo soltó la salvaguarda), no hay entrada. */
+       arma la palabra letra por letra en su .w, y le devuelve el control: el
+       velo cae cuando la portada está lista, no antes. Si el velo ya se fue
+       (carga lentísima, lo soltó la salvaguarda), no hay entrada. */
     opts = opts || {};
     var V = window.BPVelo, w = document.querySelector('.p-velo .w');
     if (!V || !w || !document.documentElement.classList.contains('cargando')) return;
@@ -305,9 +306,9 @@
       for (var i = 0; i < palabra.length; i++) out += i < fijas ? palabra[i] : glifos[(Math.random() * glifos.length) | 0];
       w.textContent = out;
       if (t < 1) requestAnimationFrame(tick);
-      else { w.textContent = palabra; setTimeout(V.soltar, 320); }
+      else { w.textContent = palabra; setTimeout(V.seguir, 320); }   /* la palabra queda; el velo cae cuando la portada está lista */
     })(t0);
-    setTimeout(V.soltar, TOPE + 1400);
+    setTimeout(V.seguir, TOPE + 1400);
   };
 
   /* ── Titular por palabras: cada una sube desde abajo detrás de una máscara.

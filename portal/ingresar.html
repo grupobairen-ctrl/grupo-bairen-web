@@ -9,7 +9,7 @@
   (function(h){h.classList.add('cargando');var V=window.BPVelo={retenido:false,cargado:false},obs=null,timer=null;
   var ESQ='.p-skel,.p-skel-card,.p-skel-ficha,.p-skel-line,.p-skel-vcard,.p-skel-panel,.p-skel-form,.p-skel-bloque,.p-skel-cta,.p-fhero-skel,.h-esq';
   V.soltar=function(){if(!h.classList.contains('cargando'))return;V.retenido=false;h.classList.remove('cargando');if(obs)obs.disconnect();try{document.dispatchEvent(new Event('bairen:velo'))}catch(e){}};
-  V.retener=function(){V.retenido=true};
+  V.retener=function(){V.retenido=true};V.seguir=function(){V.retenido=false;pedir()};
   /* Visible de verdad: checkVisibility ve lo que un rectángulo no (un details cerrado, content-visibility) */
   var vis=function(e){return e.checkVisibility?e.checkVisibility({contentVisibilityAuto:true,visibilityProperty:true}):e.getClientRects().length>0};
   V.lista=function(){if(!V.cargado)return false;var es=document.querySelectorAll(ESQ),i;for(i=0;i<es.length;i++)if(vis(es[i]))return false;
@@ -27,7 +27,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://dahusnnbyrvltcuaelxj.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260911u"><link rel="stylesheet" href="css/catalogo.css?v=20260911u"><link rel="stylesheet" href="css/portal.css?v=20260911u">
+  <link rel="stylesheet" href="css/base.css?v=20260911v"><link rel="stylesheet" href="css/catalogo.css?v=20260911v"><link rel="stylesheet" href="css/portal.css?v=20260911v">
 </head>
 <body>
 <div class="p-velo" aria-hidden="true"><span class="w">BAIREN</span></div>
@@ -44,7 +44,7 @@
   </div>
 </div></section>
 <div id="pFooter"></div>
-<script src="supabase-portal.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260911u" defer></script><script src="js/i18n-portal.js?v=20260911u" defer></script><script src="js/ui.js?v=20260911u" defer></script><script src="js/store.js?v=20260911u" defer></script><script src="js/data.js?v=20260911u" defer></script>
+<script src="supabase-portal.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260911v" defer></script><script src="js/i18n-portal.js?v=20260911v" defer></script><script src="js/ui.js?v=20260911v" defer></script><script src="js/store.js?v=20260911v" defer></script><script src="js/data.js?v=20260911v" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
