@@ -10,8 +10,10 @@
   var ESQ='.p-skel,.p-skel-card,.p-skel-ficha,.p-skel-line,.p-skel-vcard,.p-skel-panel,.p-skel-form,.p-skel-bloque,.p-skel-cta,.p-fhero-skel,.h-esq';
   V.soltar=function(){if(!h.classList.contains('cargando'))return;V.retenido=false;h.classList.remove('cargando');if(obs)obs.disconnect();try{document.dispatchEvent(new Event('bairen:velo'))}catch(e){}};
   V.retener=function(){V.retenido=true};
-  V.lista=function(){if(!V.cargado)return false;var es=document.querySelectorAll(ESQ),i;for(i=0;i<es.length;i++)if(es[i].getClientRects().length)return false;
-    var im=document.images,H=innerHeight,r;for(i=0;i<im.length;i++){if(im[i].complete||!im[i].getAttribute('src'))continue;r=im[i].getBoundingClientRect();if(r.width>0&&r.bottom>0&&r.top<H)return false}return true};
+  /* Visible de verdad: checkVisibility ve lo que un rectángulo no (un details cerrado, content-visibility) */
+  var vis=function(e){return e.checkVisibility?e.checkVisibility({contentVisibilityAuto:true,visibilityProperty:true}):e.getClientRects().length>0};
+  V.lista=function(){if(!V.cargado)return false;var es=document.querySelectorAll(ESQ),i;for(i=0;i<es.length;i++)if(vis(es[i]))return false;
+    var im=document.images,H=innerHeight,W=innerWidth,r;for(i=0;i<im.length;i++){if(im[i].complete||!im[i].getAttribute('src')||!vis(im[i]))continue;r=im[i].getBoundingClientRect();if(r.width>0&&r.bottom>0&&r.top<H&&r.right>0&&r.left<W)return false}return true};
   var revisar=function(){if(V.retenido||timer||!V.lista())return;var t=performance.now();timer=setTimeout(function(){if(!V.retenido)V.soltar()},t>500?Math.max(0,800-t):0)};
   var pedido=false,pedir=function(){if(pedido)return;pedido=true;requestAnimationFrame(function(){pedido=false;revisar()})};
   addEventListener('load',function(){V.cargado=true;pedir()});
@@ -26,7 +28,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://dahusnnbyrvltcuaelxj.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260911s"><link rel="stylesheet" href="css/catalogo.css?v=20260911s"><link rel="stylesheet" href="css/portal.css?v=20260911s">
+  <link rel="stylesheet" href="css/base.css?v=20260911u"><link rel="stylesheet" href="css/catalogo.css?v=20260911u"><link rel="stylesheet" href="css/portal.css?v=20260911u">
   <style>
     .p-emp{display:grid;grid-template-columns:minmax(260px,42%) 1fr;background:var(--p-card);border:1px solid var(--p-line);border-radius:var(--p-radius);overflow:hidden;margin-bottom:18px}
     .p-emp .ph{position:relative;min-height:260px;background:var(--p-tray)} .p-emp .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
@@ -48,7 +50,7 @@
   <div id="lista"><div class="p-skel" style="height:260px;border-radius:var(--p-radius);background:#EEE9DD"></div></div>
 </div></section>
 <div id="pFooter"></div>
-<script src="supabase-portal.js" defer></script><script src="../mapa-barrios.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260911s" defer></script><script src="js/i18n-portal.js?v=20260911s" defer></script><script src="js/ui.js?v=20260911s" defer></script><script src="js/store.js?v=20260911s" defer></script><script src="js/data.js?v=20260911s" defer></script>
+<script src="supabase-portal.js" defer></script><script src="../mapa-barrios.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260911u" defer></script><script src="js/i18n-portal.js?v=20260911u" defer></script><script src="js/ui.js?v=20260911u" defer></script><script src="js/store.js?v=20260911u" defer></script><script src="js/data.js?v=20260911u" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
