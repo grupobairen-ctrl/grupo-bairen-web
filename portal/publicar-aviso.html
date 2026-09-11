@@ -2,7 +2,22 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script>/* El velo de carga: navy desde el primer byte, se retira cuando la página está lista (load). Si carga en menos de 250 ms nadie lo ve; si se vio, se queda hasta los 600 ms para no titilar; a los 2,5 s se va pase lo que pase. Inline y sin dependencias: si un script no carga, el velo se va igual. */(function(h){h.classList.add('cargando');var V=window.BPVelo={retenido:false};V.soltar=function(){if(!h.classList.contains('cargando'))return;V.retenido=false;h.classList.remove('cargando');try{document.dispatchEvent(new Event('bairen:velo'))}catch(e){}};V.retener=function(){V.retenido=true};var fin=function(){if(V.retenido)return;var t=performance.now(),e=t>250?Math.max(0,600-t):0;setTimeout(function(){if(!V.retenido)V.soltar()},e)};addEventListener('load',fin);setTimeout(fin,2500)})(document.documentElement);</script>
+  <script>/* El velo de carga: navy desde el primer byte, se retira cuando la página está lista de verdad:
+     load + ningún esqueleto a la vista + las fotos del primer pantallazo cargadas. Si eso pasa en menos de
+     500 ms nadie lo ve; si se vio, se queda hasta los 800 ms para no titilar; a los 8 s se va pase lo que
+     pase. Inline y sin dependencias: si un script no carga, el velo se va igual. */
+  (function(h){h.classList.add('cargando');var V=window.BPVelo={retenido:false,cargado:false},obs=null,timer=null;
+  var ESQ='.p-skel,.p-skel-card,.p-skel-ficha,.p-skel-line,.p-skel-vcard,.p-skel-panel,.p-skel-form,.p-skel-bloque,.p-skel-cta,.p-fhero-skel,.h-esq';
+  V.soltar=function(){if(!h.classList.contains('cargando'))return;V.retenido=false;h.classList.remove('cargando');if(obs)obs.disconnect();try{document.dispatchEvent(new Event('bairen:velo'))}catch(e){}};
+  V.retener=function(){V.retenido=true};
+  V.lista=function(){if(!V.cargado)return false;var es=document.querySelectorAll(ESQ),i;for(i=0;i<es.length;i++)if(es[i].getClientRects().length)return false;
+    var im=document.images,H=innerHeight,r;for(i=0;i<im.length;i++){if(im[i].complete||!im[i].getAttribute('src'))continue;r=im[i].getBoundingClientRect();if(r.width>0&&r.bottom>0&&r.top<H)return false}return true};
+  var revisar=function(){if(V.retenido||timer||!V.lista())return;var t=performance.now();timer=setTimeout(function(){if(!V.retenido)V.soltar()},t>500?Math.max(0,800-t):0)};
+  var pedido=false,pedir=function(){if(pedido)return;pedido=true;requestAnimationFrame(function(){pedido=false;revisar()})};
+  addEventListener('load',function(){V.cargado=true;pedir()});
+  document.addEventListener('DOMContentLoaded',function(){obs=new MutationObserver(pedir);obs.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class','src','hidden','style']})});
+  document.addEventListener('load',pedir,true);document.addEventListener('error',pedir,true);
+  setTimeout(V.soltar,8000)})(document.documentElement);</script>
   <title>Publicar una propiedad · BAIREN</title>
   <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#131D2D">
   <script>
@@ -21,7 +36,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://dahusnnbyrvltcuaelxj.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260911q"><link rel="stylesheet" href="css/catalogo.css?v=20260911q"><link rel="stylesheet" href="css/portal.css?v=20260911q">
+  <link rel="stylesheet" href="css/base.css?v=20260911s"><link rel="stylesheet" href="css/catalogo.css?v=20260911s"><link rel="stylesheet" href="css/portal.css?v=20260911s">
   <style>
     .p-stepper{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0 26px}
     .p-stepper button{display:flex;align-items:center;gap:8px;border:1px solid var(--p-line);background:var(--p-card);border-radius:999px;padding:8px 14px;font:500 .78rem var(--font-body);color:var(--text-mid);cursor:pointer;letter-spacing:.06em}
@@ -56,7 +71,7 @@
   <p class="p-note" id="modeNote" style="margin-top:12px"></p>
 </div></section>
 <div id="pFooter"></div>
-<script src="supabase-portal.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260911q" defer></script><script src="js/i18n-portal.js?v=20260911q" defer></script><script src="js/ui.js?v=20260911q" defer></script><script src="js/store.js?v=20260911q" defer></script><script src="js/data.js?v=20260911q" defer></script>
+<script src="supabase-portal.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260911s" defer></script><script src="js/i18n-portal.js?v=20260911s" defer></script><script src="js/ui.js?v=20260911s" defer></script><script src="js/store.js?v=20260911s" defer></script><script src="js/data.js?v=20260911s" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -97,8 +112,20 @@ document.addEventListener('DOMContentLoaded', function(){
     const form = document.getElementById('perfilForm');
     const draw = t => { form.innerHTML = (t === 'dueno' ? fld('nombre','Nombre y apellido','text',v(p,'nombre'),{attrs:'required'}) + fld('dni','DNI','text',v(p,'dni'),{attrs:'inputmode="numeric"'}) : t === 'inmobiliaria' ? fld('nombre','Inmobiliaria o corredor','text',v(p,'nombre'),{attrs:'required'}) + fld('responsable','Corredor responsable, nombre y apellido','text',v(p,'responsable'),{attrs:'required'}) + fld('matricula','Matrícula','text',v(p,'matricula'),{attrs:'required placeholder="CUCICBA 0000"'},'Se valida contra el registro público del colegio.') + fld('colegio','Colegio','select',v(p,'colegio')||'CUCICBA',{opts:[['CUCICBA','CUCICBA, Ciudad de Buenos Aires'],['CMCPSI','San Isidro, Provincia de Buenos Aires'],['CMCPLZ','Lomas de Zamora, Provincia de Buenos Aires'],['Otro','Otro colegio de Provincia']]}) + fld('cuit','CUIT','text',v(p,'cuit')) : fld('nombre','Razón social','text',v(p,'nombre'),{attrs:'required'}) + fld('cuit','CUIT','text',v(p,'cuit'),{attrs:'required'}) + fld('responsable','Responsable comercial','text',v(p,'responsable')))
       + fld('telefono','Teléfono','tel',v(p,'telefono'),{attrs:'required'}) + fld('whatsapp','WhatsApp, solo números, con 54 9 11','tel',v(p,'whatsapp'),{attrs:'required placeholder="5491123456789"'}) + fld('email','Mail de contacto','email',v(p,'email')||BPStore.session.email,{attrs:'required'}) + fld('descripcion','Presentación corta','textarea',v(p,'descripcion'),{full:true,attrs:'maxlength="400" style="min-height:90px"'},'Dos líneas. Aparece en tu perfil.')
-      + `<div class="p-fld full"><label for="docs">Verificación</label><div class="p-note" style="margin-bottom:8px">${t === 'dueno' ? 'Subí tu DNI y un comprobante de titularidad: escritura, ABL o expensas a tu nombre. Lo revisamos y lo borramos.' : t === 'inmobiliaria' ? 'Con la matrícula alcanza: la validamos contra el registro público. Si querés, sumá el certificado.' : 'Subí constancia de CUIT y un documento de la sociedad.'}</div><input type="file" id="docs" multiple accept="image/*,.pdf"></div>`; };
-    draw(tipo); form.querySelectorAll('[name=tipo]').length; document.querySelectorAll('[name=tipo]').forEach(r => r.addEventListener('change', () => draw(r.value)));
+      + `<div class="p-fld full"><label for="docs">Verificación</label><div class="p-note" style="margin-bottom:8px">${t === 'dueno' ? 'Subí tu DNI y un comprobante de titularidad: escritura, ABL o expensas a tu nombre. Lo revisamos y lo borramos.' : t === 'inmobiliaria' ? 'Con la matrícula alcanza: la validamos contra el registro público. Si querés, sumá el certificado.' : 'Subí constancia de CUIT y un documento de la sociedad.'}</div><div class="p-carga" id="docsZona" tabindex="0" role="button" aria-controls="docs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8.5L19 7.5V21H6z"/><path d="M14.2 3v4.6H19"/><path d="M9 13h6M9 16.4h6"/></svg><div class="p-carga-txt"><b>Elegí los documentos</b><span>JPG, PNG o PDF, hasta 10 MB cada uno. Se borran después de revisarlos.</span></div><span class="p-btn p-btn-sm p-carga-btn" aria-hidden="true">Elegir archivos</span></div><input type="file" id="docs" multiple accept="image/*,.pdf" hidden aria-label="Documentos de verificación"><ul class="p-carga-lista" id="docsLista" aria-live="polite"></ul></div>`; };
+    /* La zona de documentos: elegir, arrastrar, y una lista con nombre, peso y quitar. La lista real vive en el input (DataTransfer). */
+    const engancharDocs = () => {
+      const zona = document.getElementById('docsZona'), inp = document.getElementById('docs'), lista = document.getElementById('docsLista'); if (!zona || !inp) return;
+      const kb = n => n < 1024 * 1024 ? Math.round(n / 1024) + ' KB' : (n / 1048576).toFixed(1) + ' MB';
+      const pintar = () => { const fs = Array.from(inp.files || []); lista.innerHTML = fs.map((f, i) => `<li><span class="nom">${BP.esc(f.name)}</span><span class="peso">${kb(f.size)}</span><button type="button" class="quitar" data-i="${i}" aria-label="Quitar ${BP.esc(f.name)}">×</button></li>`).join(''); zona.classList.toggle('con', fs.length > 0); };
+      const poner = files => { const dt = new DataTransfer(); Array.from(inp.files || []).forEach(f => dt.items.add(f)); Array.from(files || []).forEach(f => { if (!Array.from(dt.files).some(x => x.name === f.name && x.size === f.size)) dt.items.add(f); }); inp.files = dt.files; pintar(); };
+      zona.addEventListener('click', () => inp.click()); zona.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); inp.click(); } });
+      inp.addEventListener('change', () => { poner(inp.files); });
+      zona.addEventListener('dragover', e => { e.preventDefault(); zona.classList.add('sobre'); }); zona.addEventListener('dragleave', () => zona.classList.remove('sobre')); zona.addEventListener('drop', e => { e.preventDefault(); zona.classList.remove('sobre'); poner(e.dataTransfer.files); });
+      lista.addEventListener('click', e => { const b = e.target.closest('.quitar'); if (!b) return; const dt = new DataTransfer(); Array.from(inp.files).forEach((f, i) => { if (i !== Number(b.dataset.i)) dt.items.add(f); }); inp.files = dt.files; pintar(); });
+      pintar();
+    };
+    draw(tipo); engancharDocs(); document.querySelectorAll('[name=tipo]').forEach(r => r.addEventListener('change', () => { draw(r.value); engancharDocs(); }));
     bindNav(async () => {
       const t = document.querySelector('[name=tipo]:checked').value; const data = { tipo: t }; form.querySelectorAll('input:not([type=file]),select,textarea').forEach(i => data[i.name] = i.value.trim());
       if (!data.nombre || !data.telefono || !data.whatsapp || (t === 'inmobiliaria' && !data.matricula) || (t === 'desarrolladora' && !data.cuit)) {
@@ -162,7 +189,7 @@ document.addEventListener('DOMContentLoaded', function(){
   function renderFotos(){
     const a = aviso;
     el.innerHTML = `<h2 class="p-sec-t">Fotos y video</h2><p class="p-kicker" style="margin-bottom:16px">Mínimo ocho fotos horizontales. La primera es la portada. Si no tenés fotos producidas, marcá la casilla y seguí: las hace BAIREN.</p>
-      <button type="button" class="p-drop" id="drop"><b>Tocá para elegir las fotos, o arrastralas acá</b>JPG o PNG, hasta 10 MB cada una.</button><input type="file" id="fotosIn" multiple accept="image/*" hidden aria-label="Fotos de la propiedad">
+      <button type="button" class="p-carga" id="drop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14"/><path d="m3 16 5-5 4 4 3-3 6 6"/><circle cx="15.5" cy="9.5" r="1.5"/></svg><span class="p-carga-txt"><b>Elegí las fotos, o arrastralas acá</b><span>JPG o PNG, hasta 10 MB cada una. Horizontales; la primera es la portada.</span></span><span class="p-btn p-btn-sm p-carga-btn" aria-hidden="true">Elegir fotos</span></button><input type="file" id="fotosIn" multiple accept="image/*" hidden aria-label="Fotos de la propiedad">
       <div class="p-fotos" id="fotosGrid"></div>
       <div class="p-formgrid" style="margin-top:18px">${fld('video_url','Video, link de YouTube o Bunny','url',a.video_url,{full:true,attrs:'placeholder="https://"'})}<label class="full" style="display:flex;gap:10px;align-items:center;color:var(--navy-deeper)"><input type="checkbox" id="quieroProd" ${a.quiero_produccion?'checked':''}> Quiero que BAIREN produzca las fotos y el video de la unidad, sin costo.</label></div>
       ${navBtns()}`;
@@ -215,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function(){
       document.body.dataset.fotos = a.fotos.length;
     };
     const add = async files => { const key = aviso.id || aviso.slug || ('nuevo-' + BPStore.session.id.slice(-4)); let i = a.fotos.length; for (const f of Array.from(files)) { if (!/^image\//.test(f.type)) continue; try { BP.toast('Subiendo foto ' + (i + 1) + '…'); const url = await BPStore.uploadFoto(f, key, i++); a.fotos.push({ url }); } catch (e) { BP.toast('No se pudo subir una foto: ' + (e.message || e)); } } draw(); };
-    drop.addEventListener('click', () => inp.click()); inp.addEventListener('change', () => add(inp.files)); drop.addEventListener('dragover', e => { e.preventDefault(); drop.style.borderColor = 'var(--navy)'; }); drop.addEventListener('dragleave', () => drop.style.borderColor = ''); drop.addEventListener('drop', e => { e.preventDefault(); drop.style.borderColor = ''; add(e.dataTransfer.files); });
+    drop.addEventListener('click', () => inp.click()); inp.addEventListener('change', () => add(inp.files)); drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('sobre'); }); drop.addEventListener('dragleave', () => drop.classList.remove('sobre')); drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('sobre'); add(e.dataTransfer.files); });
     draw();
     bindNav(async () => { collect(); a.quiero_produccion = document.getElementById('quieroProd').checked; if (a.fotos.length < 8 && !a.quiero_produccion) { BP.toast('Hacen falta ocho fotos y hay ' + a.fotos.length + '. O pedí la producción de BAIREN.', 'error'); return false; } return true; });
   }

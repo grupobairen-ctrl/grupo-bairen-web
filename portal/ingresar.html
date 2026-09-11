@@ -2,7 +2,22 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script>/* El velo de carga: navy desde el primer byte, se retira cuando la página está lista (load). Si carga en menos de 250 ms nadie lo ve; si se vio, se queda hasta los 600 ms para no titilar; a los 2,5 s se va pase lo que pase. Inline y sin dependencias: si un script no carga, el velo se va igual. */(function(h){h.classList.add('cargando');var V=window.BPVelo={retenido:false};V.soltar=function(){if(!h.classList.contains('cargando'))return;V.retenido=false;h.classList.remove('cargando');try{document.dispatchEvent(new Event('bairen:velo'))}catch(e){}};V.retener=function(){V.retenido=true};var fin=function(){if(V.retenido)return;var t=performance.now(),e=t>250?Math.max(0,600-t):0;setTimeout(function(){if(!V.retenido)V.soltar()},e)};addEventListener('load',fin);setTimeout(fin,2500)})(document.documentElement);</script>
+  <script>/* El velo de carga: navy desde el primer byte, se retira cuando la página está lista de verdad:
+     load + ningún esqueleto a la vista + las fotos del primer pantallazo cargadas. Si eso pasa en menos de
+     500 ms nadie lo ve; si se vio, se queda hasta los 800 ms para no titilar; a los 8 s se va pase lo que
+     pase. Inline y sin dependencias: si un script no carga, el velo se va igual. */
+  (function(h){h.classList.add('cargando');var V=window.BPVelo={retenido:false,cargado:false},obs=null,timer=null;
+  var ESQ='.p-skel,.p-skel-card,.p-skel-ficha,.p-skel-line,.p-skel-vcard,.p-skel-panel,.p-skel-form,.p-skel-bloque,.p-skel-cta,.p-fhero-skel,.h-esq';
+  V.soltar=function(){if(!h.classList.contains('cargando'))return;V.retenido=false;h.classList.remove('cargando');if(obs)obs.disconnect();try{document.dispatchEvent(new Event('bairen:velo'))}catch(e){}};
+  V.retener=function(){V.retenido=true};
+  V.lista=function(){if(!V.cargado)return false;var es=document.querySelectorAll(ESQ),i;for(i=0;i<es.length;i++)if(es[i].getClientRects().length)return false;
+    var im=document.images,H=innerHeight,r;for(i=0;i<im.length;i++){if(im[i].complete||!im[i].getAttribute('src'))continue;r=im[i].getBoundingClientRect();if(r.width>0&&r.bottom>0&&r.top<H)return false}return true};
+  var revisar=function(){if(V.retenido||timer||!V.lista())return;var t=performance.now();timer=setTimeout(function(){if(!V.retenido)V.soltar()},t>500?Math.max(0,800-t):0)};
+  var pedido=false,pedir=function(){if(pedido)return;pedido=true;requestAnimationFrame(function(){pedido=false;revisar()})};
+  addEventListener('load',function(){V.cargado=true;pedir()});
+  document.addEventListener('DOMContentLoaded',function(){obs=new MutationObserver(pedir);obs.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class','src','hidden','style']})});
+  document.addEventListener('load',pedir,true);document.addEventListener('error',pedir,true);
+  setTimeout(V.soltar,8000)})(document.documentElement);</script>
   <title>Ingresar · BAIREN</title>
   <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#131D2D">
   <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
@@ -10,7 +25,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://dahusnnbyrvltcuaelxj.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260911q"><link rel="stylesheet" href="css/catalogo.css?v=20260911q"><link rel="stylesheet" href="css/portal.css?v=20260911q">
+  <link rel="stylesheet" href="css/base.css?v=20260911s"><link rel="stylesheet" href="css/catalogo.css?v=20260911s"><link rel="stylesheet" href="css/portal.css?v=20260911s">
 </head>
 <body>
 <div class="p-velo" aria-hidden="true"><span class="w">BAIREN</span></div>
@@ -21,13 +36,13 @@
     <p class="p-sub" id="sub" style="margin-bottom:18px">Favoritos, alertas, tus contactos y, si publicás, tu panel. Sin contraseña: te mandamos un código al mail.</p>
     <form id="stepMail" novalidate><label class="p-sr" for="email">Mail</label><input type="email" name="email" id="email" placeholder="Tu mail" required autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false"><button type="submit" class="p-btn p-btn-fill" style="width:100%" id="btnMail">Continuar</button></form>
     <form id="stepCode" hidden novalidate><p class="p-note" id="codeMsg" style="margin-bottom:10px" role="status"></p><label class="p-sr" for="code">Código de seis dígitos</label><input type="text" name="code" id="code" inputmode="numeric" pattern="[0-9]*" maxlength="8" placeholder="Código de seis dígitos" required autocomplete="one-time-code" autocapitalize="off" spellcheck="false"><button type="submit" class="p-btn p-btn-fill" style="width:100%" id="btnCode">Ingresar</button><p class="p-note" style="text-align:center;margin-top:10px"><a href="#" id="again" style="text-decoration:underline">Reenviar código</a> · <a href="#" id="back" style="text-decoration:underline">Cambiar mail</a></p></form>
-    <div id="social"><div class="or">o</div><button type="button" class="soc" data-soc="google">Continuar con Google</button><button type="button" class="soc" data-soc="apple">Continuar con Apple</button></div>
+    <div id="social"><div class="or">o</div><button type="button" class="soc" data-soc="google"><svg class="soc-logo" viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.7-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.8z"/><path fill="#34A853" d="M12 24c3.2 0 6-1.1 7.9-2.9l-3.9-3c-1.1.7-2.4 1.2-4 1.2-3.1 0-5.7-2.1-6.7-4.9H1.3v3.1C3.3 21.4 7.3 24 12 24z"/><path fill="#FBBC05" d="M5.3 14.4c-.2-.7-.4-1.5-.4-2.4s.1-1.6.4-2.4V6.5H1.3C.5 8.2 0 10 0 12s.5 3.8 1.3 5.5l4-3.1z"/><path fill="#EA4335" d="M12 4.8c1.8 0 3.3.6 4.6 1.8l3.4-3.4C17.9 1.2 15.2 0 12 0 7.3 0 3.3 2.6 1.3 6.5l4 3.1c1-2.8 3.6-4.8 6.7-4.8z"/></svg><span>Continuar con Google</span></button><button type="button" class="soc" data-soc="apple"><svg class="soc-logo" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16.4 12.7c0-2.5 2-3.7 2.1-3.8-1.2-1.7-3-1.9-3.6-2-1.5-.2-3 .9-3.8.9-.8 0-2-.9-3.3-.9-1.7 0-3.3 1-4.2 2.5-1.8 3.1-.5 7.7 1.3 10.3.9 1.2 1.9 2.6 3.2 2.6 1.3-.1 1.8-.8 3.3-.8s2 .8 3.3.8c1.4 0 2.3-1.3 3.1-2.5 1-1.4 1.4-2.8 1.4-2.9-.1 0-2.8-1.1-2.8-4.2zM14 5.3c.7-.8 1.2-2 1-3.1-1 0-2.2.7-2.9 1.5-.6.7-1.2 1.9-1 3 1.1.1 2.2-.6 2.9-1.4z"/></svg><span>Continuar con Apple</span></button></div>
     <p class="p-note" style="margin-top:14px">Al continuar aceptás los <a href="legales.html#terminos" style="text-decoration:underline">Términos y condiciones</a> y la <a href="legales.html#privacidad" style="text-decoration:underline">Política de privacidad</a>. Una cuenta por persona.</p>
     <p class="p-note" id="modeNote" style="margin-top:8px"></p>
   </div>
 </div></section>
 <div id="pFooter"></div>
-<script src="supabase-portal.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260911q" defer></script><script src="js/i18n-portal.js?v=20260911q" defer></script><script src="js/ui.js?v=20260911q" defer></script><script src="js/store.js?v=20260911q" defer></script><script src="js/data.js?v=20260911q" defer></script>
+<script src="supabase-portal.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260911s" defer></script><script src="js/i18n-portal.js?v=20260911s" defer></script><script src="js/ui.js?v=20260911s" defer></script><script src="js/store.js?v=20260911s" defer></script><script src="js/data.js?v=20260911s" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){

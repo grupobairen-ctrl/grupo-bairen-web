@@ -2,7 +2,22 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script>/* El velo de carga: navy desde el primer byte, se retira cuando la página está lista (load). Si carga en menos de 250 ms nadie lo ve; si se vio, se queda hasta los 600 ms para no titilar; a los 2,5 s se va pase lo que pase. Inline y sin dependencias: si un script no carga, el velo se va igual. */(function(h){h.classList.add('cargando');var V=window.BPVelo={retenido:false};V.soltar=function(){if(!h.classList.contains('cargando'))return;V.retenido=false;h.classList.remove('cargando');try{document.dispatchEvent(new Event('bairen:velo'))}catch(e){}};V.retener=function(){V.retenido=true};var fin=function(){if(V.retenido)return;var t=performance.now(),e=t>250?Math.max(0,600-t):0;setTimeout(function(){if(!V.retenido)V.soltar()},e)};addEventListener('load',fin);setTimeout(fin,2500)})(document.documentElement);</script>
+  <script>/* El velo de carga: navy desde el primer byte, se retira cuando la página está lista de verdad:
+     load + ningún esqueleto a la vista + las fotos del primer pantallazo cargadas. Si eso pasa en menos de
+     500 ms nadie lo ve; si se vio, se queda hasta los 800 ms para no titilar; a los 8 s se va pase lo que
+     pase. Inline y sin dependencias: si un script no carga, el velo se va igual. */
+  (function(h){h.classList.add('cargando');var V=window.BPVelo={retenido:false,cargado:false},obs=null,timer=null;
+  var ESQ='.p-skel,.p-skel-card,.p-skel-ficha,.p-skel-line,.p-skel-vcard,.p-skel-panel,.p-skel-form,.p-skel-bloque,.p-skel-cta,.p-fhero-skel,.h-esq';
+  V.soltar=function(){if(!h.classList.contains('cargando'))return;V.retenido=false;h.classList.remove('cargando');if(obs)obs.disconnect();try{document.dispatchEvent(new Event('bairen:velo'))}catch(e){}};
+  V.retener=function(){V.retenido=true};
+  V.lista=function(){if(!V.cargado)return false;var es=document.querySelectorAll(ESQ),i;for(i=0;i<es.length;i++)if(es[i].getClientRects().length)return false;
+    var im=document.images,H=innerHeight,r;for(i=0;i<im.length;i++){if(im[i].complete||!im[i].getAttribute('src'))continue;r=im[i].getBoundingClientRect();if(r.width>0&&r.bottom>0&&r.top<H)return false}return true};
+  var revisar=function(){if(V.retenido||timer||!V.lista())return;var t=performance.now();timer=setTimeout(function(){if(!V.retenido)V.soltar()},t>500?Math.max(0,800-t):0)};
+  var pedido=false,pedir=function(){if(pedido)return;pedido=true;requestAnimationFrame(function(){pedido=false;revisar()})};
+  addEventListener('load',function(){V.cargado=true;pedir()});
+  document.addEventListener('DOMContentLoaded',function(){obs=new MutationObserver(pedir);obs.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class','src','hidden','style']})});
+  document.addEventListener('load',pedir,true);document.addEventListener('error',pedir,true);
+  setTimeout(V.soltar,8000)})(document.documentElement);</script>
   <title>Criterios de selección · BAIREN</title>
   <meta name="description" content="Qué entra a BAIREN y qué no. Seleccionamos por cualidades verificadas, no por código postal."><meta name="theme-color" content="#131D2D">
   <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
@@ -10,7 +25,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://dahusnnbyrvltcuaelxj.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260911q"><link rel="stylesheet" href="css/catalogo.css?v=20260911q"><link rel="stylesheet" href="css/portal.css?v=20260911q">
+  <link rel="stylesheet" href="css/base.css?v=20260911s"><link rel="stylesheet" href="css/catalogo.css?v=20260911s"><link rel="stylesheet" href="css/portal.css?v=20260911s">
 </head>
 <body>
 <div class="p-velo" aria-hidden="true"><span class="w">BAIREN</span></div>
@@ -51,7 +66,7 @@
   <p>Publican corredores matriculados, dueños verificados y desarrolladoras. Las mismas reglas y el mismo lugar para todos. BAIREN no interviene en la operación: elige y muestra.</p>
 </div></section>
 <div id="pFooter"></div>
-<script src="supabase-portal.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260911q" defer></script><script src="js/i18n-portal.js?v=20260911q" defer></script><script src="js/ui.js?v=20260911q" defer></script><script src="js/store.js?v=20260911q" defer></script><script src="js/data.js?v=20260911q" defer></script>
+<script src="supabase-portal.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260911s" defer></script><script src="js/i18n-portal.js?v=20260911s" defer></script><script src="js/ui.js?v=20260911s" defer></script><script src="js/store.js?v=20260911s" defer></script><script src="js/data.js?v=20260911s" defer></script>
 <script>document.addEventListener('DOMContentLoaded', function(){BP.header("criterios"); BP.footer(); if (window.BPStore) BPStore.init(); BP.reveal(); });</script>
 </body>
 </html>

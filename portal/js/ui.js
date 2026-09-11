@@ -309,7 +309,9 @@
     window.BAIREN_LANG = BP.lang;
   };
 
-  BP.reveal = () => { const els=document.querySelectorAll('[data-reveal]:not(.in)'); if(!('IntersectionObserver' in window)){ els.forEach(e=>e.classList.add('in')); return; }
+  /* Mientras el velo de carga esté puesto, las apariciones esperan a que caiga: si no, se animan tapadas. */
+  BP.reveal = () => { if (document.documentElement.classList.contains('cargando')) { if (!BP._revealPend) { BP._revealPend = true; document.addEventListener('bairen:velo', () => { BP._revealPend = false; BP.reveal(); }, { once: true }); } return; }
+    const els=document.querySelectorAll('[data-reveal]:not(.in)'); if(!('IntersectionObserver' in window)){ els.forEach(e=>e.classList.add('in')); return; }
     /* Se juntan los que entran en la misma tanda para que suban escalonados, no de a uno */
     let tanda=[], t=null, t0=0;
     const soltar=()=>{ const g=tanda; tanda=[]; t=null; t0=0; if(!g.length) return; if(window.BPM && BPM.ok) BPM.aparecer(g); else g.forEach(e=>e.classList.add('in')); };
