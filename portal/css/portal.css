@@ -3091,3 +3091,59 @@ body.p-panel-page,html:has(body.p-panel-page){overflow-anchor:none}
 .p-login .soc{display:flex;align-items:center;justify-content:center;gap:10px}
 .p-login .soc .soc-logo{width:18px;height:18px;flex:0 0 auto}
 .p-login .soc[data-soc=apple] .soc-logo{color:#FBFAF6;transform:translateY(-1px)}
+
+/* ══ 11/9/2026 · Catálogo, con la coherencia del panel ═══════════════════════
+   Misma grilla que bairengroup.com (banda navy, barra blanca, tarjetas en 4),
+   angular, versalitas Jost, un oro por tarjeta. El plazo va como pastillas
+   Todos / Mediano / Largo, el patrón del propio sitio. En celular la barra se
+   ordena en filas de 44 px, el conteo no se corta y la banda mide lo del sitio. */
+body.p-catalogo .p-plazo-pills{display:flex;gap:6px}
+body.p-catalogo .p-plazo-pills[hidden]{display:none !important}
+body.p-catalogo .p-plazo-pills button{height:34px;padding:0 14px;border:1px solid rgba(42,58,82,.18);border-radius:0;background:#fff;color:var(--navy-deeper);font:500 .6rem/1 var(--font-body);letter-spacing:.1em;text-transform:uppercase;cursor:pointer;white-space:nowrap;transition:background .18s cubic-bezier(.22,1,.36,1),color .18s cubic-bezier(.22,1,.36,1),border-color .18s cubic-bezier(.22,1,.36,1)}
+body.p-catalogo .p-plazo-pills button:hover{border-color:rgba(42,58,82,.45)}
+body.p-catalogo .p-plazo-pills button.on{background:var(--navy-deeper);border-color:var(--navy-deeper);color:#FBFAF6}
+body.p-catalogo .p-plazo-pills button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+body.p-catalogo .p-results-head .acts .p-fbtn svg{width:15px;height:15px}
+@media(min-width:821px){
+  body.p-catalogo .p-filters-in{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+  body.p-catalogo .p-filters #zonaBox{flex:1 1 260px;min-width:220px}
+  body.p-catalogo .p-plazo-pills{order:0}
+}
+@media(max-width:820px){
+  /* Banda: título de una línea como en el sitio; el texto explicativo no va en celular */
+  body.p-catalogo .p-catband{padding:22px 20px 20px}
+  body.p-catalogo .p-catband h1,body.p-catalogo #resTitle{font-size:1.4rem !important;line-height:1.2 !important;margin:0 !important}
+  body.p-catalogo .p-catband-sub{display:none !important}
+  /* Barra: filas ordenadas, todo a 44 px, angular */
+  body.p-catalogo .p-filters-in{display:flex !important;flex-wrap:wrap;gap:8px;padding:12px 16px}
+  body.p-catalogo .p-filters .p-fsel,body.p-catalogo .p-filters .p-fbtn,body.p-catalogo .p-filters #barriosBtn,body.p-catalogo .p-filters .p-plazo-pills button{height:44px !important;min-height:44px !important;font-size:.66rem !important;letter-spacing:.1em !important;border-radius:0 !important}
+  body.p-catalogo .p-filters #barriosBtn{order:1 !important;flex:1 1 calc(50% - 4px) !important;max-width:none !important;justify-content:center;padding:0 12px !important}
+  body.p-catalogo .p-filters #opSel{order:2 !important;flex:1 1 calc(50% - 4px) !important;width:auto !important}
+  body.p-catalogo .p-filters .p-plazo-pills{order:3;flex:1 1 100%;gap:6px}
+  body.p-catalogo .p-filters .p-plazo-pills button{flex:1 1 0;padding:0 6px !important;letter-spacing:.06em !important}
+  body.p-catalogo .p-filters #tipoSel{order:4 !important;flex:1 1 calc(34% - 6px) !important;width:auto !important}
+  body.p-catalogo .p-filters .p-fwrap{order:5 !important;flex:1 1 calc(33% - 6px) !important}
+  body.p-catalogo .p-filters .p-fwrap .p-fbtn{width:100% !important;justify-content:center}
+  body.p-catalogo .p-filters #zonaBox{order:6 !important;flex:1 1 calc(100% - 120px) !important;width:auto !important;height:44px !important;min-height:44px !important}
+  body.p-catalogo .p-filters #moreBtn{order:7 !important;flex:0 0 112px !important;width:112px !important;justify-content:center;padding:0 10px !important}
+  /* Conteo y acciones: el número no se corta; la alerta es solo la campana */
+  body.p-catalogo .p-results-head{display:flex;align-items:center;gap:8px;padding:10px 16px}
+  body.p-catalogo .p-results-count{flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.66rem}
+  body.p-catalogo .p-results-head .acts{flex:0 0 auto;display:flex;gap:6px}
+  body.p-catalogo .p-results-head .acts .p-fbtn{width:40px !important;padding:0 !important;justify-content:center}
+  body.p-catalogo .p-results-head .acts .p-fbtn svg{display:inline-block !important;margin:0}
+  body.p-catalogo .p-results-head .acts .p-fbtn .t{display:none}
+  body.p-catalogo .p-results-head .acts .p-fsel{max-width:150px}
+}
+/* Catálogo: ajustes medidos. En celular la fila de acciones no ocupa todo el ancho (el conteo tenía 0 px);
+   en escritorio la barra entra en una fila: opción "Todas" corta, pastillas compactas, "Filtros" con ícono. */
+@media(max-width:820px){
+  body.p-catalogo .p-results-head .acts{width:auto !important;flex:0 0 auto !important}
+  body.p-catalogo .p-filters #moreBtn{flex:0 0 124px !important;width:124px !important;font-size:.62rem !important;letter-spacing:.08em !important}
+  body.p-catalogo .p-filters #zonaBox{flex:1 1 calc(100% - 132px) !important}
+}
+@media(min-width:821px){
+  body.p-catalogo .p-filters #zonaBox{flex:1 1 200px;min-width:180px}
+  body.p-catalogo .p-plazo-pills button{padding:0 10px;letter-spacing:.08em}
+  body.p-catalogo .p-filters #opSel{width:auto;max-width:150px}
+}

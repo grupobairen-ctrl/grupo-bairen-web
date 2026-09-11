@@ -28,7 +28,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://dahusnnbyrvltcuaelxj.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260911v"><link rel="stylesheet" href="css/catalogo.css?v=20260911v"><link rel="stylesheet" href="css/portal.css?v=20260911v">
+  <link rel="stylesheet" href="css/base.css?v=20260911x"><link rel="stylesheet" href="css/catalogo.css?v=20260911x"><link rel="stylesheet" href="css/portal.css?v=20260911x">
   <style>body{padding-top:64px}</style>
 </head>
 <body class="p-product p-catalogo">
@@ -47,14 +47,15 @@
 <div class="p-filters" id="filters">
   <div class="p-filters-in">
     <div class="p-fchip" id="zonaBox"><span style="color:var(--gold-dark);display:inline-flex"></span><span id="zonaChips" style="display:flex;gap:6px;flex-wrap:wrap"></span><input type="text" id="qInput" placeholder="Barrio, calle o característica" aria-label="Ubicación o característica"><div class="p-sugg" id="sugg" role="listbox"></div></div>
-    <select class="p-fsel" id="opSel" aria-label="Operación"><option value="venta">Comprar</option><optgroup label="Alquilar"><option value="alquiler">Alquilar · mediano y largo plazo</option><option value="mediano">Alquilar · mediano plazo</option><option value="largo">Alquilar · largo plazo</option></optgroup><option value="">Todas las operaciones</option></select>
+    <select class="p-fsel" id="opSel" aria-label="Operación"><option value="venta">Comprar</option><option value="alquiler">Alquilar</option><option value="">Todas</option></select>
+    <div class="p-plazo-pills" id="plazoPills" role="group" aria-label="Plazo del alquiler" hidden><button type="button" data-plazo="alquiler">Todos</button><button type="button" data-plazo="mediano">Mediano plazo</button><button type="button" data-plazo="largo">Largo plazo</button></div>
     <select class="p-fsel" id="tipoSel" aria-label="Tipo de propiedad"><option value="departamento">Departamento</option><option value="piso">Piso</option><option value="ph">PH</option><option value="casa">Casa</option><option value="todos">Todos los tipos</option></select>
     <div class="p-fwrap"><button type="button" class="p-fbtn" id="ambBtn" aria-haspopup="dialog" aria-controls="ambPop" aria-expanded="false">Amb | Dorm</button>
       <div class="p-pop" id="ambPop"><label>Ambientes, mínimo</label><div class="seg" data-key="amb"><button type="button" data-v="">Todos</button><button type="button" data-v="1">1+</button><button type="button" data-v="2">2+</button><button type="button" data-v="3">3+</button><button type="button" data-v="4">4+</button></div><label>Dormitorios, mínimo</label><div class="seg" data-key="dorm"><button type="button" data-v="">Todos</button><button type="button" data-v="1">1+</button><button type="button" data-v="2">2+</button><button type="button" data-v="3">3+</button></div><div class="acts"><button type="button" class="lnk" data-clear="amb,dorm">Limpiar</button><button type="button" class="p-btn p-btn-sm p-btn-navy" data-apply>Aplicar</button></div></div></div>
     <div class="p-fwrap"><button type="button" class="p-fbtn" id="precioBtn" aria-haspopup="dialog" aria-controls="precioPop" aria-expanded="false">Precio</button>
       <div class="p-pop" id="precioPop"><label for="pmin">USD, desde y hasta</label><div class="row"><input type="number" id="pmin" placeholder="Mínimo" min="0" inputmode="numeric" aria-label="Precio mínimo en USD"><input type="number" id="pmax" placeholder="Máximo" min="0" inputmode="numeric" aria-label="Precio máximo en USD"></div><div class="acts"><button type="button" class="lnk" data-clear="pmin,pmax">Limpiar</button><button type="button" class="p-btn p-btn-sm p-btn-navy" data-apply>Aplicar</button></div></div></div>
     <button type="button" class="p-fbtn p-only-m" id="barriosBtn" aria-haspopup="dialog" aria-controls="mapaSheet" aria-expanded="false">Barrios</button>
-    <button type="button" class="p-fbtn" id="moreBtn"> Más filtros <span class="cnt" id="moreCnt" hidden></span></button>
+    <button type="button" class="p-fbtn" id="moreBtn" aria-label="Más filtros"> Filtros <span class="cnt" id="moreCnt" hidden></span></button>
   </div>
 </div>
 
@@ -104,16 +105,16 @@
 
 <script src="supabase-portal.js" defer></script>
 <script src="../mapa-barrios.js" defer></script>
-<script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260911v" defer></script><script src="js/i18n-portal.js?v=20260911v" defer></script><script src="js/ui.js?v=20260911v" defer></script><script src="js/store.js?v=20260911v" defer></script>
-<script src="js/data.js?v=20260911v" defer></script>
+<script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260911x" defer></script><script src="js/i18n-portal.js?v=20260911x" defer></script><script src="js/ui.js?v=20260911x" defer></script><script src="js/store.js?v=20260911x" defer></script>
+<script src="js/data.js?v=20260911x" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
 (async function(){
   BP.header(); BP.footer(); if (window.BPStore) BPStore.init();
   document.querySelector('#zonaBox > span').innerHTML = BP.ico.pin;
-  document.getElementById('moreBtn').innerHTML = BP.ico.filter + ' Más filtros <span class="cnt" id="moreCnt" hidden></span>';
-  document.getElementById('alertBtn').innerHTML = BP.ico.bell + ' Crear alerta';
+  document.getElementById('moreBtn').innerHTML = BP.ico.filter + ' Filtros <span class="cnt" id="moreCnt" hidden></span>';
+  document.getElementById('alertBtn').innerHTML = BP.ico.bell + '<span class="t"> Crear alerta</span>'; document.getElementById('alertBtn').setAttribute('aria-label', 'Crear alerta');
   const AMEN = ['Pileta','Gimnasio','SUM','Parrilla','Seguridad 24hs','Cochera','Terraza o jardín','Ascensor','Laundry','Pet friendly','Aire acondicionado','Baulera'];
   document.getElementById('amenChecks').innerHTML = AMEN.map(a => `<label><input type="checkbox" data-amen="${a}"> ${a}</label>`).join('');
   document.getElementById('cualChecks').innerHTML = BP.CUALIDADES.map(a => `<label><input type="checkbox" data-cual="${a}"> ${a}</label>`).join('');
@@ -137,7 +138,9 @@ document.addEventListener('DOMContentLoaded', function(){
   let mapa = null;
 
   function syncControls(){
-    document.getElementById('opSel').value = F.op; document.getElementById('tipoSel').value = F.tipo; document.getElementById('qInput').value = F.q; document.getElementById('sortSel').value = F.sort;
+    const esAlq = F.op === 'alquiler' || F.op === 'mediano' || F.op === 'largo';
+    document.getElementById('opSel').value = esAlq ? 'alquiler' : F.op; const pills = document.getElementById('plazoPills'); pills.hidden = !esAlq; pills.querySelectorAll('button').forEach(b => { const on = b.dataset.plazo === F.op; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+    document.getElementById('tipoSel').value = F.tipo; document.getElementById('qInput').value = F.q; document.getElementById('sortSel').value = F.sort;
     document.getElementById('pmin').value = F.pmin||''; document.getElementById('pmax').value = F.pmax||''; document.getElementById('expmax').value = F.expmax||''; document.getElementById('m2min').value = F.m2min||''; document.getElementById('m2max').value = F.m2max||''; document.getElementById('antig').value = F.antig||''; document.getElementById('hace').value = F.hace||'';
     document.getElementById('reservadas').checked = F.reservadas; document.getElementById('amoblado').checked = F.amoblado; document.getElementById('dueno').checked = F.dueno; document.getElementById('video').checked = F.video;
     document.querySelectorAll('[data-amen]').forEach(c => c.checked = F.amen.indexOf(c.dataset.amen) > -1); document.querySelectorAll('[data-cual]').forEach(c => c.checked = F.cual.indexOf(c.dataset.cual) > -1);
@@ -191,6 +194,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
   /* controles */
   document.getElementById('opSel').addEventListener('change', e => { F.op = e.target.value; F.favs = false; apply(); });
+  document.getElementById('plazoPills').addEventListener('click', e => { const b = e.target.closest('button[data-plazo]'); if (!b) return; F.op = b.dataset.plazo; F.favs = false; apply(); });
   document.getElementById('tipoSel').addEventListener('change', e => { F.tipo = e.target.value; apply(); });
   document.getElementById('sortSel').addEventListener('change', e => { F.sort = e.target.value; apply(); });
   const qi = document.getElementById('qInput'), sugg = document.getElementById('sugg');
@@ -248,7 +252,7 @@ document.addEventListener('DOMContentLoaded', function(){
   const alertBtn = document.getElementById('alertBtn');
   const alertKey = () => { const p = new URLSearchParams(location.search); p.delete('page'); p.sort(); return location.pathname + '?' + p.toString(); };
   const alertaIdx = () => BP.alerts.get().findIndex(x => x.tipo !== 'precio' && (x.key ? x.key === alertKey() : x.url === location.href));
-  function pintarAlerta(){ const on = alertaIdx() > -1; alertBtn.classList.toggle('on', on); alertBtn.setAttribute('aria-pressed', on ? 'true' : 'false'); alertBtn.innerHTML = BP.ico.bell + (on ? ' Alerta creada' : ' Crear alerta'); }
+  function pintarAlerta(){ const on = alertaIdx() > -1; alertBtn.classList.toggle('on', on); alertBtn.setAttribute('aria-pressed', on ? 'true' : 'false'); alertBtn.innerHTML = BP.ico.bell + '<span class="t">' + (on ? ' Alerta creada' : ' Crear alerta') + '</span>'; alertBtn.setAttribute('aria-label', on ? 'Alerta creada, tocá para quitarla' : 'Crear alerta'); }
   alertBtn.addEventListener('click', () => {
     const a = BP.alerts.get(); const i = alertaIdx();
     if (i > -1) { a.splice(i, 1); BP.alerts.set(a); pintarAlerta(); BP.toast('Alerta quitada.'); return; }
