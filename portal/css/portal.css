@@ -2705,3 +2705,51 @@ body.p-home .h-edif.h-edif-mas:hover .h-mas-ic{border-color:var(--h-oro);color:v
   body.p-home .h-edif.h-edif-mas .h-mas-ic{width:72px;height:72px;font-size:2.4rem;border-radius:12px}
   body.p-home .h-edif.h-edif-mas b{font-size:1.6rem}
 }
+
+/* ══ 10/9/2026 (noche, 5) · El camino del estándar, con más oficio.
+   Una coreografía (en bairen-motion.js, BPM.camino): el hilo va de hito en
+   hito, un punto de luz viaja en la punta, y cada hito se enciende cuando el
+   hilo llega: anillo que se dibuja, ícono a oro, nombre que sube y, en
+   escritorio, una línea de detalle en voz baja. Cierra con una frase. ═════ */
+body.p-home .h-camino-linea .guia{stroke:rgba(194,169,104,.13);stroke-width:1}
+body.p-home .h-camino-linea .trazo{stroke:var(--h-oro);stroke-width:1.25;filter:none}
+body.p-home .h-camino-linea .punta{fill:#F3E7C3;opacity:0;filter:drop-shadow(0 0 5px rgba(222,205,160,.95))}
+body.p-home .h-camino-linea .halo{fill:rgba(194,169,104,.22);opacity:0;filter:blur(5px)}
+/* El punto: borde apenas, el oro lo pone el anillo al encenderse */
+body.p-home .h-hito .pt{position:relative;border-color:rgba(194,169,104,.28);background:#1B2739;color:rgba(222,205,160,.62);transition:color .6s cubic-bezier(.22,1,.36,1),background .6s cubic-bezier(.22,1,.36,1),box-shadow .8s cubic-bezier(.22,1,.36,1)}
+body.p-home .h-hito.on .pt{border-color:rgba(194,169,104,.28);background:#22314A;color:var(--h-oro);box-shadow:0 0 0 7px #131D2D,0 0 28px rgba(194,169,104,.22)}
+body.p-home .h-hito .pt .anillo{position:absolute;inset:-1px;width:calc(100% + 2px);height:calc(100% + 2px);transform:rotate(-90deg);pointer-events:none;overflow:visible}
+body.p-home .h-hito .pt .anillo circle{fill:none;stroke:var(--h-oro);stroke-width:1.6;stroke-linecap:round;stroke-dasharray:195;stroke-dashoffset:195;transition:stroke-dashoffset .75s cubic-bezier(.22,1,.36,1)}
+body.p-home .h-hito.on .pt .anillo circle{stroke-dashoffset:0}
+/* Los hitos se leen siempre; lo que cambia al encenderse es el nombre, que sube */
+body.p-home .h-hito{opacity:1;transform:none;transition:none}
+body.p-home .h-hito b{opacity:.55;transform:translateY(5px);transition:opacity .6s cubic-bezier(.22,1,.36,1) .1s,transform .6s cubic-bezier(.22,1,.36,1) .1s}
+body.p-home .h-hito.on b{opacity:1;transform:none}
+/* Detalle en voz baja: sólo en escritorio, entra después del nombre */
+body.p-home .h-hito .det{display:none}
+@media(min-width:900px){
+  body.p-home .h-hito{gap:12px}
+  body.p-home .h-hito .det{display:block;margin-top:-2px;font:300 .82rem/1.5 var(--font-body);color:rgba(251,250,246,.6);max-width:24ch;text-wrap:pretty;opacity:0;transform:translateY(6px);transition:opacity .7s cubic-bezier(.22,1,.36,1) .28s,transform .7s cubic-bezier(.22,1,.36,1) .28s}
+  body.p-home .h-hito.on .det{opacity:1;transform:none}
+  body.p-home .h-hitos{align-items:start}
+}
+/* La frase que cierra el camino: aparece cuando el cuarto hito se encendió */
+body.p-home .h-camino-cierre{margin:clamp(22px,4vw,40px) 0 0;font:italic 400 clamp(.98rem,1.6vw,1.2rem)/1.4 var(--font-display);color:rgba(251,250,246,.82);text-align:center;opacity:0;transform:translateY(6px);transition:opacity .8s cubic-bezier(.22,1,.36,1) .3s,transform .8s cubic-bezier(.22,1,.36,1) .3s}
+body.p-home .h-camino.completo ~ .h-camino-cierre,body.p-home .h-estandar:has(.h-camino.completo) .h-camino-cierre{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){
+  body.p-home .h-hito b,body.p-home .h-hito .det,body.p-home .h-camino-cierre{opacity:1;transform:none;transition:none}
+  body.p-home .h-hito .pt .anillo circle{transition:none}
+}
+
+/* ══ 10/9/2026 (noche, 6) · Fachadas: fuera el degradado navy que tapaba media
+   foto. Queda un velo corto, con transición suave, sólo donde va el texto; la
+   foto se ve entera. Las fachadas sin unidades ya no van en gris. ═══════════ */
+body.p-home .h-edif{background:#1B2739}
+body.p-home .h-edif::after{background:linear-gradient(to top,rgba(19,29,45,.72) 0%,rgba(19,29,45,.55) 8%,rgba(19,29,45,.36) 17%,rgba(19,29,45,.19) 26%,rgba(19,29,45,.07) 36%,rgba(19,29,45,0) 46%)}
+body.p-home .h-edif.sin img{filter:none}
+body.p-home .h-edif-txt b,body.p-home .h-edif-txt em{text-shadow:0 1px 2px rgba(19,29,45,.5)}
+body.p-home .h-esq{background:#1B2739}
+/* Tomás (10/9): sin frase de cierre ni líneas de detalle; el camino es ícono y nombre. */
+body.p-home .h-hito .det,body.p-home .h-camino-cierre{display:none !important}
+@media(min-width:900px){body.p-home .h-hito{gap:14px}}
+body.p-home .h-camino-linea .punta,body.p-home .h-camino-linea .halo{transition:opacity .35s cubic-bezier(.22,1,.36,1)}

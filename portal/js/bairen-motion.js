@@ -458,11 +458,13 @@
     });
   };
 
-  /* ── El camino del estándar ─────────────────────────────────────────────
-     Una línea de oro que se dibuja mientras bajás y va encendiendo cada
-     criterio al pasar. No es una infografía con cajas: es un trazo, como el
-     de un plano. La línea se calcula sobre las posiciones reales de los
-     hitos, así funciona en cualquier ancho. */
+  /* ── El camino del estándar ───────────────────────────────────────────────
+     Una sola coreografía, una vez, cuando el camino entra en pantalla. El hilo
+     de oro va de hito en hito con la curva de la casa y un punto de luz viaja
+     en la punta; en cada llegada el hito se enciende: el anillo se dibuja, el
+     ícono pasa a oro, el nombre sube. No depende de la velocidad del scroll:
+     antes sí, y con un scroll rápido se dibujaba de golpe. Sin Motion o con
+     menos movimiento pedido, se ve el estado final. */
   BPM.camino = function (cont) {
     cont = lista(cont)[0]; if (!cont || cont._camino) return; cont._camino = true;
     var svg = cont.querySelector('.h-camino-linea');
@@ -470,8 +472,18 @@
     var trazo = svg && svg.querySelector('.trazo');
     var hitos = lista(cont.querySelectorAll('[data-hito]'));
     if (!svg || !trazo || hitos.length < 2) return;
-    var control = null;
+    var NS = 'http://www.w3.org/2000/svg';
+    function nodo(tag, cls, attrs) { var n = document.createElementNS(NS, tag); n.setAttribute('class', cls); for (var k in attrs) n.setAttribute(k, attrs[k]); return n; }
+    var medida = svg.querySelector('.medida') || svg.appendChild(nodo('path', 'medida', { fill: 'none', stroke: 'none' }));
+    var halo = svg.querySelector('.halo') || svg.appendChild(nodo('circle', 'halo', { r: 11 }));
+    var punta = svg.querySelector('.punta') || svg.appendChild(nodo('circle', 'punta', { r: 3 }));
+    hitos.forEach(function (h) {
+      var pt = h.querySelector('.pt'); if (!pt || pt.querySelector('.anillo')) return;
+      var a = nodo('svg', 'anillo', { viewBox: '0 0 64 64', 'aria-hidden': 'true' });
+      a.appendChild(nodo('circle', '', { cx: 32, cy: 32, r: 31 })); pt.appendChild(a);
+    });
 
+    var total = 0, largos = [], hecho = false;
     function puntos() {
       var c = cont.getBoundingClientRect();
       return hitos.map(function (h) {
@@ -491,37 +503,55 @@
       }
       return d;
     }
+    function ubicarPunta(L) {
+      var p = trazo.getPointAtLength(Math.max(0, Math.min(total, L)));
+      punta.setAttribute('cx', p.x); punta.setAttribute('cy', p.y); halo.setAttribute('cx', p.x); halo.setAttribute('cy', p.y);
+    }
     function dibujar() {
       var c = cont.getBoundingClientRect();
       if (!c.width) return;
       svg.setAttribute('viewBox', '0 0 ' + Math.round(c.width) + ' ' + Math.round(c.height));
       svg.style.width = c.width + 'px'; svg.style.height = c.height + 'px';
-      var d = curva(puntos());
+      var ps = puntos(), d = curva(ps);
       trazo.setAttribute('d', d); if (guia) guia.setAttribute('d', d);
-      var largo = trazo.getTotalLength ? trazo.getTotalLength() : 1000;
-      trazo.style.strokeDasharray = largo; trazo.style.strokeDashoffset = ok ? largo : 0;
-      return largo;
+      total = trazo.getTotalLength ? trazo.getTotalLength() : 1000;
+      /* Largo del hilo en cada hito: el largo del camino hasta ahí */
+      largos = ps.map(function (_, i) { medida.setAttribute('d', curva(ps.slice(0, i + 1))); return medida.getTotalLength ? medida.getTotalLength() : 0; });
+      trazo.style.strokeDasharray = total;
+      trazo.style.strokeDashoffset = (ok && !hecho) ? total : 0;
+      ubicarPunta(hecho ? total : largos[0]);
     }
-    var largo = dibujar();
-    if (!ok || !M.scroll) { hitos.forEach(function (h) { h.classList.add('on'); }); return; }
+    dibujar();
+    function final() { hitos.forEach(function (h) { h.classList.add('on'); }); cont.classList.add('completo'); hecho = true; trazo.style.strokeDashoffset = 0; }
+    if (!ok || !M.inView) { final(); return; }
 
-    /* Cada hito se enciende cuando el trazo llega a su altura */
-    function marcar(p) {
-      hitos.forEach(function (h, i) {
-        var umbral = hitos.length === 1 ? 0 : (i / (hitos.length - 1)) * 0.86;
-        h.classList.toggle('on', p >= umbral - 0.02);
+    function tramo(desde, hasta) {
+      return new Promise(function (res) {
+        M.animate(desde, hasta, { duration: DUR.normal, ease: CURVA,
+          onUpdate: function (L) { trazo.style.strokeDashoffset = total - L; ubicarPunta(L); },
+          onComplete: res });
       });
     }
-    control = M.scroll(function (p) {
-      trazo.style.strokeDashoffset = largo * (1 - Math.min(1, p / 0.86));
-      marcar(p);
-    }, { target: cont, offset: ['start 0.82', 'end 0.55'] });
+    function pausa(s) { return new Promise(function (res) { setTimeout(res, s * 1000); }); }
+    function correr() {
+      if (hecho) return; hecho = true;
+      punta.style.opacity = 1; halo.style.opacity = 1; ubicarPunta(largos[0]);
+      hitos[0].classList.add('on');
+      var i = 1;
+      function siguiente() {
+        if (i >= hitos.length) {
+          punta.style.opacity = 0; halo.style.opacity = 0;   /* se funde en el último hito; la transición está en el CSS */
+          cont.classList.add('completo');
+          return;
+        }
+        pausa(0.14).then(function () { return tramo(largos[i - 1], largos[i]); }).then(function () { hitos[i].classList.add('on'); i++; siguiente(); });
+      }
+      siguiente();
+    }
+    M.inView(cont, function () { correr(); }, { amount: 0.55 });
 
     var t = null;
-    window.addEventListener('resize', function () {
-      clearTimeout(t);
-      t = setTimeout(function () { largo = dibujar() || largo; }, 160);
-    });
+    window.addEventListener('resize', function () { clearTimeout(t); t = setTimeout(dibujar, 160); });
   };
 
   /* ── Puesta en marcha ───────────────────────────────────────────────────── */
