@@ -3238,3 +3238,38 @@ body.p-publicar-landing .p-perfil:focus-visible{outline:2px solid var(--gold);ou
   body.p-publicar-landing .p-perfil b{font-size:1.08rem}
   body.p-publicar-landing .p-perfil span:not(.ico-w){font-size:.84rem}
 }
+
+/* ══ 11/9/2026 · Criterios de selección, como página de lectura de marca: sin la hoja beige
+   flotante; columna de lectura sobre la página, condiciones con número en oro y cualidades
+   como lista de dos columnas con hairlines. ═══════════════════════════════════════════════ */
+body.p-criterios .p-page.after-band{padding-top:56px}
+body.p-criterios .p-crit{max-width:860px;margin:0 auto;padding:0 24px 72px;color:var(--navy-deeper)}
+body.p-criterios .p-crit-sec{padding:44px 0 0}
+body.p-criterios .p-crit-sec + .p-crit-sec{margin-top:44px;border-top:1px solid rgba(19,29,45,.12)}
+body.p-criterios .p-crit h2{margin:0 0 12px;font:400 1.75rem/1.2 var(--font-display);color:var(--navy-deeper);letter-spacing:-.005em}
+body.p-criterios .p-crit p{margin:0 0 14px;font:400 1rem/1.7 var(--font-body);color:#3E4756;max-width:66ch}
+body.p-criterios .p-crit-intro{font-size:1.05rem}
+body.p-criterios .p-crit-cond{list-style:none;margin:26px 0 0;padding:0;display:grid;gap:0;border-top:1px solid rgba(19,29,45,.12)}
+body.p-criterios .p-crit-cond li{display:grid;grid-template-columns:52px minmax(0,1fr);gap:4px 12px;padding:20px 0;border-bottom:1px solid rgba(19,29,45,.1)}
+body.p-criterios .p-crit-cond i{grid-row:1 / span 2;font:400 2rem/1 var(--font-display);font-style:normal;color:var(--gold-dark);letter-spacing:-.02em}
+body.p-criterios .p-crit-cond b{font:500 1.05rem/1.3 var(--font-body);color:var(--navy-deeper)}
+body.p-criterios .p-crit-cond span{font:400 .95rem/1.6 var(--font-body);color:#3E4756;max-width:62ch}
+body.p-criterios .p-crit-cual{display:grid;grid-template-columns:1fr 1fr;gap:0 40px;margin:22px 0 0;padding:0;border-top:1px solid rgba(19,29,45,.12)}
+body.p-criterios .p-crit-cual > div{padding:14px 0;border-bottom:1px solid rgba(19,29,45,.1)}
+body.p-criterios .p-crit-cual dt{font:500 .98rem/1.3 var(--font-body);color:var(--navy-deeper)}
+body.p-criterios .p-crit-cual dd{margin:3px 0 0;font:400 .9rem/1.55 var(--font-body);color:#3E4756}
+body.p-criterios .p-crit-dos{display:grid;grid-template-columns:1fr 1fr;gap:0 48px}
+body.p-criterios .p-crit-cta{margin-top:26px;padding-top:0;border-top:0}
+@media(max-width:820px){
+  body.p-criterios .p-page.after-band{padding-top:36px}
+  body.p-criterios .p-crit{padding:0 20px 56px}
+  body.p-criterios .p-crit-sec{padding-top:34px}
+  body.p-criterios .p-crit-sec + .p-crit-sec{margin-top:34px}
+  body.p-criterios .p-crit h2{font-size:1.45rem}
+  body.p-criterios .p-crit-cond li{grid-template-columns:40px minmax(0,1fr)}
+  body.p-criterios .p-crit-cond i{font-size:1.6rem}
+  body.p-criterios .p-crit-cual,body.p-criterios .p-crit-dos{grid-template-columns:1fr}
+  body.p-criterios .p-crit-dos > div + div{margin-top:30px}
+}
+body.p-criterios .p-crit-cond li:last-child,body.p-criterios .p-crit-cual > div:nth-last-child(-n+2){border-bottom:0}
+@media(max-width:820px){body.p-criterios .p-crit-cual > div:nth-last-child(2){border-bottom:1px solid rgba(19,29,45,.1)}}
