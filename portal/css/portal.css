@@ -3188,3 +3188,7 @@ body.p-publicar-landing .p-pl-cta .p-note{margin:0;max-width:44ch}
   body.p-publicar-landing .p-pl-cond{padding:20px}
   body.p-publicar-landing .p-pl-cta .p-btn-fill{width:100%;justify-content:center}
 }
+
+/* ══ 11/9/2026 · PSI: el formulario con la geometría del portal (angular) y voseo. ══ */
+body.p-psi .psi-form input,body.p-psi .psi-form textarea,body.p-psi .psi-form button,body.p-psi .psi-btn,body.p-psi .psi-video,body.p-psi .psi-form .pf input{border-radius:0 !important}
+body.p-psi .psi-form input:focus-visible,body.p-psi .psi-form textarea:focus-visible{outline:0;border-color:var(--gold);box-shadow:0 0 0 3px rgba(194,169,104,.28)}
