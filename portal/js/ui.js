@@ -331,6 +331,13 @@
   <div class="p-nav-left">
     <a class="nav-logo" href="index.html" aria-label="BAIREN, inicio"><img src="../bairen_logo_96.png?v=1" alt="BAIREN" width="44" height="44" style="height:44px;width:44px;"></a>
   </div>
+  <div class="p-nav-principal">
+    <a href="buscar.html?op=venta" data-sec="venta" data-i18n="comprar">Comprar</a>
+    <a href="buscar.html?op=alquiler" data-sec="alquiler" data-i18n="alquilar">Alquilar</a>
+    <a href="emprendimientos.html" data-sec="emprendimientos" data-i18n="emprendimientos">Emprendimientos</a>
+    <a href="psi.html" data-sec="psi">PSI</a>
+  </div>
+  <div class="p-lang p-lang-movil" role="group" aria-label="Idioma"><button type="button" data-lang="es">ES</button><button type="button" data-lang="pt">PT</button><button type="button" data-lang="en">EN</button></div>
   <div class="p-nav-right">
     <div class="p-lang" role="group" aria-label="Idioma"><button type="button" data-lang="es">ES</button><button type="button" data-lang="pt">PT</button><button type="button" data-lang="en">EN</button></div>
     <button type="button" class="p-ghost p-bell p-solo-sesion" aria-label="Notificaciones" data-i18n-aria="notificaciones" data-notif hidden>${BP.ico.bell}<span class="dot" hidden></span></button>
@@ -342,18 +349,15 @@
   <button class="burger" id="burger" type="button" aria-label="Menú" data-i18n-aria="menu" aria-expanded="false" aria-controls="mobileMenu"><span></span><span></span><span></span></button>
 </nav>
 <div class="mobile-menu" id="mobileMenu">
-  <a href="buscar.html?op=venta" class="m-link" data-i18n="comprar">Comprar</a>
-  <a href="buscar.html?op=alquiler" class="m-link" data-i18n="alquilar">Alquilar</a>
-  <a href="buscar.html?op=mediano" class="m-link m-sub" data-i18n="mediano">Mediano plazo</a>
-  <a href="buscar.html?op=largo" class="m-link m-sub" data-i18n="largo">Largo plazo</a>
-  <a href="emprendimientos.html" class="m-link" data-i18n="emprendimientos">Emprendimientos</a>
-  <a href="publicadores.html" class="m-link" data-i18n="publicadores">Publicadores</a>
-  <div class="m-sep"></div>
-  <a href="buscar.html?favs=1" class="m-link" data-i18n="favoritos">Favoritos</a>
-  <a href="ingresar.html?volver=contactos" class="m-link" data-i18n="mis_contactos">Mis contactos</a>
-  <div class="p-lang" role="group" aria-label="Idioma"><button type="button" data-lang="es">ES</button><button type="button" data-lang="pt">PT</button><button type="button" data-lang="en">EN</button></div>
+  <a href="buscar.html?op=venta" class="m-link" data-sec="venta" data-i18n="comprar">Comprar</a>
+  <a href="buscar.html?op=alquiler" class="m-link" data-sec="alquiler" data-i18n="alquilar">Alquilar</a>
+  <a href="emprendimientos.html" class="m-link" data-sec="emprendimientos" data-i18n="emprendimientos">Emprendimientos</a>
+  <a href="psi.html" class="m-link" data-sec="psi">PSI</a>
+  <div class="m-secundario"><a href="publicadores.html" data-sec="publicadores" data-i18n="publicadores">Publicadores</a><a href="criterios.html" data-sec="criterios" data-i18n="criterios">Cómo seleccionamos</a></div>
+  <div class="m-cuenta" hidden></div>
   <div class="m-cta"><a class="p-btn p-btn-sm" href="publicar.html" data-i18n="publicar">Publicar</a><a class="p-btn p-btn-sm p-btn-fill" href="ingresar.html" data-i18n="ingresar">Ingresar</a></div>
-</div>`;
+</div>
+<div class="m-velo" id="mVelo" aria-hidden="true"></div>`;
     const host = document.getElementById('pHeader'); if (host) host.innerHTML = html;
     /* 5.8 Cuarenta tabulaciones para pasar el header. Un enlace de salto y los desplegables fuera del orden. */
     if (host && !document.getElementById('pSkip')) {
@@ -404,17 +408,29 @@
       cont.addEventListener('focusout', () => setTimeout(() => { if (!cont.contains(document.activeElement)) cerrarDD(dd); }, 0));
     }
     BP.desplegables(document);
-    const b=document.getElementById('burger'), m=document.getElementById('mobileMenu');
+    /* La sección activa se marca en el menú de escritorio y en el de celular (aria-current) */
+    BP.seccionActiva = function(){
+      const path = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
+      const pretty = BP.parsePretty && BP.parsePretty(); const qs = new URLSearchParams(location.search);
+      let sec = null;
+      if (pretty || /^buscar\.html/.test(path)) { const op = pretty ? pretty.op : qs.get('op'); sec = op === 'venta' ? 'venta' : (op === 'alquiler' || op === 'mediano' || op === 'largo') ? 'alquiler' : null; }
+      else if (/^emprendimientos/.test(path)) sec = 'emprendimientos'; else if (/^psi/.test(path)) sec = 'psi';
+      else if (/^publicadores/.test(path)) sec = 'publicadores'; else if (/^criterios/.test(path)) sec = 'criterios';
+      document.querySelectorAll('[data-sec]').forEach(a => { const on = !!sec && a.dataset.sec === sec; a.classList.toggle('on', on); if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+    };
+    BP.seccionActiva();
+    const b=document.getElementById('burger'), m=document.getElementById('mobileMenu'), velo=document.getElementById('mVelo');
     if (b && m) {
       m.querySelectorAll('a,button').forEach(x => x.tabIndex = -1);
       let soltar = null;
+      const pintar = o => { b.classList.toggle('open', o); b.setAttribute('aria-expanded', o ? 'true' : 'false'); if (velo) velo.classList.toggle('on', o); document.documentElement.classList.toggle('menu-abierto', o); m.querySelectorAll('a,button').forEach(x => { if (o) x.removeAttribute('tabindex'); else x.tabIndex = -1; }); };
       b.addEventListener('click', () => {
-        const o = m.classList.toggle('open'); b.classList.toggle('open', o); b.setAttribute('aria-expanded', o ? 'true' : 'false');
+        const o = m.classList.toggle('open'); pintar(o);
         if (o && window.BPM && BPM.abrirMenuMovil) BPM.abrirMenuMovil();
-        m.querySelectorAll('a,button').forEach(x => { if (o) x.removeAttribute('tabindex'); else x.tabIndex = -1; });
-        if (o) soltar = BP.focoAtrapado(m, { devolverA: b, alCerrar: () => { m.classList.remove('open'); b.classList.remove('open'); b.setAttribute('aria-expanded','false'); m.querySelectorAll('a,button').forEach(x => x.tabIndex = -1); } });
+        if (o) soltar = BP.focoAtrapado(m, { devolverA: b, alCerrar: () => { m.classList.remove('open'); pintar(false); } });
         else if (soltar) { soltar(); soltar = null; }
       });
+      if (velo) velo.addEventListener('click', () => { if (m.classList.contains('open')) b.click(); });
     }
     document.querySelectorAll('[data-notif]').forEach(el=>el.addEventListener('click',()=>BP.toast('Ingresá para ver tus notificaciones.')));
     BP.syncFavCount(); if (BP.i18n) BP.i18n.apply(document);
@@ -455,7 +471,10 @@
         <div class="p-crear"><a class="p-btn p-btn-sm" href="publicar-aviso.html" data-crear>Publicar</a><div class="p-crear-pop" hidden><p class="t">¿Quién publica?</p><a href="publicar-aviso.html?perfil=dueno">Soy dueño directo</a><a href="publicar-aviso.html?perfil=inmobiliaria">Soy inmobiliaria o corredor</a><a href="publicar-aviso.html?perfil=desarrolladora">Soy desarrolladora</a></div></div>
         <div class="p-nav-menu" style="display:flex"><div><button type="button" class="p-btn p-btn-sm p-btn-fill" aria-haspopup="true" style="padding:0 14px">${BP.ico.user} Mi cuenta <span class="car" style="border-color:var(--navy-deeper)"></span></button>
           <div class="p-dd p-dd-cuenta" style="left:auto;right:0"><div class="p-dd-ttl">${BP.esc(session.email)}${modeTag}</div><a href="panel.html#avisos">Mis avisos</a><a href="importar.html">Importar cartera</a><a href="panel.html#interesados">Interesados</a><a href="panel.html#contactos">Mis contactos</a><a href="buscar.html?favs=1">Favoritos</a><a href="panel.html#alertas">Búsquedas y alertas</a><a href="panel.html#cuenta">Mi cuenta</a><a href="curacion.html" data-curador hidden>Curación</a><a href="#" data-logout>Cerrar sesión</a></div></div></div>`;
-      if (mob) { const cta = mob.querySelector('.m-cta'); if (cta) cta.innerHTML = `<a class="p-btn p-btn-sm" href="publicar-aviso.html">Publicar</a><a class="p-btn p-btn-sm p-btn-fill" href="panel.html">Mi cuenta</a>`; }
+      if (mob) {
+        const cta = mob.querySelector('.m-cta'); if (cta) cta.innerHTML = `<a class="p-btn p-btn-sm" href="publicar-aviso.html">Publicar</a><a class="p-btn p-btn-sm p-btn-fill" href="panel.html">Mi cuenta</a>`;
+        const cuenta = mob.querySelector('.m-cuenta'); if (cuenta) { cuenta.hidden = false; cuenta.innerHTML = `<a href="buscar.html?favs=1">${BP.ico.heart} <span data-i18n="favoritos">Favoritos</span></a><a href="panel.html#interesados">${BP.ico.chat} <span data-i18n="mis_contactos">Mis contactos</span></a>`; }
+      }
       right.querySelectorAll('[data-logout]').forEach(b => b.addEventListener('click', async e => { e.preventDefault(); await window.BPStore.signOut(); BP.toast('Sesión cerrada.'); setTimeout(() => location.href = 'index.html', 600); }));
       if (window.BPStore) window.BPStore.isCurador().then(ok => { right.querySelectorAll('[data-curador]').forEach(a => a.hidden = !ok); });
     } else if (mode === 'local') {

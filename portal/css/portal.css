@@ -2807,3 +2807,57 @@ body.p-home .h-criterios:hover{color:#FBFAF6;border-color:var(--h-oro)}
 body.p-home .h-criterios em{font-style:normal}
 @media(max-width:899px){body.p-home .h-criterios{font-size:.7rem;margin-top:16px;position:relative;min-height:0}body.p-home .h-criterios::after{content:"";position:absolute;left:-8px;right:-8px;top:-12px;bottom:-12px}}
 @media(prefers-reduced-motion:reduce){body.p-home .h-criterios{transition:none}}
+
+/* ══ 11/9/2026 · El menú del portal, con el criterio de la portada ════════════
+   Escritorio: logo | COMPRAR · ALQUILAR · EMPRENDIMIENTOS · PSI (versalitas
+   del sitio, centradas, activo con línea de oro) | idioma · Publicar · Ingresar.
+   Celular: el idioma centrado en el header como en bairengroup.com; el burger
+   abre un panel que baja del header (el hero sigue detrás, con un velo), con
+   cuatro secciones en Playfair, una fila secundaria en voz baja y las dos
+   acciones. Sin plazos ni cuenta para quien no ingresó. ══════════════════════ */
+.p-navbar,body.p-home .p-navbar,body.p-home .navbar{grid-template-columns:auto 1fr auto;gap:14px}
+.p-navbar > .p-nav-left{grid-column:1}
+.p-navbar > .p-nav-principal,.p-navbar > .p-lang-movil{grid-column:2;justify-self:center}
+.p-navbar > .p-nav-right,body.p-home .p-navbar > .p-nav-right{grid-column:3;justify-self:end}
+.p-navbar > .burger{grid-column:3;justify-self:end}
+/* Menú principal (escritorio) */
+.p-nav-principal{display:none;align-items:center;gap:28px;min-width:0}
+.p-nav-principal a{position:relative;display:inline-flex;align-items:center;min-height:44px;font:500 .7rem/1 var(--font-body);letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.65);text-decoration:none;white-space:nowrap;transition:color .25s cubic-bezier(.22,1,.36,1)}
+.p-nav-principal a::after{content:"";position:absolute;left:0;right:.18em;bottom:9px;height:1px;background:var(--gold);transform:scaleX(0);transform-origin:left;transition:transform .35s cubic-bezier(.22,1,.36,1)}
+.p-nav-principal a:hover,.p-nav-principal a:focus-visible{color:#FBFAF6}
+.p-nav-principal a.on{color:#FBFAF6}
+.p-nav-principal a.on::after,.p-nav-principal a:hover::after{transform:scaleX(1)}
+.p-nav-principal a:focus-visible{outline:0;color:#FBFAF6} .p-nav-principal a:focus-visible::after{transform:scaleX(1)}
+@media(min-width:1024px){
+  .p-nav-principal{display:flex}
+  .p-lang-movil{display:none !important}
+  .p-nav-right .p-lang{margin-right:6px}
+}
+@media(min-width:1024px) and (max-width:1180px){.p-nav-principal{gap:20px}.p-nav-principal a{letter-spacing:.14em;font-size:.66rem}}
+/* Idioma centrado en el header en celular, como el sitio */
+@media(max-width:1023px){
+  .p-lang-movil{display:inline-flex !important;gap:2px}
+  .p-lang-movil button{min-width:34px;min-height:36px;font-size:.62rem;letter-spacing:.14em}
+}
+/* Panel de celular */
+.mobile-menu{padding:18px 24px 24px;max-height:calc(100dvh - 64px);overflow:auto;border-bottom:1px solid rgba(194,169,104,.22);box-shadow:0 30px 60px rgba(10,14,22,.35)}
+.mobile-menu .m-link{position:relative;display:flex;align-items:center;justify-content:space-between;font:300 1.3rem/1.2 var(--font-display);color:rgba(251,250,246,.86);padding:15px 0;border-bottom:1px solid rgba(255,255,255,.07)}
+.mobile-menu .m-link:last-of-type{border-bottom:0}
+.mobile-menu .m-link.on{color:#FBFAF6}
+.mobile-menu .m-link.on::after{content:"";width:6px;height:6px;border-radius:50%;background:var(--gold);flex:0 0 auto;margin-left:14px}
+.mobile-menu .m-secundario{display:flex;flex-wrap:wrap;gap:6px 26px;padding:14px 0 2px;border-top:1px solid rgba(255,255,255,.07)}
+.mobile-menu .m-secundario a{display:inline-flex;align-items:center;min-height:40px;font:400 .82rem/1.3 var(--font-body);letter-spacing:.02em;color:rgba(251,250,246,.62);border:0;padding:0;text-decoration:none}
+.mobile-menu .m-secundario a.on{color:var(--gold-light,#DECDA0)}
+.mobile-menu .m-cuenta{display:flex;gap:26px;padding:6px 0 2px}
+.mobile-menu .m-cuenta a{display:inline-flex;align-items:center;gap:8px;min-height:40px;font:400 .82rem/1.3 var(--font-body);color:rgba(251,250,246,.78);border:0;padding:0;text-decoration:none}
+.mobile-menu .m-cuenta a svg{width:16px;height:16px}
+.mobile-menu .m-cuenta[hidden]{display:none}
+.mobile-menu .m-cta{margin-top:16px}
+/* Velo sobre la página cuando el panel está abierto; toca afuera y cierra */
+.m-velo{position:fixed;left:0;right:0;top:64px;bottom:0;z-index:998;background:rgba(19,29,45,.55);opacity:0;pointer-events:none;transition:opacity .35s cubic-bezier(.22,1,.36,1)}
+.m-velo.on{opacity:1;pointer-events:auto}
+html.menu-abierto{overflow:hidden}
+@media(min-width:1024px){.m-velo{display:none}}
+@media(prefers-reduced-motion:reduce){.p-nav-principal a::after,.m-velo{transition:none}}
+/* En escritorio el menú se centra en la pantalla, no en el hueco: columnas laterales iguales */
+@media(min-width:1024px){.p-navbar,body.p-home .p-navbar,body.p-home .navbar{grid-template-columns:minmax(max-content,1fr) auto minmax(max-content,1fr)}}
