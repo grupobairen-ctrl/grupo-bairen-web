@@ -27,7 +27,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://dahusnnbyrvltcuaelxj.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260912o"><link rel="stylesheet" href="css/catalogo.css?v=20260912o"><link rel="stylesheet" href="css/portal.css?v=20260912o">
+  <link rel="stylesheet" href="css/base.css?v=20260912p"><link rel="stylesheet" href="css/catalogo.css?v=20260912p"><link rel="stylesheet" href="css/portal.css?v=20260912p">
 </head>
 <body class="p-product p-psi">
 <div class="p-velo" aria-hidden="true"><span class="w">BAIREN</span></div>
@@ -41,37 +41,37 @@
     <p class="psi-eyebrow">Personal Shopper Inmobiliario</p>
     <h1>Comprar en Buenos Aires</h1>
     <ul class="psi-nots">
-      <li><span>Sin buscar</span><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2 L10 10 M10 2 L2 10"/></svg></li>
-      <li><span>Sin visitar</span><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2 L10 10 M10 2 L2 10"/></svg></li>
-      <li><span>Sin negociar</span><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2 L10 10 M10 2 L2 10"/></svg></li>
+      <li><span data-i18n="psi_not_buscar">Sin buscar</span><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2 L10 10 M10 2 L2 10"/></svg></li>
+      <li><span data-i18n="psi_not_visitar">Sin visitar</span><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2 L10 10 M10 2 L2 10"/></svg></li>
+      <li><span data-i18n="psi_not_negociar">Sin negociar</span><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2 L10 10 M10 2 L2 10"/></svg></li>
     </ul>
-    <p class="psi-sub">Nos encargamos <em>de todo</em>.</p>
-    <p class="psi-lead">Vos nos decís qué departamento querés. Nosotros lo revisamos, negociamos y <b>compramos por vos.</b></p>
-    <a class="psi-btn psi-btn-oro" href="#consulta">Solicitar información</a>
+    <p class="psi-sub" data-i18n-html="psi_sub">Nos encargamos <em>de todo</em>.</p>
+    <p class="psi-lead" data-i18n-html="psi_lead">Vos nos decís qué departamento querés. Nosotros lo revisamos, negociamos y <b>compramos por vos.</b></p>
+    <a class="psi-btn psi-btn-oro" href="#consulta" data-i18n="psi_solicitar">Solicitar información</a>
   </div>
 </section>
 
 <section class="psi-sec psi-crema psi-video-sec">
   <div class="psi-in">
-    <p class="psi-eyebrow psi-oscuro">El servicio, en un minuto</p>
+    <p class="psi-eyebrow psi-oscuro" data-i18n="psi_video_eyebrow">El servicio, en un minuto</p>
     <video class="psi-video" src="../psi-video.mp4" poster="../psi-video-poster.jpg?v=2" controls preload="none" playsinline></video>
-    <a class="psi-pdf" href="../personal-shopper.pdf" download>Conocer más sobre nuestro servicio</a>
+    <a class="psi-pdf" id="psiPdf" href="../personal-shopper.pdf" download data-i18n="psi_pdf">Conocer más sobre nuestro servicio</a>
   </div>
 </section>
 
 <section class="psi-sec psi-navy" id="consulta">
   <div class="psi-in psi-centro">
-    <p class="psi-eyebrow">Solicitar información</p>
-    <h2 class="psi-h2">Dejanos tus datos y te contactamos.</h2>
+    <p class="psi-eyebrow" data-i18n="psi_solicitar">Solicitar información</p>
+    <h2 class="psi-h2" data-i18n="psi_form_h2">Dejanos tus datos y te contactamos.</h2>
     <form class="psi-form" id="psForm" action="https://formspree.io/f/xykrypqo" method="POST">
       <input type="hidden" name="_subject" value="INTERESADO - PERSONAL SHOPPER INVESTMENT">
-      <div class="pf"><label for="psNombre">Nombre</label><input id="psNombre" type="text" name="nombre" placeholder="Tu nombre" autocomplete="name" required></div>
-      <div class="pf"><label for="psEmail">Email</label><input id="psEmail" type="email" name="email" placeholder="Tu mail" autocomplete="email" inputmode="email" required></div>
-      <div class="pf full"><label for="psTel">Teléfono</label><input id="psTel" type="tel" name="telefono" placeholder="Tu teléfono" autocomplete="tel" inputmode="tel"></div>
-      <div class="pf full"><label for="psMsg">Mensaje</label><textarea id="psMsg" name="mensaje" placeholder="Mensaje (opcional)"></textarea></div>
-      <button type="submit" class="psi-btn psi-btn-oro">Enviar</button>
+      <div class="pf"><label for="psNombre" data-i18n="psi_lbl_nombre">Nombre</label><input id="psNombre" type="text" name="nombre" placeholder="Tu nombre" data-i18n-ph="psi_ph_nombre" autocomplete="name" required></div>
+      <div class="pf"><label for="psEmail" data-i18n="psi_lbl_email">Email</label><input id="psEmail" type="email" name="email" placeholder="Tu mail" data-i18n-ph="psi_ph_email" autocomplete="email" inputmode="email" required></div>
+      <div class="pf full"><label for="psTel" data-i18n="psi_lbl_tel">Teléfono</label><input id="psTel" type="tel" name="telefono" placeholder="Tu teléfono" data-i18n-ph="psi_ph_tel" autocomplete="tel" inputmode="tel"></div>
+      <div class="pf full"><label for="psMsg" data-i18n="psi_lbl_msg">Mensaje</label><textarea id="psMsg" name="mensaje" placeholder="Mensaje (opcional)" data-i18n-ph="psi_ph_msg"></textarea></div>
+      <button type="submit" class="psi-btn psi-btn-oro" data-i18n="psi_enviar">Enviar</button>
     </form>
-    <p class="psi-thanks" id="psThanks" hidden role="status">Gracias. Recibimos tu consulta y te contactamos a la brevedad.</p>
+    <p class="psi-thanks" id="psThanks" hidden role="status" data-i18n="psi_thanks">Gracias. Recibimos tu consulta y te contactamos a la brevedad.</p>
   </div>
 </section>
 
@@ -80,15 +80,20 @@
 
 <script src="supabase-portal.js" defer></script>
 <script src="js/motion.js" defer></script>
-<script src="js/bairen-motion.js?v=20260912o" defer></script>
-<script src="js/i18n-portal.js?v=20260912o" defer></script><script src="js/ui.js?v=20260912o" defer></script>
-<script src="js/store.js?v=20260912o" defer></script>
-<script src="js/data.js?v=20260912o" defer></script>
+<script src="js/bairen-motion.js?v=20260912p" defer></script>
+<script src="js/i18n-portal.js?v=20260912p" defer></script><script src="js/ui.js?v=20260912p" defer></script>
+<script src="js/store.js?v=20260912p" defer></script>
+<script src="js/data.js?v=20260912p" defer></script>
 <script>
 document.addEventListener('DOMContentLoaded', function(){
 (async function(){
   BP.header('psi'); BP.footer(); if (window.BPStore) BPStore.init(); BP.reveal();
-  if (window.BPM && BPM.titular) BPM.titular(document.querySelector('.psi-hero h1'), { demora: 0.1 });
+  /* El titular se traduce acá y no con data-i18n: apply() vuelve a correr (pie, sesión) y le pisaría las palabras ya partidas */
+  document.title = BP.t('psi_title', 'Personal Shopper Inmobiliario · BAIREN');
+  const h1 = document.querySelector('.psi-hero h1'); h1.textContent = BP.t('psi_h1', 'Comprar en Buenos Aires');
+  if (window.BPM && BPM.titular) BPM.titular(h1, { demora: 0.1 });
+  /* El PDF del servicio existe en los tres idiomas: personal-shopper.pdf, -en.pdf y -pt.pdf */
+  if (BP.lang === 'en' || BP.lang === 'pt') document.getElementById('psiPdf').href = '../personal-shopper-' + BP.lang + '.pdf';
   /* La foto de fondo es una unidad real de BAIREN, nunca stock */
   try {
     const { avisos } = await BPData.load();
@@ -101,12 +106,12 @@ document.addEventListener('DOMContentLoaded', function(){
   f.addEventListener('submit', async e => {
     e.preventDefault();
     const b = f.querySelector('button[type=submit]'); if (b.disabled) return;
-    b.disabled = true; const t = b.textContent; b.textContent = 'Enviando…';
+    b.disabled = true; const t = b.textContent; b.textContent = BP.t('psi_enviando', 'Enviando…');
     try {
       const r = await fetch(f.action, { method: 'POST', body: new FormData(f), headers: { Accept: 'application/json' } });
       if (!r.ok) throw new Error('envío');
       f.hidden = true; document.getElementById('psThanks').hidden = false;
-    } catch (err) { b.disabled = false; b.textContent = t; BP.toast('No pudimos enviar la consulta. Escribinos por WhatsApp.', 'error'); }
+    } catch (err) { b.disabled = false; b.textContent = t; BP.toast(BP.t('psi_err_envio', 'No pudimos enviar la consulta. Escribinos por WhatsApp.'), 'error'); }
   });
 })();
 });

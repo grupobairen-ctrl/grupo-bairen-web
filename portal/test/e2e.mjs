@@ -26,6 +26,8 @@ import { mkdirSync, writeFileSync, readFileSync } from 'node:fs';
 mkdirSync('/tmp/bp-e2e/shots', { recursive: true });
 const shot = async (name) => { try { await send('Emulation.setDeviceMetricsOverride', { width: 1440, height: 1000, deviceScaleFactor: 1, mobile: false }); const r = await send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true }); writeFileSync('/tmp/bp-e2e/shots/' + name + '.png', Buffer.from(r.result.data, 'base64')); } catch (e) { console.log('   (sin captura ' + name + ')'); } };
 await send('Page.enable'); await send('Runtime.enable'); await send('DOM.enable'); await send('Network.enable');
+/* La prueba compara textos en castellano: el idioma queda fijo aunque el perfil del Chrome tenga otro */
+await send('Page.addScriptToEvaluateOnNewDocument', { source: "try{localStorage.setItem('bairen_lang','es')}catch(e){}" });
 /* LOCAL=1: bloquea Supabase para que el portal caiga a modo local aunque la base responda (la prueba está escrita para modo local) */
 if (process.env.LOCAL === '1') await send('Network.setBlockedURLs', { urls: ['*supabase.co*', '*supabase-js*'] }); await send('Network.clearBrowserCache'); await send('Network.setCacheDisabled', { cacheDisabled: true });
 const results = [];

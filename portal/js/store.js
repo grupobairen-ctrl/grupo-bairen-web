@@ -14,6 +14,9 @@
   const uid = () => 'l' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
   const now = () => new Date().toISOString();
   const slugify = t => (t||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  /* 12/9 · Idioma: los textos que el store le muestra a la gente (mensajes del código, del perfil, de la imagen) pasan por
+     BP.tf con el castellano por defecto; si ui.js no está (un script suelto), queda el castellano. */
+  const T = (k, es, vars) => (window.BP && BP.tf) ? BP.tf(k, es, vars) : String(es).replace(/\{(\w+)\}/g, (m, x) => vars && vars[x] != null ? vars[x] : m);
 
   /* IndexedDB mínimo para fotos en modo local */
   const idb = { db: null,
@@ -81,15 +84,15 @@
 
   /* ── auth ─────────────────────────────────────────────── */
   S.sendCode = async function(email){
-    email = (email||'').trim().toLowerCase(); if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return { ok:false, msg:'Revisá el mail.' };
-    if (S.mode === 'supabase') { const { error } = await S.sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true } }); return error ? { ok:false, msg: error.message } : { ok:true, msg:'Te mandamos un código de seis dígitos a ' + email + '. Si no llega, revisá spam.' }; }
+    email = (email||'').trim().toLowerCase(); if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return { ok:false, msg: T('ing_revisa_mail', 'Revisá el mail.') };
+    if (S.mode === 'supabase') { const { error } = await S.sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true } }); return error ? { ok:false, msg: error.message } : { ok:true, msg: T('ing_codigo_enviado', 'Te mandamos un código de seis dígitos a {e}. Si no llega, revisá spam.', { e: email }) }; }
     const code = String(Math.floor(100000 + Math.random() * 900000)); L.code.set({ email, code, t: Date.now() });
-    return { ok:true, msg:'Modo local: tu código es ' + code + '. Con Supabase conectado llega por mail.', code };
+    return { ok:true, msg: T('ing_codigo_local', 'Modo local: tu código es {c}. Con Supabase conectado llega por mail.', { c: code }), code };
   };
   S.verifyCode = async function(email, code){
     email = (email||'').trim().toLowerCase(); code = (code||'').trim();
     if (S.mode === 'supabase') { const { data, error } = await S.sb.auth.verifyOtp({ email, token: code, type: 'email' }); if (error) return { ok:false, msg: error.message }; S.session = sesionDe(data.user); return { ok:true }; }
-    const c = L.code.get(null); if (!c || c.email !== email || c.code !== code) return { ok:false, msg:'Código incorrecto.' };
+    const c = L.code.get(null); if (!c || c.email !== email || c.code !== code) return { ok:false, msg: T('ing_codigo_incorrecto', 'Código incorrecto.') };
     /* En local el perfil se recuerda por mail (bp_perfiles), como los metadatos de Auth: la pregunta se hace una sola vez */
     const av = L.avatares.get({})[email] || {};   /* 12/9 · la imagen también se recuerda por mail (bp_avatares) */
     S.session = { id: 'local-' + slugify(email), email, perfil: L.perfiles.get({})[email] || null, avatar: av.avatar || null, avatar_url: av.avatar_url || null }; L.user.set(S.session); if (window.BP && BP.applySession) BP.applySession(S.session, S.mode); return { ok:true };
@@ -100,7 +103,8 @@
      Una preferencia, no un permiso: 'busca' (alquilar o comprar), 'dueno' (publicar su propiedad),
      'profesional' (corredor, inmobiliaria o desarrolladora). Decide qué muestra el panel. */
   S.PERFILES = ['busca', 'dueno', 'profesional'];
-  S.PERFIL_TXT = { busca: 'Busco propiedad', dueno: 'Dueño directo', profesional: 'Inmobiliaria, corredor o desarrolladora' };
+  /* 12/9 · Los rótulos del perfil se leen en el idioma de la página (getters: S.PERFIL_TXT[p] sigue funcionando igual) */
+  S.PERFIL_TXT = { get busca(){ return T('perfil_busca', 'Busco propiedad'); }, get dueno(){ return T('perfil_dueno', 'Dueño directo'); }, get profesional(){ return T('perfil_profesional', 'Inmobiliaria, corredor o desarrolladora'); } };
   /* 11/9 noche · El riel del panel y el desplegable "Mi cuenta" del header salen del mismo lugar: los ids de las
      vistas (avisos, propiedades, interesados, importar, contactos, favoritos, alertas, cuenta) según el perfil.
      Sin perfil (cuenta vieja, demo) la lista completa. El dueño lleva siempre Mis contactos: puede consultar
@@ -145,7 +149,7 @@
   /* Los íconos con su nombre (avatares.json = [{ id, archivo, nombre }]), pedidos una sola vez. Sin el archivo, los ids alcanzan. */
   S.avatares = function(){
     if (avataresCache) return avataresCache;
-    const base = () => S.AVATARES.map((id, i) => ({ id, archivo: id + '.png', nombre: 'Ícono ' + (i + 1) }));
+    const base = () => S.AVATARES.map((id, i) => ({ id, archivo: id + '.png', nombre: T('img_icono_n', 'Ícono {n}', { n: i + 1 }) }));
     avataresCache = fetch(S.AVATAR_DIR + 'avatares.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : null)
       .then(l => { const ok = Array.isArray(l) ? l.filter(a => a && S.AVATARES.indexOf(a.id) > -1).map(a => ({ id: a.id, archivo: a.archivo || a.id + '.png', nombre: a.nombre || a.id })) : []; return ok.length ? ok : base(); })
       .catch(() => base());
@@ -192,10 +196,10 @@
           ctx.drawImage(img, ((img.naturalWidth || img.width) - s) / 2, ((img.naturalHeight || img.height) - s) / 2, s, s, 0, 0, c.width, c.height);
           URL.revokeObjectURL(u);
           if (comoDataUrl) return res(c.toDataURL('image/jpeg', .85));
-          c.toBlob(b => b ? res(b) : rej(new Error('No se pudo procesar la imagen.')), 'image/jpeg', .85);
-        } catch (e) { URL.revokeObjectURL(u); rej(new Error('No se pudo procesar la imagen.')); }
+          c.toBlob(b => b ? res(b) : rej(new Error(T('img_no_proceso', 'No se pudo procesar la imagen.'))), 'image/jpeg', .85);
+        } catch (e) { URL.revokeObjectURL(u); rej(new Error(T('img_no_proceso', 'No se pudo procesar la imagen.'))); }
       };
-      img.onerror = () => { URL.revokeObjectURL(u); rej(new Error('El archivo no es una imagen que el navegador pueda abrir. Probá con JPG o PNG.')); };
+      img.onerror = () => { URL.revokeObjectURL(u); rej(new Error(T('img_no_abre', 'El archivo no es una imagen que el navegador pueda abrir. Probá con JPG o PNG.'))); };
       img.src = u;
     });
   };
@@ -203,17 +207,17 @@
      el error lo dice y la imagen elegida queda como estaba. En modo local y en demo, data URL en memoria (y en bp_user). */
   S.setAvatarFoto = async function(file){
     if (!S.session) throw new Error('sin sesión');
-    if (!file) throw new Error('Elegí una imagen.');
-    if (file.type && !/^image\//.test(file.type)) throw new Error('Elegí una imagen (JPG o PNG).');
-    if (/hei[cf]/i.test((file.type || '') + ' ' + (file.name || ''))) throw new Error('Es una foto HEIC del iPhone: compartila como JPG (Ajustes → Cámara → Formatos → Más compatible) o elegí otra.');
-    if (file.size > 15 * 1024 * 1024) throw new Error('La foto pesa más de 15 MB: exportala más chica.');
+    if (!file) throw new Error(T('img_elegi_una', 'Elegí una imagen.'));
+    if (file.type && !/^image\//.test(file.type)) throw new Error(T('img_elegi', 'Elegí una imagen (JPG o PNG).'));
+    if (/hei[cf]/i.test((file.type || '') + ' ' + (file.name || ''))) throw new Error(T('img_heic', 'Es una foto HEIC del iPhone: compartila como JPG (Ajustes → Cámara → Formatos → Más compatible) o elegí otra.'));
+    if (file.size > 15 * 1024 * 1024) throw new Error(T('img_pesada', 'La foto pesa más de 15 MB: exportala más chica.'));
     if (S.mode === 'supabase' && !DEMO) {
       const blob = await S.cuadrarFoto(file, 320);
       const path = rutaAvatar();
       const { error } = await S.sb.storage.from('portal-avatares').upload(path, blob, { contentType: 'image/jpeg', upsert: true, cacheControl: '3600' });
       if (error) {
         const msg = String(error.message || error); const sinBucket = /bucket not found/i.test(msg) || String(error.statusCode || error.status) === '404';
-        throw new Error(sinBucket ? 'La foto no se pudo subir: falta correr migracion-05-avatares.sql' : 'La foto no se pudo subir: ' + msg);
+        throw new Error(sinBucket ? 'La foto no se pudo subir: falta correr migracion-05-avatares.sql' : T('img_no_subio_msg', 'La foto no se pudo subir: {m}', { m: msg }));
       }
       const url = S.sb.storage.from('portal-avatares').getPublicUrl(path).data.publicUrl + '?v=' + Date.now();
       await guardarAvatar({ avatar: 'foto', avatar_url: url });

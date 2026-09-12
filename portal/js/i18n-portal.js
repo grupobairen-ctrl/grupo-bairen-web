@@ -9,7 +9,7 @@
    Prefijos: ui_ (compartido en ui.js), card_ (tarjetas de data.js), cat_ (catálogo),
    ficha_ (ficha), op_ (operaciones), ui_dato_ (etiquetas fijas de datos: cualidades,
    amenities, características, plazos e insignias, por su slug).
-   El registro producto (panel, publicar, curación, ingresar) queda en castellano.
+   12/9 · El panel e ingresar también hablan EN y PT (bloque "panel e ingresar", prefijos pan_, ing_, perfil_).
    Voz: par a par, sin mayúsculas sostenidas, sin exclamaciones. */
 window.BP_I18N = {
   en: {
@@ -99,8 +99,7 @@ window.BP_I18N = {
     cat_crumb_todas: 'All operations', cat_mapa_nd: 'Map not available.',
     cat_amb_btn: '{n}+ rooms', cat_dorm_btn: '{n}+ beds', cat_precio_btn: 'USD {a} to {b}', cat_sin_max: 'no maximum',
     cat_quitar: 'Remove {z}', cat_err_max: 'The maximum has to be higher than the minimum.', cat_err_carga: 'We could not load the properties.',
-    cat_toast_alerta_quitada: 'Alert removed.', cat_toast_alerta_mail: 'Alert saved. We will email you when a property like this comes in.', cat_toast_alerta_local: 'Alert saved in this browser. With an account, it reaches you by email.',
-    cat_unidad: ' unit', cat_unidades: ' units',
+    cat_toast_alerta_quitada: 'Alert removed.', cat_unidad: ' unit', cat_unidades: ' units',
 
     /* ficha (propiedad.html): hero, galería, la unidad */
     ficha_reservada: 'Reserved', ficha_estado: 'Status', ficha_precio: 'Price', ficha_precio_mensual: 'Monthly rent', ficha_no_consultas: 'not taking enquiries', ficha_por_mes: 'per month', ficha_todo_incluido: 'per month · all inclusive', ficha_mas_expensas: 'plus $ {n} building fees',
@@ -158,6 +157,89 @@ window.BP_I18N = {
     emp_wa_msg: 'Hi, I saw {t} on BAIREN and would like more information.', emp_mail_subject: 'Enquiry about {t} from BAIREN',
     emp_ver_unidad_1: 'See the unit', emp_ver_unidades: 'See the {n} units',
     emp_vacio: 'No developments listed yet{donde}. If you are a developer, <a href="publicar.html#desarrolladora" style="text-decoration:underline">list yours</a>.', emp_vacio_en: ' in {z}',
+    /* 12/9 · panel e ingresar (panel.html, ingresar.html, store.js): riel y vistas del panel, Mi cuenta, la entrada con código
+       y la pregunta del perfil. Los rótulos del riel reusan mi_cuenta, mis_avisos, mis_propiedades, interesados, mis_contactos,
+       favoritos, alertas, importar_cartera, bairen_os, curacion y cerrar_sesion (bloque del header con sesión). */
+    pan_title: 'Dashboard · BAIREN', pan_modo_local: 'local mode', pan_os_title: 'Visits, bookings and payments for your units',
+    pan_est_borrador: 'Draft', pan_est_en_revision: 'In review', pan_est_publicado: 'Live', pan_est_rechazado: 'Rejected', pan_est_pausado: 'Paused', pan_est_vencido: 'Expired',
+    perfil_busca: 'Looking for a property', perfil_dueno: 'Direct owner', perfil_profesional: 'Agency, broker or developer',
+    ing_revisa_mail: 'Check the email.', ing_codigo_enviado: 'We sent a six-digit code to {e}. If it does not arrive, check your spam folder.', ing_codigo_local: 'Local mode: your code is {c}. With Supabase connected it arrives by email.', ing_codigo_incorrecto: 'Wrong code.',
+    img_icono_n: 'Icon {n}', img_no_proceso: 'The image could not be processed.', img_no_abre: 'The file is not an image the browser can open. Try a JPG or PNG.', img_elegi_una: 'Choose an image.', img_heic: 'It is an iPhone HEIC photo: share it as JPG (Settings → Camera → Formats → Most Compatible) or choose another one.', img_pesada: 'The photo is over 15 MB: export a smaller one.', img_no_subio_msg: 'The photo could not be uploaded: {m}',
+    pan_av_1: 'Suit and tie', pan_av_2: 'T-shirt and glasses', pan_av_3: 'Blazer and shirt', pan_av_4: 'T-shirt and round glasses',
+    pan_fb_guardado: 'Saved. The owner sees it in their account.', pan_confirmada: 'Confirmed', pan_visita_confirmada: 'Visit confirmed. Let {n} know by WhatsApp or email.', pan_no_confirmo: 'Could not confirm: ',
+    /* mis avisos */
+    pan_op_venta: 'Sale', pan_op_mediano: 'Rent, mid-term', pan_op_alquiler: 'Rent, long-term', pan_op_alq: 'Rent',
+    pan_motivo: 'Reason: ', pan_visitas_reservas: 'Visits and bookings', pan_las_ve: '· seen by {e}', pan_tipo_visita: 'Visit', pan_tipo_reserva: 'Booking', pan_tipo_cierre: 'Closing',
+    pan_fb_ph: 'What did the visitor say?', pan_fb_aria: 'What the visitor said', pan_guardar: 'Save', pan_sin_registros: 'No records yet.',
+    pan_tipo_registro: 'Record type', pan_fecha_hora: 'Date and time', pan_nota_ph: 'Note (optional)', pan_nota: 'Note', pan_registrar: 'Log',
+    pan_vistas: 'Views', pan_consultas: 'Enquiries', pan_fotos: 'Photos',
+    pan_editar: 'Edit', pan_reactivar: 'Reactivate', pan_completar: 'Complete and submit', pan_ver_ficha: 'View listing', pan_marcar_disponible: 'Mark as available', pan_marcar_reservada: 'Mark as reserved', pan_pausar: 'Pause', pan_mas_acciones: 'More actions',
+    pan_verificado_min: 'verified', pan_verif_pendiente: 'verification pending', pan_publicar_otra: 'List another',
+    pan_nota_vistas: 'Views and enquiries from this browser. With the database connected, from every visitor.',
+    pan_kpi_publicados: 'Live', pan_kpi_revision: 'In review', pan_kpi_vistas_local: ' in this browser',
+    pan_vacio_avisos_t: 'You have not added a property yet.', pan_vacio_avisos_p: 'Five steps: your profile, the basics, photos and video, extras, and review. You can save and continue later.', pan_publicar_primera: 'List the first one',
+    pan_herr_aria: 'Search and filter listings', pan_buscar: 'Search', pan_q_ph: 'Address, neighborhood or code',
+    pan_estado: 'Status', pan_f_todos_estados: 'All statuses', pan_f_publicados: 'Live', pan_f_reservadas: 'Reserved', pan_f_pausados: 'Paused', pan_f_pendientes: 'In review, draft or rejected',
+    pan_operacion: 'Operation', pan_f_todas_op: 'All operations',
+    pan_ordenar: 'Sort', pan_o_recientes: 'Most recent', pan_o_vistas: 'Most viewed', pan_o_consultas: 'Most enquiries', pan_o_az: 'By address',
+    pan_n_aviso_1: '1 listing', pan_n_avisos: '{n} listings', pan_n_de: '{a} of {b}', pan_limpiar_filtros: 'Clear filters', pan_sin_coincidencia: 'No listing matches your search.', pan_ver_mas: 'Show {n} more',
+    pan_err_fecha: 'Pick a date and time.', pan_registrado: 'Logged. The owner sees it in their account.', pan_no_registro: 'Could not log it.',
+    pan_t_pausado: 'Listing paused. It no longer shows in results.', pan_t_reactivado: 'Listing is live again.', pan_t_reservada: 'Marked as reserved.', pan_t_disponible: 'Marked as available.', pan_no_se_pudo: 'It did not work.',
+    pan_sin_pub_t: 'You do not have a lister profile yet.', pan_sin_pub_p: 'It is created in the first step of listing: direct owner, agency or developer.', pan_publicar_prop: 'List a property',
+    /* mis propiedades */
+    pan_props_sub: 'Your units listed by an agency, with the visits and bookings it logs. You see them with your account.',
+    pan_props_vacio: 'There are no properties linked to {e}. Ask your agency to add your email to the listing, or <a href="publicar-aviso.html" style="text-decoration:underline">list it as a direct owner</a>.',
+    pan_publica_min: 'listed by', pan_vistas_min: 'views', pan_visitas_reservas_min: 'visits and bookings', pan_lo_que_dijo: 'Feedback: ', pan_sin_visitas: 'No visits logged yet.',
+    /* interesados */
+    pan_int_vacio_pub_t: 'Enquiries about your listings will show up here.', pan_int_vacio_pub_p: 'With the name, email and phone of whoever asks, and the visit request if there is one. Each one also reaches you by email.',
+    pan_int_sub: 'Each enquiry also reached you by email or WhatsApp. You reply: BAIREN does not step in.',
+    pan_th_fecha: 'Date', pan_th_propiedad: 'Property', pan_th_persona: 'Person', pan_th_mensaje: 'Message', pan_th_visita: 'Visit', pan_th_publicador: 'Lister', pan_th_creada: 'Created', pan_th_tipo: 'Type', pan_th_detalle: 'Details',
+    pan_confirmar_visita: 'Confirm visit', pan_wa_aria: 'Message {n} on WhatsApp',
+    pan_int_vacio_t: 'No enquiries yet.', pan_int_vacio_p: 'When someone asks about a listing, it shows up here with their name, email and phone, and the visit request if there is one. It also reaches you by email.',
+    /* mis contactos, favoritos */
+    pan_cont_sub: 'The properties you asked about and who received your message.', pan_volver_escribir: 'Write again',
+    pan_cont_vacio_t: 'You have not asked about any property yet.', pan_cont_vacio_p: 'When you write from a listing, this is where you see who got your message and when, so you can pick up the conversation.',
+    pan_ver_como_busqueda: 'See as a search', pan_fav_vacio_t: 'You have not saved any property yet.', pan_fav_vacio_p: 'Tap the heart on a card or a listing and it stays here so you can compare later.',
+    /* búsquedas y alertas */
+    pan_publicada_a: 'Listed at {p}', pan_opf_venta: 'sale', pan_opf_alquiler: 'rent', pan_opf_mediano: 'mid-term', pan_opf_largo: 'long-term', pan_busqueda_min: 'search',
+    pan_al_sub: 'We email you when a matching property comes in or when one you follow drops in price.',
+    pan_baja_precio: 'Price drop', pan_busqueda_guardada: 'Saved search', pan_quitar: 'Remove', pan_quitando: 'Removing',
+    pan_al_vacio_t: 'You have not created any alert yet.', pan_al_vacio_p: 'From the catalog, with your filters set, tap "Create alert": we email you when a matching property comes in.', pan_ir_catalogo: 'Go to the catalog',
+    pan_no_quito_alerta: 'Could not remove the alert: ',
+    /* mi cuenta */
+    pan_tipo_dueno: 'Direct owner', pan_tipo_desarrolladora: 'Developer', pan_tipo_inmobiliaria: 'Agency or broker',
+    pan_mail: 'Email', pan_en_bairen: 'On BAIREN', pan_sin_elegir: 'Not chosen: the dashboard shows everything', pan_publicador: 'Lister', pan_tipo: 'Type', pan_verificacion: 'Verification', pan_verificado: ' Verified', pan_verif_pend_bairen: 'Pending: BAIREN reviews it', pan_matricula: 'License', pan_sin_publicador: 'No profile yet. It is created when you list.',
+    pan_que_venis: 'What brings you to BAIREN', pan_perfil_nota: 'It decides what the dashboard shows, not what you can do. Change it whenever you want.', pan_editar_publicador: 'Edit lister profile',
+    pan_privacidad: '<b>Privacy.</b> You can request access, correction or deletion of your data by writing to <a href="mailto:contacto@bairengroup.com">contacto@bairengroup.com</a>. Verification documents are deleted after review.',
+    pan_perfil_listo: 'Done. The dashboard now shows what is useful to you.',
+    /* ingresar */
+    ing_title: 'Sign in · BAIREN', ing_sub: 'Favorites, alerts, your contacts and, if you list, your dashboard. No password: we email you a code.',
+    ing_mail: 'Email', ing_mail_ph: 'Your email', ing_continuar: 'Continue', ing_codigo: 'Six-digit code', ing_reenviar: 'Resend code', ing_reenviar_en: 'Resend in {s} s', ing_cambiar_mail: 'Change email',
+    ing_op_busca: 'I am looking for a property', ing_op_busca_s: 'Rent or buy. Favorites, alerts and your enquiries.', ing_op_dueno: 'I am the owner', ing_op_dueno_s: 'List my property, or follow the one my agency lists.', ing_op_prof: 'Agency, broker or developer', ing_op_prof_s: 'List properties, receive enquiries, import my portfolio.',
+    ing_o: 'or', ing_google: 'Continue with Google', ing_apple: 'Continue with Apple',
+    ing_legal: 'By continuing you accept the <a href="legales.html#terminos" style="text-decoration:underline">Terms and conditions</a> and the <a href="legales.html#privacidad" style="text-decoration:underline">Privacy policy</a>. One account per person.',
+    ing_crea_cuenta: 'Create your account to list', ing_crea_sub: 'An email and a code. Then you complete your profile and add the property.',
+    ing_modo_local: 'Local mode: with no database connected, the session and data stay in this browser.',
+    ing_pregunta: 'What brings you to BAIREN?', ing_pregunta_sub: 'So the dashboard shows what is useful to you. Change it whenever you want.',
+    ing_guardando: 'Saving…', ing_no_guardo: 'Could not save.', ing_err_mail: 'Check the email, for example name@domain.com.', ing_enviando: 'Sending…', ing_no_envio: 'The code could not be sent.',
+    ing_err_codigo: 'The code has six digits.', ing_verificando: 'Verifying…', ing_no_verifico: 'Could not verify.', ing_entrando: 'Signing in…', ing_listo: 'Done, you are in.',
+    ing_social_off: 'Google and Apple are not active yet. Use your email.',
+    /* 12/9 · psi (psi.html): la página del Personal Shopper Inmobiliario para el inversor extranjero. El nombre queda
+       como nombre propio (eyebrow y título); el lead lo explica. El PDF cambia de archivo por idioma desde la página. */
+    psi_h1: 'Buying in Buenos Aires',
+    psi_not_buscar: 'No searching', psi_not_visitar: 'No visiting', psi_not_negociar: 'No negotiating',
+    psi_sub: 'We take care of <em>everything</em>.',
+    psi_lead: 'Your buyer\'s agent in Buenos Aires. You tell us which apartment you want. We review it, negotiate and <b>buy it for you.</b>',
+    psi_solicitar: 'Request information',
+    psi_video_eyebrow: 'The service, in one minute', psi_pdf: 'Learn more about our service',
+    psi_form_h2: 'Leave us your details and we will get in touch.',
+    psi_lbl_nombre: 'Name', psi_lbl_email: 'Email', psi_lbl_tel: 'Phone', psi_lbl_msg: 'Message',
+    psi_ph_nombre: 'Your name', psi_ph_email: 'Your email', psi_ph_tel: 'Your phone number', psi_ph_msg: 'Message (optional)',
+    psi_enviar: 'Send', psi_enviando: 'Sending…',
+    psi_thanks: 'Thank you. We received your enquiry and will be in touch shortly.',
+    psi_err_envio: 'We could not send your enquiry. Message us on WhatsApp.',
+    /* 12/9 · varios */
+    ui_modo_local_title: 'No database connected: data stays in this browser', psi_title: 'Personal Shopper Inmobiliario · BAIREN',
   },
   pt: {
     skip: 'Ir para o conteúdo', menu: 'Menu', idioma: 'Idioma',
@@ -244,8 +326,7 @@ window.BP_I18N = {
     cat_crumb_todas: 'Todas as operações', cat_mapa_nd: 'Mapa indisponível.',
     cat_amb_btn: '{n}+ amb.', cat_dorm_btn: '{n}+ dorm.', cat_precio_btn: 'USD {a} a {b}', cat_sin_max: 'sem máximo',
     cat_quitar: 'Remover {z}', cat_err_max: 'O máximo tem que ser maior que o mínimo.', cat_err_carga: 'Não conseguimos carregar os imóveis.',
-    cat_toast_alerta_quitada: 'Alerta removido.', cat_toast_alerta_mail: 'Alerta salvo. Avisamos por e-mail quando entrar um imóvel assim.', cat_toast_alerta_local: 'Alerta salvo neste navegador. Com a sua conta, chega por e-mail.',
-    cat_unidad: ' unidade', cat_unidades: ' unidades',
+    cat_toast_alerta_quitada: 'Alerta removido.', cat_unidad: ' unidade', cat_unidades: ' unidades',
 
     /* ficha (propiedad.html): hero, galería, la unidad */
     ficha_reservada: 'Reservado', ficha_estado: 'Situação', ficha_precio: 'Preço', ficha_precio_mensual: 'Aluguel mensal', ficha_no_consultas: 'não recebe consultas', ficha_por_mes: 'por mês', ficha_todo_incluido: 'por mês · tudo incluído', ficha_mas_expensas: 'mais $ {n} de condomínio',
@@ -303,5 +384,87 @@ window.BP_I18N = {
     emp_wa_msg: 'Olá, vi {t} na BAIREN e quero mais informações.', emp_mail_subject: 'Consulta sobre {t} pela BAIREN',
     emp_ver_unidad_1: 'Ver a unidade', emp_ver_unidades: 'Ver as {n} unidades',
     emp_vacio: 'Ainda não há empreendimentos publicados{donde}. Se você é incorporadora, <a href="publicar.html#desarrolladora" style="text-decoration:underline">publique o seu</a>.', emp_vacio_en: ' em {z}',
+    /* 12/9 · panel e ingresar (panel.html, ingresar.html, store.js): riel y vistas del panel, Mi cuenta, la entrada con código
+       y la pregunta del perfil. Mismas claves que el bloque de en. */
+    pan_title: 'Painel · BAIREN', pan_modo_local: 'modo local', pan_os_title: 'Visitas, reservas e cobranças das suas unidades',
+    pan_est_borrador: 'Rascunho', pan_est_en_revision: 'Em revisão', pan_est_publicado: 'Publicado', pan_est_rechazado: 'Recusado', pan_est_pausado: 'Pausado', pan_est_vencido: 'Vencido',
+    perfil_busca: 'Procuro imóvel', perfil_dueno: 'Proprietário direto', perfil_profesional: 'Imobiliária, corretor ou incorporadora',
+    ing_revisa_mail: 'Confira o e-mail.', ing_codigo_enviado: 'Enviamos um código de seis dígitos para {e}. Se não chegar, confira o spam.', ing_codigo_local: 'Modo local: seu código é {c}. Com o Supabase conectado, chega por e-mail.', ing_codigo_incorrecto: 'Código incorreto.',
+    img_icono_n: 'Ícone {n}', img_no_proceso: 'Não foi possível processar a imagem.', img_no_abre: 'O arquivo não é uma imagem que o navegador consiga abrir. Tente JPG ou PNG.', img_elegi_una: 'Escolha uma imagem.', img_heic: 'É uma foto HEIC do iPhone: compartilhe como JPG (Ajustes → Câmera → Formatos → Mais compatível) ou escolha outra.', img_pesada: 'A foto tem mais de 15 MB: exporte uma menor.', img_no_subio_msg: 'Não foi possível enviar a foto: {m}',
+    pan_av_1: 'Terno e gravata', pan_av_2: 'Camiseta e óculos', pan_av_3: 'Blazer e camisa', pan_av_4: 'Camiseta e óculos redondos',
+    pan_fb_guardado: 'Salvo. O proprietário vê na conta dele.', pan_confirmada: 'Confirmada', pan_visita_confirmada: 'Visita confirmada. Avise {n} pelo WhatsApp ou por e-mail.', pan_no_confirmo: 'Não foi possível confirmar: ',
+    /* mis avisos */
+    pan_op_venta: 'Venda', pan_op_mediano: 'Aluguel, médio prazo', pan_op_alquiler: 'Aluguel, longo prazo', pan_op_alq: 'Aluguel',
+    pan_motivo: 'Motivo: ', pan_visitas_reservas: 'Visitas e reservas', pan_las_ve: '· quem vê: {e}', pan_tipo_visita: 'Visita', pan_tipo_reserva: 'Reserva', pan_tipo_cierre: 'Fechamento',
+    pan_fb_ph: 'O que disse quem visitou?', pan_fb_aria: 'O que disse quem visitou', pan_guardar: 'Salvar', pan_sin_registros: 'Ainda sem registros.',
+    pan_tipo_registro: 'Tipo de registro', pan_fecha_hora: 'Data e hora', pan_nota_ph: 'Observação (opcional)', pan_nota: 'Observação', pan_registrar: 'Registrar',
+    pan_vistas: 'Visualizações', pan_consultas: 'Consultas', pan_fotos: 'Fotos',
+    pan_editar: 'Editar', pan_reactivar: 'Reativar', pan_completar: 'Completar e enviar', pan_ver_ficha: 'Ver anúncio', pan_marcar_disponible: 'Marcar como disponível', pan_marcar_reservada: 'Marcar como reservado', pan_pausar: 'Pausar', pan_mas_acciones: 'Mais ações',
+    pan_verificado_min: 'verificado', pan_verif_pendiente: 'verificação pendente', pan_publicar_otra: 'Publicar outro',
+    pan_nota_vistas: 'Visualizações e consultas deste navegador. Com o banco conectado, as de todos os visitantes.',
+    pan_kpi_publicados: 'Publicados', pan_kpi_revision: 'Em revisão', pan_kpi_vistas_local: ' neste navegador',
+    pan_vacio_avisos_t: 'Você ainda não cadastrou nenhum imóvel.', pan_vacio_avisos_p: 'Cinco passos: seu perfil, o principal, fotos e vídeo, extras e revisão. Você pode salvar e continuar depois.', pan_publicar_primera: 'Publicar o primeiro',
+    pan_herr_aria: 'Buscar e filtrar anúncios', pan_buscar: 'Buscar', pan_q_ph: 'Endereço, bairro ou código',
+    pan_estado: 'Situação', pan_f_todos_estados: 'Todas as situações', pan_f_publicados: 'Publicados', pan_f_reservadas: 'Reservados', pan_f_pausados: 'Pausados', pan_f_pendientes: 'Em revisão, rascunho ou recusado',
+    pan_operacion: 'Operação', pan_f_todas_op: 'Todas as operações',
+    pan_ordenar: 'Ordenar', pan_o_recientes: 'Mais recentes', pan_o_vistas: 'Mais vistos', pan_o_consultas: 'Mais consultas', pan_o_az: 'Por endereço',
+    pan_n_aviso_1: '1 anúncio', pan_n_avisos: '{n} anúncios', pan_n_de: '{a} de {b}', pan_limpiar_filtros: 'Limpar filtros', pan_sin_coincidencia: 'Nenhum anúncio corresponde à busca.', pan_ver_mas: 'Ver mais {n}',
+    pan_err_fecha: 'Escolha data e hora.', pan_registrado: 'Registrado. O proprietário vê na conta dele.', pan_no_registro: 'Não foi possível registrar.',
+    pan_t_pausado: 'Anúncio pausado. Não aparece mais nos resultados.', pan_t_reactivado: 'Anúncio publicado de novo.', pan_t_reservada: 'Marcado como reservado.', pan_t_disponible: 'Marcado como disponível.', pan_no_se_pudo: 'Não foi possível.',
+    pan_sin_pub_t: 'Você ainda não tem perfil de anunciante.', pan_sin_pub_p: 'Ele é criado no primeiro passo ao publicar: proprietário direto, imobiliária ou incorporadora.', pan_publicar_prop: 'Publicar um imóvel',
+    /* mis propiedades */
+    pan_props_sub: 'Suas unidades publicadas por uma imobiliária, com as visitas e reservas que ela registra. Você as vê com a sua conta.',
+    pan_props_vacio: 'Não há imóveis associados a {e}. Peça à sua imobiliária que cadastre seu e-mail no anúncio, ou <a href="publicar-aviso.html" style="text-decoration:underline">publique como proprietário direto</a>.',
+    pan_publica_min: 'anunciado por', pan_vistas_min: 'visualizações', pan_visitas_reservas_min: 'visitas e reservas', pan_lo_que_dijo: 'O que disse: ', pan_sin_visitas: 'Ainda não há visitas registradas.',
+    /* interesados */
+    pan_int_vacio_pub_t: 'As consultas dos seus anúncios vão aparecer aqui.', pan_int_vacio_pub_p: 'Com nome, e-mail e telefone de quem pergunta, e o pedido de visita, se houver. Cada uma chega também por e-mail.',
+    pan_int_sub: 'Cada consulta chegou também por e-mail ou WhatsApp. Responda você: a BAIREN não intervém.',
+    pan_th_fecha: 'Data', pan_th_propiedad: 'Imóvel', pan_th_persona: 'Pessoa', pan_th_mensaje: 'Mensagem', pan_th_visita: 'Visita', pan_th_publicador: 'Anunciante', pan_th_creada: 'Criado', pan_th_tipo: 'Tipo', pan_th_detalle: 'Detalhe',
+    pan_confirmar_visita: 'Confirmar visita', pan_wa_aria: 'Escrever para {n} pelo WhatsApp',
+    pan_int_vacio_t: 'Você ainda não recebeu consultas.', pan_int_vacio_p: 'Quando alguém perguntar sobre um anúncio, aparece aqui com nome, e-mail e telefone, e o pedido de visita, se houver. Chega também por e-mail.',
+    /* mis contactos, favoritos */
+    pan_cont_sub: 'Os imóveis sobre os quais você consultou e quem recebeu sua mensagem.', pan_volver_escribir: 'Escrever de novo',
+    pan_cont_vacio_t: 'Você ainda não consultou sobre nenhum imóvel.', pan_cont_vacio_p: 'Quando você escrever a partir de um anúncio, fica aqui quem recebeu sua mensagem e quando, para retomar a conversa.',
+    pan_ver_como_busqueda: 'Ver como busca', pan_fav_vacio_t: 'Você ainda não salvou nenhum imóvel.', pan_fav_vacio_p: 'Toque no coração em um card ou em um anúncio e ele fica aqui para comparar depois.',
+    /* búsquedas y alertas */
+    pan_publicada_a: 'Anunciado por {p}', pan_opf_venta: 'venda', pan_opf_alquiler: 'aluguel', pan_opf_mediano: 'médio prazo', pan_opf_largo: 'longo prazo', pan_busqueda_min: 'busca',
+    pan_al_sub: 'Avisamos por e-mail quando entra um imóvel que combina ou quando um que você acompanha baixa de preço.',
+    pan_baja_precio: 'Queda de preço', pan_busqueda_guardada: 'Busca salva', pan_quitar: 'Remover', pan_quitando: 'Removendo',
+    pan_al_vacio_t: 'Você ainda não criou nenhum alerta.', pan_al_vacio_p: 'No catálogo, com os filtros aplicados, toque em "Criar alerta": avisamos por e-mail quando entrar um imóvel que combina.', pan_ir_catalogo: 'Ir ao catálogo',
+    pan_no_quito_alerta: 'Não foi possível remover o alerta: ',
+    /* mi cuenta */
+    pan_tipo_dueno: 'Proprietário direto', pan_tipo_desarrolladora: 'Incorporadora', pan_tipo_inmobiliaria: 'Imobiliária ou corretor',
+    pan_mail: 'E-mail', pan_en_bairen: 'Na BAIREN', pan_sin_elegir: 'Sem escolher: o painel mostra tudo', pan_publicador: 'Anunciante', pan_tipo: 'Tipo', pan_verificacion: 'Verificação', pan_verificado: ' Verificado', pan_verif_pend_bairen: 'Pendente: a BAIREN revisa', pan_matricula: 'Matrícula', pan_sin_publicador: 'Ainda sem perfil. Ele é criado ao publicar.',
+    pan_que_venis: 'O que você veio fazer na BAIREN', pan_perfil_nota: 'Define o que o painel mostra, não o que você pode fazer. Mude quando quiser.', pan_editar_publicador: 'Editar perfil de anunciante',
+    pan_privacidad: '<b>Privacidade.</b> Você pode pedir acesso, correção ou exclusão dos seus dados escrevendo para <a href="mailto:contacto@bairengroup.com">contacto@bairengroup.com</a>. Os documentos de verificação são apagados depois da revisão.',
+    pan_perfil_listo: 'Pronto. O painel já mostra o que serve para você.',
+    /* ingresar */
+    ing_title: 'Entrar · BAIREN', ing_sub: 'Favoritos, alertas, seus contatos e, se você publica, seu painel. Sem senha: enviamos um código para o seu e-mail.',
+    ing_mail: 'E-mail', ing_mail_ph: 'Seu e-mail', ing_continuar: 'Continuar', ing_codigo: 'Código de seis dígitos', ing_reenviar: 'Reenviar código', ing_reenviar_en: 'Reenviar em {s} s', ing_cambiar_mail: 'Trocar e-mail',
+    ing_op_busca: 'Procuro imóvel', ing_op_busca_s: 'Alugar ou comprar. Favoritos, alertas e suas consultas.', ing_op_dueno: 'Sou proprietário direto', ing_op_dueno_s: 'Publicar meu imóvel, ou acompanhar o que minha imobiliária publica.', ing_op_prof: 'Imobiliária, corretor ou incorporadora', ing_op_prof_s: 'Publicar anúncios, receber interessados, importar minha carteira.',
+    ing_o: 'ou', ing_google: 'Continuar com o Google', ing_apple: 'Continuar com a Apple',
+    ing_legal: 'Ao continuar você aceita os <a href="legales.html#terminos" style="text-decoration:underline">Termos e condições</a> e a <a href="legales.html#privacidad" style="text-decoration:underline">Política de privacidade</a>. Uma conta por pessoa.',
+    ing_crea_cuenta: 'Crie sua conta para publicar', ing_crea_sub: 'Um e-mail e um código. Depois você completa seu perfil e cadastra o imóvel.',
+    ing_modo_local: 'Modo local: sem banco conectado, a sessão e os dados ficam neste navegador.',
+    ing_pregunta: 'O que você veio fazer na BAIREN?', ing_pregunta_sub: 'Assim o painel mostra o que serve para você. Mude quando quiser.',
+    ing_guardando: 'Salvando…', ing_no_guardo: 'Não foi possível salvar.', ing_err_mail: 'Confira o e-mail, por exemplo nome@dominio.com.', ing_enviando: 'Enviando…', ing_no_envio: 'Não foi possível enviar o código.',
+    ing_err_codigo: 'O código tem seis dígitos.', ing_verificando: 'Verificando…', ing_no_verifico: 'Não foi possível verificar.', ing_entrando: 'Entrando…', ing_listo: 'Pronto, você entrou.',
+    ing_social_off: 'Google e Apple ainda não estão ativos. Use o e-mail.',
+    /* 12/9 · psi (psi.html): a página do Personal Shopper Inmobiliario para o investidor estrangeiro. O nome fica
+       como nome próprio (eyebrow e título); o lead explica. O PDF muda de arquivo por idioma desde a página. */
+    psi_h1: 'Comprar em Buenos Aires',
+    psi_not_buscar: 'Sem procurar', psi_not_visitar: 'Sem visitar', psi_not_negociar: 'Sem negociar',
+    psi_sub: 'Nós cuidamos <em>de tudo</em>.',
+    psi_lead: 'Seu personal shopper imobiliário em Buenos Aires. Você nos diz qual apartamento quer. Nós avaliamos, negociamos e <b>compramos por você.</b>',
+    psi_solicitar: 'Solicitar informações',
+    psi_video_eyebrow: 'O serviço, em um minuto', psi_pdf: 'Saiba mais sobre o nosso serviço',
+    psi_form_h2: 'Deixe seus dados e entraremos em contato.',
+    psi_lbl_nombre: 'Nome', psi_lbl_email: 'E-mail', psi_lbl_tel: 'Telefone', psi_lbl_msg: 'Mensagem',
+    psi_ph_nombre: 'Seu nome', psi_ph_email: 'Seu e-mail', psi_ph_tel: 'Seu telefone', psi_ph_msg: 'Mensagem (opcional)',
+    psi_enviar: 'Enviar', psi_enviando: 'Enviando…',
+    psi_thanks: 'Obrigado. Recebemos sua consulta e entraremos em contato em breve.',
+    psi_err_envio: 'Não foi possível enviar sua consulta. Fale com a gente pelo WhatsApp.',
+    /* 12/9 · varios */
+    ui_modo_local_title: 'Sem banco de dados conectado: os dados ficam neste navegador', psi_title: 'Personal Shopper Inmobiliario · BAIREN',
   }
 };

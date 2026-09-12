@@ -40,7 +40,8 @@
     if (!u || u.indexOf('/storage/v1/object/public/') === -1) return u;
     return u.replace('/storage/v1/object/public/','/storage/v1/render/image/public/') + (u.indexOf('?')>-1?'&':'?') + 'width=' + w + '&quality=75';
   };
-  BP.fmtUSD = n => n == null ? BP.t('ui_consultar', 'Consultar') : 'USD ' + Math.round(n).toLocaleString('es-AR');
+  BP.LOCALE = () => ({ en: 'en-US', pt: 'pt-BR' })[BP.lang] || 'es-AR';
+  BP.fmtUSD = n => n == null ? BP.t('ui_consultar', 'Consultar') : 'USD ' + Math.round(n).toLocaleString(BP.LOCALE());
   BP.isoLocal = d => { const x = new Date(d); x.setMinutes(x.getMinutes() - x.getTimezoneOffset()); return x.toISOString().slice(0, 16); };
   BP.fmtN = n => n == null ? '' : Number(n).toLocaleString('es-AR');
   BP.esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -497,7 +498,7 @@
   BP.applySession = function(session, mode){
     const right = document.querySelector('.p-nav-right'); const mob = document.getElementById('mobileMenu');
     if (!right) return;
-    const modeTag = mode === 'local' ? '<span class="p-badge demo" style="margin-left:6px" title="Sin base conectada: los datos quedan en este navegador">modo local</span>' : '';
+    const modeTag = mode === 'local' ? `<span class="p-badge demo" style="margin-left:6px" title="${BP.esc(BP.t('ui_modo_local_title', 'Sin base conectada: los datos quedan en este navegador'))}">${BP.t('pan_modo_local', 'modo local')}</span>` : '';
     if (session) {
       /* 11/9 noche · El desplegable "Mi cuenta" muestra lo mismo que el riel del panel: las vistas según el perfil
          de la cuenta (BPStore.rielDe; sin perfil, la lista completa). Los rótulos van por BP.t, con las claves

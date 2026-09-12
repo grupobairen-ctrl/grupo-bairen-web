@@ -27,44 +27,51 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://dahusnnbyrvltcuaelxj.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260912o"><link rel="stylesheet" href="css/catalogo.css?v=20260912o"><link rel="stylesheet" href="css/portal.css?v=20260912o">
+  <link rel="stylesheet" href="css/base.css?v=20260912p"><link rel="stylesheet" href="css/catalogo.css?v=20260912p"><link rel="stylesheet" href="css/portal.css?v=20260912p">
 </head>
 <body>
 <div class="p-velo" aria-hidden="true"><span class="w">BAIREN</span></div>
 <div id="pHeader"></div>
 <section class="p-page dark" role="main"><div class="p-container">
   <div class="p-login" data-reveal>
+    <!-- 12/9 · Idioma: lo fijo lleva data-i18n (ui.js lo aplica al dibujar el header); lo que el JS reescribe (título, subtítulo, botones, reenviar, la nota de modo) sale de BP.t con el castellano por defecto -->
     <h1 id="ttl">Ingresar</h1>
     <p class="p-sub" id="sub" style="margin-bottom:18px">Favoritos, alertas, tus contactos y, si publicás, tu panel. Sin contraseña: te mandamos un código al mail.</p>
-    <form id="stepMail" novalidate><label class="p-sr" for="email">Mail</label><input type="email" name="email" id="email" placeholder="Tu mail" required autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false"><button type="submit" class="p-btn p-btn-fill" style="width:100%" id="btnMail">Continuar</button></form>
-    <form id="stepCode" hidden novalidate><p class="p-note" id="codeMsg" style="margin-bottom:10px" role="status"></p><label class="p-sr" for="code">Código de seis dígitos</label><input type="text" name="code" id="code" inputmode="numeric" pattern="[0-9]*" maxlength="8" placeholder="Código de seis dígitos" required autocomplete="one-time-code" autocapitalize="off" spellcheck="false"><button type="submit" class="p-btn p-btn-fill" style="width:100%" id="btnCode">Ingresar</button><p class="p-note" style="text-align:center;margin-top:10px"><a href="#" id="again" style="text-decoration:underline">Reenviar código</a> · <a href="#" id="back" style="text-decoration:underline">Cambiar mail</a></p></form>
+    <form id="stepMail" novalidate><label class="p-sr" for="email" data-i18n="ing_mail">Mail</label><input type="email" name="email" id="email" placeholder="Tu mail" data-i18n-ph="ing_mail_ph" required autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false"><button type="submit" class="p-btn p-btn-fill" style="width:100%" id="btnMail">Continuar</button></form>
+    <form id="stepCode" hidden novalidate><p class="p-note" id="codeMsg" style="margin-bottom:10px" role="status"></p><label class="p-sr" for="code" data-i18n="ing_codigo">Código de seis dígitos</label><input type="text" name="code" id="code" inputmode="numeric" pattern="[0-9]*" maxlength="8" placeholder="Código de seis dígitos" data-i18n-ph="ing_codigo" required autocomplete="one-time-code" autocapitalize="off" spellcheck="false"><button type="submit" class="p-btn p-btn-fill" style="width:100%" id="btnCode">Ingresar</button><p class="p-note" style="text-align:center;margin-top:10px"><a href="#" id="again" style="text-decoration:underline">Reenviar código</a> · <a href="#" id="back" style="text-decoration:underline" data-i18n="ing_cambiar_mail">Cambiar mail</a></p></form>
     <form id="stepPerfil" hidden novalidate>
       <fieldset class="p-quien" aria-labelledby="ttl">
-        <label class="p-quien-op"><input type="radio" name="perfil" value="busca"><i aria-hidden="true">1</i><span class="tx"><b>Busco propiedad</b><small>Alquilar o comprar. Favoritos, alertas y tus consultas.</small></span></label>
-        <label class="p-quien-op"><input type="radio" name="perfil" value="dueno"><i aria-hidden="true">2</i><span class="tx"><b>Soy dueño directo</b><small>Publicar mi propiedad, o seguir la que publica mi inmobiliaria.</small></span></label>
-        <label class="p-quien-op"><input type="radio" name="perfil" value="profesional"><i aria-hidden="true">3</i><span class="tx"><b>Inmobiliaria, corredor o desarrolladora</b><small>Publicar avisos, recibir interesados, importar mi cartera.</small></span></label>
+        <label class="p-quien-op"><input type="radio" name="perfil" value="busca"><i aria-hidden="true">1</i><span class="tx"><b data-i18n="ing_op_busca">Busco propiedad</b><small data-i18n="ing_op_busca_s">Alquilar o comprar. Favoritos, alertas y tus consultas.</small></span></label>
+        <label class="p-quien-op"><input type="radio" name="perfil" value="dueno"><i aria-hidden="true">2</i><span class="tx"><b data-i18n="ing_op_dueno">Soy dueño directo</b><small data-i18n="ing_op_dueno_s">Publicar mi propiedad, o seguir la que publica mi inmobiliaria.</small></span></label>
+        <label class="p-quien-op"><input type="radio" name="perfil" value="profesional"><i aria-hidden="true">3</i><span class="tx"><b data-i18n="ing_op_prof">Inmobiliaria, corredor o desarrolladora</b><small data-i18n="ing_op_prof_s">Publicar avisos, recibir interesados, importar mi cartera.</small></span></label>
       </fieldset>
       <button type="submit" class="p-btn p-btn-fill" style="width:100%" id="btnPerfil" disabled>Continuar</button>
     </form>
-    <div id="social"><div class="or">o</div><button type="button" class="soc" data-soc="google"><svg class="soc-logo" viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.7-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.8z"/><path fill="#34A853" d="M12 24c3.2 0 6-1.1 7.9-2.9l-3.9-3c-1.1.7-2.4 1.2-4 1.2-3.1 0-5.7-2.1-6.7-4.9H1.3v3.1C3.3 21.4 7.3 24 12 24z"/><path fill="#FBBC05" d="M5.3 14.4c-.2-.7-.4-1.5-.4-2.4s.1-1.6.4-2.4V6.5H1.3C.5 8.2 0 10 0 12s.5 3.8 1.3 5.5l4-3.1z"/><path fill="#EA4335" d="M12 4.8c1.8 0 3.3.6 4.6 1.8l3.4-3.4C17.9 1.2 15.2 0 12 0 7.3 0 3.3 2.6 1.3 6.5l4 3.1c1-2.8 3.6-4.8 6.7-4.8z"/></svg><span>Continuar con Google</span></button><button type="button" class="soc" data-soc="apple"><svg class="soc-logo" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16.4 12.7c0-2.5 2-3.7 2.1-3.8-1.2-1.7-3-1.9-3.6-2-1.5-.2-3 .9-3.8.9-.8 0-2-.9-3.3-.9-1.7 0-3.3 1-4.2 2.5-1.8 3.1-.5 7.7 1.3 10.3.9 1.2 1.9 2.6 3.2 2.6 1.3-.1 1.8-.8 3.3-.8s2 .8 3.3.8c1.4 0 2.3-1.3 3.1-2.5 1-1.4 1.4-2.8 1.4-2.9-.1 0-2.8-1.1-2.8-4.2zM14 5.3c.7-.8 1.2-2 1-3.1-1 0-2.2.7-2.9 1.5-.6.7-1.2 1.9-1 3 1.1.1 2.2-.6 2.9-1.4z"/></svg><span>Continuar con Apple</span></button></div>
-    <p class="p-note" id="legal" style="margin-top:14px">Al continuar aceptás los <a href="legales.html#terminos" style="text-decoration:underline">Términos y condiciones</a> y la <a href="legales.html#privacidad" style="text-decoration:underline">Política de privacidad</a>. Una cuenta por persona.</p>
+    <div id="social"><div class="or" data-i18n="ing_o">o</div><button type="button" class="soc" data-soc="google"><svg class="soc-logo" viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.7-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.8z"/><path fill="#34A853" d="M12 24c3.2 0 6-1.1 7.9-2.9l-3.9-3c-1.1.7-2.4 1.2-4 1.2-3.1 0-5.7-2.1-6.7-4.9H1.3v3.1C3.3 21.4 7.3 24 12 24z"/><path fill="#FBBC05" d="M5.3 14.4c-.2-.7-.4-1.5-.4-2.4s.1-1.6.4-2.4V6.5H1.3C.5 8.2 0 10 0 12s.5 3.8 1.3 5.5l4-3.1z"/><path fill="#EA4335" d="M12 4.8c1.8 0 3.3.6 4.6 1.8l3.4-3.4C17.9 1.2 15.2 0 12 0 7.3 0 3.3 2.6 1.3 6.5l4 3.1c1-2.8 3.6-4.8 6.7-4.8z"/></svg><span data-i18n="ing_google">Continuar con Google</span></button><button type="button" class="soc" data-soc="apple"><svg class="soc-logo" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16.4 12.7c0-2.5 2-3.7 2.1-3.8-1.2-1.7-3-1.9-3.6-2-1.5-.2-3 .9-3.8.9-.8 0-2-.9-3.3-.9-1.7 0-3.3 1-4.2 2.5-1.8 3.1-.5 7.7 1.3 10.3.9 1.2 1.9 2.6 3.2 2.6 1.3-.1 1.8-.8 3.3-.8s2 .8 3.3.8c1.4 0 2.3-1.3 3.1-2.5 1-1.4 1.4-2.8 1.4-2.9-.1 0-2.8-1.1-2.8-4.2zM14 5.3c.7-.8 1.2-2 1-3.1-1 0-2.2.7-2.9 1.5-.6.7-1.2 1.9-1 3 1.1.1 2.2-.6 2.9-1.4z"/></svg><span data-i18n="ing_apple">Continuar con Apple</span></button></div>
+    <p class="p-note" id="legal" style="margin-top:14px" data-i18n-html="ing_legal">Al continuar aceptás los <a href="legales.html#terminos" style="text-decoration:underline">Términos y condiciones</a> y la <a href="legales.html#privacidad" style="text-decoration:underline">Política de privacidad</a>. Una cuenta por persona.</p>
     <p class="p-note" id="modeNote" style="margin-top:8px"></p>
   </div>
 </div></section>
 <div id="pFooter"></div>
-<script src="supabase-portal.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260912o" defer></script><script src="js/i18n-portal.js?v=20260912o" defer></script><script src="js/ui.js?v=20260912o" defer></script><script src="js/store.js?v=20260912o" defer></script><script src="js/data.js?v=20260912o" defer></script>
+<script src="supabase-portal.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260912p" defer></script><script src="js/i18n-portal.js?v=20260912p" defer></script><script src="js/ui.js?v=20260912p" defer></script><script src="js/store.js?v=20260912p" defer></script><script src="js/data.js?v=20260912p" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
 (async function(){
   BP.header(); BP.footer(); BP.reveal();
+  /* 12/9 · Idioma: los textos que este script reescribe salen de BP.t / BP.tf con el castellano por defecto (en es no cambia nada) */
+  document.title = BP.t('ing_title', 'Ingresar · BAIREN');
+  const T = { continuar: BP.t('ing_continuar', 'Continuar'), ingresar: BP.t('ingresar', 'Ingresar') };
+  document.getElementById('ttl').textContent = T.ingresar; document.getElementById('sub').textContent = BP.t('ing_sub', 'Favoritos, alertas, tus contactos y, si publicás, tu panel. Sin contraseña: te mandamos un código al mail.');
+  document.getElementById('btnMail').textContent = T.continuar; document.getElementById('btnPerfil').textContent = T.continuar; document.getElementById('btnCode').textContent = T.ingresar;
+  document.getElementById('again').textContent = BP.t('ing_reenviar', 'Reenviar código');
   const qs = BP.qs(); const volver = qs.get('volver') || 'panel'; const perfil = qs.get('perfil') || '';
   const destino = () => { if (volver === 'publicar') return 'publicar-aviso.html' + (perfil ? '?perfil=' + perfil : ''); if (volver === 'contactos') return 'panel.html#contactos'; if (volver === 'curacion') return 'curacion.html'; if (/^[a-z0-9-]+\.html(#[\w-]*)?$/i.test(volver)) return volver; return 'panel.html'; };
   const fm = document.getElementById('stepMail'), fc = document.getElementById('stepCode'), fp = document.getElementById('stepPerfil'), email = document.getElementById('email');
   fm.addEventListener('submit', e => e.preventDefault()); fc.addEventListener('submit', e => e.preventDefault()); fp.addEventListener('submit', e => e.preventDefault());
-  if (volver === 'publicar') { document.getElementById('ttl').textContent = 'Creá tu cuenta para publicar'; document.getElementById('sub').textContent = 'Un mail y un código. Después completás tu perfil y cargás la propiedad.'; }
+  if (volver === 'publicar') { document.getElementById('ttl').textContent = BP.t('ing_crea_cuenta', 'Creá tu cuenta para publicar'); document.getElementById('sub').textContent = BP.t('ing_crea_sub', 'Un mail y un código. Después completás tu perfil y cargás la propiedad.'); }
   const mode = await BPStore.init();
-  document.getElementById('modeNote').textContent = mode === 'local' ? 'Modo local: sin base conectada, la sesión y los datos quedan en este navegador.' : '';
+  document.getElementById('modeNote').textContent = mode === 'local' ? BP.t('ing_modo_local', 'Modo local: sin base conectada, la sesión y los datos quedan en este navegador.') : '';
   /* 11/9 · El perfil de la cuenta se pregunta una sola vez, después del código: no si ya lo eligió, no si ya tiene
      publicador (de ahí sale solo), no si vino a publicar (lo define el paso 1 de la carga), no si vino a curar
      y no en modo demo (la sesión es de mentira). Es una preferencia del panel, no un permiso: se cambia desde Mi cuenta.
@@ -73,36 +80,36 @@ document.addEventListener('DOMContentLoaded', function(){
      porque ahí sí importa si es inmobiliaria o desarrolladora. Si vino con un destino (volver), ese destino manda. */
   const irA = p => p === 'busca' ? 'panel.html#favoritos' : p === 'dueno' ? 'panel.html' : 'publicar-aviso.html?paso=perfil';
   const hayQuePreguntar = async () => { if (volver === 'publicar' || volver === 'curacion' || (BPStore.session && BPStore.session.demo) || BPStore.getPerfil()) return false; try { return !(await BPStore.perfilEfectivo()); } catch (e) { return true; } };
-  const mostrarPregunta = () => { document.getElementById('ttl').textContent = '¿Qué venís a hacer a BAIREN?'; document.getElementById('sub').textContent = 'Así el panel te muestra lo que te sirve. Lo cambiás cuando quieras.'; const caja = document.querySelector('.p-login'); caja.classList.add('pregunta'); const _paso = () => { fm.hidden = true; fc.hidden = true; document.getElementById('social').hidden = true; document.getElementById('legal').hidden = true; fp.hidden = false; }; if (window.BPM && BPM.cambioDePaso) BPM.cambioDePaso(caja, _paso, 1); else _paso(); const h = document.getElementById('ttl'); h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); };
+  const mostrarPregunta = () => { document.getElementById('ttl').textContent = BP.t('ing_pregunta', '¿Qué venís a hacer a BAIREN?'); document.getElementById('sub').textContent = BP.t('ing_pregunta_sub', 'Así el panel te muestra lo que te sirve. Lo cambiás cuando quieras.'); const caja = document.querySelector('.p-login'); caja.classList.add('pregunta'); const _paso = () => { fm.hidden = true; fc.hidden = true; document.getElementById('social').hidden = true; document.getElementById('legal').hidden = true; fp.hidden = false; }; if (window.BPM && BPM.cambioDePaso) BPM.cambioDePaso(caja, _paso, 1); else _paso(); const h = document.getElementById('ttl'); h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); };
   /* La opción elegida lleva la clase .on además de :has(input:checked): el estilo no depende solo de :has() */
   fp.addEventListener('change', () => { fp.querySelectorAll('.p-quien-op').forEach(l => l.classList.toggle('on', !!l.querySelector('input:checked'))); document.getElementById('btnPerfil').disabled = !fp.querySelector('[name=perfil]:checked'); });
   fp.addEventListener('submit', async e => {
     e.preventDefault(); const r = fp.querySelector('[name=perfil]:checked'), b = document.getElementById('btnPerfil'); if (!r || b.disabled) return;
-    b.disabled = true; b.textContent = 'Guardando…';
-    try { await BPStore.setPerfil(r.value); } catch (err) { b.disabled = false; b.textContent = 'Continuar'; BP.toast(err.message || 'No se pudo guardar.', 'error'); return; }
+    b.disabled = true; b.textContent = BP.t('ing_guardando', 'Guardando…');
+    try { await BPStore.setPerfil(r.value); } catch (err) { b.disabled = false; b.textContent = T.continuar; BP.toast(err.message || BP.t('ing_no_guardo', 'No se pudo guardar.'), 'error'); return; }
     const volverExplicito = qs.get('volver');
     location.href = volverExplicito && volverExplicito !== 'panel' ? destino() : irA(r.value);
   });
   if (BPStore.session) { if (await hayQuePreguntar()) { mostrarPregunta(); return; } location.replace(destino()); return; }
   let mail = '';
-  async function send(){ const b = document.getElementById('btnMail'); if (b.disabled) return; if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.value.trim())) { BP.errorCampo('email', 'Revisá el mail, por ejemplo nombre@dominio.com.'); return; } b.disabled = true; b.textContent = 'Enviando…'; await BPStore.init(); let r; try { r = await BPStore.sendCode(email.value); } catch (err) { r = { ok: false, msg: err.message || 'No se pudo enviar el código.' }; } b.disabled = false; b.textContent = 'Continuar'; if (!r.ok) { BP.errorCampo('email', r.msg); return; } mail = email.value.trim().toLowerCase(); document.getElementById('codeMsg').textContent = r.msg; const _paso = () => { fm.hidden = true; document.getElementById('social').hidden = true; fc.hidden = false; }; if (window.BPM && BPM.cambioDePaso) BPM.cambioDePaso(document.querySelector('.p-login'), _paso, 1); else _paso(); const c = document.getElementById('code'); c.value = ''; c.focus(); }
+  async function send(){ const b = document.getElementById('btnMail'); if (b.disabled) return; if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.value.trim())) { BP.errorCampo('email', BP.t('ing_err_mail', 'Revisá el mail, por ejemplo nombre@dominio.com.')); return; } b.disabled = true; b.textContent = BP.t('ing_enviando', 'Enviando…'); await BPStore.init(); let r; try { r = await BPStore.sendCode(email.value); } catch (err) { r = { ok: false, msg: err.message || BP.t('ing_no_envio', 'No se pudo enviar el código.') }; } b.disabled = false; b.textContent = T.continuar; if (!r.ok) { BP.errorCampo('email', r.msg); return; } mail = email.value.trim().toLowerCase(); document.getElementById('codeMsg').textContent = r.msg; const _paso = () => { fm.hidden = true; document.getElementById('social').hidden = true; fc.hidden = false; }; if (window.BPM && BPM.cambioDePaso) BPM.cambioDePaso(document.querySelector('.p-login'), _paso, 1); else _paso(); const c = document.getElementById('code'); c.value = ''; c.focus(); }
   fm.addEventListener('submit', e => { e.preventDefault(); send(); });
   let reenviando = false;
-  document.getElementById('again').addEventListener('click', e => { e.preventDefault(); const ag = e.currentTarget; if (reenviando) return; reenviando = true; ag.setAttribute('aria-disabled', 'true'); send(); const t0 = ag.textContent; let seg = 30; ag.textContent = 'Reenviar en 30 s'; const iv = setInterval(() => { seg--; if (seg <= 0) { clearInterval(iv); reenviando = false; ag.textContent = t0; ag.removeAttribute('aria-disabled'); } else ag.textContent = 'Reenviar en ' + seg + ' s'; }, 1000); });
+  document.getElementById('again').addEventListener('click', e => { e.preventDefault(); const ag = e.currentTarget; if (reenviando) return; reenviando = true; ag.setAttribute('aria-disabled', 'true'); send(); const t0 = ag.textContent; let seg = 30; const cuenta = n => BP.tf('ing_reenviar_en', 'Reenviar en {s} s', { s: n }); ag.textContent = cuenta(30); const iv = setInterval(() => { seg--; if (seg <= 0) { clearInterval(iv); reenviando = false; ag.textContent = t0; ag.removeAttribute('aria-disabled'); } else ag.textContent = cuenta(seg); }, 1000); });
   document.getElementById('back').addEventListener('click', e => { e.preventDefault(); const volver = () => { fc.hidden = true; fm.hidden = false; document.getElementById('social').hidden = false; }; if (window.BPM && BPM.cambioDePaso) BPM.cambioDePaso(document.querySelector('.p-login'), volver, -1); else volver(); });
   fc.addEventListener('submit', async e => {
     e.preventDefault(); const code = document.getElementById('code'), b = document.getElementById('btnCode');
-    if (!/^\d{6,8}$/.test(code.value.trim())) { BP.errorCampo('code', 'El código tiene seis dígitos.'); return; }
-    b.disabled = true; b.textContent = 'Verificando…';
-    let r; try { r = await BPStore.verifyCode(mail, code.value); } catch (err) { r = { ok: false, msg: err.message || 'No se pudo verificar.' }; }
-    if (!r.ok) { b.disabled = false; b.textContent = 'Ingresar'; BP.errorCampo('code', r.msg); code.select(); return; }
-    b.textContent = 'Entrando…';
+    if (!/^\d{6,8}$/.test(code.value.trim())) { BP.errorCampo('code', BP.t('ing_err_codigo', 'El código tiene seis dígitos.')); return; }
+    b.disabled = true; b.textContent = BP.t('ing_verificando', 'Verificando…');
+    let r; try { r = await BPStore.verifyCode(mail, code.value); } catch (err) { r = { ok: false, msg: err.message || BP.t('ing_no_verifico', 'No se pudo verificar.') }; }
+    if (!r.ok) { b.disabled = false; b.textContent = T.ingresar; BP.errorCampo('code', r.msg); code.select(); return; }
+    b.textContent = BP.t('ing_entrando', 'Entrando…');
     if (await hayQuePreguntar()) { mostrarPregunta(); return; }
-    BP.toast('Listo, entraste.'); setTimeout(() => location.href = destino(), 500);
+    BP.toast(BP.t('ing_listo', 'Listo, entraste.')); setTimeout(() => location.href = destino(), 500);
   });
   /* 11/9 noche · Google y Apple vuelven a esta misma página con sus parámetros: la rama de arriba (sesión ya abierta)
      decide si hace la pregunta del perfil y recién después manda al destino. Antes iban directo al destino y nunca la veían. */
-  document.querySelectorAll('[data-soc]').forEach(b => b.addEventListener('click', async () => { if (mode === 'supabase') { const { error } = await BPStore.sb.auth.signInWithOAuth({ provider: b.dataset.soc, options: { redirectTo: location.origin + location.pathname.replace(/[^/]*$/, '') + 'ingresar.html' + location.search } }); if (error) BP.toast(error.message, 'error'); } else { BP.toast('Google y Apple todavía no están activos. Usá el mail.'); } }));
+  document.querySelectorAll('[data-soc]').forEach(b => b.addEventListener('click', async () => { if (mode === 'supabase') { const { error } = await BPStore.sb.auth.signInWithOAuth({ provider: b.dataset.soc, options: { redirectTo: location.origin + location.pathname.replace(/[^/]*$/, '') + 'ingresar.html' + location.search } }); if (error) BP.toast(error.message, 'error'); } else { BP.toast(BP.t('ing_social_off', 'Google y Apple todavía no están activos. Usá el mail.')); } }));
 })();
 });
 </script>
