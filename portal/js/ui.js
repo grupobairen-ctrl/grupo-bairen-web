@@ -507,7 +507,7 @@
       const vistas = riel.map(id => VISTAS[id]).filter(Boolean).map(v => `<a href="${v[2]}">${BP.t(v[0], v[1])}</a>`).join('');
       /* 12/9 · Con imagen elegida (ícono o foto), el botón la muestra a 22 px en lugar del ícono genérico; sin imagen, el ícono de siempre */
       const av = (window.BPStore && BPStore.getAvatar) ? BPStore.getAvatar() : null;
-      const avH = av && av.tipo ? BP.avatar(av, 'p-avatar-h', 22) : BP.ico.user;
+      const avH = BP.ico.user;   /* 12/9: la imagen de la cuenta se ve en el panel, no en el botón del header (pedido de Tomás) */
       right.innerHTML = `<button type="button" class="p-ghost p-bell" aria-label="${BP.esc(BP.t('notificaciones', 'Notificaciones'))}" data-notif>${BP.ico.bell}<span class="dot" hidden></span></button>
         <a class="p-ghost" href="panel.html#contactos">${BP.ico.chat} ${BP.t('mis_contactos', 'Mis contactos')}</a>
         <a class="p-ghost" href="buscar.html?favs=1" aria-label="${BP.esc(BP.t('favoritos', 'Favoritos'))}">${BP.ico.heart}<span data-fav-count hidden></span></a>
@@ -515,7 +515,7 @@
         <div class="p-nav-menu" style="display:flex"><div><button type="button" class="p-btn p-btn-sm p-btn-fill" aria-haspopup="true" style="padding:0 14px">${avH} ${BP.t('mi_cuenta', 'Mi cuenta')} <span class="car" style="border-color:var(--navy-deeper)"></span></button>
           <div class="p-dd p-dd-cuenta" style="left:auto;right:0"><div class="p-dd-ttl">${BP.esc(session.email)}${modeTag}</div>${vistas}<a href="curacion.html" data-curador hidden>${BP.t('curacion', 'Curación')}</a><a href="#" data-logout>${BP.t('cerrar_sesion', 'Cerrar sesión')}</a></div></div></div>`;
       if (mob) {
-        const cta = mob.querySelector('.m-cta'); if (cta) cta.innerHTML = `<a class="p-btn p-btn-sm" href="publicar-aviso.html">${BP.t('publicar', 'Publicar')}</a><a class="p-btn p-btn-sm p-btn-fill" href="panel.html">${av && av.tipo ? BP.avatar(av, 'p-avatar-h', 22) + ' ' : ''}${BP.t('mi_cuenta', 'Mi cuenta')}</a>`;
+        const cta = mob.querySelector('.m-cta'); if (cta) cta.innerHTML = `<a class="p-btn p-btn-sm" href="publicar-aviso.html">${BP.t('publicar', 'Publicar')}</a><a class="p-btn p-btn-sm p-btn-fill" href="panel.html">${BP.t('mi_cuenta', 'Mi cuenta')}</a>`;
         const cuenta = mob.querySelector('.m-cuenta'); if (cuenta) { cuenta.hidden = false; cuenta.innerHTML = `<a href="buscar.html?favs=1">${BP.ico.heart} <span data-i18n="favoritos">Favoritos</span></a><a href="panel.html#contactos">${BP.ico.chat} <span data-i18n="mis_contactos">Mis contactos</span></a>`; }
       }
       BP.avatarFallback(right, session.email); if (mob) BP.avatarFallback(mob, session.email);

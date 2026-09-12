@@ -28,7 +28,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://dahusnnbyrvltcuaelxj.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260912n"><link rel="stylesheet" href="css/catalogo.css?v=20260912n"><link rel="stylesheet" href="css/portal.css?v=20260912n">
+  <link rel="stylesheet" href="css/base.css?v=20260912o"><link rel="stylesheet" href="css/catalogo.css?v=20260912o"><link rel="stylesheet" href="css/portal.css?v=20260912o">
   <style>body{padding-top:0}#ficha>.p-ficha-top,#ficha>.p-ficha,#ficha>section{max-width:var(--p-max);margin:0 auto;padding-left:24px;padding-right:24px}#ficha>.p-ficha-top{padding-top:88px}@media(max-width:900px){#ficha>.p-ficha-top{padding-top:76px}}.p-video{aspect-ratio:16/9;background:#0b1220;border-radius:16px;overflow:hidden}.p-video iframe,.p-video video{width:100%;height:100%;border:0;display:block}</style>
 </head>
 <body class="p-product p-ficha-page">
@@ -39,8 +39,8 @@
 <div id="pFooter"></div>
 
 <script src="supabase-portal.js" defer></script>
-<script src="js/iconos-amenities.js?v=20260912n" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260912n" defer></script><script src="js/i18n-portal.js?v=20260912n" defer></script><script src="js/ui.js?v=20260912n" defer></script><script src="js/store.js?v=20260912n" defer></script>
-<script src="js/data.js?v=20260912n" defer></script>
+<script src="js/iconos-amenities.js?v=20260912o" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260912o" defer></script><script src="js/i18n-portal.js?v=20260912o" defer></script><script src="js/ui.js?v=20260912o" defer></script><script src="js/store.js?v=20260912o" defer></script>
+<script src="js/data.js?v=20260912o" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -314,7 +314,39 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip">${fotos.map((f,i) => `<but
     const marcar = () => { location.href = 'tel:' + tel.replace(/\s/g, ''); };
     if (window.BPM && BPM.copiar) BPM.copiar(b, tel, T('ui_copiado', 'Copiado')).then(o => { if (o) BP.toast(T('ficha_tel_copiado', 'Teléfono copiado.')); else marcar(); }); else marcar();
   });
-  const btnBaja = document.getElementById('bajaPrecio'); if (btnBaja) btnBaja.addEventListener('click', () => { if (btnBaja.disabled) return; btnBaja.disabled = true; btnBaja.textContent = T('ficha_alerta_creada', 'Alerta creada'); const al = BP.alerts.get(); al.push({ tipo: 'precio', avisoId: a.id, creada: new Date().toISOString() }); BP.alerts.set(al); BP.toast(T('ficha_toast_baja', 'Te avisamos si baja de precio. Con tu cuenta, por mail.')); });
+  /* 12/9 · Alerta de precio: una por aviso, en BP.alerts como { tipo:'precio', avisoId, creada, precio } y, con sesión y
+     base real, también en portal.alertas (BPStore.syncAlerta, que guarda remoteId). El botón arranca en "Alerta creada"
+     si ya existe y al tocarlo la quita (BPStore.borrarAlerta borra la fila: si no, el motor seguiría mandando mails).
+     Estados: creando (deshabilitado), creada (aria-pressed), error (la alerta no queda y se avisa con un toast). */
+  const btnBaja = document.getElementById('bajaPrecio');
+  if (btnBaja) {
+    const idxBaja = () => BP.alerts.get().findIndex(x => x.tipo === 'precio' && String(x.avisoId) === String(a.id));
+    const pintarBaja = () => { const on = idxBaja() > -1; btnBaja.disabled = false; btnBaja.setAttribute('aria-pressed', on ? 'true' : 'false'); btnBaja.innerHTML = (on ? BP.ico.check : BP.ico.bell) + ' ' + (on ? T('ficha_alerta_creada', 'Alerta creada') : T('ficha_avisar_baja', 'Avisarme si baja de precio')); btnBaja.setAttribute('aria-label', on ? T('ficha_alerta_quitar', 'Alerta creada, tocá para quitarla') : T('ficha_avisar_baja', 'Avisarme si baja de precio')); };
+    pintarBaja();
+    /* con sesión, las alertas creadas en otro navegador llegan de la base y el botón se repinta; sin frenar la ficha */
+    if (window.BPStore && BPStore.cargarAlertas) BPStore.cargarAlertas().then(() => { if (!btnBaja.disabled) pintarBaja(); }).catch(() => {});
+    btnBaja.addEventListener('click', async () => {
+      if (btnBaja.disabled) return;
+      const al = BP.alerts.get(); const i = idxBaja();
+      if (i > -1) {
+        const [quitada] = al.splice(i, 1); BP.alerts.set(al); pintarBaja(); BP.toast(T('cat_toast_alerta_quitada', 'Alerta quitada.'));
+        const r = (window.BPStore && BPStore.borrarAlerta) ? await BPStore.borrarAlerta(quitada) : { local: true };
+        if (r && r.error) { const b = BP.alerts.get(); if (!b.some(x => x.tipo === 'precio' && String(x.avisoId) === String(a.id))) { b.push(quitada); BP.alerts.set(b); } pintarBaja(); BP.toast(T('cat_toast_alerta_no_quitada', 'No pudimos quitar la alerta. Probá de nuevo.'), 'error'); }
+        return;
+      }
+      btnBaja.disabled = true; btnBaja.innerHTML = BP.ico.bell + ' ' + T('ficha_alerta_creando', 'Creando alerta');
+      const nueva = { tipo: 'precio', avisoId: a.id, creada: new Date().toISOString(), precio: a.precio == null ? null : Number(a.precio) };
+      al.push(nueva); BP.alerts.set(al);
+      try {
+        const idRemoto = (window.BPStore && BPStore.syncAlerta) ? await BPStore.syncAlerta(nueva) : null;
+        pintarBaja();
+        BP.toast(idRemoto ? T('ficha_toast_baja_mail', 'Alerta guardada. Te avisamos por mail si baja de precio.') : T('ficha_toast_baja', 'Te avisamos si baja de precio. Con tu cuenta, por mail.'));
+      } catch (err) {
+        console.warn(err); const b = BP.alerts.get(); const j = b.findIndex(x => x.tipo === 'precio' && String(x.avisoId) === String(a.id)); if (j > -1) { b.splice(j, 1); BP.alerts.set(b); }
+        pintarBaja(); BP.toast(T('ficha_toast_baja_error', 'No pudimos crear la alerta. Probá de nuevo.'), 'error');
+      }
+    });
+  }
   document.querySelectorAll('[data-rep]').forEach(b => b.addEventListener('click', async () => { if (b.disabled) return; document.querySelectorAll('[data-rep]').forEach(x => { x.disabled = true; }); b.textContent = T('ficha_rep_ok', 'Enviado, gracias'); const r = BP.reportes.get(); r.push({ avisoId: a.id, motivo: b.dataset.rep, fecha: new Date().toISOString() }); BP.reportes.set(r); await BPStore.addDenuncia(a.id, b.dataset.rep); BP.toast(T('ficha_rep_toast', 'Gracias. Revisamos el aviso en menos de 24 horas.')); }));
   document.getElementById('share').addEventListener('click', () => BP.compartir({ titulo: a.titulo, texto: TF('ficha_en_bairen', '{t} en BAIREN', { t: a.titulo }), url: location.href }));
   /* vistas (contador local de prueba) */

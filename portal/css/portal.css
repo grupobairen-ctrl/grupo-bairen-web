@@ -3502,3 +3502,32 @@ body.p-panel-page .p-avatar-sel .p-btn[hidden]{display:none}
 body.p-panel-page .p-ficha-cuenta dd .p-avatar.vacio svg{width:46%;height:46%;color:var(--text-mid)}
 body.p-panel-page .p-side-nav .who .q{white-space:normal;overflow-wrap:anywhere}
 body.p-panel-page .p-avatar-sel .op input:focus-visible + img{outline:2px solid var(--gold);outline-offset:-2px}
+
+/* ── 12/9 · curación: pestañas en celular ── */
+/* A 390 px las tres pestañas de Curación ("Avisos en revisión", "Publicadores por verificar", "Sistema") desbordaban y
+   la tercera quedaba fuera de la pantalla sin nada que indicara deslizar (la regla de 820 px las fija nowrap en un riel).
+   Hasta 767 px reparten el ancho en una sola fila (flex 1 1 0), el texto puede ir en dos líneas, letra y padding más
+   chicos que en escritorio y 44 px de alto mínimo; la fila entera comparte la altura, así la línea oro de la activa
+   queda al ras en las tres. Sin min-width:0 a propósito: el mínimo de cada pestaña es su palabra más larga, entonces
+   la fila entra cuando puede y, si no entra (pantallas de menos de 320 px o letra agrandada), se desliza con snap.
+   La señal de que hay más a la derecha es un degradado en el borde (mask-image) que solo aparece cuando de verdad
+   hay desborde: la animación va atada al scroll horizontal del propio riel (animation-timeline) y, sin recorrido,
+   el navegador no la aplica. Donde no hay animation-timeline el riel se desliza igual, sin degradado.
+   Estados activa (línea oro) y foco: sin cambios. Los mismos selectores que la regla de 820 px, así ganan por orden. */
+@media(max-width:767px){
+  body.p-herramienta .p-band .p-tabs2{gap:4px;flex-wrap:nowrap;max-width:100%;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  body.p-herramienta .p-band .p-tabs2 button{flex:1 1 0;min-height:44px;padding:8px 6px;font:500 .78rem/1.15 var(--font-body);white-space:normal;text-align:center;scroll-snap-align:start;hyphens:manual}
+  /* El contador, si lo hay (<span class="n">), pegado a la última palabra y sin partirse: inline, no inline-block,
+     y el espacio lo pone el margen; en el HTML va sin espacio antes del span, si no ese espacio es un corte posible */
+  body.p-herramienta .p-band .p-tabs2 button .n{display:inline;white-space:nowrap;margin-left:.35em;font-variant-numeric:tabular-nums}
+  @supports (animation-timeline:scroll()){
+    body.p-herramienta .p-band .p-tabs2{animation:p-tabs2-borde linear both;animation-timeline:scroll(self x)}
+  }
+}
+@keyframes p-tabs2-borde{
+  from{-webkit-mask-image:linear-gradient(to right,transparent 0,#000 0,#000 calc(100% - 36px),transparent 100%);mask-image:linear-gradient(to right,transparent 0,#000 0,#000 calc(100% - 36px),transparent 100%)}
+  to{-webkit-mask-image:linear-gradient(to right,transparent 0,#000 36px,#000 100%,transparent 100%);mask-image:linear-gradient(to right,transparent 0,#000 36px,#000 100%,transparent 100%)}
+}
+
+/* ── 12/9 · emprendimientos: la línea "Publica …" con sus sellos se parte en celular en vez de desbordar ── */
+@media (max-width:767px){.p-emp .p-publine{flex-wrap:wrap;row-gap:6px}}

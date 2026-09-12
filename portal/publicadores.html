@@ -27,22 +27,24 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://dahusnnbyrvltcuaelxj.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260912n"><link rel="stylesheet" href="css/catalogo.css?v=20260912n"><link rel="stylesheet" href="css/portal.css?v=20260912n">
+  <link rel="stylesheet" href="css/base.css?v=20260912o"><link rel="stylesheet" href="css/catalogo.css?v=20260912o"><link rel="stylesheet" href="css/portal.css?v=20260912o">
 </head>
 <body class="p-publicadores">
 <div class="p-velo" aria-hidden="true"><span class="w">BAIREN</span></div>
 <div id="pHeader"></div>
-<div class="p-band"><div class="p-container"><div style="max-width:720px"><span class="p-eyebrow">Publicadores</span><h1 class="p-h2" style="font-size:clamp(1.8rem,3.4vw,2.6rem)">Quiénes publican</h1><p class="p-sub" style="margin-bottom:0">Corredores matriculados, dueños verificados y desarrolladoras. Las mismas reglas para todos. Cada uno responde por la operación de lo que publica.</p></div></div></div>
+<div class="p-band"><div class="p-container"><div style="max-width:720px"><span class="p-eyebrow" data-i18n="publicadores">Publicadores</span><h1 class="p-h2" style="font-size:clamp(1.8rem,3.4vw,2.6rem)" data-i18n="pubs_h1">Quiénes publican</h1><p class="p-sub" style="margin-bottom:0" data-i18n="pubs_sub">Corredores matriculados, dueños verificados y desarrolladoras. Las mismas reglas para todos. Cada uno responde por la operación de lo que publica.</p></div></div></div>
 <section class="p-page after-band" role="main"><div class="p-container">
   <div id="pubs" style="display:grid;gap:22px" data-reveal></div>
-  <div class="p-prose" style="margin-top:44px" data-reveal><div class="box"><b>¿Sos inmobiliaria o corredor de estos barrios?</b> Publicá tu cartera gratis durante el lanzamiento, con importación desde Tokko. <a href="publicar.html#inmobiliaria" style="text-decoration:underline">Empezar</a>.</div></div>
+  <div class="p-prose" style="margin-top:44px" data-reveal><div class="box" data-i18n-html="pubs_box"><b>¿Sos inmobiliaria o corredor de estos barrios?</b> Publicá tu cartera gratis durante el lanzamiento, con importación desde Tokko. <a href="publicar.html#inmobiliaria" style="text-decoration:underline">Empezar</a>.</div></div>
 </div></section>
 <div id="pFooter"></div>
-<script src="supabase-portal.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260912n" defer></script><script src="js/i18n-portal.js?v=20260912n" defer></script><script src="js/ui.js?v=20260912n" defer></script><script src="js/store.js?v=20260912n" defer></script><script src="js/data.js?v=20260912n" defer></script>
+<script src="supabase-portal.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260912o" defer></script><script src="js/i18n-portal.js?v=20260912o" defer></script><script src="js/ui.js?v=20260912o" defer></script><script src="js/store.js?v=20260912o" defer></script><script src="js/data.js?v=20260912o" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
 BP.header('publicadores'); BP.footer(); if (window.BPStore) BPStore.init(); BP.reveal();
+/* Interfaz en el idioma elegido: lo estático va con data-i18n (lo aplica BP.header); lo que se arma acá usa BP.t(clave, castellano), así en es nada cambia. */
+document.title = BP.t('pubs_title', 'Publicadores · BAIREN');
 BPData.load().then(function(d){
   var av = d.avisos;
   /* Muro de publicadores: cuadrícula con líneas y luz que sigue al cursor. Sólo los reales;
@@ -50,12 +52,12 @@ BPData.load().then(function(d){
   (function(){
     var todos = Object.values(d.publicadores), reales = todos.filter(function(p){ return !p.demo; });
     var lista = reales.length >= 3 ? reales : todos;
-    var tile = function(p){ return '<a class="tile" href="#' + p.id + '" title="' + BP.esc(p.nombre) + '"><span class="mono">' + p.inicial + '</span><span class="nom">' + BP.esc(p.nombre) + '</span><span class="tip">' + (p.tipo === 'dueno' ? 'Dueño verificado' : p.tipo === 'desarrolladora' ? 'Desarrolladora' : BP.esc(p.matricula || p.badge || '')) + (p.demo ? ' · ejemplo' : '') + '</span></a>'; };
+    var tile = function(p){ var nom = BPData.pubNombre(p); return '<a class="tile" href="#' + p.id + '" title="' + BP.esc(nom) + '"><span class="mono">' + p.inicial + '</span><span class="nom">' + BP.esc(nom) + '</span><span class="tip">' + (p.tipo === 'dueno' ? BP.t('ui_dato_dueno_verificado', 'Dueño verificado') : p.tipo === 'desarrolladora' ? BP.t('pubs_desarrolladora', 'Desarrolladora') : BP.esc(p.matricula || BP.etiqueta(p.badge) || '')) + (p.demo ? ' · ' + BP.t('pubs_ejemplo_min', 'ejemplo') : '') + '</span></a>'; };
     var tandas = []; for (var k = 0; k < lista.length; k += 4) tandas.push(lista.slice(k, k + 4));
     var ultima = tandas[tandas.length - 1]; if (ultima && ultima.length < 4) ultima.push(null);
-    var hueco = '<a class="tile vacio" href="publicar.html#inmobiliaria"><span class="mono">+</span><span class="nom">Tu inmobiliaria</span><span class="tip">Publicar en BAIREN</span></a>';
+    var hueco = '<a class="tile vacio" href="publicar.html#inmobiliaria"><span class="mono">+</span><span class="nom">' + BP.t('pubs_tu_inmo', 'Tu inmobiliaria') + '</span><span class="tip">' + BP.t('pubs_publicar_en', 'Publicar en BAIREN') + '</span></a>';
     var host = document.getElementById('pubs');
-    var muro = document.createElement('div'); muro.className = 'p-muro'; muro.id = 'muroPubs'; muro.style.marginBottom = '40px';
+    var muro = document.createElement('div'); muro.className = 'p-muro'; muro.id = 'muroPubs'; muro.style.marginBottom = '40px'; muro.setAttribute('aria-label', BP.t('pubs_muro_aria', 'Publicadores en BAIREN'));
     muro.innerHTML = tandas.map(function(t, n){ return '<div class="tanda"' + (n ? ' style="opacity:0"' : '') + '>' + t.map(function(x){ return x ? tile(x) : hueco; }).join('') + '</div>'; }).join('');
     host.parentNode.insertBefore(muro, host);
     if (window.BPM && BPM.muro) BPM.muro(muro);
@@ -64,11 +66,11 @@ BPData.load().then(function(d){
     var mine = av.filter(function(a){ return a.publicadorId === p.id; });
     var venta = mine.filter(function(a){ return a.op === 'venta'; }).length, alq = mine.length - venta;
     return '<article class="p-pub-block" id="' + p.id + '">' +
-      '<div class="row"><div class="p-pub-logo">' + p.inicial + '</div><div><b>' + BP.esc(p.nombre) + '</b><div class="p-kicker">' + (p.tipo === 'dueno' ? 'Dueño directo verificado' : [p.responsable, p.badge].filter(Boolean).map(BP.esc).join(' · ')) + '</div></div></div>' +
-      '<div class="badges">' + BPData.badgeHTML(p) + (p.demo ? '<span class="p-badge demo">Ejemplo</span>' : '') + '</div>' +
-      '<p class="p-text" style="margin:12px 0;font-size:.92rem">' + BP.esc(p.desc) + '</p>' +
-      '<p class="p-codes">Publica desde ' + p.desde + ' · ' + venta + ' en venta · ' + alq + ' en alquiler · Zonas: ' + p.zonas.map(BP.zonaLabel).join(', ') + '</p>' +
-      '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center">' + (p.email ? '<a class="p-btn p-btn-sm p-btn-navy" href="mailto:' + BP.esc(p.email) + '">Enviar consulta</a>' : '<span class="p-sincontacto">Contacto pendiente</span>') + '<a class="p-btn p-btn-sm" href="buscar.html?pub=' + p.id + '&op=">Ver sus ' + mine.length + ' propiedades</a></div>' +
+      '<div class="row"><div class="p-pub-logo">' + p.inicial + '</div><div><b>' + BP.esc(BPData.pubNombre(p)) + '</b><div class="p-kicker">' + (p.tipo === 'dueno' ? BP.t('pubs_dueno_directo_verif', 'Dueño directo verificado') : [p.demo ? BP.etiqueta(p.responsable) : p.responsable, BP.etiqueta(p.badge)].filter(Boolean).map(BP.esc).join(' · ')) + '</div></div></div>' +
+      '<div class="badges">' + BPData.badgeHTML(p) + (p.demo ? '<span class="p-badge demo">' + BP.t('card_ejemplo', 'Ejemplo') + '</span>' : '') + '</div>' +
+      '<p class="p-text" style="margin:12px 0;font-size:.92rem">' + BP.esc(BPData.pubDesc(p)) + '</p>' +
+      '<p class="p-codes">' + BP.tf('pubs_publica_desde', 'Publica desde {y}', { y: p.desde }) + ' · ' + BP.tf('pubs_en_venta', '{n} en venta', { n: venta }) + ' · ' + BP.tf('pubs_en_alquiler', '{n} en alquiler', { n: alq }) + ' · ' + BP.t('pubs_zonas', 'Zonas: ') + p.zonas.map(BP.zonaLabel).join(', ') + '</p>' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center">' + (p.email ? '<a class="p-btn p-btn-sm p-btn-navy" href="mailto:' + BP.esc(p.email) + '">' + BP.t('pubs_enviar_consulta', 'Enviar consulta') + '</a>' : '<span class="p-sincontacto">' + BP.t('card_contacto_pendiente', 'Contacto pendiente') + '</span>') + '<a class="p-btn p-btn-sm" href="buscar.html?pub=' + p.id + '&op=">' + (mine.length === 1 ? BP.t('pubs_ver_props_1', 'Ver 1 propiedad') : BP.tf('pubs_ver_props', 'Ver sus {n} propiedades', { n: mine.length })) + '</a></div>' +
       '<div class="p-grid p-pub-muestra">' + mine.slice(0,3).map(BPData.cardV).join('') + '</div></article>';
   }).join('');
 });

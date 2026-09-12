@@ -38,7 +38,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://dahusnnbyrvltcuaelxj.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260912n"><link rel="stylesheet" href="css/catalogo.css?v=20260912n"><link rel="stylesheet" href="css/portal.css?v=20260912n">
+  <link rel="stylesheet" href="css/base.css?v=20260912o"><link rel="stylesheet" href="css/catalogo.css?v=20260912o"><link rel="stylesheet" href="css/portal.css?v=20260912o">
   <style>
     .p-panel{display:grid;grid-template-columns:240px 1fr;gap:28px;align-items:start}
     .p-side-nav{background:var(--p-card);border:1px solid var(--p-line);border-radius:var(--p-radius);padding:10px;position:sticky;top:84px}
@@ -60,7 +60,7 @@
   <div id="content" aria-busy="true"><div class="p-skel-panel" aria-hidden="true"><div class="p-skel-line t"></div><div class="p-skel-line s"></div><div class="p-skel-line row"></div><div class="p-skel-line row"></div><div class="p-skel-line row"></div></div></div>
 </div></section>
 <div id="pFooter"></div>
-<script src="supabase-portal.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260912n" defer></script><script src="js/i18n-portal.js?v=20260912n" defer></script><script src="js/ui.js?v=20260912n" defer></script><script src="js/store.js?v=20260912n" defer></script><script src="js/data.js?v=20260912n" defer></script>
+<script src="supabase-portal.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260912o" defer></script><script src="js/i18n-portal.js?v=20260912o" defer></script><script src="js/ui.js?v=20260912o" defer></script><script src="js/store.js?v=20260912o" defer></script><script src="js/data.js?v=20260912o" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -100,6 +100,8 @@ document.addEventListener('DOMContentLoaded', function(){
   /* Contadores del riel: lo que ya se sabe (favoritos, alertas) va enseguida; avisos e interesados los completa la vista al cargar */
   const cuenta = { favoritos: BP.favs.get().length, alertas: BP.alerts.get().length };
   const contador = k => cuenta[k] != null && cuenta[k] > 0 ? `<span class="n">${cuenta[k]}</span>` : '';
+  /* 12/9 · El contador de alertas se completa con las de la base (sin frenar el riel); la vista Alertas ya lo hace al cargar */
+  if (tab !== 'alertas' && riel.indexOf('alertas') > -1) BPStore.cargarAlertas().then(l => actualizarContador('alertas', l.length)).catch(() => {});
   function renderNav(){
     /* Si llegó por hash a una vista que su perfil no muestra (un profesional a #favoritos), se muestra igual y el riel la suma antes de Mi cuenta: nunca un callejón sin salida */
     const ids = riel.slice(); if (TABS.some(t => t[0] === tab) && ids.indexOf(tab) === -1) ids.splice(Math.max(0, ids.indexOf('cuenta')), 0, tab);
@@ -272,10 +274,27 @@ document.addEventListener('DOMContentLoaded', function(){
     const mia = vistaEnCurso; const { avisos } = await BPData.load(); if (mia !== vistaEnCurso) return; const favs = avisos.filter(a => BP.isFav(a.id));
     content.innerHTML = `<div class="p-head-row"><h1 class="p-h2">Favoritos</h1><a class="p-link" href="buscar.html?favs=1">Ver como búsqueda</a></div>` + (favs.length ? `<div class="p-grid">${favs.map(BPData.cardV).join('')}</div>` : '<div class="p-empty p-ensena"><b>Todavía no guardaste ninguna propiedad.</b><p>Tocá el corazón en una tarjeta o en una ficha y queda acá para compararlas después.</p><a class="p-btn" href="buscar.html?op=alquiler">Ver propiedades</a></div>');
   }
-  function renderAlertas(){
-    const al = BP.alerts.get();
-    content.innerHTML = `<h1 class="p-h2">Búsquedas y alertas</h1><p class="p-sub">Te avisamos por mail cuando entra una propiedad que coincide o cuando una que seguís baja de precio.</p>` + (al.length ? `<table class="p-tbl"><thead><tr><th>Creada</th><th>Tipo</th><th>Detalle</th><th></th></tr></thead><tbody>${al.map((a, i) => `<tr><td data-th="Creada">${new Date(a.creada).toLocaleDateString('es-AR')}</td><td data-th="Tipo">${a.tipo === 'precio' ? 'Baja de precio' : 'Búsqueda guardada'}</td><td data-th="Detalle">${a.tipo === 'precio' ? `<a href="propiedad.html?id=${encodeURIComponent(a.avisoId)}" style="text-decoration:underline">${BP.esc(a.avisoId)}</a>` : `<a href="${BP.esc(a.url||'buscar.html')}" style="text-decoration:underline">${a.filtros ? [a.filtros.op, (a.filtros.zonas||[]).map(BP.zonaLabel).join(', ')].filter(Boolean).join(' · ') : 'búsqueda'}</a>`}</td><td><button type="button" class="p-btn p-btn-sm" data-del="${i}">Quitar</button></td></tr>`).join('')}</tbody></table>` : '<div class="p-empty p-ensena"><b>Todavía no creaste ninguna alerta.</b><p>Desde el catálogo, con los filtros puestos, tocá "Crear alerta": te avisamos por mail cuando entra una propiedad que coincide.</p><a class="p-btn" href="buscar.html?op=alquiler">Ir al catálogo</a></div>');
-    content.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => { const a = BP.alerts.get(); a.splice(Number(b.dataset.del), 1); BP.alerts.set(a); renderAlertas(); }));
+  /* 12/9 · Las alertas se leen de la base cuando hay sesión (BPStore.cargarAlertas las funde con BP.alerts, así las
+     creadas en otro navegador aparecen acá) y quitarlas borra la fila (BPStore.borrarAlerta) antes de sacarlas del
+     navegador: si no, el motor seguiría mandando mails. Una alerta de precio muestra el título del aviso si BPData lo
+     resuelve por id, y el precio guardado al crearla. El contador del riel sigue a la lista. */
+  async function renderAlertas(){
+    const mia = vistaEnCurso;
+    let al; try { al = await BPStore.cargarAlertas(); } catch (e) { al = BP.alerts.get(); }
+    let avisos = []; if (al.some(a => a.tipo === 'precio')) { try { ({ avisos } = await BPData.load()); } catch (e) { avisos = []; } }
+    if (mia !== vistaEnCurso) return;
+    actualizarContador('alertas', al.length);
+    const detallePrecio = a => { const av = avisos.find(x => String(x.id) === String(a.avisoId) || x.slug === a.avisoId); const titulo = av ? (av.titulo || av.dir || a.avisoId) : a.avisoId; const precio = a.precio != null ? BP.fmtUSD(Number(a.precio)) + (av && av.op !== 'venta' ? '/mes' : '') : ''; return `<a href="propiedad.html?id=${encodeURIComponent(a.avisoId)}" style="text-decoration:underline">${BP.esc(titulo)}</a>${precio ? `<br><small class="m">Publicada a ${precio}</small>` : ''}`; };
+    const detalleBusqueda = a => `<a href="${BP.esc(a.url||'buscar.html')}" style="text-decoration:underline">${a.filtros ? [a.filtros.op, (a.filtros.zonas||[]).map(BP.zonaLabel).join(', ')].filter(Boolean).join(' · ') : 'búsqueda'}</a>`;
+    content.innerHTML = `<h1 class="p-h2">Búsquedas y alertas</h1><p class="p-sub">Te avisamos por mail cuando entra una propiedad que coincide o cuando una que seguís baja de precio.</p>` + (al.length ? `<table class="p-tbl"><thead><tr><th>Creada</th><th>Tipo</th><th>Detalle</th><th></th></tr></thead><tbody>${al.map((a, i) => `<tr><td data-th="Creada">${new Date(a.creada).toLocaleDateString('es-AR')}</td><td data-th="Tipo">${a.tipo === 'precio' ? 'Baja de precio' : 'Búsqueda guardada'}</td><td data-th="Detalle">${a.tipo === 'precio' ? detallePrecio(a) : detalleBusqueda(a)}</td><td><button type="button" class="p-btn p-btn-sm" data-del="${i}">Quitar</button></td></tr>`).join('')}</tbody></table>` : '<div class="p-empty p-ensena"><b>Todavía no creaste ninguna alerta.</b><p>Desde el catálogo, con los filtros puestos, tocá "Crear alerta": te avisamos por mail cuando entra una propiedad que coincide.</p><a class="p-btn" href="buscar.html?op=alquiler">Ir al catálogo</a></div>');
+    content.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', async () => {
+      if (b.disabled) return; b.disabled = true; b.textContent = 'Quitando';
+      const objetivo = al[Number(b.dataset.del)];
+      const r = await BPStore.borrarAlerta(objetivo);
+      if (r && r.error) { b.disabled = false; b.textContent = 'Quitar'; BP.toast('No se pudo quitar la alerta: ' + r.error, 'error'); return; }
+      const lista = BP.alerts.get(); const j = lista.findIndex(x => BPStore.mismaAlerta(x, objetivo) || (x.creada === objetivo.creada && x.tipo === objetivo.tipo)); if (j > -1) lista.splice(j, 1); BP.alerts.set(lista);
+      actualizarContador('alertas', lista.length); BP.toast('Alerta quitada.'); renderAlertas();
+    }));
   }
   async function renderCuenta(){
     const tipo = pub ? (pub.tipo === 'dueno' ? 'Dueño directo' : pub.tipo === 'desarrolladora' ? 'Desarrolladora' : 'Inmobiliaria o corredor') : '';

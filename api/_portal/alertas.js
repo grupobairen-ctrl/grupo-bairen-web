@@ -22,7 +22,7 @@ const { zonaDe, ZONAS_PORTAL } = require('./zonas');
 
 const SLUG_VIEJO = { 'maxim-rentals': 'bairen' };   // igual que data.js, hasta que corra migracion-03
 const CLAVES = ['op', 'tipo', 'zonas', 'q', 'pub', 'emp', 'reservadas', 'amb', 'dorm', 'banos', 'coch', 'pmin', 'pmax', 'expmax', 'm2min', 'm2max', 'antig', 'amen', 'cual', 'amoblado', 'dueno', 'video', 'hace'];
-const NO_FILTRAN = ['sort', 'page'];
+const NO_FILTRAN = ['sort', 'page', 'key', 'favs'];
 const SELECT_AVISOS = 'id,codigo,slug,operacion,tipo,titulo,direccion,unidad,barrio,zona,precio,moneda,expensas,m2_total,ambientes,dormitorios,banos,cocheras,antiguedad,amoblado,amenities,cualidades_verificadas,descripcion,video_url,estado,publicado_en,created_at,publicadores(slug,tipo)';
 const LOTE = 100;        // ids por consulta con in.(...)
 const PARALELO = 5;      // alertas procesadas a la vez

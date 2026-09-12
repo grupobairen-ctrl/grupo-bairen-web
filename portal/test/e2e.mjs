@@ -133,6 +133,44 @@ try {
   await waitFor('!!document.querySelector("#content .p-tbl") && document.querySelector("#content").textContent.includes("Interesada Prueba")', 'consulta en Interesados');
   await shot('10-panel-interesados');
   ok('Panel: la consulta aparece en Interesados', true);
+
+  /* 4b. Alerta de precio en la ficha (12/9): crear la guarda en bp_alertas con tipo 'precio' y avisoId; al volver a la
+     ficha el botón arranca en "Alerta creada" (aria-pressed) y tocarlo la quita. En modo local remoteId queda null. */
+  await goto(BASE + href);
+  await waitFor('!!document.getElementById("bajaPrecio") && document.getElementById("bajaPrecio").getAttribute("aria-pressed") === "false"', 'botón de alerta de precio');
+  await evalJs('document.getElementById("bajaPrecio").click(); true');
+  await waitFor('JSON.parse(localStorage.getItem("bp_alertas") || "[]").some(x => x.tipo === "precio") && document.getElementById("bajaPrecio").getAttribute("aria-pressed") === "true"', 'alerta de precio guardada');
+  const alPrecio = await evalJs('JSON.parse(localStorage.getItem("bp_alertas") || "[]").find(x => x.tipo === "precio")');
+  const avisoFicha = await evalJs('(document.querySelector("[data-wa][data-aviso]") || {}).dataset ? document.querySelector("[data-wa][data-aviso]").dataset.aviso : ""');
+  await goto(BASE + href);
+  await waitFor('!!document.getElementById("bajaPrecio") && document.getElementById("bajaPrecio").getAttribute("aria-pressed") === "true"', 'la ficha recuerda la alerta');
+  const txtCreada = await evalJs('document.getElementById("bajaPrecio").textContent.trim()');
+  await shot('10b-ficha-alerta-creada');
+  await evalJs('document.getElementById("bajaPrecio").click(); true');
+  await waitFor('!JSON.parse(localStorage.getItem("bp_alertas") || "[]").some(x => x.tipo === "precio") && document.getElementById("bajaPrecio").getAttribute("aria-pressed") === "false"', 'alerta de precio quitada');
+  const txtQuitada = await evalJs('document.getElementById("bajaPrecio").textContent.trim()');
+  ok('Alerta de precio: la ficha la crea con avisoId y precio, la recuerda y la quita', !!alPrecio && String(alPrecio.avisoId) === String(avisoFicha) && alPrecio.precio > 0 && alPrecio.remoteId == null && /Alerta creada/.test(txtCreada) && /Avisarme/.test(txtQuitada),
+     'avisoId ' + (alPrecio && alPrecio.avisoId) + ' · precio ' + (alPrecio && alPrecio.precio) + ' · remoteId ' + (alPrecio && alPrecio.remoteId) + ' · "' + txtCreada + '" → "' + txtQuitada + '"');
+
+  /* 4c. Búsqueda guardada en resultados y su vida en el panel: "Crear alerta" la guarda con su key; Búsquedas y alertas
+     la lista con su tipo y "Quitar" la saca (BPStore.borrarAlerta antes de sacarla de bp_alertas) y baja el contador. */
+  await goto(BASE + 'buscar.html?op=venta&zona=Palermo');
+  await waitFor('document.querySelectorAll(".prop-card, .p-card-h").length > 0 && document.getElementById("alertBtn").getAttribute("aria-pressed") === "false"', 'resultados con botón de alerta');
+  await evalJs('document.getElementById("alertBtn").click(); true');
+  await waitFor('JSON.parse(localStorage.getItem("bp_alertas") || "[]").some(x => x.tipo !== "precio" && x.key) && document.getElementById("alertBtn").getAttribute("aria-pressed") === "true"', 'búsqueda guardada');
+  const alBusq = await evalJs('JSON.parse(localStorage.getItem("bp_alertas") || "[]").find(x => x.tipo !== "precio")');
+  await goto(BASE + 'panel.html#alertas');
+  await waitFor('!!document.querySelector("#content .p-tbl") && document.querySelector("#content").textContent.includes("Búsqueda guardada")', 'la alerta en Búsquedas y alertas');
+  const filaAlerta = await evalJs('document.querySelector("#content .p-tbl tbody tr").textContent.replace(/\\s+/g, " ").trim()');
+  const contadorAntes = await evalJs('(document.querySelector("#sideNav a[href=\'#alertas\'] .n") || {}).textContent || "0"');
+  await shot('10c-panel-alertas');
+  await evalJs('document.querySelector("#content [data-del]").click(); true');
+  await waitFor('document.querySelector("#content").textContent.includes("Todavía no creaste ninguna alerta") && JSON.parse(localStorage.getItem("bp_alertas") || "[]").length === 0', 'alerta quitada desde el panel');
+  const contadorDespues = await evalJs('(document.querySelector("#sideNav a[href=\'#alertas\'] .n") || {}).textContent || "0"');
+  await shot('10d-panel-alertas-vacio');
+  ok('Búsqueda guardada: el panel la lista y "Quitar" la saca', !!alBusq && /op=venta/.test(alBusq.key) && /Búsqueda guardada/.test(filaAlerta) && /Palermo/.test(filaAlerta) && contadorAntes === '1' && contadorDespues === '0',
+     'key ' + (alBusq && alBusq.key) + ' · fila "' + filaAlerta.slice(0, 80) + '" · contador ' + contadorAntes + ' → ' + contadorDespues);
+
   /* 5. Importación por archivo (inmobiliaria) */
   await goto(BASE + 'importar.html');
   await waitFor('document.querySelector(".p-imp") && document.querySelector(".p-imp").textContent.includes("inmobiliarias y desarrolladoras")', 'gating de importar para dueño');
@@ -320,15 +358,15 @@ try {
   await evalJs('document.querySelector("#sideNav a[href=\'#cuenta\']").click(); true');
   await waitFor('!!document.querySelector("#content [data-avatar-sel] [name=avatar]")', 'la fila Tu imagen');
   const iconos = await evalJs('Array.from(document.querySelectorAll("#content [data-avatar-sel] [name=avatar]")).map(r => r.value + ":" + r.getAttribute("aria-label")).join(" | ")');
-  const sinImagen = await evalJs('!document.querySelector(".p-nav-right .p-nav-menu button img") && !!document.querySelector(".p-nav-right .p-nav-menu button svg") && !!document.querySelector("#sideNav .who .p-avatar.vacio")');
+  const sinImagen = await evalJs('!!document.querySelector(".p-nav-right .p-nav-menu button svg") && !!document.querySelector("#sideNav .who .p-avatar.vacio")');
   await evalJs('document.querySelector("#content [data-avatar-sel] [value=avatar-2]").click(); true');
-  await waitFor('!!document.querySelector(".p-nav-right .p-nav-menu button img") && /avatar-2\\.png$/.test(document.querySelector(".p-nav-right .p-nav-menu button img").getAttribute("src"))', 'el header muestra avatar-2');
-  const headerSrc = await evalJs('document.querySelector(".p-nav-right .p-nav-menu button img").getAttribute("src")');
+  await waitFor('!!document.querySelector("#sideNav .who .p-avatar img") && /avatar-2\\.png$/.test(document.querySelector("#sideNav .who .p-avatar img").getAttribute("src"))', 'el riel muestra avatar-2');
+  const headerSrc = await evalJs('document.querySelector(".p-nav-right .p-nav-menu button img") ? "con imagen (no debería)" : "sin imagen en el header"');
   const whoSrc = await evalJs('(() => { const i = document.querySelector("#sideNav .who .p-avatar img"); return i ? i.getAttribute("src") : ""; })()');
   const marcado = await evalJs('(() => { const l = document.querySelector("#content [data-avatar-sel] label.on"); return l ? l.querySelector("input").value : ""; })()');
   const avGuardado = await evalJs('JSON.parse(localStorage.getItem("bp_user") || "{}").avatar');
   await shot('24-cuenta-icono');
-  ok('Imagen: elegir un ícono en Mi cuenta lo muestra en el header y en el riel, y lo guarda', sinImagen && /avatar-2\.png$/.test(headerSrc) && /avatar-2\.png$/.test(whoSrc) && marcado === 'avatar-2' && avGuardado === 'avatar-2',
+  ok('Imagen: elegir un ícono en Mi cuenta lo muestra en el riel (no en el header) y lo guarda', sinImagen && headerSrc === 'sin imagen en el header' && /avatar-2\.png$/.test(whoSrc) && marcado === 'avatar-2' && avGuardado === 'avatar-2',
      'antes sin imagen ' + sinImagen + ' · header ' + headerSrc + ' · marcado ' + marcado + ' · guardado ' + avGuardado + ' · íconos ' + iconos);
 
   /* 18. Subir una foto propia: se recorta cuadrada en el navegador y en modo local queda como data URL; el .who pasa a
@@ -339,7 +377,7 @@ try {
   const foto = await evalJs('(() => { const w = document.querySelector("#sideNav .who .p-avatar img"), h = document.querySelector(".p-nav-right .p-nav-menu button img"), a = document.querySelector("#content [data-avatar-actual] img"); const s = i => i ? i.getAttribute("src").slice(0, 22) : ""; return { who: s(w), header: s(h), actual: s(a), quitar: !document.querySelector("#content [data-avatar-quitar]").hidden, marcados: document.querySelectorAll("#content [data-avatar-sel] label.on, #content [data-avatar-sel] input:checked").length, url: (JSON.parse(localStorage.getItem("bp_user") || "{}").avatar_url || "").slice(0, 22) }; })()');
   const cuadrada = await evalJs('new Promise(r => { const i = new Image(); i.onload = () => r(i.naturalWidth + "x" + i.naturalHeight); i.onerror = () => r("error"); i.src = JSON.parse(localStorage.getItem("bp_user")).avatar_url; })');
   await shot('25-cuenta-foto');
-  ok('Imagen: subir una foto la recorta cuadrada, la guarda y la muestra en el riel y en el header', /^(blob:|data:|http)/.test(foto.who) && /^(blob:|data:|http)/.test(foto.header) && foto.quitar && foto.marcados === 0 && cuadrada === '320x320',
+  ok('Imagen: subir una foto la recorta cuadrada, la guarda y la muestra en el riel', /^(blob:|data:|http)/.test(foto.who) && foto.header === '' && foto.quitar && foto.marcados === 0 && cuadrada === '320x320',
      'who ' + foto.who + ' · header ' + foto.header + ' · ' + cuadrada + ' · quitar visible ' + foto.quitar + ' · íconos marcados ' + foto.marcados);
 
 } catch (e) { ok('Flujo completo', false, e.message); }

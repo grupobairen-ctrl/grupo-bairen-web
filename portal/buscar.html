@@ -28,7 +28,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://dahusnnbyrvltcuaelxj.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260912n"><link rel="stylesheet" href="css/catalogo.css?v=20260912n"><link rel="stylesheet" href="css/portal.css?v=20260912n">
+  <link rel="stylesheet" href="css/base.css?v=20260912o"><link rel="stylesheet" href="css/catalogo.css?v=20260912o"><link rel="stylesheet" href="css/portal.css?v=20260912o">
   <style>body{padding-top:64px}</style>
 </head>
 <body class="p-product p-catalogo">
@@ -105,8 +105,8 @@
 
 <script src="supabase-portal.js" defer></script>
 <script src="../mapa-barrios.js" defer></script>
-<script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260912n" defer></script><script src="js/i18n-portal.js?v=20260912n" defer></script><script src="js/ui.js?v=20260912n" defer></script><script src="js/store.js?v=20260912n" defer></script>
-<script src="js/data.js?v=20260912n" defer></script>
+<script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260912o" defer></script><script src="js/i18n-portal.js?v=20260912o" defer></script><script src="js/ui.js?v=20260912o" defer></script><script src="js/store.js?v=20260912o" defer></script>
+<script src="js/data.js?v=20260912o" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -261,21 +261,32 @@ document.addEventListener('DOMContentLoaded', function(){
   document.getElementById('clearAll').addEventListener('click', () => { Object.assign(F, { zonas:[], q:'', amb:0, dorm:0, banos:0, coch:0, pmin:0, pmax:0, expmax:0, m2min:0, m2max:0, antig:0, amen:[], cual:[], amoblado:false, dueno:false, video:false, hace:0, favs:false, reservadas:false }); openDrawer(false); apply(); });
   /* alerta: una por búsqueda; el botón muestra si ya existe y sirve para quitarla */
   const alertBtn = document.getElementById('alertBtn');
-  const alertKey = () => { const p = new URLSearchParams(location.search); p.delete('page'); p.sort(); return location.pathname + '?' + p.toString(); };
+  /* La identidad de una alerta son sus filtros (no la URL: las rutas bonitas la reescriben). Claves ordenadas, arrays ordenados, sin page/sort/favs. */
+  const alertKey = () => { const p = new URLSearchParams(); Object.keys(F).sort().forEach(k => { if (k === 'page' || k === 'sort' || k === 'favs') return; const v = F[k]; if (v == null || v === '' || v === false || (Array.isArray(v) && !v.length)) return; if (Array.isArray(v)) v.slice().sort().forEach(x => p.append(k, x)); else p.set(k, String(v)); }); return 'buscar?' + p.toString(); };
   const alertaIdx = () => BP.alerts.get().findIndex(x => x.tipo !== 'precio' && (x.key ? x.key === alertKey() : x.url === location.href));
   function pintarAlerta(){ const on = alertaIdx() > -1; alertBtn.classList.toggle('on', on); alertBtn.setAttribute('aria-pressed', on ? 'true' : 'false'); alertBtn.innerHTML = BP.ico.bell + '<span class="t"> ' + (on ? BP.t('cat_alerta_creada', 'Alerta creada') : BP.t('cat_crear_alerta', 'Crear alerta')) + '</span>'; alertBtn.setAttribute('aria-label', on ? BP.t('cat_alerta_quitar', 'Alerta creada, tocá para quitarla') : BP.t('cat_crear_alerta', 'Crear alerta')); }
+  /* 12/9 · Con sesión y base real la alerta vive también en portal.alertas (BPStore.syncAlerta guarda remoteId en la
+     copia local); quitarla borra la fila (BPStore.borrarAlerta), si no el motor seguiría mandando mails. Si la base
+     falla al quitar, la alerta vuelve a la lista y se avisa; si falla al crear, queda solo en este navegador y se avisa. */
   alertBtn.addEventListener('click', () => {
     const a = BP.alerts.get(); const i = alertaIdx();
-    if (i > -1) { a.splice(i, 1); BP.alerts.set(a); pintarAlerta(); BP.toast(BP.t('cat_toast_alerta_quitada', 'Alerta quitada.')); return; }
+    if (i > -1) {
+      const [quitada] = a.splice(i, 1); BP.alerts.set(a); pintarAlerta(); BP.toast(BP.t('cat_toast_alerta_quitada', 'Alerta quitada.'));
+      if (window.BPStore && BPStore.borrarAlerta) BPStore.borrarAlerta(quitada).then(r => { if (!r || !r.error) return; const b = BP.alerts.get(); if (!b.some(x => BPStore.mismaAlerta(x, quitada))) { b.push(quitada); BP.alerts.set(b); } pintarAlerta(); BP.toast(BP.t('cat_toast_alerta_no_quitada', 'No pudimos quitar la alerta. Probá de nuevo.'), 'error'); });
+      return;
+    }
     const al = { creada: new Date().toISOString(), filtros: Object.assign({}, F), url: location.href, key: alertKey() };
-    a.push(al); BP.alerts.set(a); if (window.BPStore && BPStore.syncAlerta) BPStore.syncAlerta(al); pintarAlerta();
-    BP.toast(window.BPStore && BPStore.session ? BP.t('cat_toast_alerta_mail', 'Alerta guardada. Te avisamos por mail cuando entre una propiedad así.') : BP.t('cat_toast_alerta_local', 'Alerta guardada en este navegador. Con tu cuenta, te llega por mail.'));
+    a.push(al); BP.alerts.set(a); pintarAlerta();
+    if (!(window.BPStore && BPStore.syncAlerta)) BP.toast(BP.t('cat_toast_alerta_local', 'Alerta guardada en este navegador. Con tu cuenta, te llega por mail.'));
+    if (window.BPStore && BPStore.syncAlerta) { alertBtn.disabled = true; BPStore.syncAlerta(al).then(id => { BP.toast(id ? BP.t('cat_toast_alerta_mail', 'Alerta guardada. Te avisamos por mail cuando entre una propiedad así.') : BP.t('cat_toast_alerta_local', 'Alerta guardada en este navegador. Con tu cuenta, te llega por mail.')); }).catch(() => { BP.toast(BP.t('cat_toast_alerta_sin_cuenta', 'No pudimos guardar la alerta en tu cuenta. Quedó en este navegador.'), 'error'); }).finally(() => { alertBtn.disabled = false; }); }
   });
+  /* Las alertas de la cuenta (creadas en otro navegador) se traen sin frenar el render; el botón se repinta al llegar */
+  const alertasCargadas = (window.BPStore && BPStore.cargarAlertas) ? BPStore.init().then(() => BPStore.cargarAlertas()).then(() => pintarAlerta()).catch(() => {}) : Promise.resolve();
 
   syncControls();
   try { render(); pintarAlerta(); } catch (err) { console.error(err); BP.estadoError(document.getElementById('list'), BP.t('cat_err_carga', 'No pudimos cargar las propiedades.'), () => location.reload()); }
   /* ?alerta=1 (desde "Avisarme" en la portada): se crea la alerta de esta búsqueda al llegar, una sola vez */
-  if (qs.get('alerta') === '1') { try { const u = new URL(location.href); u.searchParams.delete('alerta'); history.replaceState(null, '', u); } catch (e) {} if (alertaIdx() === -1) alertBtn.click(); }
+  if (qs.get('alerta') === '1') { try { const u = new URL(location.href); u.searchParams.delete('alerta'); history.replaceState(null, '', u); } catch (e) {} alertasCargadas.then(() => { if (alertaIdx() === -1) alertBtn.click(); }); }
 })();
 });
 </script>

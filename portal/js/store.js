@@ -437,12 +437,90 @@
     if (S.mode !== 'supabase' || !S.session || !esUUID(avisoId)) return;
     try { if (activo) await S.sb.schema('portal').from('favoritos').upsert({ usuario_id: S.session.id, aviso_id: avisoId }); else await S.sb.schema('portal').from('favoritos').delete().eq('usuario_id', S.session.id).eq('aviso_id', avisoId); } catch (e) { console.warn('favorito no sincronizado', e); }
   };
+  /* ── 12/9 · alertas con vida en la base ──────────────────────────────────
+     BP.alerts (ui.js, localStorage) sigue siendo la copia del navegador: { creada, filtros, url, key } para una
+     búsqueda guardada y { tipo:'precio', avisoId, creada, precio } para una baja de precio. Con base real y sesión
+     de verdad, cada una vive además en portal.alertas y la copia local guarda remoteId (el id de la fila): sin eso,
+     quitarla acá dejaba la fila viva y el motor (api/_portal/alertas.js, por cron) seguía mandando mails.
+     Cómo se reconoce una fila: las de búsqueda llevan filtros.key (la alertKey de buscar.html; el motor ignora las
+     claves que no filtran), las de precio se reconocen por aviso_id. Un mismo usuario no tiene dos iguales.
+     En modo local, en demo y sin sesión todo sigue igual: remoteId null y borrar es solo local. */
+  const esPrecio = a => !!a && a.tipo === 'precio';
+  S.mismaAlerta = (a, b) => { if (!a || !b) return false; if (a.remoteId && b.remoteId) return a.remoteId === b.remoteId; return esPrecio(a) ? (esPrecio(b) && String(a.avisoId) === String(b.avisoId)) : (!esPrecio(b) && !!a.key && a.key === b.key); };
+  const alertasLocal = () => (window.BP && BP.alerts) ? BP.alerts : { get: () => [], set: () => {} };
+  const conBaseYSesion = () => S.mode === 'supabase' && !DEMO && !!S.session && esUUID(S.session.id);
+  /* La alerta local recibe el id de la fila: se muta el objeto que llegó y también la copia guardada en BP.alerts. */
+  const guardarRemoteId = (alerta, id) => { alerta.remoteId = id; const all = alertasLocal().get(); const l = all.find(x => S.mismaAlerta(x, alerta)); if (l && l.remoteId !== id) { l.remoteId = id; alertasLocal().set(all); } };
+  /* La fila que ya tiene el usuario para esa alerta, si existe. */
+  const filaDe = async alerta => {
+    const tipo = esPrecio(alerta) ? 'precio' : 'busqueda';
+    if (tipo === 'precio' && !esUUID(alerta.avisoId)) return null;
+    if (tipo === 'busqueda' && !alerta.key) return null;
+    let q = S.sb.schema('portal').from('alertas').select('id').eq('usuario_id', S.session.id).eq('tipo', tipo);
+    q = tipo === 'precio' ? q.eq('aviso_id', alerta.avisoId) : q.eq('filtros->>key', alerta.key);
+    const { data, error } = await q.order('created_at', { ascending: true }).limit(1).maybeSingle();
+    if (error) throw error; return data || null;
+  };
+  /* Inserta (o reusa) y devuelve el id remoto; null cuando no corresponde (sin base, sin sesión, aviso de ejemplo). Lanza si la base falla. */
+  const subirAlerta = async alerta => {
+    if (!conBaseYSesion()) return null;
+    const tipo = esPrecio(alerta) ? 'precio' : 'busqueda';
+    if (tipo === 'precio' && !esUUID(alerta.avisoId)) return null;   /* un aviso de ejemplo no tiene fila en portal.avisos */
+    if (alerta.remoteId) return alerta.remoteId;
+    const ya = await filaDe(alerta);
+    let id = ya && ya.id;
+    if (!id) {
+      const fila = { usuario_id: S.session.id, tipo, frecuencia: 'diaria', filtros: tipo === 'busqueda' ? Object.assign({}, alerta.filtros || {}, { key: alerta.key || null }) : null, aviso_id: tipo === 'precio' ? alerta.avisoId : null };
+      const { data, error } = await S.sb.schema('portal').from('alertas').insert(fila).select('id').single();
+      if (error) throw error; id = data.id;
+    }
+    guardarRemoteId(alerta, id);
+    return id;
+  };
   S.syncAlerta = async function(alerta){
     S.track('alerta', { aviso_id: alerta.avisoId || null, datos: { tipo: alerta.tipo || 'busqueda' } });
-    if (S.mode !== 'supabase' || !S.session) return;
-    const fila = { usuario_id: S.session.id, tipo: alerta.tipo === 'precio' ? 'precio' : 'busqueda', filtros: alerta.filtros || null, frecuencia: 'diaria' };
-    if (alerta.avisoId && esUUID(alerta.avisoId)) fila.aviso_id = alerta.avisoId;
-    try { await S.sb.schema('portal').from('alertas').insert(fila); } catch (e) { console.warn('alerta no sincronizada', e); }
+    try { return await subirAlerta(alerta); }
+    catch (e) { console.warn('alerta no sincronizada', e); throw e; }
+  };
+  /* Quita la fila de la base (RLS "alertas propias", for all: solo la del dueño). Devuelve { ok } | { local:true } | { error }.
+     Sin remoteId busca la fila por key o aviso_id, para las alertas de antes de que se guardara el id. */
+  S.borrarAlerta = async function(alerta){
+    if (!alerta || !conBaseYSesion()) return { local: true };
+    try {
+      let id = alerta.remoteId;
+      if (!id) { const ya = await filaDe(alerta); id = ya && ya.id; }
+      if (!id) return { local: true };
+      const { error } = await S.sb.schema('portal').from('alertas').delete().eq('id', id);
+      if (error) throw error;
+      return { ok: true };
+    } catch (e) { console.warn('alerta no borrada en la base', e); return { error: e.message || String(e) }; }
+  };
+  /* Trae las filas del usuario y las funde con BP.alerts, así al entrar desde otro navegador aparecen en el panel.
+     La base manda cuando hay sesión: lo que está en la base y no acá se agrega; lo que acá tenía remoteId y en la
+     base ya no está (se quitó desde otro navegador, o el aviso se dio de baja) se saca; lo que quedó solo acá
+     (creado sin sesión) se sube, así la promesa del mail se cumple. Devuelve la lista local resultante.
+     Se recuerda qué había antes de pedir, para no sacar una alerta que se sincronizó mientras la base respondía. */
+  S.cargarAlertas = async function(){
+    if (!conBaseYSesion()) return alertasLocal().get();
+    const antes = alertasLocal().get();
+    let filas;
+    try {
+      const { data, error } = await S.sb.schema('portal').from('alertas').select('id,tipo,filtros,aviso_id,created_at').eq('usuario_id', S.session.id).order('created_at', { ascending: true });
+      if (error) throw error; filas = data || [];
+    } catch (e) { console.warn('alertas no cargadas', e); return antes; }
+    const remotas = new Set(filas.map(f => f.id));
+    const enBase = antes.filter(x => x.remoteId).map(x => x.remoteId);
+    let lista = alertasLocal().get().filter(x => !(x.remoteId && !remotas.has(x.remoteId) && enBase.indexOf(x.remoteId) > -1));
+    filas.forEach(f => {
+      const filtros = Object.assign({}, f.filtros || {}); const key = filtros.key || null; delete filtros.key;
+      const remota = f.tipo === 'precio' ? { tipo: 'precio', avisoId: f.aviso_id, creada: f.created_at, remoteId: f.id } : { creada: f.created_at, filtros, url: key || 'buscar.html', key, remoteId: f.id };
+      const local = lista.find(x => x.remoteId === f.id) || lista.find(x => !x.remoteId && S.mismaAlerta(x, remota));
+      if (local) local.remoteId = f.id; else lista.push(remota);
+    });
+    alertasLocal().set(lista);
+    /* lo que quedó solo en este navegador, a la base (una búsqueda sin key es del formato viejo y se deja quieta) */
+    for (const x of lista) { if (x.remoteId) continue; if (esPrecio(x) ? !esUUID(x.avisoId) : !x.key) continue; try { await subirAlerta(x); } catch (e) { console.warn('alerta no subida', e); } }
+    return alertasLocal().get();
   };
 
   /* ── curación ─────────────────────────────────────────── */

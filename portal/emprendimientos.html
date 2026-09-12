@@ -28,7 +28,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://dahusnnbyrvltcuaelxj.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260912n"><link rel="stylesheet" href="css/catalogo.css?v=20260912n"><link rel="stylesheet" href="css/portal.css?v=20260912n">
+  <link rel="stylesheet" href="css/base.css?v=20260912o"><link rel="stylesheet" href="css/catalogo.css?v=20260912o"><link rel="stylesheet" href="css/portal.css?v=20260912o">
   <style>
     .p-emp{display:grid;grid-template-columns:minmax(260px,42%) 1fr;background:var(--p-card);border:1px solid var(--p-line);border-radius:var(--p-radius);overflow:hidden;margin-bottom:18px}
     .p-emp .ph{position:relative;min-height:260px;background:var(--p-tray)} .p-emp .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
@@ -44,32 +44,37 @@
 <div class="p-velo" aria-hidden="true"><span class="w">BAIREN</span></div>
 <div id="pHeader"></div>
 <div class="p-band"><div class="p-container">
-  <div class="p-head-row" style="margin-bottom:0"><div><span class="p-eyebrow">Venta directa</span><h1 class="p-h2" style="font-size:clamp(1.7rem,3vw,2.3rem)">Emprendimientos</h1><p class="p-sub" style="margin:0">En pozo, en construcción o a estrenar, vendidas por la propia desarrolladora. El contacto va directo a la empresa.</p></div><a class="p-btn" href="publicar.html#desarrolladora">Publicar un emprendimiento</a></div>
+  <div class="p-head-row" style="margin-bottom:0"><div><span class="p-eyebrow" data-i18n="ui_dato_venta_directa">Venta directa</span><h1 class="p-h2" style="font-size:clamp(1.7rem,3vw,2.3rem)" data-i18n="emprendimientos">Emprendimientos</h1><p class="p-sub" style="margin:0" data-i18n="emp_sub">En pozo, en construcción o a estrenar, vendidas por la propia desarrolladora. El contacto va directo a la empresa.</p></div><a class="p-btn" href="publicar.html#desarrolladora" data-i18n="emp_publicar">Publicar un emprendimiento</a></div>
 </div></div>
 <section class="p-page after-band" role="main"><div class="p-container">
   <div id="lista"><div class="p-skel" style="height:260px;border-radius:var(--p-radius);background:#EEE9DD"></div></div>
 </div></section>
 <div id="pFooter"></div>
-<script src="supabase-portal.js" defer></script><script src="../mapa-barrios.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260912n" defer></script><script src="js/i18n-portal.js?v=20260912n" defer></script><script src="js/ui.js?v=20260912n" defer></script><script src="js/store.js?v=20260912n" defer></script><script src="js/data.js?v=20260912n" defer></script>
+<script src="supabase-portal.js" defer></script><script src="../mapa-barrios.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260912o" defer></script><script src="js/i18n-portal.js?v=20260912o" defer></script><script src="js/ui.js?v=20260912o" defer></script><script src="js/store.js?v=20260912o" defer></script><script src="js/data.js?v=20260912o" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
 (async function(){
   BP.header('venta'); BP.footer(); BP.reveal(); await BP.probePretty();
+  /* Interfaz en el idioma elegido: lo estático va con data-i18n (lo aplica BP.header); lo que se arma acá usa BP.t(clave, castellano), así en es nada cambia. */
+  document.title = BP.t('emp_title', 'Emprendimientos · BAIREN');
+  /* La entrega viene como dato ("Diciembre 2027"): se traduce sólo el nombre del mes, respetando la mayúscula; en castellano queda igual. */
+  const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const mesTr = s => { const tr = BP.t('emp_meses', MESES.join('|')).split('|'); return String(s).replace(/[A-Za-zÁÉÍÓÚÑáéíóúñ]+/g, w => { const i = MESES.indexOf(w.toLowerCase()); if (i < 0 || !tr[i]) return w; const t = tr[i]; return w[0] === w[0].toUpperCase() ? t[0].toUpperCase() + t.slice(1) : t; }); };
   const zona = BP.qs().get('zona');
   const { avisos } = await BPData.load();
   let emps = BPData.emprendimientos(avisos.filter(a => a.op === 'venta')); if (zona) emps = emps.filter(e => e.zona === zona);
-  const ETAPA = { pozo:'En pozo', construccion:'En construcción', terminado:'Terminado' };
+  const ETAPA = { pozo: BP.t('emp_pozo', 'En pozo'), construccion: BP.t('emp_construccion', 'En construcción'), terminado: BP.t('emp_terminado', 'Terminado') };
   const el = document.getElementById('lista');
-  if (!emps.length) { el.innerHTML = `<div class="p-empty">Todavía no hay emprendimientos publicados${zona ? ' en ' + BP.zonaLabel(zona) : ''}. Si sos desarrolladora, <a href="publicar.html#desarrolladora" style="text-decoration:underline">publicá el tuyo</a>.</div>`; return; }
+  if (!emps.length) { el.innerHTML = `<div class="p-empty">${BP.tf('emp_vacio', 'Todavía no hay emprendimientos publicados{donde}. Si sos desarrolladora, <a href="publicar.html#desarrolladora" style="text-decoration:underline">publicá el tuyo</a>.', { donde: zona ? BP.tf('emp_vacio_en', ' en {z}', { z: BP.esc(BP.zonaLabel(zona)) }) : '' })}</div>`; return; }
   el.innerHTML = emps.map(e => { const pub = BPData.pub(e.publicadorId); return `<article class="p-emp" data-emp="${BP.esc(e.nombre)}">
-    <div class="ph">${e.foto ? `<img src="${BP.sbImg(e.foto, 900)}" alt="${BP.esc(e.nombre)}">` : ''}<span class="tag">${ETAPA[e.etapa] || 'En construcción'}${e.entrega ? ' · entrega ' + BP.esc(e.entrega) : ''}</span></div>
+    <div class="ph">${e.foto ? `<img src="${BP.sbImg(e.foto, 900)}" alt="${BP.esc(e.nombre)}">` : ''}<span class="tag">${ETAPA[e.etapa] || ETAPA.construccion}${e.entrega ? BP.tf('emp_entrega', ' · entrega {d}', { d: BP.esc(mesTr(e.entrega)) }) : ''}</span></div>
     <div class="body"><h2>${BP.esc(e.nombre)}</h2><div class="p-barrio">${BP.esc(e.dir)}, ${BP.esc(e.barrio)}</div>
-      <div class="desde">${e.desde ? 'Desde ' + BP.fmtUSD(e.desde) : 'Consultar'}</div>
-      <div class="facts"><span>${e.unidades.length} ${e.unidades.length === 1 ? 'unidad' : 'unidades'}</span>${e.ambmin ? `<span>${e.ambmin === e.ambmax ? e.ambmin : e.ambmin + ' a ' + e.ambmax} amb.</span>` : ''}${e.m2min ? `<span>${e.m2min === e.m2max ? e.m2min : e.m2min + ' a ' + e.m2max} m²</span>` : ''}</div>
-      <div class="p-publine">Publica <b>${BP.esc(pub.nombre)}</b> ${BPData.badgeHTML(pub)}${pub.demo ? '<span class="p-badge demo">Ejemplo</span>' : ''}</div>
-      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">${pub.whatsapp ? `<a class="p-btn p-btn-sm p-btn-dark" href="https://wa.me/${encodeURIComponent(pub.whatsapp)}?text=${encodeURIComponent('Hola, vi ' + e.nombre + ' en BAIREN y quiero más información.')}" target="_blank" rel="noopener" data-wa data-aviso="${BP.esc(e.key)}" data-pub="${BP.esc(pub.storeId || pub.id)}">${BP.ico.wa} WhatsApp</a>` : ''}${pub.email ? `<a class="p-btn p-btn-sm p-btn-navy" href="mailto:${encodeURIComponent(pub.email)}?subject=${encodeURIComponent('Consulta por ' + e.nombre + ' desde BAIREN')}">${BP.ico.mail} Contactar</a>` : '<span class="p-sincontacto">Contacto pendiente</span>'}</div>
-      <details class="units"><summary>Ver las ${e.unidades.length} unidades</summary><div class="p-grid" style="margin-top:12px">${e.unidades.map(BPData.cardV).join('')}</div></details>
+      <div class="desde">${e.desde ? BP.tf('emp_desde', 'Desde {p}', { p: BP.fmtUSD(e.desde) }) : BP.t('ui_consultar', 'Consultar')}</div>
+      <div class="facts"><span>${e.unidades.length === 1 ? BP.t('emp_unidad_1', '1 unidad') : BP.tf('emp_unidades', '{n} unidades', { n: e.unidades.length })}</span>${e.ambmin ? `<span>${e.ambmin === e.ambmax ? (e.ambmin === 1 ? BP.t('emp_amb_1', '1 amb.') : BP.tf('emp_amb', '{n} amb.', { n: e.ambmin })) : BP.tf('emp_amb_rango', '{a} a {b} amb.', { a: e.ambmin, b: e.ambmax })}</span>` : ''}${e.m2min ? `<span>${e.m2min === e.m2max ? e.m2min + ' m²' : BP.tf('emp_m2_rango', '{a} a {b} m²', { a: e.m2min, b: e.m2max })}</span>` : ''}</div>
+      <div class="p-publine">${BP.t('card_publica', 'Publica')} <b>${BP.esc(BPData.pubNombre(pub))}</b> ${BPData.badgeHTML(pub)}${pub.demo ? '<span class="p-badge demo">' + BP.t('card_ejemplo', 'Ejemplo') + '</span>' : ''}</div>
+      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">${pub.whatsapp ? `<a class="p-btn p-btn-sm p-btn-dark" href="https://wa.me/${encodeURIComponent(pub.whatsapp)}?text=${encodeURIComponent(BP.tf('emp_wa_msg', 'Hola, vi {t} en BAIREN y quiero más información.', { t: e.nombre }))}" target="_blank" rel="noopener" aria-label="${BP.esc(BP.tf('card_wa_aria', 'Escribir por WhatsApp a {p}', { p: BPData.pubNombre(pub) }))}" data-wa data-aviso="${BP.esc(e.key)}" data-pub="${BP.esc(pub.storeId || pub.id)}">${BP.ico.wa} WhatsApp</a>` : ''}${pub.email ? `<a class="p-btn p-btn-sm p-btn-navy" href="mailto:${encodeURIComponent(pub.email)}?subject=${encodeURIComponent(BP.tf('emp_mail_subject', 'Consulta por {t} desde BAIREN', { t: e.nombre }))}">${BP.ico.mail} ${BP.t('card_contactar', 'Contactar')}</a>` : '<span class="p-sincontacto">' + BP.t('card_contacto_pendiente', 'Contacto pendiente') + '</span>'}</div>
+      <details class="units"><summary>${e.unidades.length === 1 ? BP.t('emp_ver_unidad_1', 'Ver la unidad') : BP.tf('emp_ver_unidades', 'Ver las {n} unidades', { n: e.unidades.length })}</summary><div class="p-grid" style="margin-top:12px">${e.unidades.map(BPData.cardV).join('')}</div></details>
     </div></article>`; }).join('');
 })();
 });
