@@ -265,6 +265,8 @@
         email: pub.email || S.session.email, telefono: pub.telefono || null, whatsapp: pub.whatsapp || null,
         matricula: (mat.replace(/\D/g, '') || null), colegio: mat ? (/cucicba/i.test(mat) ? 'CUCICBA' : (pub.colegio || null)) : null,
       };
+      const dni = datos && datos.dni ? String(datos.dni).replace(/\D/g, '') : '';
+      if (dni) persona.dni = dni;
       const { data: per, error } = await S.sb.schema('portal').from('personas').upsert(persona, { onConflict: 'auth_user_id' }).select().single();
       if (error || !per) return null;
       const { data: ya } = await S.sb.schema('portal').from('membresias').select('id').eq('persona_id', per.id).eq('publicador_id', pub.id).is('hasta', null).maybeSingle();
@@ -275,7 +277,11 @@
   S.savePublicador = async function(p){
     if (!S.session) throw new Error('sin sesión');
     const rec = Object.assign({ tipo:'dueno', verificado:false, zonas:[], badge: p.tipo === 'dueno' ? 'Dueño verificado' : p.tipo === 'desarrolladora' ? 'Venta directa' : 'Corredor inmobiliario matriculado' }, p, { auth_user_id: S.session.id, email: p.email || S.session.email, slug: p.slug || slugify(p.nombre) + '-' + (S.session.id||'').slice(-4), updated_at: now() });
-    if (S.mode === 'supabase') { const { data, error } = await S.sb.schema('portal').from('publicadores').upsert(rec, { onConflict: 'auth_user_id' }).select().single(); if (error) throw error; await S.vincularTitular(data, p); return data; }
+    if (S.mode === 'supabase') {
+      /* El DNI es de la persona (portal.personas, migración 01), no del publicador: a la tabla publicadores no va, o PostgREST rechaza la fila entera. */
+      const fila = Object.assign({}, rec); delete fila.dni;
+      const { data, error } = await S.sb.schema('portal').from('publicadores').upsert(fila, { onConflict: 'auth_user_id' }).select().single(); if (error) throw error; await S.vincularTitular(data, p); return data;
+    }
     S.track('publicador_alta', { publicador_id: rec.id || null, datos: { tipo: rec.tipo } });
     const all = L.pubs.get([]); const i = all.findIndex(x => x.auth_user_id === S.session.id); if (i > -1) { rec.id = all[i].id; rec.created_at = all[i].created_at; rec.verificado = all[i].verificado; all[i] = Object.assign(all[i], rec); } else { rec.id = uid(); rec.created_at = now(); all.push(rec); } L.pubs.set(all); return rec;
   };
