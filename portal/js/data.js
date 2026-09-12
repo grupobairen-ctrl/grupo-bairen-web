@@ -139,8 +139,12 @@
     // "Seleccionadas de la semana": las 6 con más fotos y disponibles
     publicados.filter(a=>!a.reservado).sort((a,b)=>b.fotos.length-a.fotos.length).slice(0,6).forEach(a=>a.destacado=true);
 
-    const all = publicados.concat(demoAvisos(publicados));
-    cache = { avisos: all, publicadores: D.PUBLICADORES };
+    /* Los avisos y publicadores de ejemplo existen para probar sin base (modo local).
+       Con la base real no se muestran: un mail a ejemplo@ejemplo.com no le sirve a nadie. */
+    const conEjemplos = !(window.BPStore && window.BPStore.mode === 'supabase');
+    const all = conEjemplos ? publicados.concat(demoAvisos(publicados)) : publicados;
+    const pubs = conEjemplos ? D.PUBLICADORES : Object.fromEntries(Object.entries(D.PUBLICADORES).filter(([, p]) => !p.demo));
+    cache = { avisos: all, publicadores: pubs };
     return cache;
   };
 
