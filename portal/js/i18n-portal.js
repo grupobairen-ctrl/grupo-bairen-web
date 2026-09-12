@@ -138,6 +138,10 @@ window.BP_I18N = {
     /* header con sesión y perfil (ui.js, BP.applySession): el desplegable "Mi cuenta", el popover de Publicar y las tres etiquetas del perfil */
     mi_cuenta: 'My account', mis_avisos: 'My listings', mis_propiedades: 'My properties', importar_cartera: 'Import portfolio', interesados: 'Enquiries', alertas: 'Searches and alerts', curacion: 'Curation', cerrar_sesion: 'Sign out',
     quien_publica: 'Who is listing?', busco_propiedad: 'I am looking for a property', soy_dueno_directo: 'I am the owner', soy_profesional: 'Agency, broker or developer', bairen_os: 'Bairen OS',
+    /* 12/9 · imagen de la cuenta (panel.html, Mi cuenta): la fila "Tu imagen", sus botones, avisos y aria-labels */
+    img_tu_imagen: 'Your picture', img_subir: 'Upload a photo', img_subiendo: 'Uploading…', img_quitar: 'Remove', img_elegir_icono: 'Choose an icon',
+    img_nota: 'An icon or a photo of your own. The photo is cropped to a square around the center, no editing needed.', img_actual: 'Your current picture', img_sin: 'No picture yet: the generic icon is shown',
+    img_listo: 'Done.', img_demo: 'In demo mode nothing is saved.', img_no_guardo: 'Could not save: ', img_no_subio: 'The photo could not be uploaded.', img_elegi: 'Choose an image (JPG or PNG).',
   },
   pt: {
     skip: 'Ir para o conteúdo', menu: 'Menu', idioma: 'Idioma',
@@ -263,5 +267,9 @@ window.BP_I18N = {
     /* header con sesión y perfil (ui.js, BP.applySession): el desplegable "Mi cuenta", el popover de Publicar y las tres etiquetas del perfil */
     mi_cuenta: 'Minha conta', mis_avisos: 'Meus anúncios', mis_propiedades: 'Meus imóveis', importar_cartera: 'Importar carteira', interesados: 'Interessados', alertas: 'Buscas e alertas', curacion: 'Curadoria', cerrar_sesion: 'Sair',
     quien_publica: 'Quem publica?', busco_propiedad: 'Procuro imóvel', soy_dueno_directo: 'Sou proprietário direto', soy_profesional: 'Imobiliária, corretor ou incorporadora', bairen_os: 'Bairen OS',
+    /* 12/9 · imagen de la cuenta (panel.html, Mi cuenta): la fila "Tu imagen", sus botones, avisos y aria-labels */
+    img_tu_imagen: 'Sua imagem', img_subir: 'Enviar uma foto', img_subiendo: 'Enviando…', img_quitar: 'Remover', img_elegir_icono: 'Escolher um ícone',
+    img_nota: 'Um ícone ou uma foto sua. A foto é recortada em quadrado pelo centro, sem precisar editar.', img_actual: 'Sua imagem atual', img_sin: 'Ainda sem imagem: aparece o ícone genérico',
+    img_listo: 'Pronto.', img_demo: 'No modo demo nada é salvo.', img_no_guardo: 'Não foi possível salvar: ', img_no_subio: 'Não foi possível enviar a foto.', img_elegi: 'Escolha uma imagem (JPG ou PNG).',
   }
 };

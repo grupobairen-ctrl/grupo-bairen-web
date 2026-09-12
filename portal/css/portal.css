@@ -3444,3 +3444,61 @@ body.p-ficha-page .p-form .chk,body.p-ficha-page .p-form .chk span,body.p-ficha-
 body.p-ficha-page .p-form .chk a{color:#131D2D}
 body.p-ficha-page .p-form .chk input{accent-color:#131D2D}
 body.p-ficha-page .p-form .p-err,body.p-ficha-page .p-form [data-err]{color:#b94a4a}
+
+/* ── 12/9 · imagen de perfil ── */
+/* La imagen de la cuenta (BPStore.getAvatar, BP.avatar): uno de cuatro íconos de img/avatares o la foto propia. Siempre
+   cuadrada, angular (radio 0) y con object-fit cover; sin imagen, el ícono genérico de usuario en el mismo cuadrado.
+   Tres tamaños: 22 px en el botón "Mi cuenta" del header, 48 en el .who del riel del panel, 56 en la fila de Mi cuenta.
+   .ph es el respaldo si el SVG no carga: cuadrado navy con la inicial del mail. */
+.p-avatar{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;box-sizing:border-box;width:48px;height:48px;border:1px solid rgba(19,29,45,.18);border-radius:0;background:#FFFDF8;color:var(--text-mid);overflow:hidden;vertical-align:middle}
+.p-avatar img{display:block;width:100%;height:100%;object-fit:cover;border-radius:0}
+.p-avatar.vacio svg{width:46%;height:46%}
+.p-avatar.ph{background:var(--navy-deeper);border-color:var(--navy-deeper);color:#FBFAF6}
+.p-avatar.ph b{font:500 .95rem/1 var(--font-body);letter-spacing:.04em}
+/* En las páginas de producto, la regla "todo hereda el color" de .p-page.after-band le ganaba a la inicial: crema sobre navy, siempre */
+body .p-page .p-avatar.ph,body .p-page .p-avatar.ph b,body .p-side-nav .p-avatar.ph b{color:#FBFAF6}
+/* Header: 22 px dentro del botón "Mi cuenta"; borde crema al 25 % porque la barra es navy. Misma medida en el menú de celular. */
+.p-navbar .p-avatar-h,.mobile-menu .p-avatar-h,.p-nav-right .p-avatar-h{width:22px;height:22px;border-color:rgba(246,242,232,.25);background:transparent;flex:0 0 auto}
+.p-navbar .p-avatar-h.ph b,.mobile-menu .p-avatar-h.ph b{font-size:.62rem}
+/* Panel: 48 px a la izquierda del mail y el perfil. En celular el .who sigue oculto (la fila de pastillas no lo lleva). */
+body.p-panel-page .p-side-nav .who{display:flex;align-items:center;gap:12px}
+body.p-panel-page .p-side-nav .who .txt{min-width:0;flex:1 1 auto}
+@media(max-width:1023px){body.p-panel-page .p-side-nav .who{display:none}}
+/* Mi cuenta: la fila "Tu imagen" abre la ficha y ocupa todo el ancho. A la izquierda la imagen actual (56 px); a la derecha
+   los cuatro íconos como radios visuales (44 px), la elegida con borde navy de 2 px y una esquina oro; después
+   "Subir una foto" y, si hay foto, "Quitar". Mientras guarda, el grupo entero deshabilitado y apagado. */
+body.p-panel-page .p-ficha-cuenta > .p-cuenta-img{grid-column:1/-1}
+body.p-panel-page .p-avatar-sel{display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px;margin:8px 0 0;padding:0;border:0;min-width:0}
+body.p-panel-page .p-avatar-sel .actual{display:flex;flex:0 0 auto}
+body.p-panel-page .p-avatar-sel .p-avatar-actual{width:56px;height:56px}
+body.p-panel-page .p-avatar-sel .ops{display:flex;flex-wrap:wrap;gap:6px}
+body.p-panel-page .p-avatar-sel .op{position:relative;display:inline-flex;box-sizing:border-box;width:44px;height:44px;padding:0;margin:0;border:1px solid rgba(19,29,45,.22);border-radius:0;background:#FFFDF8;cursor:pointer;overflow:hidden;transition:border-color .18s cubic-bezier(.22,1,.36,1)}
+body.p-panel-page .p-avatar-sel .op input{position:absolute;opacity:0;width:1px;height:1px;margin:0;pointer-events:none}
+body.p-panel-page .p-avatar-sel .op img{display:block;width:100%;height:100%;object-fit:cover;border-radius:0}
+body.p-panel-page .p-avatar-sel .op:hover{border-color:rgba(19,29,45,.55)}
+body.p-panel-page .p-avatar-sel .op.ph{align-items:center;justify-content:center;background:var(--navy-deeper)}
+body .p-page .p-avatar-sel .op.ph b{color:#FBFAF6;font:500 .8rem/1 var(--font-body)}
+body.p-panel-page .p-avatar-sel .op.on,body.p-panel-page .p-avatar-sel .op:has(input:checked){border:2px solid var(--navy-deeper)}
+body.p-panel-page .p-avatar-sel .op.on::after,body.p-panel-page .p-avatar-sel .op:has(input:checked)::after{content:"";position:absolute;top:0;right:0;width:0;height:0;border-style:solid;border-width:0 11px 11px 0;border-color:transparent var(--gold) transparent transparent}
+body.p-panel-page .p-avatar-sel .op:has(input:focus-visible){outline:2px solid var(--gold);outline-offset:2px;z-index:2}
+body.p-panel-page .p-avatar-sel .acts{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+body.p-panel-page .p-avatar-sel .acts .p-btn{border-radius:0;min-height:44px;height:44px}
+body.p-panel-page .p-avatar-sel .acts .p-btn.ocupado{cursor:progress;opacity:.7}
+body.p-panel-page .p-avatar-sel .p-note{flex:0 0 100%;margin:0;max-width:56ch}
+body.p-panel-page .p-avatar-sel:disabled{cursor:progress}
+body.p-panel-page .p-avatar-sel:disabled .op,body.p-panel-page .p-avatar-sel:disabled .p-btn{opacity:.55;cursor:progress}
+body.p-panel-page .p-avatar-sel:disabled .op:hover{border-color:rgba(19,29,45,.22)}
+body.p-panel-page .p-avatar-sel:disabled .op.on:hover,body.p-panel-page .p-avatar-sel:disabled .op:has(input:checked):hover{border-color:var(--navy-deeper)}
+body.p-panel-page .p-avatar-sel .p-btn[disabled]{pointer-events:none}
+/* "Quitar" solo cuando hay foto: el display de .p-btn le ganaba al atributo hidden */
+body.p-panel-page .p-avatar-sel .p-btn[hidden]{display:none}
+@media(max-width:820px){
+  body.p-panel-page .p-avatar-sel{gap:12px 14px}
+  body.p-panel-page .p-avatar-sel .acts{flex:0 0 100%}
+  body.p-panel-page .p-avatar-sel .acts .p-btn{flex:1 1 auto;justify-content:center}
+}
+
+/* ── 12/9 · imagen de perfil: ajustes de la revisión ── */
+body.p-panel-page .p-ficha-cuenta dd .p-avatar.vacio svg{width:46%;height:46%;color:var(--text-mid)}
+body.p-panel-page .p-side-nav .who .q{white-space:normal;overflow-wrap:anywhere}
+body.p-panel-page .p-avatar-sel .op input:focus-visible + img{outline:2px solid var(--gold);outline-offset:-2px}

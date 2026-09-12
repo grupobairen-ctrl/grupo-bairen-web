@@ -473,6 +473,26 @@
     const host = document.getElementById('pFooter'); if (host) host.innerHTML = html;
   };
 
+  /* ── 12/9 · La imagen de la cuenta ─────────────────────
+     Lo que devuelve BPStore.getAvatar(): un ícono de img/avatares o la foto propia, siempre cuadrada, angular y con
+     object-fit cover. Sin imagen elegida, el ícono genérico de usuario (o nada, con opts.sinGenerico). Si el ícono no
+     carga (SVG que falta), BP.avatarFallback lo cambia por un cuadrado navy con la inicial del mail: se llama después
+     de pintar, sobre el contenedor. cls suma clases al cuadrado (p-avatar-h en el header, p-avatar-who en el panel). */
+  BP.avatar = function(av, cls, size, opts){
+    const o = opts || {}; const c = 'p-avatar' + (cls ? ' ' + cls : '');
+    if (!av || !av.tipo || !av.src) return o.sinGenerico ? '' : `<span class="${c} vacio" aria-hidden="true">${BP.ico.user}</span>`;
+    const s = size || 48;
+    return `<span class="${c} ${av.tipo}" aria-hidden="true"><img src="${BP.esc(av.src)}" alt="" width="${s}" height="${s}" decoding="async"></span>`;
+  };
+  BP.avatarFallback = function(root, inicial){
+    const ini = BP.esc(String(inicial || '?').trim().slice(0, 1).toUpperCase() || '?');
+    (root || document).querySelectorAll('.p-avatar img:not([data-fb])').forEach(img => {
+      img.dataset.fb = '1';
+      const caer = () => { const w = img.parentNode; if (!w || !w.classList) return; w.classList.add('ph'); w.innerHTML = `<b>${ini}</b>`; };
+      if (img.complete && img.naturalWidth === 0 && img.getAttribute('src')) caer(); else img.addEventListener('error', caer, { once: true });
+    });
+  };
+
   /* ── Sesión en el header ───────────────────────────────── */
   BP.applySession = function(session, mode){
     const right = document.querySelector('.p-nav-right'); const mob = document.getElementById('mobileMenu');
@@ -485,16 +505,20 @@
       const VISTAS = { avisos: ['mis_avisos', 'Mis avisos', 'panel.html#avisos'], propiedades: ['mis_propiedades', 'Mis propiedades', 'panel.html#propiedades'], interesados: ['interesados', 'Interesados', 'panel.html#interesados'], importar: ['importar_cartera', 'Importar cartera', 'importar.html'], os: ['bairen_os', 'Bairen OS', 'https://os.bairengroup.com'], contactos: ['mis_contactos', 'Mis contactos', 'panel.html#contactos'], favoritos: ['favoritos', 'Favoritos', 'buscar.html?favs=1'], alertas: ['alertas', 'Búsquedas y alertas', 'panel.html#alertas'], cuenta: ['mi_cuenta', 'Mi cuenta', 'panel.html#cuenta'] };
       const riel = (window.BPStore && BPStore.rielDe) ? BPStore.rielDe(session.perfil || null) : Object.keys(VISTAS);
       const vistas = riel.map(id => VISTAS[id]).filter(Boolean).map(v => `<a href="${v[2]}">${BP.t(v[0], v[1])}</a>`).join('');
+      /* 12/9 · Con imagen elegida (ícono o foto), el botón la muestra a 22 px en lugar del ícono genérico; sin imagen, el ícono de siempre */
+      const av = (window.BPStore && BPStore.getAvatar) ? BPStore.getAvatar() : null;
+      const avH = av && av.tipo ? BP.avatar(av, 'p-avatar-h', 22) : BP.ico.user;
       right.innerHTML = `<button type="button" class="p-ghost p-bell" aria-label="${BP.esc(BP.t('notificaciones', 'Notificaciones'))}" data-notif>${BP.ico.bell}<span class="dot" hidden></span></button>
         <a class="p-ghost" href="panel.html#contactos">${BP.ico.chat} ${BP.t('mis_contactos', 'Mis contactos')}</a>
         <a class="p-ghost" href="buscar.html?favs=1" aria-label="${BP.esc(BP.t('favoritos', 'Favoritos'))}">${BP.ico.heart}<span data-fav-count hidden></span></a>
         <div class="p-crear"><a class="p-btn p-btn-sm" href="publicar-aviso.html" data-crear>${BP.t('publicar', 'Publicar')}</a><div class="p-crear-pop" hidden><p class="t">${BP.t('quien_publica', '¿Quién publica?')}</p><a href="publicar-aviso.html?perfil=dueno">${BP.t('soy_dueno_directo', 'Soy dueño directo')}</a><a href="publicar-aviso.html?paso=perfil">${BP.t('soy_profesional', 'Inmobiliaria, corredor o desarrolladora')}</a></div></div>
-        <div class="p-nav-menu" style="display:flex"><div><button type="button" class="p-btn p-btn-sm p-btn-fill" aria-haspopup="true" style="padding:0 14px">${BP.ico.user} ${BP.t('mi_cuenta', 'Mi cuenta')} <span class="car" style="border-color:var(--navy-deeper)"></span></button>
+        <div class="p-nav-menu" style="display:flex"><div><button type="button" class="p-btn p-btn-sm p-btn-fill" aria-haspopup="true" style="padding:0 14px">${avH} ${BP.t('mi_cuenta', 'Mi cuenta')} <span class="car" style="border-color:var(--navy-deeper)"></span></button>
           <div class="p-dd p-dd-cuenta" style="left:auto;right:0"><div class="p-dd-ttl">${BP.esc(session.email)}${modeTag}</div>${vistas}<a href="curacion.html" data-curador hidden>${BP.t('curacion', 'Curación')}</a><a href="#" data-logout>${BP.t('cerrar_sesion', 'Cerrar sesión')}</a></div></div></div>`;
       if (mob) {
-        const cta = mob.querySelector('.m-cta'); if (cta) cta.innerHTML = `<a class="p-btn p-btn-sm" href="publicar-aviso.html">${BP.t('publicar', 'Publicar')}</a><a class="p-btn p-btn-sm p-btn-fill" href="panel.html">${BP.t('mi_cuenta', 'Mi cuenta')}</a>`;
+        const cta = mob.querySelector('.m-cta'); if (cta) cta.innerHTML = `<a class="p-btn p-btn-sm" href="publicar-aviso.html">${BP.t('publicar', 'Publicar')}</a><a class="p-btn p-btn-sm p-btn-fill" href="panel.html">${av && av.tipo ? BP.avatar(av, 'p-avatar-h', 22) + ' ' : ''}${BP.t('mi_cuenta', 'Mi cuenta')}</a>`;
         const cuenta = mob.querySelector('.m-cuenta'); if (cuenta) { cuenta.hidden = false; cuenta.innerHTML = `<a href="buscar.html?favs=1">${BP.ico.heart} <span data-i18n="favoritos">Favoritos</span></a><a href="panel.html#contactos">${BP.ico.chat} <span data-i18n="mis_contactos">Mis contactos</span></a>`; }
       }
+      BP.avatarFallback(right, session.email); if (mob) BP.avatarFallback(mob, session.email);
       right.querySelectorAll('[data-logout]').forEach(b => b.addEventListener('click', async e => { e.preventDefault(); await window.BPStore.signOut(); BP.toast(BP.t('ui_sesion_cerrada', 'Sesión cerrada.')); setTimeout(() => location.href = 'index.html', 600); }));
       if (window.BPStore) window.BPStore.isCurador().then(ok => { right.querySelectorAll('[data-curador]').forEach(a => a.hidden = !ok); });
     } else if (mode === 'local') {

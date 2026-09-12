@@ -315,6 +315,33 @@ try {
   await shot('23-publicador-sin-perfil');
   ok('Perfil: con publicador y sin perfil elegido no se pregunta y el riel sale del publicador', sinPregunta16 && riel3.indexOf('Mis avisos') > -1 && perfilGuardado3 === 'null', 'pregunta oculta ' + sinPregunta16 + ' · ' + riel3.join(', ') + ' · guardado ' + perfilGuardado3);
 
+  /* 17. Imagen de la cuenta (12/9). En Mi cuenta, elegir avatar-2: el botón "Mi cuenta" del header pasa a mostrar esa
+     imagen (img con src que termina en avatar-2.png), el .who del riel también, y bp_user guarda avatar 'avatar-2'. */
+  await evalJs('document.querySelector("#sideNav a[href=\'#cuenta\']").click(); true');
+  await waitFor('!!document.querySelector("#content [data-avatar-sel] [name=avatar]")', 'la fila Tu imagen');
+  const iconos = await evalJs('Array.from(document.querySelectorAll("#content [data-avatar-sel] [name=avatar]")).map(r => r.value + ":" + r.getAttribute("aria-label")).join(" | ")');
+  const sinImagen = await evalJs('!document.querySelector(".p-nav-right .p-nav-menu button img") && !!document.querySelector(".p-nav-right .p-nav-menu button svg") && !!document.querySelector("#sideNav .who .p-avatar.vacio")');
+  await evalJs('document.querySelector("#content [data-avatar-sel] [value=avatar-2]").click(); true');
+  await waitFor('!!document.querySelector(".p-nav-right .p-nav-menu button img") && /avatar-2\\.png$/.test(document.querySelector(".p-nav-right .p-nav-menu button img").getAttribute("src"))', 'el header muestra avatar-2');
+  const headerSrc = await evalJs('document.querySelector(".p-nav-right .p-nav-menu button img").getAttribute("src")');
+  const whoSrc = await evalJs('(() => { const i = document.querySelector("#sideNav .who .p-avatar img"); return i ? i.getAttribute("src") : ""; })()');
+  const marcado = await evalJs('(() => { const l = document.querySelector("#content [data-avatar-sel] label.on"); return l ? l.querySelector("input").value : ""; })()');
+  const avGuardado = await evalJs('JSON.parse(localStorage.getItem("bp_user") || "{}").avatar');
+  await shot('24-cuenta-icono');
+  ok('Imagen: elegir un ícono en Mi cuenta lo muestra en el header y en el riel, y lo guarda', sinImagen && /avatar-2\.png$/.test(headerSrc) && /avatar-2\.png$/.test(whoSrc) && marcado === 'avatar-2' && avGuardado === 'avatar-2',
+     'antes sin imagen ' + sinImagen + ' · header ' + headerSrc + ' · marcado ' + marcado + ' · guardado ' + avGuardado + ' · íconos ' + iconos);
+
+  /* 18. Subir una foto propia: se recorta cuadrada en el navegador y en modo local queda como data URL; el .who pasa a
+     mostrar la foto, aparece "Quitar", ningún ícono queda marcado y bp_user guarda avatar 'foto'. */
+  const d3 = await send('DOM.getDocument', { depth: -1 }); const q3 = await send('DOM.querySelector', { nodeId: d3.result.root.nodeId, selector: '#content [data-avatar-file]' });
+  await send('DOM.setFileInputFiles', { nodeId: q3.result.nodeId, files: [FOTOS[0]] });
+  await waitFor('JSON.parse(localStorage.getItem("bp_user") || "{}").avatar === "foto" && !document.querySelector("#content [data-avatar-sel]").disabled', 'la foto guardada', 20000);
+  const foto = await evalJs('(() => { const w = document.querySelector("#sideNav .who .p-avatar img"), h = document.querySelector(".p-nav-right .p-nav-menu button img"), a = document.querySelector("#content [data-avatar-actual] img"); const s = i => i ? i.getAttribute("src").slice(0, 22) : ""; return { who: s(w), header: s(h), actual: s(a), quitar: !document.querySelector("#content [data-avatar-quitar]").hidden, marcados: document.querySelectorAll("#content [data-avatar-sel] label.on, #content [data-avatar-sel] input:checked").length, url: (JSON.parse(localStorage.getItem("bp_user") || "{}").avatar_url || "").slice(0, 22) }; })()');
+  const cuadrada = await evalJs('new Promise(r => { const i = new Image(); i.onload = () => r(i.naturalWidth + "x" + i.naturalHeight); i.onerror = () => r("error"); i.src = JSON.parse(localStorage.getItem("bp_user")).avatar_url; })');
+  await shot('25-cuenta-foto');
+  ok('Imagen: subir una foto la recorta cuadrada, la guarda y la muestra en el riel y en el header', /^(blob:|data:|http)/.test(foto.who) && /^(blob:|data:|http)/.test(foto.header) && foto.quitar && foto.marcados === 0 && cuadrada === '320x320',
+     'who ' + foto.who + ' · header ' + foto.header + ' · ' + cuadrada + ' · quitar visible ' + foto.quitar + ' · íconos marcados ' + foto.marcados);
+
 } catch (e) { ok('Flujo completo', false, e.message); }
 
 console.log('\nResultado: ' + results.filter(r => r.ok).length + ' de ' + results.length + ' pasos OK');

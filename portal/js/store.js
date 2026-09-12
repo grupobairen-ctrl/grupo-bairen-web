@@ -6,10 +6,11 @@
   'use strict';
   const S = { mode: 'local', session: null, sb: null, ready: null };
   const LS = key => ({ get(d){ try{ const v = JSON.parse(localStorage.getItem(key)); return v == null ? d : v; }catch(e){ return d; } }, set(v){ try{ localStorage.setItem(key, JSON.stringify(v)); }catch(e){ console.warn('localStorage lleno', e); } } });
-  const L = { user: LS('bp_user'), pubs: LS('bp_publicadores'), avisos: LS('bp_avisos'), consultas: LS('bp_consultas_db'), verif: LS('bp_verificaciones'), vistas: LS('bp_vistas'), code: LS('bp_code'), perfiles: LS('bp_perfiles') };
+  const L = { user: LS('bp_user'), pubs: LS('bp_publicadores'), avisos: LS('bp_avisos'), consultas: LS('bp_consultas_db'), verif: LS('bp_verificaciones'), vistas: LS('bp_vistas'), code: LS('bp_code'), perfiles: LS('bp_perfiles'), avatares: LS('bp_avatares') };
   /* La sesión que ven las páginas: id, mail y el perfil elegido al crear la cuenta (busca, dueno o profesional).
-     Con base real el perfil vive en los metadatos del usuario de Auth (user_metadata.perfil); en modo local, en bp_user. */
-  const sesionDe = u => ({ id: u.id, email: u.email, perfil: (u.user_metadata && u.user_metadata.perfil) || null });
+     Con base real el perfil vive en los metadatos del usuario de Auth (user_metadata.perfil); en modo local, en bp_user.
+     12/9 · También la imagen de la cuenta: user_metadata.avatar ('avatar-1'…'avatar-4' o 'foto') y avatar_url (la foto). */
+  const sesionDe = u => { const m = u.user_metadata || {}; return { id: u.id, email: u.email, perfil: m.perfil || null, avatar: m.avatar || null, avatar_url: m.avatar_url || null }; };
   const uid = () => 'l' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
   const now = () => new Date().toISOString();
   const slugify = t => (t||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
@@ -90,7 +91,8 @@
     if (S.mode === 'supabase') { const { data, error } = await S.sb.auth.verifyOtp({ email, token: code, type: 'email' }); if (error) return { ok:false, msg: error.message }; S.session = sesionDe(data.user); return { ok:true }; }
     const c = L.code.get(null); if (!c || c.email !== email || c.code !== code) return { ok:false, msg:'Código incorrecto.' };
     /* En local el perfil se recuerda por mail (bp_perfiles), como los metadatos de Auth: la pregunta se hace una sola vez */
-    S.session = { id: 'local-' + slugify(email), email, perfil: L.perfiles.get({})[email] || null }; L.user.set(S.session); if (window.BP && BP.applySession) BP.applySession(S.session, S.mode); return { ok:true };
+    const av = L.avatares.get({})[email] || {};   /* 12/9 · la imagen también se recuerda por mail (bp_avatares) */
+    S.session = { id: 'local-' + slugify(email), email, perfil: L.perfiles.get({})[email] || null, avatar: av.avatar || null, avatar_url: av.avatar_url || null }; L.user.set(S.session); if (window.BP && BP.applySession) BP.applySession(S.session, S.mode); return { ok:true };
   };
   S.signOut = async function(){ if (S.mode === 'supabase') await S.sb.auth.signOut(); S.session = null; L.user.set(null); if (window.BP && BP.applySession) BP.applySession(null, S.mode); };
 
@@ -128,6 +130,98 @@
     if (!S.session) return null;
     const p = S.getPerfil(); if (p) return p;
     try { return S.perfilDePublicador(await S.getMyPublicador()); } catch (e) { return null; }
+  };
+
+  /* ── 12/9 · imagen de la cuenta ───────────────────────
+     Una preferencia, como el perfil: uno de cuatro íconos (img/avatares/avatar-N.png) o una foto propia.
+     Con base real vive en user_metadata { avatar: 'avatar-1'…'avatar-4' | 'foto' | null, avatar_url } y la foto va al
+     bucket público 'portal-avatares' (migracion-05-avatares.sql) como <uid>/avatar.jpg con upsert; la URL lleva ?v= para
+     vencer la caché. En modo local vive en bp_user (y por mail en bp_avatares) y la foto es una data URL: a 320 px pesa
+     unos 20 KB. Antes de subir, la foto se recorta cuadrada al centro y se reduce en el navegador. */
+  S.AVATARES = ['avatar-1', 'avatar-2', 'avatar-3', 'avatar-4'];
+  S.AVATAR_DIR = 'img/avatares/';
+  S.avatarSrc = id => S.AVATAR_DIR + id + '.png';
+  let avataresCache = null;
+  /* Los íconos con su nombre (avatares.json = [{ id, archivo, nombre }]), pedidos una sola vez. Sin el archivo, los ids alcanzan. */
+  S.avatares = function(){
+    if (avataresCache) return avataresCache;
+    const base = () => S.AVATARES.map((id, i) => ({ id, archivo: id + '.png', nombre: 'Ícono ' + (i + 1) }));
+    avataresCache = fetch(S.AVATAR_DIR + 'avatares.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : null)
+      .then(l => { const ok = Array.isArray(l) ? l.filter(a => a && S.AVATARES.indexOf(a.id) > -1).map(a => ({ id: a.id, archivo: a.archivo || a.id + '.png', nombre: a.nombre || a.id })) : []; return ok.length ? ok : base(); })
+      .catch(() => base());
+    return avataresCache;
+  };
+  /* Lo que se muestra: { tipo: 'icono' | 'foto' | null, src, id }. src es img/avatares/avatar-N.png o la URL de la foto. */
+  S.getAvatar = function(){
+    const s = S.session; if (!s) return { tipo: null, src: null, id: null };
+    if (s.avatar === 'foto' && s.avatar_url) return { tipo: 'foto', src: s.avatar_url, id: 'foto' };
+    if (S.AVATARES.indexOf(s.avatar) > -1) return { tipo: 'icono', src: S.avatarSrc(s.avatar), id: s.avatar };
+    return { tipo: null, src: null, id: null };
+  };
+  async function guardarAvatar(patch){
+    if (!S.session) throw new Error('sin sesión');
+    if (S.mode === 'supabase' && !DEMO) { const { error } = await S.sb.auth.updateUser({ data: patch }); if (error) throw error; }
+    Object.assign(S.session, patch);
+    if (S.mode === 'local') { L.user.set(S.session); const m = L.avatares.get({}); m[S.session.email] = { avatar: S.session.avatar || null, avatar_url: S.session.avatar_url || null }; L.avatares.set(m); }
+    if (window.BP && BP.applySession) BP.applySession(S.session, S.mode);   /* el header muestra la imagen nueva */
+  }
+  const rutaAvatar = () => S.session.id + '/avatar.jpg';
+  async function borrarFotoAvatar(){
+    if (S.mode !== 'supabase' || DEMO || !S.session) return;
+    try { const { error } = await S.sb.storage.from('portal-avatares').remove([rutaAvatar()]); if (error) throw error; }
+    catch (e) { console.warn('[bairen] la foto de la cuenta no se pudo borrar del bucket:', e); }
+  }
+  /* Elegir un ícono (o ninguno, con icono: null): reemplaza la foto, que se borra del bucket. */
+  S.setAvatar = async function(o){
+    const icono = (o && o.icono) || null;
+    if (icono && S.AVATARES.indexOf(icono) === -1) throw new Error('ícono desconocido');
+    const teniaFoto = !!(S.session && S.session.avatar === 'foto' && S.session.avatar_url);
+    await guardarAvatar({ avatar: icono, avatar_url: null });
+    if (teniaFoto) await borrarFotoAvatar();
+    return S.getAvatar();
+  };
+  /* Recorte cuadrado centrado y reducción a `lado` px en el navegador: JPEG .85. Devuelve un Blob, o una data URL si se pide. */
+  S.cuadrarFoto = function(file, lado, comoDataUrl){
+    return new Promise((res, rej) => {
+      const img = new Image(); const u = URL.createObjectURL(file);
+      img.onload = () => {
+        try {
+          const s = Math.min(img.naturalWidth || img.width, img.naturalHeight || img.height); if (!s) throw new Error('vacía');
+          const c = document.createElement('canvas'); c.width = c.height = lado || 320;
+          const ctx = c.getContext('2d'); ctx.fillStyle = '#F6F2E8'; ctx.fillRect(0, 0, c.width, c.height);   /* un PNG transparente no termina en negro al pasar a JPEG */
+          ctx.drawImage(img, ((img.naturalWidth || img.width) - s) / 2, ((img.naturalHeight || img.height) - s) / 2, s, s, 0, 0, c.width, c.height);
+          URL.revokeObjectURL(u);
+          if (comoDataUrl) return res(c.toDataURL('image/jpeg', .85));
+          c.toBlob(b => b ? res(b) : rej(new Error('No se pudo procesar la imagen.')), 'image/jpeg', .85);
+        } catch (e) { URL.revokeObjectURL(u); rej(new Error('No se pudo procesar la imagen.')); }
+      };
+      img.onerror = () => { URL.revokeObjectURL(u); rej(new Error('El archivo no es una imagen que el navegador pueda abrir. Probá con JPG o PNG.')); };
+      img.src = u;
+    });
+  };
+  /* Subir una foto propia. Con base real, al bucket 'portal-avatares'; si el bucket no existe (migración sin correr),
+     el error lo dice y la imagen elegida queda como estaba. En modo local y en demo, data URL en memoria (y en bp_user). */
+  S.setAvatarFoto = async function(file){
+    if (!S.session) throw new Error('sin sesión');
+    if (!file) throw new Error('Elegí una imagen.');
+    if (file.type && !/^image\//.test(file.type)) throw new Error('Elegí una imagen (JPG o PNG).');
+    if (/hei[cf]/i.test((file.type || '') + ' ' + (file.name || ''))) throw new Error('Es una foto HEIC del iPhone: compartila como JPG (Ajustes → Cámara → Formatos → Más compatible) o elegí otra.');
+    if (file.size > 15 * 1024 * 1024) throw new Error('La foto pesa más de 15 MB: exportala más chica.');
+    if (S.mode === 'supabase' && !DEMO) {
+      const blob = await S.cuadrarFoto(file, 320);
+      const path = rutaAvatar();
+      const { error } = await S.sb.storage.from('portal-avatares').upload(path, blob, { contentType: 'image/jpeg', upsert: true, cacheControl: '3600' });
+      if (error) {
+        const msg = String(error.message || error); const sinBucket = /bucket not found/i.test(msg) || String(error.statusCode || error.status) === '404';
+        throw new Error(sinBucket ? 'La foto no se pudo subir: falta correr migracion-05-avatares.sql' : 'La foto no se pudo subir: ' + msg);
+      }
+      const url = S.sb.storage.from('portal-avatares').getPublicUrl(path).data.publicUrl + '?v=' + Date.now();
+      await guardarAvatar({ avatar: 'foto', avatar_url: url });
+      return S.getAvatar();
+    }
+    const dataUrl = await S.cuadrarFoto(file, 320, true);
+    await guardarAvatar({ avatar: 'foto', avatar_url: dataUrl });
+    return S.getAvatar();
   };
 
   /* ── publicador ───────────────────────────────────────── */

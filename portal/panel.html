@@ -38,7 +38,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://dahusnnbyrvltcuaelxj.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260912m"><link rel="stylesheet" href="css/catalogo.css?v=20260912m"><link rel="stylesheet" href="css/portal.css?v=20260912m">
+  <link rel="stylesheet" href="css/base.css?v=20260912n"><link rel="stylesheet" href="css/catalogo.css?v=20260912n"><link rel="stylesheet" href="css/portal.css?v=20260912n">
   <style>
     .p-panel{display:grid;grid-template-columns:240px 1fr;gap:28px;align-items:start}
     .p-side-nav{background:var(--p-card);border:1px solid var(--p-line);border-radius:var(--p-radius);padding:10px;position:sticky;top:84px}
@@ -60,7 +60,7 @@
   <div id="content" aria-busy="true"><div class="p-skel-panel" aria-hidden="true"><div class="p-skel-line t"></div><div class="p-skel-line s"></div><div class="p-skel-line row"></div><div class="p-skel-line row"></div><div class="p-skel-line row"></div></div></div>
 </div></section>
 <div id="pFooter"></div>
-<script src="supabase-portal.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260912m" defer></script><script src="js/i18n-portal.js?v=20260912m" defer></script><script src="js/ui.js?v=20260912m" defer></script><script src="js/store.js?v=20260912m" defer></script><script src="js/data.js?v=20260912m" defer></script>
+<script src="supabase-portal.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260912n" defer></script><script src="js/i18n-portal.js?v=20260912n" defer></script><script src="js/ui.js?v=20260912n" defer></script><script src="js/store.js?v=20260912n" defer></script><script src="js/data.js?v=20260912n" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -104,7 +104,8 @@ document.addEventListener('DOMContentLoaded', function(){
     /* Si llegó por hash a una vista que su perfil no muestra (un profesional a #favoritos), se muestra igual y el riel la suma antes de Mi cuenta: nunca un callejón sin salida */
     const ids = riel.slice(); if (TABS.some(t => t[0] === tab) && ids.indexOf(tab) === -1) ids.splice(Math.max(0, ids.indexOf('cuenta')), 0, tab);
     const item = id => { const t = TABS.find(x => x[0] === id); if (t) return `<a href="#${t[0]}" class="${t[0]===tab?'on':''}"${t[0]===tab?' aria-current="page"':''}>${BP.ico[t[2]]}<span>${t[1]}</span>${contador(t[0])}</a>`; if (id === 'importar') return `<a href="importar.html">${ICO_IMPORTAR}<span>Importar</span></a>`; if (id === 'os') return `<a href="${BPStore.OS_URL}" rel="noopener" title="Visitas, reservas y cobros de tus unidades">${BP.ico.arrow}<span>Bairen OS</span></a>`; return ''; };
-    nav.innerHTML = `<div class="who"><span class="q">${BP.esc(BPStore.session.email)}</span>${perfil ? `<span class="rol">${BPStore.PERFIL_TXT[perfil]}</span>` : ''}${mode === 'local' ? '<span class="p-badge demo">modo local</span>' : ''}</div><div class="p-rail">` + ids.map(item).join('') + `</div><div class="p-rail p-rail-pie">` + (curador ? `<a href="curacion.html">${BP.ico.shield}<span>Curación</span></a>` : '') + `<a href="#" data-logout>${BP.ico.x}<span>Cerrar sesión</span></a></div>`; nav.querySelector('[data-logout]').addEventListener('click', async e => { e.preventDefault(); await BPStore.signOut(); location.href = 'index.html'; }); }
+    /* 12/9 · La imagen de la cuenta (48 px) a la izquierda del mail y el perfil; sin imagen, el ícono genérico */
+    nav.innerHTML = `<div class="who">${BP.avatar(BPStore.getAvatar(), 'p-avatar-who', 48)}<span class="txt"><span class="q">${BP.esc(BPStore.session.email)}</span>${perfil ? `<span class="rol">${BPStore.PERFIL_TXT[perfil]}</span>` : ''}${mode === 'local' ? '<span class="p-badge demo">modo local</span>' : ''}</span></div><div class="p-rail">` + ids.map(item).join('') + `</div><div class="p-rail p-rail-pie">` + (curador ? `<a href="curacion.html">${BP.ico.shield}<span>Curación</span></a>` : '') + `<a href="#" data-logout>${BP.ico.x}<span>Cerrar sesión</span></a></div>`; BP.avatarFallback(nav, BPStore.session.email); nav.querySelector('[data-logout]').addEventListener('click', async e => { e.preventDefault(); await BPStore.signOut(); location.href = 'index.html'; }); }
   function actualizarContador(k, n){ cuenta[k] = n; const a = nav.querySelector(`a[href="#${k}"]`); if (!a) return; let sp = a.querySelector('.n'); if (n > 0) { if (!sp) { sp = document.createElement('span'); sp.className = 'n'; a.appendChild(sp); } sp.textContent = n; } else if (sp) sp.remove(); }
   /* Cambiar de vista lleva siempre al título de esa vista, justo debajo del riel (en celular,
      debajo de las pastillas pegadas al header). Sin la navegación por ancla del navegador,
@@ -276,10 +277,22 @@ document.addEventListener('DOMContentLoaded', function(){
     content.innerHTML = `<h1 class="p-h2">Búsquedas y alertas</h1><p class="p-sub">Te avisamos por mail cuando entra una propiedad que coincide o cuando una que seguís baja de precio.</p>` + (al.length ? `<table class="p-tbl"><thead><tr><th>Creada</th><th>Tipo</th><th>Detalle</th><th></th></tr></thead><tbody>${al.map((a, i) => `<tr><td data-th="Creada">${new Date(a.creada).toLocaleDateString('es-AR')}</td><td data-th="Tipo">${a.tipo === 'precio' ? 'Baja de precio' : 'Búsqueda guardada'}</td><td data-th="Detalle">${a.tipo === 'precio' ? `<a href="propiedad.html?id=${encodeURIComponent(a.avisoId)}" style="text-decoration:underline">${BP.esc(a.avisoId)}</a>` : `<a href="${BP.esc(a.url||'buscar.html')}" style="text-decoration:underline">${a.filtros ? [a.filtros.op, (a.filtros.zonas||[]).map(BP.zonaLabel).join(', ')].filter(Boolean).join(' · ') : 'búsqueda'}</a>`}</td><td><button type="button" class="p-btn p-btn-sm" data-del="${i}">Quitar</button></td></tr>`).join('')}</tbody></table>` : '<div class="p-empty p-ensena"><b>Todavía no creaste ninguna alerta.</b><p>Desde el catálogo, con los filtros puestos, tocá "Crear alerta": te avisamos por mail cuando entra una propiedad que coincide.</p><a class="p-btn" href="buscar.html?op=alquiler">Ir al catálogo</a></div>');
     content.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => { const a = BP.alerts.get(); a.splice(Number(b.dataset.del), 1); BP.alerts.set(a); renderAlertas(); }));
   }
-  function renderCuenta(){
+  async function renderCuenta(){
     const tipo = pub ? (pub.tipo === 'dueno' ? 'Dueño directo' : pub.tipo === 'desarrolladora' ? 'Desarrolladora' : 'Inmobiliaria o corredor') : '';
+    /* 12/9 · La imagen de la cuenta: uno de cuatro íconos o una foto propia. Los nombres de los íconos salen de
+       img/avatares/avatares.json (BPStore.avatares, una sola vez); la fila va primera y ocupa el ancho de la ficha. */
+    const mia = vistaEnCurso; const iconos = await BPStore.avatares(); if (mia !== vistaEnCurso) return;
+    const email = BPStore.session.email, av0 = BPStore.getAvatar();
+    const filaImagen = `<div class="p-cuenta-img"><dt>${BP.t('img_tu_imagen', 'Tu imagen')}</dt><dd>
+          <fieldset class="p-avatar-sel" data-avatar-sel aria-label="${BP.esc(BP.t('img_tu_imagen', 'Tu imagen'))}">
+            <div class="actual" data-avatar-actual role="img" aria-label="${BP.esc(av0.tipo ? BP.t('img_actual', 'Tu imagen actual') : BP.t('img_sin', 'Sin imagen todavía: se muestra el ícono genérico'))}">${BP.avatar(av0, 'p-avatar-actual', 56)}</div>
+            <div class="ops" role="radiogroup" aria-label="${BP.esc(BP.t('img_elegir_icono', 'Elegir un ícono'))}">${iconos.map(a => `<label class="op${av0.tipo === 'icono' && av0.id === a.id ? ' on' : ''}"><input type="radio" name="avatar" value="${BP.esc(a.id)}" aria-label="${BP.esc(a.nombre)}"${av0.tipo === 'icono' && av0.id === a.id ? ' checked' : ''}><img src="${BP.esc(BPStore.AVATAR_DIR + a.archivo)}" alt="" width="44" height="44" decoding="async"></label>`).join('')}</div>
+            <div class="acts"><button type="button" class="p-btn p-btn-sm" data-avatar-subir>${BP.t('img_subir', 'Subir una foto')}</button><input type="file" accept="image/*" hidden data-avatar-file aria-label="${BP.esc(BP.t('img_subir', 'Subir una foto'))}"><button type="button" class="p-btn p-btn-sm p-btn-quiet" data-avatar-quitar${av0.tipo === 'foto' ? '' : ' hidden'}>${BP.t('img_quitar', 'Quitar')}</button></div>
+            <p class="p-note">${BP.t('img_nota', 'Un ícono o una foto tuya. La foto se recorta sola, cuadrada y al centro.')}</p>
+          </fieldset></dd></div>`;
     content.innerHTML = `<h1 class="p-h2">Mi cuenta</h1>
       <dl class="p-ficha-cuenta">
+        ${filaImagen}
         <div><dt>Mail</dt><dd>${BP.esc(BPStore.session.email)}</dd></div>
         <div><dt>En BAIREN</dt><dd data-perfil-txt>${perfil ? BPStore.PERFIL_TXT[perfil] : 'Sin elegir: el panel muestra todo'}</dd></div>
         ${pub ? `<div><dt>Publicador</dt><dd>${BP.esc(pub.nombre)}</dd></div><div><dt>Tipo</dt><dd>${tipo}</dd></div><div><dt>Verificación</dt><dd>${pub.verificado ? BP.ico.check + ' Verificado' : 'Pendiente: la revisa BAIREN'}</dd></div>${pub.matricula ? `<div><dt>Matrícula</dt><dd>${BP.esc(pub.matricula)}</dd></div>` : ''}` : `<div><dt>Publicador</dt><dd>Sin perfil todavía. Se crea al publicar.</dd></div>`}
@@ -302,6 +315,44 @@ document.addEventListener('DOMContentLoaded', function(){
       const dd = content.querySelector('[data-perfil-txt]'); if (dd) dd.textContent = BPStore.PERFIL_TXT[perfil];
       BP.toast(BPStore.session.demo ? 'En modo demo no se guarda.' : 'Listo. El panel ya muestra lo que te sirve.');
     }));
+    /* 12/9 · La imagen: mismo patrón que el perfil. Mientras guarda, el grupo entero queda deshabilitado; si no se pudo,
+       vuelve la marca anterior. Al guardar se repinta la imagen actual, el .who del riel y el header (lo hace el store). */
+    const sel = content.querySelector('[data-avatar-sel]'); BP.avatarFallback(sel, email);
+    /* Si falta el SVG de un ícono, su casilla muestra el número en navy en vez de la imagen rota */
+    sel.querySelectorAll('.op img').forEach((img, i) => img.addEventListener('error', () => { const l = img.closest('label'); if (l) l.classList.add('ph'); const b = document.createElement('b'); b.textContent = String(i + 1); img.replaceWith(b); }, { once: true }));
+    const pintarAvatar = () => {
+      const av = BPStore.getAvatar(); const act = sel.querySelector('[data-avatar-actual]');
+      act.innerHTML = BP.avatar(av, 'p-avatar-actual', 56); act.setAttribute('aria-label', av.tipo ? BP.t('img_actual', 'Tu imagen actual') : BP.t('img_sin', 'Sin imagen todavía: se muestra el ícono genérico')); BP.avatarFallback(act, email);
+      sel.querySelectorAll('label.op').forEach(l => { const i = l.querySelector('input'); const on = av.tipo === 'icono' && i.value === av.id; i.checked = on; l.classList.toggle('on', on); });
+      sel.querySelector('[data-avatar-quitar]').hidden = av.tipo !== 'foto';
+      renderNav(); marcarActiva();
+    };
+    /* Deshabilitar el grupo le saca el foco a lo que estaba enfocado (el radio, el botón): al terminar vuelve al mismo control */
+    const ocupado = (on, devolverA) => { sel.disabled = on; if (on) sel.setAttribute('aria-busy', 'true'); else { sel.removeAttribute('aria-busy'); if (devolverA && !devolverA.hidden && (document.activeElement === document.body || sel.contains(document.activeElement))) { try { devolverA.focus({ preventScroll: true }); } catch (e) {} } } };
+    const listo = () => { pintarAvatar(); BP.toast(BPStore.session.demo ? BP.t('img_demo', 'En modo demo no se guarda.') : BP.t('img_listo', 'Listo.')); };
+    sel.querySelectorAll('[name=avatar]').forEach(r => r.addEventListener('change', async () => {
+      sel.querySelectorAll('label.op').forEach(l => l.classList.toggle('on', l.querySelector('input').checked));
+      ocupado(true);
+      try { await BPStore.setAvatar({ icono: r.value }); }
+      catch (e) { ocupado(false, r); pintarAvatar(); BP.toast(BP.t('img_no_guardo', 'No se pudo guardar: ') + (e.message || e), 'error'); return; }
+      ocupado(false, r); listo();
+    }));
+    const file = sel.querySelector('[data-avatar-file]'), btnSubir = sel.querySelector('[data-avatar-subir]'), btnQuitar = sel.querySelector('[data-avatar-quitar]');
+    btnSubir.addEventListener('click', () => file.click());
+    file.addEventListener('change', async () => {
+      const f = file.files && file.files[0]; if (!f) return;
+      const txt = btnSubir.textContent; btnSubir.textContent = BP.t('img_subiendo', 'Subiendo…'); btnSubir.classList.add('ocupado'); ocupado(true);
+      try { await BPStore.setAvatarFoto(f); }
+      catch (e) { BP.toast(e.message || BP.t('img_no_subio', 'La foto no se pudo subir.'), 'error'); return; }
+      finally { file.value = ''; btnSubir.textContent = txt; btnSubir.classList.remove('ocupado'); ocupado(false, btnSubir); }
+      listo();
+    });
+    btnQuitar.addEventListener('click', async () => {
+      ocupado(true);
+      try { await BPStore.setAvatar({ icono: null }); }
+      catch (e) { ocupado(false, btnQuitar); BP.toast(BP.t('img_no_guardo', 'No se pudo guardar: ') + (e.message || e), 'error'); return; }
+      ocupado(false, btnSubir); listo();   /* "Quitar" desaparece: el foco pasa a "Subir una foto" */
+    });
   }
   render();
 })();
