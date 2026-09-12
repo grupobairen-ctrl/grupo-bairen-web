@@ -13,9 +13,9 @@
 do $seed$
 declare v_pub uuid; v_aviso uuid;
 begin
-  select id into v_pub from portal.publicadores where slug = 'maxim-rentals';
+  select id into v_pub from portal.publicadores where slug = 'bairen';
   if v_pub is null then
-    raise exception 'falta el publicador maxim-rentals: corré antes portal/schema-portal.sql';
+    raise exception 'falta el publicador bairen: corré antes portal/schema-portal.sql (o migracion-02 si la base ya existía)';
   end if;
 
   -- Húsares 1080 · 1º · mediano
@@ -43,24 +43,21 @@ Toilette de recepción, dormitorio con vestidor y baño en mármol de Carrara co
 
 El edificio ocupa una manzana entera de Palermo Chico, con el MALBA cruzando la calle: pileta climatizada con solárium, gimnasio con pilates, spa con sauna, laundry y seguridad 24 horas.
 
-Las superficies y medidas son aproximadas y surgirán del título de propiedad respectivo.
-Corredor responsable: Maximiliano Matzkin, Matrícula CUCICBA Nº 7527, Maxim Rentals.', '110 m² loft with double garage in the Alcorta Palace. the former Chrysler building from 1928 designed by Mario Palanti, the architect of the Barolo Palace. Where the roof test track was, today there is an oval garden with a heated pool, and the unit looks exactly there from the dining room gallery.
+Las superficies y medidas son aproximadas y surgirán del título de propiedad respectivo.', '110 m² loft with double garage in the Alcorta Palace. the former Chrysler building from 1928 designed by Mario Palanti, the architect of the Barolo Palace. Where the roof test track was, today there is an oval garden with a heated pool, and the unit looks exactly there from the dining room gallery.
 
 A single floor with high ceilings, with two columns that organize the space without dividing it and travertine floors in all rooms. Living room with double living room, integrated kitchen in dark wood with glass bar and cellar for 100 bottles.
 Reception toilet, bedroom with dressing room and Carrara marble bathroom with hydromassage.
 
 The building occupies an entire block of Palermo Chico, with the MALBA across the street: heated pool with solarium, gym with Pilates, spa with sauna, laundry and 24-hour security.
 
-The surfaces and measurements are approximate and will arise from the respective property title.
-Responsible broker: Maximiliano Matzkin, CUCICBA Registration No. 7527, Maxim Rentals.', 'Loft de 110 m² com garagem dupla no Palácio de Alcorta. o antigo edifício da Chrysler de 1928 projetado por Mario Palanti, o arquiteto do Palácio Barolo. Onde ficava a pista de testes da cobertura, hoje existe um jardim oval com piscina aquecida, e o aparelho fica exatamente ali visto da galeria da sala de jantar.
+The surfaces and measurements are approximate and will arise from the respective property title.', 'Loft de 110 m² com garagem dupla no Palácio de Alcorta. o antigo edifício da Chrysler de 1928 projetado por Mario Palanti, o arquiteto do Palácio Barolo. Onde ficava a pista de testes da cobertura, hoje existe um jardim oval com piscina aquecida, e o aparelho fica exatamente ali visto da galeria da sala de jantar.
 
 Piso único com pé direito alto, com duas colunas que organizam o espaço sem dividi-lo e piso de travertino em todos os ambientes. Sala com sala dupla, cozinha integrada em madeira escura com balcão de vidro e adega para 100 garrafas.
 WC de recepção, quarto com closet e casa de banho em mármore Carrara com hidromassagem.
 
 O prédio ocupa um quarteirão inteiro do Palermo Chico, com o MALBA do outro lado da rua: piscina climatizada com solário, academia com Pilates, spa com sauna, lavanderia e segurança 24 horas.
 
-As superfícies e medidas são aproximadas e decorrerão do respetivo título de propriedade.
-Corretor responsável: Maximiliano Matzkin, Registro CUCICBA nº 7527, Maxim Rentals.', null, null, null, 'disponible', 'publicado', '2026-09-04T13:35:56.894553+00:00')
+As superfícies e medidas são aproximadas e decorrerão do respetivo título de propriedade.', null, null, null, 'disponible', 'publicado', '2026-09-04T13:35:56.894553+00:00')
   on conflict (codigo) do nothing
   returning id into v_aviso;
   if v_aviso is null then select id into v_aviso from portal.avisos where codigo = 'BA-FIGUEROAALCORTA30002V'; end if;
@@ -96,8 +93,7 @@ Toilette de recepción, dormitorio con vestidor y baño en mármol de Carrara co
 
 El edificio ocupa una manzana entera de Palermo Chico, con el MALBA cruzando la calle: pileta climatizada con solárium, gimnasio con pilates, spa con sauna, laundry y seguridad 24 horas.
 
-Las superficies y medidas son aproximadas y surgirán del título de propiedad respectivo.
-Corredor responsable: Maximiliano Matzkin, Matrícula CUCICBA Nº 7527, Maxim Rentals.', '110 m² loft with garage in the Alcorta Palace. Former Chrysler building designed by Mario Palanti.
+Las superficies y medidas son aproximadas y surgirán del título de propiedad respectivo.', '110 m² loft with garage in the Alcorta Palace. Former Chrysler building designed by Mario Palanti.
 Includes 1 garage. Optional double garage +$50,000usd.
 
 A single floor with high ceilings, with two columns that organize the space without dividing it and travertine floors in all rooms. Living room with double living room, integrated kitchen in dark wood with glass bar and cellar for 100 bottles.
@@ -105,8 +101,7 @@ Reception toilet, bedroom with dressing room and Carrara marble bathroom with hy
 
 The building occupies an entire block of Palermo Chico, with the MALBA across the street: heated pool with solarium, gym with Pilates, spa with sauna, laundry and 24-hour security.
 
-The surfaces and measurements are approximate and will arise from the respective property title.
-Responsible broker: Maximiliano Matzkin, CUCICBA Registration No. 7527, Maxim Rentals.', 'Loft de 110 m² com garagem no Palácio de Alcorta. Antigo edifício da Chrysler projetado por Mario Palanti.
+The surfaces and measurements are approximate and will arise from the respective property title.', 'Loft de 110 m² com garagem no Palácio de Alcorta. Antigo edifício da Chrysler projetado por Mario Palanti.
 Inclui 1 garagem. Garagem dupla opcional +$50.000usd.
 
 Piso único com pé direito alto, com duas colunas que organizam o espaço sem dividi-lo e piso de travertino em todos os ambientes. Sala com sala dupla, cozinha integrada em madeira escura com balcão de vidro e adega para 100 garrafas.
@@ -114,8 +109,7 @@ WC de recepção, quarto com closet e casa de banho em mármore Carrara com hidr
 
 O prédio ocupa um quarteirão inteiro do Palermo Chico, com o MALBA do outro lado da rua: piscina climatizada com solário, academia com Pilates, spa com sauna, lavanderia e segurança 24 horas.
 
-As superfícies e medidas são aproximadas e decorrerão do respetivo título de propriedade.
-Corretor responsável: Maximiliano Matzkin, Registro CUCICBA nº 7527, Maxim Rentals.', null, null, 'A partir de 2 años', 'disponible', 'publicado', '2026-09-04T16:21:57.129821+00:00')
+As superfícies e medidas são aproximadas e decorrerão do respetivo título de propriedade.', null, null, 'A partir de 2 años', 'disponible', 'publicado', '2026-09-04T16:21:57.129821+00:00')
   on conflict (codigo) do nothing
   returning id into v_aviso;
   if v_aviso is null then select id into v_aviso from portal.avisos where codigo = 'BA-FIGUEROAALCORTA33002L'; end if;

@@ -38,7 +38,7 @@ create table if not exists portal.personas (
   whatsapp               text,
   dni                    text,                           -- solo el número; el documento se verifica y se borra
   dni_verificado_en      timestamptz,
-  matricula              text,                           -- '7527' (sin el colegio)
+  matricula              text,                           -- '1234' (sin el colegio)
   colegio                text,                           -- 'CUCICBA' | 'CMCPSI' | ...
   matricula_verificada_en timestamptz,                   -- contra el registro público, por un curador
   matricula_verificada_por text,
@@ -133,7 +133,7 @@ drop policy if exists "consultas por membresia select" on portal.consultas;
 create policy "consultas por membresia select" on portal.consultas for select using (portal.es_miembro(publicador_id));
 
 -- ---------------------------------------------------------------------
--- 4. Lo que se muestra en la ficha: "Publica: Maximiliano Matzkin · CUCICBA 7527 · Maxim Rentals"
+-- 4. Lo que se muestra en la ficha: "Publica: Nombre Apellido · CUCICBA 1234 · Inmobiliaria"
 --    Vista pública, solo publicadores verificados y titulares con matrícula verificada.
 -- ---------------------------------------------------------------------
 create or replace view portal.publicador_publico as
@@ -203,20 +203,10 @@ create index if not exists avisos_cualidades_idx on portal.avisos using gin (cua
 -- 8. Backfill: lo que ya existe pasa al modelo nuevo sin perder nada.
 -- ---------------------------------------------------------------------
 do $mig$
-declare v_pub uuid; v_per uuid; r record;
+declare v_per uuid; r record;
 begin
-  -- 8.a Maxim Rentals: la persona es Maximiliano Matzkin, matrícula CUCICBA 7527, titular.
-  select id into v_pub from portal.publicadores where slug = 'maxim-rentals';
-  if v_pub is not null then
-    select id into v_per from portal.personas where colegio = 'CUCICBA' and matricula = '7527';
-    if v_per is null then
-      insert into portal.personas (nombre, apellido, matricula, colegio)
-      values ('Maximiliano', 'Matzkin', '7527', 'CUCICBA') returning id into v_per;
-    end if;
-    if not exists (select 1 from portal.membresias where persona_id = v_per and publicador_id = v_pub and hasta is null) then
-      insert into portal.membresias (persona_id, publicador_id, rol) values (v_per, v_pub, 'titular');
-    end if;
-  end if;
+  -- 8.a (eliminada el 11/9/2026): el portal no da de alta a ningún corredor por su cuenta;
+  --     las personas con matrícula entran solo cuando se registran.
 
   -- 8.b Cualquier publicador que ya tenga cuenta: su persona y su membresía de titular.
   for r in select id, auth_user_id, nombre, responsable, email, telefono, whatsapp, matricula, colegio

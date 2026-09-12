@@ -38,7 +38,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://dahusnnbyrvltcuaelxj.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260912i"><link rel="stylesheet" href="css/catalogo.css?v=20260912i"><link rel="stylesheet" href="css/portal.css?v=20260912i">
+  <link rel="stylesheet" href="css/base.css?v=20260912k"><link rel="stylesheet" href="css/catalogo.css?v=20260912k"><link rel="stylesheet" href="css/portal.css?v=20260912k">
   <style>
     .p-cur{background:var(--p-card);border:1px solid var(--p-line);border-radius:var(--p-radius);padding:18px;margin-bottom:14px;display:grid;grid-template-columns:200px 1fr;gap:18px}
     .p-cur .ph{aspect-ratio:4/3;border-radius:8px;overflow:hidden;background:var(--p-tray)} .p-cur .ph img{width:100%;height:100%;object-fit:cover}
@@ -57,13 +57,13 @@
   <span class="p-eyebrow">Panel BAIREN</span>
   <h1 class="p-h2">Curación</h1>
   <p class="p-sub">Entra lo que pasa el estándar. Cada rechazo lleva un motivo que el publicador ve en su panel.</p>
-  <div class="p-tabs2" role="tablist" style="margin-bottom:0;border-bottom:0"><button type="button" class="on" data-t="cola" role="tab" aria-selected="true" aria-controls="out">Avisos en revisión</button><button type="button" data-t="pubs" role="tab" aria-selected="false" aria-controls="out" tabindex="-1">Publicadores por verificar</button></div>
+  <div class="p-tabs2" role="tablist" style="margin-bottom:0;border-bottom:0"><button type="button" class="on" data-t="cola" role="tab" aria-selected="true" aria-controls="out">Avisos en revisión</button><button type="button" data-t="pubs" role="tab" aria-selected="false" aria-controls="out" tabindex="-1">Publicadores por verificar</button><button type="button" data-t="sistema" role="tab" aria-selected="false" aria-controls="out" tabindex="-1">Sistema</button></div>
 </div></div>
 <section class="p-page after-band" role="main"><div class="p-container" style="max-width:980px">
   <div id="out" role="tabpanel" aria-busy="true"><div class="p-skel-panel" aria-hidden="true"><div class="p-skel-line row"></div><div class="p-skel-line row"></div></div></div>
 </div></section>
 <div id="pFooter"></div>
-<script src="supabase-portal.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260912i" defer></script><script src="js/i18n-portal.js?v=20260912i" defer></script><script src="js/ui.js?v=20260912i" defer></script><script src="js/store.js?v=20260912i" defer></script><script src="js/data.js?v=20260912i" defer></script>
+<script src="supabase-portal.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260912k" defer></script><script src="js/i18n-portal.js?v=20260912k" defer></script><script src="js/ui.js?v=20260912k" defer></script><script src="js/store.js?v=20260912k" defer></script><script src="js/data.js?v=20260912k" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -72,12 +72,16 @@ document.addEventListener('DOMContentLoaded', function(){
   await BPStore.init();
   if (!BPStore.requireSession('curacion')) return;
   if (!(await BPStore.isCurador())) { document.getElementById('out').innerHTML = '<div class="p-empty">Solo para el equipo de curación de BAIREN.</div>'; return; }
-  const out = document.getElementById('out'); let t = 'cola';
-  document.querySelectorAll('.p-tabs2 button').forEach(b => b.addEventListener('click', () => { document.querySelectorAll('.p-tabs2 button').forEach(x => { const on = x === b; x.classList.toggle('on', on); x.setAttribute('aria-selected', on ? 'true' : 'false'); x.tabIndex = on ? 0 : -1; }); t = b.dataset.t; render(); }));
+  const out = document.getElementById('out'); const TABS = ['cola', 'pubs', 'sistema']; let t = 'cola';
+  /* La pestaña activa se refleja en el hash (#cola, #pubs, #sistema): sirve para volver a la misma y para los links internos */
+  function marcarTab(nombre){ document.querySelectorAll('.p-tabs2 button').forEach(x => { const on = x.dataset.t === nombre; x.classList.toggle('on', on); x.setAttribute('aria-selected', on ? 'true' : 'false'); x.tabIndex = on ? 0 : -1; if (on && x.scrollIntoView) try { x.scrollIntoView({ block: 'nearest', inline: 'nearest' }); } catch (e) {} }); }
+  function activar(nombre){ t = nombre; marcarTab(nombre); try { history.replaceState(null, '', '#' + nombre); } catch (e) {} render(); }
+  document.querySelectorAll('.p-tabs2 button').forEach(b => b.addEventListener('click', () => activar(b.dataset.t)));
+  if (TABS.indexOf(location.hash.slice(1)) > -1) { t = location.hash.slice(1); marcarTab(t); }
   const ok = (c, txt) => `<span class="${c?'ok':'no'}">${c ? BP.ico.check : BP.ico.x} ${txt}</span>`;
   /* Una acción de curación por vez: el botón queda ocupado y, si la base la rechaza (por ejemplo en demo), se avisa */
   async function accion(btn, fn, okMsg){ if (btn.disabled) return; const card = btn.closest('.p-cur'); const btns = card.querySelectorAll('button'); btns.forEach(x => x.disabled = true); btn.setAttribute('aria-busy', 'true'); try { await fn(); BP.toast(okMsg); return true; } catch (e) { btns.forEach(x => x.disabled = false); btn.removeAttribute('aria-busy'); BP.toast(BPStore.demo ? 'En modo demo no se guarda.' : 'No se pudo: ' + (e.message || e), 'error'); return false; } }
-  async function render(){ out.setAttribute('aria-busy', 'true'); await (t === 'cola' ? renderCola() : renderPubs()); out.removeAttribute('aria-busy'); }
+  async function render(){ out.setAttribute('aria-busy', 'true'); await (t === 'cola' ? renderCola() : t === 'pubs' ? renderPubs() : renderSistema()); out.removeAttribute('aria-busy'); }
   async function renderCola(){
     const cola = await BPStore.colaCuracion();
     if (!cola.length) { out.innerHTML = '<div class="p-empty p-ensena"><b>No hay avisos esperando revisión.</b><p>Cuando un publicador envíe uno, aparece acá con sus fotos y datos para aprobarlo, pedir cambios o rechazarlo con un motivo.</p></div>'; return; }
@@ -110,6 +114,110 @@ document.addEventListener('DOMContentLoaded', function(){
       <textarea placeholder="Nota (opcional)" aria-label="Nota de la verificación"></textarea><div class="acts"><button type="button" class="p-btn p-btn-sm p-btn-fill" data-ok>Verificar</button><button type="button" class="p-btn p-btn-sm" data-no>Rechazar</button></div></div></div>`).join('');
     out.querySelectorAll('[data-mat]').forEach(b => b.addEventListener('click', async () => { b.disabled = true; try { await BPStore.marcarMatricula(b.dataset.mat, true); BP.toast('Matrícula verificada.'); renderPubs(); } catch (e) { b.disabled = false; BP.toast(BPStore.demo ? 'En modo demo no se guarda.' : 'No se pudo: ' + (e.message || e), 'error'); } }));
     out.querySelectorAll('.p-cur').forEach(card => { const id = card.dataset.id, ta = card.querySelector('textarea'); card.querySelector('[data-ok]').addEventListener('click', async e => { if (await accion(e.currentTarget, () => BPStore.verificarPublicador(id, true, ta.value.trim()), 'Publicador verificado.')) renderPubs(); }); card.querySelector('[data-no]').addEventListener('click', async e => { if (!ta.value.trim()) { BP.errorCampo(ta, 'Escribí el motivo: el publicador lo va a leer.'); return; } if (await accion(e.currentTarget, () => BPStore.verificarPublicador(id, false, ta.value.trim()), 'Rechazado.')) renderPubs(); }); });
+  }
+  /* ── Sistema: qué está configurado del motor, qué falta y cómo resolverlo, la última sincronización,
+     los números del día y el cron. Lee GET /api/portal-salud (api/portal-salud.js): solo booleanos y
+     números, nunca valores de claves. Autorización: el JWT de la sesión del curador en Authorization:
+     Bearer (el access_token de BPStore.sb.auth.getSession()). Sin base conectada (modo local) o sin
+     token no se llama y se dice que se ve en Vercel; un 401 es sesión vencida o mail fuera de
+     portal.curadores. Los pasos de "Falta X" están escritos para alguien que no programa. ── */
+  const SIS = { estado: null, data: null, error: null, res: null };
+  const VARS = [
+    { k: 'service_key', nombre: 'Sincronización web → portal', vars: ['PORTAL_SUPABASE_SERVICE_KEY'], paso: 'Vercel → proyecto de bairengroup.com → Settings → Environment Variables → Add → PORTAL_SUPABASE_SERVICE_KEY (Production y Preview). El valor sale de Supabase → proyecto del portal → Project Settings → API Keys → service_role (en Legacy API keys). Después: Vercel → Deployments → ··· del último → Redeploy.' },
+    { k: 'mail', nombre: 'Mails a publicadores y alertas', vars: ['RESEND_API_KEY', 'PORTAL_MAIL_FROM'], paso: 'RESEND_API_KEY: resend.com → API Keys → Create. PORTAL_MAIL_FROM: BAIREN <avisos@bairengroup.com>, con el dominio verificado en resend.com → Domains (los registros DNS se cargan en Vercel → Domains → bairengroup.com → DNS Records). Después, Redeploy.' },
+    { k: 'cron_secret', nombre: 'Cron diario', vars: ['CRON_SECRET'], paso: 'CRON_SECRET: 32 letras y números cualquiera (en la Terminal: openssl rand -hex 32). Vercel → Environment Variables → Add. Después, Redeploy. El cron corre solo en producción, no en el preview.' },
+    { k: 'notify_key', nombre: 'Disparo manual', vars: ['PORTAL_NOTIFY_KEY'], paso: 'PORTAL_NOTIFY_KEY: otra cadena larga; sirve para disparar el motor a mano con la cabecera x-portal-key.' },
+    { k: 'web', nombre: 'Lectura de la web', vars: ['WEB_SUPABASE_URL', 'WEB_SUPABASE_KEY'], siempre: true, paso: 'Opcional: WEB_SUPABASE_URL y WEB_SUPABASE_KEY solo se cargan en Vercel si cambia el proyecto de bairengroup.com.' },
+  ];
+  const SIN_FUNCION = 'Las funciones del servidor se ven con sesión real en Vercel; en este entorno (local) no están.';
+  const SIN_SESION = 'Tu sesión no está en la lista de curadores o venció. Volvé a entrar.';
+  const SIN_COMPROBAR = 'Se comprueba cuando esté la service key.';
+  const codigo = s => `<code class="p-sis-code">${BP.esc(s)}</code>`;
+  /* El paso va escapado; lo que es para copiar (nombres de variables, el archivo, el comando) queda en monoespaciada */
+  const paso = s => BP.esc(s).replace(/\b[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+\b|portal\/migracion-04-producto\.sql|openssl rand -hex 32|x-portal-key/g, m => `<code class="p-sis-code">${m}</code>`);
+  const listar = a => a.length < 2 ? a.join('') : a.slice(0, -1).join(', ') + ' y ' + a[a.length - 1];
+  const n = v => v == null ? '<small>sin datos</small>' : BP.fmtN(v);
+  const hace = iso => { const ms = Date.now() - new Date(iso).getTime(); if (!(ms >= 60000)) return 'recién'; const m = Math.floor(ms / 60000); if (m < 60) return 'hace ' + m + (m === 1 ? ' minuto' : ' minutos'); const h = Math.floor(m / 60); if (h < 24) return 'hace ' + h + (h === 1 ? ' hora' : ' horas'); const d = Math.floor(h / 24); return 'hace ' + d + (d === 1 ? ' día' : ' días'); };
+  const fecha = iso => { try { return new Date(iso).toLocaleString('es-AR', { day: 'numeric', month: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false }); } catch (e) { return String(iso); } };
+  const seg = ms => ms == null ? '' : ' en ' + (ms / 1000).toLocaleString('es-AR', { maximumFractionDigits: 1 }) + ' s';
+  /* El token de la sesión del curador, para Authorization: Bearer. Null con base local o sin sesión. */
+  async function tokenCurador(){ if (BPStore.mode !== 'supabase' || !BPStore.sb) return null; try { const { data } = await BPStore.sb.auth.getSession(); return (data && data.session && data.session.access_token) || null; } catch (e) { return null; } }
+  async function renderSistema(){
+    out.innerHTML = '<div class="p-skel-panel" aria-hidden="true"><div class="p-skel-line t"></div><div class="p-skel-line row"></div><div class="p-skel-line row"></div></div>';
+    SIS.estado = 'cargando'; SIS.res = null; SIS.error = null;
+    const token = await tokenCurador();
+    if (!token) { SIS.estado = 'sinfuncion'; pintarSistema(); return; }
+    let r = null, j = null;
+    try { r = await fetch('/api/portal-salud', { headers: { Accept: 'application/json', Authorization: 'Bearer ' + token }, cache: 'no-store' }); try { j = await r.json(); } catch (e) { j = null; } } catch (e) { r = null; }
+    if (!r || r.status === 404 || (!j && r.status < 500)) SIS.estado = 'sinfuncion';
+    else if (r.status === 401) SIS.estado = 'sinsesion';
+    else if (!r.ok || !j || !j.configurado) { SIS.estado = 'error'; SIS.error = (j && j.error) ? String(j.error) : ('respuesta ' + r.status); }
+    else { SIS.data = j; SIS.estado = 'ok'; }
+    pintarSistema();
+  }
+  function filaMotor(nombre, st, txt, pasoHtml){ return `<div class="${st}"><dt>${nombre}</dt><dd><span class="st"><i class="mk ${st}" aria-hidden="true">${st === 'ok' ? BP.ico.check : ''}</i><span>${txt}</span></span>${pasoHtml ? `<small class="paso">${pasoHtml}</small>` : ''}</dd></div>`; }
+  function pintarSistema(){
+    if (SIS.estado === 'sinfuncion') { out.innerHTML = `<div class="p-empty p-ensena"><b>${SIN_FUNCION}</b><p>Acá se ve qué variables del motor están configuradas y cómo cargar las que faltan, cuándo corrió la última sincronización de la web, los números del día y el cron. Abrí Curación en la web publicada, con tu sesión.</p></div>`; return; }
+    if (SIS.estado === 'sinsesion') { out.innerHTML = `<div class="p-empty p-ensena"><b>${SIN_SESION}</b><p>El estado del motor se lee con tu sesión de curador. Si acabás de entrar y sigue pasando, tu mail no está en la lista de curadores del portal.</p><div class="acts"><button type="button" class="p-btn p-btn-sm p-btn-fill" data-reentrar>Volver a entrar</button><button type="button" class="p-btn p-btn-sm" data-reintentar>Reintentar</button></div></div>`; out.querySelector('[data-reintentar]').addEventListener('click', () => render()); out.querySelector('[data-reentrar]').addEventListener('click', async e => { e.currentTarget.disabled = true; try { await BPStore.signOut(); } catch (x) {} location.href = 'ingresar.html?volver=' + encodeURIComponent('curacion'); }); return; }
+    if (SIS.estado === 'error') { out.innerHTML = `<div class="p-empty p-ensena"><b>No se pudo leer el estado del motor.</b><p>${BP.esc(SIS.error || '')}</p><button type="button" class="p-btn p-btn-sm" data-reintentar>Reintentar</button></div>`; out.querySelector('[data-reintentar]').addEventListener('click', () => render()); return; }
+    const d = SIS.data || {}, c = d.configurado || {};
+    /* Motor */
+    let motor = '';
+    VARS.forEach(v => { let st, txt;
+      if (v.k === 'mail') { const f = []; if (c.resend === false) f.push('RESEND_API_KEY'); if (c.mail_from === false) f.push('PORTAL_MAIL_FROM'); const nose = c.resend == null || c.mail_from == null; st = f.length ? 'no' : nose ? 'nose' : 'ok'; txt = f.length ? (f.length > 1 ? 'Faltan ' : 'Falta ') + listar(f.map(codigo)) : nose ? 'Sin comprobar' : 'Configurado'; }
+      else if (v.k === 'web') { st = 'ok'; txt = 'Usa los valores por defecto'; }   /* siempre está: nunca se marca como faltante */
+      else { const val = c[v.k]; st = val === true ? 'ok' : val === false ? 'no' : 'nose'; txt = val === true ? 'Configurado' : val === false ? 'Falta ' + codigo(v.vars[0]) : 'Sin comprobar'; }
+      motor += filaMotor(v.nombre, st, txt, st === 'nose' ? SIN_COMPROBAR : (st === 'no' || v.siempre) ? paso(v.paso) : ''); });
+    if ('migracion04' in c) { const m = c.migracion04; motor += filaMotor('Base del motor (migración 04)', m === true ? 'ok' : m === false ? 'no' : 'nose', m === true ? 'Aplicada' : m === false ? 'Falta correr ' + codigo('portal/migracion-04-producto.sql') : 'Sin comprobar', m === false ? paso('Supabase → proyecto del portal → SQL Editor → subir el archivo portal/migracion-04-producto.sql (no pegarlo) → Run.') : m == null ? SIN_COMPROBAR : ''); }
+    let html = `<div class="p-sis"><section class="p-sis-sec"><h2>Motor<small>Variables de entorno en Vercel. Después de cambiarlas: Deployments → ··· del último → Redeploy.</small></h2><div><dl class="p-sis-dl">${motor}</dl></div></section>`;
+    if (!c.service_key) {
+      html += '<p class="p-sis-aviso"><span>Sin la service key el motor no puede leer la base: la última sincronización, los números del día y el cron quedan sin datos hasta que esté cargada.</span></p></div>';
+      out.innerHTML = html; return;
+    }
+    /* Última sincronización */
+    const s = d.sync, ok = s && s.ultima_ok, er = s && s.ultima_error;
+    let sync = '';
+    if (!s) sync += `<p class="p-sis-lead">Sin registro de sincronizaciones.</p><p class="p-sis-err">${c.migracion04 === false ? 'Falta la migración 04: la tabla portal.sincronizaciones no existe todavía.' : 'La tabla portal.sincronizaciones no respondió.'}</p>`;
+    else if (ok) sync += `<p class="p-sis-lead"><b>${hace(ok.terminada)}</b> <span>· ${fecha(ok.terminada)}</span></p><dl class="p-sis-nums"><div><dt>Altas</dt><dd>${n(ok.altas)}</dd></div><div><dt>Cambios</dt><dd>${n(ok.cambios)}</dd></div><div><dt>Bajas</dt><dd>${n(ok.bajas)}</dd></div><div><dt>Sin cambios</dt><dd>${n(ok.sin_cambios)}</dd></div></dl>`;
+    else sync += '<p class="p-sis-lead">Todavía no corrió.</p><p class="p-sis-err">Se dispara al abrir el portal con base real o a las 07:00 con el cron.</p>';
+    if (er) sync += `<p class="p-sis-err${!ok || Date.parse(er.terminada) > Date.parse(ok.terminada) ? ' vivo' : ''}"><b>Último error, ${hace(er.terminada)}</b> (${fecha(er.terminada)}): ${BP.esc(er.error || 'sin detalle')}</p>`;
+    sync += `<div class="p-sis-acts"><button type="button" class="p-btn p-btn-sm" data-sync>Sincronizar ahora</button><span class="p-sis-res${SIS.res ? ' ' + SIS.res.tipo : ''}" data-sync-res role="status" aria-live="polite">${SIS.res ? BP.esc(SIS.res.msg) : ''}</span></div>`;
+    html += `<section class="p-sis-sec"><h2>Última sincronización<small>Web → portal: altas, precios, reservas y bajas.</small></h2><div>${sync}</div></section>`;
+    /* Hoy */
+    const h = d.hoy;
+    if (h) { const fila = (rot, val, tab) => `<div><dt>${tab ? `<a href="#${tab}" data-tab="${tab}">${rot}</a>` : rot}</dt><dd>${val == null && rot === 'Alertas enviadas hoy' && c.migracion04 === false ? '<small>sin migración 04</small>' : n(val)}</dd></div>`;
+      html += `<section class="p-sis-sec"><h2>Hoy<small>Totales en la base y actividad del día.</small></h2><div><dl class="p-sis-hoy">${fila('Avisos publicados', h.avisos_publicados)}${fila('En revisión', h.en_revision, 'cola')}${fila('Verificaciones pendientes', h.verificaciones_pendientes, 'pubs')}${fila('Consultas en 24 h', h.consultas_24h)}${fila('Alertas activas', h.alertas_activas)}${fila('Alertas enviadas hoy', h.alertas_enviadas)}</dl></div></section>`; }
+    /* Cron */
+    const cr = d.cron || { ruta: '/api/portal-diario', horario: '10:00 UTC (07:00 Buenos Aires)' };
+    const base = /bairengroup\.com$|\.vercel\.app$/.test(location.hostname) ? location.origin : 'https://www.bairengroup.com';
+    html += `<section class="p-sis-sec"><h2>Cron<small>Corre solo, todos los días: alertas y resumen.</small></h2><div><dl class="p-sis-nums"><div><dt>Ruta</dt><dd>${BP.esc(cr.ruta)}</dd></div><div><dt>Horario</dt><dd>${BP.esc(cr.horario)}</dd></div></dl><p class="p-sis-nota">Para probarlo a mano, con el valor de PORTAL_NOTIFY_KEY en lugar de los puntos:</p><pre class="p-sis-pre"><code>curl -H "x-portal-key: …" ${BP.esc(base)}${BP.esc(cr.ruta)}</code></pre></div></section>`;
+    if (d.version) html += `<p class="p-sis-pie">Motor versión ${BP.esc(d.version)}</p>`;
+    html += '</div>';
+    out.innerHTML = html;
+    out.querySelectorAll('[data-tab]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); window.scrollTo(0, 0); activar(a.dataset.tab); }));
+    const b = out.querySelector('[data-sync]'); if (b) b.addEventListener('click', () => sincronizar(b));
+  }
+  /* POST /api/portal-sync con el mismo Bearer: respeta el freno de 10 minutos. El resultado queda en la misma fila;
+     mientras corre, el grupo lleva aria-busy (el cursor de espera vive ahí, el botón deshabilitado no recibe eventos). */
+  async function sincronizar(btn){
+    if (btn.disabled) return;
+    const res = out.querySelector('[data-sync-res]'), grupo = btn.closest('.p-sis-acts');
+    btn.disabled = true; btn.setAttribute('aria-busy', 'true'); if (grupo) grupo.setAttribute('aria-busy', 'true'); res.className = 'p-sis-res'; res.textContent = 'Sincronizando…';
+    const token = await tokenCurador();
+    let r = null, j = null;
+    if (token) { try { r = await fetch('/api/portal-sync', { method: 'POST', headers: { Accept: 'application/json', Authorization: 'Bearer ' + token } }); try { j = await r.json(); } catch (e) { j = null; } } catch (e) { r = null; } }
+    let msg, tipo = 'ok';
+    if (!token) { msg = SIN_FUNCION; tipo = 'error'; }
+    else if (!r) { msg = 'Sin conexión con el servidor.'; tipo = 'error'; }
+    else if (r.status === 404 || (!j && r.status < 500)) { msg = SIN_FUNCION; tipo = 'error'; }
+    else if (r.status === 401) { msg = SIN_SESION; tipo = 'error'; }
+    else if (r.status === 503) { msg = 'Falta ' + ((j && j.falta) || 'configuración en Vercel') + '.'; tipo = 'error'; }
+    else if (j && j.omitida) { msg = j.motivo === 'en curso' ? 'Omitida: hay una sincronización en curso.' : 'Omitida: la última corrió hace menos de 10 minutos.'; tipo = 'omitida'; }
+    else if (r.ok && j && j.ok) { msg = 'Listo' + seg(j.ms) + ': ' + BP.fmtN(j.altas || 0) + ' altas, ' + BP.fmtN(j.cambios || 0) + ' cambios, ' + BP.fmtN(j.bajas || 0) + ' bajas, ' + BP.fmtN(j.sin_cambios || 0) + ' sin cambios.'; SIS.data.sync = Object.assign({}, SIS.data.sync, { ultima_ok: { terminada: new Date().toISOString(), altas: j.altas, cambios: j.cambios, bajas: j.bajas, sin_cambios: j.sin_cambios } }); }
+    else { msg = 'No se pudo: ' + ((j && j.error) || ('respuesta ' + r.status)) + '.'; tipo = 'error'; }
+    SIS.res = { msg, tipo };
+    if (tipo === 'ok') { pintarSistema(); const b2 = out.querySelector('[data-sync]'); if (b2) b2.focus(); }
+    else { btn.disabled = false; btn.removeAttribute('aria-busy'); if (grupo) grupo.removeAttribute('aria-busy'); res.className = 'p-sis-res ' + tipo; res.textContent = msg; }
   }
   render();
 })();

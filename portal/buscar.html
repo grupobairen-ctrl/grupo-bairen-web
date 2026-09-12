@@ -28,7 +28,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://dahusnnbyrvltcuaelxj.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260912i"><link rel="stylesheet" href="css/catalogo.css?v=20260912i"><link rel="stylesheet" href="css/portal.css?v=20260912i">
+  <link rel="stylesheet" href="css/base.css?v=20260912k"><link rel="stylesheet" href="css/catalogo.css?v=20260912k"><link rel="stylesheet" href="css/portal.css?v=20260912k">
   <style>body{padding-top:64px}</style>
 </head>
 <body class="p-product p-catalogo">
@@ -39,37 +39,37 @@
   <div class="p-catband-text">
     <p class="p-catband-eyebrow">BAIREN · Buenos Aires</p>
     <h1 id="resTitle">Propiedades en Buenos Aires</h1>
-    <p class="p-catband-sub">Cada propiedad pasa por el filtro de BAIREN antes de entrar. El contacto va directo a quien publica.</p>
+    <p class="p-catband-sub" data-i18n="cat_sub">Cada propiedad pasa por el filtro de BAIREN antes de entrar. El contacto va directo a quien publica.</p>
   </div>
-  <div class="p-catband-mapa"><div class="in"><div id="mapaResultados" role="group" aria-label="Mapa de barrios"></div><p class="p-map-hint">Tocá un barrio para filtrar. El número es lo publicado hoy.</p></div></div>
+  <div class="p-catband-mapa"><div class="in"><div id="mapaResultados" role="group" aria-label="Mapa de barrios" data-i18n-aria="cat_map_aria"></div><p class="p-map-hint" data-i18n="cat_map_hint">Tocá un barrio para filtrar. El número es lo publicado hoy.</p></div></div>
 </div></div>
 
 <div class="p-filters" id="filters">
   <div class="p-filters-in">
-    <div class="p-fchip" id="zonaBox"><span style="color:var(--gold-dark);display:inline-flex"></span><span id="zonaChips" style="display:flex;gap:6px;flex-wrap:wrap"></span><input type="text" id="qInput" placeholder="Barrio, calle o característica" aria-label="Ubicación o característica"><div class="p-sugg" id="sugg" role="listbox"></div></div>
-    <select class="p-fsel" id="opSel" aria-label="Operación"><option value="venta">Comprar</option><option value="alquiler">Alquilar</option><option value="">Todas</option></select>
-    <div class="p-plazo-pills" id="plazoPills" role="group" aria-label="Plazo del alquiler" hidden><button type="button" data-plazo="alquiler">Todos</button><button type="button" data-plazo="mediano">Mediano plazo</button><button type="button" data-plazo="largo">Largo plazo</button></div>
-    <select class="p-fsel" id="tipoSel" aria-label="Tipo de propiedad"><option value="departamento">Departamento</option><option value="piso">Piso</option><option value="ph">PH</option><option value="casa">Casa</option><option value="todos">Todos los tipos</option></select>
+    <div class="p-fchip" id="zonaBox"><span style="color:var(--gold-dark);display:inline-flex"></span><span id="zonaChips" style="display:flex;gap:6px;flex-wrap:wrap"></span><input type="text" id="qInput" placeholder="Barrio, calle o característica" data-i18n-ph="cat_q_ph" aria-label="Ubicación o característica" data-i18n-aria="cat_q_aria"><div class="p-sugg" id="sugg" role="listbox"></div></div>
+    <select class="p-fsel" id="opSel" aria-label="Operación" data-i18n-aria="cat_op_aria"><option value="venta" data-i18n="comprar">Comprar</option><option value="alquiler" data-i18n="alquilar">Alquilar</option><option value="" data-i18n="cat_todas">Todas</option></select>
+    <div class="p-plazo-pills" id="plazoPills" role="group" aria-label="Plazo del alquiler" data-i18n-aria="cat_plazo_aria" hidden><button type="button" data-plazo="alquiler" data-i18n="cat_plazo_todos">Todos</button><button type="button" data-plazo="mediano" data-i18n="mediano">Mediano plazo</button><button type="button" data-plazo="largo" data-i18n="largo">Largo plazo</button></div>
+    <select class="p-fsel" id="tipoSel" aria-label="Tipo de propiedad" data-i18n-aria="cat_tipo_aria"><option value="departamento" data-i18n="cat_tipo_depto">Departamento</option><option value="piso" data-i18n="cat_tipo_piso">Piso</option><option value="ph">PH</option><option value="casa" data-i18n="cat_tipo_casa">Casa</option><option value="todos" data-i18n="cat_tipo_todos">Todos los tipos</option></select>
     <div class="p-fwrap"><button type="button" class="p-fbtn" id="ambBtn" aria-haspopup="dialog" aria-controls="ambPop" aria-expanded="false">Amb | Dorm</button>
-      <div class="p-pop" id="ambPop"><label>Ambientes, mínimo</label><div class="seg" data-key="amb"><button type="button" data-v="">Todos</button><button type="button" data-v="1">1+</button><button type="button" data-v="2">2+</button><button type="button" data-v="3">3+</button><button type="button" data-v="4">4+</button></div><label>Dormitorios, mínimo</label><div class="seg" data-key="dorm"><button type="button" data-v="">Todos</button><button type="button" data-v="1">1+</button><button type="button" data-v="2">2+</button><button type="button" data-v="3">3+</button></div><div class="acts"><button type="button" class="lnk" data-clear="amb,dorm">Limpiar</button><button type="button" class="p-btn p-btn-sm p-btn-navy" data-apply>Aplicar</button></div></div></div>
+      <div class="p-pop" id="ambPop"><label data-i18n="cat_amb_min">Ambientes, mínimo</label><div class="seg" data-key="amb"><button type="button" data-v="" data-i18n="cat_any">Todos</button><button type="button" data-v="1">1+</button><button type="button" data-v="2">2+</button><button type="button" data-v="3">3+</button><button type="button" data-v="4">4+</button></div><label data-i18n="cat_dorm_min">Dormitorios, mínimo</label><div class="seg" data-key="dorm"><button type="button" data-v="" data-i18n="cat_any">Todos</button><button type="button" data-v="1">1+</button><button type="button" data-v="2">2+</button><button type="button" data-v="3">3+</button></div><div class="acts"><button type="button" class="lnk" data-clear="amb,dorm" data-i18n="cat_limpiar">Limpiar</button><button type="button" class="p-btn p-btn-sm p-btn-navy" data-apply data-i18n="cat_aplicar">Aplicar</button></div></div></div>
     <div class="p-fwrap"><button type="button" class="p-fbtn" id="precioBtn" aria-haspopup="dialog" aria-controls="precioPop" aria-expanded="false">Precio</button>
-      <div class="p-pop" id="precioPop"><label for="pmin">USD, desde y hasta</label><div class="row"><input type="number" id="pmin" placeholder="Mínimo" min="0" inputmode="numeric" aria-label="Precio mínimo en USD"><input type="number" id="pmax" placeholder="Máximo" min="0" inputmode="numeric" aria-label="Precio máximo en USD"></div><div class="acts"><button type="button" class="lnk" data-clear="pmin,pmax">Limpiar</button><button type="button" class="p-btn p-btn-sm p-btn-navy" data-apply>Aplicar</button></div></div></div>
-    <button type="button" class="p-fbtn p-only-m" id="barriosBtn" aria-haspopup="dialog" aria-controls="mapaSheet" aria-expanded="false">Barrios</button>
-    <button type="button" class="p-fbtn" id="moreBtn" aria-label="Más filtros"> Filtros <span class="cnt" id="moreCnt" hidden></span></button>
+      <div class="p-pop" id="precioPop"><label for="pmin" data-i18n="cat_usd_rango">USD, desde y hasta</label><div class="row"><input type="number" id="pmin" placeholder="Mínimo" data-i18n-ph="cat_min_ph" min="0" inputmode="numeric" aria-label="Precio mínimo en USD" data-i18n-aria="cat_pmin_aria"><input type="number" id="pmax" placeholder="Máximo" data-i18n-ph="cat_max_ph" min="0" inputmode="numeric" aria-label="Precio máximo en USD" data-i18n-aria="cat_pmax_aria"></div><div class="acts"><button type="button" class="lnk" data-clear="pmin,pmax" data-i18n="cat_limpiar">Limpiar</button><button type="button" class="p-btn p-btn-sm p-btn-navy" data-apply data-i18n="cat_aplicar">Aplicar</button></div></div></div>
+    <button type="button" class="p-fbtn p-only-m" id="barriosBtn" aria-haspopup="dialog" aria-controls="mapaSheet" aria-expanded="false" data-i18n="cat_barrios">Barrios</button>
+    <button type="button" class="p-fbtn" id="moreBtn" aria-label="Más filtros" data-i18n-aria="cat_mas_filtros"> Filtros <span class="cnt" id="moreCnt" hidden></span></button>
   </div>
 </div>
 
 <main class="p-container" style="padding-top:26px">
   <div class="p-results-head">
     <span class="p-results-count" id="resCount" aria-live="polite"></span>
-    <div class="acts"><button type="button" class="p-fbtn" id="alertBtn" aria-pressed="false">Crear alerta</button><select class="p-fsel" id="sortSel" aria-label="Ordenar"><option value="relevancia">Más relevantes</option><option value="precio_asc">Menor precio</option><option value="precio_desc">Mayor precio</option><option value="recientes">Más recientes</option><option value="m2">Mayor superficie</option></select></div>
+    <div class="acts"><button type="button" class="p-fbtn" id="alertBtn" aria-pressed="false">Crear alerta</button><select class="p-fsel" id="sortSel" aria-label="Ordenar" data-i18n-aria="cat_ordenar"><option value="relevancia" data-i18n="cat_sort_relevancia">Más relevantes</option><option value="precio_asc" data-i18n="cat_sort_precio_asc">Menor precio</option><option value="precio_desc" data-i18n="cat_sort_precio_desc">Mayor precio</option><option value="recientes" data-i18n="cat_sort_recientes">Más recientes</option><option value="m2" data-i18n="cat_sort_m2">Mayor superficie</option></select></div>
   </div>
   <div class="p-results">
     <div>
       <div class="p-list" id="list" aria-busy="true"><div class="p-skel-card" aria-hidden="true"><div class="ph"></div><div class="bd"><div class="p-skel-line t"></div><div class="p-skel-line s"></div><div class="p-skel-line l"></div><div class="p-skel-line m"></div><div class="foot"><div class="p-skel-line"></div><div class="p-skel-line"></div></div></div></div><div class="p-skel-card" aria-hidden="true"><div class="ph"></div><div class="bd"><div class="p-skel-line t"></div><div class="p-skel-line s"></div><div class="p-skel-line l"></div><div class="p-skel-line m"></div><div class="foot"><div class="p-skel-line"></div><div class="p-skel-line"></div></div></div></div><div class="p-skel-card" aria-hidden="true"><div class="ph"></div><div class="bd"><div class="p-skel-line t"></div><div class="p-skel-line s"></div><div class="p-skel-line l"></div><div class="p-skel-line m"></div><div class="foot"><div class="p-skel-line"></div><div class="p-skel-line"></div></div></div></div></div>
-      <div class="p-pager" id="pager" role="navigation" aria-label="Páginas de resultados"></div>
+      <div class="p-pager" id="pager" role="navigation" aria-label="Páginas de resultados" data-i18n-aria="cat_pager_aria"></div>
       <p class="p-legend" id="leyendaAlq" hidden style="margin-top:22px"></p>
-      <div class="p-breadcrumb" role="navigation" aria-label="Migas de pan" id="crumbs"></div>
+      <div class="p-breadcrumb" role="navigation" aria-label="Migas de pan" data-i18n-aria="cat_crumbs_aria" id="crumbs"></div>
     </div>
   </div>
 </main>
@@ -77,26 +77,26 @@
 <div class="p-drawer" id="drawer" aria-hidden="true">
   <div class="bg" data-close></div>
   <div class="panel" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
-    <button type="button" class="x" data-close aria-label="Cerrar">×</button>
-    <h3 id="drawerTitle">Más filtros</h3>
-    <p class="p-note" style="margin:0 0 6px">Afiná la búsqueda.</p>
-    <div class="grp"><label class="t" for="expmax">Expensas máximas, pesos por mes</label><input type="number" id="expmax" class="p-fsel" style="width:100%;padding-left:12px;background-image:none" placeholder="Sin máximo" inputmode="numeric" min="0"></div>
-    <div class="grp"><label class="t">Baños, mínimo</label><div class="seg" data-key="banos" style="display:flex;gap:6px;flex-wrap:wrap"><button type="button" class="p-fbtn" data-v="">Todos</button><button type="button" class="p-fbtn" data-v="1">1+</button><button type="button" class="p-fbtn" data-v="2">2+</button><button type="button" class="p-fbtn" data-v="3">3+</button></div></div>
-    <div class="grp"><label class="t">Cocheras, mínimo</label><div class="seg" data-key="coch" style="display:flex;gap:6px;flex-wrap:wrap"><button type="button" class="p-fbtn" data-v="">Todas</button><button type="button" class="p-fbtn" data-v="1">1+</button><button type="button" class="p-fbtn" data-v="2">2+</button></div></div>
-    <div class="grp"><label class="t">Superficie total, m²</label><div style="display:flex;gap:8px"><input type="number" id="m2min" class="p-fsel" style="flex:1;padding-left:12px;background-image:none" placeholder="Desde" inputmode="numeric" min="0" aria-label="Superficie mínima en m²"><input type="number" id="m2max" class="p-fsel" style="flex:1;padding-left:12px;background-image:none" placeholder="Hasta" inputmode="numeric" min="0" aria-label="Superficie máxima en m²"></div></div>
-    <div class="grp"><label class="t" for="antig">Antigüedad</label><select id="antig" class="p-fsel" style="width:100%"><option value="">Cualquiera</option><option value="0">A estrenar</option><option value="5">Hasta 5 años</option><option value="20">Hasta 20 años</option><option value="50">Hasta 50 años</option></select></div>
-    <div class="grp"><label class="t">Cualidades verificadas por BAIREN</label><p class="p-note" style="margin:0 0 8px">Comprobadas por BAIREN en la unidad.</p><div class="checks" id="cualChecks"></div></div>
-    <div class="grp"><label class="t">Amenities y características</label><div class="checks" id="amenChecks"></div></div>
-    <div class="grp"><label class="t">Publicación</label><div class="checks"><label><input type="checkbox" id="reservadas"> Incluir reservadas</label><label><input type="checkbox" id="amoblado"> Amoblado</label><label><input type="checkbox" id="dueno"> Solo dueños directos</label><label><input type="checkbox" id="video"> Con video</label><label>Publicado hace <select id="hace" class="p-fsel" style="height:34px;padding:0 28px 0 8px;margin-left:6px"><option value="">cualquier fecha</option><option value="1">hoy</option><option value="7">7 días</option><option value="30">30 días</option></select></label></div></div>
-    <div class="foot"><button type="button" class="lnk" id="clearAll" style="background:none;border:0;text-decoration:underline;color:var(--text-mid);cursor:pointer">Limpiar todo</button><button type="button" class="p-btn p-btn-navy" id="applyDrawer">Ver resultados</button></div>
+    <button type="button" class="x" data-close aria-label="Cerrar" data-i18n-aria="cat_cerrar">×</button>
+    <h3 id="drawerTitle" data-i18n="cat_mas_filtros">Más filtros</h3>
+    <p class="p-note" style="margin:0 0 6px" data-i18n="cat_drawer_note">Afiná la búsqueda.</p>
+    <div class="grp"><label class="t" for="expmax" data-i18n="cat_expmax">Expensas máximas, pesos por mes</label><input type="number" id="expmax" class="p-fsel" style="width:100%;padding-left:12px;background-image:none" placeholder="Sin máximo" data-i18n-ph="cat_expmax_ph" inputmode="numeric" min="0"></div>
+    <div class="grp"><label class="t" data-i18n="cat_banos_min">Baños, mínimo</label><div class="seg" data-key="banos" style="display:flex;gap:6px;flex-wrap:wrap"><button type="button" class="p-fbtn" data-v="" data-i18n="cat_any">Todos</button><button type="button" class="p-fbtn" data-v="1">1+</button><button type="button" class="p-fbtn" data-v="2">2+</button><button type="button" class="p-fbtn" data-v="3">3+</button></div></div>
+    <div class="grp"><label class="t" data-i18n="cat_coch_min">Cocheras, mínimo</label><div class="seg" data-key="coch" style="display:flex;gap:6px;flex-wrap:wrap"><button type="button" class="p-fbtn" data-v="" data-i18n="cat_any">Todas</button><button type="button" class="p-fbtn" data-v="1">1+</button><button type="button" class="p-fbtn" data-v="2">2+</button></div></div>
+    <div class="grp"><label class="t" data-i18n="cat_m2">Superficie total, m²</label><div style="display:flex;gap:8px"><input type="number" id="m2min" class="p-fsel" style="flex:1;padding-left:12px;background-image:none" placeholder="Desde" data-i18n-ph="cat_desde_ph" inputmode="numeric" min="0" aria-label="Superficie mínima en m²" data-i18n-aria="cat_m2min_aria"><input type="number" id="m2max" class="p-fsel" style="flex:1;padding-left:12px;background-image:none" placeholder="Hasta" data-i18n-ph="cat_hasta_ph" inputmode="numeric" min="0" aria-label="Superficie máxima en m²" data-i18n-aria="cat_m2max_aria"></div></div>
+    <div class="grp"><label class="t" for="antig" data-i18n="cat_antig">Antigüedad</label><select id="antig" class="p-fsel" style="width:100%"><option value="" data-i18n="cat_antig_any">Cualquiera</option><option value="0" data-i18n="cat_antig_0">A estrenar</option><option value="5" data-i18n="cat_antig_5">Hasta 5 años</option><option value="20" data-i18n="cat_antig_20">Hasta 20 años</option><option value="50" data-i18n="cat_antig_50">Hasta 50 años</option></select></div>
+    <div class="grp"><label class="t" data-i18n="cat_cual_t">Cualidades verificadas por BAIREN</label><p class="p-note" style="margin:0 0 8px" data-i18n="cat_cual_note">Comprobadas por BAIREN en la unidad.</p><div class="checks" id="cualChecks"></div></div>
+    <div class="grp"><label class="t" data-i18n="cat_amen_t">Amenities y características</label><div class="checks" id="amenChecks"></div></div>
+    <div class="grp"><label class="t" data-i18n="cat_pub_t">Publicación</label><div class="checks"><label><input type="checkbox" id="reservadas"> <span data-i18n="cat_incl_res">Incluir reservadas</span></label><label><input type="checkbox" id="amoblado"> <span data-i18n="cat_amoblado">Amoblado</span></label><label><input type="checkbox" id="dueno"> <span data-i18n="cat_dueno">Solo dueños directos</span></label><label><input type="checkbox" id="video"> <span data-i18n="cat_video">Con video</span></label><label><span data-i18n="cat_hace">Publicado hace</span> <select id="hace" class="p-fsel" style="height:34px;padding:0 28px 0 8px;margin-left:6px"><option value="" data-i18n="cat_hace_any">cualquier fecha</option><option value="1" data-i18n="cat_hace_hoy">hoy</option><option value="7" data-i18n="cat_hace_7">7 días</option><option value="30" data-i18n="cat_hace_30">30 días</option></select></label></div></div>
+    <div class="foot"><button type="button" class="lnk" id="clearAll" style="background:none;border:0;text-decoration:underline;color:var(--text-mid);cursor:pointer" data-i18n="cat_limpiar_todo">Limpiar todo</button><button type="button" class="p-btn p-btn-navy" id="applyDrawer" data-i18n="cat_ver_resultados">Ver resultados</button></div>
   </div>
 </div>
 
 <div class="p-msheet-wrap" id="mapaSheet" aria-hidden="true">
   <div class="bg" data-sheet-close></div>
   <div class="p-msheet" role="dialog" aria-modal="true" aria-labelledby="mapaSheetTitle">
-    <div class="p-msheet-head"><h3 id="mapaSheetTitle">Barrios</h3><button type="button" class="x" data-sheet-close aria-label="Cerrar">×</button></div>
-    <div class="p-msheet-map"><div id="mapaSheetMap" role="group" aria-label="Mapa de barrios"></div></div>
+    <div class="p-msheet-head"><h3 id="mapaSheetTitle" data-i18n="cat_barrios">Barrios</h3><button type="button" class="x" data-sheet-close aria-label="Cerrar" data-i18n-aria="cat_cerrar">×</button></div>
+    <div class="p-msheet-map"><div id="mapaSheetMap" role="group" aria-label="Mapa de barrios" data-i18n-aria="cat_map_aria"></div></div>
     <ul class="p-msheet-list" id="mapaSheetList"></ul>
   </div>
 </div>
@@ -105,19 +105,25 @@
 
 <script src="supabase-portal.js" defer></script>
 <script src="../mapa-barrios.js" defer></script>
-<script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260912i" defer></script><script src="js/i18n-portal.js?v=20260912i" defer></script><script src="js/ui.js?v=20260912i" defer></script><script src="js/store.js?v=20260912i" defer></script>
-<script src="js/data.js?v=20260912i" defer></script>
+<script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260912k" defer></script><script src="js/i18n-portal.js?v=20260912k" defer></script><script src="js/ui.js?v=20260912k" defer></script><script src="js/store.js?v=20260912k" defer></script>
+<script src="js/data.js?v=20260912k" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
 (async function(){
   BP.header(); BP.footer(); if (window.BPStore) BPStore.init();
   document.querySelector('#zonaBox > span').innerHTML = BP.ico.pin;
-  document.getElementById('moreBtn').innerHTML = BP.ico.filter + ' Filtros <span class="cnt" id="moreCnt" hidden></span>';
-  document.getElementById('alertBtn').innerHTML = BP.ico.bell + '<span class="t"> Crear alerta</span>'; document.getElementById('alertBtn').setAttribute('aria-label', 'Crear alerta');
+  /* Interfaz en el idioma elegido: BP.t(clave, castellano) devuelve el castellano si no hay traducción, así en es nada cambia.
+     Los controles con estado (título, Amb | Dorm, Precio, alerta) se traducen acá y no con data-i18n, para que una
+     aplicación tardía del diccionario (al abrir sesión) no les pise el estado. */
+  document.getElementById('resTitle').textContent = BP.t('cat_title', 'Propiedades en Buenos Aires');
+  document.getElementById('ambBtn').textContent = BP.t('cat_amb_dorm', 'Amb | Dorm'); document.getElementById('precioBtn').textContent = BP.t('cat_precio', 'Precio');
+  document.getElementById('moreBtn').innerHTML = BP.ico.filter + ' ' + BP.t('cat_filtros', 'Filtros') + ' <span class="cnt" id="moreCnt" hidden></span>';
+  document.getElementById('alertBtn').innerHTML = BP.ico.bell + '<span class="t"> ' + BP.t('cat_crear_alerta', 'Crear alerta') + '</span>'; document.getElementById('alertBtn').setAttribute('aria-label', BP.t('cat_crear_alerta', 'Crear alerta'));
   const AMEN = ['Pileta','Gimnasio','SUM','Parrilla','Seguridad 24hs','Cochera','Terraza o jardín','Ascensor','Laundry','Pet friendly','Aire acondicionado','Baulera'];
-  document.getElementById('amenChecks').innerHTML = AMEN.map(a => `<label><input type="checkbox" data-amen="${a}"> ${a}</label>`).join('');
-  document.getElementById('cualChecks').innerHTML = BP.CUALIDADES.map(a => `<label><input type="checkbox" data-cual="${a}"> ${a}</label>`).join('');
+  /* El valor que se filtra es el castellano (data-amen / data-cual); la etiqueta visible se traduce */
+  document.getElementById('amenChecks').innerHTML = AMEN.map(a => `<label><input type="checkbox" data-amen="${a}"> ${BP.etiqueta(a)}</label>`).join('');
+  document.getElementById('cualChecks').innerHTML = BP.CUALIDADES.map(a => `<label><input type="checkbox" data-cual="${a}"> ${BP.etiqueta(a)}</label>`).join('');
 
   const PER_PAGE = 12;
   const F = { op:'venta', tipo:'departamento', zonas:[], q:'', pub:'', emp:false, reservadas:false, amb:0, dorm:0, banos:0, coch:0, pmin:0, pmax:0, expmax:0, m2min:0, m2max:0, antig:0, amen:[], cual:[], amoblado:false, dueno:false, video:false, hace:0, favs:false, sort:'relevancia', page:1 };
@@ -132,7 +138,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
   let avisos;
   try { ({ avisos } = await _datos); }
-  catch (err) { console.error(err); BP.estadoError(document.getElementById('list'), 'No pudimos cargar las propiedades.'); document.getElementById('resTitle').textContent = 'Propiedades en Buenos Aires'; return; }
+  catch (err) { console.error(err); BP.estadoError(document.getElementById('list'), BP.t('cat_err_carga', 'No pudimos cargar las propiedades.')); document.getElementById('resTitle').textContent = BP.t('cat_title', 'Propiedades en Buenos Aires'); return; }
   BP.anotarMenus(avisos);
   const countsAll = BPData.countsByZona(avisos);
   let mapa = null;
@@ -145,15 +151,18 @@ document.addEventListener('DOMContentLoaded', function(){
     document.getElementById('reservadas').checked = F.reservadas; document.getElementById('amoblado').checked = F.amoblado; document.getElementById('dueno').checked = F.dueno; document.getElementById('video').checked = F.video;
     document.querySelectorAll('[data-amen]').forEach(c => c.checked = F.amen.indexOf(c.dataset.amen) > -1); document.querySelectorAll('[data-cual]').forEach(c => c.checked = F.cual.indexOf(c.dataset.cual) > -1);
     document.querySelectorAll('.seg').forEach(s => { const k = s.dataset.key; s.querySelectorAll('button').forEach(b => b.classList.toggle('on', String(F[k]||'') === b.dataset.v)); });
-    document.getElementById('ambBtn').textContent = (F.amb||F.dorm) ? [F.amb?F.amb+'+ amb.':null, F.dorm?F.dorm+'+ dorm.':null].filter(Boolean).join(' · ') : 'Amb | Dorm';
-    document.getElementById('precioBtn').textContent = (F.pmin||F.pmax) ? 'USD ' + (F.pmin?BP.fmtN(F.pmin):'0') + ' a ' + (F.pmax?BP.fmtN(F.pmax):'sin máximo') : 'Precio';
+    document.getElementById('ambBtn').textContent = (F.amb||F.dorm) ? [F.amb?BP.tf('cat_amb_btn', '{n}+ amb.', { n: F.amb }):null, F.dorm?BP.tf('cat_dorm_btn', '{n}+ dorm.', { n: F.dorm }):null].filter(Boolean).join(' · ') : BP.t('cat_amb_dorm', 'Amb | Dorm');
+    document.getElementById('precioBtn').textContent = (F.pmin||F.pmax) ? BP.tf('cat_precio_btn', 'USD {a} a {b}', { a: F.pmin?BP.fmtN(F.pmin):'0', b: F.pmax?BP.fmtN(F.pmax):BP.t('cat_sin_max', 'sin máximo') }) : BP.t('cat_precio', 'Precio');
     const more = [F.expmax,F.banos,F.coch,F.m2min,F.m2max,F.antig,F.amen.length,F.cual.length,F.amoblado,F.dueno,F.video,F.hace,F.reservadas].filter(Boolean).length; const cnt = document.getElementById('moreCnt'); cnt.textContent = more; cnt.hidden = !more;
-    document.getElementById('zonaChips').innerHTML = F.zonas.map(z => `<span class="p-chip">${BP.zonaLabel(z)}<button type="button" data-z="${z}" aria-label="Quitar ${BP.zonaLabel(z)}">×</button></span>`).join('');
+    document.getElementById('zonaChips').innerHTML = F.zonas.map(z => `<span class="p-chip">${BP.zonaLabel(z)}<button type="button" data-z="${z}" aria-label="${BP.esc(BP.tf('cat_quitar', 'Quitar {z}', { z: BP.zonaLabel(z) }))}">×</button></span>`).join('');
     document.querySelectorAll('#zonaChips button').forEach(b => b.addEventListener('click', () => { F.zonas = F.zonas.filter(z => z !== b.dataset.z); apply(); }));
   }
   function pushURL(){ const p = new URLSearchParams(); if (F.op) p.set('op', F.op); if (F.tipo !== 'departamento') p.set('tipo', F.tipo); F.zonas.forEach(z => p.append('zona', z)); if (F.q) p.set('q', F.q); ['amb','dorm','banos','coch','pmin','pmax','expmax','m2min','m2max','antig','hace'].forEach(k => { if (F[k]) p.set(k, F[k]); }); F.amen.forEach(a => p.append('amen', a)); F.cual.forEach(a => p.append('cual', a)); ['amoblado','dueno','video','favs','reservadas'].forEach(k => { if (F[k]) p.set(k, '1'); }); if (F.pub) p.set('pub', F.pub); if (F.emp) p.set('emp', '1'); if (F.sort !== 'relevancia') p.set('sort', F.sort); if (F.page > 1) p.set('page', F.page); const target = BP.pretty && F.op && F.zonas.length <= 1 && !F.q && !F.pub && !F.favs ? BP.urlBuscar(Object.assign({}, Object.fromEntries(p), { op: F.op, tipo: F.tipo, zonas: F.zonas })) : 'buscar.html' + (p.toString() ? '?' + p.toString() : ''); history.replaceState(null, '', target); }
 
-  function titulo(n){ const tipo = F.tipo === 'todos' ? 'Propiedades' : F.tipo === 'departamento' ? 'Departamentos' : F.tipo === 'piso' ? 'Pisos' : F.tipo === 'ph' ? 'PH' : 'Casas'; const op = F.favs ? 'guardadas' : F.op ? BP.OPS[F.op].h : 'en venta y alquiler'; const where = F.zonas.length ? ' en ' + F.zonas.map(BP.zonaLabel).join(', ') : ' en Buenos Aires'; return `<span>${BP.fmtN(n)}</span> ${tipo} ${op}${where}`; }
+  /* Título del catálogo: con un solo resultado el tipo y "guardada" van en singular ("1 Departamento en venta");
+     con cualquier otra cantidad el texto es el de siempre. Por tipo: [clave singular, castellano, clave plural, castellano]. */
+  const TIPO_TITULO = { todos: ['cat_t_propiedad_1', 'Propiedad', 'cat_t_propiedades', 'Propiedades'], departamento: ['cat_t_depto_1', 'Departamento', 'cat_t_deptos', 'Departamentos'], piso: ['cat_t_piso_1', 'Piso', 'cat_t_pisos', 'Pisos'], ph: ['cat_t_ph_1', 'PH', 'cat_t_ph', 'PH'], casa: ['cat_t_casa_1', 'Casa', 'cat_t_casas', 'Casas'] };
+  function titulo(n){ const uno = n === 1; const tt = TIPO_TITULO[F.tipo] || TIPO_TITULO.casa; const tipo = uno ? BP.t(tt[0], tt[1]) : BP.t(tt[2], tt[3]); const op = F.favs ? (uno ? BP.t('cat_t_guardada_1', 'guardada') : BP.t('cat_t_guardadas', 'guardadas')) : F.op ? BP.opTxt(F.op, 'h') : BP.t('cat_t_venta_alq', 'en venta y alquiler'); const where = F.zonas.length ? ' ' + BP.t('cat_t_en', 'en') + ' ' + F.zonas.map(BP.zonaLabel).join(', ') : ' ' + BP.t('cat_t_ba', 'en Buenos Aires'); return `<span>${BP.fmtN(n)}</span> ${tipo} ${op}${where}`; }
 
   /* El vacío no es culpa de quien busca: acá entran pocas unidades por diseño.
      Se explica la curación y se ofrece la operación que sí tiene inventario en esa zona. */
@@ -163,12 +172,12 @@ document.addEventListener('DOMContentLoaded', function(){
     /* Las claves de ops son las del aviso (venta, alquiler = largo, mediano); se traducen al filtro */
     const comoFiltro = o => o === 'alquiler' ? 'largo' : o;
     const otras = Object.keys(ops).map(comoFiltro).filter(o => o !== F.op && !(F.op === 'alquiler' && o !== 'venta')).sort((a,b) => (ops[b === 'largo' ? 'alquiler' : b]||0)-(ops[a === 'largo' ? 'alquiler' : a]||0));
-    const donde = zona ? ' en ' + BP.zonaLabel(zona) : '';
-    let t = 'Acá entran pocas unidades: cada una pasa un estándar de edificio, estado y presentación. ';
-    if (otras.length) t += 'Hoy' + donde + ' hay ' + otras.map(o => { const n = ops[o === 'largo' ? 'alquiler' : o]; return `<a href="${BP.urlBuscar({ op: o, zona: zona || undefined })}" style="text-decoration:underline">${n} ${n === 1 ? 'unidad' : 'unidades'} ${BP.OPS[o].h}</a>`; }).join(' y ') + '.';
-    else t += 'Probá con otro barrio o sacá un filtro.';
-    if (!F.reservadas) { const res = BPData.filter(avisos, Object.assign({}, F, { reservadas: true })).filter(a => a.reservado).length; if (res) t += ' También hay ' + res + (res === 1 ? ' reservada' : ' reservadas') + ', que podés incluir desde Más filtros.'; }
-    return t + ' ¿Tenés una propiedad así? <a href="publicar.html" style="text-decoration:underline">Publicala</a>.';
+    const donde = zona ? ' ' + BP.t('cat_t_en', 'en') + ' ' + BP.zonaLabel(zona) : '';
+    let t = BP.t('cat_sug_intro', 'Acá entran pocas unidades: cada una pasa un estándar de edificio, estado y presentación. ');
+    if (otras.length) t += BP.tf('cat_sug_hoy', 'Hoy{donde} hay ', { donde }) + otras.map(o => { const n = ops[o === 'largo' ? 'alquiler' : o]; return `<a href="${BP.urlBuscar({ op: o, zona: zona || undefined })}" style="text-decoration:underline">${n} ${n === 1 ? BP.t('cat_sug_unidad', 'unidad') : BP.t('cat_sug_unidades', 'unidades')} ${BP.opTxt(o, 'h')}</a>`; }).join(BP.t('cat_sug_y', ' y ')) + '.';
+    else t += BP.t('cat_sug_probar', 'Probá con otro barrio o sacá un filtro.');
+    if (!F.reservadas) { const res = BPData.filter(avisos, Object.assign({}, F, { reservadas: true })).filter(a => a.reservado).length; if (res) t += res === 1 ? BP.t('cat_sug_res_1', ' También hay 1 reservada, que podés incluir desde Más filtros.') : BP.tf('cat_sug_res_n', ' También hay {n} reservadas, que podés incluir desde Más filtros.', { n: res }); }
+    return t + BP.t('cat_sug_publicar', ' ¿Tenés una propiedad así? <a href="publicar.html" style="text-decoration:underline">Publicala</a>.');
   }
   function render(){
     let list = BPData.filter(avisos, F); list = BPData.sort(list, F.sort);
@@ -176,19 +185,21 @@ document.addEventListener('DOMContentLoaded', function(){
     const slice = list.slice((F.page-1)*PER_PAGE, F.page*PER_PAGE);
     document.getElementById('resTitle').innerHTML = titulo(n); document.title = titulo(n).replace(/<[^>]+>/g,'') + ' · BAIREN';
     const el = document.getElementById('list');
-    const pintar = () => { el.innerHTML = n ? slice.map(BPData.cardV).join('') : `<div class="p-empty"><b style="display:block;color:var(--navy-deeper);font-family:var(--font-display);font-size:1.2rem;margin-bottom:6px">${F.favs ? 'Todavía no guardaste propiedades' : F.emp ? 'Todavía no hay emprendimientos publicados' : 'Todavía no hay unidades así'}</b>${F.favs ? 'Tocá el corazón en cualquier ficha y la vas a ver acá.' : F.emp ? 'Los emprendimientos tienen su propia página: <a href="emprendimientos.html" style="text-decoration:underline">ver emprendimientos</a>. Si sos desarrolladora, <a href="publicar.html#desarrolladora" style="text-decoration:underline">publicá el tuyo</a>.' : sugerencias()}</div>`; };
+    const pintar = () => { el.innerHTML = n ? slice.map(BPData.cardV).join('') : `<div class="p-empty"><b style="display:block;color:var(--navy-deeper);font-family:var(--font-display);font-size:1.2rem;margin-bottom:6px">${F.favs ? BP.t('cat_vacio_favs', 'Todavía no guardaste propiedades') : F.emp ? BP.t('cat_vacio_emp', 'Todavía no hay emprendimientos publicados') : BP.t('cat_vacio', 'Todavía no hay unidades así')}</b>${F.favs ? BP.t('cat_vacio_favs_txt', 'Tocá el corazón en cualquier ficha y la vas a ver acá.') : F.emp ? BP.t('cat_vacio_emp_txt', 'Los emprendimientos tienen su propia página: <a href="emprendimientos.html" style="text-decoration:underline">ver emprendimientos</a>. Si sos desarrolladora, <a href="publicar.html#desarrolladora" style="text-decoration:underline">publicá el tuyo</a>.') : sugerencias()}</div>`; };
     if (window.BPM && BPM.reacomodar) BPM.reacomodar(el, pintar); else pintar();
-    const rc = document.getElementById('resCount'); if (rc) rc.textContent = n === 1 ? '1 propiedad' : n + ' propiedades';
+    const rc = document.getElementById('resCount'); if (rc) rc.textContent = n === 1 ? BP.t('cat_n_1', '1 propiedad') : BP.tf('cat_n', '{n} propiedades', { n });
     BPData.bindFavs(el);
     el.setAttribute('aria-busy','false');
-    if (BP._nPrev !== n) { BP._nPrev = n; BP.anunciar(n === 0 ? 'Sin resultados con estos filtros' : n === 1 ? 'Una propiedad' : n + ' propiedades'); }
+    if (BP._nPrev !== n) { BP._nPrev = n; BP.anunciar(n === 0 ? BP.t('cat_anun_0', 'Sin resultados con estos filtros') : n === 1 ? BP.t('cat_anun_1', 'Una propiedad') : BP.tf('cat_n', '{n} propiedades', { n })); }
     /* Paginación con anterior y siguiente; al cambiar de página se vuelve al inicio de la lista, no de la página */
-    const pg = document.getElementById('pager'); pg.innerHTML = pages > 1 ? `<button type="button" class="nav" data-p="${F.page-1}" ${F.page<=1?'disabled':''} aria-label="Página anterior">‹</button>` + Array.from({length: pages}, (_, i) => `<button type="button" class="${i+1===F.page?'on':''}" data-p="${i+1}" aria-label="Página ${i+1}"${i+1===F.page?' aria-current="page"':''}>${i+1}</button>`).join('') + `<button type="button" class="nav" data-p="${F.page+1}" ${F.page>=pages?'disabled':''} aria-label="Página siguiente">›</button>` : '';
+    const pg = document.getElementById('pager'); pg.innerHTML = pages > 1 ? `<button type="button" class="nav" data-p="${F.page-1}" ${F.page<=1?'disabled':''} aria-label="${BP.t('cat_pag_ant', 'Página anterior')}">‹</button>` + Array.from({length: pages}, (_, i) => `<button type="button" class="${i+1===F.page?'on':''}" data-p="${i+1}" aria-label="${BP.tf('cat_pag', 'Página {n}', { n: i+1 })}"${i+1===F.page?' aria-current="page"':''}>${i+1}</button>`).join('') + `<button type="button" class="nav" data-p="${F.page+1}" ${F.page>=pages?'disabled':''} aria-label="${BP.t('cat_pag_sig', 'Página siguiente')}">›</button>` : '';
     pg.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { F.page = Number(b.dataset.p); pushURL(); render(); const top = document.querySelector('.p-results-head') || document.getElementById('list'); top.scrollIntoView({ behavior: 'smooth', block: 'start' }); const primero = el.querySelector('.prop-card'); if (primero) primero.focus({ preventScroll: true }); }));
-    const ley = document.getElementById('leyendaAlq'); const hayAlqCorredor = F.op !== 'venta' && list.some(a => { const p = BPData.pub(a.publicadorId); return p.tipo !== 'dueno' && !!p.matricula; }); ley.hidden = !hayAlqCorredor; ley.textContent = 'Avisos de alquiler de vivienda publicados por corredores matriculados (Ley 2340, art. 10 inc. 8): ' + BP.LEYENDA_ALQUILER;
-    document.getElementById('crumbs').innerHTML = ['<a href="index.html">BAIREN</a>', F.tipo === 'todos' ? 'Propiedades' : 'Departamentos', F.op ? BP.OPS[F.op].label.split(' ·')[0] : 'Todas las operaciones', 'Buenos Aires'].concat(F.zonas.map(BP.zonaLabel)).join(' › ');
+    const ley = document.getElementById('leyendaAlq'); const hayAlqCorredor = F.op !== 'venta' && list.some(a => { const p = BPData.pub(a.publicadorId); return p.tipo !== 'dueno' && !!p.matricula; }); ley.hidden = !hayAlqCorredor;
+    /* La cita de la Ley 2340 queda en castellano en todos los idiomas; sólo se traduce la línea que la presenta */
+    ley.innerHTML = BP.esc(BP.t('cat_leyenda_alq', 'Avisos de alquiler de vivienda publicados por corredores matriculados (Ley 2340, art. 10 inc. 8): ')) + '<span lang="es">' + BP.esc(BP.LEYENDA_ALQUILER) + '</span>';
+    document.getElementById('crumbs').innerHTML = ['<a href="index.html">BAIREN</a>', F.tipo === 'todos' ? BP.t('cat_t_propiedades', 'Propiedades') : BP.t('cat_t_deptos', 'Departamentos'), F.op ? BP.opTxt(F.op, 'label').split(' ·')[0] : BP.t('cat_crumb_todas', 'Todas las operaciones'), 'Buenos Aires'].concat(F.zonas.map(BP.zonaLabel)).join(' › ');
     const counts = BPData.countsByZona(BPData.filter(avisos, Object.assign({}, F, {zonas: []})));
-    if (window.BairenMapa && window.innerWidth >= 1024) { const mel = document.getElementById('mapaResultados'); if (!mapa) { try { mapa = window.BairenMapa.mount(mel, { counts, modo:'lite', active: F.zonas[0] || null, onSelect: z => { F.zonas = F.zonas.indexOf(z) > -1 ? [] : [z]; apply(); } }); } catch (e) { mel.innerHTML = '<p class="p-note">Mapa no disponible.</p>'; } } else { mapa.setCounts(counts); mapa.setActive(F.zonas[0] || null); mapa.refresh && mapa.refresh(); } }
+    if (window.BairenMapa && window.innerWidth >= 1024) { const mel = document.getElementById('mapaResultados'); if (!mapa) { try { mapa = window.BairenMapa.mount(mel, { counts, modo:'lite', active: F.zonas[0] || null, onSelect: z => { F.zonas = F.zonas.indexOf(z) > -1 ? [] : [z]; apply(); } }); } catch (e) { mel.innerHTML = '<p class="p-note">' + BP.t('cat_mapa_nd', 'Mapa no disponible.') + '</p>'; } } else { mapa.setCounts(counts); mapa.setActive(F.zonas[0] || null); mapa.refresh && mapa.refresh(); } }
   }
   function apply(){ F.page = 1; syncControls(); pushURL(); render(); pintarAlerta(); }
 
@@ -198,7 +209,7 @@ document.addEventListener('DOMContentLoaded', function(){
   document.getElementById('tipoSel').addEventListener('change', e => { F.tipo = e.target.value; apply(); });
   document.getElementById('sortSel').addEventListener('change', e => { F.sort = e.target.value; apply(); });
   const qi = document.getElementById('qInput'), sugg = document.getElementById('sugg');
-  function showSugg(){ const q = qi.value.trim().toLowerCase(); const cz = BPData.countsByZona(avisos, F.op || null); const zs = BP.ZONAS.filter(z => F.zonas.indexOf(z)===-1 && (!q || BP.zonaLabel(z).toLowerCase().indexOf(q)>-1)); sugg.innerHTML = zs.map(z => `<button type="button" data-z="${z}">${BP.ico.pin} ${BP.zonaLabel(z)}<small>${cz[z] ? cz[z] : 'sin unidades'}</small></button>`).join(''); sugg.classList.toggle('open', zs.length>0); sugg.querySelectorAll('button').forEach(b => b.addEventListener('mousedown', e => { e.preventDefault(); F.zonas.push(b.dataset.z); qi.value=''; F.q=''; sugg.classList.remove('open'); apply(); })); }
+  function showSugg(){ const q = qi.value.trim().toLowerCase(); const cz = BPData.countsByZona(avisos, F.op || null); const zs = BP.ZONAS.filter(z => F.zonas.indexOf(z)===-1 && (!q || BP.zonaLabel(z).toLowerCase().indexOf(q)>-1)); sugg.innerHTML = zs.map(z => `<button type="button" data-z="${z}">${BP.ico.pin} ${BP.zonaLabel(z)}<small>${cz[z] ? cz[z] : BP.t('ui_sin_unidades', 'sin unidades')}</small></button>`).join(''); sugg.classList.toggle('open', zs.length>0); sugg.querySelectorAll('button').forEach(b => b.addEventListener('mousedown', e => { e.preventDefault(); F.zonas.push(b.dataset.z); qi.value=''; F.q=''; sugg.classList.remove('open'); apply(); })); }
   BP.sugerenciasTeclado(qi, sugg, el => { const z = el.dataset.z; if (!z) return; F.zonas.push(z); qi.value=''; F.q=''; sugg.classList.remove('open'); apply(); });
   qi.addEventListener('focus', showSugg); qi.addEventListener('input', showSugg);
   qi.addEventListener('blur', () => setTimeout(() => { if (!sugg.contains(document.activeElement)) sugg.classList.remove('open'); }, 120));
@@ -210,7 +221,7 @@ document.addEventListener('DOMContentLoaded', function(){
   document.addEventListener('click', e => { if (!e.target.closest('.p-fwrap')) cerrarPops(); });
   document.addEventListener('keydown', e => { if (e.key !== 'Escape') return; const abierto = pops.find(([, p]) => p.classList.contains('open')); if (!abierto) return; e.preventDefault(); cerrarPops(); abierto[0].focus(); });
   document.querySelectorAll('.seg').forEach(s => s.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { F[s.dataset.key] = Number(b.dataset.v||0); s.querySelectorAll('button').forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); })));
-  document.querySelectorAll('[data-apply]').forEach(b => b.addEventListener('click', () => { F.pmin = Number(document.getElementById('pmin').value||0); F.pmax = Number(document.getElementById('pmax').value||0); if (F.pmin && F.pmax && F.pmax < F.pmin) { BP.errorCampo('pmax', 'El máximo tiene que ser mayor que el mínimo.'); return; } cerrarPops(); apply(); }));
+  document.querySelectorAll('[data-apply]').forEach(b => b.addEventListener('click', () => { F.pmin = Number(document.getElementById('pmin').value||0); F.pmax = Number(document.getElementById('pmax').value||0); if (F.pmin && F.pmax && F.pmax < F.pmin) { BP.errorCampo('pmax', BP.t('cat_err_max', 'El máximo tiene que ser mayor que el mínimo.')); return; } cerrarPops(); apply(); }));
   ['pmin','pmax'].forEach(id => document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); document.querySelector('#precioPop [data-apply]').click(); } }));
   document.querySelectorAll('[data-clear]').forEach(b => b.addEventListener('click', () => { b.dataset.clear.split(',').forEach(k => F[k] = 0); cerrarPops(); apply(); }));
   /* Barrios en celular: el mapa de la banda no entra en la pantalla, así que abre como hoja,
@@ -221,7 +232,7 @@ document.addEventListener('DOMContentLoaded', function(){
     const counts = BPData.countsByZona(BPData.filter(avisos, Object.assign({}, F, { zonas: [] })));
     const mel = document.getElementById('mapaSheetMap');
     if (window.BairenMapa && mel && !mel.hidden) { if (!mapaSheet) { try { mapaSheet = window.BairenMapa.mount(mel, { counts, modo: 'lite', active: F.zonas[0] || null, onSelect: z => elegirZona(z) }); } catch (e) { mel.hidden = true; } } else { mapaSheet.setCounts(counts); mapaSheet.setActive(F.zonas[0] || null); mapaSheet.refresh && mapaSheet.refresh(); } }
-    sheetList.innerHTML = BP.ZONAS.map(z => { const on = F.zonas.indexOf(z) > -1; return `<li><button type="button" data-z="${z}" class="${on ? 'on' : ''}" aria-pressed="${on}"><span>${BP.zonaLabel(z)}</span><small>${counts[z] ? counts[z] + (counts[z] === 1 ? ' unidad' : ' unidades') : 'sin unidades'}</small></button></li>`; }).join('');
+    sheetList.innerHTML = BP.ZONAS.map(z => { const on = F.zonas.indexOf(z) > -1; return `<li><button type="button" data-z="${z}" class="${on ? 'on' : ''}" aria-pressed="${on}"><span>${BP.zonaLabel(z)}</span><small>${counts[z] ? counts[z] + (counts[z] === 1 ? BP.t('cat_unidad', ' unidad') : BP.t('cat_unidades', ' unidades')) : BP.t('ui_sin_unidades', 'sin unidades')}</small></button></li>`; }).join('');
     sheetList.querySelectorAll('button').forEach(b => b.addEventListener('click', () => elegirZona(b.dataset.z)));
   }
   function elegirZona(z){ F.zonas = F.zonas.indexOf(z) > -1 ? [] : [z]; apply(); abrirSheet(false); }
@@ -252,17 +263,17 @@ document.addEventListener('DOMContentLoaded', function(){
   const alertBtn = document.getElementById('alertBtn');
   const alertKey = () => { const p = new URLSearchParams(location.search); p.delete('page'); p.sort(); return location.pathname + '?' + p.toString(); };
   const alertaIdx = () => BP.alerts.get().findIndex(x => x.tipo !== 'precio' && (x.key ? x.key === alertKey() : x.url === location.href));
-  function pintarAlerta(){ const on = alertaIdx() > -1; alertBtn.classList.toggle('on', on); alertBtn.setAttribute('aria-pressed', on ? 'true' : 'false'); alertBtn.innerHTML = BP.ico.bell + '<span class="t">' + (on ? ' Alerta creada' : ' Crear alerta') + '</span>'; alertBtn.setAttribute('aria-label', on ? 'Alerta creada, tocá para quitarla' : 'Crear alerta'); }
+  function pintarAlerta(){ const on = alertaIdx() > -1; alertBtn.classList.toggle('on', on); alertBtn.setAttribute('aria-pressed', on ? 'true' : 'false'); alertBtn.innerHTML = BP.ico.bell + '<span class="t"> ' + (on ? BP.t('cat_alerta_creada', 'Alerta creada') : BP.t('cat_crear_alerta', 'Crear alerta')) + '</span>'; alertBtn.setAttribute('aria-label', on ? BP.t('cat_alerta_quitar', 'Alerta creada, tocá para quitarla') : BP.t('cat_crear_alerta', 'Crear alerta')); }
   alertBtn.addEventListener('click', () => {
     const a = BP.alerts.get(); const i = alertaIdx();
-    if (i > -1) { a.splice(i, 1); BP.alerts.set(a); pintarAlerta(); BP.toast('Alerta quitada.'); return; }
+    if (i > -1) { a.splice(i, 1); BP.alerts.set(a); pintarAlerta(); BP.toast(BP.t('cat_toast_alerta_quitada', 'Alerta quitada.')); return; }
     const al = { creada: new Date().toISOString(), filtros: Object.assign({}, F), url: location.href, key: alertKey() };
     a.push(al); BP.alerts.set(a); if (window.BPStore && BPStore.syncAlerta) BPStore.syncAlerta(al); pintarAlerta();
-    BP.toast(window.BPStore && BPStore.session ? 'Alerta guardada. Te avisamos por mail cuando entre una propiedad así.' : 'Alerta guardada en este navegador. Con tu cuenta, te llega por mail.');
+    BP.toast(window.BPStore && BPStore.session ? BP.t('cat_toast_alerta_mail', 'Alerta guardada. Te avisamos por mail cuando entre una propiedad así.') : BP.t('cat_toast_alerta_local', 'Alerta guardada en este navegador. Con tu cuenta, te llega por mail.'));
   });
 
   syncControls();
-  try { render(); pintarAlerta(); } catch (err) { console.error(err); BP.estadoError(document.getElementById('list'), 'No pudimos cargar las propiedades.', () => location.reload()); }
+  try { render(); pintarAlerta(); } catch (err) { console.error(err); BP.estadoError(document.getElementById('list'), BP.t('cat_err_carga', 'No pudimos cargar las propiedades.'), () => location.reload()); }
   /* ?alerta=1 (desde "Avisarme" en la portada): se crea la alerta de esta búsqueda al llegar, una sola vez */
   if (qs.get('alerta') === '1') { try { const u = new URL(location.href); u.searchParams.delete('alerta'); history.replaceState(null, '', u); } catch (e) {} if (alertaIdx() === -1) alertBtn.click(); }
 })();

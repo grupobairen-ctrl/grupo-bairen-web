@@ -48,3 +48,7 @@ window.bairenReady = new Promise((resolve, reject) => {
   s.onerror = () => reject(new Error('no se pudo cargar el SDK de Supabase'));
   document.head.appendChild(s);
 });
+/* 11/9 · Si el SDK no carga, la promesa rechaza. store.js ya lo maneja (cae a modo local), pero hasta que
+   engancha su handler el rechazo quedaba "sin consumidor" y pintaba una excepción roja en la consola de
+   todas las páginas. Este catch vacío solo marca el rechazo como atendido; no cambia nada más. */
+window.bairenReady.catch(() => {});

@@ -1,12 +1,17 @@
 /* Prueba de punta a punta del portal en modo local, con Chrome headless por CDP.
-   Uso: (1) servidor local en :8080, (2) Chrome con --remote-debugging-port=9222, (3) node portal/test/e2e.mjs
+   Uso: (1) servidor local en :8080, (2) Chrome con --remote-debugging-port=9222 (u otro, con CDP=http://127.0.0.1:9223), (3) node portal/test/e2e.mjs
    Con la base del portal conectada, correrla con LOCAL=1 (bloquea Supabase y el portal cae a modo local).
-   Recorre: ingresar con código → publicar en 5 pasos con 8 fotos → panel (en revisión) → curación (aprobar) → resultados y ficha. */
+   Recorre: ingresar con código → publicar en 5 pasos con 8 fotos → panel (en revisión) → curación (aprobar) → resultados y ficha
+   → perfil al crear la cuenta (la pregunta, el riel por perfil y el cambio desde Mi cuenta; con volver=publicar no se
+   pregunta y se respeta el destino; con publicador y sin perfil elegido tampoco, y el riel sale del publicador). */
 const BASE = process.env.BASE || 'http://127.0.0.1:8080/portal/';
+/* CDP=http://127.0.0.1:9223 para usar otro Chrome: si el de 9222 tiene abiertas otras pestañas del portal, el borrado
+   del IndexedDB del arranque queda bloqueado y la subida de fotos no termina nunca. */
+const CDP = process.env.CDP || 'http://127.0.0.1:9222';
 const FOTOS = Array.from({length: 8}, (_, i) => `/tmp/bp-e2e/foto-${i+1}.jpg`);
-const list = await (await fetch('http://127.0.0.1:9222/json')).json();
+const list = await (await fetch(CDP + '/json')).json();
 let target = list.find(t => t.type === 'page');
-if (!target) target = await (await fetch('http://127.0.0.1:9222/json/new?about:blank', { method: 'PUT' })).json();
+if (!target) target = await (await fetch(CDP + '/json/new?about:blank', { method: 'PUT' })).json();
 const ws = new WebSocket(target.webSocketDebuggerUrl);
 await new Promise(r => ws.onopen = r);
 let id = 0; const pending = new Map(); const events = [];
@@ -236,6 +241,79 @@ try {
     && /revoke\s+update\s*\(\s*verificado/i.test(sql + ' ') || /proteger_verificacion\(\)/i.test(sql);
   ok('Verificación: el esquema tiene el disparador que impide auto aprobarse', tieneDisparador,
      'en modo local el store sí deja (' + auto + '), por eso la protección es del servidor: portal/schema-portal.sql');
+
+  /* 13. Perfil al crear la cuenta: sin volver=publicar aparece la pregunta (con volver=publicar, como en el paso 1, no).
+     "Busco propiedad" arma el riel de quien busca: Favoritos, Búsquedas y alertas, Mis contactos, Mi cuenta; sin Mis avisos. */
+  await evalJs('BPStore.init().then(() => BPStore.signOut())');
+  await goto(BASE + 'ingresar.html');
+  await waitFor('!!window.BPStore && !!document.getElementById("email")', 'formulario de mail');
+  await evalJs('BPStore.init()');
+  await waitFor('document.getElementById("modeNote").textContent.length > 0 || BPStore.mode === "supabase"', 'inicialización');
+  await evalJs('document.getElementById("email").value = "busca@bairen.test"; document.getElementById("stepMail").requestSubmit(); true');
+  await waitFor('document.getElementById("codeMsg").textContent.includes("código")', 'código');
+  const code3 = await evalJs('(document.getElementById("codeMsg").textContent.match(/(\\d{6})/) || [])[1]');
+  await evalJs(`document.getElementById("code").value = "${code3}"; document.getElementById("stepCode").requestSubmit(); true`);
+  await waitFor('!document.getElementById("stepPerfil").hidden', 'la pregunta del perfil', 8000);
+  const pregunta = await evalJs('document.getElementById("ttl").textContent + " · " + document.querySelectorAll("#stepPerfil [name=perfil]").length + " opciones · botón " + (document.getElementById("btnPerfil").disabled ? "deshabilitado" : "habilitado")');
+  await shot('19-pregunta-perfil');
+  await evalJs('document.querySelector("#stepPerfil [value=busca]").click(); document.getElementById("stepPerfil").requestSubmit(); true');
+  await waitFor('location.pathname.endsWith("panel.html")', 'panel', 8000);
+  await waitFor('!!document.querySelector("#sideNav .p-rail a") && !document.querySelector("#content .p-skel-panel")', 'riel del panel');
+  const riel = await evalJs('Array.from(document.querySelectorAll("#sideNav .p-rail:not(.p-rail-pie) a")).map(a => a.textContent.trim())');
+  const perfilGuardado = await evalJs('JSON.parse(localStorage.getItem("bp_user") || "{}").perfil');
+  await shot('20-panel-busca');
+  ok('Perfil: la pregunta aparece al crear la cuenta y "Busco propiedad" arma el riel de quien busca', /Qué venís/.test(pregunta) && /deshabilitado/.test(pregunta) && riel.join('|') === 'Favoritos|Búsquedas y alertas|Mis contactos|Mi cuenta' && perfilGuardado === 'busca', pregunta + ' → ' + riel.join(', ') + ' · guardado ' + perfilGuardado);
+
+  /* 14. Cambiar el perfil desde Mi cuenta: el riel se redibuja sin recargar y Favoritos desaparece */
+  await evalJs('document.querySelector("#sideNav a[href=\'#cuenta\']").click(); true');
+  await waitFor('!!document.querySelector("#content .p-perfil-sel")', 'Mi cuenta');
+  await evalJs('window.__sinRecarga = true; document.querySelector(".p-perfil-sel [value=profesional]").click(); true');
+  await waitFor('!!document.querySelector("#sideNav a[href=\'#avisos\']") && !document.querySelector("#sideNav a[href=\'#favoritos\']")', 'riel redibujado');
+  const riel2 = await evalJs('Array.from(document.querySelectorAll("#sideNav .p-rail:not(.p-rail-pie) a")).map(a => a.textContent.trim())');
+  const sinRecarga = await evalJs('window.__sinRecarga === true');
+  const perfilGuardado2 = await evalJs('JSON.parse(localStorage.getItem("bp_user") || "{}").perfil + "/" + document.querySelector("[data-perfil-txt]").textContent');
+  await shot('21-cuenta-perfil-profesional');
+  ok('Perfil: cambiarlo en Mi cuenta redibuja el riel sin recargar', sinRecarga && riel2.indexOf('Favoritos') === -1 && riel2.join('|') === 'Mis avisos|Interesados|Importar|Bairen OS|Mi cuenta' && /^profesional\//.test(perfilGuardado2), riel2.join(', ') + ' · guardado ' + perfilGuardado2);
+
+  /* 15. Quien viene a publicar (volver=publicar&perfil=dueno) con una cuenta nueva no ve la pregunta: el perfil lo define
+     el paso 1 de la carga, y el destino pedido se respeta. */
+  await evalJs('BPStore.init().then(() => BPStore.signOut())');
+  await goto(BASE + 'ingresar.html?volver=publicar&perfil=dueno');
+  await waitFor('!!window.BPStore && !!document.getElementById("email")', 'formulario de mail');
+  await evalJs('BPStore.init()');
+  await waitFor('document.getElementById("modeNote").textContent.length > 0 || BPStore.mode === "supabase"', 'inicialización');
+  await evalJs('document.getElementById("email").value = "dueno2@bairen.test"; document.getElementById("stepMail").requestSubmit(); true');
+  await waitFor('document.getElementById("codeMsg").textContent.includes("código")', 'código');
+  const code4 = await evalJs('(document.getElementById("codeMsg").textContent.match(/(\\d{6})/) || [])[1]');
+  await evalJs(`document.getElementById("code").value = "${code4}"; document.getElementById("stepCode").requestSubmit(); true`);
+  await sleep(350);   /* la pregunta, si fuera a salir, sale enseguida; la redirección tarda 500 ms más */
+  const sinPregunta15 = await evalJs('location.pathname.endsWith("ingresar.html") ? document.getElementById("stepPerfil").hidden : true');
+  await waitFor('location.pathname.endsWith("publicar-aviso.html")', 'redirección a publicar-aviso', 8000);
+  await waitFor('!!document.querySelector("[name=tipo]")', 'paso 1 de la carga');
+  const tipoMarcado15 = await evalJs('(document.querySelector("[name=tipo]:checked") || {}).value || "ninguno"');
+  await shot('22-volver-publicar-sin-pregunta');
+  ok('Perfil: con volver=publicar no se pregunta y se llega a la carga con el tipo pedido', sinPregunta15 && tipoMarcado15 === 'dueno', 'pregunta oculta ' + sinPregunta15 + ' · tipo marcado ' + tipoMarcado15);
+
+  /* 16. Cuenta con publicador y sin perfil elegido (una cuenta de antes de la pregunta): no se pregunta, el riel sale del
+     publicador. Se borra el perfil guardado del mail del paso 1 (bp_user y bp_perfiles) y se entra de nuevo. */
+  await evalJs('BPStore.init().then(() => BPStore.signOut())');
+  await evalJs('(() => { const m = JSON.parse(localStorage.getItem("bp_perfiles") || "{}"); delete m["prueba@bairen.test"]; localStorage.setItem("bp_perfiles", JSON.stringify(m)); const u = JSON.parse(localStorage.getItem("bp_user") || "null"); if (u) { delete u.perfil; localStorage.setItem("bp_user", JSON.stringify(u)); } return true; })()');
+  await goto(BASE + 'ingresar.html');
+  await waitFor('!!window.BPStore && !!document.getElementById("email")', 'formulario de mail');
+  await evalJs('BPStore.init()');
+  await waitFor('document.getElementById("modeNote").textContent.length > 0 || BPStore.mode === "supabase"', 'inicialización');
+  await evalJs('document.getElementById("email").value = "prueba@bairen.test"; document.getElementById("stepMail").requestSubmit(); true');
+  await waitFor('document.getElementById("codeMsg").textContent.includes("código")', 'código');
+  const code5 = await evalJs('(document.getElementById("codeMsg").textContent.match(/(\\d{6})/) || [])[1]');
+  await evalJs(`document.getElementById("code").value = "${code5}"; document.getElementById("stepCode").requestSubmit(); true`);
+  await sleep(350);
+  const sinPregunta16 = await evalJs('location.pathname.endsWith("ingresar.html") ? document.getElementById("stepPerfil").hidden : true');
+  await waitFor('location.pathname.endsWith("panel.html")', 'panel', 8000);
+  await waitFor('!!document.querySelector("#sideNav .p-rail a") && !document.querySelector("#content .p-skel-panel")', 'riel del panel');
+  const riel3 = await evalJs('Array.from(document.querySelectorAll("#sideNav .p-rail:not(.p-rail-pie) a")).map(a => (a.querySelector("span:not(.n)") || a).textContent.trim())');   /* sin el contador */
+  const perfilGuardado3 = await evalJs('String(JSON.parse(localStorage.getItem("bp_user") || "{}").perfil)');
+  await shot('23-publicador-sin-perfil');
+  ok('Perfil: con publicador y sin perfil elegido no se pregunta y el riel sale del publicador', sinPregunta16 && riel3.indexOf('Mis avisos') > -1 && perfilGuardado3 === 'null', 'pregunta oculta ' + sinPregunta16 + ' · ' + riel3.join(', ') + ' · guardado ' + perfilGuardado3);
 
 } catch (e) { ok('Flujo completo', false, e.message); }
 

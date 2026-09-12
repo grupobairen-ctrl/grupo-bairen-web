@@ -38,7 +38,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://dahusnnbyrvltcuaelxj.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260912i"><link rel="stylesheet" href="css/catalogo.css?v=20260912i"><link rel="stylesheet" href="css/portal.css?v=20260912i">
+  <link rel="stylesheet" href="css/base.css?v=20260912k"><link rel="stylesheet" href="css/catalogo.css?v=20260912k"><link rel="stylesheet" href="css/portal.css?v=20260912k">
   <style>
     .p-panel{display:grid;grid-template-columns:240px 1fr;gap:28px;align-items:start}
     .p-side-nav{background:var(--p-card);border:1px solid var(--p-line);border-radius:var(--p-radius);padding:10px;position:sticky;top:84px}
@@ -60,7 +60,7 @@
   <div id="content" aria-busy="true"><div class="p-skel-panel" aria-hidden="true"><div class="p-skel-line t"></div><div class="p-skel-line s"></div><div class="p-skel-line row"></div><div class="p-skel-line row"></div><div class="p-skel-line row"></div></div></div>
 </div></section>
 <div id="pFooter"></div>
-<script src="supabase-portal.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260912i" defer></script><script src="js/i18n-portal.js?v=20260912i" defer></script><script src="js/ui.js?v=20260912i" defer></script><script src="js/store.js?v=20260912i" defer></script><script src="js/data.js?v=20260912i" defer></script>
+<script src="supabase-portal.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260912k" defer></script><script src="js/i18n-portal.js?v=20260912k" defer></script><script src="js/ui.js?v=20260912k" defer></script><script src="js/store.js?v=20260912k" defer></script><script src="js/data.js?v=20260912k" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -72,6 +72,14 @@ document.addEventListener('DOMContentLoaded', function(){
   const curador = await BPStore.isCurador();
   const TABS = [['avisos','Mis avisos','building'],['propiedades','Mis propiedades','home'],['interesados','Interesados','chat'],['contactos','Mis contactos','mail'],['favoritos','Favoritos','heart'],['alertas','Búsquedas y alertas','bell'],['cuenta','Mi cuenta','user']];
   const nav = document.getElementById('sideNav'), content = document.getElementById('content');
+  /* 11/9 · El riel según el perfil de la cuenta (busca, dueno, profesional): una preferencia que se elige al crear la
+     cuenta y se cambia en Mi cuenta, no un permiso. Sin perfil (cuenta vieja, demo) el riel completo, como siempre.
+     Importar no es una vista: va como enlace a importar.html, con su propio ícono porque el set de ui.js no tiene uno.
+     11/9 noche · La lista de ids vive en BPStore.rielDe: la misma que usa el desplegable "Mi cuenta" del header. */
+  let perfil = BPStore.getPerfil() || BPStore.perfilDePublicador(pub);   /* lo mismo que BPStore.perfilEfectivo(), sin volver a pedir el publicador */
+  const ICO_IMPORTAR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 17v3h16v-3"/></svg>';
+  let riel = BPStore.rielDe(perfil);
+  const primeraVista = () => riel.find(id => TABS.some(t => t[0] === id)) || 'avisos';
   /* Feedback de una visita: lo escribe el corredor, lo lee el propietario en "Mis propiedades". */
   content.addEventListener('submit', async e => {
     const f = e.target.closest('.p-fb'); if (!f) return; e.preventDefault();
@@ -88,11 +96,15 @@ document.addEventListener('DOMContentLoaded', function(){
   });
   document.addEventListener('click', e => { if (!e.target.closest('details.p-mas')) document.querySelectorAll('details.p-mas[open]').forEach(d => { d.open = false; }); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') document.querySelectorAll('details.p-mas[open]').forEach(d => { d.open = false; const sm = d.querySelector('summary'); if (sm) sm.focus(); }); });
-  let tab = (location.hash || '#avisos').slice(1); if (!TABS.some(t => t[0] === tab)) tab = 'avisos';
+  let tab = (location.hash || '').slice(1); if (!TABS.some(t => t[0] === tab)) tab = primeraVista();
   /* Contadores del riel: lo que ya se sabe (favoritos, alertas) va enseguida; avisos e interesados los completa la vista al cargar */
   const cuenta = { favoritos: BP.favs.get().length, alertas: BP.alerts.get().length };
   const contador = k => cuenta[k] != null && cuenta[k] > 0 ? `<span class="n">${cuenta[k]}</span>` : '';
-  function renderNav(){ nav.innerHTML = `<div class="who"><span class="q">${BP.esc(BPStore.session.email)}</span>${mode === 'local' ? '<span class="p-badge demo">modo local</span>' : ''}</div><div class="p-rail">` + TABS.map(t => `<a href="#${t[0]}" class="${t[0]===tab?'on':''}"${t[0]===tab?' aria-current="page"':''}>${BP.ico[t[2]]}<span>${t[1]}</span>${contador(t[0])}</a>`).join('') + `</div><div class="p-rail p-rail-pie">` + (curador ? `<a href="curacion.html">${BP.ico.shield}<span>Curación</span></a>` : '') + `<a href="#" data-logout>${BP.ico.x}<span>Cerrar sesión</span></a></div>`; nav.querySelector('[data-logout]').addEventListener('click', async e => { e.preventDefault(); await BPStore.signOut(); location.href = 'index.html'; }); }
+  function renderNav(){
+    /* Si llegó por hash a una vista que su perfil no muestra (un profesional a #favoritos), se muestra igual y el riel la suma antes de Mi cuenta: nunca un callejón sin salida */
+    const ids = riel.slice(); if (TABS.some(t => t[0] === tab) && ids.indexOf(tab) === -1) ids.splice(Math.max(0, ids.indexOf('cuenta')), 0, tab);
+    const item = id => { const t = TABS.find(x => x[0] === id); if (t) return `<a href="#${t[0]}" class="${t[0]===tab?'on':''}"${t[0]===tab?' aria-current="page"':''}>${BP.ico[t[2]]}<span>${t[1]}</span>${contador(t[0])}</a>`; if (id === 'importar') return `<a href="importar.html">${ICO_IMPORTAR}<span>Importar</span></a>`; if (id === 'os') return `<a href="${BPStore.OS_URL}" rel="noopener" title="Visitas, reservas y cobros de tus unidades">${BP.ico.arrow}<span>Bairen OS</span></a>`; return ''; };
+    nav.innerHTML = `<div class="who"><span class="q">${BP.esc(BPStore.session.email)}</span>${perfil ? `<span class="rol">${BPStore.PERFIL_TXT[perfil]}</span>` : ''}${mode === 'local' ? '<span class="p-badge demo">modo local</span>' : ''}</div><div class="p-rail">` + ids.map(item).join('') + `</div><div class="p-rail p-rail-pie">` + (curador ? `<a href="curacion.html">${BP.ico.shield}<span>Curación</span></a>` : '') + `<a href="#" data-logout>${BP.ico.x}<span>Cerrar sesión</span></a></div>`; nav.querySelector('[data-logout]').addEventListener('click', async e => { e.preventDefault(); await BPStore.signOut(); location.href = 'index.html'; }); }
   function actualizarContador(k, n){ cuenta[k] = n; const a = nav.querySelector(`a[href="#${k}"]`); if (!a) return; let sp = a.querySelector('.n'); if (n > 0) { if (!sp) { sp = document.createElement('span'); sp.className = 'n'; a.appendChild(sp); } sp.textContent = n; } else if (sp) sp.remove(); }
   /* Cambiar de vista lleva siempre al título de esa vista, justo debajo del riel (en celular,
      debajo de las pastillas pegadas al header). Sin la navegación por ancla del navegador,
@@ -109,7 +121,7 @@ document.addEventListener('DOMContentLoaded', function(){
     const h = content.querySelector('h1'); if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
   };
   nav.addEventListener('click', e => { const a = e.target.closest('a[href^="#"]'); if (!a) return; e.preventDefault(); const nuevo = a.getAttribute('href').slice(1); if (!TABS.some(t => t[0] === nuevo)) return; if (nuevo === tab) { irAlContenido(); return; } cambiarVista(nuevo, true); });
-  const desdeUrl = () => { const nuevo = (location.hash || '#avisos').slice(1); if (TABS.some(t => t[0] === nuevo) && nuevo !== tab) cambiarVista(nuevo, false); };
+  const desdeUrl = () => { const nuevo = (location.hash || ('#' + primeraVista())).slice(1); if (TABS.some(t => t[0] === nuevo) && nuevo !== tab) cambiarVista(nuevo, false); };
   window.addEventListener('hashchange', desdeUrl); window.addEventListener('popstate', desdeUrl);
 
   function marcarActiva(){
@@ -119,7 +131,7 @@ document.addEventListener('DOMContentLoaded', function(){
     if (rail && a && rail.scrollWidth > rail.clientWidth) rail.scrollTo({ left: Math.max(0, a.offsetLeft - (rail.clientWidth - a.offsetWidth) / 2), behavior: 'smooth' });
   }
   async function render(){
-    if (!nav.querySelector('.p-rail')) renderNav();
+    if (!nav.querySelector('.p-rail') || !nav.querySelector(`.p-rail a[href="#${tab}"]`)) renderNav();
     marcarActiva();
     content.removeAttribute('aria-busy');
     if (tab === 'avisos') return renderAvisos();
@@ -240,7 +252,7 @@ document.addEventListener('DOMContentLoaded', function(){
     let html = `<h1 class="p-h2">Mis propiedades</h1><p class="p-sub">Tus unidades publicadas por una inmobiliaria, con las visitas y reservas que registra. Las ves con tu cuenta.</p>`;
     if (!mine.length) { content.innerHTML = html + `<div class="p-empty">No hay propiedades asociadas a ${BP.esc(BPStore.session.email)}. Pedile a tu inmobiliaria que cargue tu mail en el aviso, o <a href="publicar-aviso.html" style="text-decoration:underline">publicala como dueño directo</a>.</div>`; return; }
     const vProp = await BPStore.vistasDe(mine.map(a => a.id)); const visMine = await BPStore.visitasDe(mine.map(a => a.id)); if (mia !== vistaEnCurso) return;
-    for (const a of mine) { const vis = visMine[a.id] || []; const foto = a.fotos && a.fotos.length ? await BPStore.resolveFoto(a.fotos.slice().sort((x,y)=>(x.orden||0)-(y.orden||0))[0].url) : ''; const p = a.publicador || {};
+    for (const a of mine) { const vis = visMine[a.id] || []; const foto = a.fotos && a.fotos.length ? await BPStore.resolveFoto(a.fotos.slice().sort((x,y)=>(x.orden||0)-(y.orden||0))[0].url) : ''; const p = BPData.pubDeFila(a.publicador);
       html += `<div class="p-aviso-row" style="margin-bottom:10px;grid-template-columns:120px 1fr"><div class="ph">${foto ? `<img src="${foto}" alt="">` : ''}</div><div><b>${BP.esc(a.titulo || a.direccion)}</b><div class="m">${a.operacion === 'venta' ? 'Venta' : 'Alquiler'} · ${BP.esc(a.barrio||'')} · ${BP.fmtUSD(Number(a.precio))}${a.operacion !== 'venta' ? '/mes' : ''} · publica <b style="display:inline">${BP.esc(p.nombre||'')}</b>${p.matricula ? ' · ' + BP.esc(p.matricula) : ''}</div><div style="margin-top:6px">${BP.estadoBadge(a.estado_curacion)}${a.estado === 'reservado' ? ' <span class="p-badge demo">Reservada</span>' : ''}</div><div class="stats"><span><b>${vProp[String(a.id)] != null ? vProp[String(a.id)] : BPStore.vistas(a.id)}</b> vistas</span><span><b>${vis.length}</b> visitas y reservas</span></div>
         <ul style="list-style:none;margin:10px 0 0;padding:0;font-size:.84rem;color:var(--text-mid)">${vis.map(v => `<li style="padding:6px 0;border-top:1px solid var(--p-line)">${new Date(v.fecha).toLocaleString('es-AR', { dateStyle: 'medium', timeStyle: 'short' })} · <b style="color:var(--navy-deeper)">${v.tipo === 'reserva' ? 'Reserva' : v.tipo === 'cierre' ? 'Cierre' : 'Visita'}</b>${v.nota ? ' · ' + BP.esc(v.nota) : ''}${v.feedback ? `<br><span style="color:var(--navy-deeper)">Lo que dijo: <i>"${BP.esc(v.feedback)}"</i></span>` : ''}</li>`).join('') || '<li>Todavía no hay visitas registradas.</li>'}</ul>
         ${a.estado_curacion === 'publicado' ? `<p style="margin-top:10px"><a class="p-btn p-btn-sm" href="${BP.urlFicha({ id: a.id })}">Ver ficha</a></p>` : ''}</div></div>`; }
@@ -269,11 +281,27 @@ document.addEventListener('DOMContentLoaded', function(){
     content.innerHTML = `<h1 class="p-h2">Mi cuenta</h1>
       <dl class="p-ficha-cuenta">
         <div><dt>Mail</dt><dd>${BP.esc(BPStore.session.email)}</dd></div>
+        <div><dt>En BAIREN</dt><dd data-perfil-txt>${perfil ? BPStore.PERFIL_TXT[perfil] : 'Sin elegir: el panel muestra todo'}</dd></div>
         ${pub ? `<div><dt>Publicador</dt><dd>${BP.esc(pub.nombre)}</dd></div><div><dt>Tipo</dt><dd>${tipo}</dd></div><div><dt>Verificación</dt><dd>${pub.verificado ? BP.ico.check + ' Verificado' : 'Pendiente: la revisa BAIREN'}</dd></div>${pub.matricula ? `<div><dt>Matrícula</dt><dd>${BP.esc(pub.matricula)}</dd></div>` : ''}` : `<div><dt>Publicador</dt><dd>Sin perfil todavía. Se crea al publicar.</dd></div>`}
       </dl>
+      <fieldset class="p-perfil-sel"><legend>Qué venís a hacer a BAIREN</legend><p class="p-note">Decide qué muestra el panel, no lo que podés hacer. Lo cambiás cuando quieras.</p><div class="ops">${BPStore.PERFILES.map(p => `<label${p === perfil ? ' class="on"' : ''}><input type="radio" name="perfil" value="${p}"${p === perfil ? ' checked' : ''}><span>${BPStore.PERFIL_TXT[p]}</span></label>`).join('')}</div></fieldset>
       <div class="p-head-acts p-cuenta-acts">${pub ? `<a class="p-btn" href="publicar-aviso.html?paso=perfil">Editar perfil de publicador</a>` : `<a class="p-btn p-btn-fill" href="publicar-aviso.html">Publicar una propiedad</a>`}<button type="button" class="p-btn p-btn-quiet" data-logout>Cerrar sesión</button></div>
       <p class="p-note p-cuenta-priv"><b>Privacidad.</b> Podés pedir acceso, corrección o borrado de tus datos escribiendo a <a href="mailto:contacto@bairengroup.com">contacto@bairengroup.com</a>. Los documentos de verificación se eliminan después de revisarlos.</p>`;
     content.querySelector('[data-logout]').addEventListener('click', async () => { await BPStore.signOut(); location.href = 'index.html'; });
+    /* Cambiar el perfil redibuja el riel sin recargar; si no se pudo guardar, vuelve la marca anterior.
+       11/9 noche · Mientras guarda, el grupo entero queda deshabilitado (estado "guardando" visible y sin dobles
+       clics); la clase .on acompaña a la opción marcada, así el estilo no depende solo de :has(). */
+    const marcarPerfil = () => content.querySelectorAll('.p-perfil-sel label').forEach(l => l.classList.toggle('on', !!l.querySelector('input:checked')));
+    content.querySelectorAll('.p-perfil-sel [name=perfil]').forEach(r => r.addEventListener('change', async () => {
+      const antes = perfil; const fs = r.closest('fieldset'); marcarPerfil();
+      fs.disabled = true;
+      try { await BPStore.setPerfil(r.value); }
+      catch (e) { const prev = content.querySelector(`.p-perfil-sel [value="${antes}"]`); if (prev) prev.checked = true; else r.checked = false; marcarPerfil(); BP.toast('No se pudo guardar: ' + (e.message || e), 'error'); return; }
+      finally { fs.disabled = false; }
+      perfil = r.value; riel = BPStore.rielDe(perfil); renderNav(); marcarActiva();
+      const dd = content.querySelector('[data-perfil-txt]'); if (dd) dd.textContent = BPStore.PERFIL_TXT[perfil];
+      BP.toast(BPStore.session.demo ? 'En modo demo no se guarda.' : 'Listo. El panel ya muestra lo que te sirve.');
+    }));
   }
   render();
 })();

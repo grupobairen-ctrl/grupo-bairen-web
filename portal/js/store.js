@@ -6,7 +6,10 @@
   'use strict';
   const S = { mode: 'local', session: null, sb: null, ready: null };
   const LS = key => ({ get(d){ try{ const v = JSON.parse(localStorage.getItem(key)); return v == null ? d : v; }catch(e){ return d; } }, set(v){ try{ localStorage.setItem(key, JSON.stringify(v)); }catch(e){ console.warn('localStorage lleno', e); } } });
-  const L = { user: LS('bp_user'), pubs: LS('bp_publicadores'), avisos: LS('bp_avisos'), consultas: LS('bp_consultas_db'), verif: LS('bp_verificaciones'), vistas: LS('bp_vistas'), code: LS('bp_code') };
+  const L = { user: LS('bp_user'), pubs: LS('bp_publicadores'), avisos: LS('bp_avisos'), consultas: LS('bp_consultas_db'), verif: LS('bp_verificaciones'), vistas: LS('bp_vistas'), code: LS('bp_code'), perfiles: LS('bp_perfiles') };
+  /* La sesión que ven las páginas: id, mail y el perfil elegido al crear la cuenta (busca, dueno o profesional).
+     Con base real el perfil vive en los metadatos del usuario de Auth (user_metadata.perfil); en modo local, en bp_user. */
+  const sesionDe = u => ({ id: u.id, email: u.email, perfil: (u.user_metadata && u.user_metadata.perfil) || null });
   const uid = () => 'l' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
   const now = () => new Date().toISOString();
   const slugify = t => (t||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
@@ -48,7 +51,7 @@
         if (window.bairenReady) {
           const sb = await Promise.race([window.bairenReady, new Promise((_, r) => setTimeout(() => r(new Error('sdk')), 15000))]);
           const probe = await sb.schema('portal').from('publicadores').select('id').limit(1);
-          if (!probe.error) { S.mode = 'supabase'; S.sb = sb; const { data } = await sb.auth.getUser(); S.session = data && data.user ? { id: data.user.id, email: data.user.email } : null; sb.auth.onAuthStateChange((_, sess) => { if (DEMO) return; S.session = sess && sess.user ? { id: sess.user.id, email: sess.user.email } : null; if (window.BP && BP.applySession) BP.applySession(S.session, S.mode); }); }
+          if (!probe.error) { S.mode = 'supabase'; S.sb = sb; const { data } = await sb.auth.getUser(); S.session = data && data.user ? sesionDe(data.user) : null; sb.auth.onAuthStateChange((_, sess) => { if (DEMO) return; S.session = sess && sess.user ? sesionDe(sess.user) : null; if (window.BP && BP.applySession) BP.applySession(S.session, S.mode); }); }
         }
       } catch (e) { /* modo local */ }
       if (DEMO) {
@@ -59,9 +62,19 @@
       }
       if (S.mode === 'local' && !DEMO) S.session = L.user.get(null);
       if (window.BP && BP.applySession) BP.applySession(S.session, S.mode);
+      S.pedirSync();
       return S.mode;
     })();
     return S.ready;
+  };
+  /* Sincronización web → portal: se pide una vez por pestaña al abrir el portal con base real.
+     La función del servidor (api/portal-sync.js) decide si hace falta (freno de 10 minutos)
+     y trae altas, precios, reservas y bajas de la web. Si no está configurada o no existe
+     (dev server), no pasa nada: el portal sigue con lo que tiene. */
+  S.pedirSync = function(){
+    if (S.mode !== 'supabase') return;
+    try { if (sessionStorage.getItem('bp_sync_pedido')) return; sessionStorage.setItem('bp_sync_pedido', '1'); } catch (e) { return; }
+    try { fetch('/api/portal-sync', { method: 'POST', keepalive: true }).catch(() => {}); } catch (e) { /* sin red o sin función */ }
   };
   S.requireSession = function(volver){ if (!S.session) { location.href = 'ingresar.html?volver=' + encodeURIComponent(volver || location.pathname.split('/').pop() + location.search); return false; } return true; };
 
@@ -74,17 +87,56 @@
   };
   S.verifyCode = async function(email, code){
     email = (email||'').trim().toLowerCase(); code = (code||'').trim();
-    if (S.mode === 'supabase') { const { data, error } = await S.sb.auth.verifyOtp({ email, token: code, type: 'email' }); if (error) return { ok:false, msg: error.message }; S.session = { id: data.user.id, email: data.user.email }; return { ok:true }; }
+    if (S.mode === 'supabase') { const { data, error } = await S.sb.auth.verifyOtp({ email, token: code, type: 'email' }); if (error) return { ok:false, msg: error.message }; S.session = sesionDe(data.user); return { ok:true }; }
     const c = L.code.get(null); if (!c || c.email !== email || c.code !== code) return { ok:false, msg:'Código incorrecto.' };
-    S.session = { id: 'local-' + slugify(email), email }; L.user.set(S.session); if (window.BP && BP.applySession) BP.applySession(S.session, S.mode); return { ok:true };
+    /* En local el perfil se recuerda por mail (bp_perfiles), como los metadatos de Auth: la pregunta se hace una sola vez */
+    S.session = { id: 'local-' + slugify(email), email, perfil: L.perfiles.get({})[email] || null }; L.user.set(S.session); if (window.BP && BP.applySession) BP.applySession(S.session, S.mode); return { ok:true };
   };
   S.signOut = async function(){ if (S.mode === 'supabase') await S.sb.auth.signOut(); S.session = null; L.user.set(null); if (window.BP && BP.applySession) BP.applySession(null, S.mode); };
+
+  /* ── perfil de la cuenta ──────────────────────────────
+     Una preferencia, no un permiso: 'busca' (alquilar o comprar), 'dueno' (publicar su propiedad),
+     'profesional' (corredor, inmobiliaria o desarrolladora). Decide qué muestra el panel. */
+  S.PERFILES = ['busca', 'dueno', 'profesional'];
+  S.PERFIL_TXT = { busca: 'Busco propiedad', dueno: 'Dueño directo', profesional: 'Inmobiliaria, corredor o desarrolladora' };
+  /* 11/9 noche · El riel del panel y el desplegable "Mi cuenta" del header salen del mismo lugar: los ids de las
+     vistas (avisos, propiedades, interesados, importar, contactos, favoritos, alertas, cuenta) según el perfil.
+     Sin perfil (cuenta vieja, demo) la lista completa. El dueño lleva siempre Mis contactos: puede consultar
+     como cualquiera y no depende de lo que haya en este navegador. */
+  S.RIEL_COMPLETO = ['avisos', 'propiedades', 'interesados', 'importar', 'contactos', 'favoritos', 'alertas', 'os', 'cuenta'];
+  /* Bairen OS: la herramienta de los que publican (visitas, reservas, cobros, propietarios). Otra app, mismo dominio. */
+  S.OS_URL = 'https://os.bairengroup.com';
+  S.rielDe = function(p){
+    if (p === 'busca') return ['favoritos', 'alertas', 'contactos', 'cuenta'];
+    if (p === 'dueno') return ['avisos', 'propiedades', 'interesados', 'contactos', 'os', 'cuenta'];
+    if (p === 'profesional') return ['avisos', 'interesados', 'importar', 'os', 'cuenta'];
+    return S.RIEL_COMPLETO.slice();
+  };
+  S.getPerfil = function(){ const p = S.session && S.session.perfil; return S.PERFILES.indexOf(p) > -1 ? p : null; };
+  S.setPerfil = async function(p){
+    if (!S.session) throw new Error('sin sesión');
+    if (S.PERFILES.indexOf(p) === -1) throw new Error('perfil desconocido');
+    if (S.mode === 'supabase' && !DEMO) { const { error } = await S.sb.auth.updateUser({ data: { perfil: p } }); if (error) throw error; }
+    S.session.perfil = p;
+    if (S.mode === 'local') { L.user.set(S.session); const m = L.perfiles.get({}); m[S.session.email] = p; L.perfiles.set(m); }
+    return p;
+  };
+  /* El perfil que sale de un publicador ya creado: dueño directo o profesional */
+  S.perfilDePublicador = pub => pub ? (pub.tipo === 'dueno' ? 'dueno' : 'profesional') : null;
+  /* El perfil que rige el panel: el elegido; si nunca eligió pero ya tiene publicador, el que sale del publicador; si no, null (riel completo) */
+  S.perfilEfectivo = async function(){
+    if (!S.session) return null;
+    const p = S.getPerfil(); if (p) return p;
+    try { return S.perfilDePublicador(await S.getMyPublicador()); } catch (e) { return null; }
+  };
 
   /* ── publicador ───────────────────────────────────────── */
   S.getMyPublicador = async function(){
     if (DEMO && S.mode === 'supabase') {
-      const { data } = await S.sb.schema('portal').from('publicadores').select('*').eq('slug', 'maxim-rentals').maybeSingle();
-      return data || null;
+      /* 'maxim-rentals' es la fila vieja de la base, hasta que corra la migración 03 (portal sin corredor); si conviven, gana 'bairen' por orden */
+      const { data } = await S.sb.schema('portal').from('publicadores').select('*').in('slug', ['bairen', 'maxim-rentals']).order('slug').limit(1);
+      const p = data && data[0]; if (!p) return null;
+      return p.slug === 'bairen' ? p : Object.assign({}, p, { slug: 'bairen', nombre: 'BAIREN', responsable: null, matricula: null, colegio: null, badge: 'Selección BAIREN', email: 'contacto@bairengroup.com', whatsapp: '5491123106629', telefono: null });
     }
     if (!S.session) return null;
     if (S.mode === 'supabase') {
@@ -270,7 +322,7 @@
   S.avisosDePropietario = async function(){
     if (!S.session) return [];
     const e = S.session.email.toLowerCase();
-    if (S.mode === 'supabase') { const { data } = await S.sb.schema('portal').from('avisos').select('*, fotos(url, orden), publicadores(nombre, tipo, matricula, badge)').ilike('propietario_email', e); return (data || []).map(a => { a.publicador = a.publicadores; delete a.publicadores; return a; }); }
+    if (S.mode === 'supabase') { const { data } = await S.sb.schema('portal').from('avisos').select('*, fotos(url, orden), publicadores(slug, nombre, tipo, matricula, badge)').ilike('propietario_email', e); return (data || []).map(a => { a.publicador = a.publicadores; delete a.publicadores; return a; }); }
     const pubs = L.pubs.get([]); return L.avisos.get([]).filter(a => (a.propietario_email||'').toLowerCase() === e).map(a => Object.assign({}, a, { publicador: pubs.find(p => p.id === a.publicador_id) || null }));
   };
 

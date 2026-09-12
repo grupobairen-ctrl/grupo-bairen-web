@@ -165,8 +165,7 @@ El edificio cuenta con:
 . Solárium
 . Sector guarda-bicicletas
 
-Las superficies y medidas son aproximadas y surgirán del título de propiedad respectivo.
-Corredor responsable: Maximiliano Matzkin, Matrícula CUCICBA Nº 7527 Maxim rentals.', descripcion_en = '• COMPLETE APARTMENT OF 110 M² IN FRONT OF TORRE DECÓ - RECOLETA - 3 CATEGORY ROOMS WITH DEPENDENCY •
+Las superficies y medidas son aproximadas y surgirán del título de propiedad respectivo.', descripcion_en = '• COMPLETE APARTMENT OF 110 M² IN FRONT OF TORRE DECÓ - RECOLETA - 3 CATEGORY ROOMS WITH DEPENDENCY •
 Brand new unit facing front. Originally two front units that the owner decided to unify, resulting in a 3-bedroom with unique dimensions in the area.
 
 The unit has:
@@ -194,7 +193,6 @@ The building has:
 . Bicycle storage area
 
 The surfaces and measurements are approximate and will arise from the respective property title.
-Responsible broker: Maximiliano Matzkin, CUCICBA Registration No. 7527
 Contact: +54 9 11 2310-6629', descripcion_pt = '• APARTAMENTO COMPLETO DE 110 M² EM FRENTE À TORRE DECÓ - RECOLETA - 3 QUARTOS CATEGORIA COM DEPENDÊNCIA •
 Unidade totalmente nova voltada para frente. Originalmente duas unidades frontais que o proprietário decidiu unificar, resultando num T3 com dimensões únicas na área.
 
@@ -223,14 +221,9 @@ O edifício possui:
 . Área de armazenamento de bicicletas
 
 As superfícies e medidas são aproximadas e decorrerão do respetivo título de propriedade.
-Corretor responsável: Maximiliano Matzkin, CUCICBA Registro nº 7527
 Contato: +54 9 11 2310-6629' where codigo = 'BA-AUSTRIA193810V';
-update portal.avisos set titulo = 'Austria 1938 · 2B', descripcion = 'Donde Recoleta y Palermo se encuentran en su mejor versión. Piscina en último piso, solarium, sauna, gimnasio, dos SUM, parrilla, cochera con elevador y guarda-bicicletas. 1 ambiente muy amplio, dividido. Con baño completo y toilette. Luminoso, bien distribuido con terminaciones de primer nivel. A estrenar. Disponible para alquiler tradicional de 2 años, sin muebles.
-
-Corredor responsable: Maximiliano Matzkin, Matrícula CUCICBA Nº 7527 Maxim rentals.', descripcion_pt = 'Onde Recoleta e Palermo se encontram na sua melhor versão. Piscina no último andar, solário, sauna, academia, dois salões de festas, churrasqueira, garagem com elevador e bicicletário. Estúdio muito amplo, com divisória. Com banheiro completo e lavabo. Luminoso, bem distribuído, com acabamentos de primeiro nível. Novo, nunca habitado. Disponível para aluguel tradicional de 2 anos, sem mobília.', plazo = 'A partir de 2 años' where codigo = 'BA-AUSTRIA19382BL';
-update portal.avisos set titulo = 'Austria 1938 · 2D', descripcion = 'Donde Recoleta y Palermo se encuentran en su mejor versión. Piscina en último piso, solarium, sauna, gimnasio, dos SUM, parrilla, cochera con elevador y guarda-bicicletas. 1 ambiente muy amplio, dividido. Con baño completo y toilette. Luminoso, bien distribuido con terminaciones de primer nivel. A estrenar. Disponible para alquiler tradicional de 2 años, sin muebles.
-
-Corredor responsable: Maximiliano Matzkin, Matrícula CUCICBA Nº 7527 Maxim rentals.', descripcion_pt = 'Onde Recoleta e Palermo se encontram na sua melhor versão. Piscina no último andar, solário, sauna, academia, dois salões de festas, churrasqueira, garagem com elevador e bicicletário. Estúdio muito amplo, com divisória. Com banheiro completo e lavabo. Luminoso, bem distribuído, com acabamentos de primeiro nível. Novo, nunca habitado. Disponível para aluguel tradicional de 2 anos, sem mobília.', plazo = 'A partir de 2 años' where codigo = 'BA-AUSTRIA19382DL';
+update portal.avisos set titulo = 'Austria 1938 · 2B', descripcion = 'Donde Recoleta y Palermo se encuentran en su mejor versión. Piscina en último piso, solarium, sauna, gimnasio, dos SUM, parrilla, cochera con elevador y guarda-bicicletas. 1 ambiente muy amplio, dividido. Con baño completo y toilette. Luminoso, bien distribuido con terminaciones de primer nivel. A estrenar. Disponible para alquiler tradicional de 2 años, sin muebles.', descripcion_pt = 'Onde Recoleta e Palermo se encontram na sua melhor versão. Piscina no último andar, solário, sauna, academia, dois salões de festas, churrasqueira, garagem com elevador e bicicletário. Estúdio muito amplo, com divisória. Com banheiro completo e lavabo. Luminoso, bem distribuído, com acabamentos de primeiro nível. Novo, nunca habitado. Disponível para aluguel tradicional de 2 anos, sem mobília.', plazo = 'A partir de 2 años' where codigo = 'BA-AUSTRIA19382BL';
+update portal.avisos set titulo = 'Austria 1938 · 2D', descripcion = 'Donde Recoleta y Palermo se encuentran en su mejor versión. Piscina en último piso, solarium, sauna, gimnasio, dos SUM, parrilla, cochera con elevador y guarda-bicicletas. 1 ambiente muy amplio, dividido. Con baño completo y toilette. Luminoso, bien distribuido con terminaciones de primer nivel. A estrenar. Disponible para alquiler tradicional de 2 años, sin muebles.', descripcion_pt = 'Onde Recoleta e Palermo se encontram na sua melhor versão. Piscina no último andar, solário, sauna, academia, dois salões de festas, churrasqueira, garagem com elevador e bicicletário. Estúdio muito amplo, com divisória. Com banheiro completo e lavabo. Luminoso, bem distribuído, com acabamentos de primeiro nível. Novo, nunca habitado. Disponível para aluguel tradicional de 2 anos, sem mobília.', plazo = 'A partir de 2 años' where codigo = 'BA-AUSTRIA19382DL';
 update portal.avisos set titulo = 'Austria 1938 · 5 B', descripcion = 'Donde Recoleta y Palermo se encuentran en su mejor versión. Piscina en último piso, solarium, sauna, gimnasio, dos SUM, parrilla y guarda-bicicletas. 1 ambiente muy amplio, dividido. Con baño completo y toilette. Luminoso, bien distribuido con terminaciones de primer nivel. A estrenar. Disponible para alquiler temporal, amueblado.', descripcion_pt = 'Onde Recoleta e Palermo se encontram na sua melhor versão. Piscina no último andar, solário, sauna, academia, dois salões de festas, churrasqueira e bicicletário. Estúdio muito amplo, com divisória. Com banheiro completo e lavabo. Luminoso, bem distribuído, com acabamentos de primeiro nível. Novo, nunca habitado. Disponível para aluguel por temporada, mobiliado.' where codigo = 'BA-AUSTRIA19385BM';
 update portal.avisos set titulo = 'Av. Medrano 1254 · 4 D', descripcion = 'Edificio premium a estrenar en Av. Medrano, en el límite con Palermo. 
 El edificio es otro nivel: pileta en rooftop con reposeras y vista a Buenos Aires, terraza jardín, gimnasio al aire libre, SUM y lobby de acceso con sillones.
@@ -248,9 +241,7 @@ Tudo se acessa com digital — sem chaves, sem cartões.
 
 A poucos metros da Thames e do polo gastronômico de Palermo.
 Mobiliado · Todos os serviços incluídos · Sem exigência de fiador ·', zona = 'Palermo' where codigo = 'BA-AVMEDRANO12544DM';
-update portal.avisos set titulo = 'Av. Santa Fe 4866 · 12 C', descripcion = 'Ubicado en un piso 12, se encuentra este departamento completamente renovado y diseñado con estilo. Un departamento ideal para profesionales que valoran el diseño, la luz natural y un espacio cómodo y tranquilo tanto para vivir como para trabajar remoto.
-
-Corredor responsable: Maximiliano Matzkin, Matrícula CUCICBA Nº 7527 Maxim rentals.', descripcion_pt = 'No 12º andar, este apartamento completamente renovado e decorado com estilo. Ideal para profissionais que valorizam o design, a luz natural e um espaço confortável e tranquilo tanto para morar quanto para trabalhar remoto.', plazo = 'A partir de 2 años' where codigo = 'BA-AVSANTAFE486612CL';
+update portal.avisos set titulo = 'Av. Santa Fe 4866 · 12 C', descripcion = 'Ubicado en un piso 12, se encuentra este departamento completamente renovado y diseñado con estilo. Un departamento ideal para profesionales que valoran el diseño, la luz natural y un espacio cómodo y tranquilo tanto para vivir como para trabajar remoto.', descripcion_pt = 'No 12º andar, este apartamento completamente renovado e decorado com estilo. Ideal para profissionais que valorizam o design, a luz natural e um espaço confortável e tranquilo tanto para morar quanto para trabalhar remoto.', plazo = 'A partir de 2 años' where codigo = 'BA-AVSANTAFE486612CL';
 update portal.avisos set titulo = 'Bonpland 1976 · PB C', descripcion = 'Unidad en planta baja con acceso independiente en el corazón de Palermo Hollywood. Amoblada y equipada, lista para entrar. A metros de los mejores restaurantes y bares de autor del distrito audiovisual de Buenos Aires.', descripcion_pt = 'Unidade no térreo com acesso independente no coração de Palermo Hollywood. Mobiliada e equipada, pronta para entrar. A poucos metros dos melhores restaurantes e bares de autor do distrito audiovisual de Buenos Aires.', zona = 'Palermo' where codigo = 'BA-BONPLAND1976PBCM';
 update portal.avisos set titulo = 'Congreso 2361 · 2 B', descripcion = 'Belgrano · 2 ambientes con terraza propia y cochera.
 Valor de expensas $170.000.
@@ -258,9 +249,7 @@ Valor de expensas $170.000.
 48 m² cubiertos muy bien resueltos: living, cocina con balcón, dormitorio en suite y toilette. Pulmón contrafrente amplio y luminoso, con excelente ventilación. A metros de Juramento, las Barrancas y toda la movida del barrio.
 
 Mega terraza propia de 32 m²: el diferencial real de la unidad. Espacio para deck, parrilla y aire libre todo el año.
-Cochera en PB incluida. SUM y Piscina con solárium en el piso 15.
-
-Corredor responsable: Maximiliano Matzkin, Matrícula CUCICBA Nº 7527 Maxim rentals.', descripcion_en = 'Belgrano · One-bedroom apartment with private terrace and parking space.
+Cochera en PB incluida. SUM y Piscina con solárium en el piso 15.', descripcion_en = 'Belgrano · One-bedroom apartment with private terrace and parking space.
 Building fees: $170,000 ARS.
 
 48 m² indoors, very well laid out: living room, kitchen with balcony, en-suite bedroom and guest toilet. Bright, airy rear orientation with excellent ventilation. Steps from Juramento Ave, the Barrancas and everything the neighbourhood has to offer.
@@ -283,8 +272,7 @@ Ambiente muy amplio en edificio muy tranquilo en zona muy residencial de Palermo
 Con Jardín, Piscina, SUM equipado y seguridad 24hs.
 Sin Amoblar. 
 
-Click en el botón debajo para coordinar tu visita.
-Corredor responsable: Maximiliano Matzkin, Matrícula CUCICBA Nº 7527 Maxim rentals.', descripcion_en = '*Building fees: $200,000 ARS.
+Click en el botón debajo para coordinar tu visita.', descripcion_en = '*Building fees: $200,000 ARS.
 Very spacious unit in a quiet building, in a residential area of Palermo. Steps from Av. Córdoba and Av. Santa Fe, Alto Palermo mall, Plaza Unidad Latinoamericana and the city''s best transit connections.
 
 With garden, pool, equipped common room and 24-hour security.
@@ -313,9 +301,7 @@ Mobiliado · Todos os serviços incluídos · Sem exigência de fiador ·' where
 update portal.avisos set titulo = 'Gorriti 6051 · 1D', descripcion = 'Contrafrente silencioso en Palermo Hollywood. Dos ambientes amoblados y equipados en una de las zonas más codiciadas de la ciudad. Plaza Mafalda a una cuadra, rodeado de cafés de autor y gastronomía de primer nivel.', descripcion_en = 'Quiet rear-facing unit in Palermo Hollywood. Furnished and equipped one-bedroom apartment in one of the city''s most coveted areas. Plaza Mafalda one block away, surrounded by specialty cafés and top-tier dining.', descripcion_pt = 'Fundos silenciosos em Palermo Hollywood. Dois ambientes mobiliados e equipados em uma das zonas mais cobiçadas da cidade. Plaza Mafalda a uma quadra, rodeado de cafés de autor e gastronomia de primeiro nível.', zona = 'Palermo' where codigo = 'BA-GORRITI60511DM';
 update portal.avisos set titulo = 'Guido 1671 · 1B', descripcion = '*Opción Temporal y amoblado precio paquete: $3500 USD. 
 
-Edificio clásico de principios de siglo con techos altos, a 200 metros de Av. del Libertador y Plaza Francia. Living con vista verde, cocina equipada con mesada de mármol, 2 dormitorios en suite. Dormitorio principal con vestidor propio y baño con jacuzzi y ducha separada. Una propiedad de categoría que combina la arquitectura de otra época con el confort de hoy.
-
-Corredor responsable: Maximiliano Matzkin, Matrícula CUCICBA Nº 7527 Maxim rentals.', descripcion_pt = '*Opção temporada e mobiliado, preço pacote: USD 3.500.
+Edificio clásico de principios de siglo con techos altos, a 200 metros de Av. del Libertador y Plaza Francia. Living con vista verde, cocina equipada con mesada de mármol, 2 dormitorios en suite. Dormitorio principal con vestidor propio y baño con jacuzzi y ducha separada. Una propiedad de categoría que combina la arquitectura de otra época con el confort de hoy.', descripcion_pt = '*Opção temporada e mobiliado, preço pacote: USD 3.500.
 
 Edifício clássico do início do século, com pé-direito alto, a 200 metros da Av. del Libertador e da Plaza Francia. Living com vista verde, cozinha equipada com bancada de mármore, 2 quartos em suíte. Quarto principal com closet próprio e banheiro com jacuzzi e ducha separada. Um imóvel de categoria que combina a arquitetura de outra época com o conforto de hoje.', plazo = 'A partir de 2 años' where codigo = 'BA-GUIDO16711BL';
 update portal.avisos set titulo = 'Huergo 475 · 0709', descripcion = '*Incluye mobiliario.
@@ -375,9 +361,7 @@ Doble altura, terminaciones en madera de roble y luz en todos los ambientes.
 · Family room con balcón aterrazado y parrilla
 · Sauna propio 
 · 2 dormitorios en suite + escritorio con baño
-· Terraza propia con vista a la ciudad
-
-Corredor responsable: Maximiliano Matzkin, Matrícula CUCICBA Nº 7527 Maxim rentals.', descripcion_en = '*Total building fees ($600,000 ARS) and utilities paid by tenant.
+· Terraza propia con vista a la ciudad', descripcion_en = '*Total building fees ($600,000 ARS) and utilities paid by tenant.
 Fully renovated duplex on the 10th and 11th floors.
 Double-height ceilings, oak wood finishes and natural light in every room.
 · Living room with wood-burning fireplace
@@ -425,9 +409,7 @@ A poucos passos: Av. Cabildo e a melhor conectividade do bairro.
 
 Zona tranquila, arborizada, a minutos de Belgrano e San Isidro. Estúdio novo com todos os serviços incluídos.', barrio = 'Núñez', zona = 'Núñez' where codigo = 'BA-MANUELUGARTE1992M';
 update portal.avisos set titulo = 'Medrano 333 · 7A', descripcion = '*Expensas y Servicios a cargo del inquilino. 
-Departamento domotizado con balcón corrido y cochera. Totalmente amoblado y equipado, con sistema de domótica integrado y control por voz mediante Alexa. Doble vidrio, cava de vinos y aspiradora robot son algunos de los agregados que hacen de esta propiedad, una oportunidad única. En Almagro, uno de los barrios más auténticos de Buenos Aires, con acceso inmediato a Corrientes, el Teatro Colón y el centro porteño.
-
-Corredor responsable: Maximiliano Matzkin, Matrícula CUCICBA Nº 7527 Maxim rentals.', descripcion_en = '*Building fees and utilities paid by tenant.
+Departamento domotizado con balcón corrido y cochera. Totalmente amoblado y equipado, con sistema de domótica integrado y control por voz mediante Alexa. Doble vidrio, cava de vinos y aspiradora robot son algunos de los agregados que hacen de esta propiedad, una oportunidad única. En Almagro, uno de los barrios más auténticos de Buenos Aires, con acceso inmediato a Corrientes, el Teatro Colón y el centro porteño.', descripcion_en = '*Building fees and utilities paid by tenant.
 Smart-home apartment with wraparound balcony and parking space. Fully furnished and equipped, with integrated home automation and voice control via Alexa. Double glazing, a wine cellar and a robot vacuum are some of the extras that make this property one of a kind. In Almagro, one of Buenos Aires'' most authentic neighbourhoods, with immediate access to Corrientes Ave, the Teatro Colón and downtown.', descripcion_pt = '*Condomínio e serviços por conta do inquilino.
 Apartamento com automação residencial, varanda corrida e vaga de garagem. Totalmente mobiliado e equipado, com sistema de domótica integrado e controle por voz via Alexa. Vidro duplo, adega de vinhos e aspirador robô são alguns dos extras que fazem deste imóvel algo único. Em Almagro, um dos bairros mais autênticos de Buenos Aires, com acesso imediato à Corrientes, ao Teatro Colón e ao centro portenho.', plazo = 'A partir de 2 años' where codigo = 'BA-MEDRANO3337AL';
 update portal.avisos set titulo = 'Migueletes 680 · 3A', descripcion = 'Departamento amoblado en Las Cañitas, el microbarrio más cómodo y residencial de Buenos Aires. Rodeado de embajadas, jardines y arquitectura de principios del siglo XX. Silencioso, exclusivo y a metros de la Avenida del Libertador.', descripcion_en = 'Furnished apartment in Las Cañitas, Buenos Aires'' most comfortable and residential micro-neighbourhood. Surrounded by embassies, gardens and early-20th-century architecture. Quiet, exclusive and steps from Avenida del Libertador.', descripcion_pt = 'Apartamento mobiliado em Las Cañitas, o microbairro mais confortável e residencial de Buenos Aires. Rodeado de embaixadas, jardins e arquitetura do início do século XX. Silencioso, exclusivo e a poucos metros da Avenida del Libertador.', barrio = 'Las Cañitas', zona = 'Palermo' where codigo = 'BA-MIGUELETES6803AM';
@@ -514,9 +496,7 @@ Amenities:
 • Gran parque arbolado con piscina.
 • Solarium con deck de madera
 • SUM con cocina, parrilla y baño
-• Gimnasio y laundry
-
-Corredor responsable: Maximiliano Matzkin, Matrícula CUCICBA Nº 7527 Maxim rentals.', descripcion_en = 'Design complex, very quiet, with amenities and few units.
+• Gimnasio y laundry', descripcion_en = 'Design complex, very quiet, with amenities and few units.
 Building fees: $450,000 ARS
 
 Double-height loft with designer details. Excellent build quality.
@@ -586,9 +566,7 @@ update portal.avisos set titulo = 'Paraguay 3734 · 3', descripcion = '*Valor de
 Edificio con 1 año de antigüedad.
 Monoambiente dividido y muy espacioso en Palermo.
 Además de la Habitación dividida en suite, la unidad cuenta con toilette y vestidor. 
-Piscina en piso 10 y gimnasio.
-
-Corredor responsable: Maximiliano Matzkin, Matrícula CUCICBA Nº 7527 Maxim rentals.', descripcion_pt = '*Valor do condomínio: $250.000.
+Piscina en piso 10 y gimnasio.', descripcion_pt = '*Valor do condomínio: $250.000.
 Edifício com 1 ano de construção.
 Estúdio com divisória, muito espaçoso, em Palermo.
 Além do quarto separado em suíte, a unidade conta com lavabo e closet.

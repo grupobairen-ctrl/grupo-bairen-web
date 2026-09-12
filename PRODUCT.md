@@ -22,7 +22,7 @@ BAIREN es la plataforma de propiedades seleccionadas de Buenos Aires. Un medio: 
 - La inmobiliaria tradicional: carteles, "consulte", fotos con flash.
 
 ## Principios estratégicos
-1. Neutralidad: Maxim Rentals (Maximiliano Matzkin, CUCICBA 7527) es un publicador más, con el mismo lugar que cualquier inmobiliaria o dueño verificado.
+1. Neutralidad: dueños verificados, inmobiliarias con matrícula y desarrolladoras publican con las mismas reglas y en el mismo lugar. BAIREN no opera ni ejerce el corretaje. Las unidades que BAIREN mismo publica llevan "Publica: BAIREN · Selección BAIREN" y no tienen ningún distintivo por encima de nadie.
 2. Cada ficha y cada tarjeta muestra "Publica: quién", con matrícula o verificación.
 3. El contacto va directo al publicador. BAIREN nunca queda en el medio de la conversación.
 4. Legal siempre visible: leyenda de plataforma en el pie; leyenda de la Ley 2340 art. 10 inc. 8 en avisos de alquiler de vivienda de corredores.

@@ -14,6 +14,9 @@ const res = await fetch(`${url}/rest/v1/propiedades?select=*,imagenes(url,orden)
 if (!res.ok) { console.error('Supabase respondió', res.status, await res.text()); process.exit(1); }
 const units = await res.json();
 units.forEach(u => { u.imagenes = (u.imagenes || []).sort((a, b) => (a.orden || 0) - (b.orden || 0)); });
+/* El portal no muestra la línea del corredor dentro de una descripción (misma expresión que D.sinLineaCorredor en portal/js/data.js): cada reexportación entra limpia. */
+const sinLineaCorredor = s => (s || '').replace(/(^|\n+)[ \t]*(Corredor responsable|Responsible broker|Corretor respons[aá]vel)\s*:[^\n]*/gi, '').trim();
+units.forEach(u => { for (const k of ['descripcion', 'descripcion_en', 'descripcion_pt']) if (u[k] != null) u[k] = sinLineaCorredor(u[k]); });
 const destino = join(raiz, 'portal', 'data', 'avisos-src.json');
 const antes = (() => { try { return JSON.parse(readFileSync(destino, 'utf8')); } catch (e) { return []; } })();
 const viejos = new Set(antes.map(u => u.slug));

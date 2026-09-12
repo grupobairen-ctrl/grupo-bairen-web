@@ -14,7 +14,7 @@ create table if not exists portal.publicadores (
   tipo          text not null check (tipo in ('dueno','inmobiliaria','desarrolladora')),
   nombre        text not null,
   responsable   text,
-  matricula     text,                       -- 'CUCICBA 7527'
+  matricula     text,                       -- 'CUCICBA 1234'
   colegio       text,                       -- CUCICBA, CMCPSI, etc.
   cuit          text,
   logo_url      text,
@@ -180,10 +180,12 @@ create policy "cualquiera consulta" on portal.consultas for insert with check (t
 -- Exponer el esquema a la API (Dashboard -> Settings -> API -> Exposed schemas: agregar `portal`)
 
 -- ---------------------------------------------------------------------
--- MIGRACIÓN INICIAL: las unidades actuales como avisos de Maxim Rentals
+-- MIGRACIÓN INICIAL: las unidades actuales como avisos de BAIREN
 -- ---------------------------------------------------------------------
-insert into portal.publicadores (slug, tipo, nombre, responsable, matricula, colegio, badge, verificado, verificado_en, zonas, email)
-values ('maxim-rentals','inmobiliaria','Maxim Rentals','Maximiliano Matzkin','CUCICBA 7527','Colegio Único de Corredores Inmobiliarios de la Ciudad de Buenos Aires','Corredor inmobiliario matriculado', true, now(), '{Recoleta,Palermo,Núñez,Puerto Madero,Belgrano}', null)  -- el mail y el WhatsApp reales de Maxim Rentals se cargan aparte; hasta entonces la ficha dice Contacto pendiente
+-- El publicador BAIREN: las unidades que el portal mismo publica, con el contacto del sitio.
+-- Sin responsable, matrícula ni colegio: el portal no comunica corredor.
+insert into portal.publicadores (slug, tipo, nombre, responsable, matricula, colegio, badge, verificado, verificado_en, zonas, email, whatsapp)
+values ('bairen','inmobiliaria','BAIREN', null, null, null, 'Selección BAIREN', true, now(), '{Recoleta,Palermo,Núñez,Puerto Madero,Belgrano}', 'contacto@bairengroup.com', '5491123106629')
 on conflict (slug) do nothing;
 
 -- El portal vive en su propio proyecto de Supabase, separado del de bairengroup.com,
@@ -196,7 +198,7 @@ begin
     return;
   end if;
   execute $sql1$
-with pub as (select id from portal.publicadores where slug = 'maxim-rentals'),
+with pub as (select id from portal.publicadores where slug = 'bairen'),
   src as (
     select p.*, op.operacion, op.precio
     from public.propiedades p

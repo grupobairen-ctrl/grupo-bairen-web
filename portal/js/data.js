@@ -7,26 +7,42 @@
   const BP = window.BP;
   const D = {};
 
+  const SLUG_VIEJO = { 'maxim-rentals': 'bairen' };   /* fila vieja de la base; se saca cuando corra migracion-03-portal-sin-corredor.sql */
   D.PUBLICADORES = {
-    'maxim-rentals': { id:'maxim-rentals', tipo:'inmobiliaria', nombre:'BAIREN', responsable:null, matricula:null, colegio:null, badge:'Selección BAIREN', verificado:true, desde:'2026', inicial:'B',
-      whatsapp:null, email:null, telefono:null, zonas:['Recoleta','Palermo','Núñez','Puerto Madero','Belgrano'],
-      desc:'Propiedad seleccionada por BAIREN: ubicación, estado, distribución y calidad constructiva revisados antes de publicarla.' },
+    'bairen': { id:'bairen', tipo:'inmobiliaria', nombre:'BAIREN', responsable:null, matricula:null, colegio:null, badge:'Selección BAIREN', verificado:true, desde:'2026', inicial:'B', portal:true,
+      whatsapp:'5491123106629', email:'contacto@bairengroup.com', telefono:null, zonas:['Recoleta','Palermo','Núñez','Puerto Madero','Belgrano'],
+      desc:'Propiedad seleccionada por BAIREN: ubicación, estado, distribución y calidad constructiva revisados antes de publicarla.',
+      desc_en:'Property selected by BAIREN: location, condition, layout and build quality reviewed before listing it.',
+      desc_pt:'Imóvel selecionado pela BAIREN: localização, estado, distribuição e qualidade construtiva revisados antes de publicá-lo.' },
     'inmobiliaria-ejemplo': { id:'inmobiliaria-ejemplo', tipo:'inmobiliaria', nombre:'Inmobiliaria Ejemplo', responsable:'Corredor de ejemplo', matricula:'CUCICBA 0000', badge:'Corredor inmobiliario matriculado', verificado:true, desde:'2026', inicial:'IE', demo:true,
-      whatsapp:'5491100000000', email:'ejemplo@ejemplo.com', telefono:'+54 11 0000 0000', zonas:['Belgrano'], desc:'Publicador de ejemplo para mostrar cómo se ve una inmobiliaria con perfil propio. No es una empresa real.' },
+      whatsapp:'5491100000000', email:'ejemplo@ejemplo.com', telefono:'+54 11 0000 0000', zonas:['Belgrano'], desc:'Publicador de ejemplo para mostrar cómo se ve una inmobiliaria con perfil propio. No es una empresa real.',
+      desc_en:'Sample lister to show how a real estate agency with its own profile looks. Not a real company.', desc_pt:'Anunciante de exemplo para mostrar como fica uma imobiliária com perfil próprio. Não é uma empresa real.' },
     'desarrolladora-ejemplo': { id:'desarrolladora-ejemplo', tipo:'desarrolladora', nombre:'Desarrolladora Ejemplo', responsable:'Equipo comercial', matricula:null, badge:'Venta directa', verificado:true, desde:'2026', inicial:'DE', demo:true,
-      whatsapp:'5491100000002', email:'ventas@ejemplo.com', telefono:'+54 11 0000 0002', zonas:['Núñez'], desc:'Publicador de ejemplo: una desarrolladora que vende sus propias unidades, sin corretaje. No es una empresa real.' },
+      whatsapp:'5491100000002', email:'ventas@ejemplo.com', telefono:'+54 11 0000 0002', zonas:['Núñez'], desc:'Publicador de ejemplo: una desarrolladora que vende sus propias unidades, sin corretaje. No es una empresa real.',
+      desc_en:'Sample lister: a developer selling its own units, with no broker. Not a real company.', desc_pt:'Anunciante de exemplo: uma incorporadora que vende suas próprias unidades, sem corretagem. Não é uma empresa real.' },
     'dueno-ejemplo': { id:'dueno-ejemplo', tipo:'dueno', nombre:'Dueño directo', responsable:'Propietario verificado', matricula:null, badge:'Dueño verificado', verificado:true, desde:'2026', inicial:'DD', demo:true,
-      whatsapp:'5491100000001', email:'dueno@ejemplo.com', telefono:'+54 11 0000 0001', zonas:['Núñez'], desc:'Publicador de ejemplo: un propietario que muestra su propia unidad con titularidad verificada por BAIREN.' },
+      whatsapp:'5491100000001', email:'dueno@ejemplo.com', telefono:'+54 11 0000 0001', zonas:['Núñez'], desc:'Publicador de ejemplo: un propietario que muestra su propia unidad con titularidad verificada por BAIREN.',
+      desc_en:'Sample lister: an owner showing their own unit, with title verified by BAIREN.', desc_pt:'Anunciante de exemplo: um proprietário que mostra sua própria unidade, com titularidade verificada pela BAIREN.' },
   };
   D.titulares = {};
-  D.pub = id => D.PUBLICADORES[id] || D.PUBLICADORES['maxim-rentals'];
+  D.pub = id => D.PUBLICADORES[id] || D.PUBLICADORES['bairen'];
+  /* Descripción y nombre del publicador en el idioma de la interfaz, si los tiene; si no, el castellano.
+     El nombre 'Dueño directo' del ejemplo se traduce como dato fijo. */
+  D.pubDesc = pub => (BP.lang !== 'es' && pub['desc_' + BP.lang]) || pub.desc || '';
+  D.pubNombre = pub => pub.tipo === 'dueno' && pub.nombre === 'Dueño directo' ? BP.t('ui_dato_dueno_directo', pub.nombre) : pub.nombre;
+  /* Una fila cruda de la base (joins del panel) → el publicador tal como lo muestra el portal */
+  D.pubDeFila = fila => (fila && D.PUBLICADORES[SLUG_VIEJO[fila.slug] || fila.slug]) || fila || {};
+  /* El portal nunca muestra la línea del corredor dentro de una descripción: quien publica se ve en la tarjeta del publicador. */
+  D.sinLineaCorredor = s => (s || '').replace(/(^|\n+)[ \t]*(Corredor responsable|Responsible broker|Corretor respons[aá]vel)\s*:[^\n]*/gi, '').trim();
 
   const AMEN_MAP = { 'Aire acond.':'Aire acondicionado', 'Jardín / Terraza':'Terraza o jardín' };
   const norm = a => AMEN_MAP[a] || a;
 
   function fromUnit(p, op, precio){
-    const fotos = (p.imagenes||[]).slice().sort((a,b)=>(a.orden||0)-(b.orden||0)).map(i=>i.url);
+    /* Fotos en orden, con la portada primera y sin URLs repetidas: lo mismo que fotosDeUnidad en api/_portal/sync.js */
+    let fotos = (p.imagenes||[]).slice().sort((a,b)=>(a.orden||0)-(b.orden||0)).map(i=>i.url).filter(Boolean);
     if (p.portada_url && fotos.indexOf(p.portada_url)===-1) fotos.unshift(p.portada_url);
+    fotos = Array.from(new Set(fotos));
     const amen = (p.amenities||[]).map(a=>norm(a.nombre)).filter(Boolean);
     const amb = p.ambientes || null;
     const zona = (window.BairenZonas && window.BairenZonas.zonaDe(p.barrio)) || p.barrio;
@@ -42,9 +58,9 @@
       cocheras: amen.indexOf('Cochera') > -1 ? 1 : 0, antiguedad: null,
       amoblado: op === 'mediano' || amen.indexOf('Amoblado') > -1, amenities: amen, cualidades: [],
       fotos, video: p.video_url ? { tipo: p.video_tipo, url: p.video_url } : null,
-      descripcion: p.descripcion || '', descripcion_en: p.descripcion_en || '', descripcion_pt: p.descripcion_pt || '', plazo: p.plazo || '',
+      descripcion: D.sinLineaCorredor(p.descripcion), descripcion_en: D.sinLineaCorredor(p.descripcion_en), descripcion_pt: D.sinLineaCorredor(p.descripcion_pt), plazo: p.plazo || '',
       publicadoEn: p.created_at, estado: p.estado, reservado, fechaLiberacion: p.fecha_liberacion,
-      publicadorId: 'maxim-rentals', destacado: false, demo: false, codigo: 'BA-' + (p.slug||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8) + (op==='venta'?'V':op==='alquiler'?'L':'M'),
+      publicadorId: 'bairen', destacado: false, demo: false, codigo: 'BA-' + (p.slug||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8) + (op==='venta'?'V':op==='alquiler'?'L':'M'),
       apto: op === 'mediano' ? ['Sin garantía propietaria'] : [],   /* lo único que el modelo de mediano plazo de Bairen garantiza */
     };
   }
@@ -62,7 +78,7 @@
 
   /* aviso del esquema portal (o del modo local) → modelo del portal */
   D.fromStore = async function(r){
-    const pub = r.publicador || null; const pubId = pub ? (pub.slug || pub.id) : 'maxim-rentals';
+    const pub = r.publicador || null; const pubId = pub ? (SLUG_VIEJO[pub.slug] || pub.slug || pub.id) : 'bairen';
     const T = (pub && D.titulares[pub.id]) || null;   /* titular con matrícula, de la vista publicador_publico */
     if (pub && !D.PUBLICADORES[pubId]) D.PUBLICADORES[pubId] = Object.assign({ storeId: pub.id, id: pubId, inicial: (pub.nombre||'P').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(), desde: (pub.created_at||'').slice(0,4) || '2026', zonas: pub.zonas || [], desc: pub.descripcion || '', responsable: pub.responsable || pub.nombre, badge: pub.badge || (pub.tipo === 'dueno' ? 'Dueño verificado' : 'Corredor inmobiliario matriculado') }, pub, { id: pubId }, T && T.titular_nombre ? { responsable: T.titular_nombre, matricula: T.titular_matricula ? ((T.titular_colegio || 'CUCICBA') + ' ' + T.titular_matricula) : pub.matricula } : {});
     const fotos = []; for (const f of (r.fotos||[]).slice().sort((a,b)=>(a.orden||0)-(b.orden||0))) { const u = window.BPStore ? await window.BPStore.resolveFoto(f.url) : f.url; if (u) fotos.push(u); }
@@ -71,7 +87,7 @@
       precio: r.precio == null ? null : Number(r.precio), moneda: r.moneda || 'USD', periodo: r.operacion === 'venta' ? '' : '/mes', expensas: r.expensas == null ? null : Number(r.expensas),
       m2: r.m2_total || null, m2cub: r.m2_cubierto || null, amb, dorm: r.dormitorios || null, banos: r.banos || null, cocheras: r.cocheras || 0, antiguedad: r.antiguedad == null ? null : Number(r.antiguedad),
       amoblado: !!r.amoblado, amenities: r.amenities || [], caracteristicas: r.caracteristicas || [], cualidades: r.cualidades_verificadas || [], fotos, video: r.video_url ? { tipo: r.video_tipo || 'youtube', url: r.video_url } : null,
-      descripcion: r.descripcion || '', descripcion_en: r.descripcion_en || '', descripcion_pt: r.descripcion_pt || '', plazo: r.plazo || '', emprendimiento: r.emprendimiento || null, etapa: r.etapa || null, entrega: r.entrega || null, propietarioEmail: r.propietario_email || null, publicadoEn: r.publicado_en || r.created_at, estado: r.estado, reservado: r.estado === 'reservado', publicadorId: pubId, destacado: !!(r.destacado_hasta && new Date(r.destacado_hasta) > new Date()), demo: false, codigo: r.codigo, apto: r.caracteristicas && r.caracteristicas.length ? r.caracteristicas.slice(0,3) : [], fromStore: true };
+      descripcion: D.sinLineaCorredor(r.descripcion), descripcion_en: D.sinLineaCorredor(r.descripcion_en), descripcion_pt: D.sinLineaCorredor(r.descripcion_pt), plazo: r.plazo || '', emprendimiento: r.emprendimiento || null, etapa: r.etapa || null, entrega: r.entrega || null, propietarioEmail: r.propietario_email || null, publicadoEn: r.publicado_en || r.created_at, estado: r.estado, reservado: r.estado === 'reservado', publicadorId: pubId, destacado: !!(r.destacado_hasta && new Date(r.destacado_hasta) > new Date()), demo: false, codigo: r.codigo, apto: r.caracteristicas && r.caracteristicas.length ? r.caracteristicas.slice(0,3) : [], fromStore: true };
   };
 
   let cache = null;
@@ -128,68 +144,72 @@
     return cache;
   };
 
+  /* Todo lo visible de una tarjeta pasa por BP.t(clave, castellano): en es no cambia nada.
+     Cada cifra elige singular o plural (dorm., baño, coch.): en castellano las abreviaturas no cambian,
+     en inglés y portugués sí (bed/beds, vaga/vagas). m² y "amb." no cambian: amb. sólo aparece con 2 o más. */
   D.metaLine = a => [
     a.m2 ? a.m2 + ' m²' : null,
-    a.amb ? (a.amb === 1 ? 'Monoamb.' : a.amb + ' amb.') : null,
-    a.dorm ? a.dorm + ' dorm.' : null,
-    a.banos ? a.banos + (a.banos === 1 ? ' baño' : ' baños') : null,
-    a.cocheras ? a.cocheras + ' coch.' : null,
+    a.amb ? (a.amb === 1 ? BP.t('card_monoamb', 'Monoamb.') : a.amb + ' ' + BP.t('card_amb', 'amb.')) : null,
+    a.dorm ? a.dorm + ' ' + (a.dorm === 1 ? BP.t('card_dorm_1', 'dorm.') : BP.t('card_dorm_n', 'dorm.')) : null,
+    a.banos ? a.banos + ' ' + (a.banos === 1 ? BP.t('card_bano', 'baño') : BP.t('card_banos', 'baños')) : null,
+    a.cocheras ? a.cocheras + ' ' + (a.cocheras === 1 ? BP.t('card_coch_1', 'coch.') : BP.t('card_coch_n', 'coch.')) : null,
   ].filter(Boolean).join(' · ');
-  D.opTag = a => a.op === 'venta' ? 'Venta' : a.op === 'mediano' ? 'Alquiler, mediano plazo' : 'Alquiler, largo plazo';
+  D.opTag = a => a.op === 'venta' ? BP.t('card_venta', 'Venta') : a.op === 'mediano' ? BP.t('card_alq_mediano', 'Alquiler, mediano plazo') : BP.t('card_alq_largo', 'Alquiler, largo plazo');
   /* Operación como filtro (decisión de Tomás, 10/9/2026): "alquiler" abarca mediano y largo
      plazo; "largo" es sólo largo (los avisos de largo plazo llevan op 'alquiler'). */
   D.opMatch = (a, op) => !op || (op === 'alquiler' ? a.op !== 'venta' : op === 'largo' ? a.op === 'alquiler' : a.op === op);
-  D.precioHTML = a => a.precio ? `${BP.fmtUSD(a.precio)}${a.periodo ? '<small>' + a.periodo + '</small>' : ''}` : 'Consultar precio';
-  D.badgeHTML = pub => !pub.matricula && pub.tipo !== 'dueno' ? `<span class="p-badge">${BP.ico.check} ${BP.esc(pub.badge || 'Selección BAIREN')}</span>`
+  D.precioHTML = a => a.precio ? `${BP.fmtUSD(a.precio)}${a.periodo ? '<small>' + BP.t('ui_por_mes', a.periodo) + '</small>' : ''}` : BP.t('card_consultar_precio', 'Consultar precio');
+  /* La insignia es un dato del publicador ('Dueño verificado', 'Corredor inmobiliario matriculado'…): se traduce como etiqueta fija; 'Selección BAIREN' es nombre propio y queda */
+  D.badgeHTML = pub => !pub.matricula && pub.tipo !== 'dueno' ? `<span class="p-badge">${BP.ico.check} ${BP.esc(BP.etiqueta(pub.badge || 'Selección BAIREN'))}</span>`
     : pub.tipo === 'dueno'
-    ? `<span class="p-badge dueno">${BP.ico.shield} ${BP.esc(pub.badge || '')}</span>`
-    : pub.tipo === 'desarrolladora' ? `<span class="p-badge dueno">${BP.ico.building} Venta directa</span>`
+    ? `<span class="p-badge dueno">${BP.ico.shield} ${BP.esc(BP.etiqueta(pub.badge || ''))}</span>`
+    : pub.tipo === 'desarrolladora' ? `<span class="p-badge dueno">${BP.ico.building} ${BP.t('ui_dato_venta_directa', 'Venta directa')}</span>`
     : `<span class="p-badge">${BP.ico.shield} ${BP.esc(pub.matricula || '')}</span>`;
-  D.waLink = (a, pub) => pub.whatsapp ? 'https://wa.me/' + pub.whatsapp + '?text=' + encodeURIComponent('Hola, vi ' + a.titulo + ' (' + a.codigo + ') en BAIREN y quiero más información.') : null;
+  D.waLink = (a, pub) => pub.whatsapp ? 'https://wa.me/' + pub.whatsapp + '?text=' + encodeURIComponent(BP.tf('card_wa_msg', 'Hola, vi {t} ({c}) en BAIREN y quiero más información.', { t: a.titulo, c: a.codigo })) : null;
   D.sinContacto = pub => !pub.whatsapp && !pub.email;
 
   D.cardH = function(a){
     const pub = D.pub(a.publicadorId);
     const href = BP.urlFicha(a);
     const foto = a.fotos[0] ? `<img src="${BP.sbImg(a.fotos[0], 900)}" alt="${BP.esc(a.titulo)}, ${BP.esc(a.barrio)}" loading="lazy">` : '';
-    const tag = a.reservado ? '<span class="tag res">Reservada</span>' : a.destacado ? '<span class="tag">Seleccionada</span>' : a.demo ? '<span class="tag" style="background:#F4F0E6">Ejemplo</span>' : '';
+    const tag = a.reservado ? `<span class="tag res">${BP.t('card_reservada', 'Reservada')}</span>` : a.destacado ? `<span class="tag">${BP.t('card_seleccionada', 'Seleccionada')}</span>` : a.demo ? `<span class="tag" style="background:#F4F0E6">${BP.t('card_ejemplo', 'Ejemplo')}</span>` : '';
     return `
 <article class="p-card-h" data-id="${BP.esc(a.id)}">
-  <a class="p-card-photo" href="${href}" aria-label="Ver ${BP.esc(a.titulo)}">${foto}${tag}<span class="ct">${BP.ico.photo} ${a.fotos.length}${a.video ? ' · ' + BP.ico.video : ''}</span></a>
+  <a class="p-card-photo" href="${href}" aria-label="${BP.esc(BP.tf('card_ver', 'Ver {t}', { t: a.titulo }))}">${foto}${tag}<span class="ct">${BP.ico.photo} ${a.fotos.length}${a.video ? ' · ' + BP.ico.video : ''}</span></a>
   <div class="p-card-body">
-    <div class="p-card-top"><div><div class="p-price">${a.reservado ? '<span class="p-cta-res">Reservada</span>' : D.precioHTML(a)}</div>${a.expensas ? `<div class="p-expensas">$ ${BP.fmtN(a.expensas)} expensas</div>` : ''}</div></div>
+    <div class="p-card-top"><div><div class="p-price">${a.reservado ? `<span class="p-cta-res">${BP.t('card_reservada', 'Reservada')}</span>` : D.precioHTML(a)}</div>${a.expensas ? `<div class="p-expensas">$ ${BP.fmtN(a.expensas)} ${BP.t('card_expensas', 'expensas')}</div>` : ''}</div></div>
     <div class="p-meta">${D.metaLine(a).split(' · ').map(x=>`<span>${x}</span>`).join('')}</div>
     <a class="p-addr" href="${href}">${BP.esc(a.titulo)}</a>
     <div class="p-barrio">${BP.esc(a.barrio)}, ${BP.esc(a.ciudad)}</div>
     <p class="p-desc">${BP.esc(a.descripcion).slice(0, 220)}</p>
     <div class="p-card-foot">
-      <div class="p-publine">Publica <b>${BP.esc(pub.nombre)}</b> ${D.badgeHTML(pub)}</div>
-      <div class="acts">${a.reservado ? '' : `${D.waLink(a,pub) ? `<a class="p-icon-btn" href="${D.waLink(a,pub)}" target="_blank" rel="noopener" data-wa data-aviso="${BP.esc(a.id)}" data-pub="${BP.esc(pub.storeId || pub.id)}" aria-label="Escribir por WhatsApp a ${BP.esc(pub.nombre)}" title="WhatsApp">${BP.ico.wa}</a>` : ''}${D.sinContacto(pub) ? `<span class="p-sincontacto">Contacto pendiente</span>` : `<a class="p-btn p-btn-sm p-btn-navy" href="${href}#contacto">${BP.ico.mail} Contactar</a>`}`}</div>
+      <div class="p-publine">${BP.t('card_publica', 'Publica')} <b>${BP.esc(D.pubNombre(pub))}</b> ${D.badgeHTML(pub)}</div>
+      <div class="acts">${a.reservado ? '' : `${D.waLink(a,pub) ? `<a class="p-icon-btn" href="${D.waLink(a,pub)}" target="_blank" rel="noopener" data-wa data-aviso="${BP.esc(a.id)}" data-pub="${BP.esc(pub.storeId || pub.id)}" aria-label="${BP.esc(BP.tf('card_wa_aria', 'Escribir por WhatsApp a {p}', { p: D.pubNombre(pub) }))}" title="WhatsApp">${BP.ico.wa}</a>` : ''}${D.sinContacto(pub) ? `<span class="p-sincontacto">${BP.t('card_contacto_pendiente', 'Contacto pendiente')}</span>` : `<a class="p-btn p-btn-sm p-btn-navy" href="${href}#contacto">${BP.ico.mail} ${BP.t('card_contactar', 'Contactar')}</a>`}`}</div>
     </div>
   </div>
-  <button type="button" class="p-icon-btn p-fav ${BP.isFav(a.id)?'on':''}" data-fav="${BP.esc(a.id)}" aria-label="Guardar en favoritos" aria-pressed="${BP.isFav(a.id)}">${BP.isFav(a.id)?BP.ico.heartFill:BP.ico.heart}</button>
+  <button type="button" class="p-icon-btn p-fav ${BP.isFav(a.id)?'on':''}" data-fav="${BP.esc(a.id)}" aria-label="${BP.t('card_fav', 'Guardar en favoritos')}" aria-pressed="${BP.isFav(a.id)}">${BP.isFav(a.id)?BP.ico.heartFill:BP.ico.heart}</button>
 </article>`;
   };
 
   D.cardV = function(a){
     const pub = D.pub(a.publicadorId);
     const href = BP.urlFicha(a);
-    const foto = a.fotos[0] ? `<img src="${BP.sbImg(a.fotos[0], 700)}" alt="${BP.esc(a.titulo)}, ${BP.esc(a.barrio)}" loading="lazy">` : '<span class="card-img-placeholder">Fotos en producción</span>';
+    const foto = a.fotos[0] ? `<img src="${BP.sbImg(a.fotos[0], 700)}" alt="${BP.esc(a.titulo)}, ${BP.esc(a.barrio)}" loading="lazy">` : `<span class="card-img-placeholder">${BP.t('card_fotos_prod', 'Fotos en producción')}</span>`;
     return `
-<a class="prop-card" data-flip="${BP.esc(a.id)}" href="${href}" aria-label="Ver ${BP.esc(a.titulo)} en ${BP.esc(a.barrio)}">
-  <div class="card-img">${foto}<span class="card-tag tag-${a.op}">${D.opTag(a)}</span>${a.reservado?'<span class="card-status status-reservado">Reservada</span>':''}</div>
+<a class="prop-card" data-flip="${BP.esc(a.id)}" href="${href}" aria-label="${BP.esc(BP.tf('card_ver_en', 'Ver {t} en {b}', { t: a.titulo, b: a.barrio }))}">
+  <div class="card-img">${foto}<span class="card-tag tag-${a.op}">${D.opTag(a)}</span>${a.reservado?`<span class="card-status status-reservado">${BP.t('card_reservada', 'Reservada')}</span>`:''}</div>
   <div class="card-body">
     <div class="card-address">${BP.esc(a.titulo)}</div>
     <div class="card-barrio">${BP.esc(a.barrio)}</div>
     <div class="card-meta">${D.metaLine(a)}</div>
     <div class="card-divider"></div>
-    <div class="card-footer"><div class="card-price"><span class="price-amount">${a.reservado ? 'Reservada' : D.precioHTML(a)}</span></div><span class="card-cta">Ver ficha</span></div>
-    <div class="p-card-pub">Publica <b>${BP.esc(pub.nombre)}</b> ${D.badgeHTML(pub)}</div>
+    <div class="card-footer"><div class="card-price"><span class="price-amount">${a.reservado ? BP.t('card_reservada', 'Reservada') : D.precioHTML(a)}</span></div><span class="card-cta">${BP.t('card_ver_ficha', 'Ver ficha')}</span></div>
+    <div class="p-card-pub">${BP.t('card_publica', 'Publica')} <b>${BP.esc(D.pubNombre(pub))}</b> ${D.badgeHTML(pub)}</div>
   </div>
 </a>`;
   };
 
-  D.bindFavs = root => { (root||document).querySelectorAll('[data-fav]').forEach(b => { if (b._bound) return; b._bound = true; b.addEventListener('click', e => { e.preventDefault(); const on = BP.toggleFav(b.dataset.fav); b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); b.innerHTML = on ? BP.ico.heartFill : BP.ico.heart; BP.toast(on ? 'Guardada en favoritos' : 'Quitada de favoritos'); }); }); };
+  D.bindFavs = root => { (root||document).querySelectorAll('[data-fav]').forEach(b => { if (b._bound) return; b._bound = true; b.addEventListener('click', e => { e.preventDefault(); const on = BP.toggleFav(b.dataset.fav); b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); b.innerHTML = on ? BP.ico.heartFill : BP.ico.heart; BP.toast(on ? BP.t('card_fav_on', 'Guardada en favoritos') : BP.t('card_fav_off', 'Quitada de favoritos')); }); }); };
 
   D.filter = function(avisos, f){
     return avisos.filter(a => {

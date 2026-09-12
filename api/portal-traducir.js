@@ -17,8 +17,8 @@
  *   { titulo, descripcion }
  *   → { ok:true, motor:'mymemory'|'deepl', en:{titulo,descripcion}, pt:{titulo,descripcion}, chars }
  *
- * La línea del corredor responsable no se traduce acá: la ficha la agrega sola
- * en cada idioma, a partir de la persona titular (migración 01).
+ * El portal no agrega ninguna línea de corredor a las descripciones: quien
+ * publica se muestra en la tarjeta del publicador.
  */
 const SUPABASE_URL = process.env.PORTAL_SUPABASE_URL || 'https://dahusnnbyrvltcuaelxj.supabase.co';
 const SUPABASE_ANON_KEY = process.env.PORTAL_SUPABASE_KEY || 'sb_publishable_tSRRvyBksexYaiuwJ5YTQw_R_4VNp-0';

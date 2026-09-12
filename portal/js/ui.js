@@ -7,6 +7,11 @@
   /* Las cualidades que la curación verifica en cada unidad. La zona es dónde empezamos;
      la cualidad es por qué una propiedad entra. Es lo que alimenta la búsqueda por cualidades. */
   BP.CUALIDADES = ['Luminoso','Silencioso','Terraza propia','Balcón','Vista abierta','Piso alto','Apto home office','Acepta mascotas','Reciclado a nuevo','Edificio con amenities','Cochera','Calefacción central'];
+  /* Etiqueta de un dato fijo (cualidad, amenity, característica, plazo, tipo, insignia) en el idioma
+     de la interfaz. El valor guardado y filtrado sigue siendo el castellano; sólo cambia lo que se ve.
+     La clave es ui_dato_ + slug; sin clave, queda el castellano. */
+  BP.slugDato = x => String(x == null ? '' : x).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+  BP.etiqueta = x => x == null ? '' : BP.t('ui_dato_' + BP.slugDato(x), x);
   BP.zonaLabel = z => z === 'GBA Norte' ? 'Zona Norte' : z;
   BP.zonaSlug = z => z.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/gba norte/,'zona-norte').replace(/\s+/g,'-');
   BP.zonaFromSlug = s => BP.ZONAS.find(z => BP.zonaSlug(z) === s) || null;
@@ -23,6 +28,11 @@
   BP.urlFicha = function(a){ return BP.pretty ? 'propiedad-' + encodeURIComponent(a.id) : 'propiedad.html?id=' + encodeURIComponent(a.id); };
   BP.idFromPath = function(){ const seg = decodeURIComponent(location.pathname.split('/').pop() || ''); return /^propiedad-/.test(seg) ? seg.replace(/^propiedad-/, '') : null; };
   BP.OPS = { venta:{label:'Comprar', h:'en venta', per:''}, alquiler:{label:'Alquilar', h:'en alquiler', per:'/mes'}, mediano:{label:'Alquilar · mediano plazo', h:'en alquiler a mediano plazo', per:'/mes'}, largo:{label:'Alquilar · largo plazo', h:'en alquiler a largo plazo', per:'/mes'} };
+  /* Texto de una operación en el idioma de la interfaz: k es 'label' (menú, migas) o 'h' (complemento del título) */
+  BP.opTxt = (op, k) => { const o = BP.OPS[op]; return o ? BP.t('op_' + op + '_' + k, o[k]) : ''; };
+  /* La leyenda de plataforma se traduce; la de alquiler es una cita textual de la Ley 2340 y queda en castellano
+     en todos los idiomas: catálogo y ficha le anteponen una línea traducida (cat_leyenda_alq / ui_leyenda_alq_intro). */
+  BP.leyendaPlataforma = () => BP.t('ui_leyenda_plataforma', BP.LEYENDA_PLATAFORMA);
   BP.LEYENDA_PLATAFORMA = 'BAIREN es un portal de propiedades y no ejerce el corretaje inmobiliario. Cada propiedad es publicada por su titular, por un corredor matriculado o por la desarrolladora, responsables de la operación.';
   BP.LEYENDA_ALQUILER = '"Para los casos de alquiler de vivienda, el monto máximo de comisión que se le puede requerir a los propietarios será el equivalente al cuatro con quince centésimos por ciento (4,15%) del valor total del respectivo contrato. Se encuentra prohibido cobrar a los inquilinos que sean personas físicas comisiones inmobiliarias y gastos de gestoría de informes".';
 
@@ -30,13 +40,13 @@
     if (!u || u.indexOf('/storage/v1/object/public/') === -1) return u;
     return u.replace('/storage/v1/object/public/','/storage/v1/render/image/public/') + (u.indexOf('?')>-1?'&':'?') + 'width=' + w + '&quality=75';
   };
-  BP.fmtUSD = n => n == null ? 'Consultar' : 'USD ' + Math.round(n).toLocaleString('es-AR');
+  BP.fmtUSD = n => n == null ? BP.t('ui_consultar', 'Consultar') : 'USD ' + Math.round(n).toLocaleString('es-AR');
   BP.isoLocal = d => { const x = new Date(d); x.setMinutes(x.getMinutes() - x.getTimezoneOffset()); return x.toISOString().slice(0, 16); };
   BP.fmtN = n => n == null ? '' : Number(n).toLocaleString('es-AR');
   BP.esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   BP.qs = () => new URLSearchParams(location.search);
   BP.diasDesde = iso => { if(!iso) return null; const d=(Date.now()-new Date(iso).getTime())/864e5; return Math.max(0,Math.floor(d)); };
-  BP.hace = iso => { const d=BP.diasDesde(iso); if(d==null) return ''; if(d===0) return 'Publicado hoy'; if(d===1) return 'Publicado ayer'; if(d<30) return 'Publicado hace '+d+' días'; const m=Math.floor(d/30); return 'Publicado hace '+m+(m===1?' mes':' meses'); };
+  BP.hace = iso => { const d=BP.diasDesde(iso); if(d==null) return ''; if(d===0) return BP.t('ui_pub_hoy', 'Publicado hoy'); if(d===1) return BP.t('ui_pub_ayer', 'Publicado ayer'); if(d<30) return BP.tf('ui_pub_dias', 'Publicado hace {n} días', { n: d }); const m=Math.floor(d/30); return m===1 ? BP.t('ui_pub_mes', 'Publicado hace 1 mes') : BP.tf('ui_pub_meses', 'Publicado hace {n} meses', { n: m }); };
 
   /* íconos, trazo fino */
   const I = (d, extra) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ${extra||''}>${d}</svg>`;
@@ -160,7 +170,7 @@
       else input.removeAttribute('aria-activedescendant');
       const abierta = (caja.offsetHeight > 0 || caja.classList.contains('open')) && it.length > 0;
       input.setAttribute('aria-expanded', abierta ? 'true' : 'false');
-      if (abierta) BP.anunciar(it.length === 1 ? 'Una sugerencia' : it.length + ' sugerencias');
+      if (abierta) BP.anunciar(it.length === 1 ? BP.t('ui_una_sug', 'Una sugerencia') : BP.tf('ui_sugs', '{n} sugerencias', { n: it.length }));
     };
     const cerrar = () => { caja.classList.remove('open'); caja.style.display = ''; i = -1; input.setAttribute('aria-expanded', 'false'); input.removeAttribute('aria-activedescendant'); };
     input.addEventListener('keydown', e => {
@@ -185,12 +195,12 @@
     const id = 'err-' + Math.random().toString(36).slice(2, 8);
     host.innerHTML = `<div class="p-error" role="alert" aria-labelledby="${id}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></svg>
-      <div><b id="${id}">${BP.esc(msg || 'No pudimos cargar la información.')}</b>
-      <span>Puede ser tu conexión o algo de nuestro lado. Volvé a intentar en un momento.</span></div>
-      <button type="button" class="p-btn p-btn-sm" data-reintentar>Reintentar</button></div>`;
+      <div><b id="${id}">${BP.esc(msg || BP.t('ui_error_default', 'No pudimos cargar la información.'))}</b>
+      <span>${BP.t('ui_error_ayuda', 'Puede ser tu conexión o algo de nuestro lado. Volvé a intentar en un momento.')}</span></div>
+      <button type="button" class="p-btn p-btn-sm" data-reintentar>${BP.t('ui_reintentar', 'Reintentar')}</button></div>`;
     const b = host.querySelector('[data-reintentar]');
     if (b) b.addEventListener('click', () => { if (reintentar) reintentar(); else location.reload(); });
-    BP.anunciar(msg || 'No pudimos cargar la información.');
+    BP.anunciar(msg || BP.t('ui_error_default', 'No pudimos cargar la información.'));
     if (b) setTimeout(() => { try { b.focus(); } catch (e) {} }, 60);
   };
 
@@ -204,17 +214,17 @@
     var texto = (datos.texto || titulo) + ' ' + url;
     var previo = document.querySelector('.p-compartir'); if (previo) previo.remove();
     var w = document.createElement('div');
-    w.className = 'p-compartir'; w.setAttribute('role', 'dialog'); w.setAttribute('aria-modal', 'true'); w.setAttribute('aria-label', 'Compartir esta propiedad');
+    w.className = 'p-compartir'; w.setAttribute('role', 'dialog'); w.setAttribute('aria-modal', 'true'); w.setAttribute('aria-label', BP.t('ui_compartir_aria', 'Compartir esta propiedad'));
     w.innerHTML = '<div class="velo" data-cerrar></div><div class="hoja">'
       + '<div class="tirador" aria-hidden="true"></div>'
-      + '<p class="ttl">Compartir</p>'
+      + '<p class="ttl">' + BP.t('ui_compartir', 'Compartir') + '</p>'
       + '<p class="sub">' + BP.esc(titulo) + '</p>'
       + '<div class="ops">'
       + '<a class="op" target="_blank" rel="noopener" href="https://wa.me/?text=' + encodeURIComponent(texto) + '">WhatsApp</a>'
-      + '<a class="op" href="mailto:?subject=' + encodeURIComponent(titulo) + '&body=' + encodeURIComponent(texto) + '">Por mail</a>'
-      + '<button type="button" class="op" data-copiar>Copiar el enlace</button>'
-      + (navigator.share ? '<button type="button" class="op" data-sistema>Otras aplicaciones</button>' : '')
-      + '</div><button type="button" class="cerrar" data-cerrar>Cerrar</button></div>';
+      + '<a class="op" href="mailto:?subject=' + encodeURIComponent(titulo) + '&body=' + encodeURIComponent(texto) + '">' + BP.t('ui_por_mail', 'Por mail') + '</a>'
+      + '<button type="button" class="op" data-copiar>' + BP.t('ui_copiar', 'Copiar el enlace') + '</button>'
+      + (navigator.share ? '<button type="button" class="op" data-sistema>' + BP.t('ui_otras_apps', 'Otras aplicaciones') + '</button>' : '')
+      + '</div><button type="button" class="cerrar" data-cerrar>' + BP.t('ui_cerrar', 'Cerrar') + '</button></div>';
     document.body.appendChild(w);
     document.body.style.overflow = 'hidden';
     var hoja = w.querySelector('.hoja');
@@ -230,7 +240,7 @@
     w.querySelectorAll('[data-cerrar]').forEach(function (b) { b.addEventListener('click', cerrar); });
     var bc = w.querySelector('[data-copiar]');
     if (bc) bc.addEventListener('click', function () {
-      if (window.BPM && BPM.copiar) BPM.copiar(bc, url, 'Copiado').then(function (ok) { if (ok) { BP.toast('Enlace copiado.'); setTimeout(cerrar, 900); } });
+      if (window.BPM && BPM.copiar) BPM.copiar(bc, url, BP.t('ui_copiado', 'Copiado')).then(function (ok) { if (ok) { BP.toast(BP.t('ui_enlace_copiado', 'Enlace copiado.')); setTimeout(cerrar, 900); } });
     });
     var bs = w.querySelector('[data-sistema]');
     if (bs) bs.addEventListener('click', function () { navigator.share({ title: titulo, url: url }).catch(function () {}); cerrar(); });
@@ -262,9 +272,9 @@
     });
   };
 
-  /* ── Idioma: ES, PT, EN. Cambia las descripciones de las propiedades, que son
-     lo único traducido hoy, y recuerda la elección. La interfaz sigue en
-     castellano hasta que se traduzcan sus textos. */
+  /* ── Idioma: ES, PT, EN. Cambia las descripciones de las propiedades y la interfaz
+     pública (portada, catálogo, ficha, tarjetas), y recuerda la elección. Al elegir
+     otro idioma la página se recarga y todo se dibuja con BP.lang ya definido. */
   BP.lang = (function(){ try { return localStorage.getItem('bairen_lang') || 'es'; } catch (e) { return 'es'; } })();
   /* Traducción de la interfaz: el diccionario vive en js/i18n-portal.js (window.BP_I18N).
      apply() traduce los elementos marcados con data-i18n (texto), data-i18n-html,
@@ -283,13 +293,15 @@
     }
   };
   BP.t = (key, es) => { const v = BP.i18n.t(key); return v != null ? v : es; };
+  /* Igual que t, con {marcadores} que se reemplazan por vars; el castellano lleva los mismos marcadores */
+  BP.tf = (key, es, vars) => String(BP.t(key, es)).replace(/\{(\w+)\}/g, (m, k) => vars && vars[k] != null ? vars[k] : m);
   BP.idioma = function (root) {
     /* La barra derecha se vuelve a dibujar al abrir sesión, así que el selector
        se crea si falta en vez de vivir sólo en la plantilla. */
     (root || document).querySelectorAll('.p-nav-right').forEach(function (r) {
       if (r.querySelector('.p-lang')) return;
       var g = document.createElement('div');
-      g.className = 'p-lang'; g.setAttribute('role', 'group'); g.setAttribute('aria-label', 'Idioma');
+      g.className = 'p-lang'; g.setAttribute('role', 'group'); g.setAttribute('aria-label', BP.t('idioma', 'Idioma'));
       g.innerHTML = '<button type="button" data-lang="es">ES</button><button type="button" data-lang="pt">PT</button><button type="button" data-lang="en">EN</button>';
       r.insertBefore(g, r.firstChild);
     });
@@ -329,9 +341,9 @@
     const dd = (ttl, items, ancha) => `<div class="col${ancha ? ' ancha' : ''}"><div class="p-dd-ttl">${ttl}</div>` + items.map(i=>`<a href="${i[1]}"${i[2]?` data-op="${i[2]}" data-zona="${BP.esc(i[3])}"`:''}>${i[0]}<span class="p-dd-n" hidden></span></a>`).join('') + `</div>`;
     const zonasLinks = op => BP.ZONAS.map(z=>[BP.zonaLabel(z), BP.urlBuscar({ op, zona: z }), op, z]);
     const html = `
-<nav class="navbar p-navbar" aria-label="Principal">
+<nav class="navbar p-navbar" aria-label="Principal" data-i18n-aria="ui_nav_principal">
   <div class="p-nav-left">
-    <a class="nav-logo" href="index.html" aria-label="BAIREN, inicio"><img src="../bairen_logo_96.png?v=1" alt="BAIREN" width="44" height="44" style="height:44px;width:44px;"></a>
+    <a class="nav-logo" href="index.html" aria-label="BAIREN, inicio" data-i18n-aria="ui_logo_aria"><img src="../bairen_logo_96.png?v=1" alt="BAIREN" width="44" height="44" style="height:44px;width:44px;"></a>
   </div>
   <div class="p-nav-principal">
     <a href="buscar.html?op=venta" data-sec="venta" data-i18n="comprar">Comprar</a>
@@ -339,9 +351,9 @@
     <a href="emprendimientos.html" data-sec="emprendimientos" data-i18n="emprendimientos">Emprendimientos</a>
     <a href="psi.html" data-sec="psi">PSI</a>
   </div>
-  <div class="p-lang p-lang-movil" role="group" aria-label="Idioma"><button type="button" data-lang="es">ES</button><button type="button" data-lang="pt">PT</button><button type="button" data-lang="en">EN</button></div>
+  <div class="p-lang p-lang-movil" role="group" aria-label="Idioma" data-i18n-aria="idioma"><button type="button" data-lang="es">ES</button><button type="button" data-lang="pt">PT</button><button type="button" data-lang="en">EN</button></div>
   <div class="p-nav-right">
-    <div class="p-lang" role="group" aria-label="Idioma"><button type="button" data-lang="es">ES</button><button type="button" data-lang="pt">PT</button><button type="button" data-lang="en">EN</button></div>
+    <div class="p-lang" role="group" aria-label="Idioma" data-i18n-aria="idioma"><button type="button" data-lang="es">ES</button><button type="button" data-lang="pt">PT</button><button type="button" data-lang="en">EN</button></div>
     <button type="button" class="p-ghost p-bell p-solo-sesion" aria-label="Notificaciones" data-i18n-aria="notificaciones" data-notif hidden>${BP.ico.bell}<span class="dot" hidden></span></button>
     <a class="p-ghost p-solo-sesion" href="ingresar.html?volver=contactos" hidden>${BP.ico.chat} <span data-i18n="mis_contactos">Mis contactos</span></a>
     <a class="p-ghost p-fav-anon" href="buscar.html?favs=1" aria-label="Favoritos" data-i18n-aria="favoritos" hidden>${BP.ico.heart}<span data-fav-count hidden></span></a>
@@ -434,7 +446,7 @@
       });
       if (velo) velo.addEventListener('click', () => { if (m.classList.contains('open')) b.click(); });
     }
-    document.querySelectorAll('[data-notif]').forEach(el=>el.addEventListener('click',()=>BP.toast('Ingresá para ver tus notificaciones.')));
+    document.querySelectorAll('[data-notif]').forEach(el=>el.addEventListener('click',()=>BP.toast(BP.t('ui_ingresa_notif', 'Ingresá para ver tus notificaciones.'))));
     BP.syncFavCount(); if (BP.i18n) BP.i18n.apply(document);
   };
 
@@ -454,7 +466,7 @@
       <li><a href="${BP.urlBuscar({ op:'alquiler' })}" data-i18n="alquilar">Alquilar</a></li><li><a href="${BP.urlBuscar({ op:'venta' })}" data-i18n="comprar">Comprar</a></li><li><a href="psi.html">PSI</a></li><li><a href="index.html#indice" data-i18n="ft_indice">Índice BAIREN</a></li><li><a href="publicar.html" data-i18n="publicar">Publicar</a></li></ul></div>
     <div class="ft-col"><div class="ft-col-ttl" data-i18n="ft_zonas">Zonas</div><ul>${zonas}</ul></div>
     <div class="ft-col"><div class="ft-col-ttl" data-i18n="ft_mas">Más</div><ul>
-      <li><a href="publicadores.html" data-i18n="publicadores">Publicadores</a></li><li><a href="emprendimientos.html" data-i18n="emprendimientos">Emprendimientos</a></li><li><a href="criterios.html" data-i18n="ft_criterios">Criterios de selección</a></li><li><a href="legales.html" data-i18n="ft_terminos">Términos y privacidad</a></li><li><a href="mailto:contacto@bairengroup.com">contacto@bairengroup.com</a></li></ul></div>
+      <li><a href="publicadores.html" data-i18n="publicadores">Publicadores</a></li><li><a href="https://os.bairengroup.com" rel="noopener">Bairen OS</a></li><li><a href="emprendimientos.html" data-i18n="emprendimientos">Emprendimientos</a></li><li><a href="criterios.html" data-i18n="ft_criterios">Criterios de selección</a></li><li><a href="legales.html" data-i18n="ft_terminos">Términos y privacidad</a></li><li><a href="mailto:contacto@bairengroup.com">contacto@bairengroup.com</a></li></ul></div>
   </div>
   <div class="footer-bottom"><span>© ${new Date().getFullYear()} BAIREN</span><span><a href="legales.html" data-i18n="ft_uso">Términos de uso</a> · <a href="legales.html#privacidad" data-i18n="ft_priv">Política de privacidad</a></span></div>
 </footer>`;
@@ -467,22 +479,28 @@
     if (!right) return;
     const modeTag = mode === 'local' ? '<span class="p-badge demo" style="margin-left:6px" title="Sin base conectada: los datos quedan en este navegador">modo local</span>' : '';
     if (session) {
-      right.innerHTML = `<button type="button" class="p-ghost p-bell" aria-label="Notificaciones" data-notif>${BP.ico.bell}<span class="dot" hidden></span></button>
-        <a class="p-ghost" href="panel.html#interesados">${BP.ico.chat} Mis contactos</a>
-        <a class="p-ghost" href="buscar.html?favs=1" aria-label="Favoritos">${BP.ico.heart}<span data-fav-count hidden></span></a>
-        <div class="p-crear"><a class="p-btn p-btn-sm" href="publicar-aviso.html" data-crear>Publicar</a><div class="p-crear-pop" hidden><p class="t">¿Quién publica?</p><a href="publicar-aviso.html?perfil=dueno">Soy dueño directo</a><a href="publicar-aviso.html?perfil=inmobiliaria">Soy inmobiliaria o corredor</a><a href="publicar-aviso.html?perfil=desarrolladora">Soy desarrolladora</a></div></div>
-        <div class="p-nav-menu" style="display:flex"><div><button type="button" class="p-btn p-btn-sm p-btn-fill" aria-haspopup="true" style="padding:0 14px">${BP.ico.user} Mi cuenta <span class="car" style="border-color:var(--navy-deeper)"></span></button>
-          <div class="p-dd p-dd-cuenta" style="left:auto;right:0"><div class="p-dd-ttl">${BP.esc(session.email)}${modeTag}</div><a href="panel.html#avisos">Mis avisos</a><a href="importar.html">Importar cartera</a><a href="panel.html#interesados">Interesados</a><a href="panel.html#contactos">Mis contactos</a><a href="buscar.html?favs=1">Favoritos</a><a href="panel.html#alertas">Búsquedas y alertas</a><a href="panel.html#cuenta">Mi cuenta</a><a href="curacion.html" data-curador hidden>Curación</a><a href="#" data-logout>Cerrar sesión</a></div></div></div>`;
+      /* 11/9 noche · El desplegable "Mi cuenta" muestra lo mismo que el riel del panel: las vistas según el perfil
+         de la cuenta (BPStore.rielDe; sin perfil, la lista completa). Los rótulos van por BP.t, con las claves
+         del bloque "header con sesión y perfil" de i18n-portal.js, así el header con sesión también habla EN y PT. */
+      const VISTAS = { avisos: ['mis_avisos', 'Mis avisos', 'panel.html#avisos'], propiedades: ['mis_propiedades', 'Mis propiedades', 'panel.html#propiedades'], interesados: ['interesados', 'Interesados', 'panel.html#interesados'], importar: ['importar_cartera', 'Importar cartera', 'importar.html'], os: ['bairen_os', 'Bairen OS', 'https://os.bairengroup.com'], contactos: ['mis_contactos', 'Mis contactos', 'panel.html#contactos'], favoritos: ['favoritos', 'Favoritos', 'buscar.html?favs=1'], alertas: ['alertas', 'Búsquedas y alertas', 'panel.html#alertas'], cuenta: ['mi_cuenta', 'Mi cuenta', 'panel.html#cuenta'] };
+      const riel = (window.BPStore && BPStore.rielDe) ? BPStore.rielDe(session.perfil || null) : Object.keys(VISTAS);
+      const vistas = riel.map(id => VISTAS[id]).filter(Boolean).map(v => `<a href="${v[2]}">${BP.t(v[0], v[1])}</a>`).join('');
+      right.innerHTML = `<button type="button" class="p-ghost p-bell" aria-label="${BP.esc(BP.t('notificaciones', 'Notificaciones'))}" data-notif>${BP.ico.bell}<span class="dot" hidden></span></button>
+        <a class="p-ghost" href="panel.html#contactos">${BP.ico.chat} ${BP.t('mis_contactos', 'Mis contactos')}</a>
+        <a class="p-ghost" href="buscar.html?favs=1" aria-label="${BP.esc(BP.t('favoritos', 'Favoritos'))}">${BP.ico.heart}<span data-fav-count hidden></span></a>
+        <div class="p-crear"><a class="p-btn p-btn-sm" href="publicar-aviso.html" data-crear>${BP.t('publicar', 'Publicar')}</a><div class="p-crear-pop" hidden><p class="t">${BP.t('quien_publica', '¿Quién publica?')}</p><a href="publicar-aviso.html?perfil=dueno">${BP.t('soy_dueno_directo', 'Soy dueño directo')}</a><a href="publicar-aviso.html?paso=perfil">${BP.t('soy_profesional', 'Inmobiliaria, corredor o desarrolladora')}</a></div></div>
+        <div class="p-nav-menu" style="display:flex"><div><button type="button" class="p-btn p-btn-sm p-btn-fill" aria-haspopup="true" style="padding:0 14px">${BP.ico.user} ${BP.t('mi_cuenta', 'Mi cuenta')} <span class="car" style="border-color:var(--navy-deeper)"></span></button>
+          <div class="p-dd p-dd-cuenta" style="left:auto;right:0"><div class="p-dd-ttl">${BP.esc(session.email)}${modeTag}</div>${vistas}<a href="curacion.html" data-curador hidden>${BP.t('curacion', 'Curación')}</a><a href="#" data-logout>${BP.t('cerrar_sesion', 'Cerrar sesión')}</a></div></div></div>`;
       if (mob) {
-        const cta = mob.querySelector('.m-cta'); if (cta) cta.innerHTML = `<a class="p-btn p-btn-sm" href="publicar-aviso.html">Publicar</a><a class="p-btn p-btn-sm p-btn-fill" href="panel.html">Mi cuenta</a>`;
-        const cuenta = mob.querySelector('.m-cuenta'); if (cuenta) { cuenta.hidden = false; cuenta.innerHTML = `<a href="buscar.html?favs=1">${BP.ico.heart} <span data-i18n="favoritos">Favoritos</span></a><a href="panel.html#interesados">${BP.ico.chat} <span data-i18n="mis_contactos">Mis contactos</span></a>`; }
+        const cta = mob.querySelector('.m-cta'); if (cta) cta.innerHTML = `<a class="p-btn p-btn-sm" href="publicar-aviso.html">${BP.t('publicar', 'Publicar')}</a><a class="p-btn p-btn-sm p-btn-fill" href="panel.html">${BP.t('mi_cuenta', 'Mi cuenta')}</a>`;
+        const cuenta = mob.querySelector('.m-cuenta'); if (cuenta) { cuenta.hidden = false; cuenta.innerHTML = `<a href="buscar.html?favs=1">${BP.ico.heart} <span data-i18n="favoritos">Favoritos</span></a><a href="panel.html#contactos">${BP.ico.chat} <span data-i18n="mis_contactos">Mis contactos</span></a>`; }
       }
-      right.querySelectorAll('[data-logout]').forEach(b => b.addEventListener('click', async e => { e.preventDefault(); await window.BPStore.signOut(); BP.toast('Sesión cerrada.'); setTimeout(() => location.href = 'index.html', 600); }));
+      right.querySelectorAll('[data-logout]').forEach(b => b.addEventListener('click', async e => { e.preventDefault(); await window.BPStore.signOut(); BP.toast(BP.t('ui_sesion_cerrada', 'Sesión cerrada.')); setTimeout(() => location.href = 'index.html', 600); }));
       if (window.BPStore) window.BPStore.isCurador().then(ok => { right.querySelectorAll('[data-curador]').forEach(a => a.hidden = !ok); });
     } else if (mode === 'local') {
       const ing = right.querySelector('a[href="ingresar.html"]'); if (ing && !ing.dataset.tagged) { ing.dataset.tagged = '1'; ing.insertAdjacentHTML('afterend', modeTag); }
     }
-    document.querySelectorAll('[data-notif]').forEach(el => el.addEventListener('click', () => BP.toast(session ? 'No tenés notificaciones nuevas.' : 'Ingresá para ver tus notificaciones.')));
+    document.querySelectorAll('[data-notif]').forEach(el => el.addEventListener('click', () => BP.toast(session ? BP.t('ui_sin_notif', 'No tenés notificaciones nuevas.') : BP.t('ui_ingresa_notif', 'Ingresá para ver tus notificaciones.'))));
     BP.syncFavCount(); if (BP.i18n) BP.i18n.apply(document);
   };
   /* Después de cargar los datos: cada enlace de barrio dice cuántas unidades tiene,
@@ -491,7 +509,7 @@
     document.querySelectorAll('.p-dd a[data-op]').forEach(a => {
       const n = avisos.filter(x => x.op === a.dataset.op && x.zona === a.dataset.zona && !x.reservado).length;
       const tag = a.querySelector('.p-dd-n');
-      if (tag) { tag.textContent = n ? n : 'sin unidades'; tag.hidden = false; }
+      if (tag) { tag.textContent = n ? n : BP.t('ui_sin_unidades', 'sin unidades'); tag.hidden = false; }
       a.classList.toggle('zero', n === 0);
     });
   };
