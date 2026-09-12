@@ -60,7 +60,7 @@ const TABLAS = [
   { nombre: 'operaciones', pk: ['id'] },
   { nombre: 'sincronizaciones', pk: ['id'] },
   { nombre: 'precios_historial', pk: ['id'] },
-  { nombre: 'vistas', pk: ['id'], identidad: true, ventana: 'creado_en' },     /* telemetría: solo los últimos VENTANA_DIAS */
+  { nombre: 'vistas', pk: ['id'], identidad: true, ventana: 'fecha' },     /* telemetría: solo los últimos VENTANA_DIAS */
   { nombre: 'eventos', pk: ['id'], identidad: true, ventana: 'creado_en' },
 ];
 
