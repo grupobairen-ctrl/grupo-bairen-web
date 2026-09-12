@@ -38,7 +38,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://dahusnnbyrvltcuaelxj.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260912q"><link rel="stylesheet" href="css/catalogo.css?v=20260912q"><link rel="stylesheet" href="css/portal.css?v=20260912q">
+  <link rel="stylesheet" href="css/base.css?v=20260912r"><link rel="stylesheet" href="css/catalogo.css?v=20260912r"><link rel="stylesheet" href="css/portal.css?v=20260912r">
   <style>
     .p-cur{background:var(--p-card);border:1px solid var(--p-line);border-radius:var(--p-radius);padding:18px;margin-bottom:14px;display:grid;grid-template-columns:200px 1fr;gap:18px}
     .p-cur .ph{aspect-ratio:4/3;border-radius:8px;overflow:hidden;background:var(--p-tray)} .p-cur .ph img{width:100%;height:100%;object-fit:cover}
@@ -63,7 +63,7 @@
   <div id="out" role="tabpanel" aria-busy="true"><div class="p-skel-panel" aria-hidden="true"><div class="p-skel-line row"></div><div class="p-skel-line row"></div></div></div>
 </div></section>
 <div id="pFooter"></div>
-<script src="supabase-portal.js" defer></script><script src="js/errores.js?v=20260912q" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260912q" defer></script><script src="js/i18n-portal.js?v=20260912q" defer></script><script src="js/ui.js?v=20260912q" defer></script><script src="js/store.js?v=20260912q" defer></script><script src="js/data.js?v=20260912q" defer></script>
+<script src="supabase-portal.js" defer></script><script src="js/errores.js?v=20260912r" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260912r" defer></script><script src="js/i18n-portal.js?v=20260912r" defer></script><script src="js/ui.js?v=20260912r" defer></script><script src="js/store.js?v=20260912r" defer></script><script src="js/data.js?v=20260912r" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -167,6 +167,8 @@ document.addEventListener('DOMContentLoaded', function(){
     const partes = [tam(r.bytes), r.tablas != null ? BP.fmtN(r.tablas) + (r.tablas === 1 ? ' tabla' : ' tablas') : ''].filter(Boolean);
     return `<div class="p-sis-resp${r.ok ? '' : ' no'}"><dt>Último respaldo</dt><dd><b>${hace(cuando)}</b> <span>· ${fecha(cuando)}</span>${partes.length ? ' · ' + partes.join(' · ') : ''}${!r.ok && r.motivo ? `<small>${BP.esc(r.motivo)}</small>` : ''}</dd></div>`;
   }
+  /* Botón para hacer la copia sin claves ni Terminal: usa la sesión del curador. */
+  const botonRespaldo = () => `<div class="p-sis-acts"><button type="button" class="p-btn p-btn-sm" data-respaldo>Hacer copia ahora</button><span class="p-sis-res${SIS.resR ? ' ' + SIS.resR.tipo : ''}" data-respaldo-res role="status" aria-live="polite">${SIS.resR ? BP.esc(SIS.resR.msg) : ''}</span></div>`;
   /* 12/9 · Errores del navegador: el total de eventos error_js en 24 h y los cinco mensajes más repetidos, con la página
      donde más pasó, las veces y la última vez. total null: la tabla no respondió. */
   function seccionErrores(total, top){
@@ -211,7 +213,7 @@ document.addEventListener('DOMContentLoaded', function(){
     /* Hoy */
     const h = d.hoy;
     if (h) { const fila = (rot, val, tab) => `<div><dt>${tab ? `<a href="#${tab}" data-tab="${tab}">${rot}</a>` : rot}</dt><dd>${val == null && rot === 'Alertas enviadas hoy' && c.migracion04 === false ? '<small>sin migración 04</small>' : n(val)}</dd></div>`;
-      html += `<section class="p-sis-sec"><h2>Hoy<small>Totales en la base y actividad del día.</small></h2><div><dl class="p-sis-hoy">${fila('Avisos publicados', h.avisos_publicados)}${fila('En revisión', h.en_revision, 'cola')}${fila('Verificaciones pendientes', h.verificaciones_pendientes, 'pubs')}${fila('Consultas en 24 h', h.consultas_24h)}${fila('Alertas activas', h.alertas_activas)}${fila('Alertas enviadas hoy', h.alertas_enviadas)}${filaRespaldo(d.respaldo)}</dl></div></section>`; }
+      html += `<section class="p-sis-sec"><h2>Hoy<small>Totales en la base y actividad del día.</small></h2><div><dl class="p-sis-hoy">${fila('Avisos publicados', h.avisos_publicados)}${fila('En revisión', h.en_revision, 'cola')}${fila('Verificaciones pendientes', h.verificaciones_pendientes, 'pubs')}${fila('Consultas en 24 h', h.consultas_24h)}${fila('Alertas activas', h.alertas_activas)}${fila('Alertas enviadas hoy', h.alertas_enviadas)}${filaRespaldo(d.respaldo)}</dl>${botonRespaldo()}</div></section>`; }
     /* Errores del navegador, últimas 24 h (los guarda portal/js/errores.js como evento error_js) */
     if (h) html += seccionErrores(h.errores_24h, h.errores_24h_top);
     /* Cron */
@@ -223,9 +225,30 @@ document.addEventListener('DOMContentLoaded', function(){
     out.innerHTML = html;
     out.querySelectorAll('[data-tab]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); window.scrollTo(0, 0); activar(a.dataset.tab); }));
     const b = out.querySelector('[data-sync]'); if (b) b.addEventListener('click', () => sincronizar(b));
+    const br = out.querySelector('[data-respaldo]'); if (br) br.addEventListener('click', () => respaldarAhora(br));
   }
   /* POST /api/portal-sync con el mismo Bearer: respeta el freno de 10 minutos. El resultado queda en la misma fila;
      mientras corre, el grupo lleva aria-busy (el cursor de espera vive ahí, el botón deshabilitado no recibe eventos). */
+  async function respaldarAhora(btn){
+    if (btn.disabled) return;
+    const res = out.querySelector('[data-respaldo-res]'), grupo = btn.closest('.p-sis-acts');
+    btn.disabled = true; btn.setAttribute('aria-busy', 'true'); if (grupo) grupo.setAttribute('aria-busy', 'true'); res.className = 'p-sis-res'; res.textContent = 'Copiando la base…';
+    const token = await tokenCurador();
+    let r = null, j = null;
+    if (token) { try { r = await fetch('/api/portal-respaldo', { method: 'POST', headers: { Accept: 'application/json', Authorization: 'Bearer ' + token } }); try { j = await r.json(); } catch (e) { j = null; } } catch (e) { r = null; } }
+    let msg, tipo = 'ok';
+    if (!token) { msg = SIN_FUNCION; tipo = 'error'; }
+    else if (!r) { msg = 'Sin conexión con el servidor.'; tipo = 'error'; }
+    else if (r.status === 404 || (!j && r.status < 500)) { msg = SIN_FUNCION; tipo = 'error'; }
+    else if (r.status === 401) { msg = SIN_SESION; tipo = 'error'; }
+    else if (r.status === 503) { msg = 'Falta ' + ((j && j.falta) || 'configuración en Vercel') + '.'; tipo = 'error'; }
+    else if (r.ok && j && j.ok) { msg = 'Listo: ' + tam(j.bytes) + ', ' + BP.fmtN(j.tablas || 0) + ' tablas, guardada en ' + BP.esc(j.ruta || '') + '.'; }
+    else { msg = 'No se pudo: ' + ((j && j.error) || ('respuesta ' + r.status)) + '.'; tipo = 'error'; }
+    SIS.resR = { msg, tipo };
+    btn.disabled = false; btn.removeAttribute('aria-busy'); if (grupo) grupo.removeAttribute('aria-busy');
+    res.className = 'p-sis-res ' + tipo; res.textContent = msg;
+    if (tipo === 'ok') renderSistema();
+  }
   async function sincronizar(btn){
     if (btn.disabled) return;
     const res = out.querySelector('[data-sync-res]'), grupo = btn.closest('.p-sis-acts');

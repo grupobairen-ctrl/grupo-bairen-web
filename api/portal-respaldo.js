@@ -21,7 +21,8 @@ module.exports = async (req, res) => {
   const json = A.preparar(req, res, 'GET, POST');
   if (req.method === 'OPTIONS') { res.statusCode = 204; return res.end(); }
   if (req.method !== 'GET' && req.method !== 'POST') return json(405, { error: 'GET o POST' });
-  if (!A.conCron(req) && !A.conClave(req)) return json(401, { error: 'sin autorización' });
+  /* Cron, clave del equipo o sesión de un curador (el botón "Hacer copia ahora" de Curación → Sistema) */
+  if (!A.conCron(req) && !A.conClave(req) && !(await A.curadorDeSesion(req))) return json(401, { error: 'sin autorización' });
   if (!A.tieneServiceKey()) return json(503, { configured: false, falta: 'PORTAL_SUPABASE_SERVICE_KEY' });
   const q = A.query(req);
   if (q.estado === '1') return json(200, await ultimoRespaldo());
