@@ -28,7 +28,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://dahusnnbyrvltcuaelxj.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260912k"><link rel="stylesheet" href="css/catalogo.css?v=20260912k"><link rel="stylesheet" href="css/portal.css?v=20260912k">
+  <link rel="stylesheet" href="css/base.css?v=20260912l"><link rel="stylesheet" href="css/catalogo.css?v=20260912l"><link rel="stylesheet" href="css/portal.css?v=20260912l">
   <style>body{padding-top:0}#ficha>.p-ficha-top,#ficha>.p-ficha,#ficha>section{max-width:var(--p-max);margin:0 auto;padding-left:24px;padding-right:24px}#ficha>.p-ficha-top{padding-top:88px}@media(max-width:900px){#ficha>.p-ficha-top{padding-top:76px}}.p-video{aspect-ratio:16/9;background:#0b1220;border-radius:16px;overflow:hidden}.p-video iframe,.p-video video{width:100%;height:100%;border:0;display:block}</style>
 </head>
 <body class="p-product p-ficha-page">
@@ -39,8 +39,8 @@
 <div id="pFooter"></div>
 
 <script src="supabase-portal.js" defer></script>
-<script src="js/iconos-amenities.js?v=20260912k" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260912k" defer></script><script src="js/i18n-portal.js?v=20260912k" defer></script><script src="js/ui.js?v=20260912k" defer></script><script src="js/store.js?v=20260912k" defer></script>
-<script src="js/data.js?v=20260912k" defer></script>
+<script src="js/iconos-amenities.js?v=20260912l" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260912l" defer></script><script src="js/i18n-portal.js?v=20260912l" defer></script><script src="js/ui.js?v=20260912l" defer></script><script src="js/store.js?v=20260912l" defer></script>
+<script src="js/data.js?v=20260912l" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -134,7 +134,7 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip">${fotos.map((f,i) => `<but
     <div>
       <h2 class="p-sec-t">${T('ficha_preguntale', 'Preguntale a quien publica')}</h2>
       <p class="p-kicker" style="margin-bottom:10px">${TF('ficha_elegi', 'Elegí una o escribí la tuya. Le llega directo a {p}.', { p: BP.esc(pubNombre) })}</p>
-      <div class="p-quick" id="quick"><button type="button">${T('ficha_q1', '¿Sigue disponible?')}</button><button type="button">${T('ficha_q2', '¿Valor de las expensas?')}</button><button type="button">${T('ficha_q3', '¿En qué piso está?')}</button><button type="button">${T('ficha_q4', '¿Cuándo puedo visitarla?')}</button></div>
+      <div class="p-quick" id="quick"><button type="button" aria-pressed="false">${T('ficha_q1', '¿Sigue disponible?')}</button><button type="button" aria-pressed="false">${T('ficha_q2', '¿Valor de las expensas?')}</button><button type="button" aria-pressed="false">${T('ficha_q3', '¿En qué piso está?')}</button><button type="button" aria-pressed="false">${T('ficha_q4', '¿Cuándo puedo visitarla?')}</button></div>
       <div class="p-qrow"><input type="text" id="qText" placeholder="${T('ficha_q_ph', 'Escribí tu consulta')}" maxlength="200" aria-label="${T('ficha_q_aria', 'Tu consulta')}" autocomplete="off"><button type="button" class="p-btn p-btn-navy" id="qSend">${T('ficha_enviar', 'Enviar')}</button></div>
     </div>
     <div class="p-pub-block">
@@ -269,14 +269,23 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip">${fotos.map((f,i) => `<but
   const activarTab = b => { tabBtns.forEach(x => { const on = x === b; x.classList.toggle('on', on); x.setAttribute('aria-selected', on ? 'true' : 'false'); x.tabIndex = on ? 0 : -1; }); ['gen','serv','amb'].forEach(k => document.getElementById('tab-' + k).hidden = k !== b.dataset.tab); };
   tabBtns.forEach((b, i) => { b.addEventListener('click', () => activarTab(b)); b.addEventListener('keydown', e => { if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return; e.preventDefault(); const n = tabBtns[(i + (e.key === 'ArrowRight' ? 1 : tabBtns.length - 1)) % tabBtns.length]; activarTab(n); n.focus(); }); });
   const mensaje = document.getElementById('mensaje'), qText = document.getElementById('qText');
-  document.querySelectorAll('#quick button').forEach(b => b.addEventListener('click', () => { b.classList.toggle('on'); const qs = Array.from(document.querySelectorAll('#quick button.on')).map(x => x.textContent); mensaje.value = msgDefault + (qs.length ? ' ' + qs.join(' ') : '') + (qText.value.trim() ? ' ' + qText.value.trim() : ''); }));
+  /* Pregunta rápida: al tocarla se escribe en la caja de abajo (se puede editar); tocarla de nuevo la saca. Una sola a la vez. */
+  const armarMensaje = () => { const t = qText.value.trim(); mensaje.value = msgDefault + (t ? ' ' + t : ''); };
+  document.querySelectorAll('#quick button').forEach(b => b.addEventListener('click', () => {
+    const estaba = b.classList.contains('on');
+    document.querySelectorAll('#quick button.on').forEach(x => { x.classList.remove('on'); x.setAttribute('aria-pressed', 'false'); });
+    if (estaba) { qText.value = ''; } else { b.classList.add('on'); b.setAttribute('aria-pressed', 'true'); qText.value = b.textContent.trim(); }
+    armarMensaje(); qText.focus();
+  }));
+  qText.addEventListener('input', () => { document.querySelectorAll('#quick button.on').forEach(x => { if (x.textContent.trim() !== qText.value.trim()) { x.classList.remove('on'); x.setAttribute('aria-pressed', 'false'); } }); armarMensaje(); });
+  qText.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); document.getElementById('qSend')?.click(); } });
   const ctaCard = document.getElementById('ctaCard'), contactForm = document.getElementById('contactForm');
   const openForm = () => { ctaCard.hidden = true; const okb = document.getElementById('contactOk'); if (okb) okb.hidden = true; contactForm.hidden = false; contactForm.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => contactForm.querySelector('input[name=nombre]').focus({ preventScroll: true }), 320); };
   const qv = document.getElementById('quiereVisita'); if (qv) qv.addEventListener('change', () => { document.getElementById('visitaCampo').hidden = !qv.checked; if (qv.checked) document.getElementById('visitaFecha').focus(); });
   const btnAbrir = document.getElementById('abrirForm'); if (btnAbrir) btnAbrir.addEventListener('click', openForm);
   const btnVisita = document.getElementById('abrirVisita'); if (btnVisita) btnVisita.addEventListener('click', () => { openForm(); const qv = document.getElementById('quiereVisita'); if (qv && !qv.checked) { qv.checked = true; qv.dispatchEvent(new Event('change')); } });
   const mctaBtn = document.getElementById('mctaBtn'); if (mctaBtn) mctaBtn.addEventListener('click', openForm);
-  const qSendBtn = document.getElementById('qSend'); if (qSendBtn) qSendBtn.addEventListener('click', () => { const t = qText.value.trim(); const qs = Array.from(document.querySelectorAll('#quick button.on')).map(x => x.textContent); if (!t && !qs.length) { BP.toast(T('ficha_toast_elegi', 'Elegí una pregunta o escribí la tuya.')); return; } mensaje.value = msgDefault + (qs.length ? ' ' + qs.join(' ') : '') + (t ? ' ' + t : ''); openForm(); });
+  const qSendBtn = document.getElementById('qSend'); if (qSendBtn) qSendBtn.addEventListener('click', () => { const t = qText.value.trim(); if (!t) { BP.toast(T('ficha_toast_elegi', 'Elegí una pregunta o escribí la tuya.')); qText.focus(); return; } armarMensaje(); openForm(); });
   /* Consulta: validación en línea campo por campo, botón ocupado mientras se registra y un estado de éxito en el lugar del formulario */
   const contactOk = document.getElementById('contactOk');
   document.getElementById('contactForm').addEventListener('submit', async e => {

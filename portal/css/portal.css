@@ -3432,3 +3432,15 @@ body.p-herramienta #out .p-empty.p-ensena .acts .p-btn{margin-top:0}
 /* ── 12/9 madrugada · Bairen OS: enlace en la portada y en el riel del panel ── */
 body.p-home .h-link-os{color:var(--h-oro2);font-style:italic;text-decoration:underline;text-decoration-color:rgba(194,169,104,.45);text-decoration-thickness:1px;text-underline-offset:3px}
 body.p-home .h-link-os:hover{text-decoration-thickness:2px}
+
+/* ── 12/9 madrugada · ficha: el formulario de consulta es una tarjeta clara sobre crema; la tinta vuelve a navy
+   (el tema de producto le daba tinta crema y fondos translúcidos pensados para un panel oscuro) ── */
+body.p-ficha-page .p-form{--p-ink:#131D2D;--p-ink-2:#565E6E;--p-ink-3:#6B7589;color:#131D2D;background:#fff;border:1px solid rgba(42,58,82,.14);border-radius:0;box-shadow:none}
+body.p-ficha-page .p-form h3{color:#131D2D}
+body.p-ficha-page .p-form input,body.p-ficha-page .p-form textarea,body.p-ficha-page .p-form select{color:#131D2D;background:#fff;border:1px solid rgba(42,58,82,.28);border-radius:0}
+body.p-ficha-page .p-form input:focus,body.p-ficha-page .p-form textarea:focus{border-color:var(--gold);box-shadow:0 0 0 2px rgba(194,169,104,.25)}
+body.p-ficha-page .p-form input::placeholder,body.p-ficha-page .p-form textarea::placeholder{color:rgba(19,29,45,.5)}
+body.p-ficha-page .p-form .chk,body.p-ficha-page .p-form .chk span,body.p-ficha-page .p-form .p-note,body.p-ficha-page .p-form label{color:#565E6E}
+body.p-ficha-page .p-form .chk a{color:#131D2D}
+body.p-ficha-page .p-form .chk input{accent-color:#131D2D}
+body.p-ficha-page .p-form .p-err,body.p-ficha-page .p-form [data-err]{color:#b94a4a}
