@@ -231,10 +231,8 @@
   /* ── publicador ───────────────────────────────────────── */
   S.getMyPublicador = async function(){
     if (DEMO && S.mode === 'supabase') {
-      /* 'maxim-rentals' es la fila vieja de la base, hasta que corra la migración 03 (portal sin corredor); si conviven, gana 'bairen' por orden */
-      const { data } = await S.sb.schema('portal').from('publicadores').select('*').in('slug', ['bairen', 'maxim-rentals']).order('slug').limit(1);
-      const p = data && data[0]; if (!p) return null;
-      return p.slug === 'bairen' ? p : Object.assign({}, p, { slug: 'bairen', nombre: 'BAIREN', responsable: null, matricula: null, colegio: null, badge: 'Selección BAIREN', email: 'contacto@bairengroup.com', whatsapp: '5491123106629', telefono: null });
+      const { data } = await S.sb.schema('portal').from('publicadores').select('*').eq('slug', 'bairen').maybeSingle();
+      return data || null;
     }
     if (!S.session) return null;
     if (S.mode === 'supabase') {

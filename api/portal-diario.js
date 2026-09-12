@@ -18,21 +18,27 @@
  *   d. resumen a BAIREN (PORTAL_RESUMEN_A o contacto@bairengroup.com): en revisión, verificaciones
  *      pendientes, consultas de 24 h, resultado de la sincronización, alertas enviadas hoy.
  *      Si no hay nada, manda "Sin novedades" igual, para saber que el cron corre.
+ *   e. copia de seguridad de la base (api/_portal/respaldo.js): todas las tablas del esquema portal
+ *      y las cuentas de Auth a portal-respaldos/<año>/<fecha>.json, con retención (30 diarios y el
+ *      primero de cada mes de los últimos 12 meses). Corre antes del resumen, así el resumen dice
+ *      "respaldo de hoy: 412 KB, 18 tablas" o el error. Necesita portal/migracion-07-respaldos.sql.
  *
  * Variables de entorno (ver api/_portal/admin.js): PORTAL_SUPABASE_SERVICE_KEY, CRON_SECRET,
  *   PORTAL_NOTIFY_KEY, RESEND_API_KEY, PORTAL_MAIL_FROM, PORTAL_RESUMEN_A, y las URL/claves con default.
- * Necesita portal/migracion-04-producto.sql (sincronizaciones, precios_historial, alertas_enviadas, alertas.ultimo_envio).
+ * Necesita portal/migracion-04-producto.sql (sincronizaciones, precios_historial, alertas_enviadas, alertas.ultimo_envio)
+ * y portal/migracion-07-respaldos.sql (el bucket de las copias; sin él el paso e falla y el resumen lo dice).
  *
- * Responde 200 {ok, sync, busqueda, precio, resumen, mail, ms} con el detalle de cada paso;
+ * Responde 200 {ok, sync, busqueda, precio, respaldo, resumen, mail, ms} con el detalle de cada paso;
  * los pasos que fallaron traen {error}. Sin RESEND_API_KEY no manda nada y devuelve lo que habría mandado.
  */
 const A = require('./_portal/admin');
 const { sincronizar } = require('./_portal/sync');
 const { alertasDeBusqueda, alertasDePrecio, tituloDe } = require('./_portal/alertas');
+const { ultimoRespaldo } = require('./_portal/respaldo');
 
 const paso = async fn => { try { return await fn(); } catch (e) { return { error: String(e && e.message || e).slice(0, 300) }; } };
 
-async function armarResumen(sync, busqueda, precio) {
+async function armarResumen(sync, busqueda, precio, respaldo) {
   const hace24 = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
   const hoy = A.inicioDelDiaBA().toISOString();
   const [enRevision, verifs, consultas, enviadasHoy] = await Promise.all([
@@ -49,14 +55,29 @@ async function armarResumen(sync, busqueda, precio) {
     consultas: consultas.data.map(c => ({ cuando: c.created_at, canal: c.canal, nombre: c.nombre || null, aviso: c.avisos ? `${tituloDe(c.avisos)} (${c.avisos.codigo})` : (c.aviso_ref || null) })),
     sync: sync && sync.error ? { error: sync.error } : sync && sync.omitida ? { omitida: true, motivo: sync.motivo } : sync ? { altas: sync.altas, cambios: sync.cambios, bajas: sync.bajas, sin_cambios: sync.sin_cambios } : null,
     alertas_enviadas_hoy: enviadasHoy,
+    respaldo: respaldo && respaldo.error ? { error: respaldo.error } : respaldo ? { ruta: respaldo.ruta, bytes: respaldo.bytes, tablas: respaldo.tablas, faltantes: respaldo.faltantes || [], auth_users: respaldo.auth_users, auth_error: respaldo.auth_error || null, borrados: (respaldo.borrados || []).length } : null,
     alertas: { busqueda: busqueda && busqueda.error ? { error: busqueda.error } : busqueda ? { alertas: busqueda.alertas, enviadas: busqueda.enviadas, avisos: busqueda.avisos, ignoradas: busqueda.ignoradas } : null, precio: precio && precio.error ? { error: precio.error } : precio ? { alertas: precio.alertas, bajas: precio.bajas, enviadas: precio.enviadas } : null },
   };
+}
+
+/* "respaldo de hoy: 412 KB, 18 tablas" o el error. html=true escapa para el cuerpo del mail. */
+function textoRespaldo(rb, html) {
+  const e = html ? A.esc : (s => s);
+  if (!rb) return 'no corrió.';
+  if (rb.error) return 'error: ' + e(rb.error);
+  const kb = rb.bytes >= 1048576 ? (rb.bytes / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round((rb.bytes || 0) / 1024)) + ' KB';
+  let s = `${rb.ultimo && !rb.ok ? 'último respaldo (viejo, ' + (rb.motivo || '') + ')' : 'último respaldo'}: ${kb}, ${rb.tablas} tablas`;
+  if (rb.auth_users != null) s += `, ${rb.auth_users} cuentas`;
+  if (rb.auth_error) s += ` (cuentas de Auth sin copiar: ${e(rb.auth_error)})`;
+  if (rb.faltantes && rb.faltantes.length) s += ` (sin ${e(rb.faltantes.join(', '))}: no existen todavía)`;
+  if (rb.borrados) s += `; ${rb.borrados} copias viejas borradas`;
+  return s + '.';
 }
 
 function mailResumen(r) {
   const n = r.en_revision.length, m = r.consultas_24h;
   const subject = `BAIREN · Resumen del ${r.fecha} · ${n} en revisión · ${m} consultas`;
-  const hayNovedad = n || m || r.verificaciones_pendientes.length || (r.sync && (r.sync.altas || r.sync.cambios || r.sync.bajas || r.sync.error)) || r.alertas_enviadas_hoy;
+  const hayNovedad = n || m || r.verificaciones_pendientes.length || (r.sync && (r.sync.altas || r.sync.cambios || r.sync.bajas || r.sync.error)) || r.alertas_enviadas_hoy || (r.respaldo && r.respaldo.error);
   const fecha = d => d ? `${A.fechaBA(d)} ${A.horaBA(d)}` : '';
   const sec = (titulo, inner) => `<h3 style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#6B7589;margin:22px 0 8px">${titulo}</h3>${inner}`;
   const lista = items => items.length ? `<ul style="margin:0;padding-left:18px">${items.map(x => `<li style="margin:4px 0">${x}</li>`).join('')}</ul>` : '<p style="margin:0;color:#6B7589">Nada.</p>';
@@ -69,8 +90,10 @@ function mailResumen(r) {
   cuerpo += sec('Sincronización con la web', `<p style="margin:0">${!s ? 'No corrió.' : s.error ? 'Error: ' + A.esc(s.error) : s.omitida ? 'Omitida (' + A.esc(s.motivo) + ').' : `${s.altas} altas, ${s.cambios} cambios, ${s.bajas} bajas, ${s.sin_cambios} sin cambios.`}</p>`);
   const ab = r.alertas.busqueda, ap = r.alertas.precio;
   cuerpo += sec('Alertas', `<p style="margin:0">Enviadas hoy: ${r.alertas_enviadas_hoy == null ? 'sin dato' : r.alertas_enviadas_hoy}.<br>Búsqueda: ${!ab ? 'no corrió' : ab.error ? 'error: ' + A.esc(ab.error) : `${ab.alertas} alertas, ${ab.enviadas} mails, ${ab.avisos} avisos${Object.keys(ab.ignoradas || {}).length ? ' (filtros ignorados: ' + A.esc(Object.keys(ab.ignoradas).join(', ')) + ')' : ''}`}.<br>Precio: ${!ap ? 'no corrió' : ap.error ? 'error: ' + A.esc(ap.error) : `${ap.alertas} alertas, ${ap.bajas} bajas, ${ap.enviadas} mails`}.</p>`);
+  const rb = r.respaldo;
+  cuerpo += sec('Copia de seguridad', `<p style="margin:0">${textoRespaldo(rb, true)}</p>`);
   cuerpo += `<p style="margin-top:22px"><a href="${A.SITE}curacion" class="btn">Abrir curación</a></p>`;
-  const text = [`Resumen del ${r.fecha}`, hayNovedad ? '' : 'Sin novedades.', `En revisión: ${n}`, `Verificaciones pendientes: ${r.verificaciones_pendientes.length}`, `Consultas en 24 h: ${m}`, `Sincronización: ${!s ? 'no corrió' : s.error ? 'error ' + s.error : s.omitida ? 'omitida' : `${s.altas} altas, ${s.cambios} cambios, ${s.bajas} bajas`}`, `Alertas enviadas hoy: ${r.alertas_enviadas_hoy == null ? 'sin dato' : r.alertas_enviadas_hoy}`].filter(Boolean).join('\n');
+  const text = [`Resumen del ${r.fecha}`, hayNovedad ? '' : 'Sin novedades.', `En revisión: ${n}`, `Verificaciones pendientes: ${r.verificaciones_pendientes.length}`, `Consultas en 24 h: ${m}`, `Sincronización: ${!s ? 'no corrió' : s.error ? 'error ' + s.error : s.omitida ? 'omitida' : `${s.altas} altas, ${s.cambios} cambios, ${s.bajas} bajas`}`, `Alertas enviadas hoy: ${r.alertas_enviadas_hoy == null ? 'sin dato' : r.alertas_enviadas_hoy}`, `Copia de seguridad: ${textoRespaldo(r.respaldo, false)}`].filter(Boolean).join('\n');
   return { subject, html: A.plantilla(cuerpo), text };
 }
 
@@ -87,7 +110,9 @@ module.exports = async (req, res) => {
   const sync = await paso(() => sincronizar({ force: q.force === '1', origen: A.conCron(req) ? 'cron' : 'manual' }));
   const busqueda = await paso(() => alertasDeBusqueda({ simular }));
   const precio = await paso(() => alertasDePrecio({ simular }));
-  const resumen = await paso(() => armarResumen(sync, busqueda, precio));
+  /* e. el respaldo corre en su propio cron (api/portal-respaldo, 09:30 UTC) para no competir con el tope de 60 s; acá solo se informa el último */
+  const respaldo = await paso(async () => { const u = await ultimoRespaldo(); return u && u.fecha ? { ruta: u.ruta, bytes: u.bytes, tablas: u.tablas, ok: u.ok, motivo: u.motivo, ultimo: true } : { error: (u && u.motivo) || 'todavía no hay respaldo' }; });
+  const resumen = await paso(() => armarResumen(sync, busqueda, precio, respaldo));
   let mail;
   if (resumen.error) mail = { enviado: false, motivo: 'resumen con error' };
   else {
@@ -95,5 +120,5 @@ module.exports = async (req, res) => {
     mail = simular ? { enviado: false, motivo: 'simulado', subject: m.subject } : await paso(async () => Object.assign({ subject: m.subject }, await A.enviarMail({ to: A.RESUMEN_A, subject: m.subject, html: m.html, text: m.text })));
     if (mail.error) mail = { enviado: false, motivo: mail.error, subject: m.subject };
   }
-  return json(200, { ok: !(sync.error && busqueda.error && precio.error && resumen.error), sync, busqueda, precio, resumen, mail, ms: Date.now() - t0 });
+  return json(200, { ok: !(sync.error && busqueda.error && precio.error && resumen.error), sync, busqueda, precio, respaldo, resumen, mail, ms: Date.now() - t0 });
 };

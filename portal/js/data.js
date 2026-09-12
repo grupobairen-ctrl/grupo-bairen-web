@@ -7,7 +7,6 @@
   const BP = window.BP;
   const D = {};
 
-  const SLUG_VIEJO = { 'maxim-rentals': 'bairen' };   /* fila vieja de la base; se saca cuando corra migracion-03-portal-sin-corredor.sql */
   D.PUBLICADORES = {
     'bairen': { id:'bairen', tipo:'inmobiliaria', nombre:'BAIREN', responsable:null, matricula:null, colegio:null, badge:'Selección BAIREN', verificado:true, desde:'2026', inicial:'B', portal:true,
       whatsapp:'5491123106629', email:'contacto@bairengroup.com', telefono:null, zonas:['Recoleta','Palermo','Núñez','Puerto Madero','Belgrano'],
@@ -31,7 +30,7 @@
   D.pubDesc = pub => (BP.lang !== 'es' && pub['desc_' + BP.lang]) || pub.desc || '';
   D.pubNombre = pub => pub.tipo === 'dueno' && pub.nombre === 'Dueño directo' ? BP.t('ui_dato_dueno_directo', pub.nombre) : pub.nombre;
   /* Una fila cruda de la base (joins del panel) → el publicador tal como lo muestra el portal */
-  D.pubDeFila = fila => (fila && D.PUBLICADORES[SLUG_VIEJO[fila.slug] || fila.slug]) || fila || {};
+  D.pubDeFila = fila => (fila && D.PUBLICADORES[fila.slug]) || fila || {};
   /* El portal nunca muestra la línea del corredor dentro de una descripción: quien publica se ve en la tarjeta del publicador. */
   D.sinLineaCorredor = s => (s || '').replace(/(^|\n+)[ \t]*(Corredor responsable|Responsible broker|Corretor respons[aá]vel)\s*:[^\n]*/gi, '').trim();
 
@@ -78,7 +77,7 @@
 
   /* aviso del esquema portal (o del modo local) → modelo del portal */
   D.fromStore = async function(r){
-    const pub = r.publicador || null; const pubId = pub ? (SLUG_VIEJO[pub.slug] || pub.slug || pub.id) : 'bairen';
+    const pub = r.publicador || null; const pubId = pub ? (pub.slug || pub.id) : 'bairen';
     const T = (pub && D.titulares[pub.id]) || null;   /* titular con matrícula, de la vista publicador_publico */
     if (pub && !D.PUBLICADORES[pubId]) D.PUBLICADORES[pubId] = Object.assign({ storeId: pub.id, id: pubId, inicial: (pub.nombre||'P').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(), desde: (pub.created_at||'').slice(0,4) || '2026', zonas: pub.zonas || [], desc: pub.descripcion || '', responsable: pub.responsable || pub.nombre, badge: pub.badge || (pub.tipo === 'dueno' ? 'Dueño verificado' : 'Corredor inmobiliario matriculado') }, pub, { id: pubId }, T && T.titular_nombre ? { responsable: T.titular_nombre, matricula: T.titular_matricula ? ((T.titular_colegio || 'CUCICBA') + ' ' + T.titular_matricula) : pub.matricula } : {});
     const fotos = []; for (const f of (r.fotos||[]).slice().sort((a,b)=>(a.orden||0)-(b.orden||0))) { const u = window.BPStore ? await window.BPStore.resolveFoto(f.url) : f.url; if (u) fotos.push(u); }

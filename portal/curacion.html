@@ -38,7 +38,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://dahusnnbyrvltcuaelxj.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260912p"><link rel="stylesheet" href="css/catalogo.css?v=20260912p"><link rel="stylesheet" href="css/portal.css?v=20260912p">
+  <link rel="stylesheet" href="css/base.css?v=20260912q"><link rel="stylesheet" href="css/catalogo.css?v=20260912q"><link rel="stylesheet" href="css/portal.css?v=20260912q">
   <style>
     .p-cur{background:var(--p-card);border:1px solid var(--p-line);border-radius:var(--p-radius);padding:18px;margin-bottom:14px;display:grid;grid-template-columns:200px 1fr;gap:18px}
     .p-cur .ph{aspect-ratio:4/3;border-radius:8px;overflow:hidden;background:var(--p-tray)} .p-cur .ph img{width:100%;height:100%;object-fit:cover}
@@ -63,7 +63,7 @@
   <div id="out" role="tabpanel" aria-busy="true"><div class="p-skel-panel" aria-hidden="true"><div class="p-skel-line row"></div><div class="p-skel-line row"></div></div></div>
 </div></section>
 <div id="pFooter"></div>
-<script src="supabase-portal.js" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260912p" defer></script><script src="js/i18n-portal.js?v=20260912p" defer></script><script src="js/ui.js?v=20260912p" defer></script><script src="js/store.js?v=20260912p" defer></script><script src="js/data.js?v=20260912p" defer></script>
+<script src="supabase-portal.js" defer></script><script src="js/errores.js?v=20260912q" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260912q" defer></script><script src="js/i18n-portal.js?v=20260912q" defer></script><script src="js/ui.js?v=20260912q" defer></script><script src="js/store.js?v=20260912q" defer></script><script src="js/data.js?v=20260912q" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -120,7 +120,9 @@ document.addEventListener('DOMContentLoaded', function(){
      números, nunca valores de claves. Autorización: el JWT de la sesión del curador en Authorization:
      Bearer (el access_token de BPStore.sb.auth.getSession()). Sin base conectada (modo local) o sin
      token no se llama y se dice que se ve en Vercel; un 401 es sesión vencida o mail fuera de
-     portal.curadores. Los pasos de "Falta X" están escritos para alguien que no programa. ── */
+     portal.curadores. Los pasos de "Falta X" están escritos para alguien que no programa.
+     12/9 · En Hoy, la fila "Último respaldo" (respaldo de la respuesta) y, después, la sección "Errores del
+     navegador" (hoy.errores_24h y hoy.errores_24h_top: lo que guarda portal/js/errores.js). ── */
   const SIS = { estado: null, data: null, error: null, res: null };
   const VARS = [
     { k: 'service_key', nombre: 'Sincronización web → portal', vars: ['PORTAL_SUPABASE_SERVICE_KEY'], paso: 'Vercel → proyecto de bairengroup.com → Settings → Environment Variables → Add → PORTAL_SUPABASE_SERVICE_KEY (Production y Preview). El valor sale de Supabase → proyecto del portal → Project Settings → API Keys → service_role (en Legacy API keys). Después: Vercel → Deployments → ··· del último → Redeploy.' },
@@ -155,6 +157,29 @@ document.addEventListener('DOMContentLoaded', function(){
     else { SIS.data = j; SIS.estado = 'ok'; }
     pintarSistema();
   }
+  /* 12/9 · Último respaldo (api/_portal/respaldo.js, por portal-salud): fecha relativa, peso y tablas de la copia más nueva del
+     bucket portal-respaldos. ok es false cuando la copia tiene más de 36 h (el motivo lo dice) o cuando no hay ninguna. */
+  const tam = b => b == null ? '' : b < 1048576 ? Math.max(1, Math.round(b / 1024)) + ' KB' : (b / 1048576).toLocaleString('es-AR', { maximumFractionDigits: 1 }) + ' MB';
+  function filaRespaldo(r){
+    const SIN = 'Todavía no hay respaldo. Corre con el diario a las 07:00; se puede disparar a mano.';
+    if (!r || !r.fecha) { const motivo = r && r.motivo && !/todav[ií]a no hay|sin service key/i.test(r.motivo) ? `<small>${BP.esc(r.motivo)}</small>` : ''; return `<div class="p-sis-resp no"><dt>Último respaldo</dt><dd>${SIN}${motivo}</dd></div>`; }
+    const cuando = r.generado || (r.fecha + 'T03:00:00Z');   /* la fecha del nombre es de Buenos Aires: 00:00 BA = 03:00 UTC */
+    const partes = [tam(r.bytes), r.tablas != null ? BP.fmtN(r.tablas) + (r.tablas === 1 ? ' tabla' : ' tablas') : ''].filter(Boolean);
+    return `<div class="p-sis-resp${r.ok ? '' : ' no'}"><dt>Último respaldo</dt><dd><b>${hace(cuando)}</b> <span>· ${fecha(cuando)}</span>${partes.length ? ' · ' + partes.join(' · ') : ''}${!r.ok && r.motivo ? `<small>${BP.esc(r.motivo)}</small>` : ''}</dd></div>`;
+  }
+  /* 12/9 · Errores del navegador: el total de eventos error_js en 24 h y los cinco mensajes más repetidos, con la página
+     donde más pasó, las veces y la última vez. total null: la tabla no respondió. */
+  function seccionErrores(total, top){
+    let cuerpo;
+    if (total == null) cuerpo = '<p class="p-sis-lead">Sin datos.</p><p class="p-sis-err">La tabla portal.eventos no respondió.</p>';
+    else if (!total) cuerpo = '<p class="p-sis-lead">Sin errores registrados en 24 h.</p>';
+    else {
+      cuerpo = `<p class="p-sis-lead vivo"><b>${BP.fmtN(total)} ${total === 1 ? 'error' : 'errores'}</b> <span>· últimas 24 h</span></p>`;
+      const lista = Array.isArray(top) ? top.slice(0, 5) : [];
+      if (lista.length) cuerpo += `<ol class="p-sis-errs">${lista.map(e => { const msg = String(e.msg || 'sin mensaje'); return `<li><code class="msg">${BP.esc(msg.length > 120 ? msg.slice(0, 120) + '…' : msg)}</code><span class="meta">${e.pagina ? BP.esc(e.pagina) + ' · ' : ''}<span class="n">${e.n === 1 ? '1 vez' : BP.fmtN(e.n) + ' veces'}</span>${e.ultimo ? ' · último ' + hace(e.ultimo) : ''}</span></li>`; }).join('')}</ol>`;
+    }
+    return `<section class="p-sis-sec"><h2>Errores del navegador<small>Últimas 24 h: lo que falló en la pantalla de la gente. Un mismo error se guarda una vez por sesión, sin datos personales.</small></h2><div>${cuerpo}</div></section>`;
+  }
   function filaMotor(nombre, st, txt, pasoHtml){ return `<div class="${st}"><dt>${nombre}</dt><dd><span class="st"><i class="mk ${st}" aria-hidden="true">${st === 'ok' ? BP.ico.check : ''}</i><span>${txt}</span></span>${pasoHtml ? `<small class="paso">${pasoHtml}</small>` : ''}</dd></div>`; }
   function pintarSistema(){
     if (SIS.estado === 'sinfuncion') { out.innerHTML = `<div class="p-empty p-ensena"><b>${SIN_FUNCION}</b><p>Acá se ve qué variables del motor están configuradas y cómo cargar las que faltan, cuándo corrió la última sincronización de la web, los números del día y el cron. Abrí Curación en la web publicada, con tu sesión.</p></div>`; return; }
@@ -186,7 +211,9 @@ document.addEventListener('DOMContentLoaded', function(){
     /* Hoy */
     const h = d.hoy;
     if (h) { const fila = (rot, val, tab) => `<div><dt>${tab ? `<a href="#${tab}" data-tab="${tab}">${rot}</a>` : rot}</dt><dd>${val == null && rot === 'Alertas enviadas hoy' && c.migracion04 === false ? '<small>sin migración 04</small>' : n(val)}</dd></div>`;
-      html += `<section class="p-sis-sec"><h2>Hoy<small>Totales en la base y actividad del día.</small></h2><div><dl class="p-sis-hoy">${fila('Avisos publicados', h.avisos_publicados)}${fila('En revisión', h.en_revision, 'cola')}${fila('Verificaciones pendientes', h.verificaciones_pendientes, 'pubs')}${fila('Consultas en 24 h', h.consultas_24h)}${fila('Alertas activas', h.alertas_activas)}${fila('Alertas enviadas hoy', h.alertas_enviadas)}</dl></div></section>`; }
+      html += `<section class="p-sis-sec"><h2>Hoy<small>Totales en la base y actividad del día.</small></h2><div><dl class="p-sis-hoy">${fila('Avisos publicados', h.avisos_publicados)}${fila('En revisión', h.en_revision, 'cola')}${fila('Verificaciones pendientes', h.verificaciones_pendientes, 'pubs')}${fila('Consultas en 24 h', h.consultas_24h)}${fila('Alertas activas', h.alertas_activas)}${fila('Alertas enviadas hoy', h.alertas_enviadas)}${filaRespaldo(d.respaldo)}</dl></div></section>`; }
+    /* Errores del navegador, últimas 24 h (los guarda portal/js/errores.js como evento error_js) */
+    if (h) html += seccionErrores(h.errores_24h, h.errores_24h_top);
     /* Cron */
     const cr = d.cron || { ruta: '/api/portal-diario', horario: '10:00 UTC (07:00 Buenos Aires)' };
     const base = /bairengroup\.com$|\.vercel\.app$/.test(location.hostname) ? location.origin : 'https://www.bairengroup.com';
