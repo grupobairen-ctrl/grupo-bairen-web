@@ -20,7 +20,6 @@
 const A = require('./admin');
 const { zonaDe, ZONAS_PORTAL } = require('./zonas');
 
-const SLUG_VIEJO = { 'maxim-rentals': 'bairen' };   // igual que data.js, hasta que corra migracion-03
 const CLAVES = ['op', 'tipo', 'zonas', 'q', 'pub', 'emp', 'reservadas', 'amb', 'dorm', 'banos', 'coch', 'pmin', 'pmax', 'expmax', 'm2min', 'm2max', 'antig', 'amen', 'cual', 'amoblado', 'dueno', 'video', 'hace'];
 const NO_FILTRAN = ['sort', 'page', 'key', 'favs'];
 const SELECT_AVISOS = 'id,codigo,slug,operacion,tipo,titulo,direccion,unidad,barrio,zona,precio,moneda,expensas,m2_total,ambientes,dormitorios,banos,cocheras,antiguedad,amoblado,amenities,cualidades_verificadas,descripcion,video_url,estado,publicado_en,created_at,publicadores(slug,tipo)';
@@ -35,7 +34,7 @@ function clavesIgnoradas(f) { return Object.keys(f || {}).filter(k => CLAVES.ind
 /* Fila de la base → lo que D.filter mira (mismos nombres que fromStore). */
 function modelo(r) {
   const pub = r.publicadores || r.publicador || {};
-  const pubId = SLUG_VIEJO[pub.slug] || pub.slug || r.publicador_id || 'bairen';
+  const pubId = pub.slug || r.publicador_id || 'bairen';
   const zona = zonaDe(r.barrio) || r.zona || r.barrio;
   const dias = r.publicado_en ? Math.max(0, Math.floor((Date.now() - Date.parse(r.publicado_en)) / 864e5)) : null;
   return {

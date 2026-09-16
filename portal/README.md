@@ -67,7 +67,7 @@ Tres funciones de Vercel (`api/`) más los módulos compartidos de `api/_portal/
 **Variables en Vercel** (Settings → Environment Variables, Production; después de cargarlas, redeploy)
 | Variable | Qué es | Dónde se consigue |
 |---|---|---|
-| `PORTAL_SUPABASE_SERVICE_KEY` | **nueva**. Service role del proyecto del portal (`dahusnnbyrvltcuaelxj`). Solo en el servidor, nunca en el repo ni en el navegador. Sin ella, sync, diario y salud responden 503 `{configured:false, falta:'PORTAL_SUPABASE_SERVICE_KEY'}` y nada se rompe. | Supabase → proyecto del portal → Settings → API → `service_role` |
+| `PORTAL_SUPABASE_SERVICE_KEY` | **nueva**. Service role del proyecto unificado bairen OS (`jdatlsrujgfmvyuhoffg`), donde vive el esquema `portal` desde el 16/9/2026 (antes, el proyecto propio `dahusnnbyrvltcuaelxj`). Solo en el servidor, nunca en el repo ni en el navegador. Sin ella, sync, diario y salud responden 503 `{configured:false, falta:'PORTAL_SUPABASE_SERVICE_KEY'}` y nada se rompe. | Supabase → proyecto del portal → Settings → API → `service_role` |
 | `CRON_SECRET` | **nueva**. Vercel la manda como `Authorization: Bearer` en cada corrida del cron; sin ella el diario responde 401 a todo lo que no traiga `x-portal-key`. | Una cadena larga cualquiera (32 o más caracteres, por ejemplo `openssl rand -hex 32`) |
 | `PORTAL_NOTIFY_KEY` | ya existe. Clave del equipo: header `x-portal-key` para disparar sync y diario a mano y para `?force=1`. | La que ya está cargada |
 | `RESEND_API_KEY`, `PORTAL_MAIL_FROM` | ya existen. Sin la clave, el diario arma todo, no manda y devuelve en el JSON lo que habría mandado. | https://resend.com → API Keys; remitente con dominio verificado |

@@ -20,8 +20,8 @@
  * El portal no agrega ninguna línea de corredor a las descripciones: quien
  * publica se muestra en la tarjeta del publicador.
  */
-const SUPABASE_URL = process.env.PORTAL_SUPABASE_URL || 'https://dahusnnbyrvltcuaelxj.supabase.co';
-const SUPABASE_ANON_KEY = process.env.PORTAL_SUPABASE_KEY || 'sb_publishable_tSRRvyBksexYaiuwJ5YTQw_R_4VNp-0';
+const SUPABASE_URL = process.env.PORTAL_SUPABASE_URL || 'https://jdatlsrujgfmvyuhoffg.supabase.co';
+const SUPABASE_ANON_KEY = process.env.PORTAL_SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkYXRsc3J1amdmbXZ5dWhvZmZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NzcyNTYsImV4cCI6MjA5NDQ1MzI1Nn0.g9B1EoHkVeAcDJ2KNuMjwMW2_5Y6Xk2IlWjdQRrob2o';
 
 async function usuarioDe(req) {
   const auth = req.headers.authorization || '';

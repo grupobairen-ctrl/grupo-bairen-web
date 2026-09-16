@@ -16,8 +16,8 @@
 /* El portal vive en su propio proyecto, separado del de bairengroup.com.
    Se configuran como variables de entorno en Vercel para no repetir el dato
    en dos lugares; si faltan, cae al proyecto del sitio y avisa. */
-const SUPABASE_URL = process.env.PORTAL_SUPABASE_URL || 'https://dahusnnbyrvltcuaelxj.supabase.co';   // BAIREN PORTAL (proyecto propio desde el 4/9/2026)
-const SUPABASE_ANON_KEY = process.env.PORTAL_SUPABASE_KEY || 'sb_publishable_tSRRvyBksexYaiuwJ5YTQw_R_4VNp-0';
+const SUPABASE_URL = process.env.PORTAL_SUPABASE_URL || 'https://jdatlsrujgfmvyuhoffg.supabase.co';   // BAIREN PORTAL (proyecto propio desde el 4/9/2026)
+const SUPABASE_ANON_KEY = process.env.PORTAL_SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkYXRsc3J1amdmbXZ5dWhvZmZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NzcyNTYsImV4cCI6MjA5NDQ1MzI1Nn0.g9B1EoHkVeAcDJ2KNuMjwMW2_5Y6Xk2IlWjdQRrob2o';
 if (!process.env.PORTAL_SUPABASE_URL) console.warn('[portal-notify] sin PORTAL_SUPABASE_URL en Vercel: usando el proyecto del portal por defecto');
 const SITE = 'https://www.bairengroup.com/portal/';
 const TIPOS = ['consulta', 'aprobado', 'rechazado', 'cambios', 'verificado', 'verificacion_rechazada'];

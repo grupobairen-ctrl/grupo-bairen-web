@@ -33,6 +33,15 @@
 
 begin;
 
+-- Guard (16/9/2026): esta migración NO puede correr después de B1 de la unificación. Su paso 2 borra la
+-- membresía con bairen de toda persona con cuenta (las del equipo) y su paso 1 escribe tipo = 'inmobiliaria',
+-- que el check nuevo rechaza. Si B1 ya corrió (existe portal.membresia_permisos), frena acá y la transacción vuelve atrás.
+do $$ begin
+  if to_regclass('portal.membresia_permisos') is not null then
+    raise exception 'migracion-03: no correr después de B1; el paso 2 borra las membresías del equipo';
+  end if;
+end $$;
+
 -- ---------------------------------------------------------------------
 -- 1. El publicador: el de la carga inicial pasa a ser 'bairen'. Si 'bairen' ya
 --    existe, solo se aseguran sus valores y no se toca nada más.

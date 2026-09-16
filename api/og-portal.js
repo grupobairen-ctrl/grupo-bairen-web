@@ -27,9 +27,9 @@
 const fs = require('fs');
 const path = require('path');
 
-const PORTAL_URL = 'https://dahusnnbyrvltcuaelxj.supabase.co';
+const PORTAL_URL = process.env.PORTAL_SUPABASE_URL || 'https://jdatlsrujgfmvyuhoffg.supabase.co';
 // Clave publishable, pública por diseño (la misma de portal/supabase-portal.js)
-const PORTAL_KEY = 'sb_publishable_tSRRvyBksexYaiuwJ5YTQw_R_4VNp-0';
+const PORTAL_KEY = process.env.PORTAL_SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkYXRsc3J1amdmbXZ5dWhvZmZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NzcyNTYsImV4cCI6MjA5NDQ1MzI1Nn0.g9B1EoHkVeAcDJ2KNuMjwMW2_5Y6Xk2IlWjdQRrob2o';
 const SITE_ROOT = 'https://www.bairengroup.com';
 const OG_FALLBACK = `${SITE_ROOT}/og-logo.jpg`;
 

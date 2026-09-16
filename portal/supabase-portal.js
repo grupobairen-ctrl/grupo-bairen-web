@@ -1,28 +1,27 @@
 /**
  * Supabase del PORTAL — BAIREN
  *
- * El portal vive en su propio proyecto de Supabase, separado del que usa
- * bairengroup.com. Así, si algo se rompe acá, la web que ya vende no se toca.
- * El precio de esa separación: las cuentas del portal no son las del sitio.
+ * Desde el 16/9/2026 el portal comparte proyecto de Supabase con Bairen OS
+ * (proyecto bairen OS, jdatlsrujgfmvyuhoffg, São Paulo): un solo sistema, una
+ * sola base, una sola cuenta. El portal vive en el esquema `portal`; el OS en
+ * `public`. Sigue separado del proyecto de bairengroup.com (la web).
  *
- * ────────────────────────────────────────────────────────────────────────
- * COMPLETAR LAS DOS LÍNEAS DE ABAJO con el proyecto NUEVO:
- *
- *   1. https://app.supabase.com → el proyecto del portal → Project Settings → API
- *   2. "Project URL"                    → PORTAL_SUPABASE_URL
- *   3. La clave "anon public" o "publishable" (NO la "service_role") → PORTAL_SUPABASE_KEY
+ * ─────────────────────────────────────────────────
+ * Las dos líneas de abajo salen de Supabase → proyecto bairen OS → Project Settings → API:
+ *   "Project URL"  → PORTAL_SUPABASE_URL
+ *   "anon public"  → PORTAL_SUPABASE_KEY (la misma que usa el OS; NO la "service_role")
  *
  * La clave pública puede ir en el código: es pública por diseño. Lo que protege
  * los datos son las políticas por fila del esquema, en portal/schema-portal.sql.
  * El único secreto de verdad es la "service_role", que nunca va al navegador.
  *
- * Proyecto: BAIREN PORTAL (dahusnnbyrvltcuaelxj), separado del de bairengroup.com.
- * Configurado el 4/9/2026. La clave es la publishable: es pública por diseño.
- * ────────────────────────────────────────────────────────────────────────
+ * Historia: del 4/9 al 16/9/2026 el portal tuvo proyecto propio (BAIREN PORTAL,
+ * dahusnnbyrvltcuaelxj, Oregon). Se mudó al del OS en el paso A4 de la unificación.
+ * ─────────────────────────────────────────────────
  */
 
-const PORTAL_SUPABASE_URL = 'https://dahusnnbyrvltcuaelxj.supabase.co';
-const PORTAL_SUPABASE_KEY = 'sb_publishable_tSRRvyBksexYaiuwJ5YTQw_R_4VNp-0';
+const PORTAL_SUPABASE_URL = 'https://jdatlsrujgfmvyuhoffg.supabase.co';
+const PORTAL_SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkYXRsc3J1amdmbXZ5dWhvZmZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NzcyNTYsImV4cCI6MjA5NDQ1MzI1Nn0.g9B1EoHkVeAcDJ2KNuMjwMW2_5Y6Xk2IlWjdQRrob2o';
 
 window.bairenReady = new Promise((resolve, reject) => {
   if (!PORTAL_SUPABASE_URL || !PORTAL_SUPABASE_KEY) {

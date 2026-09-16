@@ -28,8 +28,8 @@
  *   PORTAL_NOTIFY_KEY            clave del equipo: header x-portal-key para disparar a mano
  *   PORTAL_RESUMEN_A             destinatario del resumen diario (default contacto@bairengroup.com)
  */
-const PORTAL_URL = process.env.PORTAL_SUPABASE_URL || 'https://dahusnnbyrvltcuaelxj.supabase.co';
-const PORTAL_ANON = process.env.PORTAL_SUPABASE_KEY || 'sb_publishable_tSRRvyBksexYaiuwJ5YTQw_R_4VNp-0';
+const PORTAL_URL = process.env.PORTAL_SUPABASE_URL || 'https://jdatlsrujgfmvyuhoffg.supabase.co';
+const PORTAL_ANON = process.env.PORTAL_SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkYXRsc3J1amdmbXZ5dWhvZmZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NzcyNTYsImV4cCI6MjA5NDQ1MzI1Nn0.g9B1EoHkVeAcDJ2KNuMjwMW2_5Y6Xk2IlWjdQRrob2o';
 const SERVICE_KEY = process.env.PORTAL_SUPABASE_SERVICE_KEY || '';
 const WEB_URL = process.env.WEB_SUPABASE_URL || 'https://nmrjyyrhwjroonrppnka.supabase.co';
 const WEB_KEY = process.env.WEB_SUPABASE_KEY || 'sb_publishable_D0YwiSL5Hm3GyOSx2r1lug_ZV7v46_n';
