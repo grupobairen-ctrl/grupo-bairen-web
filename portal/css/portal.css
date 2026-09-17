@@ -3606,3 +3606,14 @@ body.p-membership .p-faq summary::after{content:'+';position:absolute;right:4px;
 body.p-membership .p-faq details[open] summary::after{content:'\2212'}
 body.p-membership .p-faq p{margin:0 0 18px;font:400 .92rem/1.6 var(--font-body);color:var(--text-mid);max-width:68ch}
 @media(max-width:820px){body.p-membership .p-mb-head{align-items:flex-start}}
+
+/* 16/9 · Membership, versión corta: una línea de condiciones en vez de tabla y reglas; más aire en las tarjetas. */
+body.p-membership .p-mb-linea{margin:0;font:400 .95rem/1.55 var(--font-body);color:var(--text-mid);max-width:52ch}
+body.p-membership .p-planes{margin-top:26px;gap:22px}
+body.p-membership .p-plan{padding:28px 26px 26px}
+body.p-membership .p-plan h3{font-size:1.3rem}
+body.p-membership .p-plan-precio{margin-top:18px;font-size:2rem}
+body.p-membership .p-plan ul{margin-top:16px}
+body.p-membership .p-plan li{padding:9px 0}
+body.p-membership .p-mb-condiciones{margin:22px 0 0;font:400 .84rem/1.6 var(--font-body);color:var(--text-mid);letter-spacing:.01em}
+body.p-membership #preguntas .p-h2{font-size:1.35rem}
