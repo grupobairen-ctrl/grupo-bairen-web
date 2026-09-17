@@ -41,7 +41,7 @@ function modelo(r) {
     op: r.operacion, tipoProp: r.tipo || 'Departamento', zona, precio: r.precio == null ? null : Number(r.precio), expensas: r.expensas == null ? null : Number(r.expensas),
     amb: r.ambientes || null, dorm: r.dormitorios || null, banos: r.banos || null, cocheras: r.cocheras || 0, m2: r.m2_total || null, antiguedad: r.antiguedad == null ? null : Number(r.antiguedad),
     amenities: r.amenities || [], cualidades: r.cualidades_verificadas || [], amoblado: !!r.amoblado, video: !!r.video_url, reservado: r.estado === 'reservado',
-    publicadorId: pubId, pubTipo: pub.tipo || 'inmobiliaria', dias,
+    publicadorId: pubId, pubTipo: pub.tipo || 'profesional', dias,
     texto: [r.titulo || (r.direccion + (r.unidad ? ' · ' + r.unidad : '')), r.direccion, r.barrio, zona, r.descripcion, (r.amenities || []).join(' '), (r.cualidades_verificadas || []).join(' ')].join(' ').toLowerCase(),
   };
 }

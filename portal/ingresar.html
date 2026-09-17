@@ -27,7 +27,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260916m"><link rel="stylesheet" href="css/catalogo.css?v=20260916m"><link rel="stylesheet" href="css/portal.css?v=20260916m">
+  <link rel="stylesheet" href="css/base.css?v=20260917a"><link rel="stylesheet" href="css/catalogo.css?v=20260917a"><link rel="stylesheet" href="css/portal.css?v=20260917a">
 </head>
 <body>
 <div class="p-velo" aria-hidden="true"><span class="w">BAIREN</span></div>
@@ -38,7 +38,7 @@
     <h1 id="ttl">Ingresar</h1>
     <p class="p-sub" id="sub" style="margin-bottom:18px">Favoritos, alertas, tus contactos y, si publicás, tu panel. Sin contraseña: te mandamos un código al mail.</p>
     <form id="stepMail" novalidate><label class="p-sr" for="email" data-i18n="ing_mail">Mail</label><input type="email" name="email" id="email" placeholder="Tu mail" data-i18n-ph="ing_mail_ph" required autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false"><button type="submit" class="p-btn p-btn-fill" style="width:100%" id="btnMail">Continuar</button></form>
-    <form id="stepCode" hidden novalidate><p class="p-note" id="codeMsg" style="margin-bottom:10px" role="status"></p><label class="p-sr" for="code" data-i18n="ing_codigo">Código de seis dígitos</label><input type="text" name="code" id="code" inputmode="numeric" pattern="[0-9]*" maxlength="8" placeholder="Código de seis dígitos" data-i18n-ph="ing_codigo" required autocomplete="one-time-code" autocapitalize="off" spellcheck="false"><button type="submit" class="p-btn p-btn-fill" style="width:100%" id="btnCode">Ingresar</button><p class="p-note" style="text-align:center;margin-top:10px"><a href="#" id="again" style="text-decoration:underline">Reenviar código</a> · <a href="#" id="back" style="text-decoration:underline" data-i18n="ing_cambiar_mail">Cambiar mail</a></p></form>
+    <form id="stepCode" hidden novalidate><p class="p-note" id="codeMsg" style="margin-bottom:10px" role="status"></p><label class="p-sr" for="code" data-i18n="ing_codigo">Código de ocho dígitos</label><input type="text" name="code" id="code" inputmode="numeric" pattern="[0-9]*" maxlength="8" placeholder="Código de ocho dígitos" data-i18n-ph="ing_codigo" required autocomplete="one-time-code" autocapitalize="off" spellcheck="false"><button type="submit" class="p-btn p-btn-fill" style="width:100%" id="btnCode">Ingresar</button><p class="p-note" style="text-align:center;margin-top:10px"><a href="#" id="again" style="text-decoration:underline">Reenviar código</a> · <a href="#" id="back" style="text-decoration:underline" data-i18n="ing_cambiar_mail">Cambiar mail</a></p></form>
     <form id="stepPerfil" hidden novalidate>
       <fieldset class="p-quien" aria-labelledby="ttl">
         <label class="p-quien-op"><input type="radio" name="perfil" value="busca"><i aria-hidden="true">1</i><span class="tx"><b data-i18n="ing_op_busca">Busco propiedad</b><small data-i18n="ing_op_busca_s">Alquilar o comprar. Favoritos, alertas y tus consultas.</small></span></label>
@@ -54,7 +54,7 @@
   </div>
 </div></section>
 <div id="pFooter"></div>
-<script src="supabase-portal.js?v=20260916m" defer></script><script src="js/errores.js?v=20260916m" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260916m" defer></script><script src="js/i18n-portal.js?v=20260916m" defer></script><script src="js/ui.js?v=20260916m" defer></script><script src="js/store.js?v=20260916m" defer></script><script src="js/data.js?v=20260916m" defer></script>
+<script src="supabase-portal.js?v=20260917a" defer></script><script src="js/errores.js?v=20260917a" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260917a" defer></script><script src="js/i18n-portal.js?v=20260917a" defer></script><script src="js/ui.js?v=20260917a" defer></script><script src="js/store.js?v=20260917a" defer></script><script src="js/data.js?v=20260917a" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function(){
   document.getElementById('back').addEventListener('click', e => { e.preventDefault(); const volver = () => { fc.hidden = true; fm.hidden = false; document.getElementById('social').hidden = false; }; if (window.BPM && BPM.cambioDePaso) BPM.cambioDePaso(document.querySelector('.p-login'), volver, -1); else volver(); });
   fc.addEventListener('submit', async e => {
     e.preventDefault(); const code = document.getElementById('code'), b = document.getElementById('btnCode');
-    if (!/^\d{6,8}$/.test(code.value.trim())) { BP.errorCampo('code', BP.t('ing_err_codigo', 'El código tiene seis dígitos.')); return; }
+    if (!/^\d{6,8}$/.test(code.value.trim())) { BP.errorCampo('code', BP.t('ing_err_codigo', 'El código tiene ocho dígitos.')); return; }
     b.disabled = true; b.textContent = BP.t('ing_verificando', 'Verificando…');
     let r; try { r = await BPStore.verifyCode(mail, code.value); } catch (err) { r = { ok: false, msg: err.message || BP.t('ing_no_verifico', 'No se pudo verificar.') }; }
     if (!r.ok) { b.disabled = false; b.textContent = T.ingresar; BP.errorCampo('code', r.msg); code.select(); return; }

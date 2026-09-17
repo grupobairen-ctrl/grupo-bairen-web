@@ -389,7 +389,7 @@ window.BP_I18N = {
     pan_title: 'Painel · BAIREN', pan_modo_local: 'modo local', pan_os_title: 'Visitas, reservas e cobranças das suas unidades',
     pan_est_borrador: 'Rascunho', pan_est_en_revision: 'Em revisão', pan_est_publicado: 'Publicado', pan_est_rechazado: 'Recusado', pan_est_pausado: 'Pausado', pan_est_vencido: 'Vencido',
     perfil_busca: 'Procuro imóvel', perfil_dueno: 'Proprietário direto', perfil_profesional: 'Imobiliária, corretor ou incorporadora',
-    ing_revisa_mail: 'Confira o e-mail.', ing_codigo_enviado: 'Enviamos um código de seis dígitos para {e}. Se não chegar, confira o spam.', ing_codigo_local: 'Modo local: seu código é {c}. Com o Supabase conectado, chega por e-mail.', ing_codigo_incorrecto: 'Código incorreto.',
+    ing_revisa_mail: 'Confira o e-mail.', ing_codigo_enviado: 'Enviamos um código de oito dígitos para {e}. Se não chegar, confira o spam.', ing_codigo_local: 'Modo local: seu código é {c}. Com o Supabase conectado, chega por e-mail.', ing_codigo_incorrecto: 'Código incorreto.',
     img_icono_n: 'Ícone {n}', img_no_proceso: 'Não foi possível processar a imagem.', img_no_abre: 'O arquivo não é uma imagem que o navegador consiga abrir. Tente JPG ou PNG.', img_elegi_una: 'Escolha uma imagem.', img_heic: 'É uma foto HEIC do iPhone: compartilhe como JPG (Ajustes → Câmera → Formatos → Mais compatível) ou escolha outra.', img_pesada: 'A foto tem mais de 15 MB: exporte uma menor.', img_no_subio_msg: 'Não foi possível enviar a foto: {m}',
     pan_av_1: 'Terno e gravata', pan_av_2: 'Camiseta e óculos', pan_av_3: 'Blazer e camisa', pan_av_4: 'Camiseta e óculos redondos',
     pan_fb_guardado: 'Salvo. O proprietário vê na conta dele.', pan_confirmada: 'Confirmada', pan_visita_confirmada: 'Visita confirmada. Avise {n} pelo WhatsApp ou por e-mail.', pan_no_confirmo: 'Não foi possível confirmar: ',
@@ -440,7 +440,7 @@ window.BP_I18N = {
     pan_perfil_listo: 'Pronto. O painel já mostra o que serve para você.',
     /* ingresar */
     ing_title: 'Entrar · BAIREN', ing_sub: 'Favoritos, alertas, seus contatos e, se você publica, seu painel. Sem senha: enviamos um código para o seu e-mail.',
-    ing_mail: 'E-mail', ing_mail_ph: 'Seu e-mail', ing_continuar: 'Continuar', ing_codigo: 'Código de seis dígitos', ing_reenviar: 'Reenviar código', ing_reenviar_en: 'Reenviar em {s} s', ing_cambiar_mail: 'Trocar e-mail',
+    ing_mail: 'E-mail', ing_mail_ph: 'Seu e-mail', ing_continuar: 'Continuar', ing_codigo: 'Código de oito dígitos', ing_reenviar: 'Reenviar código', ing_reenviar_en: 'Reenviar em {s} s', ing_cambiar_mail: 'Trocar e-mail',
     ing_op_busca: 'Procuro imóvel', ing_op_busca_s: 'Alugar ou comprar. Favoritos, alertas e suas consultas.', ing_op_dueno: 'Sou proprietário direto', ing_op_dueno_s: 'Publicar meu imóvel, ou acompanhar o que minha imobiliária publica.', ing_op_prof: 'Imobiliária, corretor ou incorporadora', ing_op_prof_s: 'Publicar anúncios, receber interessados, importar minha carteira.',
     ing_o: 'ou', ing_google: 'Continuar com o Google', ing_apple: 'Continuar com a Apple',
     ing_legal: 'Ao continuar você aceita os <a href="legales.html#terminos" style="text-decoration:underline">Termos e condições</a> e a <a href="legales.html#privacidad" style="text-decoration:underline">Política de privacidade</a>. Uma conta por pessoa.',
@@ -448,7 +448,7 @@ window.BP_I18N = {
     ing_modo_local: 'Modo local: sem banco conectado, a sessão e os dados ficam neste navegador.',
     ing_pregunta: 'O que você veio fazer na BAIREN?', ing_pregunta_sub: 'Assim o painel mostra o que serve para você. Mude quando quiser.',
     ing_guardando: 'Salvando…', ing_no_guardo: 'Não foi possível salvar.', ing_err_mail: 'Confira o e-mail, por exemplo nome@dominio.com.', ing_enviando: 'Enviando…', ing_no_envio: 'Não foi possível enviar o código.',
-    ing_err_codigo: 'O código tem seis dígitos.', ing_verificando: 'Verificando…', ing_no_verifico: 'Não foi possível verificar.', ing_entrando: 'Entrando…', ing_listo: 'Pronto, você entrou.',
+    ing_err_codigo: 'O código tem oito dígitos.', ing_verificando: 'Verificando…', ing_no_verifico: 'Não foi possível verificar.', ing_entrando: 'Entrando…', ing_listo: 'Pronto, você entrou.',
     ing_social_off: 'Google e Apple ainda não estão ativos. Use o e-mail.',
     /* 12/9 · psi (psi.html): a página do Personal Shopper Inmobiliario para o investidor estrangeiro. O nome fica
        como nome próprio (eyebrow e título); o lead explica. O PDF muda de arquivo por idioma desde a página. */

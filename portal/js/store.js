@@ -88,7 +88,7 @@
     /* 16/9 · Desde que el portal comparte proyecto de Auth con el OS, un link en el mail (si la plantilla lo trae) caería en la
        Site URL del proyecto (el OS). emailRedirectTo lo trae de vuelta al portal, a esta misma página, conservando ?volver=. */
     const volverA = location.origin + location.pathname.replace(/[^/]*$/, '') + 'ingresar.html' + location.search;
-    if (S.mode === 'supabase') { const { error } = await S.sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true, emailRedirectTo: volverA } }); return error ? { ok:false, msg: error.message } : { ok:true, msg: T('ing_codigo_enviado', 'Te mandamos un código de seis dígitos a {e}. Si no llega, revisá spam.', { e: email }) }; }
+    if (S.mode === 'supabase') { const { error } = await S.sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true, emailRedirectTo: volverA } }); return error ? { ok:false, msg: error.message } : { ok:true, msg: T('ing_codigo_enviado', 'Te mandamos un código de ocho dígitos a {e}. Si no llega, revisá spam.', { e: email }) }; }
     const code = String(Math.floor(100000 + Math.random() * 900000)); L.code.set({ email, code, t: Date.now() });
     return { ok:true, msg: T('ing_codigo_local', 'Modo local: tu código es {c}. Con Supabase conectado llega por mail.', { c: code }), code };
   };

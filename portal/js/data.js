@@ -8,12 +8,12 @@
   const D = {};
 
   D.PUBLICADORES = {
-    'bairen': { id:'bairen', tipo:'inmobiliaria', nombre:'BAIREN', responsable:null, matricula:null, colegio:null, badge:'Selección BAIREN', verificado:true, desde:'2026', inicial:'B', portal:true,
+    'bairen': { id:'bairen', tipo:'profesional', nombre:'BAIREN', responsable:null, matricula:null, colegio:null, badge:'Selección BAIREN', verificado:true, desde:'2026', inicial:'B', portal:true,
       whatsapp:'5491123106629', email:'contacto@bairengroup.com', telefono:null, zonas:['Recoleta','Palermo','Núñez','Puerto Madero','Belgrano'],
       desc:'Propiedad seleccionada por BAIREN: ubicación, estado, distribución y calidad constructiva revisados antes de publicarla.',
       desc_en:'Property selected by BAIREN: location, condition, layout and build quality reviewed before listing it.',
       desc_pt:'Imóvel selecionado pela BAIREN: localização, estado, distribuição e qualidade construtiva revisados antes de publicá-lo.' },
-    'inmobiliaria-ejemplo': { id:'inmobiliaria-ejemplo', tipo:'inmobiliaria', nombre:'Inmobiliaria Ejemplo', responsable:'Corredor de ejemplo', matricula:'CUCICBA 0000', badge:'Corredor inmobiliario matriculado', verificado:true, desde:'2026', inicial:'IE', demo:true,
+    'inmobiliaria-ejemplo': { id:'inmobiliaria-ejemplo', tipo:'profesional', nombre:'Inmobiliaria Ejemplo', responsable:'Corredor de ejemplo', matricula:'CUCICBA 0000', badge:'Corredor inmobiliario matriculado', verificado:true, desde:'2026', inicial:'IE', demo:true,
       whatsapp:'5491100000000', email:'ejemplo@ejemplo.com', telefono:'+54 11 0000 0000', zonas:['Belgrano'], desc:'Publicador de ejemplo para mostrar cómo se ve una inmobiliaria con perfil propio. No es una empresa real.',
       desc_en:'Sample lister to show how a real estate agency with its own profile looks. Not a real company.', desc_pt:'Anunciante de exemplo para mostrar como fica uma imobiliária com perfil próprio. Não é uma empresa real.' },
     'desarrolladora-ejemplo': { id:'desarrolladora-ejemplo', tipo:'desarrolladora', nombre:'Desarrolladora Ejemplo', responsable:'Equipo comercial', matricula:null, badge:'Venta directa', verificado:true, desde:'2026', inicial:'DE', demo:true,
