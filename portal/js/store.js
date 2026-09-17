@@ -333,9 +333,17 @@
     rec.updated_at = now();   /* en local también queda cuándo se editó: el panel ordena por eso */
     if (i > -1) { rec.created_at = all[i].created_at; all[i] = rec; } else { rec.id = rec.id || uid(); rec.created_at = now(); all.push(rec); } L.avisos.set(all); return rec;
   };
+  /* Miniatura 16:9 de 320 × 180 (JPEG 60 %, 10 a 20 KB): recorte centrado. La usa Bairen OS en su lista
+     de propiedades. Se guarda junto a la foto, en portal-fotos/miniaturas/<misma ruta>. */
+  S.miniatura = function(blob){ return new Promise(res => { const img = new Image(); const u = URL.createObjectURL(blob); img.onload = () => { const W = 320, H = 180; const r = img.width / img.height; let sw = img.width, sh = img.height; if (r > 16 / 9) sw = Math.round(img.height * 16 / 9); else sh = Math.round(img.width * 9 / 16); const sx = Math.round((img.width - sw) / 2), sy = Math.round((img.height - sh) / 2); const c = document.createElement('canvas'); c.width = W; c.height = H; c.getContext('2d').drawImage(img, sx, sy, sw, sh, 0, 0, W, H); c.toBlob(b => { URL.revokeObjectURL(u); res(b); }, 'image/jpeg', .6); }; img.onerror = () => res(null); img.src = u; }); };
   S.uploadFoto = async function(file, avisoKey, i){
     const blob = await S.shrink(file, 1600);
-    if (S.mode === 'supabase') { const path = avisoKey + '/' + Date.now() + '-' + i + '.jpg'; const { error } = await S.sb.storage.from('portal-fotos').upload(path, blob, { contentType: 'image/jpeg', upsert: true }); if (error) throw error; return S.sb.storage.from('portal-fotos').getPublicUrl(path).data.publicUrl; }
+    if (S.mode === 'supabase') {
+      const path = avisoKey + '/' + Date.now() + '-' + i + '.jpg';
+      const { error } = await S.sb.storage.from('portal-fotos').upload(path, blob, { contentType: 'image/jpeg', upsert: true }); if (error) throw error;
+      try { const mini = await S.miniatura(blob); if (mini) await S.sb.storage.from('portal-fotos').upload('miniaturas/' + path, mini, { contentType: 'image/jpeg', upsert: true, cacheControl: '31536000' }); } catch (e) { console.warn('miniatura:', e && e.message); }
+      return S.sb.storage.from('portal-fotos').getPublicUrl(path).data.publicUrl;
+    }
     const key = avisoKey + '-' + Date.now() + '-' + i; await idb.put(key, blob); return 'idb:' + key;
   };
   S.setEstado = async function(id, estado_curacion, motivo, extra){
