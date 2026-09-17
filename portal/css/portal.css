@@ -3617,3 +3617,7 @@ body.p-membership .p-plan ul{margin-top:16px}
 body.p-membership .p-plan li{padding:9px 0}
 body.p-membership .p-mb-condiciones{margin:22px 0 0;font:400 .84rem/1.6 var(--font-body);color:var(--text-mid);letter-spacing:.01em}
 body.p-membership #preguntas .p-h2{font-size:1.35rem}
+
+/* 16/9 · Membership destacado en el menú: en oro, siempre (pedido de Tomás). Hover y activo siguen igual. */
+.p-nav-principal a.p-nav-destacado{color:var(--gold)}
+.mobile-menu .m-link.p-nav-destacado{color:var(--gold)}

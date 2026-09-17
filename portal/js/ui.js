@@ -350,7 +350,7 @@
     <a href="buscar.html" data-sec="propiedades" data-i18n="nav_propiedades">Propiedades</a>
     <a href="emprendimientos.html" data-sec="emprendimientos" data-i18n="emprendimientos">Desarrollos</a>
     <a href="psi.html" data-sec="psi">Personal Shopper</a>
-    <a href="membership.html" data-sec="membership">Membership</a>
+    <a href="membership.html" class="p-nav-destacado" data-sec="membership">Membership</a>
   </div>
   <div class="p-lang p-lang-movil" role="group" aria-label="Idioma" data-i18n-aria="idioma"><button type="button" data-lang="es">ES</button><button type="button" data-lang="pt">PT</button><button type="button" data-lang="en">EN</button></div>
   <div class="p-nav-right">
@@ -367,7 +367,7 @@
   <a href="buscar.html" class="m-link" data-sec="propiedades" data-i18n="nav_propiedades">Propiedades</a>
   <a href="emprendimientos.html" class="m-link" data-sec="emprendimientos" data-i18n="emprendimientos">Desarrollos</a>
   <a href="psi.html" class="m-link" data-sec="psi">Personal Shopper Inmobiliario</a>
-  <a href="membership.html" class="m-link" data-sec="membership">Membership</a>
+  <a href="membership.html" class="m-link p-nav-destacado" data-sec="membership">Membership</a>
   <div class="m-secundario"><a href="publicadores.html" data-sec="publicadores" data-i18n="publicadores">Publicadores</a><a href="criterios.html" data-sec="criterios" data-i18n="criterios">Cómo seleccionamos</a></div>
   <div class="m-cuenta" hidden></div>
   <div class="m-cta"><a class="p-btn p-btn-sm" href="publicar.html" data-i18n="publicar">Publicar</a><a class="p-btn p-btn-sm p-btn-fill" href="ingresar.html" data-i18n="ingresar">Ingresar</a></div>
