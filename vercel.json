@@ -1,6 +1,17 @@
 {
   "redirects": [
     {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "portal.bairengroup.com"
+        }
+      ],
+      "destination": "/portal/",
+      "permanent": false
+    },
+    {
       "source": "/propiedad.html",
       "has": [
         {
