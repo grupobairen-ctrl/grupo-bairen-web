@@ -28,10 +28,62 @@ window.bairenReady = new Promise((resolve, reject) => {
     reject(new Error('portal sin proyecto configurado'));
     return;
   }
-  function init() {
+// bairenCookieStorage (B4, 17/9/2026): la sesión de Supabase se guarda en una cookie del dominio
+  // .bairengroup.com, en trozos de 3000 caracteres, para que el portal y os.bairengroup.com
+  // compartan la misma sesión. Fuera de bairengroup.com (localhost, *.vercel.app) vale null y el
+  // SDK sigue usando localStorage como siempre. Copia exacta en assets/js/supabase.js (OS) (cambiar los dos juntos).
+  (function () {
+    var DOMINIO = '.bairengroup.com';
+    var TROZO = 3000;
+    var MAX_TROZOS = 8;
+    var UN_ANIO = 60 * 60 * 24 * 365;
+  
+    function enDominio() {
+      var h = window.location.hostname;
+      return window.location.protocol === 'https:' && (h === 'bairengroup.com' || /\.bairengroup\.com$/.test(h));
+    }
+    function leerCruda(nombre) {
+      var partes = document.cookie.split('; ');
+      for (var i = 0; i < partes.length; i++) {
+        if (partes[i].indexOf(nombre + '=') === 0) return partes[i].slice(nombre.length + 1);
+      }
+      return null;
+    }
+    function escribir(nombre, valor, maxAge) {
+      document.cookie = nombre + '=' + valor + '; Domain=' + DOMINIO + '; Path=/; Max-Age=' + maxAge + '; Secure; SameSite=Lax';
+    }
+  
+    window.bairenCookieStorage = enDominio() ? {
+      getItem: function (key) {
+        var trozos = [];
+        for (var i = 0; i < MAX_TROZOS; i++) {
+          var t = leerCruda(key + '.' + i);
+          if (t === null) break;
+          trozos.push(t);
+        }
+        if (!trozos.length) return null;
+        try { return decodeURIComponent(trozos.join('')); } catch (e) { return null; }
+      },
+      setItem: function (key, value) {
+        this.removeItem(key);
+        var cod = encodeURIComponent(String(value));
+        var n = Math.ceil(cod.length / TROZO);
+        if (n > MAX_TROZOS) { console.warn('bairenCookieStorage: sesión demasiado grande (' + cod.length + ')'); n = MAX_TROZOS; }
+        for (var i = 0; i < n; i++) escribir(key + '.' + i, cod.slice(i * TROZO, (i + 1) * TROZO), UN_ANIO);
+      },
+      removeItem: function (key) {
+        for (var i = 0; i < MAX_TROZOS; i++) {
+          if (leerCruda(key + '.' + i) === null) break;
+          escribir(key + '.' + i, '', 0);
+        }
+      }
+    } : null;
+  })();
+  
+function init() {
     try {
       window.bairenSupabase = window.supabase.createClient(PORTAL_SUPABASE_URL, PORTAL_SUPABASE_KEY, {
-        auth: { persistSession: true, autoRefreshToken: true },
+        auth: { persistSession: true, autoRefreshToken: true, storage: window.bairenCookieStorage || undefined },
         db: { schema: 'portal' }
       });
       resolve(window.bairenSupabase);
@@ -42,7 +94,7 @@ window.bairenReady = new Promise((resolve, reject) => {
   }
   if (window.supabase && typeof window.supabase.createClient === 'function') { init(); return; }
   const s = document.createElement('script');
-  s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js';
+  s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js';
   s.onload = init;
   s.onerror = () => reject(new Error('no se pudo cargar el SDK de Supabase'));
   document.head.appendChild(s);
