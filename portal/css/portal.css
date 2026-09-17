@@ -3621,3 +3621,23 @@ body.p-membership #preguntas .p-h2{font-size:1.35rem}
 /* 16/9 · Membership destacado en el menú: en oro, siempre (pedido de Tomás). Hover y activo siguen igual. */
 .p-nav-principal a.p-nav-destacado{color:var(--gold)}
 .mobile-menu .m-link.p-nav-destacado{color:var(--gold)}
+
+/* ══ 16/9 · PSI en la portada: textos más grandes y el navy llega más a la derecha (pedido de Tomás). ══ */
+@media(min-width:900px){
+  body.p-home .h-anuncio-fade{background:
+    linear-gradient(to right,rgba(19,29,45,.97) 0%,rgba(19,29,45,.93) 40%,rgba(19,29,45,.68) 66%,rgba(19,29,45,.3) 88%,rgba(19,29,45,.14) 100%),
+    linear-gradient(to top,rgba(19,29,45,.42) 0%,transparent 60%)}
+  body.p-home .h-anuncio-top .h-eyebrow{font-size:.72rem;letter-spacing:.3em}
+  body.p-home .h-anuncio-txt .h-h2{font-size:clamp(2.3rem,4.4vw,3.6rem);max-width:15ch;margin-bottom:18px}
+  body.p-home .h-anuncio-txt .h-copy{font-size:1.22rem;line-height:1.5;max-width:40ch;margin-bottom:16px}
+  body.p-home .h-anuncio-txt .h-btn{margin-top:14px}
+}
+@media(max-width:899px){
+  body.p-home .h-anuncio-top .h-eyebrow{font-size:.66rem}
+  body.p-home .h-anuncio-txt .h-h2{font-size:1.75rem;max-width:14ch;margin-bottom:10px}
+  body.p-home .h-anuncio-txt .h-copy{font-size:.98rem;max-width:30ch;margin-bottom:18px}
+  body.p-home .h-anuncio-txt .h-btn{min-height:44px;padding:0 18px;font-size:.64rem}
+  body.p-home .h-anuncio-fade{background:
+    linear-gradient(to right,rgba(19,29,45,.96) 0%,rgba(19,29,45,.9) 44%,rgba(19,29,45,.6) 70%,rgba(19,29,45,.26) 92%,rgba(19,29,45,.14) 100%),
+    linear-gradient(to top,rgba(19,29,45,.4) 0%,transparent 55%)}
+}
