@@ -27,7 +27,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260916i"><link rel="stylesheet" href="css/catalogo.css?v=20260916i"><link rel="stylesheet" href="css/portal.css?v=20260916i">
+  <link rel="stylesheet" href="css/base.css?v=20260916j"><link rel="stylesheet" href="css/catalogo.css?v=20260916j"><link rel="stylesheet" href="css/portal.css?v=20260916j">
 </head>
 <body class="p-publicar-landing">
 <div class="p-velo" aria-hidden="true"><span class="w">BAIREN</span></div>
@@ -37,7 +37,7 @@
   <div class="p-perfiles" data-reveal style="margin-top:0">
     <a class="p-perfil" href="ingresar.html?volver=publicar&perfil=dueno" id="dueno" data-perfil="dueno"><span class="ico-w"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg></span><b>Dueño directo</b><span>Tu unidad, con titularidad verificada. Gratis durante el lanzamiento.</span></a>
     <a class="p-perfil" href="ingresar.html?volver=publicar&perfil=inmobiliaria" id="inmobiliaria" data-perfil="inmobiliaria"><span class="ico-w"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M17 6l2 2M14 9l2 2"/></svg></span><b>Inmobiliaria o corredor</b><span>Tu cartera, con tu nombre y matrícula en cada ficha. Carga manual o importación desde tu sistema.</span></a>
-    <a class="p-perfil" href="ingresar.html?volver=publicar&perfil=desarrolladora" id="desarrolladora" data-perfil="desarrolladora"><span class="ico-w"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M8 7h2M14 7h2M8 11h2M14 11h2M8 15h2M14 15h2M10 21v-3h4v3"/></svg></span><b>Desarrolladora</b><span>Venta directa de tus unidades, con página del emprendimiento y etapa de obra.</span></a>
+    <a class="p-perfil" href="ingresar.html?volver=publicar&perfil=desarrolladora" id="desarrolladora" data-perfil="desarrolladora"><span class="ico-w"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M8 7h2M14 7h2M8 11h2M14 11h2M8 15h2M14 15h2M10 21v-3h4v3"/></svg></span><b>Desarrolladora</b><span>Venta directa de tus unidades, con página del desarrollo y etapa de obra.</span></a>
   </div>
   <div class="p-pl-sec" data-reveal><h2 class="p-h2">Cómo funciona</h2>
   <ol class="p-pasos"><li><i>1</i><b>Creás tu cuenta</b><span>Mail y código. Sin contraseña.</span></li><li><i>2</i><b>Te verificamos</b><span>DNI y titularidad si sos dueño. Matrícula contra el registro de CUCICBA si sos corredor. CUIT si sos desarrolladora. El documento se revisa y se borra.</span></li><li><i>3</i><b>Cargás el aviso</b><span>Operación, dirección, características y mínimo ocho fotos. Si no las tenés, las hacemos.</span></li><li><i>4</i><b>Curación y publicación</b><span>Revisamos en menos de 48 horas. Si entra, sale con tu nombre. Si no, te decimos por qué.</span></li></ol></div>
@@ -50,7 +50,7 @@
   <div class="p-pl-cta" data-reveal><a class="p-btn p-btn-fill" href="ingresar.html?volver=publicar">Crear mi cuenta</a><span class="p-note">Mail y código, sin contraseña. Si ya tenés cuenta, vas directo a cargar.</span></div>
 </div></section>
 <div id="pFooter"></div>
-<script src="supabase-portal.js?v=20260916i" defer></script><script src="js/errores.js?v=20260916i" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260916i" defer></script><script src="js/i18n-portal.js?v=20260916i" defer></script><script src="js/ui.js?v=20260916i" defer></script><script src="js/store.js?v=20260916i" defer></script><script src="js/data.js?v=20260916i" defer></script>
+<script src="supabase-portal.js?v=20260916j" defer></script><script src="js/errores.js?v=20260916j" defer></script><script src="js/motion.js" defer></script><script src="js/bairen-motion.js?v=20260916j" defer></script><script src="js/i18n-portal.js?v=20260916j" defer></script><script src="js/ui.js?v=20260916j" defer></script><script src="js/store.js?v=20260916j" defer></script><script src="js/data.js?v=20260916j" defer></script>
 <script>document.addEventListener('DOMContentLoaded', function(){BP.header("publicar"); BP.footer(); BP.reveal(); if (window.BPStore) BPStore.init().then(function(){ if (BPStore.session) document.querySelectorAll("[data-perfil]").forEach(function(a){ a.href = "publicar-aviso.html?perfil=" + a.dataset.perfil; }); });});</script>
 </body>
 </html>

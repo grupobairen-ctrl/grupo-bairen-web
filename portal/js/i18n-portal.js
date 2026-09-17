@@ -16,7 +16,7 @@ window.BP_I18N = {
     /* header, menú, pie */
     skip: 'Skip to content', menu: 'Menu', idioma: 'Language',
     publicar: 'List a property', ingresar: 'Sign in', notificaciones: 'Notifications', mis_contactos: 'My contacts', favoritos: 'Favorites',
-    comprar: 'Buy', alquilar: 'Rent', mediano: 'Mid-term', largo: 'Long-term', emprendimientos: 'Developments', publicadores: 'Listers',
+    nav_propiedades: 'Properties', comprar: 'Buy', alquilar: 'Rent', mediano: 'Mid-term', largo: 'Long-term', emprendimientos: 'Developments', publicadores: 'Listers',
     ft_tag: 'Selected properties portal in Buenos Aires.',
     ft_legend: 'BAIREN selects and lists properties and provides the tools to manage them. Each listing is the responsibility of whoever publishes it.',
     ft_nav: 'Navigation', ft_zonas: 'Areas', ft_mas: 'More', ft_indice: 'BAIREN Index', ft_criterios: 'Selection criteria', ft_terminos: 'Terms and privacy',
@@ -244,7 +244,7 @@ window.BP_I18N = {
   pt: {
     skip: 'Ir para o conteúdo', menu: 'Menu', idioma: 'Idioma',
     publicar: 'Publicar', ingresar: 'Entrar', notificaciones: 'Notificações', mis_contactos: 'Meus contatos', favoritos: 'Favoritos',
-    comprar: 'Comprar', alquilar: 'Alugar', mediano: 'Médio prazo', largo: 'Longo prazo', emprendimientos: 'Empreendimentos', publicadores: 'Anunciantes',
+    nav_propiedades: 'Imóveis', comprar: 'Comprar', alquilar: 'Alugar', mediano: 'Médio prazo', largo: 'Longo prazo', emprendimientos: 'Empreendimentos', publicadores: 'Anunciantes',
     ft_tag: 'Portal de imóveis selecionados em Buenos Aires.',
     ft_legend: 'A BAIREN seleciona e publica imóveis e oferece a gestão para administrá-los. Cada anúncio é responsabilidade de quem o publica.',
     ft_nav: 'Navegação', ft_zonas: 'Zonas', ft_mas: 'Mais', ft_indice: 'Índice BAIREN', ft_criterios: 'Critérios de seleção', ft_terminos: 'Termos e privacidade',
