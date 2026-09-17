@@ -59,7 +59,7 @@
       "destination": "/portal/buscar.html"
     },
     {
-      "source": "/portal/:page(publicar|ingresar|panel|curacion|legales|publicadores|buscar|importar|emprendimientos|publicar-aviso)",
+      "source": "/portal/:page(publicar|ingresar|panel|curacion|legales|publicadores|buscar|importar|emprendimientos|publicar-aviso|membership)",
       "destination": "/portal/:page.html"
     }
   ],
