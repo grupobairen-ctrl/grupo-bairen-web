@@ -4,11 +4,11 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Propiedades — BAIREN</title>
-<meta name="description" content="Catálogo de residencias en CABA y GBA Norte. A mediano y largo plazo sin garantía.">
+<meta name="description" content="Departamentos amoblados a mediano plazo en CABA y GBA Norte. Todo incluido, sin garantía ni seguro de caución.">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://www.bairengroup.com/catalogo.html">
 <meta property="og:title" content="Propiedades — BAIREN">
-<meta property="og:description" content="Catálogo de residencias en CABA y GBA Norte. A mediano y largo plazo sin garantía.">
+<meta property="og:description" content="Departamentos amoblados a mediano plazo en CABA y GBA Norte. Todo incluido, sin garantía ni seguro de caución.">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="es_AR">
 <meta property="og:site_name" content="BAIREN">
@@ -19,7 +19,7 @@
 <meta property="og:image:alt" content="BAIREN — Alquileres premium en Buenos Aires">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Propiedades — BAIREN">
-<meta name="twitter:description" content="Catálogo de residencias en CABA y GBA Norte. A mediano y largo plazo sin garantía.">
+<meta name="twitter:description" content="Departamentos amoblados a mediano plazo en CABA y GBA Norte. Todo incluido, sin garantía ni seguro de caución.">
 <meta name="twitter:image" content="https://www.bairengroup.com/og-logo.jpg">
 <meta name="theme-color" content="#131D2D">
 <link rel="icon" href="bairen_logo.png?v=3">
@@ -609,9 +609,7 @@ body.sheet-open{overflow:hidden;}
     <img src="bairen_logo.png?v=3" alt="BAIREN" style="height:46px;width:auto;">
   </a>
   <div class="nav-links">
-    <a href="comprar.html" data-i18n="nav_comprar">Comprar</a>
     <a href="catalogo.html" class="active" data-i18n="nav_alquilar">Alquilar</a>
-    <a href="psi.html">Personal Shopper</a>
     <a href="index.html#contacto" data-i18n="nav_contacto">Contacto</a>
   </div>
   <div class="lang-switch">
@@ -623,9 +621,7 @@ body.sheet-open{overflow:hidden;}
 </nav>
 
 <div class="mobile-menu" id="mobileMenu">
-  <a href="comprar.html" class="m-link" data-i18n="nav_comprar">Comprar</a>
   <a href="catalogo.html" class="m-link" data-i18n="nav_alquilar">Alquilar</a>
-  <a href="psi.html" class="m-link">Personal Shopper</a>
   <a href="index.html#contacto" class="m-link" data-i18n="nav_contacto">Contacto</a>
 </div>
 
@@ -634,25 +630,13 @@ body.sheet-open{overflow:hidden;}
   <div class="cat-hero-inner">
     <div class="cat-hero-text">
       <p class="cat-eyebrow">BAIREN · Buenos Aires</p>
-      <h1 class="cat-title" id="catTitle">Propiedades disponibles</h1>
-      <p class="cat-sub" id="catSub">Alquileres a mediano y largo plazo en CABA y GBA Norte</p>
+      <h1 class="cat-title" id="catTitle">Departamentos a mediano plazo</h1>
+      <p class="cat-sub" id="catSub">Amoblados · Todo incluido · Sin garantía ni seguro de caución</p>
       <div class="cat-panel" id="catPanel" aria-live="polite"></div>
     </div>
     <div class="cat-hero-mapa"><div class="mapa-wrap"><div id="mapaHero" role="group" aria-label="Mapa de barrios"></div></div></div>
   </div>
 </div>
-<script>
-/* Título correcto ANTES del primer paint: sin esto, el h1 por defecto
-   parpadea un instante hasta que el JS de abajo lee ?tipo= de la URL. */
-(function(){
-  var t=document.getElementById('catTitle'),s=document.getElementById('catSub');
-  var q=new URLSearchParams(location.search).get('tipo');
-  if(q==='temporal'){t.textContent='Alquileres a mediano plazo';s.textContent='Estadías de 3 a 12 meses · Amoblados · Todo incluido';}
-  else if(q==='tradicional'){t.textContent='Alquileres a largo plazo';s.textContent='Contratos anuales · Sin amoblar · Servicios no incluídos';}
-  else{t.textContent='Todas las propiedades';}
-})();
-</script>
-
 <!-- TYPE BANNER -->
 <div class="type-banner" id="typeBanner">
   <div class="type-banner-inner">
@@ -674,15 +658,6 @@ body.sheet-open{overflow:hidden;}
   <button class="filter-clear" id="barrioClear" type="button" hidden><span aria-hidden="true">×</span> <span id="barrioClearLabel">Borrar filtro</span></button>
 
   <div class="filter-sep" id="sepBarrio"></div>
-
-  <!-- TIPO PILLS -->
-  <div class="tipo-pills">
-    <button class="pill-tipo active" data-tipo="todos" data-i18n="cat_todos">Todos</button>
-    <button class="pill-tipo" data-tipo="Temporal" data-i18n="cat_temporal">Mediano plazo</button>
-    <button class="pill-tipo" data-tipo="Tradicional" data-i18n="cat_tradicional">Largo plazo</button>
-  </div>
-
-  <div class="filter-sep"></div>
 
   <!-- PRECIO Y AMBIENTES (los dos filtros más usados; inventario boutique = pocos y claros) -->
   <label class="sr-only" for="precioSelect">Filtrar por precio</label>
@@ -859,18 +834,6 @@ if (window.IntersectionObserver) {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   TIPO PILLS
-═══════════════════════════════════════════════════════════════ */
-document.querySelectorAll('[data-tipo]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('[data-tipo]').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    activeTipo = btn.dataset.tipo;
-    render();
-  });
-});
-
-/* ═══════════════════════════════════════════════════════════════
    SORT + SEARCH
 ═══════════════════════════════════════════════════════════════ */
 document.getElementById('sortSelect').addEventListener('change', e => { sortMode = e.target.value; render(); });
@@ -916,10 +879,8 @@ function sorted(arr) {
 /* Textos dinámicos del catálogo por idioma (lee window.BAIREN_LANG de i18n.js) */
 const CT = {
   es: {
-    title_todos:'Todas las propiedades', sub_todos:'Alquileres a mediano y largo plazo en CABA y GBA Norte',
-    title_temp:'Alquileres a mediano plazo', sub_temp:'Estadías de 3 a 12 meses · Amoblados · Todo incluido', tag_temp:'PRECIO FINAL', text_temp:'El precio publicado es final: mobiliario, servicios y garantía incluidos.',
-    title_trad:'Alquileres a largo plazo', sub_trad:'Contratos anuales · Sin amoblar · Servicios no incluídos',
-    count_one:'propiedad', count_many:'propiedades', empty_t:'Sin resultados', empty_s:'Probá con otro barrio o tipo de alquiler.',
+    title_todos:'Departamentos a mediano plazo', sub_todos:'Amoblados · Todo incluido · Sin garantía ni seguro de caución',
+    count_one:'propiedad', count_many:'propiedades', empty_t:'Sin resultados', empty_s:'Probá con otro barrio.',
     loading:'Cargando propiedades...', err_t:'No pudimos cargar las propiedades', err_s:'Revisá la conexión a internet. Si el problema persiste, contactanos por WhatsApp.',
     per_month:'por mes', per_month_all:'por mes · all in', consult:'Consultar precio', ver_mas:'Ver más →',
     disponible:'Disponible', reservado:'Reservado', reservado_sem:'Reservada esta semana', serv_allin:'All in', serv_sin:'Sin incl.', serv_lbl:'Servicios',
@@ -928,10 +889,8 @@ const CT = {
     barrios:'Barrios', borrar_filtro:'Borrar filtro', todos_barrios:'Todos los barrios', sheet_title:'Elegí un barrio', cerrar:'Cerrar', clear_aria:'Quitar filtro de barrio', u_one:'unidad', u_many:'unidades', panel_todos:'<b>{n}</b> unidades en <b>{z}</b> barrios'
   },
   pt: {
-    title_todos:'Todos os imóveis', sub_todos:'Aluguéis de médio e longo prazo em CABA e GBA Norte',
-    title_temp:'Aluguéis de médio prazo', sub_temp:'Estadias de 3 a 12 meses · Mobiliados · Tudo incluído', tag_temp:'PREÇO FINAL', text_temp:'O preço publicado é final: mobília, serviços e garantia incluídos.',
-    title_trad:'Aluguéis de longo prazo', sub_trad:'Contratos anuais · Sem mobília · Serviços não incluídos',
-    count_one:'imóvel', count_many:'imóveis', empty_t:'Sem resultados', empty_s:'Tente outro bairro ou tipo de aluguel.',
+    title_todos:'Apartamentos de médio prazo', sub_todos:'Mobiliados · Tudo incluído · Sem garantia nem seguro fiança',
+    count_one:'imóvel', count_many:'imóveis', empty_t:'Sem resultados', empty_s:'Tente outro bairro.',
     loading:'Carregando imóveis...', err_t:'Não foi possível carregar os imóveis', err_s:'Verifique sua conexão. Se o problema persistir, fale conosco pelo WhatsApp.',
     per_month:'por mês', per_month_all:'por mês · tudo incluído', consult:'Consultar preço', ver_mas:'Ver mais →',
     disponible:'Disponível', reservado:'Reservado', reservado_sem:'Reservada esta semana', serv_allin:'Tudo incl.', serv_sin:'Não incl.', serv_lbl:'Serviços',
@@ -940,10 +899,8 @@ const CT = {
     barrios:'Bairros', borrar_filtro:'Limpar filtro', todos_barrios:'Todos os bairros', sheet_title:'Escolha um bairro', cerrar:'Fechar', clear_aria:'Remover filtro de bairro', u_one:'unidade', u_many:'unidades', panel_todos:'<b>{n}</b> unidades em <b>{z}</b> bairros'
   },
   en: {
-    title_todos:'All properties', sub_todos:'Medium and long-term rentals in CABA and GBA Norte',
-    title_temp:'Medium-term rentals', sub_temp:'Stays from 3 to 12 months · Furnished · All inclusive', tag_temp:'FINAL PRICE', text_temp:'The published price is final: furniture, utilities and guarantee included.',
-    title_trad:'Long-term rentals', sub_trad:'Yearly contracts · Unfurnished · Utilities not included',
-    count_one:'property', count_many:'properties', empty_t:'No results', empty_s:'Try another neighbourhood or rental type.',
+    title_todos:'Medium-term apartments', sub_todos:'Furnished · All inclusive · No guarantor and no surety bond',
+    count_one:'property', count_many:'properties', empty_t:'No results', empty_s:'Try another neighbourhood.',
     loading:'Loading properties...', err_t:'We could not load the properties', err_s:'Check your internet connection. If the problem persists, contact us on WhatsApp.',
     per_month:'per month', per_month_all:'per month · all in', consult:'Ask for price', ver_mas:'See more →',
     disponible:'Available', reservado:'Reserved', reservado_sem:'Reserved this week', serv_allin:'All in', serv_sin:'Not incl.', serv_lbl:'Services',
@@ -979,16 +936,8 @@ function updateCatalogHero() {
   // de pestaña y empujaba las tarjetas. El subtítulo ya dice "Todo incluido" y
   // cada tarjeta muestra "por mes · all in": la info vive integrada, sin saltos.
   banner.style.display = 'none';
-  if (activeTipo === 'Temporal') {
-    title.textContent = ct('title_temp');
-    sub.textContent   = ct('sub_temp');
-  } else if (activeTipo === 'Tradicional') {
-    title.textContent = ct('title_trad');
-    sub.textContent   = ct('sub_trad');
-  } else {
-    title.textContent = ct('title_todos');
-    sub.textContent   = ct('sub_todos');
-  }
+  title.textContent = ct('title_todos');
+  sub.textContent   = ct('sub_todos');
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -1051,16 +1000,7 @@ function render() {
 ═══════════════════════════════════════════════════════════════ */
 function readURLParams() {
   const p = new URLSearchParams(window.location.search);
-  const pt = p.get('tipo');
   const pb = p.get('barrio');
-
-  if (pt === 'temporal') {
-    activeTipo = 'Temporal';
-    document.querySelectorAll('[data-tipo]').forEach(b => b.classList.toggle('active', b.dataset.tipo==='Temporal'));
-  } else if (pt === 'tradicional') {
-    activeTipo = 'Tradicional';
-    document.querySelectorAll('[data-tipo]').forEach(b => b.classList.toggle('active', b.dataset.tipo==='Tradicional'));
-  }
 
   if (pb) {
     activeBarrio = window.BairenZonas.zonaDe(pb) || 'Otros';
@@ -1092,7 +1032,7 @@ async function loadFromSupabase() {
     if (error) throw error;
 
     props = (data || []).flatMap(p => {
-      // Las unidades en venta viven en comprar.html, no en el catálogo de alquileres
+      // Solo se ofrece alquiler a mediano plazo: una unidad en venta no se muestra
       if (p.tipo === 'Venta') return [];
       const primera = (p.imagenes || []).sort((a, b) => a.orden - b.orden)[0];
       // portada_url = imagen especial de catálogo (cargada en el admin);
