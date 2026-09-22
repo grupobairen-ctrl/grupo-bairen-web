@@ -1,5 +1,12 @@
 {
   "redirects": [
+    { "source": "/comprar.html", "destination": "/catalogo.html", "permanent": true },
+    { "source": "/comprar", "destination": "/catalogo.html", "permanent": true },
+    { "source": "/psi.html", "destination": "/", "permanent": true },
+    { "source": "/psi", "destination": "/", "permanent": true },
+    { "source": "/encuesta", "destination": "/", "permanent": true },
+    { "source": "/encuesta/", "destination": "/", "permanent": true },
+    { "source": "/encuesta/:path*", "destination": "/", "permanent": true },
     {
       "source": "/",
       "has": [
