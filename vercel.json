@@ -5,6 +5,7 @@
     { "source": "/psi.html", "destination": "/", "permanent": true },
     { "source": "/psi", "destination": "/", "permanent": true },
     { "source": "/encuesta", "destination": "/", "permanent": true },
+    { "source": "/encuesta/", "destination": "/", "permanent": true },
     { "source": "/encuesta/:path*", "destination": "/", "permanent": true },
     {
       "source": "/propiedad.html",
