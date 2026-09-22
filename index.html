@@ -969,10 +969,19 @@ window.sbImg = window.sbImg || function(u){return u};
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 
   // ─── BAIREN: destacadas + conteos dinámicos de barrios ───
+  //
+  // Las dos cosas que este bloque pinta (los chips de barrio y la franja de
+  // destacadas) salieron de la home el 22/9/2026, cuando la web pasó a ofrecer
+  // solo mediano plazo. El código queda porque las dos pueden volver, pero si
+  // no hay nada que pintar NO se le pide nada a Supabase: era un viaje de red
+  // en cada visita a la portada, a cambio de nada.
   (async () => {
     function escapeHTML(s) {
       return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     }
+    const hayPills = document.querySelector('.pill');
+    const hayDest  = document.getElementById('destacadas');
+    if (!hayPills && !hayDest) return;
     try {
       const sb = await window.bairenReady;
       const { data, error } = await sb
@@ -1010,11 +1019,15 @@ window.sbImg = window.sbImg || function(u){return u};
         }
       });
 
-      // Destacadas: las 3 más recientes
+      // Destacadas: las 3 más recientes.
+      // La sección salió de la home el 22/9 (la web ofrece solo mediano plazo). El bloque
+      // queda porque los conteos de barrios de arriba SÍ se usan; si la sección vuelve al
+      // HTML, esto la vuelve a pintar solo. Mientras no exista, no se toca nada.
+      const secDest = document.getElementById('destacadas');
       DEST_TOP3 = props.slice(0, 3);
-      if (DEST_TOP3.length) {
+      if (DEST_TOP3.length && secDest) {
         renderDestacadas();
-        document.getElementById('destacadas').style.display = '';
+        secDest.style.display = '';
         document.querySelectorAll('#destacadas .reveal').forEach(el => io.observe(el));
       }
     } catch (err) {
@@ -1041,6 +1054,7 @@ function renderDestacadas() {
     return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
   const grid = document.getElementById('destacadasGrid');
+  if (!grid) return;   // la sección no está en esta página
   grid.innerHTML = DEST_TOP3.map(p => {
     const portada = (p.imagenes || []).sort((a,b) => a.orden - b.orden)[0];
     const fotoStyle = portada ? "background-image:url('" + window.sbImg(portada.url,700) + "')" : '';
