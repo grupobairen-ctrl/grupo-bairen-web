@@ -8,7 +8,7 @@
       // Nav
       nav_alquilar: "Alugar", nav_contacto: "Contato",
       // Footer
-      ft_tag: "Apartamentos mobiliados de médio prazo em Buenos Aires. Tudo incluído, sem garantia nem seguro fiança.",
+      ft_tag: "Apartamentos mobiliados de médio prazo em Buenos Aires. Tudo incluído, sem garantia imobiliária nem seguro fiança.",
       ft_ops: "Operações", ft_alquilar: "Alugar",
       ft_contacto: "Contato", ft_dev: "Desenvolvido por",
       ft_copy: "© 2026 Grupo Bairen. Todos os direitos reservados.",
@@ -38,7 +38,7 @@
       // Nav
       nav_alquilar: "Rent", nav_contacto: "Contact",
       // Footer
-      ft_tag: "Furnished medium-term apartments in Buenos Aires. All inclusive, no guarantor and no surety bond.",
+      ft_tag: "Furnished medium-term apartments in Buenos Aires. All inclusive, no property guarantor and no surety bond.",
       ft_ops: "Services", ft_alquilar: "Rent",
       ft_contacto: "Contact", ft_dev: "Developed by",
       ft_copy: "© 2026 Grupo Bairen. All rights reserved.",

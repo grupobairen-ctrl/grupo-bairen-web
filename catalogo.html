@@ -4,11 +4,11 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Propiedades — BAIREN</title>
-<meta name="description" content="Departamentos amoblados a mediano plazo en CABA y GBA Norte. Todo incluido, sin garantía ni seguro de caución.">
+<meta name="description" content="Departamentos amoblados a mediano plazo en CABA y GBA Norte. Todo incluido, sin garantía inmobiliaria ni seguro de caución.">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://www.bairengroup.com/catalogo.html">
 <meta property="og:title" content="Propiedades — BAIREN">
-<meta property="og:description" content="Departamentos amoblados a mediano plazo en CABA y GBA Norte. Todo incluido, sin garantía ni seguro de caución.">
+<meta property="og:description" content="Departamentos amoblados a mediano plazo en CABA y GBA Norte. Todo incluido, sin garantía inmobiliaria ni seguro de caución.">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="es_AR">
 <meta property="og:site_name" content="BAIREN">
@@ -19,7 +19,7 @@
 <meta property="og:image:alt" content="BAIREN — Alquileres premium en Buenos Aires">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Propiedades — BAIREN">
-<meta name="twitter:description" content="Departamentos amoblados a mediano plazo en CABA y GBA Norte. Todo incluido, sin garantía ni seguro de caución.">
+<meta name="twitter:description" content="Departamentos amoblados a mediano plazo en CABA y GBA Norte. Todo incluido, sin garantía inmobiliaria ni seguro de caución.">
 <meta name="twitter:image" content="https://www.bairengroup.com/og-logo.jpg">
 <meta name="theme-color" content="#131D2D">
 <link rel="icon" href="bairen_logo.png?v=3">
@@ -316,10 +316,16 @@ nav {
 @media(max-width:900px){.search-input{width:140px;}}
 @media(max-width:700px){
   :root{--filter-h:64px;}
-  .filters-bar{height:auto;min-height:var(--filter-h);padding:12px 16px;gap:8px;flex-wrap:wrap;}
+  /* Orden en celular (22/09): Barrios a lo ancho, Precio y Ambientes en dos
+     columnas, la búsqueda abajo. Si hay un barrio elegido, "Borrar filtro"
+     se ubica al lado de Barrios. */
+  .filters-bar{height:auto;min-height:var(--filter-h);padding:12px 16px;display:grid;grid-template-columns:1fr 1fr;gap:8px;}
   .filter-sep{display:none;}
-  .barrio-trigger,.pill-tipo{height:44px;padding:0 16px;font-size:.7rem;}
-  .search-wrap{order:99;flex:1 0 100%;margin:4px 0 2px;}
+  .barrio-trigger{grid-column:1 / -1;height:44px;padding:0 16px;font-size:.7rem;justify-content:center;}
+  .filters-bar:has(.filter-clear:not([hidden])) .barrio-trigger{grid-column:auto;}
+  .filter-clear{height:44px;margin:0;padding:0 10px;font-size:.7rem;justify-content:center;border:1px solid rgba(42,58,82,.18);}
+  .filter-select{width:100%;min-width:0;height:44px;font-size:.66rem;padding:0 28px 0 12px;}
+  .search-wrap{grid-column:1 / -1;margin:0;}
   .search-input{width:100%;height:44px;font-size:.92rem;padding:0 14px;}
   .search-input:focus{width:100%;}
   .sort-select{height:40px;padding:0 12px;font-size:.78rem;}
@@ -499,7 +505,6 @@ footer{
 .filter-clear:hover{color:var(--navy);}
 .filter-clear[hidden]{display:none;}
 @media(min-width:960px){.filter-clear{margin-left:0;margin-right:8px;}}
-@media(max-width:700px){.filter-clear{height:44px;padding:0 10px;font-size:.7rem;}}
 .ico-loc{width:16px;height:16px;flex-shrink:0;display:block;}
 .barrio-trigger .ico-loc{margin-right:8px;opacity:.9;}
 .mapa-fab .ico-loc{width:15px;height:15px;}
@@ -631,7 +636,7 @@ body.sheet-open{overflow:hidden;}
     <div class="cat-hero-text">
       <p class="cat-eyebrow">BAIREN · Buenos Aires</p>
       <h1 class="cat-title" id="catTitle">Departamentos a mediano plazo</h1>
-      <p class="cat-sub" id="catSub">Amoblados · Todo incluido · Sin garantía ni seguro de caución</p>
+      <p class="cat-sub" id="catSub">Amoblados · Todo incluido · Sin garantía inmobiliaria ni seguro de caución</p>
       <div class="cat-panel" id="catPanel" aria-live="polite"></div>
     </div>
     <div class="cat-hero-mapa"><div class="mapa-wrap"><div id="mapaHero" role="group" aria-label="Mapa de barrios"></div></div></div>
@@ -879,7 +884,7 @@ function sorted(arr) {
 /* Textos dinámicos del catálogo por idioma (lee window.BAIREN_LANG de i18n.js) */
 const CT = {
   es: {
-    title_todos:'Departamentos a mediano plazo', sub_todos:'Amoblados · Todo incluido · Sin garantía ni seguro de caución',
+    title_todos:'Departamentos a mediano plazo', sub_todos:'Amoblados · Todo incluido · Sin garantía inmobiliaria ni seguro de caución',
     count_one:'propiedad', count_many:'propiedades', empty_t:'Sin resultados', empty_s:'Probá con otro barrio.',
     loading:'Cargando propiedades...', err_t:'No pudimos cargar las propiedades', err_s:'Revisá la conexión a internet. Si el problema persiste, contactanos por WhatsApp.',
     per_month:'por mes', per_month_all:'por mes · all in', consult:'Consultar precio', ver_mas:'Ver más →',
@@ -889,7 +894,7 @@ const CT = {
     barrios:'Barrios', borrar_filtro:'Borrar filtro', todos_barrios:'Todos los barrios', sheet_title:'Elegí un barrio', cerrar:'Cerrar', clear_aria:'Quitar filtro de barrio', u_one:'unidad', u_many:'unidades', panel_todos:'<b>{n}</b> unidades en <b>{z}</b> barrios'
   },
   pt: {
-    title_todos:'Apartamentos de médio prazo', sub_todos:'Mobiliados · Tudo incluído · Sem garantia nem seguro fiança',
+    title_todos:'Apartamentos de médio prazo', sub_todos:'Mobiliados · Tudo incluído · Sem garantia imobiliária nem seguro fiança',
     count_one:'imóvel', count_many:'imóveis', empty_t:'Sem resultados', empty_s:'Tente outro bairro.',
     loading:'Carregando imóveis...', err_t:'Não foi possível carregar os imóveis', err_s:'Verifique sua conexão. Se o problema persistir, fale conosco pelo WhatsApp.',
     per_month:'por mês', per_month_all:'por mês · tudo incluído', consult:'Consultar preço', ver_mas:'Ver mais →',
@@ -899,7 +904,7 @@ const CT = {
     barrios:'Bairros', borrar_filtro:'Limpar filtro', todos_barrios:'Todos os bairros', sheet_title:'Escolha um bairro', cerrar:'Fechar', clear_aria:'Remover filtro de bairro', u_one:'unidade', u_many:'unidades', panel_todos:'<b>{n}</b> unidades em <b>{z}</b> bairros'
   },
   en: {
-    title_todos:'Medium-term apartments', sub_todos:'Furnished · All inclusive · No guarantor and no surety bond',
+    title_todos:'Medium-term apartments', sub_todos:'Furnished · All inclusive · No property guarantor and no surety bond',
     count_one:'property', count_many:'properties', empty_t:'No results', empty_s:'Try another neighbourhood.',
     loading:'Loading properties...', err_t:'We could not load the properties', err_s:'Check your internet connection. If the problem persists, contact us on WhatsApp.',
     per_month:'per month', per_month_all:'per month · all in', consult:'Ask for price', ver_mas:'See more →',
