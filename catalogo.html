@@ -1037,8 +1037,15 @@ async function loadFromSupabase() {
     if (error) throw error;
 
     props = (data || []).flatMap(p => {
-      // Solo se ofrece alquiler a mediano plazo: una unidad en venta no se muestra
-      if (p.tipo === 'Venta') return [];
+      // Solo se ofrece alquiler a mediano plazo (decisión del 22/9/2026): no se
+      // muestran ni las unidades en venta ni las de largo plazo.
+      //
+      // Las de largo plazo quedan publicadas en la base a propósito: su precio de
+      // hoy es "seco" (sin expensas, servicios ni muebles) y la web promete precio
+      // final, así que mostrarlas sería prometer una cosa y cobrar otra. En cuanto
+      // cada una tenga su precio paquete y pase a tipo 'Temporal', vuelve sola al
+      // catálogo. No hace falta tocar este archivo.
+      if (p.tipo === 'Venta' || p.tipo === 'Tradicional') return [];
       const primera = (p.imagenes || []).sort((a, b) => a.orden - b.orden)[0];
       // portada_url = imagen especial de catálogo (cargada en el admin);
       // solo se usa acá — la ficha sigue mostrando su galería normal.
@@ -1069,11 +1076,11 @@ async function loadFromSupabase() {
           : null,
       };
       // tipo='Ambos' se expande en dos items (uno por modalidad) para preservar filtros
+      // tipo='Ambos': solo entra su modalidad de mediano plazo, por lo mismo de arriba
       if (p.tipo === 'Ambos') {
-        const out = [];
-        if (p.precio_temporal)    out.push({ ...base, id: p.id + '-t', tipo: 'Temporal',    precio: Number(p.precio_temporal) });
-        if (p.precio_tradicional) out.push({ ...base, id: p.id + '-d', tipo: 'Tradicional', precio: Number(p.precio_tradicional) });
-        return out;
+        return p.precio_temporal
+          ? [{ ...base, id: p.id + '-t', tipo: 'Temporal', precio: Number(p.precio_temporal) }]
+          : [];
       }
       return [{
         ...base,
