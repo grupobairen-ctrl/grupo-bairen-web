@@ -52,8 +52,8 @@
     <form class="h-search" id="searchForm" action="buscar.html" method="get" role="search" aria-label="Buscar propiedades" data-i18n-aria="buscar_aria">
       <input type="hidden" name="op" id="opInput" value="venta">
       <div class="h-seg" role="group" aria-label="Operación">
-        <button type="button" class="on" data-op="venta" aria-pressed="true" data-i18n="comprar">Comprar</button>
-        <button type="button" data-op="alquiler" aria-pressed="false" data-i18n="alquilar">Alquilar</button>
+        <button type="button" data-op="venta" aria-pressed="false" data-i18n="comprar">Comprar</button>
+        <button type="button" class="on" data-op="alquiler" aria-pressed="true" data-i18n="alquilar">Alquilar</button>
       </div>
       <div class="h-field h-field-lupa">
         <svg class="lupa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.6"/><path d="m16.2 16.2 4.3 4.3"/></svg>
@@ -169,7 +169,9 @@ document.addEventListener('DOMContentLoaded', function(){
      plazo juntos (decisión de Tomás, 10/9/2026); el plazo se elige en el catálogo. ── */
   const opInput = document.getElementById('opInput');
   const segOp = document.querySelectorAll('.h-seg button');
-  let opActiva = 'venta';
+  /* 23/9/2026 · Arranca en Alquilar, no en Comprar: de 42 avisos hay 2 en venta y 40 de alquiler.
+     Entrar por la puerta que casi no tiene inventario deja al que busca frente a una lista vacía. */
+  let opActiva = 'alquiler';
   const pintarBuscador = () => {
     segOp.forEach(b => { const on = b.dataset.op === opActiva; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
     opInput.value = opActiva;

@@ -8,9 +8,14 @@
   const D = {};
 
   D.PUBLICADORES = {
-    'bairen': { id:'bairen', tipo:'profesional', nombre:'BAIREN', responsable:null, matricula:null, colegio:null, badge:'Selección BAIREN', verificado:true, desde:'2026', inicial:'B', portal:true,
+    /* 23/9/2026 · Esta fila dejó de ser "el portal publicando" y pasó a ser un publicador más:
+       Bairen Realty, la línea de alquiler a mediano plazo, con la categoría 'gestor'. El portal
+       no publica ni opera; un gestor sí. El slug 'bairen' NO cambia: está en las direcciones web
+       y en api/_portal/alertas.js. Esto tiene que decir lo mismo que la fila de la base
+       (migracion-11-gestores.sql), porque si difieren, gana esta copia escrita a mano. */
+    'bairen': { id:'bairen', tipo:'gestor', nombre:'BAIREN REALTY', responsable:null, matricula:null, colegio:null, badge:'Gestor de alquileres', verificado:true, desde:'2026', inicial:'BR', portal:true,
       whatsapp:'5491123106629', email:'contacto@bairengroup.com', telefono:null, zonas:['Recoleta','Palermo','Núñez','Puerto Madero','Belgrano'],
-      desc:'Propiedad seleccionada por BAIREN: ubicación, estado, distribución y calidad constructiva revisados antes de publicarla.',
+      desc:'Alquiler a mediano plazo, de 3 a 12 meses. Departamentos amoblados y equipados, con un solo precio todo incluido, sin garantía inmobiliaria ni seguro de caución.',
       desc_en:'Property selected by BAIREN: location, condition, layout and build quality reviewed before listing it.',
       desc_pt:'Imóvel selecionado pela BAIREN: localização, estado, distribuição e qualidade construtiva revisados antes de publicá-lo.' },
     'inmobiliaria-ejemplo': { id:'inmobiliaria-ejemplo', tipo:'profesional', nombre:'Inmobiliaria Ejemplo', responsable:'Corredor de ejemplo', matricula:'CUCICBA 0000', badge:'Corredor inmobiliario matriculado', verificado:true, desde:'2026', inicial:'IE', demo:true,
@@ -163,9 +168,15 @@
   D.opMatch = (a, op) => !op || (op === 'alquiler' ? a.op !== 'venta' : op === 'largo' ? a.op === 'alquiler' : a.op === op);
   D.precioHTML = a => a.precio ? `${BP.fmtUSD(a.precio)}${a.periodo ? '<small>' + BP.t('ui_por_mes', a.periodo) + '</small>' : ''}` : BP.t('card_consultar_precio', 'Consultar precio');
   /* La insignia es un dato del publicador ('Dueño verificado', 'Corredor inmobiliario matriculado'…): se traduce como etiqueta fija; 'Selección BAIREN' es nombre propio y queda */
+  /* 22/9/2026 · El sello del dueño se pinta SOLO si la titularidad está verificada de verdad.
+     Antes se pintaba "Dueño verificado" con escudo por el mero hecho de ser tipo 'dueno', sin
+     mirar el flag: el sello, que es la promesa del portal, no lo respaldaba nada. Sin verificar
+     se dice "Dueño directo", sin escudo, que es cierto y no promete lo que no se controló. */
   D.badgeHTML = pub => !pub.matricula && pub.tipo !== 'dueno' ? `<span class="p-badge">${BP.ico.check} ${BP.esc(BP.etiqueta(pub.badge || 'Selección BAIREN'))}</span>`
     : pub.tipo === 'dueno'
-    ? `<span class="p-badge dueno">${BP.ico.shield} ${BP.esc(BP.etiqueta(pub.badge || ''))}</span>`
+    ? (pub.verificado
+        ? `<span class="p-badge dueno">${BP.ico.shield} ${BP.esc(BP.etiqueta(pub.badge || 'Dueño verificado'))}</span>`
+        : `<span class="p-badge dueno">${BP.esc(BP.t('ui_dato_dueno_directo', 'Dueño directo'))}</span>`)
     : pub.tipo === 'desarrolladora' ? `<span class="p-badge dueno">${BP.ico.building} ${BP.t('ui_dato_venta_directa', 'Venta directa')}</span>`
     : `<span class="p-badge">${BP.ico.shield} ${BP.esc(pub.matricula || '')}</span>`;
   D.waLink = (a, pub) => pub.whatsapp ? 'https://wa.me/' + pub.whatsapp + '?text=' + encodeURIComponent(BP.tf('card_wa_msg', 'Hola, vi {t} ({c}) en BAIREN y quiero más información.', { t: a.titulo, c: a.codigo })) : null;
