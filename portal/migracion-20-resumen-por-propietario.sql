@@ -54,6 +54,12 @@ on conflict (email) do nothing;
 -- ── 3 · La lista de trabajo, con el interruptor al lado ─────────────
 -- Igual que resumen_semanal_propietarios, más una columna que dice si a
 -- ese mail hay que escribirle. `activo` en null significa que es nuevo.
+--
+-- El DROP no es opcional: esta versión devuelve una columna más que la de
+-- la migración 19, y Postgres no deja cambiarle la forma a una función que
+-- ya existe. Sin esto da "cannot change return type of existing function".
+drop function if exists portal.resumen_semanal_propietarios(timestamptz, timestamptz);
+
 create or replace function portal.resumen_semanal_propietarios(
   p_desde timestamptz,
   p_hasta timestamptz default now()
