@@ -319,7 +319,7 @@
   };
   S.savePublicador = async function(p){
     if (!S.session) throw new Error('sin sesión');
-    const rec = Object.assign({ tipo:'dueno', verificado:false, zonas:[], badge: p.tipo === 'dueno' ? 'Dueño verificado' : p.tipo === 'desarrolladora' ? 'Venta directa' : 'Corredor inmobiliario matriculado' }, p, { auth_user_id: S.session.id, email: p.email || S.session.email, slug: p.slug || slugify(p.nombre) + '-' + (S.session.id||'').slice(-4), updated_at: now() });
+    const rec = Object.assign({ tipo:'dueno', verificado:false, zonas:[], badge: p.tipo === 'dueno' ? 'Dueño verificado' : p.tipo === 'desarrolladora' ? 'Venta directa' : p.tipo === 'gestor' ? 'Gestor de alquileres' : 'Corredor inmobiliario matriculado' }, p, { auth_user_id: S.session.id, email: p.email || S.session.email, slug: p.slug || slugify(p.nombre) + '-' + (S.session.id||'').slice(-4), updated_at: now() });
     if (S.mode === 'supabase') {
       /* El DNI es de la persona (portal.personas, migración 01), no del publicador: a la tabla publicadores no va, o PostgREST rechaza la fila entera. */
       const fila = Object.assign({}, rec); delete fila.dni;

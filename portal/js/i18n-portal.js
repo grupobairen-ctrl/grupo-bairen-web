@@ -46,7 +46,8 @@ window.BP_I18N = {
     ui_compartir_aria: 'Share this property', ui_compartir: 'Share', ui_por_mail: 'By email', ui_copiar: 'Copy the link', ui_otras_apps: 'Other apps', ui_cerrar: 'Close', ui_copiado: 'Copied', ui_enlace_copiado: 'Link copied.',
     ui_ingresa_notif: 'Sign in to see your notifications.', ui_sin_notif: 'No new notifications.', ui_sesion_cerrada: 'Signed out.',
     ui_sin_unidades: 'no units', ui_una_sug: 'One suggestion', ui_sugs: '{n} suggestions', ui_nav_principal: 'Main', ui_logo_aria: 'BAIREN, home',
-    ui_leyenda_plataforma: 'BAIREN is a property portal and does not act as a real estate broker. Each property is listed by its owner, by a licensed broker or by the developer, who are responsible for the transaction.',
+    ui_leyenda_plataforma: 'BAIREN is a property portal and does not act as a real estate broker. Each property is listed by its owner, by a licensed broker, by a manager with a management mandate or by the developer, who are responsible for the transaction.',
+    ui_dato_gestor_de_alquileres: 'Rental manager', pan_tipo_gestor: 'Rental manager', ing_crea_gestor: 'Create your rental manager account', ing_crea_gestor_sub: 'An email and a code. Then you add your details, an owner\'s mandate and your first listing.',
     ui_leyenda_alq_intro: 'Legal notice, Buenos Aires rental law:',
     /* operaciones: etiqueta del menú y complemento del título ("departamentos en venta") */
     op_venta_label: 'Buy', op_venta_h: 'for sale', op_alquiler_label: 'Rent', op_alquiler_h: 'for rent', op_mediano_label: 'Rent · mid-term', op_mediano_h: 'for mid-term rent', op_largo_label: 'Rent · long-term', op_largo_h: 'for long-term rent',
@@ -148,8 +149,8 @@ window.BP_I18N = {
     img_listo: 'Done.', img_demo: 'In demo mode nothing is saved.', img_no_guardo: 'Could not save: ', img_no_subio: 'The photo could not be uploaded.', img_elegi: 'Choose an image (JPG or PNG).',
     /* 12/9 · publicadores y emprendimientos (publicadores.html, emprendimientos.html): banda, muro, bloques de publicador,
        fichas de emprendimiento, vacíos, contadores y título de la pestaña. Las tarjetas ya pasan por card_ y BPData.badgeHTML. */
-    pubs_title: 'Listers · BAIREN', pubs_h1: 'Who lists here', pubs_sub: 'Licensed brokers, verified owners and developers. The same rules for everyone. Each one is responsible for the transaction behind what they list.',
-    pubs_box: '<b>Are you an agency or broker in these neighborhoods?</b> List your portfolio for free during the launch, with import from Tokko. <a href="publicar.html#inmobiliaria" style="text-decoration:underline">Get started</a>.',
+    pubs_title: 'Listers · BAIREN', pubs_h1: 'Who lists here', pubs_sub: 'Licensed brokers, verified owners, rental managers with a mandate and developers. The same rules for everyone. Each one is responsible for the transaction behind what they list.',
+    pubs_box: '<b>Are you an agency, broker or rental manager in these neighborhoods?</b> List your portfolio for free during the launch, with import from Tokko. <a href="publicar.html#inmobiliaria" style="text-decoration:underline">Get started</a>.',
     pubs_desarrolladora: 'Developer', pubs_ejemplo_min: 'sample', pubs_tu_inmo: 'Your agency', pubs_publicar_en: 'List on BAIREN', pubs_muro_aria: 'Listers on BAIREN',
     pubs_dueno_directo_verif: 'Verified direct owner', pubs_publica_desde: 'Listing on BAIREN since {y}', pubs_en_venta: '{n} for sale', pubs_en_alquiler: '{n} for rent', pubs_zonas: 'Areas: ',
     ui_dato_corredor_de_ejemplo: 'Sample broker', ui_dato_equipo_comercial: 'Sales team',
@@ -219,7 +220,7 @@ window.BP_I18N = {
     /* ingresar */
     ing_title: 'Sign in · BAIREN', ing_sub: 'Favorites, alerts, your contacts and, if you list, your dashboard. No password: we email you a code.',
     ing_mail: 'Email', ing_mail_ph: 'Your email', ing_continuar: 'Continue', ing_codigo: 'Six-digit code', ing_reenviar: 'Resend code', ing_reenviar_en: 'Resend in {s} s', ing_cambiar_mail: 'Change email',
-    ing_op_busca: 'I am looking for a property', ing_op_busca_s: 'Rent or buy. Favorites, alerts and your enquiries.', ing_op_dueno: 'I am the owner', ing_op_dueno_s: 'List my property, or follow the one my agency lists.', ing_op_prof: 'Agency, broker or developer', ing_op_prof_s: 'List properties, receive enquiries, import my portfolio.',
+    ing_op_busca: 'I am looking for a property', ing_op_busca_s: 'Rent or buy. Favorites, alerts and your enquiries.', ing_op_dueno: 'I am the owner', ing_op_dueno_s: 'List my property, or follow the one my agency lists.', ing_op_prof: 'Agency, broker, rental manager or developer', ing_op_prof_s: 'List properties, receive enquiries, import my portfolio.',
     ing_o: 'or', ing_google: 'Continue with Google', ing_apple: 'Continue with Apple',
     ing_legal: 'By continuing you accept the <a href="legales.html#terminos" style="text-decoration:underline">Terms and conditions</a> and the <a href="legales.html#privacidad" style="text-decoration:underline">Privacy policy</a>. One account per person.',
     ing_crea_cuenta: 'Create your account to list', ing_crea_sub: 'An email and a code. Then you complete your profile and add the property.',
@@ -281,7 +282,8 @@ window.BP_I18N = {
     ui_compartir_aria: 'Compartilhar este imóvel', ui_compartir: 'Compartilhar', ui_por_mail: 'Por e-mail', ui_copiar: 'Copiar o link', ui_otras_apps: 'Outros aplicativos', ui_cerrar: 'Fechar', ui_copiado: 'Copiado', ui_enlace_copiado: 'Link copiado.',
     ui_ingresa_notif: 'Entre para ver suas notificações.', ui_sin_notif: 'Você não tem notificações novas.', ui_sesion_cerrada: 'Sessão encerrada.',
     ui_sin_unidades: 'sem unidades', ui_una_sug: 'Uma sugestão', ui_sugs: '{n} sugestões', ui_nav_principal: 'Principal', ui_logo_aria: 'BAIREN, início',
-    ui_leyenda_plataforma: 'A BAIREN é um portal de imóveis e não exerce a corretagem imobiliária. Cada imóvel é publicado pelo seu proprietário, por um corretor habilitado ou pela incorporadora, responsáveis pela operação.',
+    ui_leyenda_plataforma: 'A BAIREN é um portal de imóveis e não exerce a corretagem imobiliária. Cada imóvel é publicado pelo seu proprietário, por um corretor habilitado, por um gestor com mandato de administração ou pela incorporadora, responsáveis pela operação.',
+    ui_dato_gestor_de_alquileres: 'Gestor de aluguéis', pan_tipo_gestor: 'Gestor de aluguéis', ing_crea_gestor: 'Crie sua conta de gestor de aluguéis', ing_crea_gestor_sub: 'Um e-mail e um código. Depois você cadastra seus dados, o mandato de um proprietário e seu primeiro anúncio.',
     ui_leyenda_alq_intro: 'Aviso legal, lei de aluguéis de Buenos Aires:',
     /* operaciones */
     op_venta_label: 'Comprar', op_venta_h: 'à venda', op_alquiler_label: 'Alugar', op_alquiler_h: 'para alugar', op_mediano_label: 'Alugar · médio prazo', op_mediano_h: 'para aluguel de médio prazo', op_largo_label: 'Alugar · longo prazo', op_largo_h: 'para aluguel de longo prazo',
@@ -383,8 +385,8 @@ window.BP_I18N = {
     img_listo: 'Pronto.', img_demo: 'No modo demo nada é salvo.', img_no_guardo: 'Não foi possível salvar: ', img_no_subio: 'Não foi possível enviar a foto.', img_elegi: 'Escolha uma imagem (JPG ou PNG).',
     /* 12/9 · publicadores y emprendimientos (publicadores.html, emprendimientos.html): banda, muro, bloques de publicador,
        fichas de emprendimiento, vacíos, contadores y título de la pestaña. Las tarjetas ya pasan por card_ y BPData.badgeHTML. */
-    pubs_title: 'Anunciantes · BAIREN', pubs_h1: 'Quem publica', pubs_sub: 'Corretores habilitados, proprietários verificados e incorporadoras. As mesmas regras para todos. Cada um responde pela operação do que publica.',
-    pubs_box: '<b>Você é imobiliária ou corretor desses bairros?</b> Publique sua carteira grátis durante o lançamento, com importação do Tokko. <a href="publicar.html#inmobiliaria" style="text-decoration:underline">Começar</a>.',
+    pubs_title: 'Anunciantes · BAIREN', pubs_h1: 'Quem publica', pubs_sub: 'Corretores habilitados, proprietários verificados, gestores de aluguéis com mandato e incorporadoras. As mesmas regras para todos. Cada um responde pela operação do que publica.',
+    pubs_box: '<b>Você é imobiliária, corretor ou gestor de aluguéis desses bairros?</b> Publique sua carteira grátis durante o lançamento, com importação do Tokko. <a href="publicar.html#inmobiliaria" style="text-decoration:underline">Começar</a>.',
     pubs_desarrolladora: 'Incorporadora', pubs_ejemplo_min: 'exemplo', pubs_tu_inmo: 'Sua imobiliária', pubs_publicar_en: 'Publicar na BAIREN', pubs_muro_aria: 'Anunciantes na BAIREN',
     pubs_dueno_directo_verif: 'Proprietário direto verificado', pubs_publica_desde: 'Publica na BAIREN desde {y}', pubs_en_venta: '{n} à venda', pubs_en_alquiler: '{n} para alugar', pubs_zonas: 'Zonas: ',
     ui_dato_corredor_de_ejemplo: 'Corretor de exemplo', ui_dato_equipo_comercial: 'Equipe comercial',
@@ -453,7 +455,7 @@ window.BP_I18N = {
     /* ingresar */
     ing_title: 'Entrar · BAIREN', ing_sub: 'Favoritos, alertas, seus contatos e, se você publica, seu painel. Sem senha: enviamos um código para o seu e-mail.',
     ing_mail: 'E-mail', ing_mail_ph: 'Seu e-mail', ing_continuar: 'Continuar', ing_codigo: 'Código de oito dígitos', ing_reenviar: 'Reenviar código', ing_reenviar_en: 'Reenviar em {s} s', ing_cambiar_mail: 'Trocar e-mail',
-    ing_op_busca: 'Procuro imóvel', ing_op_busca_s: 'Alugar ou comprar. Favoritos, alertas e suas consultas.', ing_op_dueno: 'Sou proprietário direto', ing_op_dueno_s: 'Publicar meu imóvel, ou acompanhar o que minha imobiliária publica.', ing_op_prof: 'Imobiliária, corretor ou incorporadora', ing_op_prof_s: 'Publicar anúncios, receber interessados, importar minha carteira.',
+    ing_op_busca: 'Procuro imóvel', ing_op_busca_s: 'Alugar ou comprar. Favoritos, alertas e suas consultas.', ing_op_dueno: 'Sou proprietário direto', ing_op_dueno_s: 'Publicar meu imóvel, ou acompanhar o que minha imobiliária publica.', ing_op_prof: 'Imobiliária, corretor, gestor ou incorporadora', ing_op_prof_s: 'Publicar anúncios, receber interessados, importar minha carteira.',
     ing_o: 'ou', ing_google: 'Continuar com o Google', ing_apple: 'Continuar com a Apple',
     ing_legal: 'Ao continuar você aceita os <a href="legales.html#terminos" style="text-decoration:underline">Termos e condições</a> e a <a href="legales.html#privacidad" style="text-decoration:underline">Política de privacidade</a>. Uma conta por pessoa.',
     ing_crea_cuenta: 'Crie sua conta para publicar', ing_crea_sub: 'Um e-mail e um código. Depois você completa seu perfil e cadastra o imóvel.',

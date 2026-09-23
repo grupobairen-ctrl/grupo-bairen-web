@@ -33,7 +33,7 @@
   /* La leyenda de plataforma se traduce; la de alquiler es una cita textual de la Ley 2340 y queda en castellano
      en todos los idiomas: catálogo y ficha le anteponen una línea traducida (cat_leyenda_alq / ui_leyenda_alq_intro). */
   BP.leyendaPlataforma = () => BP.t('ui_leyenda_plataforma', BP.LEYENDA_PLATAFORMA);
-  BP.LEYENDA_PLATAFORMA = 'BAIREN es un portal de propiedades y no ejerce el corretaje inmobiliario. Cada propiedad es publicada por su titular, por un corredor matriculado o por la desarrolladora, responsables de la operación.';
+  BP.LEYENDA_PLATAFORMA = 'BAIREN es un portal de propiedades y no ejerce el corretaje inmobiliario. Cada propiedad es publicada por su titular, por un corredor matriculado, por un gestor con mandato de administración o por la desarrolladora, responsables de la operación.';
   BP.LEYENDA_ALQUILER = '"Para los casos de alquiler de vivienda, el monto máximo de comisión que se le puede requerir a los propietarios será el equivalente al cuatro con quince centésimos por ciento (4,15%) del valor total del respectivo contrato. Se encuentra prohibido cobrar a los inquilinos que sean personas físicas comisiones inmobiliarias y gastos de gestoría de informes".';
 
   BP.sbImg = function(u, w){

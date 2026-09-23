@@ -311,7 +311,7 @@ body{background:var(--p-bg);color:var(--text-dark);font-family:var(--font-body)}
 
 /* ── Páginas simples (Publicar, Ingresar, Legales, Publicadores) ── */
 .p-page{padding:120px 0 80px;min-height:70vh}
-.p-perfiles{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:30px}
+.p-perfiles{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:30px}
 .p-perfil{background:#fff;border:1px solid var(--p-line);border-top:3px solid var(--gold);border-radius:16px;padding:30px 22px;text-align:center;transition:all .25s;cursor:pointer;display:block}
 .p-perfil:hover{transform:translateY(-3px);box-shadow:var(--p-shadow)}
 .p-perfil svg{width:40px;height:40px;color:var(--gold-dark);margin-bottom:14px}
@@ -333,7 +333,7 @@ body{background:var(--p-bg);color:var(--text-dark);font-family:var(--font-body)}
 .p-prose h2{font-family:var(--font-display);font-weight:500;font-size:1.25rem;color:var(--navy-deeper);margin:30px 0 8px}
 .p-prose p,.p-prose li{color:var(--text-mid);line-height:1.65}
 .p-prose .box{background:#fff;border:1px solid var(--p-line);border-left:3px solid var(--gold);border-radius:8px;padding:14px 18px;color:var(--navy-deeper)}
-@media(max-width:900px){.p-perfiles,.p-steps{grid-template-columns:1fr}}
+@media(max-width:1100px){.p-perfiles{grid-template-columns:repeat(2,1fr)}} @media(max-width:900px){.p-perfiles,.p-steps{grid-template-columns:1fr}}
 .p-demo-banner{position:fixed;left:12px;bottom:12px;z-index:1900;background:#fff;border:1px solid var(--gold);border-radius:8px;padding:8px 12px;font-size:.72rem;color:var(--navy-deeper);box-shadow:var(--p-shadow);letter-spacing:.04em}
 .p-demo-banner b{color:var(--gold-dark)}
 /* etiqueta de operación sobre .card-tag de catalogo.css */
@@ -3701,3 +3701,11 @@ body.p-home .h-track-fotos{scroll-snap-type:x proximity !important}
 
 /* La tira de datos de la ficha ahora recibe foco: que se vea que lo tiene. */
 .p-icons:focus-visible{outline:3px solid var(--gold,#C2A968);outline-offset:3px}
+
+/* 23/9/2026 · El cajón "Más filtros" del catálogo tiene fondo blanco (regla body.p-catalogo de arriba) pero heredaba
+   los colores del tema oscuro: rótulos de cualidades y amenities en crema al 62 %, botones 1+/2+/3+ crema sobre
+   baldosa clara, "Limpiar todo" crema. Un agente que hizo de gestor los vio como cajitas sin texto. Todo en navy. */
+body.p-catalogo .p-drawer .checks label,body.p-catalogo .p-drawer .p-note,body.p-catalogo .p-drawer .lnk,body.p-catalogo .p-drawer .x{color:var(--s-navy)}
+body.p-catalogo .p-drawer .p-fbtn,body.p-catalogo .p-drawer .p-fsel{background:#fff;border-color:rgba(42,58,82,.22);color:var(--s-navy)}
+body.p-catalogo .p-drawer .p-fbtn.on,body.p-catalogo .p-drawer .p-fbtn[aria-pressed="true"]{background:var(--s-navy);border-color:var(--s-navy);color:#fff}
+body.p-catalogo .p-drawer .p-fsel::placeholder{color:rgba(42,58,82,.5)}
