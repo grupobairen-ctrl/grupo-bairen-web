@@ -3661,7 +3661,8 @@ body.p-membership #preguntas .p-h2{font-size:1.35rem}
   /* El selector de tipo mostraba "DEPARTAMEN": la palabra no entraba en su
      ancho. Sin el espaciado entre letras y con menos aire a los costados,
      "DEPARTAMENTO" entra entero. En escritorio queda como estaba. */
-  body.p-catalogo .p-filters .p-fsel{letter-spacing:.02em;padding:0 20px 0 8px}
+  /* Con !important porque las reglas de más arriba lo tienen: sin esto, no gana. */
+  body.p-catalogo .p-filters .p-fsel{letter-spacing:.02em !important;padding:0 22px 0 8px !important}
 
   /* La tarjeta tenía texto de 9 a 10 px en mayúscula con espaciado ancho:
      se lee con esfuerzo, y es justo la información con la que alguien
