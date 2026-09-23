@@ -27,7 +27,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260923m"><link rel="stylesheet" href="css/catalogo.css?v=20260923m"><link rel="stylesheet" href="css/portal.css?v=20260923m">
+  <link rel="stylesheet" href="css/base.css?v=20260923n"><link rel="stylesheet" href="css/catalogo.css?v=20260923n"><link rel="stylesheet" href="css/portal.css?v=20260923n">
 </head>
 <body>
 <div class="p-velo" aria-hidden="true"><span class="w">BAIREN</span></div>
@@ -54,7 +54,7 @@
   </div>
 </div></section>
 <div id="pFooter"></div>
-<script src="supabase-portal.js?v=20260923m" defer></script><script src="js/errores.js?v=20260923m" defer></script><script src="js/motion.js?v=20260923m" defer></script><script src="js/bairen-motion.js?v=20260923m" defer></script><script src="js/i18n-portal.js?v=20260923m" defer></script><script src="js/ui.js?v=20260923m" defer></script><script src="js/store.js?v=20260923m" defer></script><script src="js/data.js?v=20260923m" defer></script>
+<script src="supabase-portal.js?v=20260923n" defer></script><script src="js/errores.js?v=20260923n" defer></script><script src="js/motion.js?v=20260923n" defer></script><script src="js/bairen-motion.js?v=20260923n" defer></script><script src="js/i18n-portal.js?v=20260923n" defer></script><script src="js/ui.js?v=20260923n" defer></script><script src="js/store.js?v=20260923n" defer></script><script src="js/data.js?v=20260923n" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function(){
   });
   if (BPStore.session) { if (await hayQuePreguntar()) { mostrarPregunta(); return; } location.replace(destino()); return; }
   let mail = '';
-  async function send(){ const b = document.getElementById('btnMail'); if (b.disabled) return; if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.value.trim())) { BP.errorCampo('email', BP.t('ing_err_mail', 'Revisá el mail, por ejemplo nombre@dominio.com.')); return; } b.disabled = true; b.textContent = BP.t('ing_enviando', 'Enviando…'); await BPStore.init(); let r; try { r = await BPStore.sendCode(email.value); } catch (err) { r = { ok: false, msg: err.message || BP.t('ing_no_envio', 'No se pudo enviar el código.') }; } b.disabled = false; b.textContent = T.continuar; if (!r.ok) { BP.errorCampo('email', r.msg); return; } mail = email.value.trim().toLowerCase(); document.getElementById('codeMsg').textContent = r.msg; const _paso = () => { fm.hidden = true; document.getElementById('social').hidden = true; fc.hidden = false; }; if (window.BPM && BPM.cambioDePaso) BPM.cambioDePaso(document.querySelector('.p-login'), _paso, 1); else _paso(); const c = document.getElementById('code'); c.value = ''; c.focus(); }
+  async function send(){ const b = document.getElementById('btnMail'); if (b.disabled) return; if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.value.trim())) { BP.errorCampo('email', BP.t('ing_err_mail', 'Revisá el mail, por ejemplo nombre@dominio.com.')); return; } b.disabled = true; b.textContent = BP.t('ing_enviando', 'Enviando…'); await BPStore.init(); let r; try { r = await BPStore.sendCode(email.value); } catch (err) { r = { ok: false, msg: BPStore.errorHumano(err, 'enviar') }; } b.disabled = false; b.textContent = T.continuar; if (!r.ok) { BP.errorCampo('email', r.msg); return; } mail = email.value.trim().toLowerCase(); document.getElementById('codeMsg').textContent = r.msg; const _paso = () => { fm.hidden = true; document.getElementById('social').hidden = true; fc.hidden = false; }; if (window.BPM && BPM.cambioDePaso) BPM.cambioDePaso(document.querySelector('.p-login'), _paso, 1); else _paso(); const c = document.getElementById('code'); c.value = ''; c.focus(); }
   fm.addEventListener('submit', e => { e.preventDefault(); send(); });
   let reenviando = false;
   document.getElementById('again').addEventListener('click', e => { e.preventDefault(); const ag = e.currentTarget; if (reenviando) return; reenviando = true; ag.setAttribute('aria-disabled', 'true'); send(); const t0 = ag.textContent; let seg = 30; const cuenta = n => BP.tf('ing_reenviar_en', 'Reenviar en {s} s', { s: n }); ag.textContent = cuenta(30); const iv = setInterval(() => { seg--; if (seg <= 0) { clearInterval(iv); reenviando = false; ag.textContent = t0; ag.removeAttribute('aria-disabled'); } else ag.textContent = cuenta(seg); }, 1000); });
@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', function(){
     e.preventDefault(); const code = document.getElementById('code'), b = document.getElementById('btnCode');
     if (!/^\d{6,8}$/.test(code.value.trim())) { BP.errorCampo('code', BP.t('ing_err_codigo', 'El código tiene ocho dígitos.')); return; }
     b.disabled = true; b.textContent = BP.t('ing_verificando', 'Verificando…');
-    let r; try { r = await BPStore.verifyCode(mail, code.value); } catch (err) { r = { ok: false, msg: err.message || BP.t('ing_no_verifico', 'No se pudo verificar.') }; }
+    let r; try { r = await BPStore.verifyCode(mail, code.value); } catch (err) { r = { ok: false, msg: BPStore.errorHumano(err, 'verificar') }; }
     if (!r.ok) { b.disabled = false; b.textContent = T.ingresar; BP.errorCampo('code', r.msg); code.select(); return; }
     b.textContent = BP.t('ing_entrando', 'Entrando…');
     if (await hayQuePreguntar()) { mostrarPregunta(); return; }

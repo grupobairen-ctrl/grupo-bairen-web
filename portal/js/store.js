@@ -83,18 +83,31 @@
   S.requireSession = function(volver){ if (!S.session) { location.href = 'ingresar.html?volver=' + encodeURIComponent(volver || location.pathname.split('/').pop() + location.search); return false; } return true; };
 
   /* ── auth ─────────────────────────────────────────────── */
+  /* 23/9/2026 · Supabase contesta en inglés y en jerga ("email rate limit exceeded", "Email address ... is invalid",
+     "Token has expired or is invalid"). Un prospecto real vio eso en rojo y se fue. Acá se convierte cada caso conocido en
+     una frase en castellano que dice qué hacer; lo desconocido cae en una frase genérica, nunca en el texto crudo. */
+  const errorHumano = (e, contexto) => {
+    const m = String(e && e.message || e || '').toLowerCase();
+    if (/rate limit|too many|over_email_send_rate_limit/.test(m)) return T('ing_err_limite', 'Estamos mandando muchos códigos en este momento. Esperá unos minutos y volvé a probar, o entrá con Google.');
+    if (/is invalid|invalid email|unable to validate email/.test(m) && contexto === 'enviar') return T('ing_err_mail', 'Revisá el mail, por ejemplo nombre@dominio.com.');
+    if (/expired|invalid|otp/.test(m) && contexto === 'verificar') return T('ing_codigo_vencido', 'El código venció o no coincide. Pedí uno nuevo con "Reenviar".');
+    if (/signups? not allowed|disabled/.test(m)) return T('ing_err_cerrado', 'El ingreso está cerrado por el momento. Escribinos a portal@bairengroup.com.');
+    if (/network|fetch|failed to/.test(m)) return T('ing_err_red', 'No hay conexión. Revisá internet y probá de nuevo.');
+    return contexto === 'verificar' ? T('ing_no_verifico', 'No se pudo verificar. Probá de nuevo en un momento.') : T('ing_no_envio', 'No se pudo enviar el código. Probá de nuevo en un momento.');
+  };
+  S.errorHumano = errorHumano;
   S.sendCode = async function(email){
     email = (email||'').trim().toLowerCase(); if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return { ok:false, msg: T('ing_revisa_mail', 'Revisá el mail.') };
     /* 16/9 · Desde que el portal comparte proyecto de Auth con el OS, un link en el mail (si la plantilla lo trae) caería en la
        Site URL del proyecto (el OS). emailRedirectTo lo trae de vuelta al portal, a esta misma página, conservando ?volver=. */
     const volverA = location.origin + location.pathname.replace(/[^/]*$/, '') + 'ingresar.html' + location.search;
-    if (S.mode === 'supabase') { const { error } = await S.sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true, emailRedirectTo: volverA } }); return error ? { ok:false, msg: error.message } : { ok:true, msg: T('ing_codigo_enviado', 'Te mandamos un código de ocho dígitos a {e}. Si no llega, revisá spam.', { e: email }) }; }
+    if (S.mode === 'supabase') { const { error } = await S.sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true, emailRedirectTo: volverA } }); return error ? { ok:false, msg: errorHumano(error, 'enviar') } : { ok:true, msg: T('ing_codigo_enviado', 'Te mandamos un código de ocho dígitos a {e}. Si no llega, revisá spam.', { e: email }) }; }
     const code = String(Math.floor(100000 + Math.random() * 900000)); L.code.set({ email, code, t: Date.now() });
     return { ok:true, msg: T('ing_codigo_local', 'Modo local: tu código es {c}. Con Supabase conectado llega por mail.', { c: code }), code };
   };
   S.verifyCode = async function(email, code){
     email = (email||'').trim().toLowerCase(); code = (code||'').trim();
-    if (S.mode === 'supabase') { const { data, error } = await S.sb.auth.verifyOtp({ email, token: code, type: 'email' }); if (error) return { ok:false, msg: error.message }; S.session = sesionDe(data.user); return { ok:true }; }
+    if (S.mode === 'supabase') { const { data, error } = await S.sb.auth.verifyOtp({ email, token: code, type: 'email' }); if (error) return { ok:false, msg: errorHumano(error, 'verificar') }; S.session = sesionDe(data.user); return { ok:true }; }
     const c = L.code.get(null); if (!c || c.email !== email || c.code !== code) return { ok:false, msg: T('ing_codigo_incorrecto', 'Código incorrecto.') };
     /* En local el perfil se recuerda por mail (bp_perfiles), como los metadatos de Auth: la pregunta se hace una sola vez */
     const av = L.avatares.get({})[email] || {};   /* 12/9 · la imagen también se recuerda por mail (bp_avatares) */
