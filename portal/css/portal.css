@@ -1506,7 +1506,8 @@ a,button,[role="button"],summary{touch-action:manipulation;-webkit-tap-highlight
   body.p-catalogo .p-results-head .acts .p-fsel{height:40px !important;min-height:0 !important;font-size:.7rem !important;padding:0 26px 0 10px !important;width:auto !important;max-width:150px}
 }
 /* Ficha en celular: la fila de datos en una sola línea con scroll, como stats-row del sitio */
-@media(max-width:820px){.p-ficha .p-icons{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch}.p-ficha .p-icons > div{flex:0 0 auto;min-width:88px}}
+/* 23/9/2026 · En celular esta fila iba en una sola línea con scroll lateral y sin ninguna pista: el cuarto dato ("1 baño") quedaba cortado a 390 px. Ahora van de a dos por fila. */
+@media(max-width:820px){.p-ficha .p-icons{flex-wrap:wrap;overflow:visible;border-bottom:0}.p-ficha .p-icons > div{flex:1 1 50%;max-width:50%;min-width:0;padding:18px 8px;border-bottom:1px solid rgba(42,58,82,.1)}.p-ficha .p-icons > div:nth-child(2n){border-right:0}}
 
 /* ── Detalle en lo que se toca (Motion, 10/9/2026) ────────────────────────────
    El hundido al apretar lo pone Motion. Acá va lo visual: el relleno que sube
@@ -3709,3 +3710,16 @@ body.p-catalogo .p-drawer .checks label,body.p-catalogo .p-drawer .p-note,body.p
 body.p-catalogo .p-drawer .p-fbtn,body.p-catalogo .p-drawer .p-fsel{background:#fff;border-color:rgba(42,58,82,.22);color:var(--s-navy)}
 body.p-catalogo .p-drawer .p-fbtn.on,body.p-catalogo .p-drawer .p-fbtn[aria-pressed="true"]{background:var(--s-navy);border-color:var(--s-navy);color:#fff}
 body.p-catalogo .p-drawer .p-fsel::placeholder{color:rgba(42,58,82,.5)}
+
+/* 23/9/2026 · Tres cosas que encontró la auditoría visual de 50 capturas.
+   H1: la regla .card-tag.tag-alquiler de arriba (fondo blanco, texto navy con !important, pensada para
+   "Propiedades similares" de la ficha) le ganaba el color a las tarjetas del catálogo y la portada, cuyo fondo
+   sí es navy: "Alquiler, largo plazo" quedó navy sobre navy. Acá cada contexto recupera su texto claro.
+   H2: en el catálogo el número de página activo era blanco sobre crema, porque .p-product .p-pager button
+   pisaba el fondo navy de .on sin pisar el color.
+   H3: entre 561 y 820 px el catálogo iba a una sola columna con fotos de 400 px (página de casi 10.000 px
+   a 768). Dos columnas, como de 821 a 860. */
+body.p-catalogo .prop-card .card-tag.tag-alquiler{background:var(--s-navy);color:var(--s-white) !important}
+body.p-home .prop-card .card-tag.tag-alquiler{background:var(--h-navy);color:#FBFAF6 !important}
+.p-product .p-pager button.on,body.p-catalogo .p-pager button.on{background:var(--navy-deeper);border-color:var(--navy-deeper);color:#fff}
+@media(min-width:561px) and (max-width:820px){body.p-catalogo .p-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}}
