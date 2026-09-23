@@ -214,7 +214,7 @@ window.BP_I18N = {
     pan_tipo_dueno: 'Direct owner', pan_tipo_desarrolladora: 'Developer', pan_tipo_inmobiliaria: 'Agency or broker',
     pan_mail: 'Email', pan_en_bairen: 'On BAIREN', pan_sin_elegir: 'Not chosen: the dashboard shows everything', pan_publicador: 'Lister', pan_tipo: 'Type', pan_verificacion: 'Verification', pan_verificado: ' Verified', pan_verif_pend_bairen: 'Pending: BAIREN reviews it', pan_matricula: 'License', pan_sin_publicador: 'No profile yet. It is created when you list.',
     pan_que_venis: 'What brings you to BAIREN', pan_perfil_nota: 'It decides what the dashboard shows, not what you can do. Change it whenever you want.', pan_editar_publicador: 'Edit lister profile',
-    pan_privacidad: '<b>Privacy.</b> You can request access, correction or deletion of your data by writing to <a href="mailto:contacto@bairengroup.com">contacto@bairengroup.com</a>. Verification documents are deleted after review.',
+    pan_privacidad: '<b>Privacy.</b> You can request access, correction or deletion of your data by writing to <a href="mailto:portal@bairengroup.com">portal@bairengroup.com</a>. Verification documents are deleted after review.',
     pan_perfil_listo: 'Done. The dashboard now shows what is useful to you.',
     /* ingresar */
     ing_title: 'Sign in · BAIREN', ing_sub: 'Favorites, alerts, your contacts and, if you list, your dashboard. No password: we email you a code.',
@@ -442,7 +442,7 @@ window.BP_I18N = {
     pan_tipo_dueno: 'Proprietário direto', pan_tipo_desarrolladora: 'Incorporadora', pan_tipo_inmobiliaria: 'Imobiliária ou corretor',
     pan_mail: 'E-mail', pan_en_bairen: 'Na BAIREN', pan_sin_elegir: 'Sem escolher: o painel mostra tudo', pan_publicador: 'Anunciante', pan_tipo: 'Tipo', pan_verificacion: 'Verificação', pan_verificado: ' Verificado', pan_verif_pend_bairen: 'Pendente: a BAIREN revisa', pan_matricula: 'Matrícula', pan_sin_publicador: 'Ainda sem perfil. Ele é criado ao publicar.',
     pan_que_venis: 'O que você veio fazer na BAIREN', pan_perfil_nota: 'Define o que o painel mostra, não o que você pode fazer. Mude quando quiser.', pan_editar_publicador: 'Editar perfil de anunciante',
-    pan_privacidad: '<b>Privacidade.</b> Você pode pedir acesso, correção ou exclusão dos seus dados escrevendo para <a href="mailto:contacto@bairengroup.com">contacto@bairengroup.com</a>. Os documentos de verificação são apagados depois da revisão.',
+    pan_privacidad: '<b>Privacidade.</b> Você pode pedir acesso, correção ou exclusão dos seus dados escrevendo para <a href="mailto:portal@bairengroup.com">portal@bairengroup.com</a>. Os documentos de verificação são apagados depois da revisão.',
     pan_perfil_listo: 'Pronto. O painel já mostra o que serve para você.',
     /* ingresar */
     ing_title: 'Entrar · BAIREN', ing_sub: 'Favoritos, alertas, seus contatos e, se você publica, seu painel. Sem senha: enviamos um código para o seu e-mail.',
