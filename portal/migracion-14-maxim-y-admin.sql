@@ -36,6 +36,18 @@ update portal.publicadores p
    and p.slug = 'bairen'
    and p.auth_user_id is null;
 
+-- ── 1b · Bairen Realty tiene su propio mail de contacto ─────────────
+-- Las consultas de sus unidades van a realty@bairengroup.com, no al
+-- contacto institucional del portal. Son dos cosas distintas y conviene
+-- que lo sigan siendo: contacto@ es BAIREN, el portal; realty@ es el
+-- gestor que comercializa. El mail con el que se ENTRA al panel sigue
+-- siendo grupobairen@gmail.com, que es otra cosa que el mail de contacto.
+update portal.publicadores
+   set email      = 'realty@bairengroup.com',
+       updated_at = now()
+ where slug = 'bairen'
+   and email is distinct from 'realty@bairengroup.com';
+
 -- ── 2 · Maxim Propiedades ───────────────────────────────────────────
 insert into portal.publicadores
   (slug, tipo, nombre, responsable, matricula, colegio, email, telefono, whatsapp, badge, zonas, descripcion)

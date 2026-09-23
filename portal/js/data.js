@@ -14,7 +14,7 @@
        y en api/_portal/alertas.js. Esto tiene que decir lo mismo que la fila de la base
        (migracion-11-gestores.sql), porque si difieren, gana esta copia escrita a mano. */
     'bairen': { id:'bairen', tipo:'gestor', nombre:'BAIREN REALTY', responsable:null, matricula:null, colegio:null, badge:'Gestor de alquileres', verificado:true, desde:'2026', inicial:'BR', portal:true,
-      whatsapp:'5491123106629', email:'contacto@bairengroup.com', telefono:null, zonas:['Recoleta','Palermo','Núñez','Puerto Madero','Belgrano'],
+      whatsapp:'5491123106629', email:'realty@bairengroup.com', telefono:null, zonas:['Recoleta','Palermo','Núñez','Puerto Madero','Belgrano'],
       desc:'Alquiler a mediano plazo, de 3 a 12 meses. Departamentos amoblados y equipados, con un solo precio todo incluido, sin garantía inmobiliaria ni seguro de caución.',
       desc_en:'Property selected by BAIREN: location, condition, layout and build quality reviewed before listing it.',
       desc_pt:'Imóvel selecionado pela BAIREN: localização, estado, distribuição e qualidade construtiva revisados antes de publicá-lo.' },
