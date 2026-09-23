@@ -37,7 +37,11 @@ const SITE = 'https://www.bairengroup.com/portal/';
 const RESUMEN_A = process.env.PORTAL_RESUMEN_A || 'contacto@bairengroup.com';
 
 // Solo estos orígenes pueden llamar a las funciones. Misma lista que portal-notify.
-const ORIGENES = [/^https:\/\/(www\.)?bairengroup\.com$/, /^https:\/\/grupo-bairen[a-z0-9-]*\.vercel\.app$/, /^http:\/\/(localhost|127\.0\.0\.1):\d+$/];
+/* 23/9/2026 · Faltaba portal.bairengroup.com, que es el dominio donde vive el portal de verdad.
+   Sin él, /api/portal-sync devolvía 403 en cada carga y la sincronización web → portal disparada
+   por el navegador NUNCA corría en producción: los precios, las reservas y las bajas de
+   bairengroup.com llegaban solo por el cron de las 10:00, o sea con hasta 24 horas de atraso. */
+const ORIGENES = [/^https:\/\/(www\.)?bairengroup\.com$/, /^https:\/\/portal\.bairengroup\.com$/, /^https:\/\/grupo-bairen[a-z0-9-]*\.vercel\.app$/, /^http:\/\/(localhost|127\.0\.0\.1):\d+$/];
 const origenPermitido = req => { const o = (req.headers && req.headers.origin) || ''; return !o || ORIGENES.some(re => re.test(o)); };
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));

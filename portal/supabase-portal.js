@@ -95,6 +95,10 @@ function init() {
   if (window.supabase && typeof window.supabase.createClient === 'function') { init(); return; }
   const s = document.createElement('script');
   s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js';
+  /* 23/9/2026 · Sin esto el navegador baja el archivo DOS veces (102 KB en vez de 51):
+     el <link rel="preload"> de cada página lleva crossorigin y esta inyección no, así que
+     los modos de credenciales no coinciden, el preload se descarta y se pide de nuevo. */
+  s.crossOrigin = 'anonymous';
   s.onload = init;
   s.onerror = () => reject(new Error('no se pudo cargar el SDK de Supabase'));
   document.head.appendChild(s);
