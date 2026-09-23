@@ -158,7 +158,10 @@
   D.metaLine = a => [
     a.m2 ? a.m2 + ' m²' : null,
     a.amb ? (a.amb === 1 ? BP.t('card_monoamb', 'Monoamb.') : a.amb + ' ' + BP.t('card_amb', 'amb.')) : null,
-    a.dorm ? a.dorm + ' ' + (a.dorm === 1 ? BP.t('card_dorm_1', 'dorm.') : BP.t('card_dorm_n', 'dorm.')) : null,
+    /* 23/9/2026 · En un monoambiente no se nombra el dormitorio. Nueve avisos decían
+       "Monoamb. · 1 dorm.", que es una contradicción: el dato de dormitorios viene inferido
+       de los ambientes, no cargado. Cuando hay un solo ambiente, el dormitorio no se muestra. */
+    (a.dorm && a.amb !== 1) ? a.dorm + ' ' + (a.dorm === 1 ? BP.t('card_dorm_1', 'dorm.') : BP.t('card_dorm_n', 'dorm.')) : null,
     a.banos ? a.banos + ' ' + (a.banos === 1 ? BP.t('card_bano', 'baño') : BP.t('card_banos', 'baños')) : null,
     a.cocheras ? a.cocheras + ' ' + (a.cocheras === 1 ? BP.t('card_coch_1', 'coch.') : BP.t('card_coch_n', 'coch.')) : null,
   ].filter(Boolean).join(' · ');
@@ -234,7 +237,11 @@
       if (f.zonas && f.zonas.length && f.zonas.indexOf(a.zona) === -1) return false;
       if (f.pmin && (a.precio||0) < f.pmin) return false;
       if (f.pmax && (a.precio||0) > f.pmax) return false;
-      if (f.expmax && a.expensas && a.expensas > f.expmax) return false;
+      /* 23/9/2026 · Antes decía `a.expensas &&`, o sea que los avisos SIN expensas cargadas
+         pasaban el filtro. Con 38 de 42 sin el dato, poner "expensas máximas $1" devolvía 22
+         de 25 resultados: el filtro prometía algo que no hacía. Ahora, si alguien filtra por
+         expensas, el que no tiene el dato queda afuera, que es lo que esa persona espera. */
+      if (f.expmax && !(a.expensas > 0 && a.expensas <= f.expmax)) return false;
       if (f.amb && (a.amb||0) < f.amb) return false;
       if (f.dorm && (a.dorm||0) < f.dorm) return false;
       if (f.banos && (a.banos||0) < f.banos) return false;

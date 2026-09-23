@@ -77,7 +77,9 @@ document.addEventListener('DOMContentLoaded', function(){
   const icon = (ic, v, lbl) => `<div>${BP.ico[ic]}${v}<small>${lbl}</small></div>`;
   const similares = BPData.sort(avisos.filter(x => x.id !== a.id && x.op === a.op && (x.zona === a.zona || x.barrio === a.barrio)), 'relevancia').slice(0,4);
   const msgDefault = TF('card_wa_msg', 'Hola, vi {t} ({c}) en BAIREN y quiero más información.', { t: a.titulo, c: a.codigo });
-  document.title = `${a.titulo} · ${BPData.opTag(a)} ${T('ficha_en', 'en')} ${a.barrio} · BAIREN`;
+  /* 23/9/2026 · Con el barrio vacío el título quedaba "... Alquiler, largo plazo en · BAIREN",
+     con la preposición colgada. Si no hay barrio, se usa la zona. */
+  document.title = `${a.titulo} · ${BPData.opTag(a)} ${T('ficha_en', 'en')} ${a.barrio || BP.zonaLabel(a.zona)} · BAIREN`;
 
   main.removeAttribute('aria-busy');
   main.innerHTML = `
@@ -88,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function(){
     <div>
       <div class="p-fhero-tag">${BPData.opTag(a)}${a.reservado ? ' · ' + T('ficha_reservada', 'Reservada') : ''}</div>
       <h1 class="p-fhero-address">${BP.esc(a.dir)}${a.unidad && !a.dirAprox ? ' · ' + BP.esc(a.unidad) : ''}</h1>
-      <div class="p-fhero-sub">${BP.esc(a.barrio)} · ${BP.esc(a.ciudad)}</div>
+      <div class="p-fhero-sub">${BP.esc(a.barrio || BP.zonaLabel(a.zona))} · ${BP.esc(a.ciudad)}</div>
     </div>
     <div class="p-fhero-price-box">
       <div class="p-fhero-price-lbl">${a.reservado ? T('ficha_estado', 'Estado') : a.op === 'venta' ? T('ficha_precio', 'Precio') : T('ficha_precio_mensual', 'Precio mensual')}</div>
@@ -135,7 +137,7 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip">${fotos.map((f,i) => `<but
       <h2 class="p-sec-t">${T('ficha_ubicacion', 'Ubicación')}</h2>
       <div class="p-map-wrap"><iframe id="mapFrame" src="" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="${T('ficha_mapa_title', 'Mapa de la ubicación de la propiedad')}"></iframe></div>${a.dirAprox ? `<p class="p-note" style="margin:8px 0 0">${T('ficha_ubic_aprox', 'Ubicación aproximada. La dirección exacta la confirma quien publica.')}</p>` : ''}
     </div>
-    <div>
+    <div id="bloquePregunta">
       <h2 class="p-sec-t">${T('ficha_preguntale', 'Preguntale a quien publica')}</h2>
       <p class="p-kicker" style="margin-bottom:10px">${TF('ficha_elegi', 'Elegí una o escribí la tuya. Le llega directo a {p}.', { p: BP.esc(pubNombre) })}</p>
       <div class="p-quick" id="quick"><button type="button" aria-pressed="false">${T('ficha_q1', '¿Sigue disponible?')}</button><button type="button" aria-pressed="false">${T('ficha_q2', '¿Valor de las expensas?')}</button><button type="button" aria-pressed="false">${T('ficha_q3', '¿En qué piso está?')}</button><button type="button" aria-pressed="false">${T('ficha_q4', '¿Cuándo puedo visitarla?')}</button></div>
@@ -159,7 +161,7 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip">${fotos.map((f,i) => `<but
   <aside class="p-side" id="contacto">
     <div class="p-cta" id="ctaCard">
       <div class="p-cta-price" data-lbl="${a.op === 'venta' ? T('ficha_lbl_venta', 'Precio de venta') : T('ficha_lbl_mensual', 'Precio mensual')}">${a.reservado ? `<span class="p-cta-res">${T('ficha_reservada', 'Reservada')}</span>` : BPData.precioHTML(a)}</div>
-      <div class="p-ac-rows">${[[T('ficha_direccion', 'Dirección'), BP.esc(a.dir) + (a.unidad && !a.dirAprox ? ', ' + BP.esc(a.unidad) : '')], [T('ficha_barrio', 'Barrio'), BP.esc(a.barrio)], a.m2 ? [T('ficha_superficie', 'Superficie'), a.m2 + ' m²'] : null, a.amb ? [T('ficha_ambientes_lbl', 'Ambientes'), a.amb === 1 ? T('ficha_monoamb_val', 'Monoambiente') : TF('ficha_ambientes', '{n} ambientes', { n: a.amb })] : null, a.op !== 'venta' && a.plazo ? [T('ficha_plazo_lbl', 'Plazo'), BP.esc(BP.etiqueta(a.plazo))] : null, a.op === 'mediano' ? [T('ficha_exp_serv', 'Expensas y serv.'), T('ficha_todos_incl', 'Todos incluidos')] : (a.expensas ? [T('ficha_expensas', 'Expensas'), TF('ficha_exp_val', '$ {n} por mes', { n: BP.fmtN(a.expensas) })] : null), [T('ficha_estado', 'Estado'), a.reservado ? `<span style="color:#b94a4a">${T('ficha_reservada', 'Reservada')}</span>` : `<span style="color:#2a7a4b">${T('ficha_disponible', 'Disponible')}</span>`]].filter(Boolean).map(r => `<div class="ac-row"><span class="ac-lbl">${r[0]}</span><span class="ac-val">${r[1]}</span></div>`).join('')}</div>
+      <div class="p-ac-rows">${[[T('ficha_direccion', 'Dirección'), BP.esc(a.dir) + (a.unidad && !a.dirAprox ? ', ' + BP.esc(a.unidad) : '')], a.barrio ? [T('ficha_barrio', 'Barrio'), BP.esc(a.barrio)] : null, a.m2 ? [T('ficha_superficie', 'Superficie'), a.m2 + ' m²'] : null, a.amb ? [T('ficha_ambientes_lbl', 'Ambientes'), a.amb === 1 ? T('ficha_monoamb_val', 'Monoambiente') : TF('ficha_ambientes', '{n} ambientes', { n: a.amb })] : null, a.op !== 'venta' && a.plazo ? [T('ficha_plazo_lbl', 'Plazo'), BP.esc(BP.etiqueta(a.plazo))] : null, a.op === 'mediano' ? [T('ficha_exp_serv', 'Expensas y serv.'), T('ficha_todos_incl', 'Todos incluidos')] : (a.expensas ? [T('ficha_expensas', 'Expensas'), TF('ficha_exp_val', '$ {n} por mes', { n: BP.fmtN(a.expensas) })] : null), [T('ficha_estado', 'Estado'), a.reservado ? `<span style="color:#b94a4a">${T('ficha_reservada', 'Reservada')}</span>` : `<span style="color:#2a7a4b">${T('ficha_disponible', 'Disponible')}</span>`]].filter(Boolean).map(r => `<div class="ac-row"><span class="ac-lbl">${r[0]}</span><span class="ac-val">${r[1]}</span></div>`).join('')}</div>
       <div class="p-cta-pub"><span class="lbl">${T('ficha_publica', 'Publica')}</span><b>${BP.esc(pubNombre)}</b><span>${pub.tipo === 'dueno' ? T('ficha_dueno_v', 'Dueño verificado') : pub.tipo === 'desarrolladora' ? T('ficha_venta_directa', 'Venta directa') : pub.matricula ? TF('ficha_corredor_resp', 'Corredor responsable: {r}, {m}', { r: BP.esc(pub.responsable || ''), m: BP.esc(pub.matricula) }) : BP.esc(BP.etiqueta(pub.badge || 'Selección BAIREN'))}</span></div>
       ${(a.cualidades||[]).length ? `<div class="p-cta-verif">${BP.ico.check} ${(a.cualidades||[]).length === 1 ? T('ficha_cual_1', 'Una cualidad verificada por BAIREN') : TF('ficha_cual_n', '{n} cualidades verificadas por BAIREN', { n: (a.cualidades||[]).length })}</div>` : `<div class="p-cta-verif">${BP.ico.check} ${T('ficha_revisada', 'Ficha revisada por BAIREN antes de publicarse')}</div>`}
       ${a.reservado ? `<p class="p-sincontacto-box">${T('ficha_res_box', 'Reservada: por ahora no toma consultas. Si se libera, vuelve a publicarse acá.')}</p>` : BPData.sinContacto(pub) ? `<p class="p-sincontacto-box">${TF('ficha_sin_contacto', 'Contacto pendiente: {p} todavía no cargó su WhatsApp ni su mail. BAIREN no interviene en la operación, así que el único contacto válido es el de quien publica.', { p: BP.esc(pubNombre) })}</p>` : `
@@ -194,7 +196,7 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip">${fotos.map((f,i) => `<but
   <div class="p-head-row"><h2 class="p-h2">${T('ficha_similares', 'Propiedades similares')}</h2><a class="p-link" href="buscar.html?op=${a.op}&zona=${encodeURIComponent(a.zona)}">${TF('ficha_ver_mas_en', 'Ver más en {z}', { z: BP.zonaLabel(a.zona) })}</a></div>
   <div class="p-grid">${similares.map(BPData.cardV).join('') || `<p class="p-note">${T('ficha_sin_similares', 'Todavía no hay unidades similares.')}</p>`}</div>
   ${(a.reservado || BPData.sinContacto(pub)) ? '' : `<div class="p-mcta" id="mcta"><div class="p-mcta-price">${BPData.precioHTML(a)}</div><button type="button" class="p-btn p-btn-fill p-btn-sm" id="mctaBtn">${BP.ico.mail} ${T('ficha_contactar', 'Contactar')}</button>${BPData.waLink(a, pub) ? `<a class="p-icon-btn" href="${BPData.waLink(a, pub)}" target="_blank" rel="noopener" data-wa data-aviso="${BP.esc(a.id)}" data-pub="${BP.esc(pub.storeId || pub.id)}" aria-label="WhatsApp">${BP.ico.wa}</a>` : ''}</div>`}
-  <div class="p-breadcrumb" role="navigation" aria-label="${T('cat_crumbs_aria', 'Migas de pan')}"><a href="index.html">BAIREN</a> › <a href="buscar.html?op=${a.op}">${BPData.opTag(a)}</a> › <a href="buscar.html?op=${a.op}&zona=${encodeURIComponent(a.zona)}">${BP.zonaLabel(a.zona)}</a> › <span>${BP.esc(a.barrio)}</span> › <span>${BP.esc(a.titulo)}</span></div>
+  <div class="p-breadcrumb" role="navigation" aria-label="${T('cat_crumbs_aria', 'Migas de pan')}"><a href="index.html">BAIREN</a> › <a href="buscar.html?op=${a.op}">${BPData.opTag(a)}</a> › <a href="buscar.html?op=${a.op}&zona=${encodeURIComponent(a.zona)}">${BP.zonaLabel(a.zona)}</a>${(a.barrio && a.barrio !== a.zona) ? ` › <span>${BP.esc(a.barrio)}</span>` : ''} › <span>${BP.esc(a.titulo)}</span></div>
 </section>`;
 
   /* comportamiento */
@@ -269,6 +271,13 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip">${fotos.map((f,i) => `<but
   /* pestañas de características: rol de pestaña, flechas para moverse, un solo tab en el orden de tabulación */
   /* La foto del hero se retira más lento que el scroll y el titular se apaga: profundidad, no efecto */
   if (window.BPM && BPM.profundidad) BPM.profundidad('.p-fhero', '.p-fhero-slides', '.p-fhero-content');
+
+  /* 23/9/2026 · Una unidad reservada decía arriba "por ahora no toma consultas" y abajo tenía
+     el bloque de preguntas entero y funcionando: se podía mandar una consulta igual. El cartel
+     y el formulario decían cosas distintas en la misma pantalla. Si no toma consultas, no hay
+     formulario; el aviso de "si se libera, vuelve a publicarse acá" queda arriba, que es la
+     salida honesta. */
+  if (a.reservado) { const bq = document.getElementById('bloquePregunta'); if (bq) bq.remove(); }
 
   /* 23/9/2026 · La galería bajaba TODAS las fotos al abrir la ficha, porque un background-image
      de CSS no se puede diferir: el navegador las pide al leer el HTML. En una ficha de 156 fotos
