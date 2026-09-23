@@ -33,6 +33,22 @@
  */
 const A = require('./admin');
 
+/* ══════════════════════════════════════════════════════════════════════════════
+   23/9/2026 · LLAVE DE LOS PROPIETARIOS, APAGADA A PROPÓSITO.
+
+   Los 24 propietarios todavía NO saben que tienen acceso al portal ni que van a
+   recibir un mail semanal. Mandárselo sin avisarles es aparecer sin invitación en
+   la casilla de alguien que confió su departamento: se explica una vez, no se
+   pide perdón después.
+
+   Mientras esto esté en false, el resumen del publicador sale igual (le llega a
+   Bairen Realty y a Maxim, que son de la casa) y el de los propietarios se arma,
+   se cuenta y NO se manda.
+
+   Para encenderlo: poner true y publicar. Una línea.
+   ══════════════════════════════════════════════════════════════════════════════ */
+const AVISAR_A_PROPIETARIOS = false;
+
 /* El lunes 00:00 de Buenos Aires de la semana que ya cerró. */
 function lunesDeLaSemanaPasada(hoy) {
   const inicioHoy = A.inicioDelDiaBA(hoy);
@@ -135,6 +151,14 @@ function cuerpoPropietario(filas, publica, desde, hasta) {
 /* opciones: { desde: 'AAAA-MM-DD', ensayo: true } */
 async function resumenSemanal(opciones) {
   const o = opciones || {};
+  /* Modo prueba: en vez de a cada destinatario, todo va a una sola casilla, con el
+     asunto marcado y una línea arriba diciendo a quién le habría llegado. Sirve para
+     ver los mails de verdad, en un cliente de correo real, sin escribirle a nadie. */
+  const prueba = o.prueba && /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(o.prueba) ? o.prueba : null;
+  const aviso = (para) => prueba
+    ? '<p style="background:#FFF4D6;border:1px solid #C2A968;padding:10px 12px;margin:0 0 18px;font-size:13px">'
+      + 'Prueba. Este mail le habría llegado a <b>' + A.esc(para) + '</b>.</p>'
+    : '';
   const desde = o.desde ? A.inicioDelDiaBA(o.desde + 'T12:00:00Z') : lunesDeLaSemanaPasada();
   const hasta = new Date(desde.getTime() + 7 * 86400000);
   const semana = desde.toISOString().slice(0, 10);
@@ -174,10 +198,11 @@ async function resumenSemanal(opciones) {
 
     try {
       await A.enviarMail({
-        to: pub.email,
-        subject: 'BAIREN · ' + plural(vistas, 'persona vio', 'personas vieron') + ' lo tuyo esta semana',
-        html: cuerpo(pub, pub.filas, desde, hasta)
+        to: prueba || pub.email,
+        subject: (prueba ? '[PRUEBA] ' : '') + 'BAIREN · ' + plural(vistas, 'persona vio', 'personas vieron') + ' lo tuyo esta semana',
+        html: aviso(pub.email) + cuerpo(pub, pub.filas, desde, hasta)
       });
+      if (prueba) { mandados.push(Object.assign({ prueba: true, habriaIdoA: pub.email }, resumen)); continue; }
       /* Se registra después de mandar: si el mail falla, se reintenta la próxima corrida. */
       await A.post('resumenes_enviados',
         { publicador_id: pub.id, semana, avisos: pub.filas.length, vistas, consultas },
@@ -220,12 +245,20 @@ async function resumenSemanal(opciones) {
       const r = { propietario: mail, unidades: d.filas.length, vistas, consultas };
       if (o.ensayo) { duenos.push(Object.assign({ ensayo: true }, r)); continue; }
 
+      /* La llave de arriba: si está apagada, se cuenta pero no se manda. En modo
+         prueba sí se manda, porque va a la casilla de la casa y no a la del dueño. */
+      if (!AVISAR_A_PROPIETARIOS && !prueba) {
+        salteados.push({ nombre: mail, motivo: 'a los propietarios todavía no se les avisó (AVISAR_A_PROPIETARIOS)' });
+        continue;
+      }
+
       try {
         await A.enviarMail({
-          to: mail,
-          subject: 'BAIREN · ' + plural(vistas, 'persona vio', 'personas vieron') + (d.filas.length === 1 ? ' tu propiedad esta semana' : ' tus propiedades esta semana'),
-          html: cuerpoPropietario(d.filas, d.publica, desde, hasta)
+          to: prueba || mail,
+          subject: (prueba ? '[PRUEBA] ' : '') + 'BAIREN · ' + plural(vistas, 'persona vio', 'personas vieron') + (d.filas.length === 1 ? ' tu propiedad esta semana' : ' tus propiedades esta semana'),
+          html: aviso(mail) + cuerpoPropietario(d.filas, d.publica, desde, hasta)
         });
+        if (prueba) { duenos.push(Object.assign({ prueba: true, habriaIdoA: mail }, r)); continue; }
         await A.post('resumenes_enviados',
           { propietario_email: mail, semana, avisos: d.filas.length, vistas, consultas },
           { prefer: 'return=minimal' });
