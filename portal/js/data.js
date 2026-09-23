@@ -13,11 +13,11 @@
        no publica ni opera; un gestor sí. El slug 'bairen' NO cambia: está en las direcciones web
        y en api/_portal/alertas.js. Esto tiene que decir lo mismo que la fila de la base
        (migracion-11-gestores.sql), porque si difieren, gana esta copia escrita a mano. */
-    'bairen': { id:'bairen', tipo:'gestor', nombre:'BAIREN REALTY', responsable:null, matricula:null, colegio:null, badge:'Gestor de alquileres', verificado:true, desde:'2026', inicial:'BR', portal:true,
-      whatsapp:'5491123106629', email:'realty@bairengroup.com', telefono:null, zonas:['Recoleta','Palermo','Núñez','Puerto Madero','Belgrano'],
+    'bairen': { id:'bairen', tipo:'gestor', nombre:'BAIREN REALTY', responsable:null, matricula:null, colegio:null, badge:'Gestor de alquileres', verificado:true, desde:'2026', inicial:'BR',
+      whatsapp:'5491123106629', email:'bairenrealty@gmail.com', telefono:null, zonas:['Recoleta','Palermo','Núñez','Puerto Madero','Belgrano'],
       desc:'Alquiler a mediano plazo, de 3 a 12 meses. Departamentos amoblados y equipados, con un solo precio todo incluido, sin garantía inmobiliaria ni seguro de caución.',
-      desc_en:'Property selected by BAIREN: location, condition, layout and build quality reviewed before listing it.',
-      desc_pt:'Imóvel selecionado pela BAIREN: localização, estado, distribuição e qualidade construtiva revisados antes de publicá-lo.' },
+      desc_en:'Mid-term rentals, from 3 to 12 months. Furnished and equipped apartments, one all-inclusive price, with no property guarantor and no rental insurance.',
+      desc_pt:'Aluguel de médio prazo, de 3 a 12 meses. Apartamentos mobiliados e equipados, com preço único que inclui tudo, sem fiador nem seguro-fiança.' },
     'inmobiliaria-ejemplo': { id:'inmobiliaria-ejemplo', tipo:'profesional', nombre:'Inmobiliaria Ejemplo', responsable:'Corredor de ejemplo', matricula:'CUCICBA 0000', badge:'Corredor inmobiliario matriculado', verificado:true, desde:'2026', inicial:'IE', demo:true,
       whatsapp:'5491100000000', email:'ejemplo@ejemplo.com', telefono:'+54 11 0000 0000', zonas:['Belgrano'], desc:'Publicador de ejemplo para mostrar cómo se ve una inmobiliaria con perfil propio. No es una empresa real.',
       desc_en:'Sample lister to show how a real estate agency with its own profile looks. Not a real company.', desc_pt:'Anunciante de exemplo para mostrar como fica uma imobiliária com perfil próprio. Não é uma empresa real.' },
