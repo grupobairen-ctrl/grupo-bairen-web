@@ -28,7 +28,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260923d"><link rel="stylesheet" href="css/catalogo.css?v=20260923d"><link rel="stylesheet" href="css/portal.css?v=20260923d">
+  <link rel="stylesheet" href="css/base.css?v=20260923e"><link rel="stylesheet" href="css/catalogo.css?v=20260923e"><link rel="stylesheet" href="css/portal.css?v=20260923e">
   <style>body{padding-top:0}#ficha>.p-ficha-top,#ficha>.p-ficha,#ficha>section{max-width:var(--p-max);margin:0 auto;padding-left:24px;padding-right:24px}#ficha>.p-ficha-top{padding-top:88px}@media(max-width:900px){#ficha>.p-ficha-top{padding-top:76px}}.p-video{aspect-ratio:16/9;background:#0b1220;border-radius:16px;overflow:hidden}.p-video iframe,.p-video video{width:100%;height:100%;border:0;display:block}</style>
 </head>
 <body class="p-product p-ficha-page">
@@ -38,9 +38,9 @@
 <div class="p-lb" id="lb" aria-hidden="true"><div class="velo" data-lb-close></div><button type="button" class="x" data-lb-close aria-label="Cerrar las fotos" data-i18n-aria="ficha_lb_cerrar" data-i18n="ficha_lb_cerrar_txt">Cerrar</button><div class="marco" id="lbMarco"><img id="lbImg" alt="" draggable="false"></div><button type="button" class="nav prev" data-lb-prev aria-label="Foto anterior" data-i18n-aria="ficha_lb_prev"></button><button type="button" class="nav next" data-lb-next aria-label="Foto siguiente" data-i18n-aria="ficha_lb_next"></button><div class="pie"><span class="cuenta" id="lbCount"></span><div class="tiras" id="lbTiras"></div></div></div>
 <div id="pFooter"></div>
 
-<script src="supabase-portal.js?v=20260923d" defer></script><script src="js/errores.js?v=20260923d" defer></script>
-<script src="js/iconos-amenities.js?v=20260923d" defer></script><script src="js/motion.js?v=20260923d" defer></script><script src="js/bairen-motion.js?v=20260923d" defer></script><script src="js/i18n-portal.js?v=20260923d" defer></script><script src="js/ui.js?v=20260923d" defer></script><script src="js/store.js?v=20260923d" defer></script>
-<script src="js/data.js?v=20260923d" defer></script>
+<script src="supabase-portal.js?v=20260923e" defer></script><script src="js/errores.js?v=20260923e" defer></script>
+<script src="js/iconos-amenities.js?v=20260923e" defer></script><script src="js/motion.js?v=20260923e" defer></script><script src="js/bairen-motion.js?v=20260923e" defer></script><script src="js/i18n-portal.js?v=20260923e" defer></script><script src="js/ui.js?v=20260923e" defer></script><script src="js/store.js?v=20260923e" defer></script>
+<script src="js/data.js?v=20260923e" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -109,7 +109,10 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip">${fotos.map((f,i) => `<but
       ${(a.apto.length || (a.cualidades||[]).length || a.demo) ? `<p class="p-tags">${(a.cualidades||[]).map(x => `<span class="p-badge" title="${T('ficha_verificada_title', 'Verificada por BAIREN')}">${BP.ico.shield} ${BP.esc(BP.etiqueta(x))}</span>`).join('')}${a.apto.map(x => `<span class="p-badge">${BP.esc(BP.etiqueta(x))}</span>`).join('')}${a.demo ? `<span class="p-badge demo">${T('ficha_aviso_ejemplo', 'Aviso de ejemplo')}</span>` : ''}</p>` : ''}
     </div>
     <h2 class="p-sec-t">${T('ficha_la_unidad', 'La unidad')}</h2>
-    <div class="p-icons">${[
+    <!-- 23/9/2026 · Esta tira se desplaza de costado y no se alcanzaba con el teclado: quien no
+         usa mouse no podía leer el cuarto dato. Con tabindex entra al orden de tabulación y con
+         role/aria-label el lector de pantalla anuncia qué es. -->
+    <div class="p-icons" tabindex="0" role="group" aria-label="${T('ficha_datos_aria', 'Datos de la unidad')}">${[
       a.m2 ? ['ruler', a.m2 + ' m²', T('ficha_totales', 'totales')] : null,
       a.m2cub && a.m2cub !== a.m2 ? ['ruler', a.m2cub + ' m²', T('ficha_cubiertos', 'cubiertos')] : null,
       a.amb ? ['door', a.amb, a.amb === 1 ? T('ficha_monoamb', 'monoambiente') : T('ficha_amb_n', 'ambientes')] : null,

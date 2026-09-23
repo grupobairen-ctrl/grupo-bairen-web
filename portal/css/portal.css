@@ -3672,3 +3672,32 @@ body.p-membership #preguntas .p-h2{font-size:1.35rem}
   .card-cta{font-size:.72rem;letter-spacing:.06em}
   .p-badge{font-size:.7rem}
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   23/9/2026 · Accesibilidad, medido sobre el sitio en vivo
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Las casillas del formulario de contacto eran de 13 px: el tamaño que trae el
+   navegador. La etiqueta envuelve al input, así que tocando el texto funciona,
+   pero quien apunta al cuadradito falla, y es el paso final de la consulta. */
+.p-form input[type="checkbox"],
+.p-prose input[type="checkbox"],
+#cfAcepto, #quiereVisita{
+  width:20px;height:20px;min-width:20px;
+  accent-color:var(--gold,#C2A968);
+  cursor:pointer;
+}
+
+/* Los tres botones de idioma quedaban a una décima de píxel entre sí, por
+   debajo del mínimo de 24 px que pide la norma para un objetivo táctil.
+   Separación y área de toque, sin cambiar cómo se ven. */
+.p-lang{gap:6px !important}
+.p-lang button{padding:7px 10px !important;min-width:32px;min-height:32px}
+
+/* El carrusel de edificios de la portada daba el foco a tarjetas que estaban
+   fuera de la pantalla: el navegador quería traerlas y el anclaje obligatorio
+   se lo impedía. Con anclaje por proximidad el foco arrastra la vista. */
+body.p-home .h-track-fotos{scroll-snap-type:x proximity !important}
+
+/* La tira de datos de la ficha ahora recibe foco: que se vea que lo tiene. */
+.p-icons:focus-visible{outline:3px solid var(--gold,#C2A968);outline-offset:3px}

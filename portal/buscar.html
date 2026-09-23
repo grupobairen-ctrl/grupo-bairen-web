@@ -28,7 +28,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260923d"><link rel="stylesheet" href="css/catalogo.css?v=20260923d"><link rel="stylesheet" href="css/portal.css?v=20260923d">
+  <link rel="stylesheet" href="css/base.css?v=20260923e"><link rel="stylesheet" href="css/catalogo.css?v=20260923e"><link rel="stylesheet" href="css/portal.css?v=20260923e">
   <style>body{padding-top:64px}</style>
 </head>
 <body class="p-product p-catalogo">
@@ -78,7 +78,7 @@
   <div class="bg" data-close></div>
   <div class="panel" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
     <button type="button" class="x" data-close aria-label="Cerrar" data-i18n-aria="cat_cerrar">×</button>
-    <h3 id="drawerTitle" data-i18n="cat_mas_filtros">Más filtros</h3>
+    <h2 id="drawerTitle" data-i18n="cat_mas_filtros">Más filtros</h2>
     <p class="p-note" style="margin:0 0 6px" data-i18n="cat_drawer_note">Afiná la búsqueda.</p>
     <div class="grp"><label class="t" for="expmax" data-i18n="cat_expmax">Expensas máximas, pesos por mes</label><input type="number" id="expmax" class="p-fsel" style="width:100%;padding-left:12px;background-image:none" placeholder="Sin máximo" data-i18n-ph="cat_expmax_ph" inputmode="numeric" min="0"></div>
     <div class="grp"><label class="t" data-i18n="cat_banos_min">Baños, mínimo</label><div class="seg" data-key="banos" style="display:flex;gap:6px;flex-wrap:wrap"><button type="button" class="p-fbtn" data-v="" data-i18n="cat_any">Todos</button><button type="button" class="p-fbtn" data-v="1">1+</button><button type="button" class="p-fbtn" data-v="2">2+</button><button type="button" class="p-fbtn" data-v="3">3+</button></div></div>
@@ -95,7 +95,7 @@
 <div class="p-msheet-wrap" id="mapaSheet" aria-hidden="true">
   <div class="bg" data-sheet-close></div>
   <div class="p-msheet" role="dialog" aria-modal="true" aria-labelledby="mapaSheetTitle">
-    <div class="p-msheet-head"><h3 id="mapaSheetTitle" data-i18n="cat_barrios">Barrios</h3><button type="button" class="x" data-sheet-close aria-label="Cerrar" data-i18n-aria="cat_cerrar">×</button></div>
+    <div class="p-msheet-head"><h2 id="mapaSheetTitle" data-i18n="cat_barrios">Barrios</h2><button type="button" class="x" data-sheet-close aria-label="Cerrar" data-i18n-aria="cat_cerrar">×</button></div>
     <div class="p-msheet-map"><div id="mapaSheetMap" role="group" aria-label="Mapa de barrios" data-i18n-aria="cat_map_aria"></div></div>
     <ul class="p-msheet-list" id="mapaSheetList"></ul>
   </div>
@@ -103,10 +103,10 @@
 
 <div id="pFooter"></div>
 
-<script src="supabase-portal.js?v=20260923d" defer></script><script src="js/errores.js?v=20260923d" defer></script>
-<script src="../mapa-barrios.js?v=20260923d" defer></script>
-<script src="js/motion.js?v=20260923d" defer></script><script src="js/bairen-motion.js?v=20260923d" defer></script><script src="js/i18n-portal.js?v=20260923d" defer></script><script src="js/ui.js?v=20260923d" defer></script><script src="js/store.js?v=20260923d" defer></script>
-<script src="js/data.js?v=20260923d" defer></script>
+<script src="supabase-portal.js?v=20260923e" defer></script><script src="js/errores.js?v=20260923e" defer></script>
+<script src="../mapa-barrios.js?v=20260923e" defer></script>
+<script src="js/motion.js?v=20260923e" defer></script><script src="js/bairen-motion.js?v=20260923e" defer></script><script src="js/i18n-portal.js?v=20260923e" defer></script><script src="js/ui.js?v=20260923e" defer></script><script src="js/store.js?v=20260923e" defer></script>
+<script src="js/data.js?v=20260923e" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){

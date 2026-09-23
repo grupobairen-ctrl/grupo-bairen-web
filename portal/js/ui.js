@@ -362,7 +362,7 @@
   </div>
   <button class="burger" id="burger" type="button" aria-label="Menú" data-i18n-aria="menu" aria-expanded="false" aria-controls="mobileMenu"><span></span><span></span><span></span></button>
 </nav>
-<div class="mobile-menu" id="mobileMenu">
+<div class="mobile-menu" id="mobileMenu" role="dialog" aria-modal="true" aria-label="${BP.t('menu', 'Menú')}">
   <a href="buscar.html" class="m-link" data-sec="propiedades" data-i18n="nav_propiedades">Propiedades</a>
   <a href="emprendimientos.html" class="m-link" data-sec="emprendimientos" data-i18n="emprendimientos">Desarrollos</a>
   <a href="membership.html" class="m-link p-nav-destacado" data-sec="membership">Membership</a>
