@@ -35,6 +35,7 @@ const A = require('./_portal/admin');
 const { sincronizar } = require('./_portal/sync');
 const { alertasDeBusqueda, alertasDePrecio, tituloDe } = require('./_portal/alertas');
 const { ultimoRespaldo } = require('./_portal/respaldo');
+const { resumenSemanal, esLunes } = require('./_portal/semanal');
 
 const paso = async fn => { try { return await fn(); } catch (e) { return { error: String(e && e.message || e).slice(0, 300) }; } };
 
@@ -112,6 +113,14 @@ module.exports = async (req, res) => {
   const precio = await paso(() => alertasDePrecio({ simular }));
   /* e. el respaldo corre en su propio cron (api/portal-respaldo, 09:30 UTC) para no competir con el tope de 60 s; acá solo se informa el último */
   const respaldo = await paso(async () => { const u = await ultimoRespaldo(); return u && u.fecha ? { ruta: u.ruta, bytes: u.bytes, tablas: u.tablas, ok: u.ok, motivo: u.motivo, ultimo: true } : { error: (u && u.motivo) || 'todavía no hay respaldo' }; });
+  /* 23/9/2026 · Los lunes, además, sale el resumen semanal a cada publicador: cuántas personas
+     vieron sus unidades, cuántas consultaron y qué visitas hay. Va colgado del diario y no en su
+     propia tarea automática porque Vercel limita cuántas se pueden tener, y esta ya corre igual.
+     Con su propio try/catch: si falla, no se lleva puesto el resto del diario. */
+  const semanal = esLunes()
+    ? await paso(() => resumenSemanal({ ensayo: simular }))
+    : { omitido: true, motivo: 'solo los lunes' };
+
   const resumen = await paso(() => armarResumen(sync, busqueda, precio, respaldo));
   let mail;
   if (resumen.error) mail = { enviado: false, motivo: 'resumen con error' };
@@ -120,5 +129,5 @@ module.exports = async (req, res) => {
     mail = simular ? { enviado: false, motivo: 'simulado', subject: m.subject } : await paso(async () => Object.assign({ subject: m.subject }, await A.enviarMail({ to: A.RESUMEN_A, subject: m.subject, html: m.html, text: m.text })));
     if (mail.error) mail = { enviado: false, motivo: mail.error, subject: m.subject };
   }
-  return json(200, { ok: !(sync.error && busqueda.error && precio.error && resumen.error), sync, busqueda, precio, respaldo, resumen, mail, ms: Date.now() - t0 });
+  return json(200, { ok: !(sync.error && busqueda.error && precio.error && resumen.error), sync, busqueda, precio, semanal, respaldo, resumen, mail, ms: Date.now() - t0 });
 };
