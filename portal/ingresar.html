@@ -27,7 +27,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260923l"><link rel="stylesheet" href="css/catalogo.css?v=20260923l"><link rel="stylesheet" href="css/portal.css?v=20260923l">
+  <link rel="stylesheet" href="css/base.css?v=20260923m"><link rel="stylesheet" href="css/catalogo.css?v=20260923m"><link rel="stylesheet" href="css/portal.css?v=20260923m">
 </head>
 <body>
 <div class="p-velo" aria-hidden="true"><span class="w">BAIREN</span></div>
@@ -54,7 +54,7 @@
   </div>
 </div></section>
 <div id="pFooter"></div>
-<script src="supabase-portal.js?v=20260923l" defer></script><script src="js/errores.js?v=20260923l" defer></script><script src="js/motion.js?v=20260923l" defer></script><script src="js/bairen-motion.js?v=20260923l" defer></script><script src="js/i18n-portal.js?v=20260923l" defer></script><script src="js/ui.js?v=20260923l" defer></script><script src="js/store.js?v=20260923l" defer></script><script src="js/data.js?v=20260923l" defer></script>
+<script src="supabase-portal.js?v=20260923m" defer></script><script src="js/errores.js?v=20260923m" defer></script><script src="js/motion.js?v=20260923m" defer></script><script src="js/bairen-motion.js?v=20260923m" defer></script><script src="js/i18n-portal.js?v=20260923m" defer></script><script src="js/ui.js?v=20260923m" defer></script><script src="js/store.js?v=20260923m" defer></script><script src="js/data.js?v=20260923m" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -70,7 +70,17 @@ document.addEventListener('DOMContentLoaded', function(){
   const destino = () => { if (volver === 'publicar') return 'publicar-aviso.html' + (perfil ? '?perfil=' + perfil : ''); if (volver === 'contactos') return 'panel.html#contactos'; if (volver === 'curacion') return 'curacion.html'; if (/^[a-z0-9-]+\.html(#[\w-]*)?$/i.test(volver)) return volver; return 'index.html'; };   /* 16/9 · sin destino explícito, la landing del portal (decisión de Tomás); Mi cuenta queda a un clic */
   const fm = document.getElementById('stepMail'), fc = document.getElementById('stepCode'), fp = document.getElementById('stepPerfil'), email = document.getElementById('email');
   fm.addEventListener('submit', e => e.preventDefault()); fc.addEventListener('submit', e => e.preventDefault()); fp.addEventListener('submit', e => e.preventDefault());
-  if (volver === 'publicar') { document.getElementById('ttl').textContent = BP.t('ing_crea_cuenta', 'Creá tu cuenta para publicar'); document.getElementById('sub').textContent = BP.t('ing_crea_sub', 'Un mail y un código. Después completás tu perfil y cargás la propiedad.'); }
+  if (volver === 'publicar') {
+    /* 23/9/2026 · El ?perfil= viajaba hasta publicar-aviso sin que esta pantalla lo mostrara: una desarrolladora que
+       venía de Membresía llegaba a un "Creá tu cuenta para publicar" genérico y no sabía si estaba en el lugar correcto.
+       Ahora el título y la bajada dicen para quién es la cuenta y qué se le va a pedir después del código. */
+    const T = {
+      desarrolladora: ['ing_crea_desa', 'Creá tu cuenta de desarrolladora', 'ing_crea_desa_sub', 'Un mail y un código. Después cargás los datos de la empresa, el CUIT y tu primer desarrollo.'],
+      profesional:    ['ing_crea_prof', 'Creá tu cuenta de inmobiliaria o corredor', 'ing_crea_prof_sub', 'Un mail y un código. Después cargás la matrícula y tu primer aviso.'],
+      dueno:          ['ing_crea_dueno', 'Creá tu cuenta de dueño directo', 'ing_crea_dueno_sub', 'Un mail y un código. Después cargás tu DNI, un comprobante de titularidad y la propiedad.']
+    }[perfil] || ['ing_crea_cuenta', 'Creá tu cuenta para publicar', 'ing_crea_sub', 'Un mail y un código. Después completás tu perfil y cargás la propiedad.'];
+    document.getElementById('ttl').textContent = BP.t(T[0], T[1]); document.getElementById('sub').textContent = BP.t(T[2], T[3]);
+  }
   const mode = await BPStore.init();
   document.getElementById('modeNote').textContent = mode === 'local' ? BP.t('ing_modo_local', 'Modo local: sin base conectada, la sesión y los datos quedan en este navegador.') : '';
   /* 11/9 · El perfil de la cuenta se pregunta una sola vez, después del código: no si ya lo eligió, no si ya tiene
