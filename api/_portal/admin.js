@@ -27,13 +27,17 @@
  *   CRON_SECRET                  Vercel la manda como Authorization: Bearer en los crons
  *   PORTAL_NOTIFY_KEY            clave del equipo: header x-portal-key para disparar a mano
  *   PORTAL_RESUMEN_A             destinatario del resumen diario (default portal@bairengroup.com)
+ *   PORTAL_SITE                  raíz pública del portal para los links de los mails (default: el de hoy)
  */
 const PORTAL_URL = process.env.PORTAL_SUPABASE_URL || 'https://jdatlsrujgfmvyuhoffg.supabase.co';
 const PORTAL_ANON = process.env.PORTAL_SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkYXRsc3J1amdmbXZ5dWhvZmZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NzcyNTYsImV4cCI6MjA5NDQ1MzI1Nn0.g9B1EoHkVeAcDJ2KNuMjwMW2_5Y6Xk2IlWjdQRrob2o';
 const SERVICE_KEY = process.env.PORTAL_SUPABASE_SERVICE_KEY || '';
 const WEB_URL = process.env.WEB_SUPABASE_URL || 'https://nmrjyyrhwjroonrppnka.supabase.co';
 const WEB_KEY = process.env.WEB_SUPABASE_KEY || 'sb_publishable_D0YwiSL5Hm3GyOSx2r1lug_ZV7v46_n';
-const SITE = 'https://www.bairengroup.com/portal/';
+/* 23/9/2026 · El dominio no es el definitivo (se evalúa bairen.ar). Se mueve cambiando la
+   variable PORTAL_SITE en Vercel, sin tocar código. Lo usan los mails que salen del sistema
+   para armar los links a las fichas y al panel. */
+const SITE = process.env.PORTAL_SITE || 'https://www.bairengroup.com/portal/';
 const RESUMEN_A = process.env.PORTAL_RESUMEN_A || 'portal@bairengroup.com';
 
 // Solo estos orígenes pueden llamar a las funciones. Misma lista que portal-notify.

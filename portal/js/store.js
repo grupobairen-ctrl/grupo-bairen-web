@@ -114,10 +114,20 @@
      como cualquiera y no depende de lo que haya en este navegador. */
   S.RIEL_COMPLETO = ['avisos', 'propiedades', 'interesados', 'importar', 'contactos', 'favoritos', 'alertas', 'os', 'cuenta'];
   /* Bairen OS: la herramienta de los que publican (visitas, reservas, cobros, propietarios). Otra app, mismo dominio. */
-  S.OS_URL = 'https://os.bairengroup.com';
+  S.OS_URL = (window.BP && window.BP.OS_URL) || 'https://os.bairengroup.com';
+  /* 23/9/2026 · El menú de cada perfil, revisado contra el modelo que quedó:
+       · busca        el que busca departamento. No publica ni tiene propiedades.
+       · dueno        el propietario. "Mis propiedades" son las unidades de las que es dueño,
+                      aunque las publique otro; "Mis avisos" son las que publica él mismo, que
+                      pueden ser ninguna. NO lleva Bairen OS: el dueño tiene su panel del portal
+                      y nada más. El OS empieza en el segundo plan, el del corredor y la
+                      inmobiliaria, que son los que pagan (decisión de Tomás, 23/9/2026).
+       · profesional  corredor, inmobiliaria, gestor o desarrolladora. Publica lo de otros, así
+                      que NO tiene "Mis propiedades": no es dueño de nada de lo que publica.
+                      Sí lleva importación de cartera y Bairen OS, que es lo que paga. */
   S.rielDe = function(p){
     if (p === 'busca') return ['favoritos', 'alertas', 'contactos', 'cuenta'];
-    if (p === 'dueno') return ['avisos', 'propiedades', 'interesados', 'contactos', 'os', 'cuenta'];
+    if (p === 'dueno') return ['avisos', 'propiedades', 'interesados', 'contactos', 'cuenta'];
     if (p === 'profesional') return ['avisos', 'interesados', 'importar', 'os', 'cuenta'];
     return S.RIEL_COMPLETO.slice();
   };
@@ -131,6 +141,9 @@
     return p;
   };
   /* El perfil que sale de un publicador ya creado: dueño directo o profesional */
+  /* dueño → su panel de propietario. Todo lo demás (corredor, inmobiliaria, gestor,
+     desarrolladora) → el panel del que publica. Un gestor administra unidades de terceros:
+     publica, pero no es dueño de nada, así que va por acá. */
   S.perfilDePublicador = pub => pub ? (pub.tipo === 'dueno' ? 'dueno' : 'profesional') : null;
   /* El perfil que rige el panel: el elegido; si nunca eligió pero ya tiene publicador, el que sale del publicador; si no, null (riel completo) */
   S.perfilEfectivo = async function(){

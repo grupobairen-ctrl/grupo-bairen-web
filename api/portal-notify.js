@@ -19,7 +19,7 @@
 const SUPABASE_URL = process.env.PORTAL_SUPABASE_URL || 'https://jdatlsrujgfmvyuhoffg.supabase.co';   // BAIREN PORTAL (proyecto propio desde el 4/9/2026)
 const SUPABASE_ANON_KEY = process.env.PORTAL_SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkYXRsc3J1amdmbXZ5dWhvZmZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NzcyNTYsImV4cCI6MjA5NDQ1MzI1Nn0.g9B1EoHkVeAcDJ2KNuMjwMW2_5Y6Xk2IlWjdQRrob2o';
 if (!process.env.PORTAL_SUPABASE_URL) console.warn('[portal-notify] sin PORTAL_SUPABASE_URL en Vercel: usando el proyecto del portal por defecto');
-const SITE = 'https://www.bairengroup.com/portal/';
+const SITE = process.env.PORTAL_SITE || 'https://www.bairengroup.com/portal/';
 const TIPOS = ['consulta', 'aprobado', 'rechazado', 'cambios', 'verificado', 'verificacion_rechazada'];
 // Límite de frecuencia por instancia. En un entorno sin estado cada instancia tiene el suyo,
 // así que frena ráfagas de un mismo cliente pero no es una defensa dura. El control real

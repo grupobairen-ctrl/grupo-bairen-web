@@ -465,7 +465,7 @@
       <li><a href="${BP.urlBuscar({ op:'alquiler' })}" data-i18n="alquilar">Alquilar</a></li><li><a href="${BP.urlBuscar({ op:'venta' })}" data-i18n="comprar">Comprar</a></li><li><a href="publicar.html" data-i18n="publicar">Publicar</a></li></ul></div>
     <div class="ft-col"><div class="ft-col-ttl" data-i18n="ft_zonas">Zonas</div><ul>${zonas}</ul></div>
     <div class="ft-col"><div class="ft-col-ttl" data-i18n="ft_mas">Más</div><ul>
-      <li><a href="publicadores.html" data-i18n="publicadores">Publicadores</a></li><li><a href="https://os.bairengroup.com" rel="noopener">Bairen OS</a></li><li><a href="emprendimientos.html" data-i18n="emprendimientos">Desarrollos</a></li><li><a href="criterios.html" data-i18n="ft_criterios">Criterios de selección</a></li><li><a href="legales.html" data-i18n="ft_terminos">Términos y privacidad</a></li><li><a href="mailto:portal@bairengroup.com">portal@bairengroup.com</a></li></ul></div>
+      <li><a href="publicadores.html" data-i18n="publicadores">Publicadores</a></li><li><a href="${BP.OS_URL}" rel="noopener">Bairen OS</a></li><li><a href="emprendimientos.html" data-i18n="emprendimientos">Desarrollos</a></li><li><a href="criterios.html" data-i18n="ft_criterios">Criterios de selección</a></li><li><a href="legales.html" data-i18n="ft_terminos">Términos y privacidad</a></li><li><a href="mailto:portal@bairengroup.com">portal@bairengroup.com</a></li></ul></div>
   </div>
   <div class="footer-bottom"><span>© ${new Date().getFullYear()} BAIREN</span><span><a href="legales.html" data-i18n="ft_uso">Términos de uso</a> · <a href="legales.html#privacidad" data-i18n="ft_priv">Política de privacidad</a></span></div>
 </footer>`;
@@ -501,7 +501,7 @@
       /* 11/9 noche · El desplegable "Mi cuenta" muestra lo mismo que el riel del panel: las vistas según el perfil
          de la cuenta (BPStore.rielDe; sin perfil, la lista completa). Los rótulos van por BP.t, con las claves
          del bloque "header con sesión y perfil" de i18n-portal.js, así el header con sesión también habla EN y PT. */
-      const VISTAS = { avisos: ['mis_avisos', 'Mis avisos', 'panel.html#avisos'], propiedades: ['mis_propiedades', 'Mis propiedades', 'panel.html#propiedades'], interesados: ['interesados', 'Interesados', 'panel.html#interesados'], importar: ['importar_cartera', 'Importar cartera', 'importar.html'], os: ['bairen_os', 'Bairen OS', 'https://os.bairengroup.com'], contactos: ['mis_contactos', 'Mis contactos', 'panel.html#contactos'], favoritos: ['favoritos', 'Favoritos', 'buscar.html?favs=1'], alertas: ['alertas', 'Búsquedas y alertas', 'panel.html#alertas'], cuenta: ['mi_cuenta', 'Mi cuenta', 'panel.html#cuenta'] };
+      const VISTAS = { avisos: ['mis_avisos', 'Mis avisos', 'panel.html#avisos'], propiedades: ['mis_propiedades', 'Mis propiedades', 'panel.html#propiedades'], interesados: ['interesados', 'Interesados', 'panel.html#interesados'], importar: ['importar_cartera', 'Importar cartera', 'importar.html'], os: ['bairen_os', 'Bairen OS', BP.OS_URL], contactos: ['mis_contactos', 'Mis contactos', 'panel.html#contactos'], favoritos: ['favoritos', 'Favoritos', 'buscar.html?favs=1'], alertas: ['alertas', 'Búsquedas y alertas', 'panel.html#alertas'], cuenta: ['mi_cuenta', 'Mi cuenta', 'panel.html#cuenta'] };
       const riel = (window.BPStore && BPStore.rielDe) ? BPStore.rielDe(session.perfil || null) : Object.keys(VISTAS);
       const vistas = riel.map(id => VISTAS[id]).filter(Boolean).map(v => `<a href="${v[2]}">${BP.t(v[0], v[1])}</a>`).join('');
       /* 12/9 · Con imagen elegida (ícono o foto), el botón la muestra a 22 px en lugar del ícono genérico; sin imagen, el ícono de siempre */
@@ -545,6 +545,23 @@
     if (!a || !window.BPStore || !window.BPStore.addConsulta) return;
     try { BPStore.addConsulta({ aviso_id: a.dataset.aviso, publicador_id: a.dataset.pub, canal: 'whatsapp', acepto_tyc: true }); } catch (err) { console.warn(err); }
   }, true);
+
+  /* ── 23/9/2026 · El dominio, en un solo lugar ───────────────────────────────
+     El dominio actual no es el definitivo (Tomás evalúa bairen.ar). Para que la
+     mudanza sea cambiar una línea y no buscar la dirección por todo el código:
+
+     · BP.SITIO   la raíz del portal. Sale de la dirección que el visitante está
+                  usando, así funciona igual en bairengroup.com, en el dominio
+                  nuevo, en una vista previa de Vercel y en la máquina de casa,
+                  sin tocar nada.
+     · BP.OS_URL  Bairen OS, que vive en otro subdominio. Ese sí hay que
+                  escribirlo, y se cambia acá: es el único lugar.
+
+     Si el dominio cambia, se toca BP.OS_URL, la variable PORTAL_SITE de Vercel
+     (api/_portal/admin.js), la lista de orígenes permitidos y las redirecciones
+     de vercel.json. Nada más. */
+  BP.SITIO = (function(){ try { return location.origin + location.pathname.replace(/[^/]*$/, ''); } catch (e) { return '/'; } })();
+  BP.OS_URL = 'https://os.bairengroup.com';
 
   window.BP = BP;
 })();
