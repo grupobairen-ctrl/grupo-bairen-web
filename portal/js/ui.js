@@ -349,7 +349,6 @@
   <div class="p-nav-principal">
     <a href="buscar.html" data-sec="propiedades" data-i18n="nav_propiedades">Propiedades</a>
     <a href="emprendimientos.html" data-sec="emprendimientos" data-i18n="emprendimientos">Desarrollos</a>
-    <a href="psi.html" data-sec="psi">Personal Shopper</a>
     <a href="membership.html" class="p-nav-destacado" data-sec="membership">Membership</a>
   </div>
   <div class="p-lang p-lang-movil" role="group" aria-label="Idioma" data-i18n-aria="idioma"><button type="button" data-lang="es">ES</button><button type="button" data-lang="pt">PT</button><button type="button" data-lang="en">EN</button></div>
@@ -366,7 +365,6 @@
 <div class="mobile-menu" id="mobileMenu">
   <a href="buscar.html" class="m-link" data-sec="propiedades" data-i18n="nav_propiedades">Propiedades</a>
   <a href="emprendimientos.html" class="m-link" data-sec="emprendimientos" data-i18n="emprendimientos">Desarrollos</a>
-  <a href="psi.html" class="m-link" data-sec="psi">Personal Shopper Inmobiliario</a>
   <a href="membership.html" class="m-link p-nav-destacado" data-sec="membership">Membership</a>
   <div class="m-secundario"><a href="publicadores.html" data-sec="publicadores" data-i18n="publicadores">Publicadores</a><a href="criterios.html" data-sec="criterios" data-i18n="criterios">Cómo seleccionamos</a></div>
   <div class="m-cuenta" hidden></div>
@@ -464,7 +462,7 @@
       <p class="p-legend" data-i18n="ft_legend">BAIREN selecciona y publica propiedades, y da la gestión para administrarlas. Cada aviso es responsabilidad de quien lo publica.</p>
     </div>
     <div class="ft-col"><div class="ft-col-ttl" data-i18n="ft_nav">Navegación</div><ul>
-      <li><a href="${BP.urlBuscar({ op:'alquiler' })}" data-i18n="alquilar">Alquilar</a></li><li><a href="${BP.urlBuscar({ op:'venta' })}" data-i18n="comprar">Comprar</a></li><li><a href="psi.html">Personal Shopper</a></li><li><a href="index.html#indice" data-i18n="ft_indice">Índice BAIREN</a></li><li><a href="publicar.html" data-i18n="publicar">Publicar</a></li></ul></div>
+      <li><a href="${BP.urlBuscar({ op:'alquiler' })}" data-i18n="alquilar">Alquilar</a></li><li><a href="${BP.urlBuscar({ op:'venta' })}" data-i18n="comprar">Comprar</a></li><li><a href="index.html#indice" data-i18n="ft_indice">Índice BAIREN</a></li><li><a href="publicar.html" data-i18n="publicar">Publicar</a></li></ul></div>
     <div class="ft-col"><div class="ft-col-ttl" data-i18n="ft_zonas">Zonas</div><ul>${zonas}</ul></div>
     <div class="ft-col"><div class="ft-col-ttl" data-i18n="ft_mas">Más</div><ul>
       <li><a href="publicadores.html" data-i18n="publicadores">Publicadores</a></li><li><a href="https://os.bairengroup.com" rel="noopener">Bairen OS</a></li><li><a href="emprendimientos.html" data-i18n="emprendimientos">Desarrollos</a></li><li><a href="criterios.html" data-i18n="ft_criterios">Criterios de selección</a></li><li><a href="legales.html" data-i18n="ft_terminos">Términos y privacidad</a></li><li><a href="mailto:contacto@bairengroup.com">contacto@bairengroup.com</a></li></ul></div>

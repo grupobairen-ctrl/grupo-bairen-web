@@ -134,16 +134,6 @@
   </div>
 </section>
 
-<section class="h-sec h-navy h-anuncio" id="psi">
-  <div class="h-in h-anuncio-top"><p class="h-eyebrow" data-i18n="psi_eyebrow">PSI · Personal Shopper Inmobiliario</p></div>
-  <figure class="h-anuncio-foto" id="psiFoto" aria-hidden="true"><img src="img/psi-terraza.webp" alt="" onerror="this.remove()"><span class="h-anuncio-fade" aria-hidden="true"></span></figure>
-  <div class="h-anuncio-velo" aria-hidden="true"></div>
-  <div class="h-in h-anuncio-txt">
-    <h2 class="h-h2" data-i18n="psi_h2">¿Buscando invertir en una propiedad?</h2>
-    <p class="h-copy" data-i18n="psi_copy">Adquirimos juntos tu próxima mejor inversión en Buenos Aires.</p>
-    <a class="h-btn h-btn-oro" href="psi.html" data-i18n="psi_btn">Conocer PSI</a>
-  </div>
-</section>
 
 </main>
 <div id="pFooter"></div>
@@ -280,24 +270,8 @@ document.addEventListener('DOMContentLoaded', function(){
     }));
   })();
 
-  /* ── PSI: fotografía real de una unidad, nunca stock ── */
-  /* Foto de PSI: la unidad en venta mejor producida, que es la que habla de una compra */
-  const conFotos = reales.filter(a => a.fotos && a.fotos.length);
-  const conFoto = conFotos.filter(a => a.op === 'venta').sort((x, y) => y.fotos.length - x.fotos.length)[0]
-    || conFotos.sort((x, y) => y.fotos.length - x.fotos.length)[0]
-    || avisos.find(a => a.fotos && a.fotos.length);
-  const psiFig = document.getElementById('psiFoto');
-  /* La foto propia manda. Si el archivo no está o tarda, entra una unidad real. */
-  (function(){
-    const propia = psiFig.querySelector('img');
-    if (!propia) return ponerUnidad();
-    if (propia.complete && !propia.naturalWidth) return ponerUnidad();
-    propia.addEventListener('error', () => { propia.remove(); ponerUnidad(); });
-  })();
-  function ponerUnidad(){
-    if (!conFoto || psiFig.querySelector('img')) return;
-    psiFig.insertAdjacentHTML('afterbegin', `<img src="${BP.sbImg(conFoto.fotos[0], 1800)}" alt="" loading="lazy">`);
-  }
+  /* 23/9/2026 · PSI salió del portal (decisión de Tomás): la línea no se ofrece por ahora.
+     Con la sección fuera, todo este bloque quedó sin destino. */
 
   if (window.BPM && BPM.init) BPM.init(document);
 })();

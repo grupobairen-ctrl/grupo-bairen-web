@@ -247,7 +247,17 @@
           .eq('personas.auth_user_id', S.session.id).is('hasta', null).order('desde').limit(1).maybeSingle();
         if (!error && m && m.publicadores) return m.publicadores;
       } catch (e) { /* sin migración: seguimos */ }
-      const { data } = await S.sb.schema('portal').from('publicadores').select('*').eq('auth_user_id', S.session.id).maybeSingle(); return data || null;
+      const { data } = await S.sb.schema('portal').from('publicadores').select('*').eq('auth_user_id', S.session.id).maybeSingle();
+      if (data) return data;
+      /* 22/9/2026 · Los dueños directos tienen su fila creada por el equipo, todavía sin cuenta atada.
+         La primera vez que entran con su mail, la función ata la fila a su sesión y la devuelve.
+         Solo ata filas sin dueño y usa el mail del token, no el que diga el navegador.
+         Si la migración 08 no corrió, falla y seguimos sin publicador, como antes. */
+      try {
+        const { data: v } = await S.sb.schema('portal').rpc('vincular_publicador_por_email');
+        if (v) return v;
+      } catch (e) { /* sin migración 08: seguimos */ }
+      return null;
     }
     return L.pubs.get([]).find(p => p.auth_user_id === S.session.id) || null;
   };

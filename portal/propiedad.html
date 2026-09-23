@@ -64,6 +64,10 @@ document.addEventListener('DOMContentLoaded', function(){
   const pub = BPData.pub(a.publicadorId);
   const esAlqCorredor = a.op !== 'venta' && pub.tipo !== 'dueno' && !!pub.matricula;
   const fotos = a.fotos.length ? a.fotos : [];
+  /* 23/9/2026 · Ancho de foto según la pantalla real, no 1600 fijo. En un celular de 390 px con
+     pantalla de doble densidad alcanzan 780: pedir 1600 era bajar el doble de bytes para nada.
+     Se topea en 1600 para que en escritorio quede igual que antes. */
+  const ANCHO_FOTO = Math.min(1600, Math.round((window.innerWidth || 390) * Math.min(window.devicePixelRatio || 1, 2)));
   /* Toda la ficha se arma desde JS con BP.t(clave, castellano): en es no cambia nada. La descripción ya viene traducida por dato. */
   const T = BP.t, TF = BP.tf;
   const pubNombre = BPData.pubNombre(pub);
@@ -78,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function(){
   main.removeAttribute('aria-busy');
   main.innerHTML = `
 <div class="p-fhero" id="gal">
-  <div class="p-fhero-slides" id="heroSlides">${fotos.length ? fotos.map((f,i) => `<a href="#" class="p-fhero-slide" data-i="${i}" style="background-image:url('${BP.sbImg(f, 1600)}')" aria-label="${BP.esc(TF('ficha_foto_de', '{t}, foto {i} de {n}', { t: a.titulo, i: i+1, n: fotos.length }))}"></a>`).join('') : `<div class="p-fhero-slide p-fhero-empty">${T('ficha_fotos_prod', 'Fotos en producción')}</div>`}</div>
+  <div class="p-fhero-slides" id="heroSlides">${fotos.length ? fotos.map((f,i) => `<div class="p-fhero-slide" data-i="${i}" role="img" ${i < 2 ? `style="background-image:url('${BP.sbImg(f, ANCHO_FOTO)}')"` : `data-bg="${BP.esc(BP.sbImg(f, ANCHO_FOTO))}"`} aria-label="${BP.esc(TF('ficha_foto_de', '{t}, foto {i} de {n}', { t: a.titulo, i: i+1, n: fotos.length }))}"></div>`).join('') : `<div class="p-fhero-slide p-fhero-empty">${T('ficha_fotos_prod', 'Fotos en producción')}</div>`}</div>
   <div class="p-fhero-grad"></div>
   <div class="p-fhero-content">
     <div>
@@ -265,6 +269,22 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip">${fotos.map((f,i) => `<but
   /* pestañas de características: rol de pestaña, flechas para moverse, un solo tab en el orden de tabulación */
   /* La foto del hero se retira más lento que el scroll y el titular se apaga: profundidad, no efecto */
   if (window.BPM && BPM.profundidad) BPM.profundidad('.p-fhero', '.p-fhero-slides', '.p-fhero-content');
+
+  /* 23/9/2026 · La galería bajaba TODAS las fotos al abrir la ficha, porque un background-image
+     de CSS no se puede diferir: el navegador las pide al leer el HTML. En una ficha de 156 fotos
+     eran 6,7 MB y dieciséis segundos con datos móviles, justo en la página donde alguien decide
+     si te escribe. Ahora las dos primeras vienen puestas (para que la primera se vea al instante)
+     y el resto se cargan cuando se acercan. Sin observador, se cargan todas: peor pero nunca roto. */
+  (function(){
+    const pendientes = Array.from(document.querySelectorAll('.p-fhero-slide[data-bg]'));
+    if (!pendientes.length) return;
+    const poner = el => { const u = el.dataset.bg; if (!u) return; el.style.backgroundImage = `url('${u}')`; delete el.dataset.bg; };
+    if (!('IntersectionObserver' in window)) { pendientes.forEach(poner); return; }
+    const obs = new IntersectionObserver((entradas, o) => {
+      entradas.forEach(e => { if (e.isIntersecting) { poner(e.target); o.unobserve(e.target); } });
+    }, { root: document.getElementById('heroSlides'), rootMargin: '0px 150%' });
+    pendientes.forEach(el => obs.observe(el));
+  })();
   const tabBtns = Array.from(document.querySelectorAll('.p-tabs2 button'));
   const activarTab = b => { tabBtns.forEach(x => { const on = x === b; x.classList.toggle('on', on); x.setAttribute('aria-selected', on ? 'true' : 'false'); x.tabIndex = on ? 0 : -1; }); ['gen','serv','amb'].forEach(k => document.getElementById('tab-' + k).hidden = k !== b.dataset.tab); };
   tabBtns.forEach((b, i) => { b.addEventListener('click', () => activarTab(b)); b.addEventListener('keydown', e => { if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return; e.preventDefault(); const n = tabBtns[(i + (e.key === 'ArrowRight' ? 1 : tabBtns.length - 1)) % tabBtns.length]; activarTab(n); n.focus(); }); });
