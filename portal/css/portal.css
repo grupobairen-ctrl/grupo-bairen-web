@@ -339,7 +339,13 @@ body{background:var(--p-bg);color:var(--text-dark);font-family:var(--font-body)}
 /* etiqueta de operación sobre .card-tag de catalogo.css */
 .card-tag.tag-venta{background:var(--gold);color:var(--navy-deeper)}
 .card-tag.tag-mediano{background:var(--navy-deeper);color:#fff}
-.card-tag.tag-alquiler{background:#fff;color:var(--navy-deeper)}
+/* 23/9/2026 · El !important va acá porque la regla genérica .card-tag (más abajo en este mismo
+   archivo) fuerza color:#FBFAF6 !important sobre fondo navy. En "Propiedades similares" de la
+   ficha ganaba ese color y este fondo blanco al mismo tiempo: la etiqueta quedaba blanco sobre
+   blanco, contraste 1,04 a 1, o sea invisible. En el catálogo y la portada no se veía porque
+   hay reglas con body.p-catalogo y body.p-home que pisan el fondo; la ficha era la única sin
+   ese paraguas. */
+.card-tag.tag-alquiler{background:#fff;color:var(--navy-deeper) !important}
 
 /* ── Correcciones tras la primera revisión visual (3/9) ─────── */
 .p-container{min-width:0}
@@ -2771,7 +2777,11 @@ body.p-home .h-camino-linea .punta,body.p-home .h-camino-linea .halo{transition:
   body.p-home .h-m2-mas{font-size:.8125rem}
   body.p-home .h-hito b{font-size:.6875rem}
   /* Pie: las zonas en dos columnas, así el pie deja de ser un tercio de la página */
-  body.p-home .footer .ft-col ul{columns:2;column-gap:18px}
+  /* 23/9/2026 · Las dos columnas solo cuando entran. A 360px el ancho mínimo de este bloque
+     era 347px contra 312px disponibles, así que el pie se salía de la pantalla: el mail
+     quedaba cortado sin la "m" final y la línea divisoria se iba de largo. */
+  body.p-home .footer .ft-col ul{columns:1}
+  @media(min-width:420px){ body.p-home .footer .ft-col ul{columns:2;column-gap:18px} }
   body.p-home .footer .ft-col li{break-inside:avoid}
 }
 /* Estándar: el copy y la puerta a los criterios en la misma línea */
