@@ -126,7 +126,9 @@ document.addEventListener('DOMContentLoaded', function(){
   document.getElementById('cualChecks').innerHTML = BP.CUALIDADES.map(a => `<label><input type="checkbox" data-cual="${a}"> ${BP.etiqueta(a)}</label>`).join('');
 
   const PER_PAGE = 12;
-  const F = { op:'venta', tipo:'departamento', zonas:[], q:'', pub:'', emp:false, reservadas:false, amb:0, dorm:0, banos:0, coch:0, pmin:0, pmax:0, expmax:0, m2min:0, m2max:0, antig:0, amen:[], cual:[], amoblado:false, dueno:false, video:false, hace:0, favs:false, sort:'relevancia', page:1 };
+  /* 23/9/2026 · Arrancaba en 'venta', igual que la portada. El ítem "Propiedades" del menú
+     lleva acá sin parámetros, así que el visitante veía 2 avisos de 42 y se iba. */
+  const F = { op:'alquiler', tipo:'departamento', zonas:[], q:'', pub:'', emp:false, reservadas:false, amb:0, dorm:0, banos:0, coch:0, pmin:0, pmax:0, expmax:0, m2min:0, m2max:0, antig:0, amen:[], cual:[], amoblado:false, dueno:false, video:false, hace:0, favs:false, sort:'relevancia', page:1 };
   const _datos = BPData.load(); await BP.probePretty(); const pretty = BP.parsePretty(); if (pretty) { F.op = pretty.op; F.tipo = pretty.tipo; if (pretty.zona) F.zonas = [pretty.zona]; }
   const qs = BP.qs();
   if (qs.has('op')) F.op = qs.get('op'); if (qs.get('tipo')) F.tipo = qs.get('tipo'); if (qs.getAll('zona').length) F.zonas = qs.getAll('zona').map(z => BP.zonaFromSlug(z) || z).filter(Boolean);

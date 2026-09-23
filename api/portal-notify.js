@@ -34,7 +34,11 @@ async function sbGet(path) {
 }
 
 // Solo estos orígenes pueden llamar a la función. Nada de comodín: era usable como relay.
-const ORIGENES = [/^https:\/\/(www\.)?bairengroup\.com$/, /^https:\/\/grupo-bairen[a-z0-9-]*\.vercel\.app$/, /^http:\/\/(localhost|127\.0\.0\.1):\d+$/];
+/* 23/9/2026 · Faltaba portal.bairengroup.com, el dominio donde vive el portal. Esta función es la
+   que le avisa por mail al publicador que le entró una consulta: con el origen rechazado, la
+   consulta se guardaba en la base y NADIE SE ENTERABA. En un portal cuyo valor es que te lleguen
+   consultas, ese es el peor lugar posible para un 403. Misma lista que api/_portal/admin.js. */
+const ORIGENES = [/^https:\/\/(www\.)?bairengroup\.com$/, /^https:\/\/portal\.bairengroup\.com$/, /^https:\/\/grupo-bairen[a-z0-9-]*\.vercel\.app$/, /^http:\/\/(localhost|127\.0\.0\.1):\d+$/];
 // Los avisos derivan su destinatario del propio aviso; la verificación es del equipo y va con clave.
 const POR_AVISO = ['consulta', 'aprobado', 'rechazado', 'cambios'];
 const POR_CLAVE = ['verificado', 'verificacion_rechazada'];
