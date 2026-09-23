@@ -34,7 +34,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260923e"><link rel="stylesheet" href="css/catalogo.css?v=20260923e"><link rel="stylesheet" href="css/portal.css?v=20260923e">
+  <link rel="stylesheet" href="css/base.css?v=20260923f"><link rel="stylesheet" href="css/catalogo.css?v=20260923f"><link rel="stylesheet" href="css/portal.css?v=20260923f">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"BAIREN","url":"https://www.bairengroup.com","logo":"https://www.bairengroup.com/bairen_logo.png","description":"El portal de propiedades seleccionadas de Buenos Aires. Alquileres a mediano y largo plazo y departamentos en venta, seleccionados uno por uno antes de entrar al portal.","areaServed":[{"@type":"City","name":"Ciudad Autónoma de Buenos Aires"},{"@type":"AdministrativeArea","name":"Zona Norte, Buenos Aires"}]}</script>
 </head>
 <body class="p-home">
@@ -122,28 +122,17 @@
   </div>
 </section>
 
-<section class="h-sec h-crema h-m2" id="indice">
-  <div class="h-in">
-    <p class="h-eyebrow" data-i18n="idx_eyebrow">Índice BAIREN</p>
-    <h2 class="h-h2" data-i18n="idx_h2">¿Cuánto vale el m²?</h2>
-    <p class="h-m2-fecha" data-i18n="idx_fecha">USD por m² en venta. Promedio de publicación, septiembre de 2026.</p>
-    <div class="h-m2-caja">
-      <ol class="h-m2-lista" id="m2Lista"></ol>
-    </div>
-    <a class="h-m2-mas" href="buscar.html?op=venta"><span data-i18n="idx_mas">Ver las propiedades en venta</span><em aria-hidden="true">›</em></a>
-  </div>
-</section>
 
 
 </main>
 <div id="pFooter"></div>
 
-<script src="../mapa-barrios.js?v=20260923e" defer></script><script src="supabase-portal.js?v=20260923e" defer></script><script src="js/errores.js?v=20260923e" defer></script>
-<script src="js/motion.js?v=20260923e" defer></script>
-<script src="js/bairen-motion.js?v=20260923e" defer></script>
-<script src="js/i18n-portal.js?v=20260923e" defer></script><script src="js/ui.js?v=20260923e" defer></script>
-<script src="js/store.js?v=20260923e" defer></script>
-<script src="js/data.js?v=20260923e" defer></script>
+<script src="../mapa-barrios.js?v=20260923f" defer></script><script src="supabase-portal.js?v=20260923f" defer></script><script src="js/errores.js?v=20260923f" defer></script>
+<script src="js/motion.js?v=20260923f" defer></script>
+<script src="js/bairen-motion.js?v=20260923f" defer></script>
+<script src="js/i18n-portal.js?v=20260923f" defer></script><script src="js/ui.js?v=20260923f" defer></script>
+<script src="js/store.js?v=20260923f" defer></script>
+<script src="js/data.js?v=20260923f" defer></script>
 <script>
 document.addEventListener('DOMContentLoaded', function(){
 (async function(){
@@ -201,11 +190,12 @@ document.addEventListener('DOMContentLoaded', function(){
   });
 
   /* ── Lo que no depende de datos se pinta ya: el índice y el camino del estándar ── */
-  /* Índice: el valor del m² de los tres barrios más caros donde trabajamos.
-     Promedio de publicación del mercado en venta, septiembre de 2026. */
-  const VENTA_M2 = { 'Puerto Madero':6122, 'Palermo':3431, 'Núñez':3387, 'Belgrano':3273, 'Colegiales':3075, 'Saavedra':2894, 'Recoleta':2795, 'Retiro':2616, 'Villa Crespo':2542 };
-  const top = Object.entries(VENTA_M2).sort((a, b) => b[1] - a[1]).slice(0, 3);
-  document.getElementById('m2Lista').innerHTML = top.map(([z, v]) => `<li><a href="${BP.urlBuscar({ op: 'venta', zona: z })}"><span class="b">${z}</span><span class="v">USD ${BP.fmtN(v)}</span></a></li>`).join('');
+  /* 23/9/2026 · El Índice BAIREN salió de la portada. Los valores del m² estaban escritos a
+     mano, no salían de ningún lado, y cada barrio linkeaba a una búsqueda en venta: con dos
+     unidades en venta en todo el portal, dos de los tres links daban cero resultados.
+     Presentar eso como "promedio de publicación" es afirmar un dato de mercado sin fuente.
+     Vuelve cuando el índice salga de los datos del Gobierno de la Ciudad, que es fuente
+     pública y citable, y es en lo que Julián ya está trabajando. */
   if (window.BPM && BPM.camino) BPM.camino(document.getElementById('camino'));
 
   /* ── Datos ── */

@@ -462,7 +462,7 @@
       <p class="p-legend" data-i18n="ft_legend">BAIREN selecciona y publica propiedades, y da la gestión para administrarlas. Cada aviso es responsabilidad de quien lo publica.</p>
     </div>
     <div class="ft-col"><div class="ft-col-ttl" data-i18n="ft_nav">Navegación</div><ul>
-      <li><a href="${BP.urlBuscar({ op:'alquiler' })}" data-i18n="alquilar">Alquilar</a></li><li><a href="${BP.urlBuscar({ op:'venta' })}" data-i18n="comprar">Comprar</a></li><li><a href="index.html#indice" data-i18n="ft_indice">Índice BAIREN</a></li><li><a href="publicar.html" data-i18n="publicar">Publicar</a></li></ul></div>
+      <li><a href="${BP.urlBuscar({ op:'alquiler' })}" data-i18n="alquilar">Alquilar</a></li><li><a href="${BP.urlBuscar({ op:'venta' })}" data-i18n="comprar">Comprar</a></li><li><a href="publicar.html" data-i18n="publicar">Publicar</a></li></ul></div>
     <div class="ft-col"><div class="ft-col-ttl" data-i18n="ft_zonas">Zonas</div><ul>${zonas}</ul></div>
     <div class="ft-col"><div class="ft-col-ttl" data-i18n="ft_mas">Más</div><ul>
       <li><a href="publicadores.html" data-i18n="publicadores">Publicadores</a></li><li><a href="https://os.bairengroup.com" rel="noopener">Bairen OS</a></li><li><a href="emprendimientos.html" data-i18n="emprendimientos">Desarrollos</a></li><li><a href="criterios.html" data-i18n="ft_criterios">Criterios de selección</a></li><li><a href="legales.html" data-i18n="ft_terminos">Términos y privacidad</a></li><li><a href="mailto:contacto@bairengroup.com">contacto@bairengroup.com</a></li></ul></div>
