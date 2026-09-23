@@ -14,8 +14,10 @@
  * hecha mail.
  *
  * A quiénes les llega:
- *   · Al PUBLICADOR, sobre lo que publica.
- *   · Al PROPIETARIO, sobre su unidad, aunque la publique otro. Desde que las
+ *   · Al PUBLICADOR, sobre lo que publica. A todos: corredores, inmobiliarias,
+ *     gestores y desarrolladoras.
+ *   · Al PROPIETARIO, sobre su unidad, aunque la publique otro, y solo si está
+ *     encendido en portal.propietarios_resumen (ver el bloque de abajo). Desde que las
  *     unidades volvieron a Bairen Realty el dueño no es publicador, así que sin
  *     este segundo envío se quedaba sin el mail, y ese mail es la palanca entera
  *     del modelo. Necesita portal/migracion-19-resumen-propietarios.sql.
@@ -34,20 +36,22 @@
 const A = require('./admin');
 
 /* ══════════════════════════════════════════════════════════════════════════════
-   23/9/2026 · LLAVE DE LOS PROPIETARIOS, APAGADA A PROPÓSITO.
+   23/9/2026 · A QUIÉN LE LLEGA EL RESUMEN
 
-   Los 24 propietarios todavía NO saben que tienen acceso al portal ni que van a
-   recibir un mail semanal. Mandárselo sin avisarles es aparecer sin invitación en
-   la casilla de alguien que confió su departamento: se explica una vez, no se
-   pide perdón después.
+   · Publicadores (corredores, inmobiliarias, gestores, desarrolladoras): a todos.
+     Están adentro sabiendo que están adentro.
 
-   Mientras esto esté en false, el resumen del publicador sale igual (le llega a
-   Bairen Realty y a Maxim, que son de la casa) y el de los propietarios se arma,
-   se cuenta y NO se manda.
+   · Propietarios: uno por uno, según portal.propietarios_resumen. Los 24 que ya
+     eran propietarios el 23/9/2026 entraron APAGADOS, porque todavía no sabían
+     que tenían acceso al portal ni que les iba a llegar un mail semanal.
+     Mandárselo sin avisarles es aparecer sin invitación en la casilla de alguien
+     que confió su departamento.
+     El que aparezca de ahora en más se enciende solo: entra sabiendo cómo
+     funciona.
 
-   Para encenderlo: poner true y publicar. Una línea.
+   Para encender a los de hoy, cuando se les avise, es una línea de SQL que está
+   escrita al final de portal/migracion-20-resumen-por-propietario.sql.
    ══════════════════════════════════════════════════════════════════════════════ */
-const AVISAR_A_PROPIETARIOS = false;
 
 /* El lunes 00:00 de Buenos Aires de la semana que ya cerró. */
 function lunesDeLaSemanaPasada(hoy) {
@@ -227,7 +231,7 @@ async function resumenSemanal(opciones) {
     const porDueno = new Map();
     for (const f of fp) {
       if (!f.propietario_email) continue;
-      if (!porDueno.has(f.propietario_email)) porDueno.set(f.propietario_email, { publica: f.publica, filas: [] });
+      if (!porDueno.has(f.propietario_email)) porDueno.set(f.propietario_email, { publica: f.publica, activo: f.activo, filas: [] });
       porDueno.get(f.propietario_email).filas.push(f);
     }
 
@@ -245,10 +249,12 @@ async function resumenSemanal(opciones) {
       const r = { propietario: mail, unidades: d.filas.length, vistas, consultas };
       if (o.ensayo) { duenos.push(Object.assign({ ensayo: true }, r)); continue; }
 
-      /* La llave de arriba: si está apagada, se cuenta pero no se manda. En modo
-         prueba sí se manda, porque va a la casilla de la casa y no a la del dueño. */
-      if (!AVISAR_A_PROPIETARIOS && !prueba) {
-        salteados.push({ nombre: mail, motivo: 'a los propietarios todavía no se les avisó (AVISAR_A_PROPIETARIOS)' });
+      /* activo en null = no figura en la tabla = es nuevo: se da de alta encendido.
+         En modo prueba se manda igual, porque va a la casilla de la casa. */
+      if (d.activo === null || d.activo === undefined) {
+        try { await A.post('rpc/alta_propietario_resumen', { p_email: mail }); } catch (e) { /* si falla, se reintenta la semana que viene */ }
+      } else if (d.activo === false && !prueba) {
+        salteados.push({ nombre: mail, motivo: 'todavía no se le avisó de que recibe el resumen' });
         continue;
       }
 
