@@ -128,7 +128,11 @@
   S.rielDe = function(p){
     if (p === 'busca') return ['favoritos', 'alertas', 'contactos', 'cuenta'];
     if (p === 'dueno') return ['avisos', 'propiedades', 'interesados', 'contactos', 'cuenta'];
-    if (p === 'profesional') return ['avisos', 'interesados', 'importar', 'os', 'cuenta'];
+    /* 23/9/2026 · 'os' fuera del menú hasta que el puente esté verificado. Hoy un profesional que
+       se registra y toca "Bairen OS" ve "Todavía no tenés una cuenta" o lo echan: el titular queda
+       sin plan ni rol (trg_pub_gestion, main.js:294 del OS). Una puerta que lleva a eso es peor
+       que ninguna. Vuelve cuando el alta deje plan y rol por defecto, y se pruebe con un login real. */
+    if (p === 'profesional') return ['avisos', 'interesados', 'importar', 'cuenta'];
     return S.RIEL_COMPLETO.slice();
   };
   S.getPerfil = function(){ const p = S.session && S.session.perfil; return S.PERFILES.indexOf(p) > -1 ? p : null; };
