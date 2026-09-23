@@ -13,6 +13,10 @@
    Voz: par a par, sin mayúsculas sostenidas, sin exclamaciones. */
 window.BP_I18N = {
   en: {
+    /* 23/9/2026 · El título y la descripción de la portada quedaban en castellano en EN y PT:
+       se ven en la pestaña del navegador y en la vista previa al compartir el link. */
+    home_title: 'BAIREN · Selected properties in Buenos Aires',
+    home_desc: 'The portal of selected properties in Buenos Aires. Apartments for sale and for rent in Palermo, Recoleta, Retiro, Belgrano, Núñez, Colegiales, Villa Crespo, Puerto Madero, Saavedra and Zona Norte, reviewed one by one before entering the portal.',
     /* header, menú, pie */
     skip: 'Skip to content', menu: 'Menu', idioma: 'Language',
     publicar: 'List a property', ingresar: 'Sign in', notificaciones: 'Notifications', mis_contactos: 'My contacts', favoritos: 'Favorites',
@@ -242,6 +246,8 @@ window.BP_I18N = {
     ui_modo_local_title: 'No database connected: data stays in this browser', psi_title: 'Personal Shopper Inmobiliario · BAIREN',
   },
   pt: {
+    home_title: 'BAIREN · Imóveis selecionados em Buenos Aires',
+    home_desc: 'O portal de imóveis selecionados de Buenos Aires. Apartamentos à venda e para alugar em Palermo, Recoleta, Retiro, Belgrano, Núñez, Colegiales, Villa Crespo, Puerto Madero, Saavedra e Zona Norte, revisados um por um antes de entrar no portal.',
     skip: 'Ir para o conteúdo', menu: 'Menu', idioma: 'Idioma',
     publicar: 'Publicar', ingresar: 'Entrar', notificaciones: 'Notificações', mis_contactos: 'Meus contatos', favoritos: 'Favoritos',
     nav_propiedades: 'Imóveis', comprar: 'Comprar', alquilar: 'Alugar', mediano: 'Médio prazo', largo: 'Longo prazo', emprendimientos: 'Empreendimentos', publicadores: 'Anunciantes',

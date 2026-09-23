@@ -34,7 +34,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260923c"><link rel="stylesheet" href="css/catalogo.css?v=20260923c"><link rel="stylesheet" href="css/portal.css?v=20260923c">
+  <link rel="stylesheet" href="css/base.css?v=20260923d"><link rel="stylesheet" href="css/catalogo.css?v=20260923d"><link rel="stylesheet" href="css/portal.css?v=20260923d">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"BAIREN","url":"https://www.bairengroup.com","logo":"https://www.bairengroup.com/bairen_logo.png","description":"El portal de propiedades seleccionadas de Buenos Aires. Alquileres a mediano y largo plazo y departamentos en venta, seleccionados uno por uno antes de entrar al portal.","areaServed":[{"@type":"City","name":"Ciudad Autónoma de Buenos Aires"},{"@type":"AdministrativeArea","name":"Zona Norte, Buenos Aires"}]}</script>
 </head>
 <body class="p-home">
@@ -138,16 +138,25 @@
 </main>
 <div id="pFooter"></div>
 
-<script src="../mapa-barrios.js?v=20260923c" defer></script><script src="supabase-portal.js?v=20260923c" defer></script><script src="js/errores.js?v=20260923c" defer></script>
-<script src="js/motion.js?v=20260923c" defer></script>
-<script src="js/bairen-motion.js?v=20260923c" defer></script>
-<script src="js/i18n-portal.js?v=20260923c" defer></script><script src="js/ui.js?v=20260923c" defer></script>
-<script src="js/store.js?v=20260923c" defer></script>
-<script src="js/data.js?v=20260923c" defer></script>
+<script src="../mapa-barrios.js?v=20260923d" defer></script><script src="supabase-portal.js?v=20260923d" defer></script><script src="js/errores.js?v=20260923d" defer></script>
+<script src="js/motion.js?v=20260923d" defer></script>
+<script src="js/bairen-motion.js?v=20260923d" defer></script>
+<script src="js/i18n-portal.js?v=20260923d" defer></script><script src="js/ui.js?v=20260923d" defer></script>
+<script src="js/store.js?v=20260923d" defer></script>
+<script src="js/data.js?v=20260923d" defer></script>
 <script>
 document.addEventListener('DOMContentLoaded', function(){
 (async function(){
   if (BP.i18n) BP.i18n.apply(document);   /* antes de que el titular se parta en palabras */
+  /* 23/9/2026 · El <title> y la descripción están escritos fijos en el HTML, así que en inglés y
+     en portugués quedaban en castellano: se ven en la pestaña del navegador y en la vista previa
+     cuando alguien comparte el link. Se reescriben con el idioma activo; en castellano, como no
+     hay clave, queda exactamente lo que ya estaba. */
+  (function(){
+    const t = BP.t('home_title', ''); if (t) document.title = t;
+    const d = BP.t('home_desc', ''); const m = document.querySelector('meta[name="description"]');
+    if (d && m) m.setAttribute('content', d);
+  })();
   if (window.BPM && BPM.entrada) BPM.entrada('BAIREN');
   /* El titular se parte cuando cae el velo, no antes: si no, se anima tapado. */
   (function(){ var t = function(){ if (window.BPM && BPM.titular) BPM.titular(document.querySelector('.h-hero h1'), { demora: 0.15 }); };
