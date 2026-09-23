@@ -28,7 +28,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260923k"><link rel="stylesheet" href="css/catalogo.css?v=20260923k"><link rel="stylesheet" href="css/portal.css?v=20260923k">
+  <link rel="stylesheet" href="css/base.css?v=20260923l"><link rel="stylesheet" href="css/catalogo.css?v=20260923l"><link rel="stylesheet" href="css/portal.css?v=20260923l">
   <style>body{padding-top:64px}</style>
 </head>
 <body class="p-product p-catalogo">
@@ -103,10 +103,10 @@
 
 <div id="pFooter"></div>
 
-<script src="supabase-portal.js?v=20260923k" defer></script><script src="js/errores.js?v=20260923k" defer></script>
-<script src="../mapa-barrios.js?v=20260923k" defer></script>
-<script src="js/motion.js?v=20260923k" defer></script><script src="js/bairen-motion.js?v=20260923k" defer></script><script src="js/i18n-portal.js?v=20260923k" defer></script><script src="js/ui.js?v=20260923k" defer></script><script src="js/store.js?v=20260923k" defer></script>
-<script src="js/data.js?v=20260923k" defer></script>
+<script src="supabase-portal.js?v=20260923l" defer></script><script src="js/errores.js?v=20260923l" defer></script>
+<script src="../mapa-barrios.js?v=20260923l" defer></script>
+<script src="js/motion.js?v=20260923l" defer></script><script src="js/bairen-motion.js?v=20260923l" defer></script><script src="js/i18n-portal.js?v=20260923l" defer></script><script src="js/ui.js?v=20260923l" defer></script><script src="js/store.js?v=20260923l" defer></script>
+<script src="js/data.js?v=20260923l" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', function(){
   const PER_PAGE = 12;
   /* 23/9/2026 · Arrancaba en 'venta', igual que la portada. El ítem "Propiedades" del menú
      lleva acá sin parámetros, así que el visitante veía 2 avisos de 42 y se iba. */
-  const F = { op:'alquiler', tipo:'departamento', zonas:[], q:'', pub:'', emp:false, reservadas:false, amb:0, dorm:0, banos:0, coch:0, pmin:0, pmax:0, expmax:0, m2min:0, m2max:0, antig:0, amen:[], cual:[], amoblado:false, dueno:false, video:false, hace:0, favs:false, sort:'relevancia', page:1 };
+  const F = { op:'alquiler', tipo:'todos'   /* 23/9/2026 · arrancaba fijo en departamento y escondía PH, pisos y casas */, zonas:[], q:'', pub:'', emp:false, reservadas:false, amb:0, dorm:0, banos:0, coch:0, pmin:0, pmax:0, expmax:0, m2min:0, m2max:0, antig:0, amen:[], cual:[], amoblado:false, dueno:false, video:false, hace:0, favs:false, sort:'relevancia', page:1 };
   const _datos = BPData.load(); await BP.probePretty(); const pretty = BP.parsePretty(); if (pretty) { F.op = pretty.op; F.tipo = pretty.tipo; if (pretty.zona) F.zonas = [pretty.zona]; }
   const qs = BP.qs();
   if (qs.has('op')) F.op = qs.get('op'); if (qs.get('tipo')) F.tipo = qs.get('tipo'); if (qs.getAll('zona').length) F.zonas = qs.getAll('zona').map(z => BP.zonaFromSlug(z) || z).filter(Boolean);
