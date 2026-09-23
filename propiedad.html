@@ -393,6 +393,7 @@ const PROP_T = {
     nav_comprar:'Comprar', nav_alquilar:'Alquilar',
     tag_ambos:'Alquiler a mediano y largo plazo', tag_temporal:'Alquiler a Mediano Plazo', tag_tradicional:'Alquiler a Largo Plazo', tag_venta:'En Venta',
     temporal_allin:'mediano plazo · all in', pm_allin:'por mes · all in', pm_todo:'por mes · todo incluido', pm:'por mes',
+    pm_exp:'por mes + expensas',
     trad_lbl:'Largo plazo',
     stat_unidad:'Unidad', stat_amb:'Ambientes', stat_meses:'Meses', stat_anios:'Años',
     amenities:'Amenities del edificio',
@@ -400,6 +401,8 @@ const PROP_T = {
     r_dir:'Dirección', r_barrio:'Barrio', r_sup:'Superficie', r_amb:'Ambientes', r_plazo:'Plazo', r_serv:'Servicios', r_serv_temp:'Expensas y serv.', r_gar:'Garantía', r_estado:'Estado',
     amb_sing:'ambiente', amb_pl:'ambientes',
     v_serv_all:'Todos incluidos', v_serv_inq:'A cargo del inquilino',
+    /* Unidades cuyo precio NO es paquete: las expensas van aparte y se dicen acá (23/9/2026) */
+    v_exp_monto:'{m} + servicios, aparte',
     v_gar_trad:'Gtía CABA / Seguro de Caución', v_gar_no:'No requerida',
     est_Disponible:'Disponible', est_Reservado:'Reservado', est_Ocupado:'Ocupado',
     plazo_default:'3 a 12 meses',
@@ -417,6 +420,7 @@ const PROP_T = {
     nav_comprar:'Comprar', nav_alquilar:'Alugar',
     tag_ambos:'Aluguel de médio e longo prazo', tag_temporal:'Aluguel de Médio Prazo', tag_tradicional:'Aluguel de Longo Prazo', tag_venta:'À Venda',
     temporal_allin:'médio prazo · tudo incluído', pm_allin:'por mês · tudo incluído', pm_todo:'por mês · tudo incluído', pm:'por mês',
+    pm_exp:'por mês + condomínio',
     trad_lbl:'Longo prazo',
     stat_unidad:'Unidade', stat_amb:'Ambientes', stat_meses:'Meses', stat_anios:'Anos',
     amenities:'Comodidades do edifício',
@@ -424,6 +428,7 @@ const PROP_T = {
     r_dir:'Endereço', r_barrio:'Bairro', r_sup:'Área', r_amb:'Ambientes', r_plazo:'Prazo', r_serv:'Serviços', r_serv_temp:'Condomínio e serv.', r_gar:'Garantia', r_estado:'Status',
     amb_sing:'ambiente', amb_pl:'ambientes',
     v_serv_all:'Todos incluídos', v_serv_inq:'Por conta do inquilino',
+    v_exp_monto:'{m} + serviços, à parte',
     v_gar_trad:'Garantia CABA / Seguro fiança', v_gar_no:'Não exigida',
     est_Disponible:'Disponível', est_Reservado:'Reservado', est_Ocupado:'Ocupado',
     plazo_default:'3 a 12 meses',
@@ -442,6 +447,7 @@ const PROP_T = {
     nav_comprar:'Buy', nav_alquilar:'Rent',
     tag_ambos:'Medium & long-term rental', tag_temporal:'Medium-term Rental', tag_tradicional:'Long-term Rental', tag_venta:'For Sale',
     temporal_allin:'medium-term · all in', pm_allin:'per month · all in', pm_todo:'per month · all inclusive', pm:'per month',
+    pm_exp:'per month + building fees',
     trad_lbl:'Long-term',
     stat_unidad:'Unit', stat_amb:'Rooms', stat_meses:'Months', stat_anios:'Years',
     amenities:'Building amenities',
@@ -449,6 +455,7 @@ const PROP_T = {
     r_dir:'Address', r_barrio:'Neighbourhood', r_sup:'Area', r_amb:'Rooms', r_plazo:'Term', r_serv:'Utilities', r_serv_temp:'Fees and utilities', r_gar:'Guarantee', r_estado:'Status',
     amb_sing:'room', amb_pl:'rooms',
     v_serv_all:'All included', v_serv_inq:'Paid by tenant',
+    v_exp_monto:'{m} + utilities, not included',
     v_gar_trad:'CABA guarantee / Surety bond', v_gar_no:'Not required',
     est_Disponible:'Available', est_Reservado:'Reserved', est_Ocupado:'Occupied',
     plazo_default:'3 to 12 months',
@@ -520,6 +527,11 @@ function escapeHTML(s) {
 function fmtUSD(n) {
   if (!n || n === 0) return 'Consultar';
   return 'USD ' + Number(n).toLocaleString('es-AR');
+}
+// Las expensas se cargan y se publican en pesos, siempre: el precio del alquiler
+// es el único número en dólares de la ficha.
+function fmtARS(n) {
+  return '$' + Number(n).toLocaleString('es-AR');
 }
 
 // Devuelve {val, lbl} para la stat de plazo a partir del texto libre cargado en admin.
@@ -754,10 +766,14 @@ function renderDynamicTexts(p) {
       $('acPriceSecondary').innerHTML = `<span>${t.trad_lbl}</span>${priceTradStr}`;
     }
   } else if (isTemp) {
+    // El "all in" del precio grande solo va si el precio es de verdad un paquete.
+    // Las unidades con expensas aparte (23/9/2026) dicen "+ expensas" acá arriba,
+    // igual que en la tarjeta del catálogo y que en la fila de la ficha.
+    const allIn = p.expensas_incluidas !== false;
     $('heroPrice').textContent = priceTempStr;
-    $('heroPriceMo').textContent = t.pm_allin;
+    $('heroPriceMo').textContent = allIn ? t.pm_allin : t.pm_exp;
     $('acPrice').textContent = priceTempStr;
-    $('acPriceMo').textContent = t.pm_todo;
+    $('acPriceMo').textContent = allIn ? t.pm_todo : t.pm_exp;
   } else if (isTrad) {
     $('heroPrice').textContent = priceTradStr;
     $('heroPriceMo').textContent = t.pm;
@@ -826,8 +842,18 @@ function renderActionCard(p, titleFull, unidadLbl, reservado, isTemp, isTrad) {
   if (p.m2)        rows.push({ l:t.r_sup, v: `${p.m2} m²` });
   if (p.ambientes) rows.push({ l:t.r_amb, v: `${p.ambientes} ${p.ambientes !== 1 ? t.amb_pl : t.amb_sing}` });
   if (!isVenta) rows.push({ l:t.r_plazo,  v: p.plazo || t.plazo_default });
-  /* En mediano plazo el label es "Expensas y serv." (pedido de Tomás, 19/08) */
-  if (isTemp || p.tipo === 'Ambos') rows.push({ l:t.r_serv_temp, v: t.v_serv_all });
+  /* En mediano plazo el label es "Expensas y serv." (pedido de Tomás, 19/08).
+     El valor ya no es siempre "Todos incluidos": desde el 23/9/2026 hay unidades
+     de mediano plazo cuyo precio es seco y cuyas expensas van aparte. Si la unidad
+     está marcada así, la fila dice el monto real; si no lo tenemos cargado, dice
+     que corren por cuenta del inquilino, pero nunca inventa un número ni promete
+     un paquete que no existe. */
+  if (isTemp || p.tipo === 'Ambos') {
+    const v = p.expensas_incluidas === false
+      ? (p.expensas ? t.v_exp_monto.replace('{m}', fmtARS(p.expensas)) : t.v_serv_inq)
+      : t.v_serv_all;
+    rows.push({ l:t.r_serv_temp, v });
+  }
   else if (isTrad) rows.push({ l:t.r_serv, v: t.v_serv_inq });
   if (!isVenta) rows.push({ l:t.r_gar,    v: isTrad ? t.v_gar_trad : t.v_gar_no });
   rows.push({ l:t.r_estado, v: t['est_' + p.estado] || p.estado, color: reservado ? '#b94a4a' : '#2a7a4b' });
