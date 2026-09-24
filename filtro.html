@@ -127,6 +127,8 @@ nav{height:64px;background:var(--navy-deeper);border-bottom:2px solid var(--gold
 .cf-input:hover{border-color:rgba(194,169,104,.4);}
 .cf-input:focus{outline:none;border-color:var(--gold);background:rgba(194,169,104,.04);}
 .cf-input:user-invalid{border-color:rgba(220,100,100,.5);}
+select.cf-input{appearance:none;-webkit-appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23C2A968' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;background-size:14px;padding-right:40px;}
+select.cf-input option{background:var(--navy-deeper);color:var(--white);}
 .cf-hint{font-size:.68rem;color:rgba(255,255,255,.3);letter-spacing:.02em;margin-top:-4px;}
 @media(max-width:560px){.cf-row{flex-direction:column;gap:14px;}}
 
@@ -174,6 +176,7 @@ nav{height:64px;background:var(--navy-deeper);border-bottom:2px solid var(--gold
 }
 *:focus-visible{outline:2px solid var(--gold);outline-offset:3px;}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 <body>
 <div class="ambient"></div>
@@ -388,8 +391,19 @@ nav{height:64px;background:var(--navy-deeper);border-bottom:2px solid var(--gold
         <input class="cf-input" id="cfTelefono" name="tel" type="tel" required autocomplete="tel" placeholder="+54 11 1234-5678" inputmode="tel" pattern="[0-9+\-\s\(\)]{7,}">
         <span class="cf-hint" data-i18n="cf_hint">Solo lo usamos para coordinar la visita.</span>
       </div>
+      <div class="cf-row">
+        <div class="cf-field">
+          <label class="cf-lbl" for="cfDia" data-i18n="f_dia">Día</label>
+          <select class="cf-input" id="cfDia" name="dia" required></select>
+        </div>
+        <div class="cf-field">
+          <label class="cf-lbl" for="cfHora" data-i18n="f_hora">Horario</label>
+          <select class="cf-input" id="cfHora" name="hora" required></select>
+        </div>
+      </div>
+      <span class="cf-hint" data-i18n="cf_horario">Atendemos de lunes a viernes de 10 a 18 hs y los sábados de 10 a 17 hs.</span>
       <button type="submit" class="btn-calendly" id="btnGoConfirm" disabled>
-        <span data-i18n="ok_btn">Elegir día y horario</span>
+        <span data-i18n="ok_btn">Enviar por WhatsApp</span>
         <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
       </button>
     </form>
@@ -428,7 +442,8 @@ const DYN = {
     fueraRango: 'Fuera de rango',
     entraPresu: '✓ Entra en presupuesto',
     conMargen: '✓ Con margen',
-    excedeCap: 'Excede capacidad'
+    excedeCap: 'Excede capacidad',
+    elegiDia: 'Elegí un día', elegiHora: 'Elegí un horario', primeroDia: 'Primero elegí el día'
   },
   pt: {
     paso: function(n){ return 'Etapa ' + n + ' de 5'; },
@@ -440,7 +455,8 @@ const DYN = {
     fueraRango: 'Fora da faixa',
     entraPresu: '✓ Dentro do orçamento',
     conMargen: '✓ Com folga',
-    excedeCap: 'Excede a capacidade'
+    excedeCap: 'Excede a capacidade',
+    elegiDia: 'Escolha um dia', elegiHora: 'Escolha um horário', primeroDia: 'Primeiro escolha o dia'
   },
   en: {
     paso: function(n){ return 'Step ' + n + ' of 5'; },
@@ -452,7 +468,8 @@ const DYN = {
     fueraRango: 'Out of range',
     entraPresu: '✓ Within budget',
     conMargen: '✓ With room to spare',
-    excedeCap: 'Exceeds capacity'
+    excedeCap: 'Exceeds capacity',
+    elegiDia: 'Choose a day', elegiHora: 'Choose a time', primeroDia: 'Choose the day first'
   }
 };
 
@@ -505,52 +522,167 @@ function goPrev(step) {
   }
 }
 
-function goToConfirmar() {
-  const p = new URLSearchParams(window.location.search);
+// ── Día y horario de la visita ─────────────────────────────────
+// Lunes a viernes de 10 a 18 hs, sábados de 10 a 17 hs, domingos no.
+// Turnos de media hora: el último arranca 30 min antes del cierre.
+function horariosDelDia(fecha) {
+  const dow = fecha.getDay();
+  if (dow === 0) return [];
+  const cierre = dow === 6 ? 17 : 18;
+  const out = [];
+  const hoy = new Date();
+  const esHoy = fecha.toDateString() === hoy.toDateString();
+  const minimo = hoy.getHours() * 60 + hoy.getMinutes() + 60; // hoy: con al menos 1 hora de margen
+  for (let m = 10 * 60; m < cierre * 60; m += 30) {
+    if (esHoy && m < minimo) continue;
+    out.push(String(Math.floor(m / 60)).padStart(2, '0') + ':' + (m % 60 ? '30' : '00'));
+  }
+  return out;
+}
 
+// Próximos 14 días con turnos disponibles
+function diasDisponibles() {
+  const out = [];
+  const d = new Date(); d.setHours(0, 0, 0, 0);
+  while (out.length < 14) {
+    if (horariosDelDia(d).length) out.push(new Date(d));
+    d.setDate(d.getDate() + 1);
+  }
+  return out;
+}
+
+function fechaLegible(fecha, locale) {
+  const dia = fecha.toLocaleDateString(locale, { weekday: 'long' });
+  const d = fecha.getDate(), m = fecha.getMonth() + 1;
+  return dia.charAt(0).toUpperCase() + dia.slice(1) + ' ' + (locale === 'en-US' ? m + '/' + d : d + '/' + m);
+}
+
+// Re-ejecutable: se vuelve a renderizar al cambiar de idioma (conserva la selección)
+function renderDias() {
+  const sel = document.getElementById('cfDia');
+  if (!sel) return;
+  const prev = sel.value;
+  sel.innerHTML = '<option value="" disabled selected>' + DYN[LANG].elegiDia + '</option>';
+  diasDisponibles().forEach(function(f) {
+    const o = document.createElement('option');
+    o.value = f.getFullYear() + '-' + (f.getMonth() + 1) + '-' + f.getDate();
+    o.textContent = fechaLegible(f, DYN[LANG].locale);
+    sel.appendChild(o);
+  });
+  if (prev && sel.querySelector('option[value="' + prev + '"]')) sel.value = prev;
+  renderHoras();
+}
+
+function fechaDeValor(v) {
+  const x = (v || '').split('-');
+  return x.length === 3 ? new Date(+x[0], +x[1] - 1, +x[2]) : null;
+}
+
+function renderHoras() {
+  const sel = document.getElementById('cfHora');
+  const fecha = fechaDeValor(document.getElementById('cfDia').value);
+  const prev = sel.value;
+  sel.innerHTML = '<option value="" disabled selected>' + (fecha ? DYN[LANG].elegiHora : DYN[LANG].primeroDia) + '</option>';
+  sel.disabled = !fecha;
+  if (!fecha) return;
+  horariosDelDia(fecha).forEach(function(h) {
+    const o = document.createElement('option');
+    o.value = h; o.textContent = h + ' hs';
+    sel.appendChild(o);
+  });
+  if (prev && sel.querySelector('option[value="' + prev + '"]')) sel.value = prev;
+}
+
+function enviarPorWhatsApp() {
   // Mapas de val → texto legible
   const mapMudanza   = { 'urgente':'Antes de 2 semanas', 'este-mes':'Este mes', '3-meses':'En los próximos 3 meses' };
   const mapPlazo     = { '3-6':'3 a 6 meses', '6-12':'6 a 12 meses', '12':'12 meses', '12-24':'12 a 24 meses', '24+':'Más de 24 meses' };
   const mapPersonas  = { '1':'Solo yo', '2':'2 personas', '3+':'3 o más' };
   const mapMascotas  = { 'no':'No', 'pequeña':'Sí, una pequeña', 'grande':'Sí, una grande', 'varias':'Sí, más de una' };
   const mapPresup    = { 'menos700':'Menos de USD 700', '700-800':'USD 700 a 800', '800-1200':'USD 800 a 1.200', '1200-2000':'USD 1.200 a 2.000', 'mas2000':'Más de USD 2.000' };
+  const resp = function(n, map) { return answers[n] ? (map[answers[n].val] || answers[n].val) : ''; };
 
-  if (answers['1']) p.set('r_mudanza',    mapMudanza[answers['1'].val]   || answers['1'].val);
-  if (answers['2']) p.set('r_plazo',      mapPlazo[answers['2'].val]     || answers['2'].val);
-  if (answers['3']) p.set('r_personas',   mapPersonas[answers['3'].val]  || answers['3'].val);
-  if (answers['4']) p.set('r_mascotas',   mapMascotas[answers['4'].val]  || answers['4'].val);
-  if (answers['5']) p.set('r_presupuesto',mapPresup[answers['5'].val]    || answers['5'].val);
+  const nombre   = document.getElementById('cfNombre').value.trim();
+  const apellido = document.getElementById('cfApellido').value.trim();
+  const telefono = document.getElementById('cfTelefono').value.trim();
+  const fecha    = fechaDeValor(document.getElementById('cfDia').value);
+  const hora     = document.getElementById('cfHora').value;
+  // El mensaje nos llega a nosotros: la fecha va siempre en castellano
+  const diaTxt   = fecha ? fechaLegible(fecha, 'es-AR') : '';
 
-  // Datos de contacto del form
-  const nombre   = (document.getElementById('cfNombre')   || {}).value;
-  const apellido = (document.getElementById('cfApellido') || {}).value;
-  const telefono = (document.getElementById('cfTelefono') || {}).value;
-  if (nombre)   p.set('r_nombre',   nombre.trim());
-  if (apellido) p.set('r_apellido', apellido.trim());
-  if (telefono) p.set('r_telefono', telefono.trim());
+  const r = {
+    telefono: telefono,
+    mudanza: resp('1', mapMudanza), plazo: resp('2', mapPlazo), personas: resp('3', mapPersonas),
+    mascotas: resp('4', mapMascotas), presupuesto: resp('5', mapPresup)
+  };
 
-  window.location = 'confirmar.html?' + p.toString();
+  // Mensaje de WhatsApp con las respuestas del cuestionario y el turno elegido
+  const L = [];
+  const nom = (nombre + ' ' + apellido).trim();
+  L.push('Hola BAIREN, soy ' + (nom || 'un interesado') + '. Quiero coordinar una visita para ' + (propName || 'una unidad') + (propBarrio ? ' (' + propBarrio + ')' : '') + '.');
+  L.push('');
+  L.push('Día y horario que me queda cómodo: ' + diaTxt + ', ' + hora + ' hs');
+  L.push('');
+  L.push('Mis respuestas del cuestionario:');
+  function add(q, v) { if (v) L.push(q + ': ' + v); }
+  add('Telefono', r.telefono);
+  add('Fecha de mudanza', r.mudanza);
+  add('Plazo', r.plazo);
+  add('Personas', r.personas);
+  add('Mascotas', r.mascotas);
+  add('Presupuesto', r.presupuesto);
+  const waUrl = 'https://wa.me/5491123106629?text=' + encodeURIComponent(L.join('\n'));
+
+  // Respaldo por mail (EmailJS). No frena el paso a WhatsApp: a lo sumo 1,5 s de espera.
+  let fuimos = false;
+  const irAWhatsApp = function() { if (fuimos) return; fuimos = true; window.location.href = waUrl; };
+  try {
+    emailjs.init('x_bJ-nlzs5uVeH6wM');
+    emailjs.send('service_wpvj18e', 'template_z52ebjn', {
+      propiedad:   propName   || 'No especificada',
+      barrio:      propBarrio || 'No especificado',
+      tipo:        propTipo   || 'No especificado',
+      nombre:      nombre     || 'No respondido',
+      apellido:    apellido   || 'No respondido',
+      telefono:    r.telefono    || 'No respondido',
+      mudanza:     r.mudanza     || 'No respondido',
+      plazo:       r.plazo       || 'No respondido',
+      personas:    r.personas    || 'No respondido',
+      mascotas:    r.mascotas    || 'No respondido',
+      presupuesto: r.presupuesto || 'No respondido',
+      dia:         diaTxt || 'No respondido',
+      horario:     hora ? hora + ' hs' : 'No respondido'
+    }).catch(function(err) { console.warn('EmailJS error:', err); }).finally(irAWhatsApp);
+  } catch (e) { console.warn('EmailJS error:', e); }
+  setTimeout(irAWhatsApp, 1500);
 }
 
-// Form de contacto: valida + submit lleva a confirmar.html
+// Form de contacto: valida + submit abre WhatsApp
 (function wireContactForm() {
   const form = document.getElementById('contactForm');
   if (!form) return;
   const btn = document.getElementById('btnGoConfirm');
   const inputs = ['cfNombre','cfApellido','cfTelefono'].map(id => document.getElementById(id));
+  const dia  = document.getElementById('cfDia');
+  const hora = document.getElementById('cfHora');
 
   function validate() {
     const allFilled = inputs.every(i => i && i.value.trim().length >= 2);
     const telOk = /^[0-9+\-\s()]{7,}$/.test((document.getElementById('cfTelefono').value || '').trim());
-    btn.disabled = !(allFilled && telOk);
+    btn.disabled = !(allFilled && telOk && dia.value && hora.value);
   }
 
   inputs.forEach(i => i && i.addEventListener('input', validate));
+  dia.addEventListener('change', function() { renderHoras(); validate(); });
+  hora.addEventListener('change', validate);
+  // Al volver desde WhatsApp con "atrás", el botón vuelve a quedar activo
+  window.addEventListener('pageshow', validate);
 
   form.addEventListener('submit', function(e) {
     e.preventDefault();
     if (btn.disabled) return;
-    goToConfirmar();
+    btn.disabled = true;
+    enviarPorWhatsApp();
   });
 })();
 
@@ -714,7 +846,9 @@ const T = {
     f_nombre: "Nome", f_apellido: "Sobrenome", f_tel: "Telefone / WhatsApp",
     ph_nombre: "Seu nome", ph_apellido: "Seu sobrenome",
     cf_hint: "Usamos seus dados apenas para agendar a visita.",
-    ok_btn: "Escolher dia e horário",
+    f_dia: "Dia", f_hora: "Horário",
+    cf_horario: "Atendemos de segunda a sexta das 10h às 18h e aos sábados das 10h às 17h.",
+    ok_btn: "Enviar pelo WhatsApp",
     no_title: "Esta unidade não é a ideal para você",
     no_sub: "Mas pode haver outra que seja. Conte o que você procura e nós ajudamos a encontrá-la.",
     no_btn: "Falar com um consultor"
@@ -741,7 +875,9 @@ const T = {
     f_nombre: "First name", f_apellido: "Last name", f_tel: "Phone / WhatsApp",
     ph_nombre: "Your first name", ph_apellido: "Your last name",
     cf_hint: "We only use it to arrange the visit.",
-    ok_btn: "Choose a day and time",
+    f_dia: "Day", f_hora: "Time",
+    cf_horario: "We are available Monday to Friday from 10 am to 6 pm and Saturdays from 10 am to 5 pm.",
+    ok_btn: "Send via WhatsApp",
     no_title: "This unit is not the right fit for you",
     no_sub: "But another one may be. Tell us what you are looking for and we will help you find it.",
     no_btn: "Talk to an advisor"
@@ -772,6 +908,7 @@ function applyLang(lang) {
   renderStep2();
   applyStep5Personalization();
   applyStep3Personalization();
+  renderDias();
 }
 document.querySelectorAll('.flag').forEach(f => f.addEventListener('click', () => applyLang(f.dataset.lang)));
 applyLang(LANG);
