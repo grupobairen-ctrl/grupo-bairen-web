@@ -228,6 +228,8 @@
 
   D.bindFavs = root => { (root||document).querySelectorAll('[data-fav]').forEach(b => { if (b._bound) return; b._bound = true; b.addEventListener('click', e => { e.preventDefault(); const on = BP.toggleFav(b.dataset.fav); b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); b.innerHTML = on ? BP.ico.heartFill : BP.ico.heart; BP.toast(on ? BP.t('card_fav_on', 'Guardada en favoritos') : BP.t('card_fav_off', 'Quitada de favoritos')); }); }); };
 
+  /* El precio del aviso incluye expensas y servicios: el alquiler a mediano plazo (op 'mediano') */
+  D.todoIncluido = a => a.op === 'mediano';
   D.filter = function(avisos, f){
     return avisos.filter(a => {
       if (f.favs && !BP.isFav(a.id)) return false;
@@ -241,7 +243,10 @@
          pasaban el filtro. Con 38 de 42 sin el dato, poner "expensas máximas $1" devolvía 22
          de 25 resultados: el filtro prometía algo que no hacía. Ahora, si alguien filtra por
          expensas, el que no tiene el dato queda afuera, que es lo que esa persona espera. */
-      if (f.expmax && !(a.expensas > 0 && a.expensas <= f.expmax)) return false;
+      /* 25/9/2026 · El precio del mediano plazo es todo incluido (la ficha lo dice: "por mes · todo
+         incluido"; en los datos no hay otra marca, es la operación 'mediano'): ahí las expensas cuentan
+         como 0 y el aviso pasa cualquier máximo. Si no es todo incluido y no hay dato, no pasa. */
+      if (f.expmax && !(D.todoIncluido(a) || (a.expensas > 0 && a.expensas <= f.expmax))) return false;
       if (f.amb && (a.amb||0) < f.amb) return false;
       if (f.dorm && (a.dorm||0) < f.dorm) return false;
       if (f.banos && (a.banos||0) < f.banos) return false;
