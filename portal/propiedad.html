@@ -98,7 +98,10 @@ document.addEventListener('DOMContentLoaded', function(){
   main.removeAttribute('aria-busy');
   main.innerHTML = `
 <div class="p-fhero" id="gal">
-  <div class="p-fhero-slides" id="heroSlides">${fotos.length ? fotos.map((f,i) => `<div class="p-fhero-slide" data-i="${i}" role="img" ${i === 0 ? `style="background-image:url('${BP.sbImg(f, ANCHO_FOTO)}')"` : `data-bg="${BP.esc(BP.sbImg(f, ANCHO_FOTO))}"`} aria-label="${BP.esc(TF('ficha_foto_de', '{t}, foto {i} de {n}', { t: a.titulo, i: i+1, n: fotos.length }))}"></div>`).join('') : `<div class="p-fhero-slide p-fhero-empty">${T('ficha_fotos_prod', 'Fotos en producción')}</div>`}</div>
+  <!-- 25/9/2026 · Chrome hace tabulable todo contenedor con desplazamiento que no tenga nada tabulable adentro:
+       el carrusel del hero era una segunda parada antes de la tira. Con tira (más de una foto), la tira es la
+       única parada y sus flechas mueven el hero; el carrusel sale del orden de tabulación. -->
+  <div class="p-fhero-slides" id="heroSlides"${fotos.length > 1 ? ' tabindex="-1"' : ''}>${fotos.length ? fotos.map((f,i) => `<div class="p-fhero-slide" data-i="${i}" role="img" ${i === 0 ? `style="background-image:url('${BP.sbImg(f, ANCHO_FOTO)}')"` : `data-bg="${BP.esc(BP.sbImg(f, ANCHO_FOTO))}"`} aria-label="${BP.esc(TF('ficha_foto_de', '{t}, foto {i} de {n}', { t: a.titulo, i: i+1, n: fotos.length }))}"></div>`).join('') : `<div class="p-fhero-slide p-fhero-empty">${T('ficha_fotos_prod', 'Fotos en producción')}</div>`}</div>
   <div class="p-fhero-grad"></div>
   <div class="p-fhero-content">
     <div>
