@@ -1,0 +1,25 @@
+# Lo que Vercel NO sube al sitio público (www.bairengroup.com y portal.bairengroup.com).
+#
+# 25/9/2026 · Se servían con 200 a cualquiera que adivinara la ruta: schema.sql,
+# julian-schema.sql, las migraciones y el seed del portal, PLAN-META-ADS-BAIREN.md,
+# portal/README.md y bairen-deploy.zip (una copia vieja del sitio). Nada de eso lo
+# usa el navegador ni las funciones de api/: las menciones a .sql y .csv en el
+# código son texto, no archivos que se carguen. Las páginas .html no se tocan
+# acá, aunque sean herramientas internas, porque alguien puede estar usándolas.
+
+# Base de datos: migraciones, seeds y respaldos. Se corren a mano en Supabase.
+*.sql
+backup-*.json
+
+# Documentación y notas de trabajo
+*.md
+graphify-out/
+.claude/
+.agents/
+
+# Datos de formularios y archivos sueltos
+*.csv
+*.zip
+
+# Pruebas y herramientas del portal que corren en la máquina, no en el sitio
+portal/test/
