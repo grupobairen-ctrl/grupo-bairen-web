@@ -28,8 +28,15 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260923p"><link rel="stylesheet" href="css/catalogo.css?v=20260923p"><link rel="stylesheet" href="css/portal.css?v=20260923p">
-  <style>body{padding-top:0}#ficha>.p-ficha-top,#ficha>.p-ficha,#ficha>section{max-width:var(--p-max);margin:0 auto;padding-left:24px;padding-right:24px}#ficha>.p-ficha-top{padding-top:88px}@media(max-width:900px){#ficha>.p-ficha-top{padding-top:76px}}.p-video{aspect-ratio:16/9;background:#0b1220;border-radius:16px;overflow:hidden}.p-video iframe,.p-video video{width:100%;height:100%;border:0;display:block}</style>
+  <link rel="stylesheet" href="css/base.css?v=20260925a"><link rel="stylesheet" href="css/catalogo.css?v=20260925a"><link rel="stylesheet" href="css/portal.css?v=20260925a">
+  <style>body{padding-top:0}#ficha>.p-ficha-top,#ficha>.p-ficha,#ficha>section{max-width:var(--p-max);margin:0 auto;padding-left:24px;padding-right:24px}#ficha>.p-ficha-top{padding-top:88px}@media(max-width:900px){#ficha>.p-ficha-top{padding-top:76px}}.p-video{aspect-ratio:16/9;background:#0b1220;border-radius:16px;overflow:hidden}.p-video iframe,.p-video video{width:100%;height:100%;border:0;display:block}
+  /* Fachada del video (25/9/2026): portada y botón de reproducir; el reproductor se pide al tocar */
+  .p-video-play{position:relative;display:block;width:100%;height:100%;padding:0;border:0;background:#0b1220;cursor:pointer}
+  .p-video-play img{width:100%;height:100%;object-fit:cover;display:block;opacity:.86;transition:opacity .3s cubic-bezier(.22,1,.36,1)}
+  .p-video-play .ico{position:absolute;left:50%;top:50%;width:72px;height:72px;margin:-36px 0 0 -36px;border-radius:50%;background:rgba(19,29,45,.72);border:1px solid var(--gold,#C2A968);transition:background .3s cubic-bezier(.22,1,.36,1)}
+  .p-video-play .ico::before{content:'';position:absolute;left:29px;top:23px;border-style:solid;border-width:13px 0 13px 21px;border-color:transparent transparent transparent #FBFAF6}
+  .p-video-play:hover img,.p-video-play:focus-visible img{opacity:1}.p-video-play:hover .ico,.p-video-play:focus-visible .ico{background:rgba(19,29,45,.92)}
+  .p-video-play:focus-visible{outline:3px solid var(--gold,#C2A968);outline-offset:-3px}</style>
 </head>
 <body class="p-product p-ficha-page">
 <div class="p-velo" aria-hidden="true"><span class="w">BAIREN</span></div>
@@ -38,9 +45,9 @@
 <div class="p-lb" id="lb" aria-hidden="true"><div class="velo" data-lb-close></div><button type="button" class="x" data-lb-close aria-label="Cerrar las fotos" data-i18n-aria="ficha_lb_cerrar" data-i18n="ficha_lb_cerrar_txt">Cerrar</button><div class="marco" id="lbMarco"><img id="lbImg" alt="" draggable="false"></div><button type="button" class="nav prev" data-lb-prev aria-label="Foto anterior" data-i18n-aria="ficha_lb_prev"></button><button type="button" class="nav next" data-lb-next aria-label="Foto siguiente" data-i18n-aria="ficha_lb_next"></button><div class="pie"><span class="cuenta" id="lbCount"></span><div class="tiras" id="lbTiras"></div></div></div>
 <div id="pFooter"></div>
 
-<script src="supabase-portal.js?v=20260923p" defer></script><script src="js/errores.js?v=20260923p" defer></script>
-<script src="js/iconos-amenities.js?v=20260923p" defer></script><script src="js/motion.js?v=20260923p" defer></script><script src="js/bairen-motion.js?v=20260923p" defer></script><script src="js/i18n-portal.js?v=20260923p" defer></script><script src="js/ui.js?v=20260923p" defer></script><script src="js/store.js?v=20260923p" defer></script>
-<script src="js/data.js?v=20260923p" defer></script>
+<script src="supabase-portal.js?v=20260925a" defer></script><script src="js/errores.js?v=20260925a" defer></script>
+<script src="js/iconos-amenities.js?v=20260925a" defer></script><script src="js/motion.js?v=20260925a" defer></script><script src="js/bairen-motion.js?v=20260925a" defer></script><script src="js/i18n-portal.js?v=20260925a" defer></script><script src="js/ui.js?v=20260925a" defer></script><script src="js/store.js?v=20260925a" defer></script>
+<script src="js/data.js?v=20260925a" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -68,6 +75,13 @@ document.addEventListener('DOMContentLoaded', function(){
      pantalla de doble densidad alcanzan 780: pedir 1600 era bajar el doble de bytes para nada.
      Se topea en 1600 para que en escritorio quede igual que antes. */
   const ANCHO_FOTO = Math.min(1600, Math.round((window.innerWidth || 390) * Math.min(window.devicePixelRatio || 1, 2)));
+  /* 25/9/2026 · El visor pedía cada foto dos veces (1600 y después 1800), también en un celular
+     donde la foto se ve a 390 px. Ahora arranca con la del hero, que ya está bajada, y solo pide
+     otra si la pantalla da para más (escritorio, o el celular girado). */
+  const ANCHO_VISOR = Math.min(1800, Math.round((window.innerWidth || 390) * Math.min(window.devicePixelRatio || 1, 2)));
+  /* 25/9/2026 · Con el barrio vacío (Juncal 600) se rompían el título, las migas y el mapa.
+     El lugar es el barrio; si falta, la zona; si falta también, se omite ese tramo entero. */
+  const lugar = a.barrio || BP.zonaLabel(a.zona) || '';
   /* Toda la ficha se arma desde JS con BP.t(clave, castellano): en es no cambia nada. La descripción ya viene traducida por dato. */
   const T = BP.t, TF = BP.tf;
   const pubNombre = BPData.pubNombre(pub);
@@ -79,18 +93,21 @@ document.addEventListener('DOMContentLoaded', function(){
   const msgDefault = TF('card_wa_msg', 'Hola, vi {t} ({c}) en BAIREN y quiero más información.', { t: a.titulo, c: a.codigo });
   /* 23/9/2026 · Con el barrio vacío el título quedaba "... Alquiler, largo plazo en · BAIREN",
      con la preposición colgada. Si no hay barrio, se usa la zona. */
-  document.title = `${a.titulo} · ${BPData.opTag(a)} ${T('ficha_en', 'en')} ${a.barrio || BP.zonaLabel(a.zona)} · BAIREN`;
+  document.title = `${a.titulo} · ${BPData.opTag(a)}${lugar ? ' ' + T('ficha_en', 'en') + ' ' + lugar : ''} · BAIREN`;
 
   main.removeAttribute('aria-busy');
   main.innerHTML = `
 <div class="p-fhero" id="gal">
-  <div class="p-fhero-slides" id="heroSlides">${fotos.length ? fotos.map((f,i) => `<div class="p-fhero-slide" data-i="${i}" role="img" ${i < 2 ? `style="background-image:url('${BP.sbImg(f, ANCHO_FOTO)}')"` : `data-bg="${BP.esc(BP.sbImg(f, ANCHO_FOTO))}"`} aria-label="${BP.esc(TF('ficha_foto_de', '{t}, foto {i} de {n}', { t: a.titulo, i: i+1, n: fotos.length }))}"></div>`).join('') : `<div class="p-fhero-slide p-fhero-empty">${T('ficha_fotos_prod', 'Fotos en producción')}</div>`}</div>
+  <!-- 25/9/2026 · Chrome hace tabulable todo contenedor con desplazamiento que no tenga nada tabulable adentro:
+       el carrusel del hero era una segunda parada antes de la tira. Con tira (más de una foto), la tira es la
+       única parada y sus flechas mueven el hero; el carrusel sale del orden de tabulación. -->
+  <div class="p-fhero-slides" id="heroSlides"${fotos.length > 1 ? ' tabindex="-1"' : ''}>${fotos.length ? fotos.map((f,i) => `<div class="p-fhero-slide" data-i="${i}" role="img" ${i === 0 ? `style="background-image:url('${BP.sbImg(f, ANCHO_FOTO)}')"` : `data-bg="${BP.esc(BP.sbImg(f, ANCHO_FOTO))}"`} aria-label="${BP.esc(TF('ficha_foto_de', '{t}, foto {i} de {n}', { t: a.titulo, i: i+1, n: fotos.length }))}"></div>`).join('') : `<div class="p-fhero-slide p-fhero-empty">${T('ficha_fotos_prod', 'Fotos en producción')}</div>`}</div>
   <div class="p-fhero-grad"></div>
   <div class="p-fhero-content">
     <div>
       <div class="p-fhero-tag">${BPData.opTag(a)}${a.reservado ? ' · ' + T('ficha_reservada', 'Reservada') : ''}</div>
       <h1 class="p-fhero-address">${BP.esc(a.dir)}${a.unidad && !a.dirAprox ? ' · ' + BP.esc(a.unidad) : ''}</h1>
-      <div class="p-fhero-sub">${BP.esc(a.barrio || BP.zonaLabel(a.zona))} · ${BP.esc(a.ciudad)}</div>
+      <div class="p-fhero-sub">${[lugar, a.ciudad].filter(Boolean).map(BP.esc).join(' · ')}</div>
     </div>
     <div class="p-fhero-price-box">
       <div class="p-fhero-price-lbl">${a.reservado ? T('ficha_estado', 'Estado') : a.op === 'venta' ? T('ficha_precio', 'Precio') : T('ficha_precio_mensual', 'Precio mensual')}</div>
@@ -100,12 +117,17 @@ document.addEventListener('DOMContentLoaded', function(){
   </div>
   <div class="cts"><span>${BP.ico.photo} ${fotos.length === 1 ? T('ficha_foto_1', '1 foto') : TF('ficha_fotos', '{n} fotos', { n: fotos.length })}</span>${a.video ? `<span>${BP.ico.video} ${T('ficha_video', 'Video')}</span>` : ''}</div>
 </div>
-${fotos.length > 1 ? `<div class="p-strip" id="strip">${fotos.map((f,i) => `<button type="button" class="thumb ${i===0?'active':''}" data-t="${i}" aria-label="${BP.esc(TF('ficha_ver_foto', 'Ver foto {i}', { i: i+1 }))}"><img src="${BP.sbImg(f, 300)}" alt="" loading="lazy"></button>`).join('')}</div>` : ''}
-<div class="p-ficha">
+<!-- 25/9/2026 · La tira de miniaturas era una tabulación por foto: 156 en la ficha más cargada antes de
+     llegar a la descripción. Ahora es un solo punto de tabulación (tabindex itinerante): las flechas
+     izquierda y derecha pasan de foto y Enter abre el visor. Miniaturas a 200 px (se ven a 96, a doble
+     densidad) y en diferido: antes se pedían a 300. -->
+${fotos.length > 1 ? `<div class="p-strip" id="strip" role="group" aria-label="${BP.esc(TF('ficha_lb_fotos_de', 'Fotos de {t}', { t: a.titulo }))}">${fotos.map((f,i) => `<button type="button" class="thumb ${i===0?'active':''}" data-t="${i}" tabindex="${i===0?0:-1}"${i===0?' aria-current="true"':''} aria-label="${BP.esc(TF('ficha_ver_foto', 'Ver foto {i}', { i: i+1 }))}"><img src="${BP.sbImg(f, 200)}" alt="" loading="lazy" decoding="async"></button>`).join('')}</div>` : ''}
+<!-- El enlace "Saltar al contenido" lleva acá, después de la galería (id contenido, ver BP.header) -->
+<div class="p-ficha" id="contenido">
   <div class="p-ficha-main">
     <div class="p-ficha-head">
       <div class="p-kicker">${BP.esc(BP.etiqueta(a.tipoProp))}${a.amb ? ' · ' + (a.amb === 1 ? T('ficha_monoamb', 'monoambiente') : TF('ficha_ambientes', '{n} ambientes', { n: a.amb })) : ''}${a.m2 ? ' · ' + a.m2 + ' m²' : ''}</div>
-      ${a.reservado ? `<p class="p-reservada">${BP.ico.flag} ${T('ficha_reservada_msg', 'Esta propiedad está reservada y por ahora no toma consultas.')} <a href="${BP.urlBuscar({ op: a.op, zona: a.zona })}">${TF('ficha_ver_disponibles', 'Ver las disponibles en {z}', { z: BP.zonaLabel(a.zona) })}</a>.</p>` : ''}
+      ${a.reservado ? `<p class="p-reservada">${BP.ico.flag} ${T('ficha_reservada_msg', 'Esta propiedad está reservada y por ahora no toma consultas.')}${a.zona ? ` <a href="${BP.urlBuscar({ op: a.op, zona: a.zona })}">${TF('ficha_ver_disponibles', 'Ver las disponibles en {z}', { z: BP.zonaLabel(a.zona) })}</a>.` : ''}</p>` : ''}
       ${(a.apto.length || (a.cualidades||[]).length || a.demo) ? `<p class="p-tags">${(a.cualidades||[]).map(x => `<span class="p-badge" title="${T('ficha_verificada_title', 'Verificada por BAIREN')}">${BP.ico.shield} ${BP.esc(BP.etiqueta(x))}</span>`).join('')}${a.apto.map(x => `<span class="p-badge">${BP.esc(BP.etiqueta(x))}</span>`).join('')}${a.demo ? `<span class="p-badge demo">${T('ficha_aviso_ejemplo', 'Aviso de ejemplo')}</span>` : ''}</p>` : ''}
     </div>
     <h2 class="p-sec-t">${T('ficha_la_unidad', 'La unidad')}</h2>
@@ -116,7 +138,9 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip">${fotos.map((f,i) => `<but
       a.m2 ? ['ruler', a.m2 + ' m²', T('ficha_totales', 'totales')] : null,
       a.m2cub && a.m2cub !== a.m2 ? ['ruler', a.m2cub + ' m²', T('ficha_cubiertos', 'cubiertos')] : null,
       a.amb ? ['door', a.amb, a.amb === 1 ? T('ficha_monoamb', 'monoambiente') : T('ficha_amb_n', 'ambientes')] : null,
-      a.dorm ? ['bed', a.dorm, a.dorm === 1 ? T('ficha_dorm_1', 'dormitorio') : T('ficha_dorm_n', 'dormitorios')] : null,
+      /* 25/9/2026 · "Monoambiente · 1 dormitorio" es una contradicción: el dormitorio viene inferido
+         de los ambientes (ambientes - 1, mínimo 1). Con un solo ambiente no se muestra, como en las tarjetas. */
+      (a.dorm && a.amb !== 1) ? ['bed', a.dorm, a.dorm === 1 ? T('ficha_dorm_1', 'dormitorio') : T('ficha_dorm_n', 'dormitorios')] : null,
       a.banos ? ['bath', a.banos, a.banos === 1 ? T('ficha_bano_1', 'baño') : T('ficha_bano_n', 'baños')] : null,
       a.cocheras ? ['car', a.cocheras, a.cocheras === 1 ? T('ficha_coch_1', 'cochera') : T('ficha_coch_n', 'cocheras')] : null,
       a.antiguedad != null ? ['cal', a.antiguedad === 0 ? T('ficha_a_estrenar', 'A estrenar') : a.antiguedad === 1 ? T('ficha_ano_1', '1 año') : TF('ficha_anos', '{n} años', { n: a.antiguedad }), T('ficha_antiguedad', 'antigüedad')] : null
@@ -140,12 +164,14 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip">${fotos.map((f,i) => `<but
       <h2 class="p-sec-t">${T('ficha_ubicacion', 'Ubicación')}</h2>
       <div class="p-map-wrap"><iframe id="mapFrame" src="" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="${T('ficha_mapa_title', 'Mapa de la ubicación de la propiedad')}"></iframe></div>${a.dirAprox ? `<p class="p-note" style="margin:8px 0 0">${T('ficha_ubic_aprox', 'Ubicación aproximada. La dirección exacta la confirma quien publica.')}</p>` : ''}
     </div>
-    <div id="bloquePregunta">
+    <!-- 25/9/2026 · Reservada: ni el bloque de preguntas ni el formulario se dibujan (antes se borraba
+         después de dibujarlo y el código que lo esperaba fallaba: la ficha reservada se quedaba sin mapa). -->
+    ${a.reservado ? '' : `<div id="bloquePregunta">
       <h2 class="p-sec-t">${T('ficha_preguntale', 'Preguntale a quien publica')}</h2>
       <p class="p-kicker" style="margin-bottom:10px">${TF('ficha_elegi', 'Elegí una o escribí la tuya. Le llega directo a {p}.', { p: BP.esc(pubNombre) })}</p>
       <div class="p-quick" id="quick"><button type="button" aria-pressed="false">${T('ficha_q1', '¿Sigue disponible?')}</button><button type="button" aria-pressed="false">${T('ficha_q2', '¿Valor de las expensas?')}</button><button type="button" aria-pressed="false">${T('ficha_q3', '¿En qué piso está?')}</button><button type="button" aria-pressed="false">${T('ficha_q4', '¿Cuándo puedo visitarla?')}</button></div>
       <div class="p-qrow"><input type="text" id="qText" placeholder="${T('ficha_q_ph', 'Escribí tu consulta')}" maxlength="200" aria-label="${T('ficha_q_aria', 'Tu consulta')}" autocomplete="off"><button type="button" class="p-btn p-btn-navy" id="qSend">${T('ficha_enviar', 'Enviar')}</button></div>
-    </div>
+    </div>`}
     <div class="p-pub-block">
       <h2 class="p-sec-t">${T('ficha_quien_publica', 'Quién publica')}</h2>
       <div class="row"><div class="p-pub-logo">${pub.inicial}</div><div><b>${BP.esc(pubNombre)}</b><div class="p-kicker">${pub.tipo === 'dueno' ? T('ficha_dueno_verif', 'Dueño directo, titularidad verificada por BAIREN') : [pub.responsable, BP.etiqueta(pub.badge)].filter(Boolean).map(BP.esc).join(' · ')}</div></div></div>
@@ -177,7 +203,8 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip">${fotos.map((f,i) => `<but
       <div class="p-cta-acts"><button type="button" class="p-icon-btn ${BP.isFav(a.id)?'on':''}" data-fav="${BP.esc(a.id)}" aria-label="${T('ficha_fav', 'Guardar en favoritos')}">${BP.isFav(a.id)?BP.ico.heartFill:BP.ico.heart}</button><button type="button" class="p-icon-btn" id="share" aria-label="${T('ficha_compartir', 'Compartir')}">${BP.ico.share}</button></div>
       <div class="p-cta-foot">${pub.portal ? T('ficha_foot_bairen', 'Tu consulta llega a BAIREN') : T('ficha_foot_directo', 'Contacto directo con quien publica · BAIREN no interviene en la operación')}</div>
     </div>
-    <form class="p-form" id="contactForm" hidden novalidate>
+    <!-- Reservada: sin formulario de consulta (el cartel de arriba lo explica) -->
+    ${a.reservado ? '' : `<form class="p-form" id="contactForm" hidden novalidate>
       <h3>${TF('ficha_escribile', 'Escribile a {p}', { p: BP.esc(pubNombre) })}</h3>
       <div class="r2"><label class="p-sr" for="cfNombre">${T('ficha_nombre', 'Nombre')}</label><input type="text" name="nombre" id="cfNombre" placeholder="${T('ficha_nombre', 'Nombre')}" required autocomplete="name" autocapitalize="words"><label class="p-sr" for="cfEmail">${T('ficha_mail', 'Mail')}</label><input type="email" name="email" id="cfEmail" placeholder="${T('ficha_mail', 'Mail')}" required autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false"></div>
       <label class="p-sr" for="cfTel">${T('ficha_tel', 'Teléfono con código de área')}</label><input type="tel" name="telefono" id="cfTel" placeholder="${T('ficha_tel', 'Teléfono con código de área')}" required autocomplete="tel" inputmode="tel">
@@ -192,18 +219,28 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip">${fotos.map((f,i) => `<but
       <p>${TF('ficha_ok_p', 'Le llega directo a {p}, que te responde por mail o WhatsApp.', { p: BP.esc(pubNombre) })}${pub.email ? TF('ficha_ok_mail', ' Si tu correo no se abrió, escribile a <a href="mailto:{e}">{e}</a>.', { e: BP.esc(pub.email) }) : ''}</p>
       ${BPData.waLink(a, pub) ? `<a class="p-btn" href="${BPData.waLink(a, pub)}" target="_blank" rel="noopener" data-wa data-aviso="${BP.esc(a.id)}" data-pub="${BP.esc(pub.storeId || pub.id)}">${BP.ico.wa} ${T('ficha_seguir_wa', 'Seguir por WhatsApp')}</a>` : ''}
       <button type="button" class="p-linkbtn" id="contactOtra">${T('ficha_otra', 'Enviar otra consulta')}</button>
-    </div>
+    </div>`}
   </aside>
 </div>
 <section style="padding:0 0 64px">
-  <div class="p-head-row"><h2 class="p-h2">${T('ficha_similares', 'Propiedades similares')}</h2><a class="p-link" href="buscar.html?op=${a.op}&zona=${encodeURIComponent(a.zona)}">${TF('ficha_ver_mas_en', 'Ver más en {z}', { z: BP.zonaLabel(a.zona) })}</a></div>
+  <div class="p-head-row"><h2 class="p-h2">${T('ficha_similares', 'Propiedades similares')}</h2>${a.zona ? `<a class="p-link" href="buscar.html?op=${a.op}&zona=${encodeURIComponent(a.zona)}">${TF('ficha_ver_mas_en', 'Ver más en {z}', { z: BP.zonaLabel(a.zona) })}</a>` : ''}</div>
   <div class="p-grid">${similares.map(BPData.cardV).join('') || `<p class="p-note">${T('ficha_sin_similares', 'Todavía no hay unidades similares.')}</p>`}</div>
   ${(a.reservado || BPData.sinContacto(pub)) ? '' : `<div class="p-mcta" id="mcta"><div class="p-mcta-price">${BPData.precioHTML(a)}</div><button type="button" class="p-btn p-btn-fill p-btn-sm" id="mctaBtn">${BP.ico.mail} ${T('ficha_contactar', 'Contactar')}</button>${BPData.waLink(a, pub) ? `<a class="p-icon-btn" href="${BPData.waLink(a, pub)}" target="_blank" rel="noopener" data-wa data-aviso="${BP.esc(a.id)}" data-pub="${BP.esc(pub.storeId || pub.id)}" aria-label="WhatsApp">${BP.ico.wa}</a>` : ''}</div>`}
-  <div class="p-breadcrumb" role="navigation" aria-label="${T('cat_crumbs_aria', 'Migas de pan')}"><a href="index.html">BAIREN</a> › <a href="buscar.html?op=${a.op}">${BPData.opTag(a)}</a> › <a href="buscar.html?op=${a.op}&zona=${encodeURIComponent(a.zona)}">${BP.zonaLabel(a.zona)}</a>${(a.barrio && a.barrio !== a.zona) ? ` › <span>${BP.esc(a.barrio)}</span>` : ''} › <span>${BP.esc(a.titulo)}</span></div>
+  <!-- Las migas se arman como lista y se unen con ›: un tramo vacío (zona o barrio) no deja separadores sueltos -->
+  <div class="p-breadcrumb" role="navigation" aria-label="${T('cat_crumbs_aria', 'Migas de pan')}">${[
+    `<a href="index.html">BAIREN</a>`,
+    `<a href="buscar.html?op=${a.op}">${BPData.opTag(a)}</a>`,
+    a.zona ? `<a href="buscar.html?op=${a.op}&zona=${encodeURIComponent(a.zona)}">${BP.esc(BP.zonaLabel(a.zona))}</a>` : null,
+    (a.barrio && a.barrio !== a.zona) ? `<span>${BP.esc(a.barrio)}</span>` : null,
+    `<span>${BP.esc(a.titulo)}</span>`
+  ].filter(Boolean).join(' › ')}</div>
 </section>`;
 
   /* comportamiento */
   BPData.bindFavs(main);
+  /* 25/9/2026 · "Saltar al contenido" apuntaba al main, que empieza con la galería: el salto dejaba
+     a la persona adentro de las fotos. Ahora va a la ficha propiamente dicha (#contenido), después. */
+  const skip = document.getElementById('pSkip'); if (skip) skip.href = '#contenido';
   const gal = document.getElementById('gal'); const lb = document.getElementById('lb'), lbImg = document.getElementById('lbImg'), lbCount = document.getElementById('lbCount'); let cur = 0;
   let soltarLb = null, abridorLb = null;
   const lbTiras = document.getElementById('lbTiras'), lbMarco = document.getElementById('lbMarco');
@@ -211,8 +248,16 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip">${fotos.map((f,i) => `<but
   const pintarTiras = () => {
     if (!lbTiras) return;
     if (lbTiras.childElementCount !== fotos.length) {
-      lbTiras.innerHTML = fotos.map((f, i) => `<button type="button" class="t" data-lbt="${i}" aria-label="${BP.esc(TF('ficha_ver_foto', 'Ver foto {i}', { i: i+1 }))}"><img src="${BP.sbImg(f, 200)}" alt="" loading="lazy"></button>`).join('');
+      /* 25/9/2026 · El loading="lazy" del navegador no alcanzaba dentro del visor: al abrirlo se pedían
+         30 o más miniaturas de una, fuera de la vista. Ahora cada una lleva la dirección en data-src y
+         se pide cuando está a 200 px de verse dentro de la tira (misma URL de 200 px que la tira de la
+         ficha, así las que ya se vieron salen de la caché). */
+      lbTiras.innerHTML = fotos.map((f, i) => `<button type="button" class="t" data-lbt="${i}" aria-label="${BP.esc(TF('ficha_ver_foto', 'Ver foto {i}', { i: i+1 }))}"><img data-src="${BP.esc(BP.sbImg(f, 200))}" alt="" decoding="async"></button>`).join('');
       lbTiras.querySelectorAll('[data-lbt]').forEach(b => b.addEventListener('click', () => showLb(Number(b.dataset.lbt))));
+      const ponerMini = img => { if (img.dataset.src) { img.src = img.dataset.src; delete img.dataset.src; } };
+      const minis = lbTiras.querySelectorAll('img[data-src]');
+      if ('IntersectionObserver' in window) { const om = new IntersectionObserver((en, o) => en.forEach(e => { if (e.isIntersecting) { ponerMini(e.target); o.unobserve(e.target); } }), { root: lbTiras, rootMargin: '0px 200px' }); minis.forEach(img => om.observe(img)); }
+      else minis.forEach(ponerMini);
     }
     lbTiras.querySelectorAll('.t').forEach((b, i) => { const on = i === cur; b.classList.toggle('on', on); b.setAttribute('aria-current', on ? 'true' : 'false'); if (on) b.scrollIntoView({ block:'nearest', inline:'center', behavior:'smooth' }); });
   };
@@ -220,7 +265,7 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip">${fotos.map((f,i) => `<but
     if (!fotos.length) return;
     const abriendo = !lb.classList.contains('open');
     cur = (i + fotos.length) % fotos.length;
-    const chica = BP.sbImg(fotos[cur], 1600), grande = BP.sbImg(fotos[cur], 1800);
+    const chica = BP.sbImg(fotos[cur], ANCHO_FOTO), grande = BP.sbImg(fotos[cur], ANCHO_VISOR);
     lbImg.src = chica; lbImg.alt = TF('ficha_foto_alt', '{t}, foto {i}', { t: a.titulo, i: cur+1 });
     if (grande !== chica) { const alta = new Image(); alta.onload = () => { if (lbImg.src === chica) lbImg.src = grande; }; alta.src = grande; }
     lbCount.textContent = TF('ficha_lb_de', '{i} de {n}', { i: cur+1, n: fotos.length });
@@ -237,7 +282,9 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip">${fotos.map((f,i) => `<but
         if (lbImg.complete && lbImg.naturalWidth) requestAnimationFrame(listo);
         else lbImg.addEventListener('load', () => requestAnimationFrame(listo), { once: true });
       }
-      soltarLb = BP.focoAtrapado(lb, { devolverA: abridorLb, primero: lb.querySelector('[data-lb-close]'), alCerrar: () => cerrarLbSolo() });
+      /* 25/9/2026 · El primer [data-lb-close] es el velo (un div), que no toma foco: al abrir con Enter
+         desde la tira el foco se quedaba detrás del visor. Va al botón Cerrar. */
+      soltarLb = BP.focoAtrapado(lb, { devolverA: abridorLb, primero: lb.querySelector('button[data-lb-close]'), alCerrar: () => cerrarLbSolo() });
     } else if (dir && window.BPM && BPM.pasarFoto) BPM.pasarFoto(lbImg, dir);
     BP.anunciar(TF('ficha_foto_n', 'Foto {i} de {n}', { i: cur+1, n: fotos.length }));
   };
@@ -262,13 +309,42 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip">${fotos.map((f,i) => `<but
   document.querySelectorAll('#strip [data-t]').forEach(th => th.addEventListener('dblclick', () => { origenLb = th; showLb(Number(th.dataset.t)); }));
   const heroSlides = document.getElementById('heroSlides'), strip = document.getElementById('strip');
   if (heroSlides && strip) {
-    const setActive = i => strip.querySelectorAll('.thumb').forEach((th, n) => th.classList.toggle('active', n === i));
+    /* La miniatura activa es la única que entra en el orden de tabulación (tabindex itinerante) */
+    const setActive = i => strip.querySelectorAll('.thumb').forEach((th, n) => { const on = n === i; th.classList.toggle('active', on); th.tabIndex = on ? 0 : -1; if (on) th.setAttribute('aria-current', 'true'); else th.removeAttribute('aria-current'); });
     strip.querySelectorAll('[data-t]').forEach(th => th.addEventListener('click', () => { const i = Number(th.dataset.t); heroSlides.scrollTo({ left: i * heroSlides.clientWidth, behavior: 'smooth' }); setActive(i); }));
+    /* Flechas izquierda y derecha: pasan de foto dentro de la tira. Enter: abre el visor en esa foto. */
+    strip.addEventListener('keydown', e => {
+      const th = e.target.closest('.thumb'); if (!th) return;
+      const ths = strip.querySelectorAll('.thumb'), i = Number(th.dataset.t);
+      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); const n = ths[(i + (e.key === 'ArrowRight' ? 1 : ths.length - 1)) % ths.length]; n.click(); n.focus(); }
+      else if (e.key === 'Enter') { e.preventDefault(); origenLb = th; showLb(i); }
+    });
     let tk; heroSlides.addEventListener('scroll', () => { clearTimeout(tk); tk = setTimeout(() => { const i = Math.round(heroSlides.scrollLeft / Math.max(1, heroSlides.clientWidth)); setActive(i); const th = strip.querySelectorAll('.thumb')[i]; if (th) th.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' }); }, 80); }, { passive: true });
   }
   lb.querySelectorAll('[data-lb-close]').forEach(b => b.addEventListener('click', closeLb)); lb.querySelector('[data-lb-prev]').addEventListener('click', () => showLb(cur-1, -1)); lb.querySelector('[data-lb-next]').addEventListener('click', () => showLb(cur+1, 1));
   document.addEventListener('keydown', e => { if (!lb.classList.contains('open')) return; if (e.key === 'ArrowLeft') showLb(cur-1, -1); if (e.key === 'ArrowRight') showLb(cur+1, 1); });
-  if (a.video) { const v = document.getElementById('video'); if (a.video.tipo === 'youtube') { const m = a.video.url.match(/(?:v=|be\/|embed\/)([A-Za-z0-9_-]{6,})/); v.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${m ? m[1] : ''}" title="${BP.esc(TF('ficha_video_de', 'Video de {t}', { t: a.titulo }))}" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>`; } else if (a.video.tipo === 'bunny') { v.innerHTML = `<iframe src="${BP.esc(a.video.url)}" title="${BP.esc(TF('ficha_video_de', 'Video de {t}', { t: a.titulo }))}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>`; } else { v.innerHTML = `<video src="${BP.esc(a.video.url)}" controls playsinline preload="metadata"></video>`; } }
+  /* 25/9/2026 · El video (YouTube o Bunny) bajaba su reproductor entero con la carga inicial: en Juncal 600,
+     casi un mega de scripts de YouTube antes de que nadie lo mirara. Ahora hay una fachada: la portada del
+     video (la de YouTube, o la primera foto del aviso, que ya está en caché) con un botón de reproducir, y
+     el reproductor se pide recién al tocarlo, con autoplay, y recibe el foco. Al tocar y no al acercarse,
+     a diferencia del mapa: un video no se mira de pasada y el reproductor pesa mucho más. Un mp4 propio
+     ya no precarga nada (preload="none") y usa la primera foto de portada. */
+  if (a.video) {
+    const v = document.getElementById('video'), titV = BP.esc(TF('ficha_video_de', 'Video de {t}', { t: a.titulo }));
+    /* YouTube se reconoce también por la dirección: Juncal 600 tiene un enlace de YouTube cargado con tipo 'bunny' */
+    const esYT = a.video.tipo === 'youtube' || /youtu\.?be/i.test(String(a.video.url));
+    const yt = esYT ? (String(a.video.url).match(/(?:v=|be\/|embed\/)([A-Za-z0-9_-]{6,})/) || [])[1] || '' : null;
+    const portada = yt ? `https://i.ytimg.com/vi/${yt}/hqdefault.jpg` : (fotos[0] ? BP.sbImg(fotos[0], ANCHO_FOTO) : '');
+    const src = esYT ? `https://www.youtube-nocookie.com/embed/${yt}?autoplay=1`
+      : a.video.tipo === 'bunny' ? a.video.url + (String(a.video.url).indexOf('?') > -1 ? '&' : '?') + 'autoplay=true' : null;
+    if (src) {
+      v.innerHTML = `<button type="button" class="p-video-play" aria-label="${BP.esc(TF('ficha_video_play', 'Reproducir el video de {t}', { t: a.titulo }))}">${portada ? `<img src="${BP.esc(portada)}" alt="" loading="lazy" decoding="async">` : ''}<span class="ico" aria-hidden="true"></span></button>`;
+      v.querySelector('.p-video-play').addEventListener('click', () => {
+        v.innerHTML = `<iframe src="${BP.esc(src)}" title="${titV}" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+        const f = v.querySelector('iframe'); if (f) { try { f.focus(); } catch (e) {} }
+      });
+    } else v.innerHTML = `<video src="${BP.esc(a.video.url)}" controls playsinline preload="none"${portada ? ` poster="${BP.esc(portada)}"` : ''} title="${titV}"></video>`;
+  }
   (() => { const t = document.getElementById('amenToggle'), m = document.getElementById('amenMas'); if (!t || !m) return; t.addEventListener('click', () => { const abre = m.hidden; m.hidden = !abre; t.setAttribute('aria-expanded', abre ? 'true' : 'false'); t.textContent = abre ? T('ficha_ver_menos', 'Ver menos') : TF('ficha_ver_caract', 'Ver las {n} características', { n: 6 + m.children.length }); }); })();
   const desc = document.getElementById('desc'), more = document.getElementById('descMore'); if (desc.scrollHeight <= desc.clientHeight + 4) more.hidden = true; more.addEventListener('click', () => { desc.classList.toggle('clamp'); more.textContent = desc.classList.contains('clamp') ? T('ficha_leer_mas', 'Leer más') : T('ficha_leer_menos', 'Leer menos'); });
   /* pestañas de características: rol de pestaña, flechas para moverse, un solo tab en el orden de tabulación */
@@ -279,66 +355,79 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip">${fotos.map((f,i) => `<but
      el bloque de preguntas entero y funcionando: se podía mandar una consulta igual. El cartel
      y el formulario decían cosas distintas en la misma pantalla. Si no toma consultas, no hay
      formulario; el aviso de "si se libera, vuelve a publicarse acá" queda arriba, que es la
-     salida honesta. */
-  if (a.reservado) { const bq = document.getElementById('bloquePregunta'); if (bq) bq.remove(); }
+     salida honesta.
+     25/9/2026 · Ahora el bloque y el formulario directamente no se dibujan (ver la plantilla), y
+     todo lo que los usa más abajo pregunta primero si existen. */
 
   /* 23/9/2026 · La galería bajaba TODAS las fotos al abrir la ficha, porque un background-image
      de CSS no se puede diferir: el navegador las pide al leer el HTML. En una ficha de 156 fotos
      eran 6,7 MB y dieciséis segundos con datos móviles, justo en la página donde alguien decide
-     si te escribe. Ahora las dos primeras vienen puestas (para que la primera se vea al instante)
-     y el resto se cargan cuando se acercan. Sin observador, se cargan todas: peor pero nunca roto. */
+     si te escribe. Sin observador, se cargan todas: peor pero nunca roto.
+     25/9/2026 · De entrada baja solo la primera foto. Las vecinas se piden cuando la persona
+     toca, desliza o recorre la galería con el teclado: recién ahí hay señal de que va a mirar
+     más. Y se piden cuando el desplazamiento se detiene (120 ms quieto), así un salto de la
+     foto 1 a la 50 desde las miniaturas no baja las 48 del medio al pasar. */
   (function(){
     const pendientes = Array.from(document.querySelectorAll('.p-fhero-slide[data-bg]'));
     if (!pendientes.length) return;
     const poner = el => { const u = el.dataset.bg; if (!u) return; el.style.backgroundImage = `url('${u}')`; delete el.dataset.bg; };
     if (!('IntersectionObserver' in window)) { pendientes.forEach(poner); return; }
-    const obs = new IntersectionObserver((entradas, o) => {
-      entradas.forEach(e => { if (e.isIntersecting) { poner(e.target); o.unobserve(e.target); } });
-    }, { root: document.getElementById('heroSlides'), rootMargin: '0px 150%' });
+    const cerca = new Set(); let activa = false, quieto = null;
+    const cargar = () => { quieto = null; if (!activa) return; cerca.forEach(el => { poner(el); obs.unobserve(el); }); cerca.clear(); };
+    const obs = new IntersectionObserver(entradas => {
+      entradas.forEach(e => { if (e.isIntersecting) cerca.add(e.target); else cerca.delete(e.target); });
+      clearTimeout(quieto); quieto = setTimeout(cargar, 120);
+    }, { root: heroSlides, rootMargin: '0px 100%' });
     pendientes.forEach(el => obs.observe(el));
+    const activar = () => { if (activa) return; activa = true; cargar(); };
+    ['pointerdown', 'touchstart', 'scroll', 'wheel'].forEach(ev => heroSlides.addEventListener(ev, activar, { once: true, passive: true }));
+    if (strip) ['pointerdown', 'focusin'].forEach(ev => strip.addEventListener(ev, activar, { once: true, passive: true }));
   })();
   const tabBtns = Array.from(document.querySelectorAll('.p-tabs2 button'));
   const activarTab = b => { tabBtns.forEach(x => { const on = x === b; x.classList.toggle('on', on); x.setAttribute('aria-selected', on ? 'true' : 'false'); x.tabIndex = on ? 0 : -1; }); ['gen','serv','amb'].forEach(k => document.getElementById('tab-' + k).hidden = k !== b.dataset.tab); };
   tabBtns.forEach((b, i) => { b.addEventListener('click', () => activarTab(b)); b.addEventListener('keydown', e => { if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return; e.preventDefault(); const n = tabBtns[(i + (e.key === 'ArrowRight' ? 1 : tabBtns.length - 1)) % tabBtns.length]; activarTab(n); n.focus(); }); });
-  const mensaje = document.getElementById('mensaje'), qText = document.getElementById('qText');
-  /* Pregunta rápida: al tocarla se escribe en la caja de abajo (se puede editar); tocarla de nuevo la saca. Una sola a la vez. */
-  const armarMensaje = () => { const t = qText.value.trim(); mensaje.value = msgDefault + (t ? ' ' + t : ''); };
-  document.querySelectorAll('#quick button').forEach(b => b.addEventListener('click', () => {
-    const estaba = b.classList.contains('on');
-    document.querySelectorAll('#quick button.on').forEach(x => { x.classList.remove('on'); x.setAttribute('aria-pressed', 'false'); });
-    if (estaba) { qText.value = ''; } else { b.classList.add('on'); b.setAttribute('aria-pressed', 'true'); qText.value = b.textContent.trim(); }
-    armarMensaje(); qText.focus();
-  }));
-  qText.addEventListener('input', () => { document.querySelectorAll('#quick button.on').forEach(x => { if (x.textContent.trim() !== qText.value.trim()) { x.classList.remove('on'); x.setAttribute('aria-pressed', 'false'); } }); armarMensaje(); });
-  qText.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); document.getElementById('qSend')?.click(); } });
-  const ctaCard = document.getElementById('ctaCard'), contactForm = document.getElementById('contactForm');
-  const openForm = () => { ctaCard.hidden = true; const okb = document.getElementById('contactOk'); if (okb) okb.hidden = true; contactForm.hidden = false; contactForm.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => contactForm.querySelector('input[name=nombre]').focus({ preventScroll: true }), 320); };
-  const qv = document.getElementById('quiereVisita'); if (qv) qv.addEventListener('change', () => { document.getElementById('visitaCampo').hidden = !qv.checked; if (qv.checked) document.getElementById('visitaFecha').focus(); });
-  const btnAbrir = document.getElementById('abrirForm'); if (btnAbrir) btnAbrir.addEventListener('click', openForm);
-  const btnVisita = document.getElementById('abrirVisita'); if (btnVisita) btnVisita.addEventListener('click', () => { openForm(); const qv = document.getElementById('quiereVisita'); if (qv && !qv.checked) { qv.checked = true; qv.dispatchEvent(new Event('change')); } });
-  const mctaBtn = document.getElementById('mctaBtn'); if (mctaBtn) mctaBtn.addEventListener('click', openForm);
-  const qSendBtn = document.getElementById('qSend'); if (qSendBtn) qSendBtn.addEventListener('click', () => { const t = qText.value.trim(); if (!t) { BP.toast(T('ficha_toast_elegi', 'Elegí una pregunta o escribí la tuya.')); qText.focus(); return; } armarMensaje(); openForm(); });
-  /* Consulta: validación en línea campo por campo, botón ocupado mientras se registra y un estado de éxito en el lugar del formulario */
-  const contactOk = document.getElementById('contactOk');
-  document.getElementById('contactForm').addEventListener('submit', async e => {
-    e.preventDefault(); const f = e.target; const btn = f.querySelector('button[type=submit]');
-    const nombre = f.nombre.value.trim(), mail = f.email.value.trim(), tel = f.telefono.value.trim();
-    if (!nombre) { BP.errorCampo('cfNombre', T('ficha_err_nombre', 'Decinos tu nombre.')); return; }
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mail)) { BP.errorCampo('cfEmail', T('ficha_err_mail', 'Revisá el mail, por ejemplo nombre@dominio.com.')); return; }
-    if (tel.replace(/\D/g, '').length < 8) { BP.errorCampo('cfTel', T('ficha_err_tel', 'Teléfono con código de área, por ejemplo 11 5555 6666.')); return; }
-    const pideVisita = !!(f.quiere_visita && f.quiere_visita.checked && f.visita_deseada && f.visita_deseada.value);
-    if (f.quiere_visita && f.quiere_visita.checked && !pideVisita) { BP.errorCampo('visitaFecha', T('ficha_err_fecha', 'Elegí día y hora.')); return; }
-    if (!f.acepto.checked) { BP.errorCampo('cfAcepto', T('ficha_err_acepto', 'Para enviar la consulta hay que aceptar los términos.')); return; }
-    btn.disabled = true; const etiqueta = btn.innerHTML; btn.innerHTML = BP.ico.mail + ' ' + T('ficha_enviando', 'Enviando…');
-    try { await BPStore.addConsulta({ aviso_id: a.id, aviso_titulo: a.titulo, publicador_id: pub.storeId || pub.id, publicador_nombre: pub.nombre, nombre, email: mail, telefono: tel, mensaje: f.mensaje.value, acepto_tyc: true, enviada_a: pub.email, canal: pideVisita ? 'visita' : 'formulario', visita_deseada: pideVisita ? new Date(f.visita_deseada.value).toISOString() : null }); } catch (err) { console.warn(err); }
-    const LOCALE = { es: 'es-AR', en: 'en-US', pt: 'pt-BR' }[BP.lang] || 'es-AR';
-    const subject = encodeURIComponent(TF('ficha_mail_subject', 'Consulta por {t} ({c}) desde BAIREN', { t: a.titulo, c: a.codigo })); const body = encodeURIComponent(f.mensaje.value + (pideVisita ? '\n\n' + TF('ficha_mail_visita', 'Quiero visitar el {d}.', { d: new Date(f.visita_deseada.value).toLocaleString(LOCALE, { weekday:'long', day:'numeric', month:'long', hour:'2-digit', minute:'2-digit' }) }) : '') + '\n\n' + nombre + ' · ' + tel + ' · ' + mail);
-    if (pub.email) window.location.href = 'mailto:' + pub.email + '?subject=' + subject + '&body=' + body;
-    btn.disabled = false; btn.innerHTML = etiqueta;
-    f.hidden = true; contactOk.hidden = false; contactOk.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => contactOk.focus({ preventScroll: true }), 300);
-    BP.toast(TF('ficha_toast_enviada', 'Tu consulta va directo a {p}.', { p: pubNombre }));
-  });
-  document.getElementById('contactOtra').addEventListener('click', () => { contactOk.hidden = true; openForm(); });
+  /* Preguntas rápidas y formulario de consulta: una reservada no los tiene (no se dibujan) */
+  if (!a.reservado) {
+    const mensaje = document.getElementById('mensaje'), qText = document.getElementById('qText');
+    /* Pregunta rápida: al tocarla se escribe en la caja de abajo (se puede editar); tocarla de nuevo la saca. Una sola a la vez. */
+    const armarMensaje = () => { const t = qText.value.trim(); mensaje.value = msgDefault + (t ? ' ' + t : ''); };
+    document.querySelectorAll('#quick button').forEach(b => b.addEventListener('click', () => {
+      const estaba = b.classList.contains('on');
+      document.querySelectorAll('#quick button.on').forEach(x => { x.classList.remove('on'); x.setAttribute('aria-pressed', 'false'); });
+      if (estaba) { qText.value = ''; } else { b.classList.add('on'); b.setAttribute('aria-pressed', 'true'); qText.value = b.textContent.trim(); }
+      armarMensaje(); qText.focus();
+    }));
+    qText.addEventListener('input', () => { document.querySelectorAll('#quick button.on').forEach(x => { if (x.textContent.trim() !== qText.value.trim()) { x.classList.remove('on'); x.setAttribute('aria-pressed', 'false'); } }); armarMensaje(); });
+    qText.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); document.getElementById('qSend')?.click(); } });
+    const ctaCard = document.getElementById('ctaCard'), contactForm = document.getElementById('contactForm');
+    const openForm = () => { ctaCard.hidden = true; const okb = document.getElementById('contactOk'); if (okb) okb.hidden = true; contactForm.hidden = false; contactForm.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => contactForm.querySelector('input[name=nombre]').focus({ preventScroll: true }), 320); };
+    const qv = document.getElementById('quiereVisita'); if (qv) qv.addEventListener('change', () => { document.getElementById('visitaCampo').hidden = !qv.checked; if (qv.checked) document.getElementById('visitaFecha').focus(); });
+    const btnAbrir = document.getElementById('abrirForm'); if (btnAbrir) btnAbrir.addEventListener('click', openForm);
+    const btnVisita = document.getElementById('abrirVisita'); if (btnVisita) btnVisita.addEventListener('click', () => { openForm(); const qv = document.getElementById('quiereVisita'); if (qv && !qv.checked) { qv.checked = true; qv.dispatchEvent(new Event('change')); } });
+    const mctaBtn = document.getElementById('mctaBtn'); if (mctaBtn) mctaBtn.addEventListener('click', openForm);
+    const qSendBtn = document.getElementById('qSend'); if (qSendBtn) qSendBtn.addEventListener('click', () => { const t = qText.value.trim(); if (!t) { BP.toast(T('ficha_toast_elegi', 'Elegí una pregunta o escribí la tuya.')); qText.focus(); return; } armarMensaje(); openForm(); });
+    /* Consulta: validación en línea campo por campo, botón ocupado mientras se registra y un estado de éxito en el lugar del formulario */
+    const contactOk = document.getElementById('contactOk');
+    document.getElementById('contactForm').addEventListener('submit', async e => {
+      e.preventDefault(); const f = e.target; const btn = f.querySelector('button[type=submit]');
+      const nombre = f.nombre.value.trim(), mail = f.email.value.trim(), tel = f.telefono.value.trim();
+      if (!nombre) { BP.errorCampo('cfNombre', T('ficha_err_nombre', 'Decinos tu nombre.')); return; }
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mail)) { BP.errorCampo('cfEmail', T('ficha_err_mail', 'Revisá el mail, por ejemplo nombre@dominio.com.')); return; }
+      if (tel.replace(/\D/g, '').length < 8) { BP.errorCampo('cfTel', T('ficha_err_tel', 'Teléfono con código de área, por ejemplo 11 5555 6666.')); return; }
+      const pideVisita = !!(f.quiere_visita && f.quiere_visita.checked && f.visita_deseada && f.visita_deseada.value);
+      if (f.quiere_visita && f.quiere_visita.checked && !pideVisita) { BP.errorCampo('visitaFecha', T('ficha_err_fecha', 'Elegí día y hora.')); return; }
+      if (!f.acepto.checked) { BP.errorCampo('cfAcepto', T('ficha_err_acepto', 'Para enviar la consulta hay que aceptar los términos.')); return; }
+      btn.disabled = true; const etiqueta = btn.innerHTML; btn.innerHTML = BP.ico.mail + ' ' + T('ficha_enviando', 'Enviando…');
+      try { await BPStore.addConsulta({ aviso_id: a.id, aviso_titulo: a.titulo, publicador_id: pub.storeId || pub.id, publicador_nombre: pub.nombre, nombre, email: mail, telefono: tel, mensaje: f.mensaje.value, acepto_tyc: true, enviada_a: pub.email, canal: pideVisita ? 'visita' : 'formulario', visita_deseada: pideVisita ? new Date(f.visita_deseada.value).toISOString() : null }); } catch (err) { console.warn(err); }
+      const LOCALE = { es: 'es-AR', en: 'en-US', pt: 'pt-BR' }[BP.lang] || 'es-AR';
+      const subject = encodeURIComponent(TF('ficha_mail_subject', 'Consulta por {t} ({c}) desde BAIREN', { t: a.titulo, c: a.codigo })); const body = encodeURIComponent(f.mensaje.value + (pideVisita ? '\n\n' + TF('ficha_mail_visita', 'Quiero visitar el {d}.', { d: new Date(f.visita_deseada.value).toLocaleString(LOCALE, { weekday:'long', day:'numeric', month:'long', hour:'2-digit', minute:'2-digit' }) }) : '') + '\n\n' + nombre + ' · ' + tel + ' · ' + mail);
+      if (pub.email) window.location.href = 'mailto:' + pub.email + '?subject=' + subject + '&body=' + body;
+      btn.disabled = false; btn.innerHTML = etiqueta;
+      f.hidden = true; contactOk.hidden = false; contactOk.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => contactOk.focus({ preventScroll: true }), 300);
+      BP.toast(TF('ficha_toast_enviada', 'Tu consulta va directo a {p}.', { p: pubNombre }));
+    });
+    document.getElementById('contactOtra').addEventListener('click', () => { contactOk.hidden = true; openForm(); });
+  }
   const btnTel = document.getElementById('verTel');
   if (btnTel) btnTel.addEventListener('click', e => {
     const b = e.target.closest('button'); const tel = String(pub.telefono || '');
@@ -383,13 +472,26 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip">${fotos.map((f,i) => `<but
   document.getElementById('share').addEventListener('click', () => BP.compartir({ titulo: a.titulo, texto: TF('ficha_en_bairen', '{t} en BAIREN', { t: a.titulo }), url: location.href }));
   /* vistas (contador local de prueba) */
   try { const n = await BPStore.addVista(a.id); document.getElementById('vistas').textContent = n === 1 ? T('ficha_vista_1', '1 vista') : TF('ficha_vistas', '{n} vistas', { n }); } catch (e) {}
-  /* mapa: el mismo embed de Google Maps que usa la ficha de bairengroup.com */
-  try { const dirQ = String(a.dir || '').replace(/\bal\s+(\d)/i, '$1'); const mapsQ = encodeURIComponent(dirQ + (a.unidad && !a.dirAprox ? ' ' + a.unidad : '') + ', ' + (a.barrio || '') + ', Buenos Aires, Argentina'); const mf = document.getElementById('mapFrame'); if (mf) mf.src = 'https://www.google.com/maps?q=' + mapsQ + '&output=embed&z=' + (a.dirAprox ? 15 : 16) + '&hl=' + (BP.lang === 'pt' ? 'pt-BR' : BP.lang); } catch (e) {}
+  /* mapa: el mismo embed de Google Maps que usa la ficha de bairengroup.com
+     25/9/2026 · Sin barrio la búsqueda quedaba "Juncal 600, , Buenos Aires": ahora se arma con lo que hay
+     (dirección, barrio o zona, ciudad) y un tramo vacío no deja coma suelta. "Zona Norte" no es un lugar
+     para el mapa, así que esa zona no se usa. La unidad ("Pisos 10 - 11", "2") ya no entra en la búsqueda:
+     el mapa marca el edificio, y ese número suelto después de la altura confundía la dirección.
+     Y el mapa (unos 450 KB de scripts de Google) se pide cuando está a 300 px de verse: el
+     loading="lazy" del navegador lo traía con la carga inicial. */
+  try {
+    const dirQ = String(a.dir || '').replace(/\bal\s+(\d)/i, '$1');
+    const mapsQ = encodeURIComponent([dirQ, a.barrio || (a.zona !== 'GBA Norte' ? a.zona : ''), 'Buenos Aires', 'Argentina'].filter(Boolean).join(', '));
+    const mf = document.getElementById('mapFrame');
+    const ponerMapa = () => { mf.src = 'https://www.google.com/maps?q=' + mapsQ + '&output=embed&z=' + (a.dirAprox ? 15 : 16) + '&hl=' + (BP.lang === 'pt' ? 'pt-BR' : BP.lang); };
+    if (mf && 'IntersectionObserver' in window) { const om = new IntersectionObserver((en, o) => { if (en.some(e => e.isIntersecting)) { o.disconnect(); ponerMapa(); } }, { rootMargin: '300px 0px' }); om.observe(mf); }
+    else if (mf) ponerMapa();
+  } catch (e) {}
   /* JSON-LD */
   const ld = { '@context':'https://schema.org', '@type':'RealEstateListing', name: a.titulo, description: (a.descripcion||'').slice(0,300), url: location.href, image: fotos.slice(0,3), datePosted: a.publicadoEn, offers: { '@type':'Offer', price: a.precio, priceCurrency: 'USD', availability: a.reservado ? 'https://schema.org/LimitedAvailability' : 'https://schema.org/InStock', /* 23/9/2026 · Un gestor no es una agencia inmobiliaria: declararlo como RealEstateAgent en los
      datos estructurados sería afirmar que ejerce el corretaje, que es justo lo que no hace. Solo
      quien tiene matrícula se declara como tal. */
-    offeredBy: { '@type': pub.tipo === 'dueno' ? 'Person' : (pub.matricula ? 'RealEstateAgent' : 'Organization'), name: pub.nombre, identifier: pub.matricula || pub.badge || 'Selección BAIREN' } }, address: { '@type':'PostalAddress', streetAddress: a.dir, addressLocality: a.barrio, addressRegion: a.ciudad, addressCountry: 'AR' } };
+    offeredBy: { '@type': pub.tipo === 'dueno' ? 'Person' : (pub.matricula ? 'RealEstateAgent' : 'Organization'), name: pub.nombre, identifier: pub.matricula || pub.badge || 'Selección BAIREN' } }, address: { '@type':'PostalAddress', streetAddress: a.dir, addressLocality: lugar || undefined, addressRegion: a.ciudad, addressCountry: 'AR' } };
   const s = document.createElement('script'); s.type = 'application/ld+json'; s.textContent = JSON.stringify(ld); document.head.appendChild(s);
 })();
 });

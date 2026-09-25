@@ -42,11 +42,26 @@
   const AMEN_MAP = { 'Aire acond.':'Aire acondicionado', 'Jardín / Terraza':'Terraza o jardín' };
   const norm = a => AMEN_MAP[a] || a;
 
+  /* 25/9/2026 · Una ficha anunciaba 156 fotos y tenía 60 distintas: la misma foto llegaba
+     varias veces con la dirección apenas cambiada (con ?t=, con ?width=, o pedida por
+     /render/image/ en vez de /object/). Comparar la URL tal cual no las veía iguales.
+     La clave de una foto es su archivo: sin query, sin fragmento y siempre por /object/.
+     Se queda la primera de cada archivo, en su orden; si es de Supabase Storage público,
+     en su forma limpia, para que BP.sbImg la pueda pedir al tamaño que haga falta. */
+  const RE_STORAGE = /\/storage\/v1\/(object|render\/image)\/public\//;
+  D.claveFoto = u => String(u || '').split('#')[0].split('?')[0].replace('/storage/v1/render/image/public/', '/storage/v1/object/public/');
+  D.fotosUnicas = lista => {
+    const vistas = new Set(), out = [];
+    (lista || []).forEach(u => { if (!u) return; const k = D.claveFoto(u); if (vistas.has(k)) return; vistas.add(k); out.push(RE_STORAGE.test(u) ? k : u); });
+    return out;
+  };
+
   function fromUnit(p, op, precio){
-    /* Fotos en orden, con la portada primera y sin URLs repetidas: lo mismo que fotosDeUnidad en api/_portal/sync.js */
+    /* Fotos en orden, con la portada primera y sin fotos repetidas: lo mismo que fotosDeUnidad en api/_portal/sync.js,
+       pero comparando por archivo (D.claveFoto) y no por la URL exacta */
     let fotos = (p.imagenes||[]).slice().sort((a,b)=>(a.orden||0)-(b.orden||0)).map(i=>i.url).filter(Boolean);
-    if (p.portada_url && fotos.indexOf(p.portada_url)===-1) fotos.unshift(p.portada_url);
-    fotos = Array.from(new Set(fotos));
+    if (p.portada_url && !fotos.some(u => D.claveFoto(u) === D.claveFoto(p.portada_url))) fotos.unshift(p.portada_url);
+    fotos = D.fotosUnicas(fotos);
     const amen = (p.amenities||[]).map(a=>norm(a.nombre)).filter(Boolean);
     const amb = p.ambientes || null;
     const zona = (window.BairenZonas && window.BairenZonas.zonaDe(p.barrio)) || p.barrio;
@@ -85,7 +100,8 @@
     const pub = r.publicador || null; const pubId = pub ? (pub.slug || pub.id) : 'bairen';
     const T = (pub && D.titulares[pub.id]) || null;   /* titular con matrícula, de la vista publicador_publico */
     if (pub && !D.PUBLICADORES[pubId]) D.PUBLICADORES[pubId] = Object.assign({ storeId: pub.id, id: pubId, inicial: (pub.nombre||'P').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(), desde: (pub.created_at||'').slice(0,4) || '2026', zonas: pub.zonas || [], desc: pub.descripcion || '', responsable: pub.responsable || pub.nombre, badge: pub.badge || (pub.tipo === 'dueno' ? 'Dueño verificado' : 'Corredor inmobiliario matriculado') }, pub, { id: pubId }, T && T.titular_nombre ? { responsable: T.titular_nombre, matricula: T.titular_matricula ? ((T.titular_colegio || 'CUCICBA') + ' ' + T.titular_matricula) : pub.matricula } : {});
-    const fotos = []; for (const f of (r.fotos||[]).slice().sort((a,b)=>(a.orden||0)-(b.orden||0))) { const u = window.BPStore ? await window.BPStore.resolveFoto(f.url) : f.url; if (u) fotos.push(u); }
+    /* Sin repetidas (D.fotosUnicas): la tabla portal.fotos puede traer el mismo archivo varias veces */
+    const fotos = []; for (const url of D.fotosUnicas((r.fotos||[]).slice().sort((a,b)=>(a.orden||0)-(b.orden||0)).map(f => f.url))) { const u = window.BPStore ? await window.BPStore.resolveFoto(url) : url; if (u) fotos.push(u); }
     const amb = r.ambientes || null;
     return { id: r.id, slug: r.slug, op: r.operacion, tipoProp: r.tipo || 'Departamento', dir: r.direccion, unidad: r.unidad || '', titulo: r.titulo || (r.direccion + (r.unidad ? ' · ' + r.unidad : '')), barrio: r.barrio, zona: (window.BairenZonas && window.BairenZonas.zonaDe(r.barrio)) || r.zona || r.barrio, ciudad: r.ciudad || 'Capital Federal',
       precio: r.precio == null ? null : Number(r.precio), moneda: r.moneda || 'USD', periodo: r.operacion === 'venta' ? '' : '/mes', expensas: r.expensas == null ? null : Number(r.expensas),
@@ -188,7 +204,10 @@
   D.cardH = function(a){
     const pub = D.pub(a.publicadorId);
     const href = BP.urlFicha(a);
-    const foto = a.fotos[0] ? `<img src="${BP.sbImg(a.fotos[0], 900)}" alt="${BP.esc(a.titulo)}, ${BP.esc(a.barrio)}" loading="lazy">` : '';
+    /* 25/9/2026 · Con el barrio vacío la tarjeta decía ", Capital Federal" y el texto alternativo terminaba en coma.
+       Misma regla que la ficha: el barrio; si falta, la zona; si falta también, se omite el tramo. */
+    const lugar = a.barrio || BP.zonaLabel(a.zona) || '';
+    const foto = a.fotos[0] ? `<img src="${BP.sbImg(a.fotos[0], 900)}" alt="${BP.esc([a.titulo, lugar].filter(Boolean).join(', '))}" loading="lazy">` : '';
     const tag = a.reservado ? `<span class="tag res">${BP.t('card_reservada', 'Reservada')}</span>` : a.destacado ? `<span class="tag">${BP.t('card_seleccionada', 'Seleccionada')}</span>` : a.demo ? `<span class="tag" style="background:#F4F0E6">${BP.t('card_ejemplo', 'Ejemplo')}</span>` : '';
     return `
 <article class="p-card-h" data-id="${BP.esc(a.id)}">
@@ -197,7 +216,7 @@
     <div class="p-card-top"><div><div class="p-price">${a.reservado ? `<span class="p-cta-res">${BP.t('card_reservada', 'Reservada')}</span>` : D.precioHTML(a)}</div>${a.expensas ? `<div class="p-expensas">$ ${BP.fmtN(a.expensas)} ${BP.t('card_expensas', 'expensas')}</div>` : ''}</div></div>
     <div class="p-meta">${D.metaLine(a).split(' · ').map(x=>`<span>${x}</span>`).join('')}</div>
     <a class="p-addr" href="${href}">${BP.esc(a.titulo)}</a>
-    <div class="p-barrio">${BP.esc(a.barrio)}, ${BP.esc(a.ciudad)}</div>
+    <div class="p-barrio">${[lugar, a.ciudad].filter(Boolean).map(BP.esc).join(', ')}</div>
     <p class="p-desc">${BP.esc(a.descripcion).slice(0, 220)}</p>
     <div class="p-card-foot">
       <div class="p-publine">${BP.t('card_publica', 'Publica')} <b>${BP.esc(D.pubNombre(pub))}</b> ${D.badgeHTML(pub)}</div>
@@ -211,13 +230,14 @@
   D.cardV = function(a){
     const pub = D.pub(a.publicadorId);
     const href = BP.urlFicha(a);
-    const foto = a.fotos[0] ? `<img src="${BP.sbImg(a.fotos[0], 700)}" alt="${BP.esc(a.titulo)}, ${BP.esc(a.barrio)}" loading="lazy">` : `<span class="card-img-placeholder">${BP.t('card_fotos_prod', 'Fotos en producción')}</span>`;
+    const lugar = a.barrio || BP.zonaLabel(a.zona) || '';   /* barrio vacío: la zona, o nada (ver cardH) */
+    const foto = a.fotos[0] ? `<img src="${BP.sbImg(a.fotos[0], 700)}" alt="${BP.esc([a.titulo, lugar].filter(Boolean).join(', '))}" loading="lazy">` : `<span class="card-img-placeholder">${BP.t('card_fotos_prod', 'Fotos en producción')}</span>`;
     return `
-<a class="prop-card" data-flip="${BP.esc(a.id)}" href="${href}" aria-label="${BP.esc(BP.tf('card_ver_en', 'Ver {t} en {b}', { t: a.titulo, b: a.barrio }))}">
+<a class="prop-card" data-flip="${BP.esc(a.id)}" href="${href}" aria-label="${BP.esc(lugar ? BP.tf('card_ver_en', 'Ver {t} en {b}', { t: a.titulo, b: lugar }) : BP.tf('card_ver', 'Ver {t}', { t: a.titulo }))}">
   <div class="card-img">${foto}<span class="card-tag tag-${a.op}">${D.opTag(a)}</span>${a.reservado?`<span class="card-status status-reservado">${BP.t('card_reservada', 'Reservada')}</span>`:''}</div>
   <div class="card-body">
     <div class="card-address">${BP.esc(a.titulo)}</div>
-    <div class="card-barrio">${BP.esc(a.barrio)}</div>
+    <div class="card-barrio">${BP.esc(lugar)}</div>
     <div class="card-meta">${D.metaLine(a)}</div>
     <div class="card-divider"></div>
     <div class="card-footer"><div class="card-price"><span class="price-amount">${a.reservado ? BP.t('card_reservada', 'Reservada') : D.precioHTML(a)}</span></div><span class="card-cta">${BP.t('card_ver_ficha', 'Ver ficha')}</span></div>
@@ -228,6 +248,8 @@
 
   D.bindFavs = root => { (root||document).querySelectorAll('[data-fav]').forEach(b => { if (b._bound) return; b._bound = true; b.addEventListener('click', e => { e.preventDefault(); const on = BP.toggleFav(b.dataset.fav); b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); b.innerHTML = on ? BP.ico.heartFill : BP.ico.heart; BP.toast(on ? BP.t('card_fav_on', 'Guardada en favoritos') : BP.t('card_fav_off', 'Quitada de favoritos')); }); }); };
 
+  /* El precio del aviso incluye expensas y servicios: el alquiler a mediano plazo (op 'mediano') */
+  D.todoIncluido = a => a.op === 'mediano';
   D.filter = function(avisos, f){
     return avisos.filter(a => {
       if (f.favs && !BP.isFav(a.id)) return false;
@@ -241,7 +263,10 @@
          pasaban el filtro. Con 38 de 42 sin el dato, poner "expensas máximas $1" devolvía 22
          de 25 resultados: el filtro prometía algo que no hacía. Ahora, si alguien filtra por
          expensas, el que no tiene el dato queda afuera, que es lo que esa persona espera. */
-      if (f.expmax && !(a.expensas > 0 && a.expensas <= f.expmax)) return false;
+      /* 25/9/2026 · El precio del mediano plazo es todo incluido (la ficha lo dice: "por mes · todo
+         incluido"; en los datos no hay otra marca, es la operación 'mediano'): ahí las expensas cuentan
+         como 0 y el aviso pasa cualquier máximo. Si no es todo incluido y no hay dato, no pasa. */
+      if (f.expmax && !(D.todoIncluido(a) || (a.expensas > 0 && a.expensas <= f.expmax))) return false;
       if (f.amb && (a.amb||0) < f.amb) return false;
       if (f.dorm && (a.dorm||0) < f.dorm) return false;
       if (f.banos && (a.banos||0) < f.banos) return false;

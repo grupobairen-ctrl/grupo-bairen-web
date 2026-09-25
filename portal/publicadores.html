@@ -27,18 +27,18 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260923p"><link rel="stylesheet" href="css/catalogo.css?v=20260923p"><link rel="stylesheet" href="css/portal.css?v=20260923p">
+  <link rel="stylesheet" href="css/base.css?v=20260925a"><link rel="stylesheet" href="css/catalogo.css?v=20260925a"><link rel="stylesheet" href="css/portal.css?v=20260925a">
 </head>
 <body class="p-publicadores">
 <div class="p-velo" aria-hidden="true"><span class="w">BAIREN</span></div>
 <div id="pHeader"></div>
 <div class="p-band"><div class="p-container"><div style="max-width:720px"><span class="p-eyebrow" data-i18n="publicadores">Publicadores</span><h1 class="p-h2" style="font-size:clamp(1.8rem,3.4vw,2.6rem)" data-i18n="pubs_h1">Quiénes publican</h1><p class="p-sub" style="margin-bottom:0" data-i18n="pubs_sub">Corredores matriculados, dueños verificados, gestores de alquileres con mandato y desarrolladoras. Las mismas reglas para todos. Cada uno responde por la operación de lo que publica.</p></div></div></div>
 <section class="p-page after-band" role="main"><div class="p-container">
-  <div id="pubs" style="display:grid;gap:22px" data-reveal></div>
+  <div id="pubs" style="display:grid;gap:22px" data-reveal aria-busy="true"><div class="p-skel-panel" aria-hidden="true"><div class="p-skel-line row"></div><div class="p-skel-line t"></div><div class="p-skel-line s"></div><div class="p-skel-line row"></div><div class="p-skel-line row"></div></div></div>
   <div class="p-prose" style="margin-top:44px" data-reveal><div class="box" data-i18n-html="pubs_box"><b>¿Sos inmobiliaria, corredor o gestor de alquileres de estos barrios?</b> Publicá tu cartera gratis durante el lanzamiento, con importación desde Tokko. <a href="publicar.html#inmobiliaria" style="text-decoration:underline">Empezar</a>.</div></div>
 </div></section>
 <div id="pFooter"></div>
-<script src="supabase-portal.js?v=20260923p" defer></script><script src="js/errores.js?v=20260923p" defer></script><script src="js/motion.js?v=20260923p" defer></script><script src="js/bairen-motion.js?v=20260923p" defer></script><script src="js/i18n-portal.js?v=20260923p" defer></script><script src="js/ui.js?v=20260923p" defer></script><script src="js/store.js?v=20260923p" defer></script><script src="js/data.js?v=20260923p" defer></script>
+<script src="supabase-portal.js?v=20260925a" defer></script><script src="js/errores.js?v=20260925a" defer></script><script src="js/motion.js?v=20260925a" defer></script><script src="js/bairen-motion.js?v=20260925a" defer></script><script src="js/i18n-portal.js?v=20260925a" defer></script><script src="js/ui.js?v=20260925a" defer></script><script src="js/store.js?v=20260925a" defer></script><script src="js/data.js?v=20260925a" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -73,6 +73,12 @@ BPData.load().then(function(d){
       '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center">' + (p.email ? '<a class="p-btn p-btn-sm p-btn-navy" href="mailto:' + BP.esc(p.email) + '">' + BP.t('pubs_enviar_consulta', 'Enviar consulta') + '</a>' : '<span class="p-sincontacto">' + BP.t('card_contacto_pendiente', 'Contacto pendiente') + '</span>') + '<a class="p-btn p-btn-sm" href="buscar.html?pub=' + p.id + '&op=">' + (mine.length === 1 ? BP.t('pubs_ver_props_1', 'Ver 1 propiedad') : BP.tf('pubs_ver_props', 'Ver sus {n} propiedades', { n: mine.length })) + '</a></div>' +
       '<div class="p-grid p-pub-muestra">' + mine.slice(0,3).map(BPData.cardV).join('') + '</div></article>';
   }).join('');
+  document.getElementById('pubs').removeAttribute('aria-busy');
+}).catch(function(err){
+  /* 25/9/2026 · Con el esqueleto a la vista, si los datos no llegan no puede quedar latiendo: error con reintento, como en el catálogo */
+  console.error(err);
+  var host = document.getElementById('pubs'); host.removeAttribute('aria-busy');
+  BP.estadoError(host, null, function(){ location.reload(); });
 });
 });
 </script>
