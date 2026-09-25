@@ -3928,3 +3928,43 @@ body.p-home .footer .ft-col ul,.footer .ft-col ul{columns:1}
   body.p-catalogo .p-filters #tipoSel{flex:1 1 100% !important}
   body.p-catalogo .p-filters .p-fwrap{flex:1 1 calc(50% - 4px) !important}
 }
+
+/* 11 · La ficha, a 12 px. Quedaban en la ficha textos de 9,3 a 11,8 px con selectores propios (la
+   medición, sobre todos los nodos de texto visibles y los ::before con texto de tres fichas a 390 y
+   1440 px, con el visor, el formulario y los desplegables abiertos): la etiqueta de operación y los
+   rótulos del precio del hero, el conteo de fotos, los títulos de sección, los rótulos de la fila de
+   cifras, los mosaicos de características, las preguntas rápidas, las filas y botones de la tarjeta
+   de contacto, los desplegables del pie de la ficha y el visor. Todo pasa a .75rem; donde la letra
+   crece, el espaciado entre letras se acorta, con el mismo criterio que el punto 1. */
+/* Hero */
+.p-fhero-tag{font-size:.75rem;letter-spacing:.12em}
+/* A 360 px "Alquiler, mediano plazo · Reservada" se partía en dos líneas: hasta 400 px, menos espaciado y aire */
+@media(max-width:400px){.p-fhero-tag{letter-spacing:.06em;padding-left:10px;padding-right:10px}}
+.p-fhero-price-lbl{font-size:.75rem;letter-spacing:.14em}
+.p-fhero-price-mo{font-size:.75rem;letter-spacing:.06em}
+.p-fhero .cts span{font-size:.75rem}
+/* Títulos de sección y "Propiedades similares" */
+.p-ficha .p-sec-t,body.p-ficha-page .p-head-row .p-h2{font-size:.75rem;letter-spacing:.24em}
+/* Fila de cifras */
+.p-ficha .p-icons small{font-size:.75rem;letter-spacing:.06em}
+/* Descripción, mosaicos, preguntas, desplegables y línea de publicación */
+.p-ficha .p-more{font-size:.75rem;letter-spacing:.1em}
+.p-amen-grid .amenity-name{font-size:.75rem;letter-spacing:.08em}
+.p-ficha .p-quick button{font-size:.75rem;letter-spacing:.06em}
+.p-report-min summary,.p-legal-min summary{font-size:.75rem;letter-spacing:.1em}
+.p-ficha .p-meta-line{font-size:.75rem}
+/* Tarjeta de contacto */
+.p-ficha .p-cta-price::before{font-size:.75rem;letter-spacing:.14em}
+.p-ficha .p-cta-price small{font-size:.75rem;letter-spacing:.06em}
+.p-ficha .ac-lbl{font-size:.75rem;letter-spacing:.06em}
+.p-ficha .p-cta-pub .lbl{font-size:.75rem;letter-spacing:.06em}
+.p-ficha .p-cta-verif{font-size:.75rem}
+.p-ficha .p-cta .p-btn-fill,.p-product .p-ficha .p-cta .p-btn-fill{font-size:.75rem;letter-spacing:.14em}
+.p-ficha .p-cta .p-btn:not(.p-btn-fill){font-size:.75rem;letter-spacing:.1em}
+.p-ficha .p-ac-link{font-size:.75rem;letter-spacing:.1em}
+.p-alerta{font-size:.75rem;letter-spacing:.1em}
+.p-ficha .p-cta-foot{font-size:.75rem;letter-spacing:.03em}
+/* Barra de contacto del celular y visor de fotos */
+.p-mcta-price small{font-size:.75rem}
+.p-lb .x{font-size:.75rem;letter-spacing:.16em}
+.p-lb .cuenta{font-size:.75rem;letter-spacing:.2em}
