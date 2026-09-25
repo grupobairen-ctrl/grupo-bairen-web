@@ -3891,3 +3891,16 @@ body.p-emprendimientos .p-page,body.p-ingresar .p-page{min-height:0}
   .p-navbar:has(.p-nav-right .p-nav-menu) .p-nav-principal a[data-sec="publicadores"],
   .p-navbar:has(.p-nav-right .p-nav-menu) .p-nav-principal a[data-sec="criterios"]{display:none}
 }
+
+/* 6 · Catálogo a 1024 px: la barra de filtros no entraba en una fila y "Filtros" caía solo a la segunda.
+   Entre 1024 y 1179 px se achican el margen de la barra, la separación, el aire de cada control y el
+   espaciado entre letras, y el buscador puede angostarse hasta 150 px. Todo sigue a 12 px. */
+@media(min-width:1024px) and (max-width:1179px){
+  body.p-catalogo .p-filters-in{padding-left:16px;padding-right:16px;gap:6px}
+  body.p-catalogo .p-filters #zonaBox{flex:1 1 150px;min-width:150px}
+  body.p-catalogo .p-filters .p-fbtn,body.p-catalogo .p-filters .p-fsel,body.p-catalogo .p-plazo-pills button{letter-spacing:.03em !important}
+  body.p-catalogo .p-filters .p-fbtn{padding:0 10px}
+  body.p-catalogo .p-filters .p-fsel{padding:0 26px 0 10px}
+  body.p-catalogo .p-plazo-pills{gap:4px}
+  body.p-catalogo .p-plazo-pills button{padding:0 8px}
+}
