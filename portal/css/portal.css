@@ -3968,3 +3968,47 @@ body.p-home .footer .ft-col ul,.footer .ft-col ul{columns:1}
 .p-mcta-price small{font-size:.75rem}
 .p-lb .x{font-size:.75rem;letter-spacing:.16em}
 .p-lb .cuenta{font-size:.75rem;letter-spacing:.2em}
+
+/* 12 · Catálogo entre 821 y 1023 px: la barra de filtros ocupaba 6 filas (268 px). Las reglas de hasta
+   1023 px (.p-filters-in .p-fsel y .p-fbtn a width:100%) son de la grilla del celular, y con la barra en
+   flex estiraban el tipo, Barrios y Filtros a todo el ancho, cada uno en su fila. En este tramo la barra
+   va en dos filas: arriba lo de dónde y qué operación (buscador, Barrios, operación y plazo), abajo lo
+   que afina (tipo, Amb | Dorm, Precio) y Filtros al final. El salto lo da un ::after a todo el ancho;
+   la separación entre filas va como margen de la segunda, así el salto no suma un hueco. Hasta 900 px
+   los controles miden 44 px (objetivo táctil de las reglas de arriba): el buscador y el plazo también. */
+@media(min-width:821px) and (max-width:1023px){
+  body.p-catalogo .p-filters-in{row-gap:0}
+  body.p-catalogo .p-filters-in::after{content:'';order:5;flex:0 0 100%;height:0}
+  body.p-catalogo .p-filters .p-fsel,body.p-catalogo .p-filters .p-fbtn{width:auto}
+  body.p-catalogo .p-filters #zonaBox{order:1;flex:1 1 200px;min-width:160px}
+  body.p-catalogo .p-filters #barriosBtn{order:2}
+  body.p-catalogo .p-filters #opSel{order:3}
+  body.p-catalogo .p-filters .p-plazo-pills{order:4}
+  body.p-catalogo .p-filters #tipoSel{order:6}
+  body.p-catalogo .p-filters .p-fwrap{order:7}
+  body.p-catalogo .p-filters #moreBtn{order:8;margin-left:auto}
+  body.p-catalogo .p-filters #tipoSel,body.p-catalogo .p-filters .p-fwrap,body.p-catalogo .p-filters #moreBtn{margin-top:8px}
+}
+@media(min-width:821px) and (max-width:900px){
+  body.p-catalogo .p-filters #zonaBox{height:44px;min-height:44px}
+  body.p-catalogo .p-plazo-pills button{height:44px}
+}
+/* Desde 1024 px, con un filtro de texto largo ("2+ amb. · 1+ dorm.") Filtros caía solo a la segunda fila
+   (a 1024 y también a 1180, 1280 y 1440): el buscador pedía 150 o 200 px antes de partir la fila. Ahora
+   pide 120 px (110 entre 1024 y 1179) y crece con lo que sobra. */
+@media(min-width:1024px){
+  body.p-catalogo .p-filters #zonaBox{flex:1 1 120px;min-width:120px}
+}
+@media(min-width:1024px) and (max-width:1179px){
+  body.p-catalogo .p-filters #zonaBox{flex-basis:110px;min-width:110px}
+}
+/* Con un barrio elegido, a 1024 px el campo de texto (80 px mínimo) se salía del buscador y quedaba
+   debajo de la operación; con el filtro largo, también la pastilla del barrio. Con pastilla, el buscador
+   pide 160 px y el campo se achica a lo que quede. Y el cuadro de Precio abría hacia la derecha desde el
+   botón: entre 1024 y unos 1180 px se salía de la pantalla y la página se corría de costado. Abre hacia
+   la izquierda, alineado con el borde derecho del botón. */
+@media(min-width:1024px){
+  body.p-catalogo .p-filters #zonaBox:has(.p-chip){min-width:160px}
+  body.p-catalogo #zonaBox:has(.p-chip) input{min-width:0}
+  body.p-catalogo .p-filters #precioPop{left:auto;right:0}
+}
