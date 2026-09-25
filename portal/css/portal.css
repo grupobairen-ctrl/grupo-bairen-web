@@ -3807,3 +3807,54 @@ body.p-membership .p-plan-precio{white-space:nowrap}
    contenido y el pie, según el alto de la pantalla. Estas dos páginas miden lo que mide su contenido;
    el pie queda pegado y, si la página es más corta que la pantalla, debajo sigue el navy del html. */
 body.p-emprendimientos .p-page,body.p-ingresar .p-page{min-height:0}
+
+/* 5 · Portada entre 900 y 1023 px: las secciones pasaban a escritorio a los 900 px y el header recién a
+   los 1024 (con cinco secciones, idioma y dos botones, el menú de escritorio no entra antes). Quedaban
+   secciones de escritorio con el menú de celular. El corte de la portada pasa a ser el del header: hasta
+   1023 px se ve como en el celular. Acá se repiten, sólo para ese tramo, los valores de las reglas de
+   max-width:899px de arriba y se deshacen los de min-width:900px de lo que hoy tiene la portada (hero y
+   buscador, el estándar, el carrusel de edificios y la banda de publicar). */
+@media(min-width:900px) and (max-width:1023px){
+  body.p-home .h-sec{min-height:0;padding:26px 0}
+  body.p-home .h-in{padding:0 18px}
+  body.p-home .h-eyebrow{margin-bottom:8px;letter-spacing:.2em}
+  body.p-home .h-h2{font-size:1.42rem;line-height:1.14;margin-bottom:6px;max-width:19ch}
+  body.p-home .h-copy{font-size:.875rem;line-height:1.55;margin-bottom:0}
+  /* Hero y buscador */
+  body.p-home .h-hero{min-height:100svh;align-items:flex-end;padding:96px 0 30px}
+  body.p-home .h-hero-in{text-align:left;max-width:none;padding:0 18px}
+  body.p-home .h-hero h1{font-size:1.72rem;line-height:1.14;margin-bottom:6px}
+  body.p-home .h-hero-sub{font-size:.9rem;margin-bottom:16px;color:rgba(251,250,246,.86)}
+  body.p-home .h-search{grid-template-columns:none;align-items:normal;gap:10px;padding:14px;border-radius:24px}
+  body.p-home .h-search .h-seg,body.p-home .h-search .h-field,body.p-home .h-search .h-cta{grid-column:auto;grid-row:auto}
+  body.p-home .h-seg{border-radius:8px;padding:3px;gap:3px;background:rgba(251,250,246,.12)}
+  body.p-home .h-seg button{flex:1;padding:1px 6px;min-height:44px;border-radius:6px !important;font-size:.78rem}
+  body.p-home .h-field input{height:48px;border-radius:8px;font-size:.9rem}
+  body.p-home .h-field-lupa input{padding-left:38px}
+  body.p-home .h-field-lupa .lupa{left:13px;width:15px;height:15px}
+  body.p-home .h-cta{min-height:46px;padding:1px 6px;border-radius:8px !important;letter-spacing:.16em}
+  /* El estándar */
+  body.p-home .h-estandar{min-height:0;padding:26px 0 28px}
+  body.p-home .h-camino{margin-top:12px;padding-bottom:0}
+  body.p-home .h-hitos{gap:0 6px}
+  body.p-home .h-hito{gap:10px}
+  body.p-home .h-hito .pt{width:38px;height:38px;box-shadow:0 0 0 5px var(--h-navy)}
+  body.p-home .h-hito .pt svg{width:17px;height:17px}
+  body.p-home .h-hito b{line-height:1.18;letter-spacing:0}
+  body.p-home .h-criterios{margin-top:16px;position:relative;min-height:0}
+  /* Edificios: una fachada casi a todo el ancho y la siguiente asomando, sin flechas */
+  body.p-home .h-edificios{gap:12px;padding:16px 18px 6px;scroll-padding-left:18px}
+  body.p-home .h-edificios .h-edif{flex-basis:82vw;border-radius:12px}
+  body.p-home .h-edificios .h-edif-txt{padding:18px 18px 19px;gap:6px}
+  body.p-home .h-edificios .h-edif-txt b{font-size:1.4rem}
+  body.p-home #edifCarrusel .h-flecha{display:none}
+  body.p-home .h-edif.h-edif-mas .h-mas-ic{width:60px;height:60px;font-size:2rem;border-radius:10px}
+  body.p-home .h-edif.h-edif-mas b{font-size:1.3rem}
+  body.p-home .h-puntos{margin-top:12px}
+  /* Publicar */
+  body.p-home .h-encaja{padding:24px 0}
+  body.p-home .h-encaja-fila{grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:center}
+  body.p-home .h-encaja-txt .h-h2{font-size:1.28rem;max-width:14ch;margin-bottom:5px}
+  body.p-home .h-encaja-txt .h-copy{font-size:.875rem;line-height:1.48}
+  body.p-home .h-encaja .h-btn{min-height:44px;padding:0 14px;letter-spacing:.12em;text-align:center}
+}
