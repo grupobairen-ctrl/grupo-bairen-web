@@ -350,6 +350,8 @@
     <a href="buscar.html" data-sec="propiedades" data-i18n="nav_propiedades">Propiedades</a>
     <a href="emprendimientos.html" data-sec="emprendimientos" data-i18n="emprendimientos">Desarrollos</a>
     <a href="membership.html" class="p-nav-destacado" data-sec="membership">Membership</a>
+    <a href="publicadores.html" data-sec="publicadores" data-i18n="publicadores">Publicadores</a>
+    <a href="criterios.html" data-sec="criterios" data-i18n="criterios">Cómo seleccionamos</a>
   </div>
   <div class="p-lang p-lang-movil" role="group" aria-label="Idioma" data-i18n-aria="idioma"><button type="button" data-lang="es">ES</button><button type="button" data-lang="pt">PT</button><button type="button" data-lang="en">EN</button></div>
   <div class="p-nav-right">

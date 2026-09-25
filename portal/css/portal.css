@@ -3858,3 +3858,36 @@ body.p-emprendimientos .p-page,body.p-ingresar .p-page{min-height:0}
   body.p-home .h-encaja-txt .h-copy{font-size:.875rem;line-height:1.48}
   body.p-home .h-encaja .h-btn{min-height:44px;padding:0 14px;letter-spacing:.12em;text-align:center}
 }
+
+/* 9 · Menú de escritorio: suma Publicadores y Cómo seleccionamos, que ya estaban en el panel del celular,
+   con el mismo estilo que los otros ítems (ui.js). Con cinco secciones a 12 px, entre 1024 y 1279 px
+   la barra no entraba: el menú se montaba sobre el idioma y los botones. En ese tramo se acortan el
+   espaciado entre letras, la separación entre ítems y el aire de los botones y del idioma (que sigue
+   con 32 px de área táctil). */
+@media(min-width:1024px) and (max-width:1279px){
+  .p-navbar,body.p-home .p-navbar,body.p-home .navbar{gap:12px}
+  .p-nav-principal{gap:14px}
+  .p-nav-principal a{letter-spacing:.06em}
+  .p-nav-right{gap:10px}
+  .p-nav-right .p-btn{padding:0 12px;letter-spacing:.1em}
+  .p-nav-right .p-lang{gap:0 !important;margin-right:0}
+  .p-nav-right .p-lang button{padding:7px 4px !important}
+}
+/* Con sesión abierta la barra derecha suma campana, Mis contactos, favoritos y Mi cuenta (casi 600 px):
+   ya antes de este cambio se montaba sobre el menú a 1024 px. Con sesión, hasta 1599 px la barra va
+   compacta y Mis contactos queda como ícono (el nombre sigue siendo el texto del enlace para el lector
+   de pantalla, y la vista también está en Mi cuenta); entre 1024 y 1199 px, además, Publicadores y Cómo
+   seleccionamos no entran y quedan en el pie, como estaban. */
+@media(min-width:1024px) and (max-width:1599px){
+  .p-navbar:has(.p-nav-right .p-nav-menu){gap:12px}
+  .p-navbar:has(.p-nav-right .p-nav-menu) .p-nav-principal{gap:14px}
+  .p-navbar:has(.p-nav-right .p-nav-menu) .p-nav-principal a{letter-spacing:.06em}
+  .p-navbar:has(.p-nav-right .p-nav-menu) .p-nav-right{gap:10px}
+  .p-navbar:has(.p-nav-right .p-nav-menu) .p-nav-right .p-lang{gap:0 !important;margin-right:0}
+  .p-navbar:has(.p-nav-right .p-nav-menu) .p-nav-right .p-lang button{padding:7px 4px !important}
+  .p-nav-right a.p-ghost[href$="#contactos"]{font-size:0;gap:0;letter-spacing:0}
+}
+@media(min-width:1024px) and (max-width:1199px){
+  .p-navbar:has(.p-nav-right .p-nav-menu) .p-nav-principal a[data-sec="publicadores"],
+  .p-navbar:has(.p-nav-right .p-nav-menu) .p-nav-principal a[data-sec="criterios"]{display:none}
+}
