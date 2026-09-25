@@ -365,9 +365,11 @@
     if ('codigo_interno' in rec) rec.codigo_interno = rec.codigo_interno == null ? null : (String(rec.codigo_interno).trim() || null);
     if (!rec.id && rec.codigo_interno) {
       let ya = null;
-      if (S.mode === 'supabase') { const { data, error } = await S.sb.schema('portal').from('avisos').select('id,slug,codigo').eq('publicador_id', pub.id).eq('codigo_interno', rec.codigo_interno).order('created_at', { ascending: true }).limit(1); if (error) throw error; ya = (data || [])[0] || null; }
+      if (S.mode === 'supabase') { const { data, error } = await S.sb.schema('portal').from('avisos').select('id,slug,codigo,estado_curacion').eq('publicador_id', pub.id).eq('codigo_interno', rec.codigo_interno).order('created_at', { ascending: true }).limit(1); if (error) throw error; ya = (data || [])[0] || null; }
       else ya = L.avisos.get([]).find(x => x.publicador_id === pub.id && x.codigo_interno != null && String(x.codigo_interno).trim() === rec.codigo_interno) || null;
-      if (ya) { rec.id = ya.id; rec.slug = ya.slug; rec.codigo = ya.codigo; }
+      /* El estado de curación es el que ya tiene: importar.html manda 'borrador' en cada fila, y reimportar
+         no puede despublicar un aviso que está en línea. */
+      if (ya) { rec.id = ya.id; rec.slug = ya.slug; rec.codigo = ya.codigo; if (ya.estado_curacion) rec.estado_curacion = ya.estado_curacion; }
     }
     if (!rec.slug) rec.slug = slugify((rec.direccion||'') + ' ' + (rec.unidad||'') + ' ' + (rec.barrio||''));
     if (!rec.codigo) rec.codigo = codigo(rec.slug, rec.operacion);
