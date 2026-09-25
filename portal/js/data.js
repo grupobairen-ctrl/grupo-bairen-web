@@ -42,11 +42,26 @@
   const AMEN_MAP = { 'Aire acond.':'Aire acondicionado', 'Jardín / Terraza':'Terraza o jardín' };
   const norm = a => AMEN_MAP[a] || a;
 
+  /* 25/9/2026 · Una ficha anunciaba 156 fotos y tenía 60 distintas: la misma foto llegaba
+     varias veces con la dirección apenas cambiada (con ?t=, con ?width=, o pedida por
+     /render/image/ en vez de /object/). Comparar la URL tal cual no las veía iguales.
+     La clave de una foto es su archivo: sin query, sin fragmento y siempre por /object/.
+     Se queda la primera de cada archivo, en su orden; si es de Supabase Storage público,
+     en su forma limpia, para que BP.sbImg la pueda pedir al tamaño que haga falta. */
+  const RE_STORAGE = /\/storage\/v1\/(object|render\/image)\/public\//;
+  D.claveFoto = u => String(u || '').split('#')[0].split('?')[0].replace('/storage/v1/render/image/public/', '/storage/v1/object/public/');
+  D.fotosUnicas = lista => {
+    const vistas = new Set(), out = [];
+    (lista || []).forEach(u => { if (!u) return; const k = D.claveFoto(u); if (vistas.has(k)) return; vistas.add(k); out.push(RE_STORAGE.test(u) ? k : u); });
+    return out;
+  };
+
   function fromUnit(p, op, precio){
-    /* Fotos en orden, con la portada primera y sin URLs repetidas: lo mismo que fotosDeUnidad en api/_portal/sync.js */
+    /* Fotos en orden, con la portada primera y sin fotos repetidas: lo mismo que fotosDeUnidad en api/_portal/sync.js,
+       pero comparando por archivo (D.claveFoto) y no por la URL exacta */
     let fotos = (p.imagenes||[]).slice().sort((a,b)=>(a.orden||0)-(b.orden||0)).map(i=>i.url).filter(Boolean);
-    if (p.portada_url && fotos.indexOf(p.portada_url)===-1) fotos.unshift(p.portada_url);
-    fotos = Array.from(new Set(fotos));
+    if (p.portada_url && !fotos.some(u => D.claveFoto(u) === D.claveFoto(p.portada_url))) fotos.unshift(p.portada_url);
+    fotos = D.fotosUnicas(fotos);
     const amen = (p.amenities||[]).map(a=>norm(a.nombre)).filter(Boolean);
     const amb = p.ambientes || null;
     const zona = (window.BairenZonas && window.BairenZonas.zonaDe(p.barrio)) || p.barrio;
@@ -85,7 +100,8 @@
     const pub = r.publicador || null; const pubId = pub ? (pub.slug || pub.id) : 'bairen';
     const T = (pub && D.titulares[pub.id]) || null;   /* titular con matrícula, de la vista publicador_publico */
     if (pub && !D.PUBLICADORES[pubId]) D.PUBLICADORES[pubId] = Object.assign({ storeId: pub.id, id: pubId, inicial: (pub.nombre||'P').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(), desde: (pub.created_at||'').slice(0,4) || '2026', zonas: pub.zonas || [], desc: pub.descripcion || '', responsable: pub.responsable || pub.nombre, badge: pub.badge || (pub.tipo === 'dueno' ? 'Dueño verificado' : 'Corredor inmobiliario matriculado') }, pub, { id: pubId }, T && T.titular_nombre ? { responsable: T.titular_nombre, matricula: T.titular_matricula ? ((T.titular_colegio || 'CUCICBA') + ' ' + T.titular_matricula) : pub.matricula } : {});
-    const fotos = []; for (const f of (r.fotos||[]).slice().sort((a,b)=>(a.orden||0)-(b.orden||0))) { const u = window.BPStore ? await window.BPStore.resolveFoto(f.url) : f.url; if (u) fotos.push(u); }
+    /* Sin repetidas (D.fotosUnicas): la tabla portal.fotos puede traer el mismo archivo varias veces */
+    const fotos = []; for (const url of D.fotosUnicas((r.fotos||[]).slice().sort((a,b)=>(a.orden||0)-(b.orden||0)).map(f => f.url))) { const u = window.BPStore ? await window.BPStore.resolveFoto(url) : url; if (u) fotos.push(u); }
     const amb = r.ambientes || null;
     return { id: r.id, slug: r.slug, op: r.operacion, tipoProp: r.tipo || 'Departamento', dir: r.direccion, unidad: r.unidad || '', titulo: r.titulo || (r.direccion + (r.unidad ? ' · ' + r.unidad : '')), barrio: r.barrio, zona: (window.BairenZonas && window.BairenZonas.zonaDe(r.barrio)) || r.zona || r.barrio, ciudad: r.ciudad || 'Capital Federal',
       precio: r.precio == null ? null : Number(r.precio), moneda: r.moneda || 'USD', periodo: r.operacion === 'venta' ? '' : '/mes', expensas: r.expensas == null ? null : Number(r.expensas),
