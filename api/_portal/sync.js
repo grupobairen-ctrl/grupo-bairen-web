@@ -7,6 +7,9 @@
  * portal/js/data.js y que los seeds (seed-avisos.sql, seed-avisos-2026-09-10.sql):
  *   · una unidad da hasta tres avisos: venta (precio_venta), alquiler
  *     (precio_tradicional) y mediano (precio_temporal); solo los que tienen precio.
+ *     Salvo lo que el publicador no publica (OPS_EXCLUIDAS): Bairen Realty publica solo
+ *     mediano plazo, así que sus unidades no dan aviso de alquiler (L) aunque tengan
+ *     precio_tradicional (25/9/2026). Los precios de la web no se tocan.
  *   · codigo = 'BA-' + slug en mayúsculas sin símbolos + V/L/M. Es el formato de los
  *     seeds y de la base (data.js recorta a 8 letras, pero eso choca: las tres
  *     unidades de Austria 1938 darían el mismo código, y la base ya tiene el largo).
@@ -17,8 +20,12 @@
  *   · dormitorios = ambientes - 1 (mínimo 1); baños = 2 si hay 4 o más ambientes, si no 1;
  *     cocheras = 1 si "Cochera" está en amenities; amoblado = mediano o amenity "Amoblado".
  *   · amenities normalizadas (Aire acond. → Aire acondicionado, Jardín / Terraza → Terraza o jardín).
- *   · descripciones sin la línea del corredor; portada primera en las fotos, sin URLs
- *     repetidas (la web tiene alguna unidad con la misma foto dos veces).
+ *   · descripciones sin la línea del corredor; portada primera en las fotos, sin fotos
+ *     repetidas (la web tiene alguna unidad con la misma foto dos y tres veces). Se compara
+ *     por claveFoto(): la misma foto con otra variante de URL (?t=, http/https, /render/)
+ *     cuenta como repetida; gana la primera aparición.
+ *   · barrio, zona y ciudad: si la web manda el barrio vacío, se respeta el que ya tiene el
+ *     portal (Juncal 600, 25/9/2026: el barrio se completó a mano y la web lo volvía a vaciar).
  *   · estado 'reservado' si la web dice Reservado u Ocupado; estado_curacion 'publicado';
  *     publicado_en = created_at de la web en el alta. Después la web no lo gobierna:
  *     al reactivar un aviso pausado se pone publicado_en = ahora, para que las alertas
@@ -30,7 +37,9 @@
  * Nunca pisa cualidades_verificadas, estado_curacion (salvo reactivar una baja hecha
  * por esta misma sincronización), destacado_hasta, motivo_rechazo, tipo, expensas ni
  * moneda. Baja: el aviso cuya unidad (o precio) ya no está en la web pasa a 'pausado';
- * no se borra porque consultas, favoritos y vistas lo referencian.
+ * no se borra porque consultas, favoritos y vistas lo referencian. También pasa a 'pausado'
+ * el aviso publicado de Bairen Realty cuya operación está en OPS_EXCLUIDAS (sus L), y no se
+ * reactiva mientras siga excluida.
  * Todo queda registrado en portal.sincronizaciones (migracion-04-producto.sql), también
  * el detalle parcial de una corrida que falló a mitad de camino: así los avisos que
  * alcanzó a pausar se reactivan solos cuando vuelven a la web.
@@ -47,6 +56,20 @@ const AMEN_MAP = { 'Aire acond.': 'Aire acondicionado', 'Jardín / Terraza': 'Te
 const normAmen = a => AMEN_MAP[a] || a;
 const OPS = [['venta', 'precio_venta', 'V'], ['alquiler', 'precio_tradicional', 'L'], ['mediano', 'precio_temporal', 'M']];
 const VIDEO_TIPOS = ['bunny', 'youtube', 'mp4'];
+/* Operaciones que un publicador NO publica aunque la unidad tenga ese precio en la web (por slug).
+   Decisión del 25/9/2026, cerrada: Bairen Realty (slug 'bairen', gestor) publica SOLO mediano plazo.
+   Los precios quedan como están en la web, que el equipo usa para trabajar: el filtro vive acá.
+     · Unidad de Bairen Realty con precio_tradicional: no se crea el aviso L.
+     · L que ya existe a nombre de Bairen Realty: no se marca como visto, así que la baja de
+       correr() lo pausa, y no se reactiva mientras la operación siga en esta lista.
+     · Unidad que SOLO tiene precio_tradicional: queda sin publicar hasta que la web le cargue
+       precio_temporal; ese día nace sola su aviso M. Hoy es el caso de Francisco Acuña de
+       Figueroa 1560 · 1G (BA-FRANCISCOACUNADEFIGUEROA15601GL): se pausa y no vuelve como L.
+   Un L a nombre de otro publicador (un dueño, Maxim) se sigue sincronizando como siempre.
+   Venta no está en la lista: los V van al perfil de Maxim (migracion-13) y eso es otra decisión.
+   Los L que ya estaban publicados los pausa también portal/migracion-21-realty-mediano-y-limpieza.sql. */
+const OPS_EXCLUIDAS = { bairen: ['alquiler'] };
+const excluida = (pubSlug, op) => (OPS_EXCLUIDAS[pubSlug] || []).indexOf(op) > -1;
 /* Campos que la web gobierna. Lo que no está acá, la sincronización no lo toca nunca
    (publicado_en solo se fija en el alta y al reactivar; estado, solo si es disponible/reservado). */
 const CAMPOS = ['slug', 'titulo', 'direccion', 'unidad', 'barrio', 'zona', 'ciudad', 'precio', 'm2_total', 'm2_cubierto', 'ambientes', 'dormitorios', 'banos', 'cocheras', 'amoblado', 'amenities', 'descripcion', 'descripcion_en', 'descripcion_pt', 'video_url', 'video_tipo', 'plazo', 'estado'];
@@ -66,11 +89,37 @@ function videoTipo(p) {
   return 'bunny';
 }
 
-/* Fotos de una unidad, en orden y con la portada primera (igual que fromUnit), sin URLs repetidas. */
+/* Clave de una foto para detectar repetidas: la misma foto llega con variantes de URL que un Set
+   no ve (una ficha llegó a anunciar 156 fotos con 60 distintas). Sin espacios ni fragmento; en el
+   storage de Supabase, sin query (?t=, ?width=) y /render/image/ igual a /object/; http igual a
+   https; esquema y host en minúsculas; sin barras dobles; espacio = %20. Fuera de Supabase la
+   query se respeta: hay servicios donde es lo que distingue una foto de otra (?id=).
+   MISMA REGLA que pg_temp.clave_url_foto en portal/migracion-21-realty-mediano-y-limpieza.sql. */
+function claveFoto(url) {
+  let s = String(url == null ? '' : url).trim();
+  if (!s) return null;
+  s = s.replace(/#.*$/, '');
+  if (/\/storage\/v1\//.test(s)) s = s.replace(/\?.*$/, '');
+  s = s.replace(/^http:\/\//i, 'https://');
+  s = s.split('/storage/v1/render/image/public/').join('/storage/v1/object/public/');
+  const h = /^[A-Za-z]+:\/\/[^/?]+/.exec(s);
+  if (h) s = h[0].toLowerCase() + s.slice(h[0].length);
+  s = s.replace(/([^:])\/{2,}/g, '$1/');
+  return s.split(' ').join('%20') || null;
+}
+/* Lista de URLs sin fotos repetidas (por claveFoto), en orden: gana la primera aparición. */
+function sinRepetidas(urls) {
+  const vistas = new Set(), out = [];
+  for (const u of urls || []) { const k = claveFoto(u); if (!k || vistas.has(k)) continue; vistas.add(k); out.push(String(u).trim()); }
+  return out;
+}
+
+/* Fotos de una unidad, en orden y con la portada primera (igual que fromUnit), sin fotos repetidas.
+   La portada va primera solo si no está ya en la galería (con cualquier variante de URL), como en fromUnit. */
 function fotosDeUnidad(p) {
   const fotos = (p.imagenes || []).slice().sort((a, b) => (a.orden || 0) - (b.orden || 0)).map(i => i.url).filter(Boolean);
-  if (p.portada_url && fotos.indexOf(p.portada_url) === -1) fotos.unshift(p.portada_url);
-  return Array.from(new Set(fotos));
+  if (p.portada_url && fotos.map(claveFoto).indexOf(claveFoto(p.portada_url)) === -1) fotos.unshift(p.portada_url);
+  return sinRepetidas(fotos);
 }
 
 /* Una unidad de la web + una operación → la fila de portal.avisos (sin publicador_id) y sus fotos. */
@@ -79,11 +128,12 @@ function filaDesdeUnidad(p, op, precio) {
   const amb = p.ambientes || null;
   const unidad = p.unidad && p.unidad !== '-' ? p.unidad : null;
   const reservado = p.estado === 'Reservado' || p.estado === 'Ocupado' || p.reservada === true;
-  const zona = zonaDe(p.barrio) || p.barrio;
+  const barrio = String(p.barrio == null ? '' : p.barrio).trim();   // '' y no null: barrio y zona son not null en portal.avisos
+  const zona = zonaDe(barrio) || barrio;
   return {
     codigo: codigoDe(p.slug, op), slug: p.slug, propiedad_id: p.id, operacion: op,
     titulo: p.portada_titulo || (p.dir + (unidad ? ' · ' + unidad : '')),
-    direccion: p.dir, unidad, barrio: p.barrio, zona, ciudad: zona === 'GBA Norte' ? 'Zona Norte' : 'Capital Federal',
+    direccion: p.dir, unidad, barrio, zona, ciudad: zona === 'GBA Norte' ? 'Zona Norte' : 'Capital Federal',
     precio: Number(precio), moneda: 'USD',
     m2_total: p.m2 || null, m2_cubierto: p.m2 || null, ambientes: amb,
     dormitorios: amb == null ? null : Math.max(1, amb - 1), banos: amb == null ? null : (amb >= 4 ? 2 : 1),
@@ -116,13 +166,22 @@ function normalizar(v) {
   }
   return v;
 }
-/* Qué cambió entre la fila que hay y la que manda la web: solo los CAMPOS que la web gobierna. */
+/* Qué cambió entre la fila que hay y la que manda la web: solo los CAMPOS que la web gobierna.
+   barrio, zona y ciudad van juntos (los tres salen del barrio): si la web manda el barrio vacío y
+   el portal tiene uno, no se tocan. Así un barrio completado en el portal no se vuelve a vaciar. */
+const CAMPOS_BARRIO = ['barrio', 'zona', 'ciudad'];
+const sinTexto = v => String(v == null ? '' : v).trim() === '';
 function diferencias(existente, nueva) {
   const patch = {};
-  for (const k of CAMPOS) { if (normalizar(existente[k]) !== normalizar(nueva[k])) patch[k] = nueva[k]; }
+  const respetarBarrio = sinTexto(nueva.barrio) && !sinTexto(existente.barrio);
+  for (const k of CAMPOS) {
+    if (respetarBarrio && CAMPOS_BARRIO.indexOf(k) > -1) continue;
+    if (normalizar(existente[k]) !== normalizar(nueva[k])) patch[k] = nueva[k];
+  }
   return patch;
 }
-/* Lista ordenada de URLs de la fila de la base vs. la de la web. */
+/* Lista ordenada de URLs de la fila de la base vs. la de la web (ya sin repetidas): si la base
+   tiene fotos repetidas, difieren y se reescriben, así que la sincronización también limpia. */
 function fotosDifieren(fotosBase, fotosWeb) {
   const a = (fotosBase || []).slice().sort((x, y) => (x.orden || 0) - (y.orden || 0)).map(f => f.url);
   return JSON.stringify(a) !== JSON.stringify(fotosWeb || []);
@@ -166,7 +225,7 @@ async function sincronizar(opts) {
   const cerrar = async (campos) => { try { await A.patch(`sincronizaciones?id=eq.${fila.id}`, Object.assign({ terminada: iso(Date.now()) }, campos), { prefer: 'return=minimal' }); } catch (e) { /* el resultado ya se devuelve igual */ } };
 
   /* El detalle vive acá afuera: si correr() falla a mitad de camino, lo que alcanzó a hacer queda guardado igual. */
-  const detalle = { altas: [], cambios: [], bajas: [], reactivados: [], fotos: [] };
+  const detalle = { altas: [], cambios: [], bajas: [], reactivados: [], fotos: [], excluidos: [] };
   try {
     const r = await correr(detalle);
     r.ms = Date.now() - t0;
@@ -201,6 +260,9 @@ async function correr(detalle) {
     for (const n of avisosDeUnidad(p)) {
       const fotosWeb = n.fotos; delete n.fotos;
       const ex = porClave.get(n.propiedad_id + '|' + n.operacion) || porCodigo.get(n.codigo);
+      /* Lo que el publicador de destino no publica (los L de Bairen Realty, ver OPS_EXCLUIDAS): no nace, y el
+         que ya existe a su nombre no se marca visto, así que la baja de abajo lo pausa. No se reactiva nunca acá. */
+      if (excluida(pub.slug, n.operacion) && (!ex || ex.publicador_id === pub.id)) { detalle.excluidos.push(n.codigo); continue; }
       if (!ex) { nuevos.push({ fila: Object.assign({ publicador_id: pub.id }, n), fotos: fotosWeb }); continue; }
       vistos.add(ex.id);
       const patch = diferencias(ex, n);
@@ -229,9 +291,11 @@ async function correr(detalle) {
     if (fotos.length) await A.post('fotos', fotos, { prefer: 'return=minimal' });
   }
 
-  /* Bajas: lo que vino de la web (propiedad_id) y ya no está, o ya no tiene ese precio. */
+  /* Bajas: lo que vino de la web (propiedad_id) y ya no está, o ya no tiene ese precio. Y lo que el
+     publicador de destino no publica (OPS_EXCLUIDAS), haya venido de la web o no: los L de Bairen Realty. */
   for (const a of avisos) {
-    if (!a.propiedad_id || vistos.has(a.id)) continue;
+    if (vistos.has(a.id)) continue;
+    if (!a.propiedad_id && !(a.publicador_id === pub.id && excluida(pub.slug, a.operacion))) continue;
     if (a.estado_curacion !== 'publicado') continue;   // ya estaba fuera (pausado, vencido, etc.): no se toca
     await A.patch(`avisos?id=eq.${a.id}`, { estado_curacion: 'pausado' }, { prefer: 'return=minimal' });
     detalle.bajas.push(a.codigo);
@@ -240,4 +304,4 @@ async function correr(detalle) {
   return { altas: detalle.altas.length, cambios: detalle.cambios.length, bajas: detalle.bajas.length, sin_cambios: sinCambios, unidades: unidades.length, detalle };
 }
 
-module.exports = { sincronizar, _interno: { AMEN_MAP, CAMPOS, ESTADOS_WEB, codigoDe, videoTipo, fotosDeUnidad, filaDesdeUnidad, avisosDeUnidad, normalizar, diferencias, fotosDifieren, esCandado, FRENO_MS, CANDADO_MS } };
+module.exports = { sincronizar, _interno: { AMEN_MAP, CAMPOS, CAMPOS_BARRIO, ESTADOS_WEB, OPS_EXCLUIDAS, excluida, claveFoto, sinRepetidas, codigoDe, videoTipo, fotosDeUnidad, filaDesdeUnidad, avisosDeUnidad, normalizar, diferencias, fotosDifieren, esCandado, FRENO_MS, CANDADO_MS } };
