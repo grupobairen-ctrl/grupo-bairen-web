@@ -204,7 +204,10 @@
   D.cardH = function(a){
     const pub = D.pub(a.publicadorId);
     const href = BP.urlFicha(a);
-    const foto = a.fotos[0] ? `<img src="${BP.sbImg(a.fotos[0], 900)}" alt="${BP.esc(a.titulo)}, ${BP.esc(a.barrio)}" loading="lazy">` : '';
+    /* 25/9/2026 · Con el barrio vacío la tarjeta decía ", Capital Federal" y el texto alternativo terminaba en coma.
+       Misma regla que la ficha: el barrio; si falta, la zona; si falta también, se omite el tramo. */
+    const lugar = a.barrio || BP.zonaLabel(a.zona) || '';
+    const foto = a.fotos[0] ? `<img src="${BP.sbImg(a.fotos[0], 900)}" alt="${BP.esc([a.titulo, lugar].filter(Boolean).join(', '))}" loading="lazy">` : '';
     const tag = a.reservado ? `<span class="tag res">${BP.t('card_reservada', 'Reservada')}</span>` : a.destacado ? `<span class="tag">${BP.t('card_seleccionada', 'Seleccionada')}</span>` : a.demo ? `<span class="tag" style="background:#F4F0E6">${BP.t('card_ejemplo', 'Ejemplo')}</span>` : '';
     return `
 <article class="p-card-h" data-id="${BP.esc(a.id)}">
@@ -213,7 +216,7 @@
     <div class="p-card-top"><div><div class="p-price">${a.reservado ? `<span class="p-cta-res">${BP.t('card_reservada', 'Reservada')}</span>` : D.precioHTML(a)}</div>${a.expensas ? `<div class="p-expensas">$ ${BP.fmtN(a.expensas)} ${BP.t('card_expensas', 'expensas')}</div>` : ''}</div></div>
     <div class="p-meta">${D.metaLine(a).split(' · ').map(x=>`<span>${x}</span>`).join('')}</div>
     <a class="p-addr" href="${href}">${BP.esc(a.titulo)}</a>
-    <div class="p-barrio">${BP.esc(a.barrio)}, ${BP.esc(a.ciudad)}</div>
+    <div class="p-barrio">${[lugar, a.ciudad].filter(Boolean).map(BP.esc).join(', ')}</div>
     <p class="p-desc">${BP.esc(a.descripcion).slice(0, 220)}</p>
     <div class="p-card-foot">
       <div class="p-publine">${BP.t('card_publica', 'Publica')} <b>${BP.esc(D.pubNombre(pub))}</b> ${D.badgeHTML(pub)}</div>
@@ -227,13 +230,14 @@
   D.cardV = function(a){
     const pub = D.pub(a.publicadorId);
     const href = BP.urlFicha(a);
-    const foto = a.fotos[0] ? `<img src="${BP.sbImg(a.fotos[0], 700)}" alt="${BP.esc(a.titulo)}, ${BP.esc(a.barrio)}" loading="lazy">` : `<span class="card-img-placeholder">${BP.t('card_fotos_prod', 'Fotos en producción')}</span>`;
+    const lugar = a.barrio || BP.zonaLabel(a.zona) || '';   /* barrio vacío: la zona, o nada (ver cardH) */
+    const foto = a.fotos[0] ? `<img src="${BP.sbImg(a.fotos[0], 700)}" alt="${BP.esc([a.titulo, lugar].filter(Boolean).join(', '))}" loading="lazy">` : `<span class="card-img-placeholder">${BP.t('card_fotos_prod', 'Fotos en producción')}</span>`;
     return `
-<a class="prop-card" data-flip="${BP.esc(a.id)}" href="${href}" aria-label="${BP.esc(BP.tf('card_ver_en', 'Ver {t} en {b}', { t: a.titulo, b: a.barrio }))}">
+<a class="prop-card" data-flip="${BP.esc(a.id)}" href="${href}" aria-label="${BP.esc(lugar ? BP.tf('card_ver_en', 'Ver {t} en {b}', { t: a.titulo, b: lugar }) : BP.tf('card_ver', 'Ver {t}', { t: a.titulo }))}">
   <div class="card-img">${foto}<span class="card-tag tag-${a.op}">${D.opTag(a)}</span>${a.reservado?`<span class="card-status status-reservado">${BP.t('card_reservada', 'Reservada')}</span>`:''}</div>
   <div class="card-body">
     <div class="card-address">${BP.esc(a.titulo)}</div>
-    <div class="card-barrio">${BP.esc(a.barrio)}</div>
+    <div class="card-barrio">${BP.esc(lugar)}</div>
     <div class="card-meta">${D.metaLine(a)}</div>
     <div class="card-divider"></div>
     <div class="card-footer"><div class="card-price"><span class="price-amount">${a.reservado ? BP.t('card_reservada', 'Reservada') : D.precioHTML(a)}</span></div><span class="card-cta">${BP.t('card_ver_ficha', 'Ver ficha')}</span></div>
