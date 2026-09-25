@@ -3723,3 +3723,208 @@ body.p-catalogo .prop-card .card-tag.tag-alquiler{background:var(--s-navy);color
 body.p-home .prop-card .card-tag.tag-alquiler{background:var(--h-navy);color:#FBFAF6 !important}
 .p-product .p-pager button.on,body.p-catalogo .p-pager button.on{background:var(--navy-deeper);border-color:var(--navy-deeper);color:#fff}
 @media(min-width:561px) and (max-width:820px){body.p-catalogo .p-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}}
+
+/* ═══════════════════════════════════════════════════════════════════
+   25/9/2026 · Auditoría visual del 23/9 (360, 390, 768, 1024 y 1440 px)
+   Todo este bloque se agrega al final: pisa las reglas de arriba sin
+   desarmarlas. Donde arriba hay !important, acá también, si no no gana.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* 1 · Ningún texto legible por debajo de 12 px. La medición (getComputedStyle sobre todos los nodos de
+   texto visibles) encontró el idioma a 9,9 px, las etiquetas de la tarjeta a 9 px, los títulos del pie a
+   9,3 px y botones, rótulos y conteos entre 9,6 y 11,8 px. Todo pasa a .75rem; donde la letra crece, el
+   espaciado entre letras se acorta un poco para que la composición no se abra. */
+/* Idioma, en el header y en el menú del celular */
+.p-lang button,.p-lang-movil button,.mobile-menu .p-lang button{font-size:.75rem}
+/* Menú de escritorio y botones del header */
+.p-nav-principal a{font-size:.75rem}
+.p-nav-right .p-btn,.p-nav-right .p-btn-sm,.p-nav-right .p-ghost{font-size:.75rem}
+.p-crear-pop .t,.p-nav-menu .p-dd-cuenta .p-dd-ttl{font-size:.75rem;letter-spacing:.16em}
+.mobile-menu .m-cta .p-btn,.mobile-menu .m-cta a{font-size:.75rem !important;letter-spacing:.12em}
+/* Pie */
+.ft-col-ttl{font-size:.75rem;letter-spacing:.26em}
+/* Tarjeta de propiedad (catálogo, portada, publicadores, desarrollos) */
+.card-tag{font-size:.75rem !important;letter-spacing:.12em !important}
+.card-status,.card-img-placeholder{font-size:.75rem}
+body.p-catalogo .prop-card .card-barrio,.prop-card .card-barrio{font-size:.75rem;letter-spacing:.14em}
+body.p-catalogo .prop-card .card-cta,.prop-card .card-cta{font-size:.75rem;letter-spacing:.12em}
+body.p-catalogo .prop-card .card-price small,.p-grid .price-amount small,.prop-card .price-amount small{font-size:.75rem}
+body.p-catalogo .prop-card .p-card-pub,.prop-card .p-card-pub,body.p-catalogo .prop-card .p-card-pub b,.prop-card .p-card-pub b{font-size:.75rem}
+.p-badge,.prop-card .p-card-pub .p-badge{font-size:.75rem;letter-spacing:.08em}
+/* Rótulos en versalita de las bandas y de las páginas */
+.p-eyebrow,.p-band .p-eyebrow{font-size:.75rem}
+.p-btn-sm{font-size:.75rem}
+body .p-login .p-btn-fill{font-size:.75rem}
+/* Catálogo: banda, barra de filtros, fila de resultados, popovers y cajón */
+.p-catband-eyebrow,.p-catband .p-map-hint{font-size:.75rem}
+body.p-catalogo .p-filters .p-fbtn,body.p-catalogo .p-filters .p-fsel,body.p-catalogo .p-plazo-pills button{font-size:.75rem !important;letter-spacing:.06em !important}
+body.p-catalogo .p-fchip .p-chip,body.p-catalogo #zonaChips .p-chip,.p-fbtn .cnt{font-size:.75rem}
+body.p-catalogo .p-results-count{font-size:.75rem !important}
+body.p-catalogo .p-results-head .acts .p-fbtn,body.p-catalogo .p-results-head .acts .p-fsel{font-size:.75rem !important}
+.p-pop label,.p-drawer .grp label.t{font-size:.75rem}
+/* Portada */
+body.p-home .h-eyebrow{font-size:.75rem}
+body.p-home .h-hito b{font-size:.75rem}
+body.p-home .h-cta,body.p-home .h-btn,body.p-home .h-encaja .h-btn{font-size:.75rem}
+body.p-home .h-edif-txt em,body.p-home .h-edificios .h-edif-txt em{font-size:.75rem;letter-spacing:.14em}
+body.p-home .h-criterios{font-size:.75rem}
+/* Publicadores, Membresía, Legales */
+.p-muro .tip{font-size:.75rem;letter-spacing:.1em}
+body.p-publicar-landing .p-plan-nota{font-size:.75rem}
+body.p-membership .p-toggle button small{font-size:.75rem}
+body.p-legales .p-indice-secciones .t{font-size:.75rem}
+/* Barrios, Filtros y las pastillas del plazo llevan id o más selectores en las reglas de celular: acá con los mismos */
+body.p-catalogo .p-filters #barriosBtn,body.p-catalogo .p-filters #moreBtn,body.p-catalogo .p-filters .p-plazo-pills button{font-size:.75rem !important}
+
+/* 2 · Publicadores. A 768 px la muestra iba en una columna con fotos de 400 px y escondía la tercera
+   tarjeta: se veían 2 de 3. Entre 700 y 820 px van las tres, en tres columnas; entre 561 y 699, dos
+   columnas con dos tarjetas (tres no entran: el sello del publicador se cortaba); en el celular sigue
+   como estaba (una columna, dos tarjetas y el resto en "Ver sus propiedades"). Mientras cargan los
+   datos, #pubs lleva el esqueleto del panel y de curación (.p-skel-panel) en lugar de un hueco. */
+@media(min-width:561px) and (max-width:699px){body.p-publicadores .p-pub-muestra{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}}
+@media(min-width:700px) and (max-width:820px){
+  body.p-publicadores .p-pub-muestra{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+  body.p-publicadores .p-pub-muestra .prop-card:nth-child(n+3){display:flex}
+  body.p-publicadores .p-pub-muestra .card-body{padding:16px 14px 14px}
+}
+
+/* 3 · Membresía a 1024 px. "$149.000 por mes" se partía en dos líneas y los botones de los planes
+   quedaban a distintas alturas: la regla de .p-plan .p-btn decía margin-top:auto y enseguida
+   margin-top:18px, que la anulaba. El botón vuelve al pie de la tarjeta (las cuatro miden lo mismo
+   en la grilla) y el precio va en una línea; entre 1001 y 1180 px, con cuatro columnas angostas,
+   la cifra y el aire de la tarjeta se achican un poco para que entre. */
+body.p-membership .p-plan ul{margin-bottom:18px}
+body.p-membership .p-plan .p-btn{margin-top:auto}
+body.p-membership .p-plan-precio{white-space:nowrap}
+@media(min-width:1001px) and (max-width:1180px){
+  body.p-membership .p-planes{gap:16px}
+  body.p-membership .p-plan{padding:24px 20px 22px}
+  body.p-membership .p-plan-precio{font-size:1.6rem}
+  body.p-membership .p-plan-precio small{font-size:.75rem;margin-left:2px}
+}
+
+/* 4 · Desarrollos e Ingresar: .p-page{min-height:70vh} dejaba entre 130 y 550 px vacíos entre el
+   contenido y el pie, según el alto de la pantalla. Estas dos páginas miden lo que mide su contenido;
+   el pie queda pegado y, si la página es más corta que la pantalla, debajo sigue el navy del html. */
+body.p-emprendimientos .p-page,body.p-ingresar .p-page{min-height:0}
+
+/* 5 · Portada entre 900 y 1023 px: las secciones pasaban a escritorio a los 900 px y el header recién a
+   los 1024 (con cinco secciones, idioma y dos botones, el menú de escritorio no entra antes). Quedaban
+   secciones de escritorio con el menú de celular. El corte de la portada pasa a ser el del header: hasta
+   1023 px se ve como en el celular. Acá se repiten, sólo para ese tramo, los valores de las reglas de
+   max-width:899px de arriba y se deshacen los de min-width:900px de lo que hoy tiene la portada (hero y
+   buscador, el estándar, el carrusel de edificios y la banda de publicar). */
+@media(min-width:900px) and (max-width:1023px){
+  body.p-home .h-sec{min-height:0;padding:26px 0}
+  body.p-home .h-in{padding:0 18px}
+  body.p-home .h-eyebrow{margin-bottom:8px;letter-spacing:.2em}
+  body.p-home .h-h2{font-size:1.42rem;line-height:1.14;margin-bottom:6px;max-width:19ch}
+  body.p-home .h-copy{font-size:.875rem;line-height:1.55;margin-bottom:0}
+  /* Hero y buscador */
+  body.p-home .h-hero{min-height:100svh;align-items:flex-end;padding:96px 0 30px}
+  body.p-home .h-hero-in{text-align:left;max-width:none;padding:0 18px}
+  body.p-home .h-hero h1{font-size:1.72rem;line-height:1.14;margin-bottom:6px}
+  body.p-home .h-hero-sub{font-size:.9rem;margin-bottom:16px;color:rgba(251,250,246,.86)}
+  body.p-home .h-search{grid-template-columns:none;align-items:normal;gap:10px;padding:14px;border-radius:24px}
+  body.p-home .h-search .h-seg,body.p-home .h-search .h-field,body.p-home .h-search .h-cta{grid-column:auto;grid-row:auto}
+  body.p-home .h-seg{border-radius:8px;padding:3px;gap:3px;background:rgba(251,250,246,.12)}
+  body.p-home .h-seg button{flex:1;padding:1px 6px;min-height:44px;border-radius:6px !important;font-size:.78rem}
+  body.p-home .h-field input{height:48px;border-radius:8px;font-size:.9rem}
+  body.p-home .h-field-lupa input{padding-left:38px}
+  body.p-home .h-field-lupa .lupa{left:13px;width:15px;height:15px}
+  body.p-home .h-cta{min-height:46px;padding:1px 6px;border-radius:8px !important;letter-spacing:.16em}
+  /* El estándar */
+  body.p-home .h-estandar{min-height:0;padding:26px 0 28px}
+  body.p-home .h-camino{margin-top:12px;padding-bottom:0}
+  body.p-home .h-hitos{gap:0 6px}
+  body.p-home .h-hito{gap:10px}
+  body.p-home .h-hito .pt{width:38px;height:38px;box-shadow:0 0 0 5px var(--h-navy)}
+  body.p-home .h-hito .pt svg{width:17px;height:17px}
+  body.p-home .h-hito b{line-height:1.18;letter-spacing:0}
+  body.p-home .h-criterios{margin-top:16px;position:relative;min-height:0}
+  /* Edificios: una fachada casi a todo el ancho y la siguiente asomando, sin flechas */
+  body.p-home .h-edificios{gap:12px;padding:16px 18px 6px;scroll-padding-left:18px}
+  body.p-home .h-edificios .h-edif{flex-basis:82vw;border-radius:12px}
+  body.p-home .h-edificios .h-edif-txt{padding:18px 18px 19px;gap:6px}
+  body.p-home .h-edificios .h-edif-txt b{font-size:1.4rem}
+  body.p-home #edifCarrusel .h-flecha{display:none}
+  body.p-home .h-edif.h-edif-mas .h-mas-ic{width:60px;height:60px;font-size:2rem;border-radius:10px}
+  body.p-home .h-edif.h-edif-mas b{font-size:1.3rem}
+  body.p-home .h-puntos{margin-top:12px}
+  /* Publicar */
+  body.p-home .h-encaja{padding:24px 0}
+  body.p-home .h-encaja-fila{grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:center}
+  body.p-home .h-encaja-txt .h-h2{font-size:1.28rem;max-width:14ch;margin-bottom:5px}
+  body.p-home .h-encaja-txt .h-copy{font-size:.875rem;line-height:1.48}
+  body.p-home .h-encaja .h-btn{min-height:44px;padding:0 14px;letter-spacing:.12em;text-align:center}
+}
+
+/* 9 · Menú de escritorio: suma Publicadores y Cómo seleccionamos, que ya estaban en el panel del celular,
+   con el mismo estilo que los otros ítems (ui.js). Con cinco secciones a 12 px, entre 1024 y 1279 px
+   la barra no entraba: el menú se montaba sobre el idioma y los botones. En ese tramo se acortan el
+   espaciado entre letras, la separación entre ítems y el aire de los botones y del idioma (que sigue
+   con 32 px de área táctil). */
+@media(min-width:1024px) and (max-width:1279px){
+  .p-navbar,body.p-home .p-navbar,body.p-home .navbar{gap:12px}
+  .p-nav-principal{gap:14px}
+  .p-nav-principal a{letter-spacing:.06em}
+  .p-nav-right{gap:10px}
+  .p-nav-right .p-btn{padding:0 12px;letter-spacing:.1em}
+  .p-nav-right .p-lang{gap:0 !important;margin-right:0}
+  .p-nav-right .p-lang button{padding:7px 4px !important}
+}
+/* Con sesión abierta la barra derecha suma campana, Mis contactos, favoritos y Mi cuenta (casi 600 px):
+   ya antes de este cambio se montaba sobre el menú a 1024 px. Con sesión, hasta 1599 px la barra va
+   compacta y Mis contactos queda como ícono (el nombre sigue siendo el texto del enlace para el lector
+   de pantalla, y la vista también está en Mi cuenta); entre 1024 y 1199 px, además, Publicadores y Cómo
+   seleccionamos no entran y quedan en el pie, como estaban. */
+@media(min-width:1024px) and (max-width:1599px){
+  .p-navbar:has(.p-nav-right .p-nav-menu){gap:12px}
+  .p-navbar:has(.p-nav-right .p-nav-menu) .p-nav-principal{gap:14px}
+  .p-navbar:has(.p-nav-right .p-nav-menu) .p-nav-principal a{letter-spacing:.06em}
+  .p-navbar:has(.p-nav-right .p-nav-menu) .p-nav-right{gap:10px}
+  .p-navbar:has(.p-nav-right .p-nav-menu) .p-nav-right .p-lang{gap:0 !important;margin-right:0}
+  .p-navbar:has(.p-nav-right .p-nav-menu) .p-nav-right .p-lang button{padding:7px 4px !important}
+  .p-nav-right a.p-ghost[href$="#contactos"]{font-size:0;gap:0;letter-spacing:0}
+}
+@media(min-width:1024px) and (max-width:1199px){
+  .p-navbar:has(.p-nav-right .p-nav-menu) .p-nav-principal a[data-sec="publicadores"],
+  .p-navbar:has(.p-nav-right .p-nav-menu) .p-nav-principal a[data-sec="criterios"]{display:none}
+}
+
+/* 6 · Catálogo a 1024 px: la barra de filtros no entraba en una fila y "Filtros" caía solo a la segunda.
+   Entre 1024 y 1179 px se achican el margen de la barra, la separación, el aire de cada control y el
+   espaciado entre letras, y el buscador puede angostarse hasta 150 px. Todo sigue a 12 px. */
+@media(min-width:1024px) and (max-width:1179px){
+  body.p-catalogo .p-filters-in{padding-left:16px;padding-right:16px;gap:6px}
+  body.p-catalogo .p-filters #zonaBox{flex:1 1 150px;min-width:150px}
+  body.p-catalogo .p-filters .p-fbtn,body.p-catalogo .p-filters .p-fsel,body.p-catalogo .p-plazo-pills button{letter-spacing:.03em !important}
+  body.p-catalogo .p-filters .p-fbtn{padding:0 10px}
+  body.p-catalogo .p-filters .p-fsel{padding:0 26px 0 10px}
+  body.p-catalogo .p-plazo-pills{gap:4px}
+  body.p-catalogo .p-plazo-pills button{padding:0 8px}
+}
+
+/* 7 · La banda del mapa del catálogo: el contenedor del mapa medía 520 px fijos (.p-product
+   #mapaResultados, de cuando el mapa era una columna lateral) y el dibujo, que guarda su proporción,
+   ocupa 351 px a 1024 y 448 a 1440: quedaban entre 70 y 170 px muertos antes de la leyenda. El
+   contenedor mide lo que mide el mapa. */
+body.p-catalogo #mapaResultados{height:auto}
+
+/* 8 · El pie, igual en todas las páginas. Las listas iban en dos columnas sólo en la portada (y entre
+   780 y 899 px, donde el pie ya reparte sus columnas, la portada partía cada lista otra vez en dos y el
+   mail llegaba al borde). Ahora, en todas: dos columnas mientras el pie va en una sola (420 a 779 px),
+   una en el resto. */
+body.p-home .footer .ft-col ul,.footer .ft-col ul{columns:1}
+@media(min-width:420px) and (max-width:779px){
+  body.p-home .footer .ft-col ul,.footer .ft-col ul{columns:2;column-gap:18px}
+  .footer .ft-col li{break-inside:avoid}
+}
+
+/* 10 · Catálogo en el celular: el tipo compartía fila con Amb | Dorm y Precio y a 360 y 390 px le
+   quedaban 74 y 84 px para "DEPARTAMENTO" (100 px) o "TODOS LOS TIPOS" (113 px): se leía "DEPARTAMEN".
+   Hasta 560 px el tipo va en su propia fila a todo el ancho y Amb | Dorm y Precio comparten la de abajo. */
+@media(max-width:560px){
+  body.p-catalogo .p-filters #tipoSel{flex:1 1 100% !important}
+  body.p-catalogo .p-filters .p-fwrap{flex:1 1 calc(50% - 4px) !important}
+}
