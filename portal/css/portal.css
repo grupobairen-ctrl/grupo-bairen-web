@@ -3775,3 +3775,15 @@ body.p-membership .p-toggle button small{font-size:.75rem}
 body.p-legales .p-indice-secciones .t{font-size:.75rem}
 /* Barrios, Filtros y las pastillas del plazo llevan id o más selectores en las reglas de celular: acá con los mismos */
 body.p-catalogo .p-filters #barriosBtn,body.p-catalogo .p-filters #moreBtn,body.p-catalogo .p-filters .p-plazo-pills button{font-size:.75rem !important}
+
+/* 2 · Publicadores. A 768 px la muestra iba en una columna con fotos de 400 px y escondía la tercera
+   tarjeta: se veían 2 de 3. Entre 700 y 820 px van las tres, en tres columnas; entre 561 y 699, dos
+   columnas con dos tarjetas (tres no entran: el sello del publicador se cortaba); en el celular sigue
+   como estaba (una columna, dos tarjetas y el resto en "Ver sus propiedades"). Mientras cargan los
+   datos, #pubs lleva el esqueleto del panel y de curación (.p-skel-panel) en lugar de un hueco. */
+@media(min-width:561px) and (max-width:699px){body.p-publicadores .p-pub-muestra{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}}
+@media(min-width:700px) and (max-width:820px){
+  body.p-publicadores .p-pub-muestra{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+  body.p-publicadores .p-pub-muestra .prop-card:nth-child(n+3){display:flex}
+  body.p-publicadores .p-pub-muestra .card-body{padding:16px 14px 14px}
+}
