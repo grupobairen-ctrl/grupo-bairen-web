@@ -3904,3 +3904,9 @@ body.p-emprendimientos .p-page,body.p-ingresar .p-page{min-height:0}
   body.p-catalogo .p-plazo-pills{gap:4px}
   body.p-catalogo .p-plazo-pills button{padding:0 8px}
 }
+
+/* 7 · La banda del mapa del catálogo: el contenedor del mapa medía 520 px fijos (.p-product
+   #mapaResultados, de cuando el mapa era una columna lateral) y el dibujo, que guarda su proporción,
+   ocupa 351 px a 1024 y 448 a 1440: quedaban entre 70 y 170 px muertos antes de la leyenda. El
+   contenedor mide lo que mide el mapa. */
+body.p-catalogo #mapaResultados{height:auto}
