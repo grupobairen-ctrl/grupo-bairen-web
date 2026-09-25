@@ -68,6 +68,13 @@ document.addEventListener('DOMContentLoaded', function(){
      pantalla de doble densidad alcanzan 780: pedir 1600 era bajar el doble de bytes para nada.
      Se topea en 1600 para que en escritorio quede igual que antes. */
   const ANCHO_FOTO = Math.min(1600, Math.round((window.innerWidth || 390) * Math.min(window.devicePixelRatio || 1, 2)));
+  /* 25/9/2026 · El visor pedía cada foto dos veces (1600 y después 1800), también en un celular
+     donde la foto se ve a 390 px. Ahora arranca con la del hero, que ya está bajada, y solo pide
+     otra si la pantalla da para más (escritorio, o el celular girado). */
+  const ANCHO_VISOR = Math.min(1800, Math.round((window.innerWidth || 390) * Math.min(window.devicePixelRatio || 1, 2)));
+  /* 25/9/2026 · Con el barrio vacío (Juncal 600) se rompían el título, las migas y el mapa.
+     El lugar es el barrio; si falta, la zona; si falta también, se omite ese tramo entero. */
+  const lugar = a.barrio || BP.zonaLabel(a.zona) || '';
   /* Toda la ficha se arma desde JS con BP.t(clave, castellano): en es no cambia nada. La descripción ya viene traducida por dato. */
   const T = BP.t, TF = BP.tf;
   const pubNombre = BPData.pubNombre(pub);
@@ -84,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function(){
   main.removeAttribute('aria-busy');
   main.innerHTML = `
 <div class="p-fhero" id="gal">
-  <div class="p-fhero-slides" id="heroSlides">${fotos.length ? fotos.map((f,i) => `<div class="p-fhero-slide" data-i="${i}" role="img" ${i < 2 ? `style="background-image:url('${BP.sbImg(f, ANCHO_FOTO)}')"` : `data-bg="${BP.esc(BP.sbImg(f, ANCHO_FOTO))}"`} aria-label="${BP.esc(TF('ficha_foto_de', '{t}, foto {i} de {n}', { t: a.titulo, i: i+1, n: fotos.length }))}"></div>`).join('') : `<div class="p-fhero-slide p-fhero-empty">${T('ficha_fotos_prod', 'Fotos en producción')}</div>`}</div>
+  <div class="p-fhero-slides" id="heroSlides">${fotos.length ? fotos.map((f,i) => `<div class="p-fhero-slide" data-i="${i}" role="img" ${i === 0 ? `style="background-image:url('${BP.sbImg(f, ANCHO_FOTO)}')"` : `data-bg="${BP.esc(BP.sbImg(f, ANCHO_FOTO))}"`} aria-label="${BP.esc(TF('ficha_foto_de', '{t}, foto {i} de {n}', { t: a.titulo, i: i+1, n: fotos.length }))}"></div>`).join('') : `<div class="p-fhero-slide p-fhero-empty">${T('ficha_fotos_prod', 'Fotos en producción')}</div>`}</div>
   <div class="p-fhero-grad"></div>
   <div class="p-fhero-content">
     <div>
@@ -100,8 +107,13 @@ document.addEventListener('DOMContentLoaded', function(){
   </div>
   <div class="cts"><span>${BP.ico.photo} ${fotos.length === 1 ? T('ficha_foto_1', '1 foto') : TF('ficha_fotos', '{n} fotos', { n: fotos.length })}</span>${a.video ? `<span>${BP.ico.video} ${T('ficha_video', 'Video')}</span>` : ''}</div>
 </div>
-${fotos.length > 1 ? `<div class="p-strip" id="strip">${fotos.map((f,i) => `<button type="button" class="thumb ${i===0?'active':''}" data-t="${i}" aria-label="${BP.esc(TF('ficha_ver_foto', 'Ver foto {i}', { i: i+1 }))}"><img src="${BP.sbImg(f, 300)}" alt="" loading="lazy"></button>`).join('')}</div>` : ''}
-<div class="p-ficha">
+<!-- 25/9/2026 · La tira de miniaturas era una tabulación por foto: 156 en la ficha más cargada antes de
+     llegar a la descripción. Ahora es un solo punto de tabulación (tabindex itinerante): las flechas
+     izquierda y derecha pasan de foto y Enter abre el visor. Miniaturas a 200 px (se ven a 96, a doble
+     densidad) y en diferido: antes se pedían a 300. -->
+${fotos.length > 1 ? `<div class="p-strip" id="strip" role="group" aria-label="${BP.esc(TF('ficha_lb_fotos_de', 'Fotos de {t}', { t: a.titulo }))}">${fotos.map((f,i) => `<button type="button" class="thumb ${i===0?'active':''}" data-t="${i}" tabindex="${i===0?0:-1}"${i===0?' aria-current="true"':''} aria-label="${BP.esc(TF('ficha_ver_foto', 'Ver foto {i}', { i: i+1 }))}"><img src="${BP.sbImg(f, 200)}" alt="" loading="lazy" decoding="async"></button>`).join('')}</div>` : ''}
+<!-- El enlace "Saltar al contenido" lleva acá, después de la galería (id contenido, ver BP.header) -->
+<div class="p-ficha" id="contenido">
   <div class="p-ficha-main">
     <div class="p-ficha-head">
       <div class="p-kicker">${BP.esc(BP.etiqueta(a.tipoProp))}${a.amb ? ' · ' + (a.amb === 1 ? T('ficha_monoamb', 'monoambiente') : TF('ficha_ambientes', '{n} ambientes', { n: a.amb })) : ''}${a.m2 ? ' · ' + a.m2 + ' m²' : ''}</div>
@@ -204,6 +216,9 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip">${fotos.map((f,i) => `<but
 
   /* comportamiento */
   BPData.bindFavs(main);
+  /* 25/9/2026 · "Saltar al contenido" apuntaba al main, que empieza con la galería: el salto dejaba
+     a la persona adentro de las fotos. Ahora va a la ficha propiamente dicha (#contenido), después. */
+  const skip = document.getElementById('pSkip'); if (skip) skip.href = '#contenido';
   const gal = document.getElementById('gal'); const lb = document.getElementById('lb'), lbImg = document.getElementById('lbImg'), lbCount = document.getElementById('lbCount'); let cur = 0;
   let soltarLb = null, abridorLb = null;
   const lbTiras = document.getElementById('lbTiras'), lbMarco = document.getElementById('lbMarco');
@@ -220,7 +235,7 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip">${fotos.map((f,i) => `<but
     if (!fotos.length) return;
     const abriendo = !lb.classList.contains('open');
     cur = (i + fotos.length) % fotos.length;
-    const chica = BP.sbImg(fotos[cur], 1600), grande = BP.sbImg(fotos[cur], 1800);
+    const chica = BP.sbImg(fotos[cur], ANCHO_FOTO), grande = BP.sbImg(fotos[cur], ANCHO_VISOR);
     lbImg.src = chica; lbImg.alt = TF('ficha_foto_alt', '{t}, foto {i}', { t: a.titulo, i: cur+1 });
     if (grande !== chica) { const alta = new Image(); alta.onload = () => { if (lbImg.src === chica) lbImg.src = grande; }; alta.src = grande; }
     lbCount.textContent = TF('ficha_lb_de', '{i} de {n}', { i: cur+1, n: fotos.length });
@@ -237,7 +252,9 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip">${fotos.map((f,i) => `<but
         if (lbImg.complete && lbImg.naturalWidth) requestAnimationFrame(listo);
         else lbImg.addEventListener('load', () => requestAnimationFrame(listo), { once: true });
       }
-      soltarLb = BP.focoAtrapado(lb, { devolverA: abridorLb, primero: lb.querySelector('[data-lb-close]'), alCerrar: () => cerrarLbSolo() });
+      /* 25/9/2026 · El primer [data-lb-close] es el velo (un div), que no toma foco: al abrir con Enter
+         desde la tira el foco se quedaba detrás del visor. Va al botón Cerrar. */
+      soltarLb = BP.focoAtrapado(lb, { devolverA: abridorLb, primero: lb.querySelector('button[data-lb-close]'), alCerrar: () => cerrarLbSolo() });
     } else if (dir && window.BPM && BPM.pasarFoto) BPM.pasarFoto(lbImg, dir);
     BP.anunciar(TF('ficha_foto_n', 'Foto {i} de {n}', { i: cur+1, n: fotos.length }));
   };
@@ -262,8 +279,16 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip">${fotos.map((f,i) => `<but
   document.querySelectorAll('#strip [data-t]').forEach(th => th.addEventListener('dblclick', () => { origenLb = th; showLb(Number(th.dataset.t)); }));
   const heroSlides = document.getElementById('heroSlides'), strip = document.getElementById('strip');
   if (heroSlides && strip) {
-    const setActive = i => strip.querySelectorAll('.thumb').forEach((th, n) => th.classList.toggle('active', n === i));
+    /* La miniatura activa es la única que entra en el orden de tabulación (tabindex itinerante) */
+    const setActive = i => strip.querySelectorAll('.thumb').forEach((th, n) => { const on = n === i; th.classList.toggle('active', on); th.tabIndex = on ? 0 : -1; if (on) th.setAttribute('aria-current', 'true'); else th.removeAttribute('aria-current'); });
     strip.querySelectorAll('[data-t]').forEach(th => th.addEventListener('click', () => { const i = Number(th.dataset.t); heroSlides.scrollTo({ left: i * heroSlides.clientWidth, behavior: 'smooth' }); setActive(i); }));
+    /* Flechas izquierda y derecha: pasan de foto dentro de la tira. Enter: abre el visor en esa foto. */
+    strip.addEventListener('keydown', e => {
+      const th = e.target.closest('.thumb'); if (!th) return;
+      const ths = strip.querySelectorAll('.thumb'), i = Number(th.dataset.t);
+      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); const n = ths[(i + (e.key === 'ArrowRight' ? 1 : ths.length - 1)) % ths.length]; n.click(); n.focus(); }
+      else if (e.key === 'Enter') { e.preventDefault(); origenLb = th; showLb(i); }
+    });
     let tk; heroSlides.addEventListener('scroll', () => { clearTimeout(tk); tk = setTimeout(() => { const i = Math.round(heroSlides.scrollLeft / Math.max(1, heroSlides.clientWidth)); setActive(i); const th = strip.querySelectorAll('.thumb')[i]; if (th) th.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' }); }, 80); }, { passive: true });
   }
   lb.querySelectorAll('[data-lb-close]').forEach(b => b.addEventListener('click', closeLb)); lb.querySelector('[data-lb-prev]').addEventListener('click', () => showLb(cur-1, -1)); lb.querySelector('[data-lb-next]').addEventListener('click', () => showLb(cur+1, 1));
@@ -285,17 +310,26 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip">${fotos.map((f,i) => `<but
   /* 23/9/2026 · La galería bajaba TODAS las fotos al abrir la ficha, porque un background-image
      de CSS no se puede diferir: el navegador las pide al leer el HTML. En una ficha de 156 fotos
      eran 6,7 MB y dieciséis segundos con datos móviles, justo en la página donde alguien decide
-     si te escribe. Ahora las dos primeras vienen puestas (para que la primera se vea al instante)
-     y el resto se cargan cuando se acercan. Sin observador, se cargan todas: peor pero nunca roto. */
+     si te escribe. Sin observador, se cargan todas: peor pero nunca roto.
+     25/9/2026 · De entrada baja solo la primera foto. Las vecinas se piden cuando la persona
+     toca, desliza o recorre la galería con el teclado: recién ahí hay señal de que va a mirar
+     más. Y se piden cuando el desplazamiento se detiene (120 ms quieto), así un salto de la
+     foto 1 a la 50 desde las miniaturas no baja las 48 del medio al pasar. */
   (function(){
     const pendientes = Array.from(document.querySelectorAll('.p-fhero-slide[data-bg]'));
     if (!pendientes.length) return;
     const poner = el => { const u = el.dataset.bg; if (!u) return; el.style.backgroundImage = `url('${u}')`; delete el.dataset.bg; };
     if (!('IntersectionObserver' in window)) { pendientes.forEach(poner); return; }
-    const obs = new IntersectionObserver((entradas, o) => {
-      entradas.forEach(e => { if (e.isIntersecting) { poner(e.target); o.unobserve(e.target); } });
-    }, { root: document.getElementById('heroSlides'), rootMargin: '0px 150%' });
+    const cerca = new Set(); let activa = false, quieto = null;
+    const cargar = () => { quieto = null; if (!activa) return; cerca.forEach(el => { poner(el); obs.unobserve(el); }); cerca.clear(); };
+    const obs = new IntersectionObserver(entradas => {
+      entradas.forEach(e => { if (e.isIntersecting) cerca.add(e.target); else cerca.delete(e.target); });
+      clearTimeout(quieto); quieto = setTimeout(cargar, 120);
+    }, { root: heroSlides, rootMargin: '0px 100%' });
     pendientes.forEach(el => obs.observe(el));
+    const activar = () => { if (activa) return; activa = true; cargar(); };
+    ['pointerdown', 'touchstart', 'scroll', 'wheel'].forEach(ev => heroSlides.addEventListener(ev, activar, { once: true, passive: true }));
+    if (strip) ['pointerdown', 'focusin'].forEach(ev => strip.addEventListener(ev, activar, { once: true, passive: true }));
   })();
   const tabBtns = Array.from(document.querySelectorAll('.p-tabs2 button'));
   const activarTab = b => { tabBtns.forEach(x => { const on = x === b; x.classList.toggle('on', on); x.setAttribute('aria-selected', on ? 'true' : 'false'); x.tabIndex = on ? 0 : -1; }); ['gen','serv','amb'].forEach(k => document.getElementById('tab-' + k).hidden = k !== b.dataset.tab); };
@@ -383,8 +417,21 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip">${fotos.map((f,i) => `<but
   document.getElementById('share').addEventListener('click', () => BP.compartir({ titulo: a.titulo, texto: TF('ficha_en_bairen', '{t} en BAIREN', { t: a.titulo }), url: location.href }));
   /* vistas (contador local de prueba) */
   try { const n = await BPStore.addVista(a.id); document.getElementById('vistas').textContent = n === 1 ? T('ficha_vista_1', '1 vista') : TF('ficha_vistas', '{n} vistas', { n }); } catch (e) {}
-  /* mapa: el mismo embed de Google Maps que usa la ficha de bairengroup.com */
-  try { const dirQ = String(a.dir || '').replace(/\bal\s+(\d)/i, '$1'); const mapsQ = encodeURIComponent(dirQ + (a.unidad && !a.dirAprox ? ' ' + a.unidad : '') + ', ' + (a.barrio || '') + ', Buenos Aires, Argentina'); const mf = document.getElementById('mapFrame'); if (mf) mf.src = 'https://www.google.com/maps?q=' + mapsQ + '&output=embed&z=' + (a.dirAprox ? 15 : 16) + '&hl=' + (BP.lang === 'pt' ? 'pt-BR' : BP.lang); } catch (e) {}
+  /* mapa: el mismo embed de Google Maps que usa la ficha de bairengroup.com
+     25/9/2026 · Sin barrio la búsqueda quedaba "Juncal 600, , Buenos Aires": ahora se arma con lo que hay
+     (dirección, barrio o zona, ciudad) y un tramo vacío no deja coma suelta. "Zona Norte" no es un lugar
+     para el mapa, así que esa zona no se usa. La unidad ("Pisos 10 - 11", "2") ya no entra en la búsqueda:
+     el mapa marca el edificio, y ese número suelto después de la altura confundía la dirección.
+     Y el mapa (unos 450 KB de scripts de Google) se pide cuando está a 300 px de verse: el
+     loading="lazy" del navegador lo traía con la carga inicial. */
+  try {
+    const dirQ = String(a.dir || '').replace(/\bal\s+(\d)/i, '$1');
+    const mapsQ = encodeURIComponent([dirQ, a.barrio || (a.zona !== 'GBA Norte' ? a.zona : ''), 'Buenos Aires', 'Argentina'].filter(Boolean).join(', '));
+    const mf = document.getElementById('mapFrame');
+    const ponerMapa = () => { mf.src = 'https://www.google.com/maps?q=' + mapsQ + '&output=embed&z=' + (a.dirAprox ? 15 : 16) + '&hl=' + (BP.lang === 'pt' ? 'pt-BR' : BP.lang); };
+    if (mf && 'IntersectionObserver' in window) { const om = new IntersectionObserver((en, o) => { if (en.some(e => e.isIntersecting)) { o.disconnect(); ponerMapa(); } }, { rootMargin: '300px 0px' }); om.observe(mf); }
+    else if (mf) ponerMapa();
+  } catch (e) {}
   /* JSON-LD */
   const ld = { '@context':'https://schema.org', '@type':'RealEstateListing', name: a.titulo, description: (a.descripcion||'').slice(0,300), url: location.href, image: fotos.slice(0,3), datePosted: a.publicadoEn, offers: { '@type':'Offer', price: a.precio, priceCurrency: 'USD', availability: a.reservado ? 'https://schema.org/LimitedAvailability' : 'https://schema.org/InStock', /* 23/9/2026 · Un gestor no es una agencia inmobiliaria: declararlo como RealEstateAgent en los
      datos estructurados sería afirmar que ejerce el corretaje, que es justo lo que no hace. Solo
