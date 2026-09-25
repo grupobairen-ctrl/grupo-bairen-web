@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function(){
   const msgDefault = TF('card_wa_msg', 'Hola, vi {t} ({c}) en BAIREN y quiero más información.', { t: a.titulo, c: a.codigo });
   /* 23/9/2026 · Con el barrio vacío el título quedaba "... Alquiler, largo plazo en · BAIREN",
      con la preposición colgada. Si no hay barrio, se usa la zona. */
-  document.title = `${a.titulo} · ${BPData.opTag(a)} ${T('ficha_en', 'en')} ${a.barrio || BP.zonaLabel(a.zona)} · BAIREN`;
+  document.title = `${a.titulo} · ${BPData.opTag(a)}${lugar ? ' ' + T('ficha_en', 'en') + ' ' + lugar : ''} · BAIREN`;
 
   main.removeAttribute('aria-busy');
   main.innerHTML = `
@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function(){
     <div>
       <div class="p-fhero-tag">${BPData.opTag(a)}${a.reservado ? ' · ' + T('ficha_reservada', 'Reservada') : ''}</div>
       <h1 class="p-fhero-address">${BP.esc(a.dir)}${a.unidad && !a.dirAprox ? ' · ' + BP.esc(a.unidad) : ''}</h1>
-      <div class="p-fhero-sub">${BP.esc(a.barrio || BP.zonaLabel(a.zona))} · ${BP.esc(a.ciudad)}</div>
+      <div class="p-fhero-sub">${[lugar, a.ciudad].filter(Boolean).map(BP.esc).join(' · ')}</div>
     </div>
     <div class="p-fhero-price-box">
       <div class="p-fhero-price-lbl">${a.reservado ? T('ficha_estado', 'Estado') : a.op === 'venta' ? T('ficha_precio', 'Precio') : T('ficha_precio_mensual', 'Precio mensual')}</div>
@@ -117,7 +117,7 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip" role="group" aria-label="$
   <div class="p-ficha-main">
     <div class="p-ficha-head">
       <div class="p-kicker">${BP.esc(BP.etiqueta(a.tipoProp))}${a.amb ? ' · ' + (a.amb === 1 ? T('ficha_monoamb', 'monoambiente') : TF('ficha_ambientes', '{n} ambientes', { n: a.amb })) : ''}${a.m2 ? ' · ' + a.m2 + ' m²' : ''}</div>
-      ${a.reservado ? `<p class="p-reservada">${BP.ico.flag} ${T('ficha_reservada_msg', 'Esta propiedad está reservada y por ahora no toma consultas.')} <a href="${BP.urlBuscar({ op: a.op, zona: a.zona })}">${TF('ficha_ver_disponibles', 'Ver las disponibles en {z}', { z: BP.zonaLabel(a.zona) })}</a>.</p>` : ''}
+      ${a.reservado ? `<p class="p-reservada">${BP.ico.flag} ${T('ficha_reservada_msg', 'Esta propiedad está reservada y por ahora no toma consultas.')}${a.zona ? ` <a href="${BP.urlBuscar({ op: a.op, zona: a.zona })}">${TF('ficha_ver_disponibles', 'Ver las disponibles en {z}', { z: BP.zonaLabel(a.zona) })}</a>.` : ''}</p>` : ''}
       ${(a.apto.length || (a.cualidades||[]).length || a.demo) ? `<p class="p-tags">${(a.cualidades||[]).map(x => `<span class="p-badge" title="${T('ficha_verificada_title', 'Verificada por BAIREN')}">${BP.ico.shield} ${BP.esc(BP.etiqueta(x))}</span>`).join('')}${a.apto.map(x => `<span class="p-badge">${BP.esc(BP.etiqueta(x))}</span>`).join('')}${a.demo ? `<span class="p-badge demo">${T('ficha_aviso_ejemplo', 'Aviso de ejemplo')}</span>` : ''}</p>` : ''}
     </div>
     <h2 class="p-sec-t">${T('ficha_la_unidad', 'La unidad')}</h2>
@@ -128,7 +128,9 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip" role="group" aria-label="$
       a.m2 ? ['ruler', a.m2 + ' m²', T('ficha_totales', 'totales')] : null,
       a.m2cub && a.m2cub !== a.m2 ? ['ruler', a.m2cub + ' m²', T('ficha_cubiertos', 'cubiertos')] : null,
       a.amb ? ['door', a.amb, a.amb === 1 ? T('ficha_monoamb', 'monoambiente') : T('ficha_amb_n', 'ambientes')] : null,
-      a.dorm ? ['bed', a.dorm, a.dorm === 1 ? T('ficha_dorm_1', 'dormitorio') : T('ficha_dorm_n', 'dormitorios')] : null,
+      /* 25/9/2026 · "Monoambiente · 1 dormitorio" es una contradicción: el dormitorio viene inferido
+         de los ambientes (ambientes - 1, mínimo 1). Con un solo ambiente no se muestra, como en las tarjetas. */
+      (a.dorm && a.amb !== 1) ? ['bed', a.dorm, a.dorm === 1 ? T('ficha_dorm_1', 'dormitorio') : T('ficha_dorm_n', 'dormitorios')] : null,
       a.banos ? ['bath', a.banos, a.banos === 1 ? T('ficha_bano_1', 'baño') : T('ficha_bano_n', 'baños')] : null,
       a.cocheras ? ['car', a.cocheras, a.cocheras === 1 ? T('ficha_coch_1', 'cochera') : T('ficha_coch_n', 'cocheras')] : null,
       a.antiguedad != null ? ['cal', a.antiguedad === 0 ? T('ficha_a_estrenar', 'A estrenar') : a.antiguedad === 1 ? T('ficha_ano_1', '1 año') : TF('ficha_anos', '{n} años', { n: a.antiguedad }), T('ficha_antiguedad', 'antigüedad')] : null
@@ -152,12 +154,14 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip" role="group" aria-label="$
       <h2 class="p-sec-t">${T('ficha_ubicacion', 'Ubicación')}</h2>
       <div class="p-map-wrap"><iframe id="mapFrame" src="" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="${T('ficha_mapa_title', 'Mapa de la ubicación de la propiedad')}"></iframe></div>${a.dirAprox ? `<p class="p-note" style="margin:8px 0 0">${T('ficha_ubic_aprox', 'Ubicación aproximada. La dirección exacta la confirma quien publica.')}</p>` : ''}
     </div>
-    <div id="bloquePregunta">
+    <!-- 25/9/2026 · Reservada: ni el bloque de preguntas ni el formulario se dibujan (antes se borraba
+         después de dibujarlo y el código que lo esperaba fallaba: la ficha reservada se quedaba sin mapa). -->
+    ${a.reservado ? '' : `<div id="bloquePregunta">
       <h2 class="p-sec-t">${T('ficha_preguntale', 'Preguntale a quien publica')}</h2>
       <p class="p-kicker" style="margin-bottom:10px">${TF('ficha_elegi', 'Elegí una o escribí la tuya. Le llega directo a {p}.', { p: BP.esc(pubNombre) })}</p>
       <div class="p-quick" id="quick"><button type="button" aria-pressed="false">${T('ficha_q1', '¿Sigue disponible?')}</button><button type="button" aria-pressed="false">${T('ficha_q2', '¿Valor de las expensas?')}</button><button type="button" aria-pressed="false">${T('ficha_q3', '¿En qué piso está?')}</button><button type="button" aria-pressed="false">${T('ficha_q4', '¿Cuándo puedo visitarla?')}</button></div>
       <div class="p-qrow"><input type="text" id="qText" placeholder="${T('ficha_q_ph', 'Escribí tu consulta')}" maxlength="200" aria-label="${T('ficha_q_aria', 'Tu consulta')}" autocomplete="off"><button type="button" class="p-btn p-btn-navy" id="qSend">${T('ficha_enviar', 'Enviar')}</button></div>
-    </div>
+    </div>`}
     <div class="p-pub-block">
       <h2 class="p-sec-t">${T('ficha_quien_publica', 'Quién publica')}</h2>
       <div class="row"><div class="p-pub-logo">${pub.inicial}</div><div><b>${BP.esc(pubNombre)}</b><div class="p-kicker">${pub.tipo === 'dueno' ? T('ficha_dueno_verif', 'Dueño directo, titularidad verificada por BAIREN') : [pub.responsable, BP.etiqueta(pub.badge)].filter(Boolean).map(BP.esc).join(' · ')}</div></div></div>
@@ -189,7 +193,8 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip" role="group" aria-label="$
       <div class="p-cta-acts"><button type="button" class="p-icon-btn ${BP.isFav(a.id)?'on':''}" data-fav="${BP.esc(a.id)}" aria-label="${T('ficha_fav', 'Guardar en favoritos')}">${BP.isFav(a.id)?BP.ico.heartFill:BP.ico.heart}</button><button type="button" class="p-icon-btn" id="share" aria-label="${T('ficha_compartir', 'Compartir')}">${BP.ico.share}</button></div>
       <div class="p-cta-foot">${pub.portal ? T('ficha_foot_bairen', 'Tu consulta llega a BAIREN') : T('ficha_foot_directo', 'Contacto directo con quien publica · BAIREN no interviene en la operación')}</div>
     </div>
-    <form class="p-form" id="contactForm" hidden novalidate>
+    <!-- Reservada: sin formulario de consulta (el cartel de arriba lo explica) -->
+    ${a.reservado ? '' : `<form class="p-form" id="contactForm" hidden novalidate>
       <h3>${TF('ficha_escribile', 'Escribile a {p}', { p: BP.esc(pubNombre) })}</h3>
       <div class="r2"><label class="p-sr" for="cfNombre">${T('ficha_nombre', 'Nombre')}</label><input type="text" name="nombre" id="cfNombre" placeholder="${T('ficha_nombre', 'Nombre')}" required autocomplete="name" autocapitalize="words"><label class="p-sr" for="cfEmail">${T('ficha_mail', 'Mail')}</label><input type="email" name="email" id="cfEmail" placeholder="${T('ficha_mail', 'Mail')}" required autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false"></div>
       <label class="p-sr" for="cfTel">${T('ficha_tel', 'Teléfono con código de área')}</label><input type="tel" name="telefono" id="cfTel" placeholder="${T('ficha_tel', 'Teléfono con código de área')}" required autocomplete="tel" inputmode="tel">
@@ -204,14 +209,21 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip" role="group" aria-label="$
       <p>${TF('ficha_ok_p', 'Le llega directo a {p}, que te responde por mail o WhatsApp.', { p: BP.esc(pubNombre) })}${pub.email ? TF('ficha_ok_mail', ' Si tu correo no se abrió, escribile a <a href="mailto:{e}">{e}</a>.', { e: BP.esc(pub.email) }) : ''}</p>
       ${BPData.waLink(a, pub) ? `<a class="p-btn" href="${BPData.waLink(a, pub)}" target="_blank" rel="noopener" data-wa data-aviso="${BP.esc(a.id)}" data-pub="${BP.esc(pub.storeId || pub.id)}">${BP.ico.wa} ${T('ficha_seguir_wa', 'Seguir por WhatsApp')}</a>` : ''}
       <button type="button" class="p-linkbtn" id="contactOtra">${T('ficha_otra', 'Enviar otra consulta')}</button>
-    </div>
+    </div>`}
   </aside>
 </div>
 <section style="padding:0 0 64px">
-  <div class="p-head-row"><h2 class="p-h2">${T('ficha_similares', 'Propiedades similares')}</h2><a class="p-link" href="buscar.html?op=${a.op}&zona=${encodeURIComponent(a.zona)}">${TF('ficha_ver_mas_en', 'Ver más en {z}', { z: BP.zonaLabel(a.zona) })}</a></div>
+  <div class="p-head-row"><h2 class="p-h2">${T('ficha_similares', 'Propiedades similares')}</h2>${a.zona ? `<a class="p-link" href="buscar.html?op=${a.op}&zona=${encodeURIComponent(a.zona)}">${TF('ficha_ver_mas_en', 'Ver más en {z}', { z: BP.zonaLabel(a.zona) })}</a>` : ''}</div>
   <div class="p-grid">${similares.map(BPData.cardV).join('') || `<p class="p-note">${T('ficha_sin_similares', 'Todavía no hay unidades similares.')}</p>`}</div>
   ${(a.reservado || BPData.sinContacto(pub)) ? '' : `<div class="p-mcta" id="mcta"><div class="p-mcta-price">${BPData.precioHTML(a)}</div><button type="button" class="p-btn p-btn-fill p-btn-sm" id="mctaBtn">${BP.ico.mail} ${T('ficha_contactar', 'Contactar')}</button>${BPData.waLink(a, pub) ? `<a class="p-icon-btn" href="${BPData.waLink(a, pub)}" target="_blank" rel="noopener" data-wa data-aviso="${BP.esc(a.id)}" data-pub="${BP.esc(pub.storeId || pub.id)}" aria-label="WhatsApp">${BP.ico.wa}</a>` : ''}</div>`}
-  <div class="p-breadcrumb" role="navigation" aria-label="${T('cat_crumbs_aria', 'Migas de pan')}"><a href="index.html">BAIREN</a> › <a href="buscar.html?op=${a.op}">${BPData.opTag(a)}</a> › <a href="buscar.html?op=${a.op}&zona=${encodeURIComponent(a.zona)}">${BP.zonaLabel(a.zona)}</a>${(a.barrio && a.barrio !== a.zona) ? ` › <span>${BP.esc(a.barrio)}</span>` : ''} › <span>${BP.esc(a.titulo)}</span></div>
+  <!-- Las migas se arman como lista y se unen con ›: un tramo vacío (zona o barrio) no deja separadores sueltos -->
+  <div class="p-breadcrumb" role="navigation" aria-label="${T('cat_crumbs_aria', 'Migas de pan')}">${[
+    `<a href="index.html">BAIREN</a>`,
+    `<a href="buscar.html?op=${a.op}">${BPData.opTag(a)}</a>`,
+    a.zona ? `<a href="buscar.html?op=${a.op}&zona=${encodeURIComponent(a.zona)}">${BP.esc(BP.zonaLabel(a.zona))}</a>` : null,
+    (a.barrio && a.barrio !== a.zona) ? `<span>${BP.esc(a.barrio)}</span>` : null,
+    `<span>${BP.esc(a.titulo)}</span>`
+  ].filter(Boolean).join(' › ')}</div>
 </section>`;
 
   /* comportamiento */
@@ -304,8 +316,9 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip" role="group" aria-label="$
      el bloque de preguntas entero y funcionando: se podía mandar una consulta igual. El cartel
      y el formulario decían cosas distintas en la misma pantalla. Si no toma consultas, no hay
      formulario; el aviso de "si se libera, vuelve a publicarse acá" queda arriba, que es la
-     salida honesta. */
-  if (a.reservado) { const bq = document.getElementById('bloquePregunta'); if (bq) bq.remove(); }
+     salida honesta.
+     25/9/2026 · Ahora el bloque y el formulario directamente no se dibujan (ver la plantilla), y
+     todo lo que los usa más abajo pregunta primero si existen. */
 
   /* 23/9/2026 · La galería bajaba TODAS las fotos al abrir la ficha, porque un background-image
      de CSS no se puede diferir: el navegador las pide al leer el HTML. En una ficha de 156 fotos
@@ -334,45 +347,48 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip" role="group" aria-label="$
   const tabBtns = Array.from(document.querySelectorAll('.p-tabs2 button'));
   const activarTab = b => { tabBtns.forEach(x => { const on = x === b; x.classList.toggle('on', on); x.setAttribute('aria-selected', on ? 'true' : 'false'); x.tabIndex = on ? 0 : -1; }); ['gen','serv','amb'].forEach(k => document.getElementById('tab-' + k).hidden = k !== b.dataset.tab); };
   tabBtns.forEach((b, i) => { b.addEventListener('click', () => activarTab(b)); b.addEventListener('keydown', e => { if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return; e.preventDefault(); const n = tabBtns[(i + (e.key === 'ArrowRight' ? 1 : tabBtns.length - 1)) % tabBtns.length]; activarTab(n); n.focus(); }); });
-  const mensaje = document.getElementById('mensaje'), qText = document.getElementById('qText');
-  /* Pregunta rápida: al tocarla se escribe en la caja de abajo (se puede editar); tocarla de nuevo la saca. Una sola a la vez. */
-  const armarMensaje = () => { const t = qText.value.trim(); mensaje.value = msgDefault + (t ? ' ' + t : ''); };
-  document.querySelectorAll('#quick button').forEach(b => b.addEventListener('click', () => {
-    const estaba = b.classList.contains('on');
-    document.querySelectorAll('#quick button.on').forEach(x => { x.classList.remove('on'); x.setAttribute('aria-pressed', 'false'); });
-    if (estaba) { qText.value = ''; } else { b.classList.add('on'); b.setAttribute('aria-pressed', 'true'); qText.value = b.textContent.trim(); }
-    armarMensaje(); qText.focus();
-  }));
-  qText.addEventListener('input', () => { document.querySelectorAll('#quick button.on').forEach(x => { if (x.textContent.trim() !== qText.value.trim()) { x.classList.remove('on'); x.setAttribute('aria-pressed', 'false'); } }); armarMensaje(); });
-  qText.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); document.getElementById('qSend')?.click(); } });
-  const ctaCard = document.getElementById('ctaCard'), contactForm = document.getElementById('contactForm');
-  const openForm = () => { ctaCard.hidden = true; const okb = document.getElementById('contactOk'); if (okb) okb.hidden = true; contactForm.hidden = false; contactForm.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => contactForm.querySelector('input[name=nombre]').focus({ preventScroll: true }), 320); };
-  const qv = document.getElementById('quiereVisita'); if (qv) qv.addEventListener('change', () => { document.getElementById('visitaCampo').hidden = !qv.checked; if (qv.checked) document.getElementById('visitaFecha').focus(); });
-  const btnAbrir = document.getElementById('abrirForm'); if (btnAbrir) btnAbrir.addEventListener('click', openForm);
-  const btnVisita = document.getElementById('abrirVisita'); if (btnVisita) btnVisita.addEventListener('click', () => { openForm(); const qv = document.getElementById('quiereVisita'); if (qv && !qv.checked) { qv.checked = true; qv.dispatchEvent(new Event('change')); } });
-  const mctaBtn = document.getElementById('mctaBtn'); if (mctaBtn) mctaBtn.addEventListener('click', openForm);
-  const qSendBtn = document.getElementById('qSend'); if (qSendBtn) qSendBtn.addEventListener('click', () => { const t = qText.value.trim(); if (!t) { BP.toast(T('ficha_toast_elegi', 'Elegí una pregunta o escribí la tuya.')); qText.focus(); return; } armarMensaje(); openForm(); });
-  /* Consulta: validación en línea campo por campo, botón ocupado mientras se registra y un estado de éxito en el lugar del formulario */
-  const contactOk = document.getElementById('contactOk');
-  document.getElementById('contactForm').addEventListener('submit', async e => {
-    e.preventDefault(); const f = e.target; const btn = f.querySelector('button[type=submit]');
-    const nombre = f.nombre.value.trim(), mail = f.email.value.trim(), tel = f.telefono.value.trim();
-    if (!nombre) { BP.errorCampo('cfNombre', T('ficha_err_nombre', 'Decinos tu nombre.')); return; }
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mail)) { BP.errorCampo('cfEmail', T('ficha_err_mail', 'Revisá el mail, por ejemplo nombre@dominio.com.')); return; }
-    if (tel.replace(/\D/g, '').length < 8) { BP.errorCampo('cfTel', T('ficha_err_tel', 'Teléfono con código de área, por ejemplo 11 5555 6666.')); return; }
-    const pideVisita = !!(f.quiere_visita && f.quiere_visita.checked && f.visita_deseada && f.visita_deseada.value);
-    if (f.quiere_visita && f.quiere_visita.checked && !pideVisita) { BP.errorCampo('visitaFecha', T('ficha_err_fecha', 'Elegí día y hora.')); return; }
-    if (!f.acepto.checked) { BP.errorCampo('cfAcepto', T('ficha_err_acepto', 'Para enviar la consulta hay que aceptar los términos.')); return; }
-    btn.disabled = true; const etiqueta = btn.innerHTML; btn.innerHTML = BP.ico.mail + ' ' + T('ficha_enviando', 'Enviando…');
-    try { await BPStore.addConsulta({ aviso_id: a.id, aviso_titulo: a.titulo, publicador_id: pub.storeId || pub.id, publicador_nombre: pub.nombre, nombre, email: mail, telefono: tel, mensaje: f.mensaje.value, acepto_tyc: true, enviada_a: pub.email, canal: pideVisita ? 'visita' : 'formulario', visita_deseada: pideVisita ? new Date(f.visita_deseada.value).toISOString() : null }); } catch (err) { console.warn(err); }
-    const LOCALE = { es: 'es-AR', en: 'en-US', pt: 'pt-BR' }[BP.lang] || 'es-AR';
-    const subject = encodeURIComponent(TF('ficha_mail_subject', 'Consulta por {t} ({c}) desde BAIREN', { t: a.titulo, c: a.codigo })); const body = encodeURIComponent(f.mensaje.value + (pideVisita ? '\n\n' + TF('ficha_mail_visita', 'Quiero visitar el {d}.', { d: new Date(f.visita_deseada.value).toLocaleString(LOCALE, { weekday:'long', day:'numeric', month:'long', hour:'2-digit', minute:'2-digit' }) }) : '') + '\n\n' + nombre + ' · ' + tel + ' · ' + mail);
-    if (pub.email) window.location.href = 'mailto:' + pub.email + '?subject=' + subject + '&body=' + body;
-    btn.disabled = false; btn.innerHTML = etiqueta;
-    f.hidden = true; contactOk.hidden = false; contactOk.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => contactOk.focus({ preventScroll: true }), 300);
-    BP.toast(TF('ficha_toast_enviada', 'Tu consulta va directo a {p}.', { p: pubNombre }));
-  });
-  document.getElementById('contactOtra').addEventListener('click', () => { contactOk.hidden = true; openForm(); });
+  /* Preguntas rápidas y formulario de consulta: una reservada no los tiene (no se dibujan) */
+  if (!a.reservado) {
+    const mensaje = document.getElementById('mensaje'), qText = document.getElementById('qText');
+    /* Pregunta rápida: al tocarla se escribe en la caja de abajo (se puede editar); tocarla de nuevo la saca. Una sola a la vez. */
+    const armarMensaje = () => { const t = qText.value.trim(); mensaje.value = msgDefault + (t ? ' ' + t : ''); };
+    document.querySelectorAll('#quick button').forEach(b => b.addEventListener('click', () => {
+      const estaba = b.classList.contains('on');
+      document.querySelectorAll('#quick button.on').forEach(x => { x.classList.remove('on'); x.setAttribute('aria-pressed', 'false'); });
+      if (estaba) { qText.value = ''; } else { b.classList.add('on'); b.setAttribute('aria-pressed', 'true'); qText.value = b.textContent.trim(); }
+      armarMensaje(); qText.focus();
+    }));
+    qText.addEventListener('input', () => { document.querySelectorAll('#quick button.on').forEach(x => { if (x.textContent.trim() !== qText.value.trim()) { x.classList.remove('on'); x.setAttribute('aria-pressed', 'false'); } }); armarMensaje(); });
+    qText.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); document.getElementById('qSend')?.click(); } });
+    const ctaCard = document.getElementById('ctaCard'), contactForm = document.getElementById('contactForm');
+    const openForm = () => { ctaCard.hidden = true; const okb = document.getElementById('contactOk'); if (okb) okb.hidden = true; contactForm.hidden = false; contactForm.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => contactForm.querySelector('input[name=nombre]').focus({ preventScroll: true }), 320); };
+    const qv = document.getElementById('quiereVisita'); if (qv) qv.addEventListener('change', () => { document.getElementById('visitaCampo').hidden = !qv.checked; if (qv.checked) document.getElementById('visitaFecha').focus(); });
+    const btnAbrir = document.getElementById('abrirForm'); if (btnAbrir) btnAbrir.addEventListener('click', openForm);
+    const btnVisita = document.getElementById('abrirVisita'); if (btnVisita) btnVisita.addEventListener('click', () => { openForm(); const qv = document.getElementById('quiereVisita'); if (qv && !qv.checked) { qv.checked = true; qv.dispatchEvent(new Event('change')); } });
+    const mctaBtn = document.getElementById('mctaBtn'); if (mctaBtn) mctaBtn.addEventListener('click', openForm);
+    const qSendBtn = document.getElementById('qSend'); if (qSendBtn) qSendBtn.addEventListener('click', () => { const t = qText.value.trim(); if (!t) { BP.toast(T('ficha_toast_elegi', 'Elegí una pregunta o escribí la tuya.')); qText.focus(); return; } armarMensaje(); openForm(); });
+    /* Consulta: validación en línea campo por campo, botón ocupado mientras se registra y un estado de éxito en el lugar del formulario */
+    const contactOk = document.getElementById('contactOk');
+    document.getElementById('contactForm').addEventListener('submit', async e => {
+      e.preventDefault(); const f = e.target; const btn = f.querySelector('button[type=submit]');
+      const nombre = f.nombre.value.trim(), mail = f.email.value.trim(), tel = f.telefono.value.trim();
+      if (!nombre) { BP.errorCampo('cfNombre', T('ficha_err_nombre', 'Decinos tu nombre.')); return; }
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mail)) { BP.errorCampo('cfEmail', T('ficha_err_mail', 'Revisá el mail, por ejemplo nombre@dominio.com.')); return; }
+      if (tel.replace(/\D/g, '').length < 8) { BP.errorCampo('cfTel', T('ficha_err_tel', 'Teléfono con código de área, por ejemplo 11 5555 6666.')); return; }
+      const pideVisita = !!(f.quiere_visita && f.quiere_visita.checked && f.visita_deseada && f.visita_deseada.value);
+      if (f.quiere_visita && f.quiere_visita.checked && !pideVisita) { BP.errorCampo('visitaFecha', T('ficha_err_fecha', 'Elegí día y hora.')); return; }
+      if (!f.acepto.checked) { BP.errorCampo('cfAcepto', T('ficha_err_acepto', 'Para enviar la consulta hay que aceptar los términos.')); return; }
+      btn.disabled = true; const etiqueta = btn.innerHTML; btn.innerHTML = BP.ico.mail + ' ' + T('ficha_enviando', 'Enviando…');
+      try { await BPStore.addConsulta({ aviso_id: a.id, aviso_titulo: a.titulo, publicador_id: pub.storeId || pub.id, publicador_nombre: pub.nombre, nombre, email: mail, telefono: tel, mensaje: f.mensaje.value, acepto_tyc: true, enviada_a: pub.email, canal: pideVisita ? 'visita' : 'formulario', visita_deseada: pideVisita ? new Date(f.visita_deseada.value).toISOString() : null }); } catch (err) { console.warn(err); }
+      const LOCALE = { es: 'es-AR', en: 'en-US', pt: 'pt-BR' }[BP.lang] || 'es-AR';
+      const subject = encodeURIComponent(TF('ficha_mail_subject', 'Consulta por {t} ({c}) desde BAIREN', { t: a.titulo, c: a.codigo })); const body = encodeURIComponent(f.mensaje.value + (pideVisita ? '\n\n' + TF('ficha_mail_visita', 'Quiero visitar el {d}.', { d: new Date(f.visita_deseada.value).toLocaleString(LOCALE, { weekday:'long', day:'numeric', month:'long', hour:'2-digit', minute:'2-digit' }) }) : '') + '\n\n' + nombre + ' · ' + tel + ' · ' + mail);
+      if (pub.email) window.location.href = 'mailto:' + pub.email + '?subject=' + subject + '&body=' + body;
+      btn.disabled = false; btn.innerHTML = etiqueta;
+      f.hidden = true; contactOk.hidden = false; contactOk.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => contactOk.focus({ preventScroll: true }), 300);
+      BP.toast(TF('ficha_toast_enviada', 'Tu consulta va directo a {p}.', { p: pubNombre }));
+    });
+    document.getElementById('contactOtra').addEventListener('click', () => { contactOk.hidden = true; openForm(); });
+  }
   const btnTel = document.getElementById('verTel');
   if (btnTel) btnTel.addEventListener('click', e => {
     const b = e.target.closest('button'); const tel = String(pub.telefono || '');
@@ -436,7 +452,7 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip" role="group" aria-label="$
   const ld = { '@context':'https://schema.org', '@type':'RealEstateListing', name: a.titulo, description: (a.descripcion||'').slice(0,300), url: location.href, image: fotos.slice(0,3), datePosted: a.publicadoEn, offers: { '@type':'Offer', price: a.precio, priceCurrency: 'USD', availability: a.reservado ? 'https://schema.org/LimitedAvailability' : 'https://schema.org/InStock', /* 23/9/2026 · Un gestor no es una agencia inmobiliaria: declararlo como RealEstateAgent en los
      datos estructurados sería afirmar que ejerce el corretaje, que es justo lo que no hace. Solo
      quien tiene matrícula se declara como tal. */
-    offeredBy: { '@type': pub.tipo === 'dueno' ? 'Person' : (pub.matricula ? 'RealEstateAgent' : 'Organization'), name: pub.nombre, identifier: pub.matricula || pub.badge || 'Selección BAIREN' } }, address: { '@type':'PostalAddress', streetAddress: a.dir, addressLocality: a.barrio, addressRegion: a.ciudad, addressCountry: 'AR' } };
+    offeredBy: { '@type': pub.tipo === 'dueno' ? 'Person' : (pub.matricula ? 'RealEstateAgent' : 'Organization'), name: pub.nombre, identifier: pub.matricula || pub.badge || 'Selección BAIREN' } }, address: { '@type':'PostalAddress', streetAddress: a.dir, addressLocality: lugar || undefined, addressRegion: a.ciudad, addressCountry: 'AR' } };
   const s = document.createElement('script'); s.type = 'application/ld+json'; s.textContent = JSON.stringify(ld); document.head.appendChild(s);
 })();
 });
