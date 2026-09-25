@@ -3910,3 +3910,13 @@ body.p-emprendimientos .p-page,body.p-ingresar .p-page{min-height:0}
    ocupa 351 px a 1024 y 448 a 1440: quedaban entre 70 y 170 px muertos antes de la leyenda. El
    contenedor mide lo que mide el mapa. */
 body.p-catalogo #mapaResultados{height:auto}
+
+/* 8 · El pie, igual en todas las páginas. Las listas iban en dos columnas sólo en la portada (y entre
+   780 y 899 px, donde el pie ya reparte sus columnas, la portada partía cada lista otra vez en dos y el
+   mail llegaba al borde). Ahora, en todas: dos columnas mientras el pie va en una sola (420 a 779 px),
+   una en el resto. */
+body.p-home .footer .ft-col ul,.footer .ft-col ul{columns:1}
+@media(min-width:420px) and (max-width:779px){
+  body.p-home .footer .ft-col ul,.footer .ft-col ul{columns:2;column-gap:18px}
+  .footer .ft-col li{break-inside:avoid}
+}
