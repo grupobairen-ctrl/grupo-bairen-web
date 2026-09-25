@@ -3802,3 +3802,8 @@ body.p-membership .p-plan-precio{white-space:nowrap}
   body.p-membership .p-plan-precio{font-size:1.6rem}
   body.p-membership .p-plan-precio small{font-size:.75rem;margin-left:2px}
 }
+
+/* 4 · Desarrollos e Ingresar: .p-page{min-height:70vh} dejaba entre 130 y 550 px vacíos entre el
+   contenido y el pie, según el alto de la pantalla. Estas dos páginas miden lo que mide su contenido;
+   el pie queda pegado y, si la página es más corta que la pantalla, debajo sigue el navy del html. */
+body.p-emprendimientos .p-page,body.p-ingresar .p-page{min-height:0}
