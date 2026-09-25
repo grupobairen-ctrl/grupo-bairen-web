@@ -3920,3 +3920,11 @@ body.p-home .footer .ft-col ul,.footer .ft-col ul{columns:1}
   body.p-home .footer .ft-col ul,.footer .ft-col ul{columns:2;column-gap:18px}
   .footer .ft-col li{break-inside:avoid}
 }
+
+/* 10 · Catálogo en el celular: el tipo compartía fila con Amb | Dorm y Precio y a 360 y 390 px le
+   quedaban 74 y 84 px para "DEPARTAMENTO" (100 px) o "TODOS LOS TIPOS" (113 px): se leía "DEPARTAMEN".
+   Hasta 560 px el tipo va en su propia fila a todo el ancho y Amb | Dorm y Precio comparten la de abajo. */
+@media(max-width:560px){
+  body.p-catalogo .p-filters #tipoSel{flex:1 1 100% !important}
+  body.p-catalogo .p-filters .p-fwrap{flex:1 1 calc(50% - 4px) !important}
+}
