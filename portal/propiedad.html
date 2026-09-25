@@ -29,7 +29,14 @@
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/base.css?v=20260923p"><link rel="stylesheet" href="css/catalogo.css?v=20260923p"><link rel="stylesheet" href="css/portal.css?v=20260923p">
-  <style>body{padding-top:0}#ficha>.p-ficha-top,#ficha>.p-ficha,#ficha>section{max-width:var(--p-max);margin:0 auto;padding-left:24px;padding-right:24px}#ficha>.p-ficha-top{padding-top:88px}@media(max-width:900px){#ficha>.p-ficha-top{padding-top:76px}}.p-video{aspect-ratio:16/9;background:#0b1220;border-radius:16px;overflow:hidden}.p-video iframe,.p-video video{width:100%;height:100%;border:0;display:block}</style>
+  <style>body{padding-top:0}#ficha>.p-ficha-top,#ficha>.p-ficha,#ficha>section{max-width:var(--p-max);margin:0 auto;padding-left:24px;padding-right:24px}#ficha>.p-ficha-top{padding-top:88px}@media(max-width:900px){#ficha>.p-ficha-top{padding-top:76px}}.p-video{aspect-ratio:16/9;background:#0b1220;border-radius:16px;overflow:hidden}.p-video iframe,.p-video video{width:100%;height:100%;border:0;display:block}
+  /* Fachada del video (25/9/2026): portada y botón de reproducir; el reproductor se pide al tocar */
+  .p-video-play{position:relative;display:block;width:100%;height:100%;padding:0;border:0;background:#0b1220;cursor:pointer}
+  .p-video-play img{width:100%;height:100%;object-fit:cover;display:block;opacity:.86;transition:opacity .3s cubic-bezier(.22,1,.36,1)}
+  .p-video-play .ico{position:absolute;left:50%;top:50%;width:72px;height:72px;margin:-36px 0 0 -36px;border-radius:50%;background:rgba(19,29,45,.72);border:1px solid var(--gold,#C2A968);transition:background .3s cubic-bezier(.22,1,.36,1)}
+  .p-video-play .ico::before{content:'';position:absolute;left:29px;top:23px;border-style:solid;border-width:13px 0 13px 21px;border-color:transparent transparent transparent #FBFAF6}
+  .p-video-play:hover img,.p-video-play:focus-visible img{opacity:1}.p-video-play:hover .ico,.p-video-play:focus-visible .ico{background:rgba(19,29,45,.92)}
+  .p-video-play:focus-visible{outline:3px solid var(--gold,#C2A968);outline-offset:-3px}</style>
 </head>
 <body class="p-product p-ficha-page">
 <div class="p-velo" aria-hidden="true"><span class="w">BAIREN</span></div>
@@ -238,8 +245,16 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip" role="group" aria-label="$
   const pintarTiras = () => {
     if (!lbTiras) return;
     if (lbTiras.childElementCount !== fotos.length) {
-      lbTiras.innerHTML = fotos.map((f, i) => `<button type="button" class="t" data-lbt="${i}" aria-label="${BP.esc(TF('ficha_ver_foto', 'Ver foto {i}', { i: i+1 }))}"><img src="${BP.sbImg(f, 200)}" alt="" loading="lazy"></button>`).join('');
+      /* 25/9/2026 · El loading="lazy" del navegador no alcanzaba dentro del visor: al abrirlo se pedían
+         30 o más miniaturas de una, fuera de la vista. Ahora cada una lleva la dirección en data-src y
+         se pide cuando está a 200 px de verse dentro de la tira (misma URL de 200 px que la tira de la
+         ficha, así las que ya se vieron salen de la caché). */
+      lbTiras.innerHTML = fotos.map((f, i) => `<button type="button" class="t" data-lbt="${i}" aria-label="${BP.esc(TF('ficha_ver_foto', 'Ver foto {i}', { i: i+1 }))}"><img data-src="${BP.esc(BP.sbImg(f, 200))}" alt="" decoding="async"></button>`).join('');
       lbTiras.querySelectorAll('[data-lbt]').forEach(b => b.addEventListener('click', () => showLb(Number(b.dataset.lbt))));
+      const ponerMini = img => { if (img.dataset.src) { img.src = img.dataset.src; delete img.dataset.src; } };
+      const minis = lbTiras.querySelectorAll('img[data-src]');
+      if ('IntersectionObserver' in window) { const om = new IntersectionObserver((en, o) => en.forEach(e => { if (e.isIntersecting) { ponerMini(e.target); o.unobserve(e.target); } }), { root: lbTiras, rootMargin: '0px 200px' }); minis.forEach(img => om.observe(img)); }
+      else minis.forEach(ponerMini);
     }
     lbTiras.querySelectorAll('.t').forEach((b, i) => { const on = i === cur; b.classList.toggle('on', on); b.setAttribute('aria-current', on ? 'true' : 'false'); if (on) b.scrollIntoView({ block:'nearest', inline:'center', behavior:'smooth' }); });
   };
@@ -305,7 +320,28 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip" role="group" aria-label="$
   }
   lb.querySelectorAll('[data-lb-close]').forEach(b => b.addEventListener('click', closeLb)); lb.querySelector('[data-lb-prev]').addEventListener('click', () => showLb(cur-1, -1)); lb.querySelector('[data-lb-next]').addEventListener('click', () => showLb(cur+1, 1));
   document.addEventListener('keydown', e => { if (!lb.classList.contains('open')) return; if (e.key === 'ArrowLeft') showLb(cur-1, -1); if (e.key === 'ArrowRight') showLb(cur+1, 1); });
-  if (a.video) { const v = document.getElementById('video'); if (a.video.tipo === 'youtube') { const m = a.video.url.match(/(?:v=|be\/|embed\/)([A-Za-z0-9_-]{6,})/); v.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${m ? m[1] : ''}" title="${BP.esc(TF('ficha_video_de', 'Video de {t}', { t: a.titulo }))}" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>`; } else if (a.video.tipo === 'bunny') { v.innerHTML = `<iframe src="${BP.esc(a.video.url)}" title="${BP.esc(TF('ficha_video_de', 'Video de {t}', { t: a.titulo }))}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>`; } else { v.innerHTML = `<video src="${BP.esc(a.video.url)}" controls playsinline preload="metadata"></video>`; } }
+  /* 25/9/2026 · El video (YouTube o Bunny) bajaba su reproductor entero con la carga inicial: en Juncal 600,
+     casi un mega de scripts de YouTube antes de que nadie lo mirara. Ahora hay una fachada: la portada del
+     video (la de YouTube, o la primera foto del aviso, que ya está en caché) con un botón de reproducir, y
+     el reproductor se pide recién al tocarlo, con autoplay, y recibe el foco. Al tocar y no al acercarse,
+     a diferencia del mapa: un video no se mira de pasada y el reproductor pesa mucho más. Un mp4 propio
+     ya no precarga nada (preload="none") y usa la primera foto de portada. */
+  if (a.video) {
+    const v = document.getElementById('video'), titV = BP.esc(TF('ficha_video_de', 'Video de {t}', { t: a.titulo }));
+    /* YouTube se reconoce también por la dirección: Juncal 600 tiene un enlace de YouTube cargado con tipo 'bunny' */
+    const esYT = a.video.tipo === 'youtube' || /youtu\.?be/i.test(String(a.video.url));
+    const yt = esYT ? (String(a.video.url).match(/(?:v=|be\/|embed\/)([A-Za-z0-9_-]{6,})/) || [])[1] || '' : null;
+    const portada = yt ? `https://i.ytimg.com/vi/${yt}/hqdefault.jpg` : (fotos[0] ? BP.sbImg(fotos[0], ANCHO_FOTO) : '');
+    const src = esYT ? `https://www.youtube-nocookie.com/embed/${yt}?autoplay=1`
+      : a.video.tipo === 'bunny' ? a.video.url + (String(a.video.url).indexOf('?') > -1 ? '&' : '?') + 'autoplay=true' : null;
+    if (src) {
+      v.innerHTML = `<button type="button" class="p-video-play" aria-label="${BP.esc(TF('ficha_video_play', 'Reproducir el video de {t}', { t: a.titulo }))}">${portada ? `<img src="${BP.esc(portada)}" alt="" loading="lazy" decoding="async">` : ''}<span class="ico" aria-hidden="true"></span></button>`;
+      v.querySelector('.p-video-play').addEventListener('click', () => {
+        v.innerHTML = `<iframe src="${BP.esc(src)}" title="${titV}" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+        const f = v.querySelector('iframe'); if (f) { try { f.focus(); } catch (e) {} }
+      });
+    } else v.innerHTML = `<video src="${BP.esc(a.video.url)}" controls playsinline preload="none"${portada ? ` poster="${BP.esc(portada)}"` : ''} title="${titV}"></video>`;
+  }
   (() => { const t = document.getElementById('amenToggle'), m = document.getElementById('amenMas'); if (!t || !m) return; t.addEventListener('click', () => { const abre = m.hidden; m.hidden = !abre; t.setAttribute('aria-expanded', abre ? 'true' : 'false'); t.textContent = abre ? T('ficha_ver_menos', 'Ver menos') : TF('ficha_ver_caract', 'Ver las {n} características', { n: 6 + m.children.length }); }); })();
   const desc = document.getElementById('desc'), more = document.getElementById('descMore'); if (desc.scrollHeight <= desc.clientHeight + 4) more.hidden = true; more.addEventListener('click', () => { desc.classList.toggle('clamp'); more.textContent = desc.classList.contains('clamp') ? T('ficha_leer_mas', 'Leer más') : T('ficha_leer_menos', 'Leer menos'); });
   /* pestañas de características: rol de pestaña, flechas para moverse, un solo tab en el orden de tabulación */
