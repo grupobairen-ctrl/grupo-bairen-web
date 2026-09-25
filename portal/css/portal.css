@@ -3787,3 +3787,18 @@ body.p-catalogo .p-filters #barriosBtn,body.p-catalogo .p-filters #moreBtn,body.
   body.p-publicadores .p-pub-muestra .prop-card:nth-child(n+3){display:flex}
   body.p-publicadores .p-pub-muestra .card-body{padding:16px 14px 14px}
 }
+
+/* 3 · Membresía a 1024 px. "$149.000 por mes" se partía en dos líneas y los botones de los planes
+   quedaban a distintas alturas: la regla de .p-plan .p-btn decía margin-top:auto y enseguida
+   margin-top:18px, que la anulaba. El botón vuelve al pie de la tarjeta (las cuatro miden lo mismo
+   en la grilla) y el precio va en una línea; entre 1001 y 1180 px, con cuatro columnas angostas,
+   la cifra y el aire de la tarjeta se achican un poco para que entre. */
+body.p-membership .p-plan ul{margin-bottom:18px}
+body.p-membership .p-plan .p-btn{margin-top:auto}
+body.p-membership .p-plan-precio{white-space:nowrap}
+@media(min-width:1001px) and (max-width:1180px){
+  body.p-membership .p-planes{gap:16px}
+  body.p-membership .p-plan{padding:24px 20px 22px}
+  body.p-membership .p-plan-precio{font-size:1.6rem}
+  body.p-membership .p-plan-precio small{font-size:.75rem;margin-left:2px}
+}
