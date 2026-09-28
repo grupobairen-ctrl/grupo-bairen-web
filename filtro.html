@@ -177,6 +177,7 @@ select.cf-input option{background:var(--navy-deeper);color:var(--white);}
 *:focus-visible{outline:2px solid var(--gold);outline-offset:3px;}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="/meta-pixel.js"></script>
 </head>
 <body>
 <div class="ambient"></div>
@@ -416,7 +417,7 @@ select.cf-input option{background:var(--navy-deeper);color:var(--white);}
     </div>
     <div class="no-title" data-i18n="no_title">Esta unidad no es la indicada para vos</div>
     <div class="no-sub" data-i18n="no_sub">Pero puede haber otra que sí lo sea. Contanos qué buscás y te ayudamos a encontrarla.</div>
-    <button class="btn-wa" onclick="window.open('https://wa.me/5491123106629','_blank')" data-i18n="no_btn">
+    <button class="btn-wa" onclick="if (window.bairenPixel) window.bairenPixel('Contact'); window.open('https://wa.me/5491123106629','_blank')" data-i18n="no_btn">
       Hablar con un asesor
     </button>
   </div>
@@ -682,6 +683,13 @@ function enviarPorWhatsApp() {
     e.preventDefault();
     if (btn.disabled) return;
     btn.disabled = true;
+    // Píxel de Meta: dejó sus datos (Lead) y se va a WhatsApp (Contact).
+    // Si un bloqueador frenó el píxel, se pierde la medición, nunca la consulta.
+    if (window.bairenPixel) {
+      const unidad = { content_name: propName, content_category: propBarrio };
+      window.bairenPixel('Lead', unidad);
+      window.bairenPixel('Contact', unidad);
+    }
     enviarPorWhatsApp();
   });
 })();
