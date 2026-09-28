@@ -8,7 +8,7 @@
    cada evento. Sin PIXEL_ID no se carga nada y bairenPixel no hace nada. */
 (function () {
   "use strict";
-  var PIXEL_ID = '';
+  var PIXEL_ID = '5295040354113422';
 
   window.BAIREN_PIXEL = window.BAIREN_PIXEL || {};
   window.bairenPixel = function (evento, extra) {
