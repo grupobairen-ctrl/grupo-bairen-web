@@ -30,7 +30,7 @@
       prop_price_m: "Preço mensal",
       prop_price_v: "Valor",
       prop_secl_unidad: "A unidade", prop_secl_ubic: "Localização",
-      prop_ac_footer: "Consulta sem custo · Resposta em menos de 2 h",
+      prop_ac_footer: "Consulta sem custo · Quem responde é uma pessoa da equipe",
       prop_nf_h: "Imóvel não encontrado",
       prop_nf_p: "O link pode ter mudado, a unidade já foi alugada ou o endereço está incorreto."
     },
@@ -60,7 +60,7 @@
       prop_price_m: "Monthly price",
       prop_price_v: "Price",
       prop_secl_unidad: "The unit", prop_secl_ubic: "Location",
-      prop_ac_footer: "Free inquiry · Reply within 2 hours",
+      prop_ac_footer: "Free inquiry · A person from our team replies",
       prop_nf_h: "Property not found",
       prop_nf_p: "The link may have changed, the unit may already be rented, or the address is incorrect."
     }

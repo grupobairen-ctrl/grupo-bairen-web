@@ -181,8 +181,16 @@ footer{background:var(--navy-dark);border-top:1px solid var(--gold);padding:40px
 .wa-btn:hover{transform:scale(1.06);box-shadow:0 10px 28px rgba(37,211,102,.4),0 2px 6px rgba(0,0,0,.18);}
 .wa-btn svg{width:27px;height:27px;fill:#fff;}
 @media(max-width:700px){.wa-btn{width:48px;height:48px;bottom:18px;right:16px;}.wa-btn svg{width:24px;height:24px;}}
-.wa-btn:hover{transform:scale(1.06);box-shadow:0 10px 28px rgba(37,211,102,.4),0 2px 6px rgba(0,0,0,.18);}
-@media(max-width:700px){.wa-btn{width:48px;height:48px;bottom:18px;right:16px;}.wa-btn svg{width:24px;height:24px;}}
+
+/* BARRA DE CONSULTA (celular y tablet): reemplaza a la burbuja cuando la
+   ficha está cargada, así el botón queda siempre a mano sin bajar */
+.wa-bar{display:none;}
+@media(max-width:960px){
+  .wa-bar{display:flex;align-items:center;justify-content:center;gap:10px;position:fixed;left:0;right:0;bottom:0;z-index:800;min-height:56px;padding:16px 20px calc(16px + env(safe-area-inset-bottom,0px));background:var(--navy-deeper);border-top:1px solid var(--gold);color:var(--white);font-size:.8rem;letter-spacing:.16em;font-weight:600;text-transform:uppercase;}
+  .wa-bar svg{width:20px;height:20px;fill:#25D366;flex-shrink:0;}
+  body.has-wa-bar .wa-btn{display:none;}
+  body.has-wa-bar footer{padding-bottom:calc(30px + 56px + env(safe-area-inset-bottom,0px));}
+}
 
 /* SCROLL REVEAL */
 .reveal{opacity:0;transform:translateY(24px);transition:opacity .6s var(--ease),transform .6s var(--ease);}
@@ -265,6 +273,7 @@ footer{background:var(--navy-dark);border-top:1px solid var(--gold);padding:40px
 *:focus-visible{outline:2px solid var(--gold);outline-offset:3px;}
 </style>
 <link rel="stylesheet" href="/premium.css">
+<script src="/meta-pixel.js"></script>
 </head>
 <body>
 
@@ -349,9 +358,15 @@ footer{background:var(--navy-dark);border-top:1px solid var(--gold);padding:40px
         <div class="ac-price-mo" id="acPriceMo"></div>
       </div>
       <div class="ac-body" id="acBody"></div>
-      <div class="ac-footer"><div class="ac-footer-txt" data-i18n="prop_ac_footer">Sin cargo por consulta · Respuesta en menos de 2 hs</div></div>
+      <div class="ac-footer"><div class="ac-footer-txt" data-i18n="prop_ac_footer">Sin cargo por consulta · Te responde una persona del equipo</div></div>
     </div>
   </div>
+
+  <!-- CONSULTA FIJA (celular) -->
+  <a class="wa-bar" id="waBar" href="https://wa.me/5491123106629" target="_blank" rel="noopener noreferrer">
+    <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 0C7.163 0 0 7.163 0 16c0 2.83.736 5.487 2.023 7.793L0 32l8.438-2.01A15.93 15.93 0 0016 32c8.837 0 16-7.163 16-16S24.837 0 16 0zm0 29.333a13.278 13.278 0 01-6.77-1.848l-.484-.287-5.013 1.195 1.228-4.88-.317-.502A13.278 13.278 0 012.667 16C2.667 8.636 8.636 2.667 16 2.667S29.333 8.636 29.333 16 23.364 29.333 16 29.333zm7.3-9.96c-.4-.2-2.363-1.166-2.728-1.3-.366-.133-.633-.2-.9.2-.266.4-1.033 1.3-1.266 1.566-.233.267-.466.3-.866.1-2.367-1.183-3.917-2.117-5.475-4.8-.413-.712.413-.663 1.183-2.202.133-.267.067-.5-.033-.7-.1-.2-.9-2.163-1.233-2.963-.324-.778-.653-.672-.9-.685l-.767-.013a1.47 1.47 0 00-1.067.5c-.366.4-1.4 1.367-1.4 3.33s1.434 3.863 1.634 4.13c.2.267 2.823 4.312 6.837 6.05 2.54 1.097 3.534 1.19 4.804.999.773-.115 2.363-.966 2.696-1.9.333-.933.333-1.733.233-1.9-.1-.166-.366-.266-.766-.466z"/></svg>
+    <span id="waBarTxt">Consultar por WhatsApp</span>
+  </a>
 </main>
 
 <!-- NOT FOUND -->
@@ -368,7 +383,7 @@ footer{background:var(--navy-dark);border-top:1px solid var(--gold);padding:40px
 </footer>
 
 <!-- WHATSAPP -->
-<a class="wa-btn" href="https://wa.me/5491123106629" target="_blank" rel="noopener" aria-label="WhatsApp BAIREN">
+<a class="wa-btn" id="waFloat" href="https://wa.me/5491123106629" target="_blank" rel="noopener" aria-label="WhatsApp BAIREN">
   <svg viewBox="0 0 32 32"><path d="M16 0C7.163 0 0 7.163 0 16c0 2.83.736 5.487 2.023 7.793L0 32l8.438-2.01A15.93 15.93 0 0016 32c8.837 0 16-7.163 16-16S24.837 0 16 0zm0 29.333a13.278 13.278 0 01-6.77-1.848l-.484-.287-5.013 1.195 1.228-4.88-.317-.502A13.278 13.278 0 012.667 16C2.667 8.636 8.636 2.667 16 2.667S29.333 8.636 29.333 16 23.364 29.333 16 29.333zm7.3-9.96c-.4-.2-2.363-1.166-2.728-1.3-.366-.133-.633-.2-.9.2-.266.4-1.033 1.3-1.266 1.566-.233.267-.466.3-.866.1-2.367-1.183-3.917-2.117-5.475-4.8-.413-.712.413-.663 1.183-2.202.133-.267.067-.5-.033-.7-.1-.2-.9-2.163-1.233-2.963-.324-.778-.653-.672-.9-.685l-.767-.013a1.47 1.47 0 00-1.067.5c-.366.4-1.4 1.367-1.4 3.33s1.434 3.863 1.634 4.13c.2.267 2.823 4.312 6.837 6.05 2.54 1.097 3.534 1.19 4.804.999.773-.115 2.363-.966 2.696-1.9.333-.933.333-1.733.233-1.9-.1-.166-.366-.266-.766-.466z"/></svg>
 </a>
 
@@ -408,9 +423,10 @@ const PROP_T = {
     plazo_default:'3 a 12 meses',
     urg_res:'Esta unidad ya está reservada. Te mostramos opciones similares.',
     urg_ok:'Seleccionada y verificada por el equipo de BAIREN.',
-    btn_similares:'VER OPCIONES SIMILARES', btn_visita:'COORDINAR VISITA', btn_reservar:'RESERVAR LA UNIDAD',
+    btn_similares:'VER OPCIONES SIMILARES', btn_visita:'COORDINAR VISITA', btn_consultar:'CONSULTAR POR WHATSAPP',
+    bar_consultar:'Consultar por WhatsApp',
     wa_similar:'Muy buenas! ¿Cuentan con propiedades similares a {p}? Me encuentro interesado/a. Gracias!',
-    wa_reservar:'Muy buenas! Estoy interesado/a en reservar la unidad de {p}. ¿Cómo seguimos? Gracias!',
+    wa_consulta:'Hola, me interesa {p}, que vi en la web. ¿Sigue disponible?',
     wa_venta:'Hola muy buenas, me interesa la propiedad en venta en {p}. Me gustaría coordinar una visita. Gracias!',
     default_desc:'{t} — unidad disponible en {b}, Buenos Aires. Listo para vivir desde el primer día.',
     lib_hoy:'Se libera hoy', lib_manana:'Se libera mañana', lib_dias:'Se libera en {d} días', lib_fecha:'Se libera: {f}',
@@ -434,9 +450,10 @@ const PROP_T = {
     plazo_default:'3 a 12 meses',
     urg_res:'Esta unidade já está reservada. Mostramos opções semelhantes.',
     urg_ok:'Selecionada e verificada pela equipe BAIREN.',
-    btn_similares:'VER OPÇÕES SEMELHANTES', btn_visita:'AGENDAR VISITA', btn_reservar:'RESERVAR A UNIDADE',
+    btn_similares:'VER OPÇÕES SEMELHANTES', btn_visita:'AGENDAR VISITA', btn_consultar:'CONSULTAR PELO WHATSAPP',
+    bar_consultar:'Consultar pelo WhatsApp',
     wa_similar:'Olá, vocês têm imóveis semelhantes a {p}? Tenho interesse. Obrigado!',
-    wa_reservar:'Olá, tenho interesse em reservar a unidade de {p}. Como seguimos? Obrigado!',
+    wa_consulta:'Olá, tenho interesse em {p}, que vi no site. Ainda está disponível?',
     wa_venta:'Olá, tenho interesse no imóvel à venda em {p}. Gostaria de agendar uma visita. Obrigado!',
     default_desc:'{t} — unidade disponível em {b}, Buenos Aires. Pronta para morar desde o primeiro dia.',
     lib_hoy:'Libera hoje', lib_manana:'Libera amanhã', lib_dias:'Libera em {d} dias', lib_fecha:'Libera em: {f}',
@@ -461,9 +478,10 @@ const PROP_T = {
     plazo_default:'3 to 12 months',
     urg_res:'This unit is already reserved. We can show you similar options.',
     urg_ok:'Selected and verified by the BAIREN team.',
-    btn_similares:'SEE SIMILAR OPTIONS', btn_visita:'SCHEDULE A VISIT', btn_reservar:'RESERVE THIS UNIT',
+    btn_similares:'SEE SIMILAR OPTIONS', btn_visita:'SCHEDULE A VISIT', btn_consultar:'ASK ON WHATSAPP',
+    bar_consultar:'Ask on WhatsApp',
     wa_similar:'Hi! Do you have properties similar to {p}? I am interested. Thank you!',
-    wa_reservar:'Hi! I would like to reserve the unit at {p}. What are the next steps? Thank you!',
+    wa_consulta:'Hi, I am interested in {p}, which I saw on your website. Is it still available?',
     wa_venta:'Hello, I am interested in the property for sale at {p}. I would like to schedule a visit. Thank you!',
     default_desc:'{t} — unit available in {b}, Buenos Aires. Move-in ready from day one.',
     lib_hoy:'Available today', lib_manana:'Available tomorrow', lib_dias:'Available in {d} days', lib_fecha:'Available: {f}',
@@ -603,9 +621,14 @@ async function loadProperty() {
   if (!slug) return showNotFound();
 
   // El redirect de links viejos deja ?slug= redundante en la URL: se limpia
-  // para que la barra de direcciones muestre siempre la URL canónica
+  // para que la barra de direcciones muestre siempre la URL canónica.
+  // Solo sale el slug: utm_* y fbclid se quedan, el píxel de Meta los lee
+  // para saber de qué anuncio vino la visita.
   if (pathSlug && window.location.search) {
-    history.replaceState(null, '', window.location.pathname);
+    const q = new URLSearchParams(window.location.search);
+    q.delete('slug');
+    const resto = q.toString();
+    history.replaceState(null, '', window.location.pathname + (resto ? '?' + resto : ''));
   }
 
   try {
@@ -726,6 +749,11 @@ function renderProperty(p) {
   // ─── MOSTRAR CONTENIDO ───
   $('loadingScreen').style.display = 'none';
   $('pageContent').style.display = '';
+
+  // Píxel de Meta: la unidad viaja con cada evento de esta página
+  window.BAIREN_PIXEL = { content_ids: [p.slug], content_type: 'home_listing', content_name: titleFull, content_category: p.barrio };
+  if (window.bairenPixel) window.bairenPixel('ViewContent');
+  document.body.classList.add('has-wa-bar');
 
   // wire interactivity
   wireGallery();
@@ -863,6 +891,17 @@ function renderActionCard(p, titleFull, unidadLbl, reservado, isTemp, isTrad) {
   ).join('');
 
   const propRef = `${p.dir}${p.barrio ? ', ' + p.barrio : ''}`;
+  // Todos los WhatsApp de la ficha (tarjeta, barra fija y burbuja) llegan con
+  // la unidad escrita, así quien atiende sabe al toque por cuál es la consulta
+  const unidadRef = `${p.dir}${p.unidad ? ' ' + t.stat_unidad.toLowerCase() + ' ' + p.unidad : ''}${p.barrio ? ', ' + p.barrio : ''}`;
+  const waMsg = reservado ? t.wa_similar.replace('{p}', propRef)
+              : isVenta   ? t.wa_venta.replace('{p}', propRef)
+              :             t.wa_consulta.replace('{p}', unidadRef);
+  const waFicha = `https://wa.me/${WHATSAPP_NUM}?text=${encodeURIComponent(waMsg)}`;
+  $('waBar').href = waFicha;
+  $('waFloat').href = waFicha;
+  $('waBarTxt').textContent = t.bar_consultar;
+
   if (reservado) {
     const wa = encodeURIComponent(t.wa_similar.replace('{p}', propRef));
     html += `
@@ -884,14 +923,13 @@ function renderActionCard(p, titleFull, unidadLbl, reservado, isTemp, isTrad) {
     const ctaPrecio = ctaTipo === 'Tradicional' ? p.precio_tradicional
                     : (ctaTipo === 'Venta' ? p.precio_venta : p.precio_temporal);
     const filtro = `/filtro.html?prop=${encodeURIComponent(p.dir)}&barrio=${encodeURIComponent(p.barrio)}&tipo=${encodeURIComponent(ctaTipo)}&amb=${p.ambientes || 0}&precio=${ctaPrecio || 0}`;
-    const waReservar = encodeURIComponent(t.wa_reservar.replace('{p}', propRef));
     html += `
       <div class="urgency">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8A7547" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5"/></svg>
         <div class="urgency-txt">${t.urg_ok}</div>
       </div>
-      <a class="btn-primary" href="${filtro}">${t.btn_visita}</a>
-      <a class="btn-secondary" href="https://wa.me/${WHATSAPP_NUM}?text=${waReservar}" target="_blank" rel="noopener noreferrer">${t.btn_reservar}</a>
+      <a class="btn-primary" href="${waFicha}" target="_blank" rel="noopener noreferrer">${t.btn_consultar}</a>
+      <a class="btn-secondary" href="${filtro}">${t.btn_visita}</a>
     `;
   }
 
