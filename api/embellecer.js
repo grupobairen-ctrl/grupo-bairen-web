@@ -8,10 +8,10 @@
  * Variables en Vercel (proyecto grupo-bairen-web, entorno Production):
  *   OPENAI_API_KEY        clave de platform.openai.com. Sin ella responde 501.
  *   ADMIN_EMAILS          mails que pueden usar el botón, separados por coma.
- *                         Sin ella responde 501: el registro de Supabase está abierto,
- *                         así que "tener sesión" no alcanza para gastar la clave.
+ *                         Sin ella responde 501: tener sesión no alcanza para gastar la
+ *                         clave (el registro de Supabase estuvo abierto hasta el 1/10/2026).
  *   OPENAI_IMAGE_MODEL    opcional, por defecto 'gpt-image-2.5-sunburst'.
- *   OPENAI_IMAGE_QUALITY  opcional, por defecto 'medium'.
+ *   OPENAI_IMAGE_QUALITY  opcional, por defecto 'high' (≈ USD 0,06 por foto; 'medium' ≈ 0,026 empasta textos chicos).
  *   OPENAI_IMAGE_SIZE     opcional, por defecto '1024x1280' (4:5, como las fotos de la web).
  *
  * Uso (desde admin.html, con sesión):
@@ -89,7 +89,7 @@ module.exports = async (req, res) => {
   const bytes = Buffer.from(m[2], 'base64');
 
   const model   = process.env.OPENAI_IMAGE_MODEL   || 'gpt-image-2.5-sunburst';
-  const quality = process.env.OPENAI_IMAGE_QUALITY || 'medium';
+  const quality = process.env.OPENAI_IMAGE_QUALITY || 'high';
   const size    = process.env.OPENAI_IMAGE_SIZE    || '1024x1280';
 
   const fd = new FormData();
