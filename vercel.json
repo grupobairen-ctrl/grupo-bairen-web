@@ -22,5 +22,8 @@
       "has": [{ "type": "query", "key": "slug" }],
       "destination": "/api/og-propiedad"
     }
-  ]
+  ],
+  "functions": {
+    "api/embellecer.js": { "maxDuration": 150 }
+  }
 }

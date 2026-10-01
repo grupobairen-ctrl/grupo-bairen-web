@@ -180,6 +180,7 @@ textarea.fi{resize:vertical;min-height:96px;line-height:1.6;}
 .btn-sec{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:transparent;color:var(--navy);border:1px solid rgba(42,58,82,.22);padding:11px;font-size:.62rem;letter-spacing:.14em;font-weight:600;text-transform:uppercase;transition:all .18s;margin-bottom:8px;}
 .btn-sec:hover{background:var(--navy);color:var(--white);}
 .btn-sec:disabled{opacity:.5;cursor:not-allowed;}
+#btnEmbellecer:disabled,#btnEmbellecer:disabled:hover{opacity:1;cursor:progress;background:var(--off);color:var(--navy);}
 .btn-danger{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:transparent;color:var(--err);border:1px solid rgba(185,74,74,.3);padding:11px;font-size:.62rem;letter-spacing:.14em;font-weight:600;text-transform:uppercase;transition:all .18s;}
 .btn-danger:hover{background:var(--err);color:var(--white);border-color:var(--err);}
 
@@ -358,6 +359,9 @@ textarea.fi{resize:vertical;min-height:96px;line-height:1.6;}
             <div class="photo-grid" id="photoGrid"></div>
             <input type="file" id="photoInput" accept="image/*" multiple style="display:none">
             <p class="hint" style="margin-top:10px">Arrastrá imágenes al grid o click para seleccionar. Arrastrá entre slots para reordenar. Se comprimen automáticamente al subir.</p>
+            <button class="btn-sec" id="btnEmbellecer" type="button" style="width:auto;margin:12px 0 0;padding:11px 20px">Embellecer con IA</button>
+            <!-- Referencia de la prueba del 1/10/2026 con calidad alta; si cambia OPENAI_IMAGE_QUALITY en Vercel, actualizar -->
+            <p class="hint" style="margin-top:6px">Aprox. USD 0,06 por foto.</p>
           </div>
         </div>
 
@@ -615,8 +619,12 @@ async function initAuth() {
 
   state.sb.auth.onAuthStateChange((event, sess) => {
     if (sess) {
+      // Supabase repite SIGNED_IN / TOKEN_REFRESHED con la misma sesión cada vez que la
+      // pestaña vuelve a estar visible y al renovar el token. Solo un ingreso nuevo
+      // recarga el listado: si no, se pierde lo que se estaba editando.
+      const nuevo = !state.user || state.user.id !== sess.user.id;
       state.user = sess.user;
-      onAuthed();
+      if (nuevo) onAuthed();
     } else {
       state.user = null;
       showView('Login');
@@ -924,7 +932,8 @@ function renderPhotoGrid() {
     s.dataset.idx = i;
     if (state.photos[i]) {
       const ph = state.photos[i];
-      const uploading = ph._uploading ? '<div class="ph-uploading">Subiendo...</div>' : '';
+      const uploading = ph._uploading ? '<div class="ph-uploading">Subiendo...</div>'
+                      : ph._iaWorking ? '<div class="ph-uploading">Embelleciendo...</div>' : '';
       s.innerHTML =
         `<img src="${ph.url}" alt="">
          <button class="ph-rm" data-rm="${i}" title="Quitar">×</button>
@@ -1031,6 +1040,104 @@ async function handleNewFiles(fileList) {
       toast('Error procesando "' + f.name + '": ' + err.message, 'err');
     }
   }
+}
+
+// ════════════════════════════════════════════════════════════════════
+// FORM: embellecer fotos con IA (api/embellecer.js, se paga por foto en OpenAI)
+// Trabaja sobre las fotos subidas en esta edición que todavía no pasaron por la IA.
+// Cada una se reemplaza en la grilla y se sube al guardar, como cualquier foto nueva.
+// ════════════════════════════════════════════════════════════════════
+const IA_PARALELO = 3;
+
+function blobToDataURL(blob) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result);
+    r.onerror = () => reject(new Error('No se pudo leer la foto'));
+    r.readAsDataURL(blob);
+  });
+}
+
+function dataURLToBlob(dataUrl) {
+  const [head, b64] = dataUrl.split(',');
+  const type = (head.match(/data:([^;]+)/) || [])[1] || 'image/jpeg';
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return new Blob([bytes], { type });
+}
+
+async function embellecerFoto(ph, token) {
+  const body = JSON.stringify({ image: await blobToDataURL(ph.file) });
+  for (let intento = 0; ; intento++) {
+    const r = await fetch('/api/embellecer', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+      body,
+    });
+    const j = await r.json().catch(() => ({}));
+    if (r.ok && j.image) return dataURLToBlob(j.image);
+    // Límite por minuto de OpenAI o caída pasajera: esperar y reintentar.
+    // Un 504 (se cortó por tiempo) no se reintenta: OpenAI pudo haberla cobrado igual.
+    if ((r.status === 429 || r.status === 502 || r.status === 503) && intento < 2) {
+      await new Promise(res => setTimeout(res, (intento + 1) * 10000));
+      continue;
+    }
+    const err = new Error(j.error || ('Error ' + r.status + '.'));
+    err.fatal = r.status === 401 || r.status === 403 || r.status === 501;
+    throw err;
+  }
+}
+
+async function embellecerFotos() {
+  const pendientes = state.photos.filter(p => p._new && p.file && !p._ia && !p._iaWorking);
+  if (!pendientes.length) { toast('No hay fotos nuevas para embellecer.', 'err'); return; }
+  const { data: { session } } = await state.sb.auth.getSession();
+  if (!session) { toast('La sesión venció. Volvé a ingresar.', 'err'); return; }
+
+  const btn = $('btnEmbellecer');
+  const guardar = [$('btnPublish'), $('btnDraft')];
+  const total = pendientes.length;
+  let hechas = 0, fallas = 0, error = '', cortar = false;
+  const progreso = () => { btn.textContent = `Embelleciendo ${hechas + fallas} de ${total}...`; };
+  btn.disabled = true;
+  guardar.forEach(b => b.disabled = true);
+  pendientes.forEach(ph => ph._iaWorking = true);
+  progreso();
+  renderPhotoGrid();
+
+  const cola = pendientes.slice();
+  async function trabajador() {
+    while (cola.length && !cortar) {
+      const ph = cola.shift();
+      try {
+        const blob = await embellecerFoto(ph, session.access_token);
+        URL.revokeObjectURL(ph.url);
+        ph.file = blob;
+        ph.url = URL.createObjectURL(blob);
+        ph._ia = true;
+        hechas++;
+      } catch (e) {
+        fallas++;
+        error = e.message;
+        if (e.fatal) cortar = true;
+      }
+      ph._iaWorking = false;
+      renderPhotoGrid();
+      progreso();
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(IA_PARALELO, total) }, trabajador));
+
+  pendientes.forEach(ph => ph._iaWorking = false);
+  renderPhotoGrid();
+  saveDraftDebounced();
+  btn.disabled = false;
+  btn.textContent = 'Embellecer con IA';
+  guardar.forEach(b => b.disabled = false);
+
+  if (hechas === total) toast(total === 1 ? 'Foto embellecida.' : `${total} fotos embellecidas.`, 'ok');
+  else toast(`Listas ${hechas} de ${total}. ${error}` + (cortar ? '' : ' Tocá el botón de nuevo para reintentar las que faltan.'), 'err');
 }
 
 // ════════════════════════════════════════════════════════════════════
@@ -1481,6 +1588,7 @@ async function saveDraftPhotos(photos) {
         id: p.id || null,
         url: !p._new ? p.url : null,
         storage_path: p.storage_path || null,
+        ia: !!p._ia,
       }, i);
     });
     await new Promise((res, rej) => { tx.oncomplete = res; tx.onerror = () => rej(tx.error); });
@@ -1618,7 +1726,7 @@ async function restoreDraftIntoForm(draft) {
   if (records.length) {
     state.photos = records.map(r => {
       if (r.blob) {
-        return { _new: true, file: r.blob, url: URL.createObjectURL(r.blob) };
+        return { _new: true, file: r.blob, url: URL.createObjectURL(r.blob), _ia: !!r.ia };
       }
       return { id: r.id, url: r.url, storage_path: r.storage_path };
     });
@@ -1752,6 +1860,7 @@ function wireUI() {
     handleNewFiles(e.target.files);
     e.target.value = '';
   });
+  $('btnEmbellecer').addEventListener('click', embellecerFotos);
 
   // portada del catálogo
   $('portadaInput').addEventListener('change', e => {
