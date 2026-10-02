@@ -66,9 +66,11 @@ const VIDEO_TIPOS = ['bunny', 'youtube', 'mp4'];
        precio_temporal; ese día nace sola su aviso M. Hoy es el caso de Francisco Acuña de
        Figueroa 1560 · 1G (BA-FRANCISCOACUNADEFIGUEROA15601GL): se pausa y no vuelve como L.
    Un L a nombre de otro publicador (un dueño, Maxim) se sigue sincronizando como siempre.
-   Venta no está en la lista: los V van al perfil de Maxim (migracion-13) y eso es otra decisión.
-   Los L que ya estaban publicados los pausa también portal/migracion-21-realty-mediano-y-limpieza.sql. */
-const OPS_EXCLUIDAS = { bairen: ['alquiler'] };
+   Venta entra el 2/10/2026: Maximiliano Matzkin (Maxim Propiedades, el corredor matriculado de los V)
+   dejó de trabajar con Bairen el 30/9, y Bairen Realty es gestor sin matrícula: una unidad de la web con
+   precio_venta ya no da aviso V a su nombre. Un V a nombre de otro publicador sigue su curso.
+   Los L ya publicados y los V de Maxim los pausa portal/migracion-21-realty-mediano-y-limpieza.sql. */
+const OPS_EXCLUIDAS = { bairen: ['alquiler', 'venta'] };
 const excluida = (pubSlug, op) => (OPS_EXCLUIDAS[pubSlug] || []).indexOf(op) > -1;
 /* Campos que la web gobierna. Lo que no está acá, la sincronización no lo toca nunca
    (publicado_en solo se fija en el alta y al reactivar; estado, solo si es disponible/reservado). */

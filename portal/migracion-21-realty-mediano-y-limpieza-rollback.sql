@@ -3,6 +3,8 @@
 --
 -- Deja todo como estaba antes de migracion-21-realty-mediano-y-limpieza.sql,
 -- con los valores guardados en portal.respaldo_migracion_21:
+--   E · vuelve a publicar los avisos de Maxim Propiedades (y ventas de
+--       Bairen Realty, si hubo) que la 21 pausó.
 --   D · saca el índice avisos_codigo_interno_idx SOLO si lo creó la 21
 --       (si ya existía antes, queda) y devuelve cada codigo_interno a su
 --       valor original, con espacios o vacío incluidos.
@@ -71,6 +73,29 @@ begin
     into v_trg_foto;
   if v_trg_aviso then execute 'alter table portal.avisos disable trigger trg_aviso_sincroniza_os'; end if;
   if v_trg_foto  then execute 'alter table portal.fotos disable trigger trg_foto_portada_os'; end if;
+
+  -- ── E · Los avisos de Maxim Propiedades (y V de Bairen Realty) vuelven.
+  update portal.avisos a
+     set estado_curacion = r.antes->>'estado_curacion',
+         updated_at      = now()
+    from (select distinct on (fila_id) fila_id, antes
+            from portal.respaldo_migracion_21
+           where paso = 'E_pausa_maxim'
+           order by fila_id, id) r
+   where a.id = r.fila_id
+     and a.estado_curacion = 'pausado';
+  get diagnostics v_n = row_count;
+  raise notice 'E · Avisos de Maxim Propiedades devueltos a publicado: %.', v_n;
+
+  select count(*) into v_n
+    from (select distinct fila_id from portal.respaldo_migracion_21 where paso = 'E_pausa_maxim') r
+    join portal.avisos a on a.id = r.fila_id
+   where a.estado_curacion is distinct from (select x.antes->>'estado_curacion' from portal.respaldo_migracion_21 x
+                                              where x.paso = 'E_pausa_maxim' and x.fila_id = r.fila_id order by x.id limit 1);
+  if v_n > 0 then
+    v_pendientes := v_pendientes + v_n;
+    raise notice 'E · % avisos de Maxim cambiaron de estado después de la 21 y quedan como están.', v_n;
+  end if;
 
   -- ── D · El índice (primero: si lo creó la 21, los vacíos originales
   --       chocarían con él) y los códigos internos.

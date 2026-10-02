@@ -44,13 +44,23 @@
 --      dentro de un mismo publicador, este paso SE FRENA, lo dice y no crea
 --      nada: hay que decidir a mano cuál queda.
 --
+--   E. MAXIM PROPIEDADES SALE DEL PORTAL (agregado el 2/10/2026).
+--      Maximiliano Matzkin dejó de trabajar con Bairen el 30/9 y el
+--      portal lo seguía mostrando en Publicadores, con su matrícula y un
+--      aviso en venta (Figueroa Alcorta 3000 · 2). Se pausan todos los
+--      avisos publicados de Maxim Propiedades: sin avisos, el directorio
+--      deja de listarlo. El publicador no se borra (consultas y vistas lo
+--      referencian). Se pausan también los V publicados de Bairen Realty,
+--      si hubiera alguno: es gestor sin matrícula, y desde el 2/10 la
+--      sincronización tampoco los crea (OPS_EXCLUIDAS en sync.js).
+--
 -- CÓMO SE CORRE
 --   1. ENSAYO. Seleccioná desde "PASO 0" hasta el final del "PASO 1" y
 --      Run. No modifica nada (la función del paso 0 es temporal, vive solo
 --      en esa sesión). Muestra qué se va a tocar en cada punto. Corré las
 --      consultas de a una si el editor muestra solo el último resultado.
 --   2. Si el ensayo está bien, SUBIR el archivo entero y Run.
---      · A, B y C van en una transacción y D en otra. Cada una tiene sus
+--      · A, B, C y E van en una transacción y D en otra. Cada una tiene sus
 --        controles adentro: si un control falla, esa transacción se
 --        deshace entera y el error dice por qué.
 --      · El último resultado es el tablero de verificación del PASO 4.
@@ -61,15 +71,14 @@
 --
 -- Qué NO hace, a propósito:
 --   · No toca public.propiedades (ni del OS ni de la web), ni precios.
---   · No toca los avisos de venta (V) de Bairen Realty, si queda alguno:
---     la decisión es "solo mediano", pero los V van al perfil de Maxim
---     (migración 13) y eso se decide aparte. El ensayo los cuenta.
+--   · No borra el publicador de Maxim Propiedades ni sus datos (E solo
+--     pausa sus avisos).
 --   · No renumera fotos.orden: quedan huecos (0, 3, 7...), que no
 --     cambian nada porque todo ordena por esa columna.
 --   · No despausa nada que otra migración haya pausado.
 --
 -- Orden: después de migracion-20-resumen-por-propietario.sql.
--- Generada el 25/9/2026. NO CORRIDA todavía.
+-- Generada el 25/9/2026; parte E agregada el 2/10/2026. NO CORRIDA todavía.
 -- =====================================================================
 
 
@@ -193,6 +202,16 @@ select indexname, indexdef
   from pg_indexes
  where schemaname = 'portal' and tablename = 'avisos' and indexdef ilike '%codigo_interno%';
 
+-- 1.E · Lo que se pausa en E: todo lo publicado de Maxim Propiedades
+--       (se espera Figueroa Alcorta 3000 · 2, venta) y los V publicados
+--       de Bairen Realty (se esperan 0).
+select p.slug, a.codigo, a.operacion, a.direccion, a.unidad, a.precio, a.estado
+  from portal.avisos a
+  join portal.publicadores p on p.id = a.publicador_id
+ where a.estado_curacion = 'publicado'
+   and (p.slug = 'maxim-propiedades' or (p.slug = 'bairen' and a.operacion = 'venta'))
+ order by p.slug, a.direccion;
+
 -- ── FIN DEL ENSAYO ──────────────────────────────────────────────────
 
 
@@ -204,7 +223,7 @@ begin;
 -- corre dos veces, vale la primera fila de cada una (menor id).
 create table if not exists portal.respaldo_migracion_21 (
   id         bigint generated always as identity primary key,
-  paso       text not null,          -- 'A_pausa_largo_plazo' | 'B_barrio' | 'C_foto_repetida' | 'D_codigo_interno' | 'D_indice_creado'
+  paso       text not null,          -- 'A_pausa_largo_plazo' | 'B_barrio' | 'C_foto_repetida' | 'D_codigo_interno' | 'D_indice_creado' | 'E_pausa_maxim'
   tabla      text not null,          -- 'avisos' | 'fotos' | 'indice'
   fila_id    uuid,                   -- id del aviso o de la foto (null para el índice)
   antes      jsonb not null,         -- la fila o los campos como estaban
@@ -216,7 +235,7 @@ alter table portal.respaldo_migracion_21 enable row level security;
 -- Sin políticas a propósito: solo el servidor y el SQL Editor lo leen.
 
 comment on table portal.respaldo_migracion_21 is
-  'Valores anteriores de todo lo que tocó migracion-21 (25/9/2026): L de Bairen Realty pausados, barrio de Juncal 600, filas de fotos repetidas (completas) y códigos internos normalizados. Lo usa migracion-21-realty-mediano-y-limpieza-rollback.sql, que la borra al terminar.';
+  'Valores anteriores de todo lo que tocó migracion-21 (25/9/2026): L de Bairen Realty pausados, barrio de Juncal 600, filas de fotos repetidas (completas), códigos internos normalizados y avisos de Maxim Propiedades pausados (2/10/2026). Lo usa migracion-21-realty-mediano-y-limpieza-rollback.sql, que la borra al terminar.';
 
 -- ── A · Los L de Bairen Realty se pausan ────────────────────────────
 -- El disparador trg_aviso_sincroniza_os mira estado_curacion, pero solo
@@ -357,6 +376,41 @@ begin
   end if;
 end $$;
 
+-- ── E · Maxim Propiedades sale del portal ───────────────────────────
+-- Igual que en A: pausar no dispara trg_aviso_sincroniza_os, no se apaga.
+do $$
+declare
+  v_n integer;
+begin
+  insert into portal.respaldo_migracion_21 (paso, tabla, fila_id, antes)
+  select 'E_pausa_maxim', 'avisos', a.id,
+         jsonb_build_object('codigo', a.codigo, 'publicador', p.slug, 'estado_curacion', a.estado_curacion, 'updated_at', a.updated_at)
+    from portal.avisos a
+    join portal.publicadores p on p.id = a.publicador_id
+   where a.estado_curacion = 'publicado'
+     and (p.slug = 'maxim-propiedades' or (p.slug = 'bairen' and a.operacion = 'venta'));
+
+  update portal.avisos a
+     set estado_curacion = 'pausado',
+         updated_at      = now()
+    from portal.publicadores p
+   where p.id = a.publicador_id
+     and a.estado_curacion = 'publicado'
+     and (p.slug = 'maxim-propiedades' or (p.slug = 'bairen' and a.operacion = 'venta'));
+  get diagnostics v_n = row_count;
+  raise notice 'E · Avisos pausados (Maxim Propiedades y ventas de Bairen Realty): % (se esperaba 1).', v_n;
+
+  -- Control: no queda nada publicado de Maxim ni ventas de Bairen Realty.
+  select count(*) into v_n
+    from portal.avisos a
+    join portal.publicadores p on p.id = a.publicador_id
+   where a.estado_curacion = 'publicado'
+     and (p.slug = 'maxim-propiedades' or (p.slug = 'bairen' and a.operacion = 'venta'));
+  if v_n > 0 then
+    raise exception 'E · Control fallido: quedan % avisos publicados de Maxim o ventas de Bairen Realty.', v_n;
+  end if;
+end $$;
+
 commit;
 
 
@@ -479,7 +533,17 @@ select control, valor, esperado, case when esperado is null then null else valor
                 then 'está' else 'falta' end,
            'está'
     union all
-    select 6, 'Disparador trg_aviso_sincroniza_os (O = prendido)',
+    select 6, 'E · avisos publicados de Maxim Propiedades',
+           (select count(*) from portal.avisos a join portal.publicadores p on p.id = a.publicador_id
+             where p.slug = 'maxim-propiedades' and a.estado_curacion = 'publicado')::text,
+           '0'
+    union all
+    select 7, 'E · ventas publicadas de Bairen Realty',
+           (select count(*) from portal.avisos a join portal.publicadores p on p.id = a.publicador_id
+             where p.slug = 'bairen' and a.operacion = 'venta' and a.estado_curacion = 'publicado')::text,
+           '0'
+    union all
+    select 8, 'Disparador trg_aviso_sincroniza_os (O = prendido)',
            coalesce((select t.tgenabled::text from pg_trigger t
                       where t.tgrelid = 'portal.avisos'::regclass and t.tgname = 'trg_aviso_sincroniza_os'), 'no existe'),
            'O'
