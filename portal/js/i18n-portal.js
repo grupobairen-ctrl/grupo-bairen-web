@@ -114,7 +114,7 @@ window.BP_I18N = {
     ficha_reservada_msg: 'This property is reserved and is not taking enquiries for now.', ficha_ver_disponibles: 'See what is available in {z}',
     ficha_verificada_title: 'Verified by BAIREN', ficha_aviso_ejemplo: 'Sample listing',
     ficha_la_unidad: 'The unit', ficha_totales: 'total', ficha_cubiertos: 'covered', ficha_amb_1: 'room', ficha_amb_n: 'rooms', ficha_dorm_1: 'bedroom', ficha_dorm_n: 'bedrooms', ficha_bano_1: 'bathroom', ficha_bano_n: 'bathrooms', ficha_coch_1: 'parking space', ficha_coch_n: 'parking spaces', ficha_a_estrenar: 'Brand new', ficha_ano_1: '1 year', ficha_anos: '{n} years', ficha_antiguedad: 'age',
-    ficha_video_t: 'Video tour', ficha_video_de: 'Video of {t}', ficha_desc_prod: 'Description coming soon.', ficha_leer_mas: 'Read more', ficha_leer_menos: 'Read less',
+    ficha_video_t: 'Video tour', ficha_video_de: 'Video of {t}', ficha_video_play: 'Play the video of {t}', ficha_desc_prod: 'Description coming soon.', ficha_leer_mas: 'Read more', ficha_leer_menos: 'Read less',
     ficha_detalle: 'The unit in detail', ficha_plazo_tile: 'Term {p}', ficha_ver_caract: 'See all {n} features', ficha_ver_menos: 'Show less',
     ficha_ubicacion: 'Location', ficha_mapa_title: 'Map of the property location', ficha_ubic_aprox: 'Approximate location. The exact address is confirmed by the lister.',
     /* ficha: preguntas, quién publica, reporte, legal */
@@ -350,7 +350,7 @@ window.BP_I18N = {
     ficha_reservada_msg: 'Este imóvel está reservado e por enquanto não recebe consultas.', ficha_ver_disponibles: 'Ver os disponíveis em {z}',
     ficha_verificada_title: 'Verificada pela BAIREN', ficha_aviso_ejemplo: 'Anúncio de exemplo',
     ficha_la_unidad: 'A unidade', ficha_totales: 'totais', ficha_cubiertos: 'cobertos', ficha_amb_1: 'ambiente', ficha_amb_n: 'ambientes', ficha_dorm_1: 'dormitório', ficha_dorm_n: 'dormitórios', ficha_bano_1: 'banheiro', ficha_bano_n: 'banheiros', ficha_coch_1: 'vaga', ficha_coch_n: 'vagas', ficha_a_estrenar: 'Novo', ficha_ano_1: '1 ano', ficha_anos: '{n} anos', ficha_antiguedad: 'idade',
-    ficha_video_t: 'Tour em vídeo', ficha_video_de: 'Vídeo de {t}', ficha_desc_prod: 'Descrição em produção.', ficha_leer_mas: 'Ler mais', ficha_leer_menos: 'Ler menos',
+    ficha_video_t: 'Tour em vídeo', ficha_video_de: 'Vídeo de {t}', ficha_video_play: 'Reproduzir o vídeo de {t}', ficha_desc_prod: 'Descrição em produção.', ficha_leer_mas: 'Ler mais', ficha_leer_menos: 'Ler menos',
     ficha_detalle: 'A unidade em detalhe', ficha_plazo_tile: 'Prazo {p}', ficha_ver_caract: 'Ver as {n} características', ficha_ver_menos: 'Ver menos',
     ficha_ubicacion: 'Localização', ficha_mapa_title: 'Mapa da localização do imóvel', ficha_ubic_aprox: 'Localização aproximada. O endereço exato é confirmado por quem publica.',
     /* ficha: preguntas, quién publica, reporte, legal */
