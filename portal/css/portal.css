@@ -4012,3 +4012,58 @@ body.p-home .footer .ft-col ul,.footer .ft-col ul{columns:1}
   body.p-catalogo #zonaBox:has(.p-chip) input{min-width:0}
   body.p-catalogo .p-filters #precioPop{left:auto;right:0}
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   PORTADA CON EL LENGUAJE DEL VIDEO (2/10/2026)
+   Referencia: el video del portal y el OS (v2, 1/10/2026), que Tomás fijó
+   como la forma en que quiere la web. Reglas en la nota de dirección de arte
+   del vault, sección "Referencia del 2/10/2026". Va al final a propósito:
+   pisa lo de arriba sin tocarlo, y sacar este bloque deja la portada como estaba.
+   · Todo recto: ni píldoras ni esquinas redondeadas.
+   · El oro no rellena botones. Principal: navy lleno con versalitas espaciadas.
+     Sobre navy: contorno fino que se llena de crema al pasar.
+   · El buscador es una tarjeta crema sobre el hero, como las del video.
+   · La frase que importa de cada título, en itálica oro.
+   · Sin vidrio ni sombras de tarjeta flotante.
+   ══════════════════════════════════════════════════════════════════════════ */
+body.p-home main :is(.h-search,.h-seg,.h-seg button,.h-field input,.h-field .p-sugg,.h-cta,.h-btn,.h-edif,.h-edif-mas .h-mas-ic,.h-foto-card,.h-flecha,.prop-card,.prop-card .card-tag,.prop-card .card-cta,.h-zona,.h-tipo,.h-foto,.h-indice,.h-mapa,.h-ind-dest,.h-rent,.h-m2-caja){border-radius:0 !important}
+
+/* Títulos: la frase que importa, en itálica oro (más oscuro sobre crema, para que se lea) */
+body.p-home :is(.h-hero h1,.h-h2) em{font-style:italic;font-weight:400}
+body.p-home .h-hero h1 em{color:var(--h-oro2)}
+body.p-home .h-navy .h-h2 em{color:var(--h-oro)}
+body.p-home .h-crema .h-h2 em{color:#8A7547}
+
+/* Buscador: tarjeta crema, pestañas con subrayado de oro, plazo como chip, botón navy */
+body.p-home .h-search{background:#FBFAF6;border:1px solid rgba(19,29,45,.1);backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:0 24px 60px rgba(10,14,22,.32);color:var(--h-tinta)}
+body.p-home .h-search .h-seg{gap:0;padding:0;background:none;border-bottom:1px solid rgba(19,29,45,.12)}
+body.p-home .h-search .h-seg button{min-height:44px;background:transparent;color:var(--h-tinta2);font:600 .68rem/1 var(--font-body);letter-spacing:.2em;text-transform:uppercase;box-shadow:inset 0 -2px 0 transparent;transition:color .3s cubic-bezier(.22,1,.36,1),box-shadow .3s cubic-bezier(.22,1,.36,1)}
+body.p-home .h-search .h-seg button:hover{color:var(--h-navy)}
+body.p-home .h-search .h-seg button.on{background:transparent;color:var(--h-navy);box-shadow:inset 0 -2px 0 var(--h-oro)}
+body.p-home .h-search .h-seg-plazo{border-bottom:0;gap:8px}
+body.p-home .h-search .h-seg-plazo button{border:1px solid rgba(19,29,45,.22);box-shadow:none;color:var(--h-tinta);letter-spacing:.16em}
+body.p-home .h-search .h-seg-plazo button.on{background:var(--h-navy);border-color:var(--h-navy);color:#FBFAF6;box-shadow:none}
+body.p-home .h-search .h-seg-plazo button.on::before{content:'';display:inline-block;width:8px;height:4px;margin:0 9px 3px 0;border-left:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(-45deg)}
+body.p-home .h-search .h-ctx{color:var(--h-tinta2)}
+body.p-home .h-search .h-field input{background:#fff;border:1px solid rgba(19,29,45,.18);color:var(--h-tinta)}
+body.p-home .h-search .h-field input::placeholder{color:#6B7589}
+body.p-home .h-search .h-field input:focus-visible{outline:2px solid var(--h-navy2);outline-offset:1px}
+body.p-home .h-search .h-field-lupa .lupa{color:#6B7589}
+body.p-home .h-search .h-cta{display:inline-flex;align-items:center;justify-content:center;gap:12px;background:var(--h-navy);color:#FBFAF6;font:600 .7rem/1 var(--font-body);letter-spacing:.2em;transition:background .3s cubic-bezier(.22,1,.36,1),gap .3s cubic-bezier(.22,1,.36,1)}
+body.p-home .h-search .h-cta::after{content:'→';font-weight:300;letter-spacing:0}
+body.p-home .h-search .h-cta:hover{background:var(--h-navy2);gap:16px}
+body.p-home .h-search .h-cta:focus-visible{outline:2px solid var(--h-oro);outline-offset:2px}
+@media(min-width:900px){
+  body.p-home .h-search{padding:14px}
+  body.p-home .h-search .h-seg{border-bottom:0;box-shadow:inset 0 -1px 0 rgba(19,29,45,.12)}
+  body.p-home .h-search .h-cta{padding:0 26px}
+}
+
+/* Publicar, sobre navy: contorno fino crema; al pasar se llena */
+body.p-home .h-navy .h-btn-oro{background:transparent;color:#FBFAF6;border-color:rgba(251,250,246,.55)}
+body.p-home .h-navy .h-btn-oro:hover{background:#FBFAF6;border-color:#FBFAF6;color:var(--h-navy)}
+body.p-home .h-navy .h-btn-oro:focus-visible{outline:2px solid var(--h-oro);outline-offset:3px}
+
+/* Edificios: fotos planas, sin sombra; flechas cuadradas de filete fino */
+body.p-home .h-edif,body.p-home .h-foto-card{box-shadow:none}
+body.p-home .h-flecha{width:48px;height:48px;box-shadow:none;border-color:rgba(19,29,45,.2);background:#FBFAF6}

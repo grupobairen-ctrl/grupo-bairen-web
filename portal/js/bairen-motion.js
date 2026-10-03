@@ -311,28 +311,42 @@
     setTimeout(V.seguir, TOPE + 1400);
   };
 
-  /* ── Titular por palabras: cada una sube desde abajo detrás de una máscara.
-     Es el gesto de las casas de moda y de las galerías. No aparece: entra. */
+  /* ── Titular por palabras: cada una sube desde abajo detrás de una máscara
+     y se enfoca al llegar (el gesto del video del portal, 2/10/2026).
+     Las palabras en <em> (la frase en itálica oro) conservan su <em>.
+     Con { alVer: true } espera a que el titular entre en pantalla. */
   BPM.titular = function (el, opts) {
     el = lista(el)[0]; if (!el) return;
-    if (el._titular) return; el._titular = true;
     opts = opts || {};
+    if (opts.alVer) {
+      if (!ok || !M.inView) return;   // sin movimiento, el titular queda como está, entero y quieto
+      if (el._titularVer) return; el._titularVer = true;
+      M.inView(el, function () { BPM.titular(el, { demora: opts.demora }); }, { amount: 0.4 });
+      return;
+    }
+    if (el._titular) return; el._titular = true;
     var lineas = el.querySelectorAll('.hline');
     var fuentes = lineas.length ? lineas : [el];
     var piezas = [];
     Array.prototype.forEach.call(fuentes, function (ln) {
-      var palabras = (ln.textContent || '').trim().split(/\s+/);
+      var palabras = [];
+      Array.prototype.forEach.call(ln.childNodes, function (n) {
+        var enfasis = n.nodeType === 1 && n.tagName === 'EM';
+        (n.textContent || '').trim().split(/\s+/).forEach(function (w) { if (w) palabras.push({ w: w, em: enfasis }); });
+      });
       ln.textContent = '';
-      palabras.forEach(function (w, i) {
+      palabras.forEach(function (p, i) {
         var caja = document.createElement('span'); caja.className = 'p-msk';
         var dentro = document.createElement('span'); dentro.className = 'p-msk-in';
-        dentro.textContent = w + (i < palabras.length - 1 ? '\u00A0' : '');
+        var txt = p.w + (i < palabras.length - 1 ? '\u00A0' : '');
+        if (p.em) { var em = document.createElement('em'); em.textContent = txt; dentro.appendChild(em); }
+        else dentro.textContent = txt;
         caja.appendChild(dentro); ln.appendChild(caja); piezas.push(dentro);
       });
     });
     if (!ok) { piezas.forEach(function (x) { x.style.transform = 'none'; }); return; }
     piezas.forEach(function (x) { x.style.transform = 'translateY(110%)'; });
-    M.animate(piezas, { transform: ['translateY(110%)', 'translateY(0%)'] },
+    M.animate(piezas, { transform: ['translateY(110%)', 'translateY(0%)'], filter: ['blur(8px)', 'blur(0px)'] },
       { duration: 0.6, ease: CURVA, delay: M.stagger(0.05, { startDelay: opts.demora || 0 }) });
   };
 
