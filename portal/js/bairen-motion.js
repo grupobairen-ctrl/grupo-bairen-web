@@ -332,15 +332,20 @@
       var palabras = [];
       Array.prototype.forEach.call(ln.childNodes, function (n) {
         var enfasis = n.nodeType === 1 && n.tagName === 'EM';
-        (n.textContent || '').trim().split(/\s+/).forEach(function (w) { if (w) palabras.push({ w: w, em: enfasis }); });
+        (n.textContent || '').trim().split(/\s+/).forEach(function (w) {
+          if (!w) return;
+          /* Un signo suelto ("?" después de una palabra en itálica) va pegado a la palabra anterior, sin espacio. */
+          if (/^[?!.,;:)»]+$/.test(w) && palabras.length) { palabras[palabras.length - 1].cola = (palabras[palabras.length - 1].cola || '') + w; return; }
+          palabras.push({ w: w, em: enfasis });
+        });
       });
       ln.textContent = '';
       palabras.forEach(function (p, i) {
         var caja = document.createElement('span'); caja.className = 'p-msk';
         var dentro = document.createElement('span'); dentro.className = 'p-msk-in';
-        var txt = p.w + (i < palabras.length - 1 ? '\u00A0' : '');
-        if (p.em) { var em = document.createElement('em'); em.textContent = txt; dentro.appendChild(em); }
-        else dentro.textContent = txt;
+        var esp = i < palabras.length - 1 ? '\u00A0' : '';
+        if (p.em) { var em = document.createElement('em'); em.textContent = p.w; dentro.appendChild(em); dentro.appendChild(document.createTextNode((p.cola || '') + esp)); }
+        else dentro.textContent = p.w + (p.cola || '') + esp;
         caja.appendChild(dentro); ln.appendChild(caja); piezas.push(dentro);
       });
     });

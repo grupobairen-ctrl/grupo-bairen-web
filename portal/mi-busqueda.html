@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>/* El velo de carga: navy desde el primer byte, se retira cuando la página está lista de verdad:
+     load + ningún esqueleto a la vista + las fotos del primer pantallazo cargadas. Si eso pasa en menos de
+     500 ms nadie lo ve; si se vio, se queda hasta los 800 ms para no titilar; a los 8 s se va pase lo que
+     pase. Inline y sin dependencias: si un script no carga, el velo se va igual. */
+  (function(h){h.classList.add('cargando');var V=window.BPVelo={retenido:false,cargado:false},obs=null,timer=null;
+  var ESQ='.p-skel,.p-skel-card,.p-skel-ficha,.p-skel-line,.p-skel-vcard,.p-skel-panel,.p-skel-form,.p-skel-bloque,.p-skel-cta,.p-fhero-skel,.h-esq';
+  V.soltar=function(){if(!h.classList.contains('cargando'))return;V.retenido=false;h.classList.remove('cargando');if(obs)obs.disconnect();try{document.dispatchEvent(new Event('bairen:velo'))}catch(e){}};
+  V.retener=function(){V.retenido=true};V.seguir=function(){V.retenido=false;pedir()};
+  /* Visible de verdad: checkVisibility ve lo que un rectángulo no (un details cerrado, content-visibility) */
+  var vis=function(e){return e.checkVisibility?e.checkVisibility({contentVisibilityAuto:true,visibilityProperty:true}):e.getClientRects().length>0};
+  V.lista=function(){if(!V.cargado)return false;var es=document.querySelectorAll(ESQ),i;for(i=0;i<es.length;i++)if(vis(es[i]))return false;
+    var im=document.images,H=innerHeight,W=innerWidth,r;for(i=0;i<im.length;i++){if(im[i].complete||!im[i].getAttribute('src')||!vis(im[i]))continue;r=im[i].getBoundingClientRect();if(r.width>0&&r.bottom>0&&r.top<H&&r.right>0&&r.left<W)return false}return true};
+  var revisar=function(){if(V.retenido||timer||!V.lista())return;var t=performance.now();timer=setTimeout(function(){if(!V.retenido)V.soltar()},t>500?Math.max(0,800-t):0)};
+  var pedido=false,pedir=function(){if(pedido)return;pedido=true;requestAnimationFrame(function(){pedido=false;revisar()})};
+  addEventListener('load',function(){V.cargado=true;pedir()});
+  document.addEventListener('DOMContentLoaded',function(){obs=new MutationObserver(pedir);obs.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class','src','hidden','style']})});
+  document.addEventListener('load',pedir,true);document.addEventListener('error',pedir,true);
+  setTimeout(V.soltar,8000)})(document.documentElement);</script>
+  <title>Mi búsqueda · BAIREN</title>
+  <meta name="description" content="Contanos qué buscás y te mostramos lo que coincide, con lo que le falta a cada unidad."><meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#131D2D">
+  <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
+  <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css?v=20261003a"><link rel="stylesheet" href="css/catalogo.css?v=20261003a"><link rel="stylesheet" href="css/portal.css?v=20261003a"><link rel="stylesheet" href="css/red.css?v=20261003a">
+</head>
+<body class="r-body r-con-tabbar">
+<div class="p-velo" aria-hidden="true"><span class="w">BAIREN</span></div>
+<div id="pHeader"></div>
+<main id="contenido" class="r-angosto">
+  <div class="r-wiz" id="wiz" aria-live="polite">
+    <div class="r-wiz-arriba">
+      <span class="r-wiz-paso" id="wizPaso">Mi búsqueda</span>
+      <div class="r-wiz-barra" aria-hidden="true"><i id="wizBarra" style="width:0%"></i></div>
+    </div>
+    <div class="r-wiz-cuerpo" id="wizCuerpo"></div>
+    <div class="r-wiz-abajo" id="wizAbajo">
+      <button type="button" class="r-btn-link" id="wizAtras">Atrás</button>
+      <button type="button" class="r-btn flecha" id="wizSeguir">Seguir</button>
+    </div>
+  </div>
+</main>
+<div id="pFooter"></div>
+<div id="rTab"></div>
+
+<script src="../mapa-barrios.js?v=20261003a" defer></script><script src="supabase-portal.js?v=20261003a" defer></script><script src="js/errores.js?v=20261003a" defer></script>
+<script src="js/motion.js?v=20261003a" defer></script><script src="js/bairen-motion.js?v=20261003a" defer></script>
+<script src="js/i18n-portal.js?v=20261003a" defer></script><script src="js/ui.js?v=20261003a" defer></script>
+<script src="js/store.js?v=20261003a" defer></script><script src="js/data.js?v=20261003a" defer></script>
+<script src="js/red.js?v=20261003a" defer></script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){ (async function(){
+  BP.header('red'); BP.footer(); if (window.BPStore) BPStore.init();
+  const R = BPRed, esc = BP.esc;
+  document.getElementById('rTab').innerHTML = R.tabbar('perfil');
+  await BP.probePretty();
+  let avisos = [];
+  try { ({ avisos } = await BPData.load()); } catch (e) { console.error(e); }
+  avisos = (avisos || []).filter(a => !a.demo);
+
+  let b = R.leer() || R.vacia();
+  const nuevo = !R.leer();
+  /* Los pasos. "gusto" tiene sus propios pares adentro; "etapa" solo aparece si la persona compra. */
+  const PASOS = ['inicio', 'intencion', 'barrios', 'tipo', 'presupuesto', 'imprescindibles', 'etapa', 'gusto', 'resultado'];
+  const activos = () => PASOS.filter(p => p !== 'etapa' || b.intencion === 'comprar');
+  const qs = new URLSearchParams(location.search);
+  let paso = (location.hash === '#resultado' || qs.get('paso') === 'resultado') && !nuevo ? 'resultado' : (qs.get('paso') && PASOS.indexOf(qs.get('paso')) > -1 ? qs.get('paso') : 'inicio');
+  let parGusto = 0;
+
+  const cuerpo = document.getElementById('wizCuerpo'), btnSeguir = document.getElementById('wizSeguir'), btnAtras = document.getElementById('wizAtras');
+  const opDe = () => b.intencion === 'alquilar' ? 'alquiler' : 'venta';
+  const conteoZona = z => avisos.filter(a => a.zona === z && !a.reservado && (opDe() === 'venta' ? a.op === 'venta' : a.op !== 'venta')).length;
+  const guardar = () => { R.guardar(b); };
+  const toggle = (lista, v) => { const i = lista.indexOf(v); if (i > -1) lista.splice(i, 1); else lista.push(v); return lista; };
+
+  const pintarBarra = () => {
+    const l = activos(), i = l.indexOf(paso);
+    document.getElementById('wizBarra').style.width = Math.round((i / (l.length - 1)) * 100) + '%';
+    document.getElementById('wizPaso').textContent = paso === 'resultado' ? 'Tu búsqueda' : (i === 0 ? 'Mi búsqueda' : 'Paso ' + i + ' de ' + (l.length - 2));
+    btnAtras.hidden = i === 0;
+    document.getElementById('wizAbajo').hidden = paso === 'resultado';
+  };
+  const ir = (destino) => { paso = destino; pintar(); window.scrollTo(0, 0); };
+  const siguiente = () => { const l = activos(); const i = l.indexOf(paso); guardar(); ir(l[Math.min(i + 1, l.length - 1)]); };
+  const anterior = () => { const l = activos(); const i = l.indexOf(paso); ir(l[Math.max(i - 1, 0)]); };
+  btnSeguir.addEventListener('click', () => { if (paso === 'inicio') return interpretarYSeguir(); siguiente(); });
+  btnAtras.addEventListener('click', anterior);
+
+  /* Cada paso dibuja su pregunta y engancha sus controles. */
+  const VISTA = {
+    inicio() {
+      cuerpo.innerHTML = `
+        <h1 class="r-wiz-q" id="pregunta">¿Qué estás <em>buscando</em>?</h1>
+        <p class="r-wiz-ayuda">Escribilo como lo dirías. Lo ordenamos nosotros y después lo ajustás.</p>
+        <label class="r-ceja" for="texto" style="margin:0">Tu búsqueda en una frase</label>
+        <textarea class="r-texto" id="texto" placeholder="Ej.: 4 ambientes con vista abierta y cochera en Palermo Chico, hasta USD 1,2 millones">${esc(b.texto || '')}</textarea>
+        <div id="entendi"></div>
+        <p class="r-dato" style="margin:0">¿Preferís elegir de a una? <button type="button" class="r-btn-link" id="pasoAPaso">Armarla paso a paso</button></p>`;
+      const t = document.getElementById('texto');
+      const mostrar = () => {
+        const r = R.interpretar(t.value); const partes = [];
+        if (r.intencion) partes.push(r.intencion === 'alquilar' ? 'alquilar' : 'comprar');
+        if (r.tipos.length) partes.push(r.tipos.join(' o '));
+        if (r.ambMin) partes.push(r.ambMin + ' ambientes o más');
+        if (r.zonas.length) partes.push('en ' + r.zonas.map(BP.zonaLabel).join(', '));
+        if (r.presupuestoMax) partes.push('hasta ' + R.usdCorto(r.presupuestoMax));
+        if (r.imprescindibles.length) partes.push('con ' + r.imprescindibles.map(id => (R.IMPRESCINDIBLES.find(x => x.id === id) || {}).label.toLowerCase()).join(', '));
+        if (r.etapa) partes.push(r.etapa === 'pozo' ? 'en pozo' : 'terminado');
+        document.getElementById('entendi').innerHTML = partes.length ? `<div class="r-entendi"><b>Entendimos:</b> ${esc(partes.join(' · '))}.</div>` : '';
+      };
+      t.addEventListener('input', mostrar); mostrar();
+      document.getElementById('pasoAPaso').addEventListener('click', () => { b.texto = t.value; siguiente(); });
+      btnSeguir.textContent = 'Seguir';
+    },
+    intencion() {
+      cuerpo.innerHTML = `
+        <h1 class="r-wiz-q">¿Querés <em>comprar</em> o alquilar?</h1>
+        <div class="r-opciones dos" role="group" aria-label="Operación">
+          <button type="button" class="r-opcion" data-v="comprar" aria-pressed="${b.intencion === 'comprar'}"><div><b>Comprar</b><span>Terminado o en pozo</span></div></button>
+          <button type="button" class="r-opcion" data-v="alquilar" aria-pressed="${b.intencion === 'alquilar'}"><div><b>Alquilar</b><span>Mediano o largo plazo</span></div></button>
+        </div>
+        <p class="r-ceja" style="margin:8px 0 0">¿Para qué?</p>
+        <div class="r-opciones dos" role="group" aria-label="Para qué">
+          <button type="button" class="r-opcion" data-p="vivir" aria-pressed="${b.para === 'vivir'}"><div><b>Para vivir</b></div></button>
+          <button type="button" class="r-opcion" data-p="invertir" aria-pressed="${b.para === 'invertir'}"><div><b>Para invertir</b></div></button>
+        </div>`;
+      cuerpo.querySelectorAll('[data-v]').forEach(x => x.addEventListener('click', () => { if (b.intencion !== x.dataset.v) { b.presupuestoMax = null; b.presupuestoMin = null; } b.intencion = x.dataset.v; VISTA.intencion(); }));
+      cuerpo.querySelectorAll('[data-p]').forEach(x => x.addEventListener('click', () => { b.para = x.dataset.p; VISTA.intencion(); }));
+    },
+    barrios() {
+      cuerpo.innerHTML = `
+        <h1 class="r-wiz-q">¿En qué <em>barrios</em>?</h1>
+        <p class="r-wiz-ayuda">Elegí todos los que te sirvan. El número es lo que hay hoy publicado.</p>
+        <div class="r-chips" role="group" aria-label="Barrios">${R.ZONAS.map(z => { const n = conteoZona(z); return `<button type="button" class="r-chip" data-z="${esc(z)}" aria-pressed="${b.zonas.indexOf(z) > -1}">${esc(BP.zonaLabel(z))}${n ? ` <small>${n}</small>` : ''}</button>`; }).join('')}</div>`;
+      cuerpo.querySelectorAll('[data-z]').forEach(x => x.addEventListener('click', () => { toggle(b.zonas, x.dataset.z); x.setAttribute('aria-pressed', b.zonas.indexOf(x.dataset.z) > -1); }));
+    },
+    tipo() {
+      cuerpo.innerHTML = `
+        <h1 class="r-wiz-q">¿Qué tipo de <em>propiedad</em>?</h1>
+        <div class="r-chips" role="group" aria-label="Tipo">${R.TIPOS.map(t => `<button type="button" class="r-chip" data-t="${t.id}" aria-pressed="${b.tipos.indexOf(t.id) > -1}">${esc(t.label)}</button>`).join('')}</div>
+        <p class="r-ceja" style="margin:10px 0 0">Ambientes, como mínimo</p>
+        <div class="r-paso-num"><button type="button" id="menos" aria-label="Uno menos">−</button><output id="amb" aria-live="polite">${b.ambMin || 'Cualquiera'}</output><button type="button" id="mas" aria-label="Uno más">+</button></div>`;
+      cuerpo.querySelectorAll('[data-t]').forEach(x => x.addEventListener('click', () => { toggle(b.tipos, x.dataset.t); x.setAttribute('aria-pressed', b.tipos.indexOf(x.dataset.t) > -1); }));
+      const out = document.getElementById('amb');
+      const pintar = () => { out.textContent = b.ambMin ? b.ambMin + (b.ambMin >= 5 ? ' o más' : '') : 'Cualquiera'; };
+      document.getElementById('menos').addEventListener('click', () => { b.ambMin = b.ambMin && b.ambMin > 1 ? b.ambMin - 1 : null; pintar(); });
+      document.getElementById('mas').addEventListener('click', () => { b.ambMin = Math.min((b.ambMin || 0) + 1, 5); pintar(); });
+      pintar();
+    },
+    presupuesto() {
+      const alq = b.intencion === 'alquilar';
+      const min = alq ? 400 : 100000, max = alq ? 8000 : 3000000, salto = alq ? 50 : 25000;
+      if (!b.presupuestoMax) b.presupuestoMax = alq ? 1500 : 450000;
+      cuerpo.innerHTML = `
+        <h1 class="r-wiz-q">¿Hasta cuánto <em>querés</em> ${alq ? 'pagar por mes' : 'invertir'}?</h1>
+        <div class="r-rango">
+          <output id="valor" for="rango"></output>
+          <input type="range" id="rango" min="${min}" max="${max}" step="${salto}" value="${Math.min(Math.max(b.presupuestoMax, min), max)}" aria-label="Presupuesto máximo en dólares">
+          <div class="r-dato"><span>${R.usdCorto(min)}</span><span>${R.usdCorto(max)} o más</span></div>
+        </div>
+        <p class="r-wiz-ayuda" style="margin:0">Te mostramos también lo que está hasta un 10% arriba, marcado.</p>`;
+      const r = document.getElementById('rango'), v = document.getElementById('valor');
+      const pintar = () => { b.presupuestoMax = +r.value; v.textContent = R.usd(+r.value) + (+r.value >= max ? ' o más' : '') + (alq ? ' por mes' : ''); };
+      r.addEventListener('input', pintar); pintar();
+    },
+    imprescindibles() {
+      cuerpo.innerHTML = `
+        <h1 class="r-wiz-q">¿Qué no puede <em>faltar</em>?</h1>
+        <p class="r-wiz-ayuda">Hasta cinco. Lo usamos para decirte qué le falta a cada unidad.</p>
+        <div class="r-chips" role="group" aria-label="Imprescindibles">${R.IMPRESCINDIBLES.map(i => `<button type="button" class="r-chip" data-i="${i.id}" aria-pressed="${b.imprescindibles.indexOf(i.id) > -1}">${esc(i.label)}</button>`).join('')}</div>`;
+      cuerpo.querySelectorAll('[data-i]').forEach(x => x.addEventListener('click', () => {
+        const ya = b.imprescindibles.indexOf(x.dataset.i) > -1;
+        if (!ya && b.imprescindibles.length >= 5) { BP.toast('Hasta cinco. Sacá uno para sumar otro.'); return; }
+        toggle(b.imprescindibles, x.dataset.i); x.setAttribute('aria-pressed', !ya);
+      }));
+    },
+    etapa() {
+      const op = (v, t, s) => `<button type="button" class="r-opcion" data-e="${v}" aria-pressed="${b.etapa === v}"><div><b>${t}</b><span>${s}</span></div></button>`;
+      cuerpo.innerHTML = `
+        <h1 class="r-wiz-q">¿Terminado o <em>en pozo</em>?</h1>
+        <div class="r-opciones">${op('terminado', 'Terminado', 'Para mudarse o alquilar ya')}${op('pozo', 'En pozo', 'Comprar antes y seguir la obra')}${op('cualquiera', 'Cualquiera', 'Mostrame los dos')}</div>`;
+      cuerpo.querySelectorAll('[data-e]').forEach(x => x.addEventListener('click', () => { b.etapa = x.dataset.e; VISTA.etapa(); }));
+    },
+    gusto() {
+      if (parGusto >= R.PARES.length) parGusto = 0;
+      const par = R.PARES[parGusto];
+      const COLORES = { clasico: ['#E9E1D3', '#B89B72', '#F7F3EA'], moderno: ['#D7D9DB', '#2B2E33', '#F4F4F2'], calido: ['#8A5A3C', '#C9A27E', '#E8DCCB'], luminoso: ['#FFFFFF', '#E9E4D8', '#CFE0EA'], industrial: ['#7A4B3A', '#5E6064', '#BDB7AE'], verde: ['#5F6F52', '#A9B59A', '#E5E2D6'] };
+      const tarjeta = id => { const e = R.ESTILOS[id], c = COLORES[id]; return `<button type="button" data-g="${id}" aria-pressed="${b.estilos['p' + parGusto] === id}"><span class="muestras" aria-hidden="true"><i style="background:${c[0]}"></i><i style="background:${c[1]}"></i><i style="background:${c[2]}"></i></span><b>${esc(e.label)}</b><span>${esc(e.frase)}</span></button>`; };
+      cuerpo.innerHTML = `
+        <h1 class="r-wiz-q">¿Cuál va más <em>con vos</em>?</h1>
+        <p class="r-wiz-ayuda">Par ${parGusto + 1} de ${R.PARES.length}. Elegí rápido, sin pensarlo mucho.</p>
+        <div class="r-par">${tarjeta(par[0])}${tarjeta(par[1])}</div>
+        <p class="r-dato" style="margin:0"><button type="button" class="r-btn-link" id="saltarGusto">Saltear este paso</button></p>`;
+      cuerpo.querySelectorAll('[data-g]').forEach(x => x.addEventListener('click', () => {
+        b.estilos['p' + parGusto] = x.dataset.g; guardar();
+        if (parGusto < R.PARES.length - 1) { parGusto++; VISTA.gusto(); } else { parGusto = 0; siguiente(); }
+      }));
+      document.getElementById('saltarGusto').addEventListener('click', () => { parGusto = 0; siguiente(); });
+    },
+    resultado() {
+      guardar();
+      const prog = R.progreso(b);
+      const lista = R.coincidencias(avisos, b);
+      /* Con pocas coincidencias, también las que están cerca: cumplen lo que no se negocia pero menos de la mitad del resto. */
+      const cerca = lista.length < 3 ? R.coincidencias(avisos, b, { minimo: 0 }).filter(x => !lista.some(y => y.aviso.id === x.aviso.id)).slice(0, 3) : [];
+      const estilo = (() => { const c = {}; Object.values(b.estilos || {}).forEach(e => { c[e] = (c[e] || 0) + 1; }); const top = Object.keys(c).sort((x, y) => c[y] - c[x])[0]; return top ? R.ESTILOS[top] : null; })();
+      const sugerencias = R.sugerencias(avisos, b, 6);
+      const sesion = window.BPStore && BPStore.session;
+      cuerpo.innerHTML = `
+        <div><p class="r-ceja">Tu búsqueda</p><h1 class="r-wiz-q">Lista. Ya estás <em>buscando</em> en BAIREN.</h1></div>
+        <p class="r-bajada" style="margin:0">${esc(R.resumen(b))}${estilo ? `. Tu gusto: <b style="font-weight:500">${esc(estilo.label.toLowerCase())}</b>` : ''}.</p>
+        <div class="r-progreso"><div class="r-progreso-barra"><i style="width:${prog.porcentaje}%"></i></div>
+          <p>${prog.faltan.length ? `Tu búsqueda está al <b>${prog.porcentaje}%</b>. Sumá ${esc(prog.faltan.slice(0, 2).join(' y '))} para recibir mejores propuestas.` : 'Tu búsqueda está <b>completa</b>.'} <button type="button" class="r-btn-link" id="editar">Editar</button></p></div>
+        <section aria-labelledby="tCoinc" style="display:grid;gap:18px">
+          <div class="r-cabeza" style="margin:0"><h2 class="r-h2" id="tCoinc" style="margin:0">${lista.length ? `<em>${lista.length}</em> ${lista.length === 1 ? 'unidad coincide' : 'unidades coinciden'} hoy` : 'Todavía no hay unidades que <em>coincidan</em>'}</h2>
+          ${lista.length ? `<a class="r-btn-link" href="buscar.html?op=${opDe()}${(b.zonas || []).map(z => '&zona=' + encodeURIComponent(z)).join('')}">Ver en el catálogo</a>` : ''}</div>
+          ${lista.length ? `<div class="r-grilla">${lista.slice(0, 6).map(x => R.tarjeta(x.aviso, x.c)).join('')}</div>` : `<div class="r-vacio"><p>Te avisamos apenas entre una que encaje. Mientras tanto, seguí los barrios y edificios que te interesan.</p></div>`}
+        </section>
+        ${cerca.length ? `<section aria-labelledby="tCerca" style="display:grid;gap:18px">
+          <h2 class="r-h2" id="tCerca" style="margin:0">Y estas están <em>cerca</em></h2>
+          <div class="r-grilla">${cerca.map(x => R.tarjeta(x.aviso, x.c)).join('')}</div>
+        </section>` : ''}
+        ${sugerencias.length ? `<section aria-labelledby="tSigue" style="display:grid;gap:12px">
+          <h2 class="r-h2" id="tSigue" style="margin:0">Seguí lo que te <em>importa</em></h2>
+          <p class="r-wiz-ayuda" style="margin:0">Te avisamos cuando haya novedades: una unidad nueva, una baja de precio, un avance de obra.</p>
+          <div class="r-sigue">${sugerencias.map(s => `<div class="r-sigue-fila"><div><span class="r-sigue-tipo">${esc({ barrio: 'Barrio', edificio: 'Edificio', obra: 'Obra', publicador: 'Publica' }[s.tipo] || s.tipo)}</span><b>${esc(s.nombre)}</b><span>${esc(s.detalle || '')}</span></div><button type="button" class="r-chip" data-st="${esc(s.tipo)}" data-si="${esc(s.id)}" data-sn="${esc(s.nombre)}" aria-pressed="${R.sigo(s.tipo, s.id)}">${R.sigo(s.tipo, s.id) ? 'Siguiendo' : 'Seguir'}</button></div>`).join('')}</div>
+        </section>` : ''}
+        <section class="r-vacio" aria-labelledby="tGuardar">
+          <h2 class="r-h3" id="tGuardar">${sesion ? 'Guardada en tu <em>cuenta</em>' : 'Guardala para que te <em>avisemos</em>'}</h2>
+          <p>${sesion ? 'Te avisamos por mail cuando entre una unidad que coincida. La cambiás cuando quieras.' : 'Por ahora vive en este navegador. Con tu cuenta, te avisamos por mail cuando entre algo que coincida y la ves desde cualquier dispositivo.'}</p>
+          ${sesion ? '<a class="r-btn flecha" href="inicio.html">Ir a mi inicio</a>' : '<a class="r-btn flecha" href="ingresar.html?volver=inicio.html">Crear mi cuenta</a><a class="r-btn-link" href="inicio.html">Seguir sin cuenta</a>'}
+        </section>`;
+      document.getElementById('editar').addEventListener('click', () => ir('intencion'));
+      cuerpo.querySelectorAll('[data-st]').forEach(x => x.addEventListener('click', () => { const ahora = R.alternarSeguir(x.dataset.st, x.dataset.si, x.dataset.sn); x.setAttribute('aria-pressed', ahora); x.textContent = ahora ? 'Siguiendo' : 'Seguir'; }));
+      if (window.BPM && BPM.titular) BPM.titular(cuerpo.querySelector('.r-wiz-q'));
+    }
+  };
+
+  const interpretarYSeguir = () => {
+    const t = document.getElementById('texto'); const v = (t && t.value || '').trim();
+    if (v) {
+      const r = R.interpretar(v); b.texto = v;
+      if (r.intencion) b.intencion = r.intencion; if (r.para) b.para = r.para;
+      if (r.zonas.length) b.zonas = r.zonas; if (r.tipos.length) b.tipos = r.tipos; if (r.ambMin) b.ambMin = r.ambMin;
+      if (r.presupuestoMax) b.presupuestoMax = r.presupuestoMax; if (r.imprescindibles.length) b.imprescindibles = r.imprescindibles; if (r.etapa) b.etapa = r.etapa;
+    }
+    siguiente();
+  };
+
+  function pintar() {
+    btnSeguir.textContent = paso === 'gusto' ? 'Seguir sin elegir' : 'Seguir';
+    VISTA[paso](); pintarBarra();
+    const q = cuerpo.querySelector('.r-wiz-q'); if (q && paso !== 'resultado' && window.BPM && BPM.titular) BPM.titular(q);
+    if (paso !== 'inicio') { const h = cuerpo.querySelector('h1'); if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); } }
+  }
+  pintar();
+  if (window.BPM && BPM.init) BPM.init(document);
+})(); });
+</script>
+</body>
+</html>
