@@ -25,6 +25,7 @@
  * Lo que NO hace, a propósito: no toca la base ni el storage. El navegador decide si la
  * publica, después de compararla con la original (es regeneración, no retoque).
  */
+const A = require('./_portal/admin');
 const SUPABASE_URL = process.env.PORTAL_SUPABASE_URL || 'https://jdatlsrujgfmvyuhoffg.supabase.co';
 const SUPABASE_ANON_KEY = process.env.PORTAL_SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkYXRsc3J1amdmbXZ5dWhvZmZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NzcyNTYsImV4cCI6MjA5NDQ1MzI1Nn0.g9B1EoHkVeAcDJ2KNuMjwMW2_5Y6Xk2IlWjdQRrob2o';
 
@@ -86,6 +87,23 @@ module.exports = async (req, res) => {
 
   const user = await usuarioDe(req);
   if (!user) { res.status(401).json({ ok: false, error: 'Hace falta una sesión de publicador.' }); return; }
+
+  /* Tope de gasto (3/10/2026): cualquier cuenta del portal podía pedir fotos sin límite y cada una se paga.
+     40 por persona y 300 entre todos, por día. Cuenta con public.consumir_rate_limit (sql/rate_limit.sql del OS),
+     que vive en esta misma base y solo se llama con la service key. Si no se puede contar, no se genera. */
+  try {
+    for (const [clave, limite] of [['produccion:' + user.id, 40], ['produccion:total', 300]]) {
+      const filas = await A.post('rpc/consumir_rate_limit', { p_clave: clave, p_limite: limite, p_ventana: 86400 }, { esquema: 'public' });
+      const cupo = Array.isArray(filas) ? filas[0] : filas;
+      if (!cupo || !cupo.permitido) {
+        const horas = cupo && cupo.reset_en ? Math.ceil(cupo.reset_en / 3600) : 24;
+        res.status(429).json({ ok: false, error: `Llegaste al tope de fotos con IA de hoy. Se renueva en unas ${horas} horas.` }); return;
+      }
+    }
+  } catch (e) {
+    console.error('[portal-produccion] cupo', String(e && e.message || e).slice(0, 300));
+    res.status(503).json({ ok: false, error: 'No pude verificar el cupo de fotos con IA. Probá de nuevo en unos minutos.' }); return;
+  }
 
   const foto = await fetch(url);
   if (!foto.ok) { res.status(400).json({ ok: false, error: 'No pude leer la foto original.' }); return; }
