@@ -77,11 +77,12 @@ class RestError extends Error {
   constructor(status, path, texto) { super(`supabase ${status} en ${path.split('?')[0]}: ${String(texto || '').slice(0, 200)}`); this.status = status; this.path = path; this.detalle = texto; }
 }
 
-/* Cliente REST del portal con la service key. opts.prefer: 'return=representation' | 'return=minimal' | 'resolution=merge-duplicates' ... ; opts.count: true para leer el total (Content-Range). */
+/* Cliente REST del portal con la service key. opts.prefer: 'return=representation' | 'return=minimal' | 'resolution=merge-duplicates' ... ; opts.count: true para leer el total (Content-Range); opts.esquema: 'public' para lo que vive fuera de portal (por defecto, portal). */
 async function rest(method, path, body, opts) {
   if (!SERVICE_KEY) throw new Error('sin PORTAL_SUPABASE_SERVICE_KEY');
   opts = opts || {};
-  const headers = { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}`, 'Accept-Profile': 'portal', 'Content-Profile': 'portal', 'Content-Type': 'application/json' };
+  const esquema = opts.esquema || 'portal';
+  const headers = { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}`, 'Accept-Profile': esquema, 'Content-Profile': esquema, 'Content-Type': 'application/json' };
   const prefer = [];
   if (opts.prefer) prefer.push(opts.prefer); else if (method === 'POST' || method === 'PATCH') prefer.push('return=representation'); else if (method === 'DELETE') prefer.push('return=minimal');
   if (opts.count) prefer.push('count=exact');
