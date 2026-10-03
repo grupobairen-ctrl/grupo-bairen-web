@@ -170,3 +170,149 @@ body.r-body{background:var(--r-papel);color:var(--r-tinta)}
 /* El header del portal es fijo: el contenido de la red empieza debajo. Y lo oculto se oculta aunque tenga display propio. */
 body.r-body main{padding-top:72px}
 .r-wiz-abajo[hidden],.r-tabbar[hidden],.r-btn-link[hidden]{display:none !important}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Fase 2 (3/10/2026): el inicio del miembro, el kit, la demanda y la obra
+   ══════════════════════════════════════════════════════════════════════════ */
+/* Las anclas no quedan debajo del header fijo; el aviso flotante sube sobre la barra inferior */
+body.r-body [id]{scroll-margin-top:88px}
+@media(max-width:860px){body.r-con-tabbar .p-toast{bottom:calc(84px + env(safe-area-inset-bottom,0px))}}
+body.r-body .p-skel-line{border-radius:0}
+.r-esq{display:grid;gap:14px;padding-block:44px}
+.r-esq .p-skel-line.t{height:44px;width:70%}
+[hidden].r-prop-motivos,[hidden].r-aviso,[hidden].r-vacio{display:none !important}
+
+/* Enlace claro, para fondo oscuro (el hero de la portada, una tarjeta navy) */
+.r-btn-link.claro{display:inline-flex;align-items:center;color:#FBFAF6;text-decoration-color:var(--r-oro)}
+.r-btn-link.claro:hover{color:var(--r-oro)}
+.r-hero-otra{margin:16px 0 0}
+.r-btn.chico{min-height:40px;padding:0 16px;font-size:.64rem}
+
+/* Rótulo de lo inventado para mostrar: borde punteado, gris. Nunca se confunde con un sello. */
+.r-ejemplo{display:inline-flex;align-items:center;justify-self:start;padding:4px 7px;border:1px dashed rgba(23,32,46,.4);color:var(--r-gris);font:500 .58rem/1 var(--font-body);letter-spacing:.16em;text-transform:uppercase}
+.r-ejemplo.claro{border-color:rgba(251,250,246,.5);color:rgba(251,250,246,.8)}
+.r-sello svg{flex:none}
+
+/* Arreglo de la barra inferior: catalogo.css le da a todo <nav> la forma del header (fijo arriba,
+   64 px de alto, filete oro, z-index 1000). La barra es un <nav>, así que quedaba pegada arriba,
+   escondida detrás del header. Acá recupera su lugar abajo. */
+.r-tabbar{inset:auto 0 0 0;height:auto;border-bottom:0;gap:0;justify-content:stretch;align-items:stretch}
+/* La barra inferior quieta, dibujada dentro de una página */
+.r-tabbar.muestra{display:grid;grid-template-columns:repeat(5,1fr);position:relative;inset:auto;z-index:auto;max-width:430px;background:var(--r-papel);border:1px solid var(--r-filete);padding:8px 4px}
+.r-tabbar.muestra a{display:grid;justify-items:center;gap:5px;min-height:48px;padding-top:6px;text-decoration:none;color:var(--r-gris);font:500 .58rem/1 var(--font-body);letter-spacing:.06em}
+.r-tabbar.muestra a svg{width:20px;height:20px}
+.r-tabbar.muestra a[aria-current="page"]{color:var(--r-tinta);box-shadow:inset 0 2px 0 var(--r-oro)}
+.r-tabbar .punto{position:absolute;margin:-2px 0 0 14px;width:6px;height:6px;border-radius:50%;background:var(--r-oro)}
+
+/* ── Inicio del miembro: una portada, no un muro ─────────────────────────── */
+.r-portada{display:grid;align-content:center;padding-block:40px 48px}
+@media(min-width:861px){.r-portada{min-height:calc(100dvh - 72px - 120px)}}
+.r-h1.xl{font-size:clamp(2.5rem,9vw,4.6rem)}
+.r-portada .r-bajada{font-size:1.08rem}
+.r-portada .r-btn{justify-self:start;margin-top:28px}
+.r-portada .r-dato{margin:14px 0 0}
+.r-pasos{display:grid;gap:0;margin:0;padding:0;list-style:none;border-top:1px solid var(--r-filete);counter-reset:paso}
+.r-pasos li{display:grid;grid-template-columns:44px minmax(0,1fr);gap:4px 12px;padding:18px 0;border-bottom:1px solid var(--r-filete);counter-increment:paso}
+.r-pasos li::before{content:counter(paso,decimal-leading-zero);grid-row:1 / span 2;font:400 1.3rem/1 var(--font-display);color:var(--r-oro-tinta);font-variant-numeric:tabular-nums}
+.r-pasos b{font:400 1.12rem/1.25 var(--font-display)}
+.r-pasos span{font:300 .9rem/1.5 var(--font-body);color:var(--r-gris)}
+@media(min-width:860px){.r-pasos{grid-template-columns:repeat(3,1fr);gap:0 32px;border-bottom:1px solid var(--r-filete)}.r-pasos li{border-bottom:0;grid-template-columns:1fr}.r-pasos li::before{grid-row:auto;margin-bottom:10px}}
+
+.r-ini-cab{display:grid;gap:28px;padding-block:40px}
+@media(min-width:900px){.r-ini-cab{grid-template-columns:minmax(0,1.35fr) minmax(300px,1fr);align-items:end;gap:64px}}
+.r-ini-nov{margin:20px 0 0;font:400 clamp(1.35rem,3.4vw,1.8rem)/1.25 var(--font-display);text-wrap:balance}
+.r-ini-nov em{font-style:italic;color:var(--r-oro-tinta);font-variant-numeric:tabular-nums}
+.r-ini-cab .r-bajada{margin-top:10px}
+.r-ini-caja{display:grid;gap:14px;padding:20px;border:1px solid var(--r-filete);background:#fff}
+.r-ini-caja .r-ceja{margin:0}
+.r-sigue-fila .r-sigue-tipo{display:block;margin-bottom:4px;font:500 .58rem/1 var(--font-body);letter-spacing:.16em;text-transform:uppercase;color:var(--r-oro-tinta)}
+.r-vacio{max-width:760px}
+@media(min-width:860px){.r-card.grande .r-card-foto{aspect-ratio:5/4}}
+@media(max-width:860px){
+  .r-grilla.r-riel{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:74%;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;margin-inline:-20px;padding:0 20px 6px;scroll-padding-inline:20px;gap:14px;scrollbar-width:none}
+  .r-grilla.r-riel::-webkit-scrollbar{display:none}
+  .r-grilla.r-riel > *{scroll-snap-align:start}
+}
+.r-sigue-fila .r-sigue-acc{display:flex;gap:8px;align-items:center}
+.r-sigue-fila a.r-sigue-nombre{color:inherit;text-decoration:none}
+.r-sigue-fila a.r-sigue-nombre:hover b{text-decoration:underline;text-decoration-color:var(--r-oro);text-underline-offset:4px}
+.r-sigue-fila.apagada b,.r-sigue-fila.apagada span{opacity:.5}
+.r-props{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr))}
+
+/* Propuesta: la unidad en una fila, la nota en serif, la respuesta en calma */
+.r-prop-cab{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.r-prop-unidad{display:grid;grid-template-columns:96px minmax(0,1fr);gap:14px;align-items:center;text-decoration:none;color:inherit}
+.r-prop-unidad img,.r-prop-sinfoto{width:96px;aspect-ratio:4/5;object-fit:cover;background:var(--r-crema);display:block}
+.r-prop-unidad > span{display:grid;gap:4px;min-width:0}
+.r-prop-unidad b{font:400 1.08rem/1.25 var(--font-display)}
+.r-prop-nota{margin:0;padding-left:14px;border-left:1px solid var(--r-oro);font:italic 400 .98rem/1.5 var(--font-display);color:var(--r-tinta)}
+.r-prop-respuesta{margin:0;padding:10px 12px;background:var(--r-crema);font:300 .88rem/1.5 var(--font-body)}
+.r-prop .r-btn{min-height:46px;padding:0 12px}
+.r-prop-motivos .r-chip{min-height:40px}
+
+/* Obra: la línea con nota y foto de cada avance */
+.r-hito-nota{margin:6px 0 0;font:300 .9rem/1.5 var(--font-body);color:var(--r-tinta);max-width:56ch}
+.r-hito-foto{display:block;margin-top:10px;width:100%;max-width:420px;aspect-ratio:3/2;object-fit:cover;background:var(--r-crema)}
+.r-obra-cab{display:grid;gap:24px;padding-block:40px 36px}
+.r-obra-cab .r-hechos{margin-top:22px}
+@media(min-width:900px){.r-obra-cab{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);align-items:end;gap:56px}}
+.r-obra-foto{aspect-ratio:4/3;max-width:100%;overflow:hidden;background:var(--r-crema)}
+.r-obra-foto img{width:100%;height:100%;object-fit:cover;display:block}
+.r-acciones{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin-top:24px}
+.r-btn[aria-pressed="true"]{background:transparent;color:var(--r-tinta);border-color:rgba(23,32,46,.28)}
+.r-btn[aria-pressed="true"]::before{content:'';width:8px;height:4px;margin-bottom:3px;border-left:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(-45deg)}
+.r-dos-col{display:grid;gap:40px}
+@media(min-width:900px){.r-dos-col{grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:64px}}
+
+/* ── Demanda: búsquedas sin nombres, para el que vende ───────────────────── */
+.r-busq-grilla{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:14px}
+.r-busq{align-content:start}
+.r-busq b{font-size:1.5rem}
+.r-busq .r-busq-piden{font-size:.8rem;color:rgba(251,250,246,.66)}
+.r-busq .r-btn{justify-self:start;margin-top:10px}
+.r-busq .r-btn:hover{background:var(--r-crema);color:var(--r-navy);border-color:var(--r-crema)}
+.r-busq .r-ejemplo{margin-bottom:4px}
+.r-filtros{display:grid;gap:12px;margin-bottom:26px}
+.r-filtros .r-chip{min-height:40px;padding:0 13px}
+.r-aviso{display:grid;gap:10px;justify-items:start;padding:20px 22px;border-left:2px solid var(--r-oro);background:#fff}
+.r-aviso p{margin:0;font:300 .95rem/1.55 var(--font-body);color:var(--r-gris);max-width:62ch}
+.r-aviso b{font:400 1.15rem/1.3 var(--font-display);color:var(--r-tinta)}
+
+/* El panel de enviar propuesta: hoja desde abajo en el celular, columna a la derecha en escritorio */
+.r-panel{position:fixed;inset:auto 0 0 0;width:100%;max-width:none;max-height:92dvh;margin:0;padding:0;border:0;border-top:1px solid var(--r-filete);background:var(--r-papel);color:var(--r-tinta);overflow:auto}
+.r-panel::backdrop{background:rgba(19,29,45,.55)}
+.r-panel-in{display:grid;gap:18px;padding:24px 20px calc(24px + env(safe-area-inset-bottom,0px))}
+.r-panel-cab{display:flex;justify-content:space-between;align-items:start;gap:16px}
+.r-panel-cerrar{width:44px;height:44px;flex:none;display:grid;place-items:center;border:1px solid var(--r-filete);background:#fff;color:var(--r-tinta);cursor:pointer;border-radius:0}
+.r-panel-cerrar svg{width:18px;height:18px}
+.r-panel-cerrar:focus-visible{outline:2px solid var(--r-oro);outline-offset:2px}
+@media(min-width:861px){.r-panel{inset:0 0 0 auto;width:min(480px,100%);height:100dvh;max-height:none;border-top:0;border-left:1px solid var(--r-filete)}}
+.r-unidades{display:grid;gap:8px;margin:0;padding:0;border:0;min-width:0}
+.r-unidad{display:grid;grid-template-columns:auto 64px minmax(0,1fr);gap:12px;align-items:center;padding:10px 12px;border:1px solid rgba(23,32,46,.18);background:#fff;cursor:pointer}
+.r-unidad:has(input:checked){border-color:var(--r-navy);box-shadow:0 0 0 1px var(--r-navy)}
+.r-unidad input{width:18px;height:18px;accent-color:var(--r-navy);margin:0}
+.r-unidad img,.r-unidad .r-prop-sinfoto{width:64px;aspect-ratio:4/5;object-fit:cover;background:var(--r-crema);display:block}
+.r-unidad b{display:block;font:400 1rem/1.25 var(--font-display)}
+.r-unidad span{font:300 .82rem/1.4 var(--font-body);color:var(--r-gris)}
+.r-campo{display:grid;gap:8px}
+.r-campo .r-texto{min-height:110px}
+.r-panel-pie{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:center;padding-top:16px;border-top:1px solid var(--r-filete)}
+
+/* ── El kit visual ───────────────────────────────────────────────────────── */
+.r-kit-indice{display:flex;flex-wrap:wrap;gap:4px 18px;margin:22px 0 0;padding:0;list-style:none}
+.r-kit-indice a{display:inline-flex;align-items:center;min-height:40px;font:500 .66rem/1 var(--font-body);letter-spacing:.16em;text-transform:uppercase;color:var(--r-tinta);text-decoration:none;border-bottom:1px solid transparent}
+.r-kit-indice a:hover{border-bottom-color:var(--r-oro)}
+.r-kit-bloque{display:grid;gap:20px;padding-block:44px;border-top:1px solid var(--r-filete)}
+@media(min-width:900px){.r-kit-bloque{grid-template-columns:minmax(220px,300px) minmax(0,1fr);gap:48px;align-items:start}}
+.r-kit-bloque > header{display:grid;gap:6px}
+.r-kit-bloque > header .r-ceja{margin:0}
+.r-kit-bloque > header p:last-child{margin:0;font:300 .92rem/1.55 var(--font-body);color:var(--r-gris)}
+.r-kit-lienzo{display:grid;gap:18px;padding:24px;background:#fff;border:1px solid var(--r-filete);min-width:0}
+.r-kit-lienzo.navy{background:var(--r-navy);border-color:var(--r-navy);color:#FBFAF6}
+.r-kit-fila{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.r-kit-nota{margin:0;font:300 .8rem/1.45 var(--font-body);color:var(--r-gris)}
+.r-kit-lienzo.navy .r-kit-nota{color:rgba(251,250,246,.7)}
+.r-kit-lienzo .r-grilla{grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr))}
+.r-kit-lienzo .r-card{max-width:300px}
+.r-kit-lienzo .r-card.grande{max-width:none}
+@media(max-width:520px){.r-kit-lienzo{padding:16px}}

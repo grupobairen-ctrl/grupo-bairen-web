@@ -8,6 +8,9 @@
      para decir "coincide en 7 de 8; le falta cochera" en vez de un filtro mudo.
    · Lo que sigue: edificios, barrios y publicadores. Por ahora en este navegador;
      la tabla portal.seguimientos está escrita en portal/migracion-22-red-miembros.sql.
+   · Fase 2 (3/10/2026): las piezas que comparten inicio.html, red-kit.html, demanda.html y obra.html:
+     el medidor (R.progresoHTML), la búsqueda sin nombres (R.busq), la propuesta (R.prop y R.engancharProps),
+     la línea de obra (R.obraLinea), el sello, las novedades y las unidades de lo que se sigue.
    Sin dependencias: usa BP (ui.js) y BPData (data.js) si están, y funciona sin ellos.
    ───────────────────────────────────────────────────────────────────────── */
 (function () {
@@ -162,7 +165,10 @@
       if (c.total && c.cumple.length < piso) return;
       out.push({ aviso: a, c: c, puntaje: c.total ? c.cumple.length / c.total : 0.5 });
     });
-    out.sort(function (x, y) { return (y.puntaje - x.puntaje) || ((y.aviso.fotos || []).length - (x.aviso.fotos || []).length); });
+    /* A igual puntaje, primero la que está en uno de sus barrios, después la más nueva, después la de más fotos. */
+    var enBarrio = function (x) { return x.c.faltan.indexOf('barrio') === -1 ? 1 : 0; };
+    var fecha = function (x) { return new Date(x.aviso.publicadoEn || 0).getTime() || 0; };
+    out.sort(function (x, y) { return (y.puntaje - x.puntaje) || (enBarrio(y) - enBarrio(x)) || (fecha(y) - fecha(x)) || ((y.aviso.fotos || []).length - (x.aviso.fotos || []).length); });
     return out;
   };
 
@@ -231,7 +237,59 @@
   R.alternarSeguir = function (tipo, id, nombre) {
     var l = R.siguiendo(); var i = l.findIndex(function (s) { return s.tipo === tipo && s.id === id; });
     if (i > -1) l.splice(i, 1); else l.push({ tipo: tipo, id: id, nombre: nombre || id, desde: new Date().toISOString() });
-    guardar(LS_SIGO, l); return i === -1;
+    guardar(LS_SIGO, l);
+    R.subirSeguir(tipo, id, i === -1);
+    return i === -1;
+  };
+  /* Con cuenta y base real, lo que sigue vive también en portal.seguimientos (migración 22).
+     Si la tabla todavía no existe, la consulta falla en silencio y queda lo del navegador. */
+  var conBase = function () {
+    var S = window.BPStore;
+    return !!(S && S.mode === 'supabase' && S.sb && S.session && !S.demo && /^[0-9a-f-]{36}$/i.test(String(S.session.id || '')));
+  };
+  R.subirSeguir = function (tipo, id, activo) {
+    if (!conBase()) return;
+    var t = BPStore.sb.schema('portal').from('seguimientos');
+    var q = activo ? t.upsert({ usuario_id: BPStore.session.id, tipo: tipo, ref: id }, { onConflict: 'usuario_id,tipo,ref', ignoreDuplicates: true })
+      : t.delete().eq('usuario_id', BPStore.session.id).eq('tipo', tipo).eq('ref', id);
+    q.then(function () {}, function () {});
+  };
+  /* Trae lo que la cuenta sigue en la base y lo suma a lo de este navegador. Devuelve la lista resultante. */
+  R.traerSeguimientos = async function () {
+    if (!conBase()) return R.siguiendo();
+    try {
+      var r = await BPStore.sb.schema('portal').from('seguimientos').select('tipo,ref,creado').eq('usuario_id', BPStore.session.id);
+      if (r.error || !r.data) return R.siguiendo();
+      var l = R.siguiendo();
+      r.data.forEach(function (f) { if (!l.some(function (s) { return s.tipo === f.tipo && s.id === f.ref; })) l.push({ tipo: f.tipo, id: f.ref, nombre: f.ref, desde: f.creado }); });
+      guardar(LS_SIGO, l);
+      return l;
+    } catch (e) { return R.siguiendo(); }
+  };
+  R.ROTULO_SIGUE = { barrio: 'Barrio', edificio: 'Edificio', obra: 'Obra', publicador: 'Publica' };
+  /* Las unidades disponibles hoy de lo que se sigue: el barrio, el edificio (por dirección), la obra o quien publica. */
+  R.unidadesDe = function (avisos, s) {
+    return (avisos || []).filter(function (a) {
+      if (a.reservado) return false;
+      if (s.tipo === 'barrio') return a.zona === s.id;
+      if (s.tipo === 'edificio') return sinTildes(a.dir || a.titulo) === s.id;
+      if (s.tipo === 'obra') return !!a.emprendimiento && sinTildes(a.emprendimiento) === sinTildes(s.id);
+      if (s.tipo === 'publicador') return a.publicadorId === s.id;
+      return false;
+    });
+  };
+  R.hrefSigue = function (s) {
+    if (s.tipo === 'barrio') return 'buscar.html?op=&zona=' + encodeURIComponent(s.id);
+    if (s.tipo === 'edificio') return 'buscar.html?op=&q=' + encodeURIComponent(s.nombre || s.id);
+    if (s.tipo === 'obra') return 'obra.html?e=' + encodeURIComponent(s.id);
+    if (s.tipo === 'publicador') return 'publicadores.html#' + encodeURIComponent(s.id);
+    return 'buscar.html';
+  };
+
+  /* Las coincidencias que entraron en los últimos `dias` (por fecha de publicación). */
+  R.novedades = function (lista, dias) {
+    var tope = (dias || 14) * 864e5, ahora = Date.now();
+    return (lista || []).filter(function (x) { var t = new Date(x.aviso.publicadoEn || 0).getTime(); return t && ahora - t <= tope; });
   };
   /* Sugerencias para seguir según la búsqueda: sus barrios, los edificios con unidades que coinciden y quienes las publican. */
   R.sugerencias = function (avisos, b, max) {
@@ -302,11 +360,138 @@
     siguiendo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M6 4h12v16l-6-4-6 4z"/></svg>',
     perfil: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><circle cx="12" cy="8.5" r="3.6"/><path d="M5 20c1.2-3.6 3.8-5.4 7-5.4s5.8 1.8 7 5.4"/></svg>'
   };
-  R.tabbar = function (activo) {
+  /* opts.muestra: la barra dibujada quieta, dentro de la página (el kit visual).
+     opts.punto: las pestañas con algo nuevo, marcadas con un punto oro (nunca un número ni rojo). */
+  R.tabbar = function (activo, opts) {
+    opts = opts || {};
+    var punto = opts.punto || [];
     var items = [['inicio', 'Inicio', 'inicio.html'], ['buscar', 'Buscar', 'buscar.html'], ['propuestas', 'Propuestas', 'inicio.html#propuestas'], ['siguiendo', 'Siguiendo', 'inicio.html#siguiendo'], ['perfil', 'Mi búsqueda', 'mi-busqueda.html#resultado']];
-    return '<nav class="r-tabbar" aria-label="Red BAIREN">' + items.map(function (it) {
-      return '<a href="' + it[2] + '"' + (it[0] === activo ? ' aria-current="page"' : '') + '>' + ICO[it[0]] + '<span>' + it[1] + '</span></a>';
+    return '<nav class="r-tabbar' + (opts.muestra ? ' muestra' : '') + '" aria-label="' + (opts.muestra ? 'Muestra de la barra de la red' : 'Red BAIREN') + '">' + items.map(function (it) {
+      var hay = punto.indexOf(it[0]) > -1;
+      return '<a href="' + it[2] + '"' + (it[0] === activo ? ' aria-current="page"' : '') + (hay ? ' aria-label="' + it[1] + ', hay novedades"' : '') + '>' + ICO[it[0]] + (hay ? '<i class="punto" aria-hidden="true"></i>' : '') + '<span>' + it[1] + '</span></a>';
     }).join('') + '</nav>';
+  };
+
+  /* ── Más piezas compartidas (Fase 2, 3/10/2026) ─────────────────────────── */
+  /* A qué paso del asistente lleva cada cosa que falta en la búsqueda. */
+  R.PASO_DE = { 'barrios': 'barrios', 'presupuesto': 'presupuesto', 'ambientes': 'tipo', 'lo que no puede faltar': 'imprescindibles', 'tu gusto': 'gusto', 'tipo de propiedad': 'tipo' };
+  /* El medidor: cuánto está armada la búsqueda y qué sumar. opts.completar agrega el enlace al paso que falta. */
+  R.progresoHTML = function (b, opts) {
+    opts = opts || {};
+    var p = R.progreso(b);
+    var texto = p.faltan.length
+      ? 'Tu búsqueda está al <b>' + p.porcentaje + '%</b>. Sumá ' + esc(p.faltan.slice(0, 2).join(' y ')) + ' para recibir mejores propuestas.'
+      : 'Tu búsqueda está <b>completa</b>.';
+    var enlace = opts.completar !== false
+      ? (p.faltan.length ? '<a class="r-btn-link" href="mi-busqueda.html?paso=' + (R.PASO_DE[p.faltan[0]] || 'intencion') + '">Completar</a>' : '<a class="r-btn-link" href="mi-busqueda.html?paso=intencion">Editar</a>')
+      : '';
+    return '<div class="r-progreso"><div class="r-progreso-barra" role="progressbar" aria-label="Búsqueda armada" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + p.porcentaje + '"><i style="width:' + p.porcentaje + '%"></i></div><p>' + texto + (enlace ? ' ' + enlace : '') + '</p></div>';
+  };
+  /* Un grupo de demanda (lo que devuelve portal.demanda_agregada): "12 compradores · 4 ambientes · Palermo · hasta USD 1,2 M". */
+  R.grupoTexto = function (g) {
+    var alq = g.operacion === 'alquiler';
+    var n = Number(g.busquedas) || 0;
+    var quien = n + ' ' + (alq ? (n === 1 ? 'inquilino' : 'inquilinos') : (n === 1 ? 'comprador' : 'compradores'));
+    var amb = g.amb_min ? g.amb_min + (g.amb_min === 1 ? ' ambiente' : ' ambientes') + (g.amb_min >= 5 ? ' o más' : '') : 'Cualquier tamaño';
+    var zona = g.zona ? ((window.BP && BP.zonaLabel) ? BP.zonaLabel(g.zona) : g.zona) : 'Cualquier barrio';
+    var plata = g.presupuesto_hasta ? 'hasta ' + R.usdCorto(Number(g.presupuesto_hasta)) + (alq ? ' por mes' : '') : (g.presupuesto_desde ? 'más de ' + R.usdCorto(Number(g.presupuesto_desde)) + (alq ? ' por mes' : '') : 'sin tope dicho');
+    return { quien: quien, resto: [amb, zona, plata].join(' · '), todo: [quien, amb, zona, plata].join(' · ') };
+  };
+  /* Tarjeta de búsqueda sin nombres, para el que vende. opts.boton: texto del botón; opts.datos: atributos data-* del botón. */
+  R.busq = function (g, opts) {
+    opts = opts || {};
+    var t = R.grupoTexto(g);
+    var datos = Object.keys(opts.datos || {}).map(function (k) { return ' data-' + k + '="' + esc(opts.datos[k]) + '"'; }).join('');
+    return '<article class="r-busq"' + (opts.ejemplo ? ' data-ejemplo' : '') + '>' +
+      (opts.ejemplo ? '<span class="r-ejemplo claro">Ejemplo</span>' : '') +
+      '<b>' + esc(t.quien) + '</b><span>' + esc(t.resto) + '</span>' +
+      (g.imprescindibles && g.imprescindibles.length ? '<span class="r-busq-piden">La mayoría pide: ' + esc(g.imprescindibles.map(function (id) { var x = R.IMPRESCINDIBLES.find(function (i) { return i.id === id; }); return x ? x.label.toLowerCase() : id; }).join(', ')) + '</span>' : '') +
+      (opts.boton === false ? '' : '<button type="button" class="r-btn" aria-label="Enviar propuesta a ' + esc(t.todo) + '"' + datos + '>' + esc(opts.boton || 'Enviar propuesta') + '</button>') +
+      '</article>';
+  };
+  /* Propuesta que le llega al que busca: la unidad, la nota de quien publica y dos respuestas.
+     opts.nota, opts.de (quien la manda), opts.id (para engancharla), opts.ejemplo, opts.estado ('enviada'|'interesa'|'no_gracias'). */
+  R.MOTIVOS = [['precio', 'Precio'], ['zona', 'Zona'], ['estado', 'Estado']];
+  R.prop = function (a, opts) {
+    opts = opts || {};
+    var foto = a.fotos && a.fotos[0] ? ((window.BP && BP.sbImg) ? BP.sbImg(a.fotos[0], 700) : a.fotos[0]) : '';
+    var href = (window.BP && BP.urlFicha) ? BP.urlFicha(a) : 'propiedad.html?id=' + encodeURIComponent(a.id);
+    var zona = (window.BP && BP.zonaLabel) ? BP.zonaLabel(a.zona) : a.zona;
+    var datos = [a.m2 ? a.m2 + ' m²' : '', a.amb ? a.amb + ' amb.' : '', zona].filter(Boolean).join(' · ');
+    var precio = a.precio ? R.usd(a.precio) + (a.periodo ? ' por mes' : '') : 'Precio a consultar';
+    var estado = opts.estado || 'enviada';
+    var respuesta = estado === 'interesa' ? '<p class="r-prop-respuesta">Le dijiste que te interesa. Quien publica te va a escribir.</p>'
+      : estado === 'no_gracias' ? '<p class="r-prop-respuesta">Le dijiste que no, gracias.' + (opts.motivo ? ' Motivo: ' + esc(opts.motivo) + '.' : '') + '</p>' : '';
+    return '<article class="r-prop"' + (opts.id ? ' data-prop="' + esc(opts.id) + '"' : '') + '>' +
+      '<div class="r-prop-cab"><p class="r-ceja" style="margin:0">Propuesta' + (opts.de ? ' de ' + esc(opts.de) : '') + '</p>' + (opts.ejemplo ? '<span class="r-ejemplo">Ejemplo</span>' : '') + '</div>' +
+      '<a class="r-prop-unidad" href="' + href + '">' + (foto ? '<img src="' + esc(foto) + '" alt="' + esc(a.titulo || a.dir) + '" loading="lazy">' : '<span class="r-prop-sinfoto" aria-hidden="true"></span>') +
+      '<span><b>' + esc(a.dir || a.titulo) + (a.unidad ? ' · ' + esc(a.unidad) : '') + '</b><span class="r-card-precio">' + esc(precio) + '</span><span class="r-dato">' + esc(datos) + '</span></span></a>' +
+      (opts.nota ? '<p class="r-prop-nota">' + esc(opts.nota) + '</p>' : '') +
+      (opts.porque ? '<p class="r-card-porque">' + esc(opts.porque) + '</p>' : '') +
+      (estado === 'enviada'
+        ? '<div class="r-prop-acciones"><button type="button" class="r-btn" data-resp="interesa">Me interesa</button><button type="button" class="r-btn r-btn-sec" data-resp="no_gracias">No, gracias</button></div>' +
+          '<div class="r-prop-motivos" hidden><p class="r-dato" style="margin:0;width:100%">¿Por qué? Nos ayuda a mandarte mejores. Es opcional.</p>' + R.MOTIVOS.map(function (m) { return '<button type="button" class="r-chip" data-motivo="' + m[0] + '" aria-pressed="false">' + m[1] + '</button>'; }).join('') + '</div>'
+        : respuesta) +
+      '</article>';
+  };
+  /* Engancha las respuestas de las propuestas dentro de root. alResponder(id, estado, motivo) guarda; si devuelve una promesa que falla, se avisa. */
+  R.engancharProps = function (root, alResponder) {
+    (root || document).querySelectorAll('.r-prop').forEach(function (p) {
+      if (p._r) return; p._r = true;
+      var motivos = p.querySelector('.r-prop-motivos');
+      var cerrar = function (estado, motivo) {
+        var acc = p.querySelector('.r-prop-acciones'); if (acc) acc.remove();
+        if (motivos) motivos.hidden = true;
+        var r = document.createElement('p'); r.className = 'r-prop-respuesta';
+        r.textContent = estado === 'interesa' ? 'Le avisamos a quien publica que te interesa. Te va a escribir.' : 'Listo. No te vamos a mandar más de esta unidad.' + (motivo ? ' Motivo: ' + motivo + '.' : '');
+        p.appendChild(r);
+      };
+      p.querySelectorAll('[data-resp]').forEach(function (b) {
+        b.addEventListener('click', function () {
+          var estado = b.dataset.resp;
+          if (estado === 'no_gracias' && motivos && motivos.hidden) {
+            motivos.hidden = false;
+            b.textContent = 'Listo';   /* segundo toque: confirma sin motivo */
+            var m = motivos.querySelector('[data-motivo]'); if (m) m.focus();
+            return;
+          }
+          var elegido = motivos && motivos.querySelector('[aria-pressed="true"]');
+          var motivo = elegido ? elegido.dataset.motivo : null;
+          var hecho = alResponder ? alResponder(p.dataset.prop || null, estado, motivo) : null;
+          Promise.resolve(hecho).then(function () { cerrar(estado, elegido ? elegido.textContent.toLowerCase() : null); }, function () { if (window.BP && BP.toast) BP.toast('No se pudo guardar tu respuesta. Probá de nuevo.', 'error'); });
+        });
+      });
+      if (motivos) motivos.querySelectorAll('[data-motivo]').forEach(function (c) {
+        c.addEventListener('click', function () {
+          var ya = c.getAttribute('aria-pressed') === 'true';
+          motivos.querySelectorAll('[data-motivo]').forEach(function (x) { x.setAttribute('aria-pressed', 'false'); });
+          c.setAttribute('aria-pressed', ya ? 'false' : 'true');
+          var no = p.querySelector('[data-resp="no_gracias"]'); if (no) no.textContent = 'Enviar respuesta';
+        });
+      });
+    });
+  };
+  /* La línea de una obra: hitos en orden de fecha; el último es el actual (opts.actual elige otro: lo que sigue queda sin marcar).
+     Cada evento: { titulo, fecha, porcentaje, nota, foto_url } como portal.obra_eventos, o fechaTexto para un texto libre. */
+  R.obraLinea = function (eventos, opts) {
+    opts = opts || {};
+    var l = (eventos || []).slice().sort(function (x, y) { return String(x.fecha || '').localeCompare(String(y.fecha || '')); });
+    var fmt = function (f) { if (!f) return ''; var d = new Date(String(f).length <= 10 ? f + 'T12:00:00' : f); return isNaN(d) ? String(f) : d.toLocaleDateString('es-AR', { month: 'long', year: 'numeric' }); };
+    var ultimo = opts.actual != null ? opts.actual : l.length - 1;
+    return '<ol class="r-obra">' + '<i class="linea" aria-hidden="true" style="height:' + (l.length ? Math.round(((ultimo + 0.5) / l.length) * 100) : 0) + '%"></i>' + l.map(function (e, i) {
+      var clase = i < ultimo ? 'hecho' : i === ultimo ? 'actual' : '';
+      var foto = e.foto_url ? ((window.BP && BP.sbImg) ? BP.sbImg(e.foto_url, 700) : e.foto_url) : '';
+      return '<li class="r-hito ' + clase + '"' + (i === ultimo ? ' aria-current="step"' : '') + '><b>' + esc(e.titulo) + '</b>' +
+        '<span>' + esc([e.fechaTexto || fmt(e.fecha), e.porcentaje != null ? e.porcentaje + '% de la obra' : ''].filter(Boolean).join(' · ')) + '</span>' +
+        (e.nota ? '<p class="r-hito-nota">' + esc(e.nota) + '</p>' : '') +
+        (foto ? '<img class="r-hito-foto" src="' + esc(foto) + '" alt="' + esc(e.titulo) + '" loading="lazy">' : '') + '</li>';
+    }).join('') + '</ol>';
+  };
+  /* Un sello: filete oro, nunca relleno. */
+  R.sello = function (texto, opts) {
+    opts = opts || {};
+    var ico = '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>';
+    return '<span class="r-sello' + (opts.claro ? ' claro' : '') + '">' + ico + esc(texto) + '</span>';
   };
 
   window.BPRed = R;

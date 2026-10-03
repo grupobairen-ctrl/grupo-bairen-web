@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>/* El velo de carga: navy desde el primer byte, se retira cuando la página está lista de verdad:
+     load + ningún esqueleto a la vista + las fotos del primer pantallazo cargadas. Si eso pasa en menos de
+     500 ms nadie lo ve; si se vio, se queda hasta los 800 ms para no titilar; a los 8 s se va pase lo que
+     pase. Inline y sin dependencias: si un script no carga, el velo se va igual. */
+  (function(h){h.classList.add('cargando');var V=window.BPVelo={retenido:false,cargado:false},obs=null,timer=null;
+  var ESQ='.p-skel,.p-skel-card,.p-skel-ficha,.p-skel-line,.p-skel-vcard,.p-skel-panel,.p-skel-form,.p-skel-bloque,.p-skel-cta,.p-fhero-skel,.h-esq';
+  V.soltar=function(){if(!h.classList.contains('cargando'))return;V.retenido=false;h.classList.remove('cargando');if(obs)obs.disconnect();try{document.dispatchEvent(new Event('bairen:velo'))}catch(e){}};
+  V.retener=function(){V.retenido=true};V.seguir=function(){V.retenido=false;pedir()};
+  /* Visible de verdad: checkVisibility ve lo que un rectángulo no (un details cerrado, content-visibility) */
+  var vis=function(e){return e.checkVisibility?e.checkVisibility({contentVisibilityAuto:true,visibilityProperty:true}):e.getClientRects().length>0};
+  V.lista=function(){if(!V.cargado)return false;var es=document.querySelectorAll(ESQ),i;for(i=0;i<es.length;i++)if(vis(es[i]))return false;
+    var im=document.images,H=innerHeight,W=innerWidth,r;for(i=0;i<im.length;i++){if(im[i].complete||!im[i].getAttribute('src')||!vis(im[i]))continue;r=im[i].getBoundingClientRect();if(r.width>0&&r.bottom>0&&r.top<H&&r.right>0&&r.left<W)return false}return true};
+  var revisar=function(){if(V.retenido||timer||!V.lista())return;var t=performance.now();timer=setTimeout(function(){if(!V.retenido)V.soltar()},t>500?Math.max(0,800-t):0)};
+  var pedido=false,pedir=function(){if(pedido)return;pedido=true;requestAnimationFrame(function(){pedido=false;revisar()})};
+  addEventListener('load',function(){V.cargado=true;pedir()});
+  document.addEventListener('DOMContentLoaded',function(){obs=new MutationObserver(pedir);obs.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class','src','hidden','style']})});
+  document.addEventListener('load',pedir,true);document.addEventListener('error',pedir,true);
+  setTimeout(V.soltar,8000)})(document.documentElement);</script>
+  <title>Inicio · BAIREN</title>
+  <meta name="description" content="Tu inicio en BAIREN: lo que coincide con tu búsqueda, lo que seguís y las propuestas que te llegan."><meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#131D2D">
+  <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
+  <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css?v=20261003a"><link rel="stylesheet" href="css/catalogo.css?v=20261003a"><link rel="stylesheet" href="css/portal.css?v=20261003a"><link rel="stylesheet" href="css/red.css?v=20261003b">
+</head>
+<body class="r-body r-con-tabbar">
+<div class="p-velo" aria-hidden="true"><span class="w">BAIREN</span></div>
+<div id="pHeader"></div>
+<main id="contenido" class="r-contenedor" aria-busy="true">
+  <div class="r-esq" aria-hidden="true"><span class="p-skel-line s"></span><span class="p-skel-line t"></span><span class="p-skel-line m"></span><span class="p-skel-line l"></span></div>
+</main>
+<div id="pFooter"></div>
+<div id="rTab"></div>
+
+<script src="../mapa-barrios.js?v=20261003a" defer></script><script src="supabase-portal.js?v=20261003a" defer></script><script src="js/errores.js?v=20261003a" defer></script>
+<script src="js/motion.js?v=20261003a" defer></script><script src="js/bairen-motion.js?v=20261003a" defer></script>
+<script src="js/i18n-portal.js?v=20261003a" defer></script><script src="js/ui.js?v=20261003a" defer></script>
+<script src="js/store.js?v=20261003a" defer></script><script src="js/data.js?v=20261003a" defer></script>
+<script src="js/red.js?v=20261003b" defer></script>
+<script>
+/* El inicio del miembro (Fase 2, 3/10/2026). Una portada, no un muro:
+   · sin búsqueda, la invitación a armarla;
+   · con búsqueda, el saludo, las novedades de los últimos 14 días, la que mejor coincide en grande,
+     más coincidencias, las propuestas que le llegaron y lo que sigue, con el medidor de la búsqueda.
+   Las propuestas se leen de portal.propuestas (migración 22) solo con cuenta; sin la tabla, el vacío. */
+document.addEventListener('DOMContentLoaded', function(){ (async function(){
+  BP.header('red'); BP.footer(); if (window.BPStore) BPStore.init();
+  const R = BPRed, esc = BP.esc, S = window.BPStore;
+  const main = document.getElementById('contenido');
+  let hayPropuestas = false;
+  const pintarTab = () => {
+    const h = location.hash, activo = h === '#siguiendo' ? 'siguiendo' : h === '#propuestas' ? 'propuestas' : 'inicio';
+    document.getElementById('rTab').innerHTML = R.tabbar(activo, { punto: hayPropuestas ? ['propuestas'] : [] });
+  };
+  pintarTab(); addEventListener('hashchange', pintarTab);
+
+  await BP.probePretty();
+  let avisos = [];
+  try { ({ avisos } = await BPData.load()); }
+  catch (e) {
+    console.error(e); main.removeAttribute('aria-busy');
+    BP.estadoError(main, 'No pudimos cargar las unidades.', () => location.reload());
+    return;
+  }
+  avisos = (avisos || []).filter(a => !a.demo);
+
+  const b = R.leer();
+  const sesion = S && S.session && !S.session.demo ? S.session : null;
+  const opDe = () => b && b.intencion === 'alquilar' ? 'alquiler' : 'venta';
+  const zona = z => BP.zonaLabel(z);
+
+  /* ── Saludo: por la hora y, con cuenta, por el nombre de la persona ── */
+  let nombre = null;
+  if (sesion) {
+    nombre = sesion.nombre || null;
+    if (!nombre && S.getMyPersona) { try { const p = await S.getMyPersona(); nombre = p && p.nombre; } catch (e) { /* sin persona */ } }
+    nombre = nombre ? String(nombre).trim().split(/\s+/)[0] : null;
+  }
+  const hora = new Date().getHours();
+  const saludo = hora < 6 ? ['Buenas', 'noches'] : hora < 13 ? ['Buen', 'día'] : hora < 20 ? ['Buenas', 'tardes'] : ['Buenas', 'noches'];
+  const titular = nombre ? `${saludo.join(' ')}, <em>${esc(nombre)}</em>.` : `${saludo[0]} <em>${saludo[1]}</em>.`;
+  const hoy = (() => { const t = new Date().toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' }).replace(',', ''); return t.charAt(0).toUpperCase() + t.slice(1); })();
+
+  /* ── Lo que sigue: cuántas unidades hay hoy en cada cosa, y la opción de dejar de seguir ── */
+  const nombreDe = s => s.tipo === 'barrio' ? zona(s.id) : s.tipo === 'publicador' ? (BPData.pub(s.id) || {}).nombre || s.nombre : (s.nombre || s.id);
+  const detalleDe = s => {
+    const n = R.unidadesDe(avisos, s).length;
+    return n ? (n === 1 ? '1 unidad disponible hoy' : n + ' unidades disponibles hoy') : 'Sin unidades disponibles hoy. Te avisamos cuando entre una.';
+  };
+  const filaSigue = (s, sugerida) => `<div class="r-sigue-fila">
+      <a class="r-sigue-nombre" href="${R.hrefSigue(s)}"><span class="r-sigue-tipo">${esc(R.ROTULO_SIGUE[s.tipo] || s.tipo)}</span><b>${esc(nombreDe(s))}</b><span>${esc(sugerida ? (s.detalle || detalleDe(s)) : detalleDe(s))}</span></a>
+      <div class="r-sigue-acc">${sugerida
+        ? `<button type="button" class="r-chip" data-seguir data-st="${esc(s.tipo)}" data-si="${esc(s.id)}" data-sn="${esc(s.nombre)}" aria-pressed="false">Seguir</button>`
+        : `<button type="button" class="r-chip" data-dejar data-st="${esc(s.tipo)}" data-si="${esc(s.id)}" data-sn="${esc(nombreDe(s))}" aria-label="Dejar de seguir ${esc(nombreDe(s))}">Dejar de seguir</button>`}</div>
+    </div>`;
+  const pintarSiguiendo = lista => {
+    const host = document.getElementById('sigueHost'); if (!host) return;
+    if (lista.length) {
+      host.innerHTML = `<div class="r-sigue">${lista.map(s => filaSigue(s, false)).join('')}</div>`;
+    } else {
+      const sug = b ? R.sugerencias(avisos, b, 4) : [];
+      host.innerHTML = `<div class="r-vacio"><p>Todavía no seguís nada. Seguí un barrio, un edificio o una obra y te avisamos cuando haya novedades: una unidad nueva, una baja de precio, un avance de obra.</p>${b ? '' : '<a class="r-btn-link" href="buscar.html">Ir al catálogo</a>'}</div>
+        ${sug.length ? `<p class="r-ceja" style="margin:24px 0 0">Para empezar</p><div class="r-sigue">${sug.map(s => filaSigue(s, true)).join('')}</div>` : ''}`;
+    }
+    host.querySelectorAll('[data-dejar]').forEach(x => x.addEventListener('click', () => {
+      const ahora = R.alternarSeguir(x.dataset.st, x.dataset.si, x.dataset.sn);
+      x.closest('.r-sigue-fila').classList.toggle('apagada', !ahora);
+      x.textContent = ahora ? 'Dejar de seguir' : 'Volver a seguir';
+      x.setAttribute('aria-label', (ahora ? 'Dejar de seguir ' : 'Volver a seguir ') + x.dataset.sn);
+      BP.toast(ahora ? 'Seguís ' + x.dataset.sn + '.' : 'Dejaste de seguir ' + x.dataset.sn + '.');
+    }));
+    host.querySelectorAll('[data-seguir]').forEach(x => x.addEventListener('click', () => {
+      const ahora = R.alternarSeguir(x.dataset.st, x.dataset.si, x.dataset.sn);
+      x.setAttribute('aria-pressed', ahora); x.textContent = ahora ? 'Siguiendo' : 'Seguir';
+    }));
+  };
+
+  /* ── Propuestas: con cuenta y la tabla de la migración 22; si no, el vacío diseñado ── */
+  const VACIO_PROP = '<div class="r-vacio"><p>Cuando una inmobiliaria o desarrolladora te mande una propuesta, aparece acá. Solo si coincide con tu búsqueda.</p><p>Quien la manda ve tu búsqueda, nunca tu nombre. Vos decidís si te interesa.</p></div>';
+  const cargarPropuestas = async () => {
+    if (!(S && S.mode === 'supabase' && S.sb && sesion)) return null;
+    try {
+      const { data, error } = await S.sb.schema('portal').from('propuestas').select('id,aviso_id,publicador_id,nota,estado,motivo,creada').eq('usuario_destino', sesion.id).order('creada', { ascending: false }).limit(20);
+      return error ? null : (data || []);
+    } catch (e) { return null; }
+  };
+  const pintarPropuestas = filas => {
+    const host = document.getElementById('propHost'); if (!host) return;
+    const visibles = (filas || []).map(p => ({ p, a: avisos.find(a => String(a.id) === String(p.aviso_id)) })).filter(x => x.a);
+    hayPropuestas = visibles.some(x => x.p.estado === 'enviada'); pintarTab();
+    if (!visibles.length) { host.innerHTML = VACIO_PROP; return; }
+    const MOT = { precio: 'precio', zona: 'zona', estado: 'estado' };
+    host.innerHTML = `<div class="r-props">${visibles.map(({ p, a }) => R.prop(a, { id: p.id, de: (BPData.pub(a.publicadorId) || {}).nombre, nota: p.nota, estado: p.estado, motivo: MOT[p.motivo], porque: b ? R.frase(R.coincidencia(a, b)) : null })).join('')}</div>`;
+    R.engancharProps(host, async (id, estado, motivo) => {
+      const { error } = await S.sb.schema('portal').from('propuestas').update({ estado, motivo: estado === 'no_gracias' ? motivo : null }).eq('id', id);
+      if (error) throw error;
+    });
+  };
+
+  /* ── Las dos portadas ── */
+  if (!b) {
+    const ultimas = avisos.filter(a => !a.reservado).sort((x, y) => new Date(y.publicadoEn || 0) - new Date(x.publicadoEn || 0)).slice(0, 3);
+    main.innerHTML = `
+      <section class="r-portada" aria-labelledby="tInv">
+        <p class="r-ceja">Tu inicio en BAIREN</p>
+        <h1 class="r-h1 xl" id="tInv">Contanos qué <em>buscás</em>.</h1>
+        <p class="r-bajada">Lo armás una sola vez, en dos minutos. Te mostramos lo que coincide hoy, qué le falta a cada unidad, y te avisamos cuando entre algo nuevo.</p>
+        <a class="r-btn flecha" href="mi-busqueda.html">Contanos qué buscás</a>
+        <p class="r-dato">Sin costo. Quien vende ve tu búsqueda, nunca tu nombre.</p>
+      </section>
+      <section class="r-seccion" aria-labelledby="tComo">
+        <h2 class="r-h2" id="tComo">Cómo <em>funciona</em></h2>
+        <ol class="r-pasos">
+          <li><b>Contás qué buscás</b><span>Barrios, presupuesto y lo que no puede faltar. Como lo dirías.</span></li>
+          <li><b>Ves lo que coincide</b><span>Cada unidad te dice en qué coincide y qué le falta.</span></li>
+          <li><b>Te llegan propuestas</b><span>Inmobiliarias, desarrolladoras y dueños te escriben solo si lo suyo coincide. Vos decidís.</span></li>
+        </ol>
+      </section>
+      ${ultimas.length ? `<section class="r-seccion" aria-labelledby="tUlt">
+        <div class="r-cabeza"><h2 class="r-h2" id="tUlt" style="margin:0">Lo último que <em>entró</em></h2><a class="r-btn-link" href="buscar.html">Ver el catálogo</a></div>
+        <div class="r-grilla r-riel">${ultimas.map(a => R.tarjeta(a, null)).join('')}</div>
+      </section>` : ''}
+      <section class="r-seccion" id="siguiendo" aria-labelledby="tSigue"><h2 class="r-h2" id="tSigue">Lo que <em>seguís</em></h2><div id="sigueHost"></div></section>
+      <section class="r-seccion" id="propuestas" aria-labelledby="tProp"><h2 class="r-h2" id="tProp">Tus <em>propuestas</em></h2><div id="propHost">${VACIO_PROP}</div></section>`;
+  } else {
+    const lista = R.coincidencias(avisos, b);
+    const conFecha = lista.some(x => x.aviso.publicadoEn);
+    const nov = conFecha ? R.novedades(lista, 14) : lista;
+    const esNueva = x => nov.indexOf(x) > -1;
+    const cerca = lista.length < 3 ? R.coincidencias(avisos, b, { minimo: 0 }).filter(x => !lista.some(y => y.aviso.id === x.aviso.id)).slice(0, 3) : [];
+    let linea, bajada;
+    if (!lista.length) { linea = 'Hoy no hay unidades que <em>coincidan</em>.'; bajada = 'Te avisamos apenas entre una. Mientras tanto, mirá las que están cerca o ajustá tu búsqueda.'; }
+    else if (!conFecha) { linea = `<em>${lista.length}</em> ${lista.length === 1 ? 'novedad' : 'novedades'} para tu búsqueda.`; bajada = `${lista.length === 1 ? 'Es la que coincide' : 'Son las que coinciden'} hoy.`; }
+    else if (nov.length) { linea = `<em>${nov.length}</em> ${nov.length === 1 ? 'novedad' : 'novedades'} para tu búsqueda.`; bajada = `${nov.length === 1 ? 'Entró' : 'Entraron'} en los últimos 14 días. En total coinciden ${lista.length} ${lista.length === 1 ? 'unidad' : 'unidades'}.`; }
+    else { linea = 'Sin novedades en los últimos <em>14 días</em>.'; bajada = `Hoy coinciden ${lista.length} ${lista.length === 1 ? 'unidad' : 'unidades'}. Te avisamos apenas entre una nueva.`; }
+    const mejor = lista[0];
+    const resto = lista.slice(1, 7);
+    const catalogo = `buscar.html?op=${opDe()}${(b.zonas || []).map(z => '&zona=' + encodeURIComponent(z)).join('')}`;
+    main.innerHTML = `
+      <header class="r-ini-cab">
+        <div>
+          <p class="r-ceja">${esc(hoy)}</p>
+          <h1 class="r-h1" id="tSaludo">${titular}</h1>
+          <p class="r-ini-nov">${linea}</p>
+          <p class="r-bajada">${esc(bajada)}</p>
+        </div>
+        <aside class="r-ini-caja" aria-labelledby="tTuBusq">
+          <p class="r-ceja" id="tTuBusq">Tu búsqueda</p>
+          <p class="r-card-dir" style="font-size:1.08rem">${esc(R.resumen(b))}</p>
+          ${R.progresoHTML(b)}
+        </aside>
+      </header>
+      ${mejor ? `<section class="r-seccion" aria-labelledby="tMejor">
+        <h2 class="r-h2" id="tMejor">La que mejor <em>coincide</em></h2>
+        ${R.tarjeta(mejor.aviso, mejor.c, { grande: true, ceja: esNueva(mejor) && conFecha ? 'Nueva · ' + BP.hace(mejor.aviso.publicadoEn).toLowerCase() : null })}
+      </section>` : ''}
+      ${resto.length ? `<section class="r-seccion" aria-labelledby="tMas">
+        <div class="r-cabeza"><h2 class="r-h2" id="tMas" style="margin:0">Más que <em>coinciden</em></h2><a class="r-btn-link" href="${catalogo}">Ver en el catálogo</a></div>
+        <div class="r-grilla r-riel">${resto.map(x => R.tarjeta(x.aviso, x.c, { ceja: esNueva(x) && conFecha ? 'Nueva' : null })).join('')}</div>
+      </section>` : ''}
+      ${!lista.length ? `<section class="r-seccion" aria-labelledby="tNada"><h2 class="r-h2" id="tNada">Lo que <em>coincide</em></h2><div class="r-vacio"><p>Todavía no hay unidades que cumplan lo que no se negocia de tu búsqueda. Te avisamos apenas entre una.</p><a class="r-btn-link" href="mi-busqueda.html?paso=intencion">Ajustar mi búsqueda</a></div></section>` : ''}
+      ${cerca.length ? `<section class="r-seccion" aria-labelledby="tCerca"><h2 class="r-h2" id="tCerca">Y estas están <em>cerca</em></h2><div class="r-grilla r-riel">${cerca.map(x => R.tarjeta(x.aviso, x.c)).join('')}</div></section>` : ''}
+      <section class="r-seccion" id="propuestas" aria-labelledby="tProp"><h2 class="r-h2" id="tProp">Tus <em>propuestas</em></h2><div id="propHost">${VACIO_PROP}</div></section>
+      <section class="r-seccion" id="siguiendo" aria-labelledby="tSigue"><h2 class="r-h2" id="tSigue">Lo que <em>seguís</em></h2><div id="sigueHost"></div></section>
+      ${sesion ? '' : `<section class="r-seccion" aria-labelledby="tCuenta"><div class="r-vacio">
+        <h2 class="r-h3" id="tCuenta">Guardala en tu <em>cuenta</em></h2>
+        <p>Hoy tu búsqueda vive en este navegador. Con tu cuenta te avisamos por mail cuando entre algo que coincida, y la ves desde cualquier dispositivo.</p>
+        <a class="r-btn flecha" href="ingresar.html?volver=inicio.html">Crear mi cuenta</a>
+      </div></section>`}`;
+  }
+  main.removeAttribute('aria-busy');
+  const sigoAntes = R.siguiendo();
+  pintarSiguiendo(sigoAntes);
+  /* Con cuenta: lo que sigue en la base y las propuestas, sin frenar el primer dibujo */
+  R.traerSeguimientos().then(l => { if (l.length !== sigoAntes.length) pintarSiguiendo(l); });
+  cargarPropuestas().then(f => { if (f) pintarPropuestas(f); });
+  if (location.hash) { const d = document.getElementById(location.hash.slice(1)); if (d) d.scrollIntoView(); }
+
+  const h1 = main.querySelector('h1');
+  const animar = () => { if (h1 && window.BPM && BPM.titular) BPM.titular(h1); };
+  if (document.documentElement.classList.contains('cargando')) document.addEventListener('bairen:velo', animar, { once: true }); else animar();
+  if (window.BPM && BPM.init) BPM.init(document);
+})(); });
+</script>
+</body>
+</html>
