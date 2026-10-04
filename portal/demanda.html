@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>/* El velo de carga: navy desde el primer byte, se retira cuando la página está lista de verdad:
+     load + ningún esqueleto a la vista + las fotos del primer pantallazo cargadas. Si eso pasa en menos de
+     500 ms nadie lo ve; si se vio, se queda hasta los 800 ms para no titilar; a los 8 s se va pase lo que
+     pase. Inline y sin dependencias: si un script no carga, el velo se va igual. */
+  (function(h){h.classList.add('cargando');var V=window.BPVelo={retenido:false,cargado:false},obs=null,timer=null;
+  var ESQ='.p-skel,.p-skel-card,.p-skel-ficha,.p-skel-line,.p-skel-vcard,.p-skel-panel,.p-skel-form,.p-skel-bloque,.p-skel-cta,.p-fhero-skel,.h-esq';
+  V.soltar=function(){if(!h.classList.contains('cargando'))return;V.retenido=false;h.classList.remove('cargando');if(obs)obs.disconnect();try{document.dispatchEvent(new Event('bairen:velo'))}catch(e){}};
+  V.retener=function(){V.retenido=true};V.seguir=function(){V.retenido=false;pedir()};
+  /* Visible de verdad: checkVisibility ve lo que un rectángulo no (un details cerrado, content-visibility) */
+  var vis=function(e){return e.checkVisibility?e.checkVisibility({contentVisibilityAuto:true,visibilityProperty:true}):e.getClientRects().length>0};
+  V.lista=function(){if(!V.cargado)return false;var es=document.querySelectorAll(ESQ),i;for(i=0;i<es.length;i++)if(vis(es[i]))return false;
+    var im=document.images,H=innerHeight,W=innerWidth,r;for(i=0;i<im.length;i++){if(im[i].complete||!im[i].getAttribute('src')||!vis(im[i]))continue;r=im[i].getBoundingClientRect();if(r.width>0&&r.bottom>0&&r.top<H&&r.right>0&&r.left<W)return false}return true};
+  var revisar=function(){if(V.retenido||timer||!V.lista())return;var t=performance.now();timer=setTimeout(function(){if(!V.retenido)V.soltar()},t>500?Math.max(0,800-t):0)};
+  var pedido=false,pedir=function(){if(pedido)return;pedido=true;requestAnimationFrame(function(){pedido=false;revisar()})};
+  addEventListener('load',function(){V.cargado=true;pedir()});
+  document.addEventListener('DOMContentLoaded',function(){obs=new MutationObserver(pedir);obs.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class','src','hidden','style']})});
+  document.addEventListener('load',pedir,true);document.addEventListener('error',pedir,true);
+  setTimeout(V.soltar,8000)})(document.documentElement);</script>
+  <title>Demanda · BAIREN</title>
+  <meta name="description" content="Compradores que buscan lo tuyo: la demanda de la red BAIREN, en grupos y sin nombres, para quien publica."><meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#131D2D">
+  <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
+  <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css?v=20261003a"><link rel="stylesheet" href="css/catalogo.css?v=20261003a"><link rel="stylesheet" href="css/portal.css?v=20261003a"><link rel="stylesheet" href="css/red.css?v=20261003b">
+</head>
+<body class="r-body r-con-tabbar">
+<div class="p-velo" aria-hidden="true"><span class="w">BAIREN</span></div>
+<div id="pHeader"></div>
+<main id="contenido" class="r-contenedor" aria-busy="true">
+  <div class="r-esq" aria-hidden="true"><span class="p-skel-line t"></span><span class="p-skel-line"></span><span class="p-skel-line"></span></div>
+</main>
+<div id="pFooter"></div>
+<div id="rTab"></div>
+
+<dialog class="r-panel" id="panel" aria-labelledby="panelTit">
+  <form method="dialog" class="r-panel-in" id="panelForm">
+    <div class="r-panel-cab">
+      <div><p class="r-ceja" style="margin:0">Enviar propuesta</p><h2 class="r-h3" id="panelTit" style="margin:6px 0 0"></h2></div>
+      <button type="button" class="r-panel-cerrar" id="panelCerrar" aria-label="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+    <p class="r-dato" style="margin:0" id="panelAyuda"></p>
+    <fieldset class="r-unidades" id="panelUnidades"><legend class="r-ceja" style="margin:0 0 6px">¿Qué unidad les mandás?</legend></fieldset>
+    <div class="r-campo">
+      <label class="r-ceja" for="panelNota" style="margin:0">Una nota corta, si querés</label>
+      <textarea class="r-texto" id="panelNota" maxlength="600" placeholder="Ej.: Tiene la cochera y la vista que buscan. Se puede visitar esta semana."></textarea>
+    </div>
+    <div class="r-panel-pie">
+      <button type="submit" class="r-btn flecha" id="panelEnviar">Enviar</button>
+      <span class="r-dato" id="panelCupo">Hasta 30 por semana. Solo le llega a quien coincide.</span>
+    </div>
+  </form>
+</dialog>
+
+<script src="../mapa-barrios.js?v=20261003a" defer></script><script src="supabase-portal.js?v=20261003a" defer></script><script src="js/errores.js?v=20261003a" defer></script>
+<script src="js/motion.js?v=20261003a" defer></script><script src="js/bairen-motion.js?v=20261003a" defer></script>
+<script src="js/i18n-portal.js?v=20261003a" defer></script><script src="js/ui.js?v=20261003a" defer></script>
+<script src="js/store.js?v=20261003a" defer></script><script src="js/data.js?v=20261003a" defer></script>
+<script src="js/red.js?v=20261004a" defer></script>
+<script>
+/* Demanda para el que vende (Fase 2, 4/10/2026): "Compradores que buscan lo tuyo".
+   · Lee portal.demanda_agregada (migración 22): grupos de 3 búsquedas o más, sin nombres.
+   · "Enviar propuesta" manda una unidad propia a un grupo con portal.enviar_propuesta: la base elige
+     a quién le llega y nadie ve quién es hasta que esa persona responde "Me interesa".
+   · "Lo que mandaste" lee portal.mis_propuestas_enviadas: números y el contacto de los interesados.
+   · Sin la migración 22, un vacío que lo explica y un ejemplo rotulado. Sin sesión, la puerta para entrar. */
+document.addEventListener('DOMContentLoaded', function(){ (async function(){
+  BP.header('red'); BP.footer(); if (window.BPStore) BPStore.init();
+  const R = BPRed, esc = BP.esc, main = document.getElementById('contenido');
+  document.getElementById('rTab').innerHTML = R.tabbar('');
+  await BP.probePretty();
+  const S = window.BPStore;
+  const conBase = !!(S && S.mode === 'supabase' && S.sb);
+  const sesion = S && S.session;
+
+  const cabeza = (sub) => `<header class="r-ini-cab" style="padding-bottom:12px"><div><p class="r-ceja">Para quien publica</p><h1 class="r-h1">Compradores que buscan <em>lo tuyo</em>.</h1><p class="r-bajada">${sub}</p></div></header>`;
+  const listo = html => { main.innerHTML = html; main.removeAttribute('aria-busy'); main.querySelectorAll('[data-ejemplo] button').forEach(x => { x.disabled = true; x.title = 'Ejemplo'; }); if (window.BPM) { if (BPM.titular) BPM.titular(main.querySelector('.r-h1')); if (BPM.init) BPM.init(main); } };
+
+  if (!sesion) {
+    listo(cabeza('Lo que buscan los miembros de BAIREN, en grupos y sin nombres. Les mandás una unidad tuya y, si les interesa, te escriben.') +
+      `<section class="r-seccion"><div class="r-aviso"><b>Entrá con tu cuenta de publicador</b><p>Esta página es para inmobiliarias, corredores, desarrolladoras y dueños que publican en BAIREN.</p><a class="r-btn flecha" href="ingresar.html?volver=demanda.html">Entrar</a></div></section>` + ejemploHTML());
+    return;
+  }
+
+  let pub = null, misAvisos = [];
+  try { pub = await S.getMyPublicador(); } catch (e) { console.error(e); }
+  try { misAvisos = (await S.myAvisos()) || []; } catch (e) { console.error(e); }
+  misAvisos = misAvisos.filter(a => a.estado_curacion === 'publicado');
+
+  if (!pub) {
+    listo(cabeza('Lo que buscan los miembros de BAIREN, en grupos y sin nombres.') +
+      `<section class="r-seccion"><div class="r-aviso"><b>Tu cuenta todavía no publica</b><p>Para ver la demanda y mandar propuestas, primero publicá una unidad. Inmobiliarias y corredores con matrícula, desarrolladoras con CUIT y dueños con título.</p><a class="r-btn flecha" href="publicar.html">Publicar</a></div></section>` + ejemploHTML());
+    return;
+  }
+
+  /* La demanda real. Si la función no existe todavía (falta la migración 22), se dice y se muestra un ejemplo. */
+  let grupos = null, errorBase = null;
+  if (conBase) {
+    const r = await S.sb.schema('portal').rpc('demanda_agregada', { p_zona: null });
+    if (r.error) errorBase = r.error; else grupos = r.data || [];
+  } else errorBase = { message: 'modo local' };
+
+  if (errorBase) {
+    listo(cabeza('Lo que buscan los miembros de BAIREN, en grupos y sin nombres. Les mandás una unidad tuya y, si les interesa, te escriben.') +
+      `<section class="r-seccion"><div class="r-aviso"><b>Se activa con la base de la red</b><p>La demanda vive en la base de datos y esta parte todavía no está prendida. Mientras tanto, así se va a ver.</p></div></section>` + ejemploHTML());
+    return;
+  }
+
+  /* Coincide alguna unidad mía con el grupo? (misma operación, mismo barrio, ambientes y presupuesto con 10% de margen) */
+  const opDe = a => a.operacion === 'venta' ? 'venta' : 'alquiler';
+  const zonaDe = a => (window.BairenZonas && BairenZonas.zonaDe(a.barrio)) || a.zona || a.barrio;
+  const sirve = (a, g) => opDe(a) === g.operacion && (!g.zona || zonaDe(a) === g.zona) && (!g.amb_min || (a.ambientes || 0) >= g.amb_min) && (!g.presupuesto_hasta || !a.precio || a.precio <= Number(g.presupuesto_hasta) * 1.1) && (!g.presupuesto_desde || !a.precio || a.precio >= Number(g.presupuesto_desde) * 0.7);
+  const conOferta = grupos.filter(g => misAvisos.some(a => sirve(a, g)));
+  const sinOferta = grupos.filter(g => !misAvisos.some(a => sirve(a, g)));
+  const zonas = [...new Set(grupos.map(g => g.zona).filter(Boolean))];
+  let filtro = '';
+
+  const tarjetas = (lista, conBoton) => lista.length ? `<div class="r-busq-grilla">${lista.map(g => R.busq(g, { boton: conBoton ? 'Enviar propuesta' : false, datos: { g: grupos.indexOf(g) } })).join('')}</div>` : '';
+  const pintar = () => {
+    const f = g => !filtro || g.zona === filtro;
+    const a = conOferta.filter(f), b = sinOferta.filter(f);
+    document.getElementById('demHost').innerHTML =
+      (a.length ? `<section class="r-seccion"><div class="r-cabeza"><h2 class="r-h2" style="margin:0">Buscan algo que <em>tenés</em></h2><span class="r-dato">${a.reduce((s, g) => s + Number(g.busquedas || 0), 0)} búsquedas</span></div>${tarjetas(a, true)}</section>` : '') +
+      (b.length ? `<section class="r-seccion"><div class="r-cabeza"><h2 class="r-h2" style="margin:0">Demanda que nadie <em>cubre</em></h2></div><p class="r-bajada" style="margin:-6px 0 18px">Hoy no tenés nada publicado para estos grupos. Es una pista de qué salir a captar.</p>${tarjetas(b, false)}</section>` : '') +
+      (!a.length && !b.length ? `<section class="r-seccion"><div class="r-vacio"><p>${grupos.length ? 'No hay grupos en ese barrio.' : 'Todavía no hay grupos de 3 búsquedas o más. Para cuidar a cada miembro, solo mostramos la demanda cuando no se puede saber quién es.'}</p></div></section>` : '');
+    document.querySelectorAll('[data-g]').forEach(btn => btn.addEventListener('click', () => abrirPanel(grupos[+btn.dataset.g])));
+  };
+
+  listo(cabeza(`Lo que buscan los miembros de BAIREN, en grupos y sin nombres. Les mandás una unidad de ${esc(pub.nombre || 'tu cuenta')} y, si les interesa, te escriben.`) +
+    (zonas.length > 1 ? `<div class="r-filtros"><div class="r-chips" role="group" aria-label="Barrio"><button type="button" class="r-chip" data-z="" aria-pressed="true">Todos</button>${zonas.map(z => `<button type="button" class="r-chip" data-z="${esc(z)}" aria-pressed="false">${esc(BP.zonaLabel(z))}</button>`).join('')}</div></div>` : '') +
+    `<div id="demHost"></div><section class="r-seccion" id="enviadas"><h2 class="r-h2">Lo que <em>mandaste</em></h2><div id="envHost"><p class="r-dato">Cargando…</p></div></section>`);
+  main.querySelectorAll('[data-z]').forEach(x => x.addEventListener('click', () => { filtro = x.dataset.z; main.querySelectorAll('[data-z]').forEach(y => y.setAttribute('aria-pressed', y === x)); pintar(); }));
+  pintar();
+  pintarEnviadas();
+
+  async function pintarEnviadas() {
+    const host = document.getElementById('envHost'); if (!host) return;
+    const r = await S.sb.schema('portal').rpc('mis_propuestas_enviadas', { p_publicador: pub.id });
+    if (r.error) { host.innerHTML = '<div class="r-vacio"><p>No pudimos traer lo que mandaste. Probá de nuevo en un rato.</p></div>'; return; }
+    const filas = r.data || [];
+    if (!filas.length) { host.innerHTML = '<div class="r-vacio"><p>Todavía no mandaste propuestas. Cuando lo hagas, acá ves cuántas llegaron, a cuántos les interesó y el contacto de quienes dijeron que sí.</p></div>'; return; }
+    const porId = Object.fromEntries(misAvisos.map(a => [a.id, a]));
+    host.innerHTML = `<div class="r-sigue">${filas.map(f => {
+      const a = porId[f.aviso_id] || {};
+      const motivos = [['por_precio', 'precio'], ['por_zona', 'zona'], ['por_estado', 'estado']].filter(([k]) => f[k]).map(([k, t]) => f[k] + ' por ' + t).join(', ');
+      const contactos = (f.contactos || []).map(c => `<span class="r-sello" style="text-transform:none;letter-spacing:.02em">${esc(c.email)}</span>`).join(' ');
+      return `<div class="r-sigue-fila" style="grid-template-columns:1fr"><div><span class="r-sigue-tipo">${esc([a.direccion, a.unidad].filter(Boolean).join(' · ') || 'Unidad')}</span>
+        <b>${f.enviadas} enviadas · ${f.interesa} les interesa · ${f.no_gracias} no</b>
+        ${motivos ? `<span>Dijeron que no: ${esc(motivos)}.</span>` : ''}
+        ${contactos ? `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">${contactos}</div><span>Les interesa: escribiles. Te dieron su mail al aceptar.</span>` : ''}</div></div>`;
+    }).join('')}</div>`;
+  }
+
+  /* El panel: elegir una de mis unidades que sirva para el grupo, una nota y enviar. */
+  const panel = document.getElementById('panel'), form = document.getElementById('panelForm');
+  let grupoActual = null;
+  document.getElementById('panelCerrar').addEventListener('click', () => panel.close());
+  function abrirPanel(g) {
+    grupoActual = g;
+    const t = R.grupoTexto(g);
+    document.getElementById('panelTit').textContent = t.todo;
+    document.getElementById('panelAyuda').textContent = 'Le llega solo a quienes de este grupo coinciden con la unidad. No ves quiénes son hasta que alguien responde que le interesa.';
+    const opciones = misAvisos.filter(a => sirve(a, g));
+    const fs = document.getElementById('panelUnidades');
+    fs.querySelectorAll('label').forEach(l => l.remove());
+    opciones.forEach((a, i) => {
+      const foto = (a.fotos || []).slice().sort((x, y) => (x.orden || 0) - (y.orden || 0))[0];
+      const l = document.createElement('label'); l.className = 'r-unidad';
+      l.innerHTML = `<input type="radio" name="aviso" value="${esc(a.id)}"${i === 0 ? ' checked' : ''}>${foto ? `<img src="${esc(BP.sbImg(foto.url, 700))}" alt="">` : '<span class="r-prop-sinfoto" aria-hidden="true"></span>'}<span><b>${esc([a.direccion, a.unidad].filter(Boolean).join(' · '))}</b><span>${esc([a.precio ? R.usd(a.precio) : '', a.ambientes ? a.ambientes + ' amb.' : ''].filter(Boolean).join(' · '))}</span></span>`;
+      fs.appendChild(l);
+    });
+    document.getElementById('panelEnviar').disabled = !opciones.length;
+    if (!opciones.length) { const l = document.createElement('label'); l.className = 'r-dato'; l.textContent = 'Ninguna de tus unidades publicadas sirve para este grupo.'; fs.appendChild(l); }
+    if (panel.showModal) panel.showModal(); else panel.setAttribute('open', '');
+  }
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const elegido = form.querySelector('input[name=aviso]:checked'); if (!elegido || !grupoActual) return;
+    const btn = document.getElementById('panelEnviar'); btn.disabled = true; btn.textContent = 'Enviando…';
+    const g = grupoActual;
+    const r = await S.sb.schema('portal').rpc('enviar_propuesta', { p_aviso: elegido.value, p_zona: g.zona, p_operacion: g.operacion, p_amb_min: g.amb_min || 0, p_desde: g.presupuesto_desde, p_hasta: g.presupuesto_hasta, p_nota: document.getElementById('panelNota').value || null });
+    btn.disabled = false; btn.textContent = 'Enviar';
+    if (r.error) { BP.toast(r.error.message || 'No se pudo enviar.', 'error'); return; }
+    const n = r.data || 0;
+    panel.close(); document.getElementById('panelNota').value = '';
+    BP.toast(n ? `Le llegó a ${n} ${n === 1 ? 'persona' : 'personas'} del grupo.` : 'Ya le habías mandado esta unidad a todo el grupo que coincide.');
+    pintarEnviadas();
+  });
+
+  function ejemploHTML() {
+    const ej = [
+      { zona: 'Palermo', operacion: 'venta', amb_min: 4, presupuesto_desde: 1000000, presupuesto_hasta: 2000000, busquedas: 12, imprescindibles: ['vista', 'cochera'] },
+      { zona: 'Núñez', operacion: 'venta', amb_min: 3, presupuesto_desde: 300000, presupuesto_hasta: 600000, busquedas: 7, imprescindibles: ['amenities'] },
+      { zona: 'Recoleta', operacion: 'alquiler', amb_min: 2, presupuesto_desde: 1000, presupuesto_hasta: 2000, busquedas: 5, imprescindibles: ['amoblado'] }
+    ];
+    return `<section class="r-seccion"><div class="r-cabeza"><h2 class="r-h2" style="margin:0">Así se <em>ve</em></h2><span class="r-ejemplo">Ejemplo</span></div><div class="r-busq-grilla">${ej.map(g => R.busq(g, { ejemplo: true, boton: 'Enviar propuesta' })).join('')}</div></section>`;
+  }
+})(); });
+</script>
+</body>
+</html>
