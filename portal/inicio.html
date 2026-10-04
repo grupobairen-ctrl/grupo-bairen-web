@@ -178,7 +178,7 @@ document.addEventListener('DOMContentLoaded', function(){ (async function(){
     if (!lista.length) { linea = 'Hoy no hay unidades que <em>coincidan</em>.'; bajada = 'Te avisamos apenas entre una. Mientras tanto, mirá las que están cerca o ajustá tu búsqueda.'; }
     else if (!conFecha) { linea = `<em>${lista.length}</em> ${lista.length === 1 ? 'novedad' : 'novedades'} para tu búsqueda.`; bajada = `${lista.length === 1 ? 'Es la que coincide' : 'Son las que coinciden'} hoy.`; }
     else if (nov.length) { linea = `<em>${nov.length}</em> ${nov.length === 1 ? 'novedad' : 'novedades'} para tu búsqueda.`; bajada = `${nov.length === 1 ? 'Entró' : 'Entraron'} en los últimos 14 días. En total coinciden ${lista.length} ${lista.length === 1 ? 'unidad' : 'unidades'}.`; }
-    else { linea = 'Sin novedades en los últimos <em>14 días</em>.'; bajada = `Hoy coinciden ${lista.length} ${lista.length === 1 ? 'unidad' : 'unidades'}. Te avisamos apenas entre una nueva.`; }
+    else { linea = 'Sin novedades en los últimos <em>14 días</em>.'; bajada = `Hoy ${lista.length === 1 ? 'coincide 1 unidad' : 'coinciden ' + lista.length + ' unidades'}. Te avisamos apenas entre una nueva.`; }
     const mejor = lista[0];
     const resto = lista.slice(1, 7);
     const catalogo = `buscar.html?op=${opDe()}${(b.zonas || []).map(z => '&zona=' + encodeURIComponent(z)).join('')}`;
