@@ -320,3 +320,7 @@ body.r-body .p-skel-line{border-radius:0}
 .r-obra-foto.dibujo{display:grid;place-items:center;color:var(--r-oro-tinta);background:var(--r-crema)}
 .r-obra-foto.dibujo svg{width:78%;height:auto}
 .r-obra-cab .r-hechos b{font-size:clamp(1.15rem,4.4vw,1.5rem);white-space:nowrap}
+/* La red en la ficha: coincidencia con la búsqueda del miembro y seguir el edificio, dentro de la tarjeta lateral */
+.r-ficha-red{display:grid;gap:10px;justify-items:start;padding:14px 0;margin:4px 0 10px;border-top:1px solid var(--r-filete);border-bottom:1px solid var(--r-filete)}
+.r-ficha-coinc{margin:0;font:300 .88rem/1.5 var(--font-body);color:var(--r-tinta)}
+.r-ficha-red .r-chip{min-height:38px;padding:0 12px;font-size:.62rem}

@@ -28,7 +28,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20261004a"><link rel="stylesheet" href="css/catalogo.css?v=20261004a"><link rel="stylesheet" href="css/portal.css?v=20261004a">
+  <link rel="stylesheet" href="css/base.css?v=20261004a"><link rel="stylesheet" href="css/catalogo.css?v=20261004a"><link rel="stylesheet" href="css/portal.css?v=20261004a"><link rel="stylesheet" href="css/red.css?v=20261004a">
   <style>body{padding-top:0}#ficha>.p-ficha-top,#ficha>.p-ficha,#ficha>section{max-width:var(--p-max);margin:0 auto;padding-left:24px;padding-right:24px}#ficha>.p-ficha-top{padding-top:88px}@media(max-width:900px){#ficha>.p-ficha-top{padding-top:76px}}.p-video{aspect-ratio:16/9;background:#0b1220;border-radius:16px;overflow:hidden}.p-video iframe,.p-video video{width:100%;height:100%;border:0;display:block}
   /* Fachada del video (25/9/2026): portada y botón de reproducir; el reproductor se pide al tocar */
   .p-video-play{position:relative;display:block;width:100%;height:100%;padding:0;border:0;background:#0b1220;cursor:pointer}
@@ -47,7 +47,7 @@
 
 <script src="supabase-portal.js?v=20261004a" defer></script><script src="js/errores.js?v=20261004a" defer></script>
 <script src="js/iconos-amenities.js?v=20261004a" defer></script><script src="js/motion.js?v=20261004a" defer></script><script src="js/bairen-motion.js?v=20261004a" defer></script><script src="js/i18n-portal.js?v=20261004a" defer></script><script src="js/ui.js?v=20261004a" defer></script><script src="js/store.js?v=20261004a" defer></script>
-<script src="js/data.js?v=20261004a" defer></script>
+<script src="js/data.js?v=20261004a" defer></script><script src="js/red.js?v=20261004a" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -193,6 +193,7 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip" role="group" aria-label="$
       <div class="p-ac-rows">${[[T('ficha_direccion', 'Dirección'), BP.esc(a.dir) + (a.unidad && !a.dirAprox ? ', ' + BP.esc(a.unidad) : '')], a.barrio ? [T('ficha_barrio', 'Barrio'), BP.esc(a.barrio)] : null, a.m2 ? [T('ficha_superficie', 'Superficie'), a.m2 + ' m²'] : null, a.amb ? [T('ficha_ambientes_lbl', 'Ambientes'), a.amb === 1 ? T('ficha_monoamb_val', 'Monoambiente') : TF('ficha_ambientes', '{n} ambientes', { n: a.amb })] : null, a.op !== 'venta' && a.plazo ? [T('ficha_plazo_lbl', 'Plazo'), BP.esc(BP.etiqueta(a.plazo))] : null, a.op === 'mediano' ? [T('ficha_exp_serv', 'Expensas y serv.'), T('ficha_todos_incl', 'Todos incluidos')] : (a.expensas ? [T('ficha_expensas', 'Expensas'), TF('ficha_exp_val', '$ {n} por mes', { n: BP.fmtN(a.expensas) })] : null), [T('ficha_estado', 'Estado'), a.reservado ? `<span style="color:#b94a4a">${T('ficha_reservada', 'Reservada')}</span>` : `<span style="color:#2a7a4b">${T('ficha_disponible', 'Disponible')}</span>`]].filter(Boolean).map(r => `<div class="ac-row"><span class="ac-lbl">${r[0]}</span><span class="ac-val">${r[1]}</span></div>`).join('')}</div>
       <div class="p-cta-pub"><span class="lbl">${T('ficha_publica', 'Publica')}</span><b>${BP.esc(pubNombre)}</b><span>${pub.tipo === 'dueno' ? T('ficha_dueno_v', 'Dueño verificado') : pub.tipo === 'desarrolladora' ? T('ficha_venta_directa', 'Venta directa') : pub.matricula ? TF('ficha_corredor_resp', 'Corredor responsable: {r}, {m}', { r: BP.esc(pub.responsable || ''), m: BP.esc(pub.matricula) }) : BP.esc(BP.etiqueta(pub.badge || 'Selección BAIREN'))}</span></div>
       ${(a.cualidades||[]).length ? `<div class="p-cta-verif">${BP.ico.check} ${(a.cualidades||[]).length === 1 ? T('ficha_cual_1', 'Una cualidad verificada por BAIREN') : TF('ficha_cual_n', '{n} cualidades verificadas por BAIREN', { n: (a.cualidades||[]).length })}</div>` : `<div class="p-cta-verif">${BP.ico.check} ${T('ficha_revisada', 'Ficha revisada por BAIREN antes de publicarse')}</div>`}
+      <div id="redFicha"></div>
       ${a.reservado ? `<p class="p-sincontacto-box">${T('ficha_res_box', 'Reservada: por ahora no toma consultas. Si se libera, vuelve a publicarse acá.')}</p>` : BPData.sinContacto(pub) ? `<p class="p-sincontacto-box">${TF('ficha_sin_contacto', 'Contacto pendiente: {p} todavía no cargó su WhatsApp ni su mail. BAIREN no interviene en la operación, así que el único contacto válido es el de quien publica.', { p: BP.esc(pubNombre) })}</p>` : `
       <button type="button" class="p-btn p-btn-fill" id="abrirVisita">${T('ficha_coordinar', 'Coordinar visita')}</button>
       <button type="button" class="p-btn" id="abrirForm">${T('ficha_consultar', 'Consultar')}</button>
@@ -439,6 +440,21 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip" role="group" aria-label="$
      base real, también en portal.alertas (BPStore.syncAlerta, que guarda remoteId). El botón arranca en "Alerta creada"
      si ya existe y al tocarlo la quita (BPStore.borrarAlerta borra la fila: si no, el motor seguiría mandando mails).
      Estados: creando (deshabilitado), creada (aria-pressed), error (la alerta no queda y se avisa con un toast). */
+  /* 4/10/2026 · La red en la ficha: si la persona armó su búsqueda, la ficha le dice si coincide y qué le falta,
+     y le deja seguir el edificio; si no, la invita a armarla. Solo en castellano por ahora; sin red.js no pasa nada. */
+  (function(){
+    const host = document.getElementById('redFicha'); if (!host || !window.BPRed || (BP.lang && BP.lang !== 'es')) return;
+    const R = BPRed, b = R.leer(), edif = a.dir || a.titulo || '';
+    const idEdif = edif.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const sigo = R.sigo('edificio', idEdif);
+    const c = b ? R.coincidencia(a, b) : null;
+    host.innerHTML = `<div class="r-ficha-red">${c && c.total ? `<p class="r-ceja" style="margin:0">Para tu búsqueda</p><p class="r-ficha-coinc">${BP.esc(R.frase(c))}</p>` : b ? `<p class="r-ficha-coinc">No entra en tu búsqueda: buscás ${b.intencion === 'alquilar' ? 'alquilar' : 'comprar'}. <a class="r-btn-link" href="mi-busqueda.html?paso=intencion">Editar</a></p>` : `<p class="r-ficha-coinc">¿Buscás algo así? <a class="r-btn-link" href="mi-busqueda.html">Contanos qué buscás</a></p>`}<button type="button" class="r-chip" id="seguirEdif" aria-pressed="${sigo}">${sigo ? 'Siguiendo el edificio' : 'Seguir el edificio'}</button></div>`;
+    document.getElementById('seguirEdif').addEventListener('click', e => {
+      const on = R.alternarSeguir('edificio', idEdif, edif); const btn = e.currentTarget;
+      btn.setAttribute('aria-pressed', on); btn.textContent = on ? 'Siguiendo el edificio' : 'Seguir el edificio';
+      BP.toast(on ? 'Te avisamos si hay novedades en ' + edif + '.' : 'Dejaste de seguir ' + edif + '.');
+    });
+  })();
   const btnBaja = document.getElementById('bajaPrecio');
   if (btnBaja) {
     const idxBaja = () => BP.alerts.get().findIndex(x => x.tipo === 'precio' && String(x.avisoId) === String(a.id));
