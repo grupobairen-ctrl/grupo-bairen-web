@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>/* El velo de carga: navy desde el primer byte, se retira cuando la página está lista de verdad:
+     load + ningún esqueleto a la vista + las fotos del primer pantallazo cargadas. Si eso pasa en menos de
+     500 ms nadie lo ve; si se vio, se queda hasta los 800 ms para no titilar; a los 8 s se va pase lo que
+     pase. Inline y sin dependencias: si un script no carga, el velo se va igual. */
+  (function(h){h.classList.add('cargando');var V=window.BPVelo={retenido:false,cargado:false},obs=null,timer=null;
+  var ESQ='.p-skel,.p-skel-card,.p-skel-ficha,.p-skel-line,.p-skel-vcard,.p-skel-panel,.p-skel-form,.p-skel-bloque,.p-skel-cta,.p-fhero-skel,.h-esq';
+  V.soltar=function(){if(!h.classList.contains('cargando'))return;V.retenido=false;h.classList.remove('cargando');if(obs)obs.disconnect();try{document.dispatchEvent(new Event('bairen:velo'))}catch(e){}};
+  V.retener=function(){V.retenido=true};V.seguir=function(){V.retenido=false;pedir()};
+  /* Visible de verdad: checkVisibility ve lo que un rectángulo no (un details cerrado, content-visibility) */
+  var vis=function(e){return e.checkVisibility?e.checkVisibility({contentVisibilityAuto:true,visibilityProperty:true}):e.getClientRects().length>0};
+  V.lista=function(){if(!V.cargado)return false;var es=document.querySelectorAll(ESQ),i;for(i=0;i<es.length;i++)if(vis(es[i]))return false;
+    var im=document.images,H=innerHeight,W=innerWidth,r;for(i=0;i<im.length;i++){if(im[i].complete||!im[i].getAttribute('src')||!vis(im[i]))continue;r=im[i].getBoundingClientRect();if(r.width>0&&r.bottom>0&&r.top<H&&r.right>0&&r.left<W)return false}return true};
+  var revisar=function(){if(V.retenido||timer||!V.lista())return;var t=performance.now();timer=setTimeout(function(){if(!V.retenido)V.soltar()},t>500?Math.max(0,800-t):0)};
+  var pedido=false,pedir=function(){if(pedido)return;pedido=true;requestAnimationFrame(function(){pedido=false;revisar()})};
+  addEventListener('load',function(){V.cargado=true;pedir()});
+  document.addEventListener('DOMContentLoaded',function(){obs=new MutationObserver(pedir);obs.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class','src','hidden','style']})});
+  document.addEventListener('load',pedir,true);document.addEventListener('error',pedir,true);
+  setTimeout(V.soltar,8000)})(document.documentElement);</script>
+  <title>Obra · BAIREN</title>
+  <meta name="description" content="Seguí una obra de la excavación a la entrega: los avances que carga la desarrolladora y las unidades disponibles."><meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#131D2D">
+  <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
+  <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css?v=20261003a"><link rel="stylesheet" href="css/catalogo.css?v=20261003a"><link rel="stylesheet" href="css/portal.css?v=20261003a"><link rel="stylesheet" href="css/red.css?v=20261003b">
+</head>
+<body class="r-body r-con-tabbar">
+<div class="p-velo" aria-hidden="true"><span class="w">BAIREN</span></div>
+<div id="pHeader"></div>
+<main id="contenido" class="r-contenedor" aria-busy="true">
+  <div class="r-esq" aria-hidden="true"><span class="p-skel-line t"></span><span class="p-skel-line"></span><span class="p-skel-line"></span></div>
+</main>
+<div id="pFooter"></div>
+<div id="rTab"></div>
+
+<script src="../mapa-barrios.js?v=20261003a" defer></script><script src="supabase-portal.js?v=20261003a" defer></script><script src="js/errores.js?v=20261003a" defer></script>
+<script src="js/motion.js?v=20261003a" defer></script><script src="js/bairen-motion.js?v=20261003a" defer></script>
+<script src="js/i18n-portal.js?v=20261003a" defer></script><script src="js/ui.js?v=20261003a" defer></script>
+<script src="js/store.js?v=20261003a" defer></script><script src="js/data.js?v=20261003a" defer></script>
+<script src="js/red.js?v=20261004a" defer></script>
+<script>
+/* La obra (Fase 3, 4/10/2026): un emprendimiento con su línea de tiempo, las unidades disponibles y "Seguir esta obra".
+   · obra.html?e=<nombre>: la obra. Los hitos salen de portal.obra_eventos (migración 22); sin la tabla o sin hitos, se dice.
+   · obra.html sin parámetro: las obras que hay en el portal.
+   · obra.html?e=ejemplo: una obra de ejemplo, rotulada, para ver cómo se va a ver. */
+document.addEventListener('DOMContentLoaded', function(){ (async function(){
+  BP.header('red'); BP.footer(); if (window.BPStore) BPStore.init();
+  const R = BPRed, esc = BP.esc, main = document.getElementById('contenido');
+  document.getElementById('rTab').innerHTML = R.tabbar('siguiendo');
+  await BP.probePretty();
+  const S = window.BPStore;
+  let avisos = [];
+  try { ({ avisos } = await BPData.load()); } catch (e) { console.error(e); }
+  avisos = (avisos || []).filter(a => !a.demo);
+  const qs = new URLSearchParams(location.search);
+  const nombre = (qs.get('e') || '').trim();
+  const sinTildes = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  const listo = html => { main.innerHTML = html; main.removeAttribute('aria-busy'); if (window.BPM) { if (BPM.titular) BPM.titular(main.querySelector('.r-h1')); if (BPM.init) BPM.init(main); } };
+
+  /* Sin obra elegida: la lista de obras del portal. */
+  if (!nombre) {
+    const obras = BPData.emprendimientos ? BPData.emprendimientos(avisos) : [];
+    listo(`<header class="r-ini-cab"><div><p class="r-ceja">Obras</p><h1 class="r-h1">Seguí una obra de la <em>excavación</em> a la entrega.</h1><p class="r-bajada">Cada desarrolladora carga los avances. Si seguís la obra, te avisamos cuando hay uno nuevo.</p></div></header>` +
+      (obras.length ? `<section class="r-seccion"><div class="r-sigue">${obras.map(o => `<div class="r-sigue-fila"><div><span class="r-sigue-tipo">Obra</span><b>${esc(o.nombre || o.emprendimiento || '')}</b><span>${esc((o.unidades || o.avisos || []).length + ' unidades')}</span></div><a class="r-btn chico" href="obra.html?e=${encodeURIComponent(o.nombre || o.emprendimiento || '')}">Ver la obra</a></div>`).join('')}</div></section>`
+        : `<section class="r-seccion"><div class="r-vacio"><p>Todavía no hay obras publicadas. Cuando una desarrolladora publique su emprendimiento, aparece acá con su línea de tiempo.</p><a class="r-btn-link" href="obra.html?e=ejemplo">Ver una obra de ejemplo</a></div></section>`));
+    return;
+  }
+
+  const esEjemplo = sinTildes(nombre) === 'ejemplo';
+  const unidades = esEjemplo ? [] : avisos.filter(a => a.emprendimiento && sinTildes(a.emprendimiento) === sinTildes(nombre) && !a.reservado);
+
+  /* Los hitos: de la base si está la tabla; en el ejemplo, inventados y rotulados. */
+  let eventos = [], sinTabla = false;
+  if (esEjemplo) {
+    eventos = [
+      { titulo: 'Excavación', fecha: '2026-03-01', porcentaje: 10, nota: 'Submuros terminados y platea lista.' },
+      { titulo: 'Estructura', fecha: '2026-07-01', porcentaje: 45, nota: 'Losas hasta el piso 9.' },
+      { titulo: 'Cerramientos', fecha: '2026-10-01', porcentaje: 70, nota: 'Carpinterías de aluminio en los pisos altos.' },
+      { titulo: 'Terminaciones', fecha: '2027-01-01', porcentaje: 90 },
+      { titulo: 'Entrega', fecha: '2027-04-01', porcentaje: 100 }
+    ];
+  } else if (S && S.mode === 'supabase' && S.sb) {
+    const r = await S.sb.schema('portal').from('obra_eventos').select('titulo,fecha,porcentaje,foto_url,nota,emprendimiento').ilike('emprendimiento', nombre).order('fecha', { ascending: true });
+    if (r.error) sinTabla = true; else eventos = r.data || [];
+  } else sinTabla = true;
+  const actual = esEjemplo ? 2 : Math.max(0, eventos.length - 1);
+  const avance = eventos.length ? (eventos[actual] && eventos[actual].porcentaje) : null;
+  const desde = unidades.length ? Math.min(...unidades.map(a => a.precio || Infinity)) : null;
+  const zona = unidades[0] ? BP.zonaLabel(unidades[0].zona) : (esEjemplo ? 'Núñez' : '');
+  const foto = unidades.find(a => a.fotos && a.fotos[0]);
+  const sigo = R.sigo('obra', nombre);
+  const titulo = esEjemplo ? 'Torre de ejemplo' : nombre;
+  /* Sin foto, el edificio en línea, como en el video del portal: estructura, grúa y los pisos que faltan punteados. */
+  const DIBUJO = `<svg viewBox="0 0 320 240" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true">
+    <path d="M40 220h240"/><path d="M110 220V70h100v150"/>
+    ${[200, 180, 160, 140, 120].map(y => `<path d="M110 ${y}h100"/>`).join('')}
+    ${[100, 85, 70].map(y => `<path d="M110 ${y}h100" stroke-dasharray="3 5" opacity=".55"/>`).join('')}
+    ${[130, 160, 190].map(x => `<path d="M${x} 220V120"/>`).join('')}
+    <path d="M232 220V34M232 34h-120M232 34l40 0M232 52l-18-18M120 34v24" opacity=".8"/><path d="M118 58h4v8h-4z"/>
+  </svg>`;
+
+  listo(`
+    <header class="r-obra-cab">
+      <div class="r-dos-col">
+        <div>
+          <p class="r-ceja">Obra${zona ? ' · ' + esc(zona) : ''}</p>
+          ${esEjemplo ? '<span class="r-ejemplo" style="margin-bottom:12px">Ejemplo</span>' : ''}
+          <h1 class="r-h1">${esc(titulo)}, <em>en obra</em>.</h1>
+          <div class="r-hechos">
+            <div><b>${avance != null ? avance + '%' : '–'}</b><span>avance</span></div>
+            <div><b>${esEjemplo ? '8' : unidades.length}</b><span>disponibles</span></div>
+            <div><b>${desde && isFinite(desde) ? R.usdCorto(desde) : (esEjemplo ? 'USD 280 mil' : '–')}</b><span>desde</span></div>
+          </div>
+          <div class="r-acciones"><button type="button" class="r-btn" id="seguir" aria-pressed="${sigo}">${sigo ? 'Siguiendo' : 'Seguir esta obra'}</button><span class="r-dato">Te avisamos cuando haya un avance nuevo.</span></div>
+        </div>
+        <div class="r-obra-foto${foto ? '' : ' dibujo'}">${foto ? `<img src="${esc(BP.sbImg(foto.fotos[0], 900))}" alt="${esc(titulo)}">` : DIBUJO}</div>
+      </div>
+    </header>
+    <section class="r-seccion">
+      <h2 class="r-h2">La <em>línea</em> de obra</h2>
+      ${eventos.length ? R.obraLinea(eventos, { actual }) : `<div class="r-vacio"><p>${sinTabla ? 'La línea de obra se activa con la base de la red.' : 'La desarrolladora todavía no cargó avances de esta obra.'} Si la seguís, te avisamos cuando lo haga.</p></div>`}
+    </section>
+    <section class="r-seccion">
+      <div class="r-cabeza"><h2 class="r-h2" style="margin:0">Unidades <em>disponibles</em></h2></div>
+      ${unidades.length ? `<div class="r-grilla">${unidades.map(a => { const b = R.leer(); return R.tarjeta(a, b ? R.coincidencia(a, b) : null); }).join('')}</div>`
+        : `<div class="r-vacio"><p>${esEjemplo ? 'En una obra real, acá van las unidades con su precio y lo que le falta a cada una para tu búsqueda.' : 'No hay unidades disponibles de esta obra en este momento.'}</p></div>`}
+    </section>`);
+  const btn = document.getElementById('seguir');
+  btn.addEventListener('click', () => { if (esEjemplo) { BP.toast('Es una obra de ejemplo: en una real, te avisamos de cada avance.'); return; } const ahora = R.alternarSeguir('obra', nombre, titulo); btn.setAttribute('aria-pressed', ahora); btn.textContent = ahora ? 'Siguiendo' : 'Seguir esta obra'; BP.toast(ahora ? 'Seguís ' + titulo + '.' : 'Dejaste de seguir ' + titulo + '.'); });
+})(); });
+</script>
+</body>
+</html>

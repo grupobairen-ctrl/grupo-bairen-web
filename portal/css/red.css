@@ -316,3 +316,7 @@ body.r-body .p-skel-line{border-radius:0}
 .r-kit-lienzo .r-card{max-width:300px}
 .r-kit-lienzo .r-card.grande{max-width:none}
 @media(max-width:520px){.r-kit-lienzo{padding:16px}}
+/* La obra sin foto: el edificio dibujado en línea oro sobre crema. Y las cifras de la cabecera de obra, en una línea. */
+.r-obra-foto.dibujo{display:grid;place-items:center;color:var(--r-oro-tinta);background:var(--r-crema)}
+.r-obra-foto.dibujo svg{width:78%;height:auto}
+.r-obra-cab .r-hechos b{font-size:clamp(1.15rem,4.4vw,1.5rem);white-space:nowrap}
