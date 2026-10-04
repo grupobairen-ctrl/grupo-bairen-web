@@ -28,7 +28,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20261004a"><link rel="stylesheet" href="css/catalogo.css?v=20261004a"><link rel="stylesheet" href="css/portal.css?v=20261004a">
+  <link rel="stylesheet" href="css/base.css?v=20261004a"><link rel="stylesheet" href="css/catalogo.css?v=20261004a"><link rel="stylesheet" href="css/portal.css?v=20261004a"><link rel="stylesheet" href="css/red.css?v=20261004a">
   <style>body{padding-top:64px}</style>
 </head>
 <body class="p-product p-catalogo">
@@ -106,7 +106,7 @@
 <script src="supabase-portal.js?v=20261004a" defer></script><script src="js/errores.js?v=20261004a" defer></script>
 <script src="../mapa-barrios.js?v=20261004a" defer></script>
 <script src="js/motion.js?v=20261004a" defer></script><script src="js/bairen-motion.js?v=20261004a" defer></script><script src="js/i18n-portal.js?v=20261004a" defer></script><script src="js/ui.js?v=20261004a" defer></script><script src="js/store.js?v=20261004a" defer></script>
-<script src="js/data.js?v=20261004a" defer></script>
+<script src="js/data.js?v=20261004a" defer></script><script src="js/red.js?v=20261004a" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -187,7 +187,20 @@ document.addEventListener('DOMContentLoaded', function(){
     const slice = list.slice((F.page-1)*PER_PAGE, F.page*PER_PAGE);
     document.getElementById('resTitle').innerHTML = titulo(n); document.title = titulo(n).replace(/<[^>]+>/g,'') + ' · BAIREN';
     const el = document.getElementById('list');
-    const pintar = () => { el.innerHTML = n ? slice.map(BPData.cardV).join('') : `<div class="p-empty"><b style="display:block;color:var(--navy-deeper);font-family:var(--font-display);font-size:1.2rem;margin-bottom:6px">${F.favs ? BP.t('cat_vacio_favs', 'Todavía no guardaste propiedades') : F.emp ? BP.t('cat_vacio_emp', 'Todavía no hay desarrollos publicados') : BP.t('cat_vacio', 'Todavía no hay unidades así')}</b>${F.favs ? BP.t('cat_vacio_favs_txt', 'Tocá el corazón en cualquier ficha y la vas a ver acá.') : F.emp ? BP.t('cat_vacio_emp_txt', 'Los desarrollos tienen su propia página: <a href="emprendimientos.html" style="text-decoration:underline">ver desarrollos</a>. Si sos desarrolladora, <a href="publicar.html#desarrolladora" style="text-decoration:underline">publicá el tuyo</a>.') : sugerencias()}</div>`; };
+    /* 4/10/2026 · La red en el catálogo: con búsqueda armada, cada tarjeta dice cuánto coincide (sobre la foto,
+       como en la red). Solo en castellano por ahora; sin red.js o sin búsqueda, el catálogo queda igual. */
+    const decorarRed = (host, lista) => {
+      if (!window.BPRed || (BP.lang && BP.lang !== 'es')) return;
+      const b = BPRed.leer(); if (!b) return;
+      host.querySelectorAll('.prop-card[data-flip]').forEach(card => {
+        const a = lista.find(x => x.id === card.getAttribute('data-flip')); if (!a) return;
+        const c = BPRed.coincidencia(a, b); if (!c.ok || !c.total) return;
+        const img = card.querySelector('.card-img'); if (!img || img.querySelector('.r-coinc')) return;
+        const chip = document.createElement('span'); chip.className = 'r-coinc'; chip.textContent = BPRed.chip(c); chip.title = BPRed.frase(c);
+        img.appendChild(chip);
+      });
+    };
+    const pintar = () => { el.innerHTML = n ? slice.map(BPData.cardV).join('') : `<div class="p-empty"><b style="display:block;color:var(--navy-deeper);font-family:var(--font-display);font-size:1.2rem;margin-bottom:6px">${F.favs ? BP.t('cat_vacio_favs', 'Todavía no guardaste propiedades') : F.emp ? BP.t('cat_vacio_emp', 'Todavía no hay desarrollos publicados') : BP.t('cat_vacio', 'Todavía no hay unidades así')}</b>${F.favs ? BP.t('cat_vacio_favs_txt', 'Tocá el corazón en cualquier ficha y la vas a ver acá.') : F.emp ? BP.t('cat_vacio_emp_txt', 'Los desarrollos tienen su propia página: <a href="emprendimientos.html" style="text-decoration:underline">ver desarrollos</a>. Si sos desarrolladora, <a href="publicar.html#desarrolladora" style="text-decoration:underline">publicá el tuyo</a>.') : sugerencias()}</div>`; if (n) decorarRed(el, slice); };
     if (window.BPM && BPM.reacomodar) BPM.reacomodar(el, pintar); else pintar();
     const rc = document.getElementById('resCount'); if (rc) rc.textContent = n === 1 ? BP.t('cat_n_1', '1 propiedad') : BP.tf('cat_n', '{n} propiedades', { n });
     BPData.bindFavs(el);
