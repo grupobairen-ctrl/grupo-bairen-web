@@ -78,6 +78,9 @@ async function usuarioDe(req) {
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   if (req.method !== 'POST') { res.status(405).json({ ok: false, error: 'POST' }); return; }
+  /* 3/10/2026 · Las vistas previas de Vercel también tienen la clave de OpenAI. Ahí no se genera nunca:
+     las pruebas no gastan. Solo producción (VERCEL_ENV = 'production') o, en local, sin VERCEL_ENV. */
+  if (process.env.VERCEL_ENV && process.env.VERCEL_ENV !== 'production') { res.status(403).json({ ok: false, error: 'En las vistas previas no se generan fotos con IA, para no gastar en pruebas.' }); return; }
   const key = process.env.OPENAI_API_KEY;
   if (!key) { res.status(501).json({ ok: false, configured: false, msg: 'Falta OPENAI_API_KEY en Vercel.' }); return; }
 
