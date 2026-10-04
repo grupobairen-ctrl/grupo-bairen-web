@@ -348,6 +348,7 @@
   </div>
   <div class="p-nav-principal">
     <a href="buscar.html" data-sec="propiedades" data-i18n="nav_propiedades">Propiedades</a>
+    <a href="mi-busqueda.html" data-sec="red" data-i18n="red_mi_busqueda">Mi búsqueda</a>
     <a href="emprendimientos.html" data-sec="emprendimientos" data-i18n="emprendimientos">Desarrollos</a>
     <a href="membership.html" class="p-nav-destacado" data-sec="membership">Membership</a>
     <a href="publicadores.html" data-sec="publicadores" data-i18n="publicadores">Publicadores</a>
@@ -366,6 +367,7 @@
 </nav>
 <div class="mobile-menu" id="mobileMenu" role="dialog" aria-modal="true" aria-label="${BP.t('menu', 'Menú')}">
   <a href="buscar.html" class="m-link" data-sec="propiedades" data-i18n="nav_propiedades">Propiedades</a>
+  <a href="mi-busqueda.html" class="m-link" data-sec="red" data-i18n="red_mi_busqueda">Mi búsqueda</a>
   <a href="emprendimientos.html" class="m-link" data-sec="emprendimientos" data-i18n="emprendimientos">Desarrollos</a>
   <a href="membership.html" class="m-link p-nav-destacado" data-sec="membership">Membership</a>
   <div class="m-secundario"><a href="publicadores.html" data-sec="publicadores" data-i18n="publicadores">Publicadores</a><a href="criterios.html" data-sec="criterios" data-i18n="criterios">Cómo seleccionamos</a></div>
@@ -506,6 +508,8 @@
       const VISTAS = { avisos: ['mis_avisos', 'Mis avisos', 'panel.html#avisos'], propiedades: ['mis_propiedades', 'Mis propiedades', 'panel.html#propiedades'], interesados: ['interesados', 'Interesados', 'panel.html#interesados'], importar: ['importar_cartera', 'Importar cartera', 'importar.html'], os: ['bairen_os', 'Bairen OS', BP.OS_URL], contactos: ['mis_contactos', 'Mis contactos', 'panel.html#contactos'], favoritos: ['favoritos', 'Favoritos', 'buscar.html?favs=1'], alertas: ['alertas', 'Búsquedas y alertas', 'panel.html#alertas'], cuenta: ['mi_cuenta', 'Mi cuenta', 'panel.html#cuenta'] };
       const riel = (window.BPStore && BPStore.rielDe) ? BPStore.rielDe(session.perfil || null) : Object.keys(VISTAS);
       const vistas = riel.map(id => VISTAS[id]).filter(Boolean).map(v => `<a href="${v[2]}">${BP.t(v[0], v[1])}</a>`).join('');
+      /* 4/10/2026 · La red en Mi cuenta: el inicio del miembro y su búsqueda; a quien publica, la demanda. */
+      const red = `<a href="inicio.html">${BP.t('red_mi_inicio', 'Mi inicio')}</a><a href="mi-busqueda.html#resultado">${BP.t('red_mi_busqueda', 'Mi búsqueda')}</a>` + (riel.indexOf('avisos') > -1 ? `<a href="demanda.html">${BP.t('red_demanda', 'Compradores que buscan lo tuyo')}</a>` : '');
       /* 12/9 · Con imagen elegida (ícono o foto), el botón la muestra a 22 px en lugar del ícono genérico; sin imagen, el ícono de siempre */
       const av = (window.BPStore && BPStore.getAvatar) ? BPStore.getAvatar() : null;
       const avH = BP.ico.user;   /* 12/9: la imagen de la cuenta se ve en el panel, no en el botón del header (pedido de Tomás) */
@@ -514,7 +518,7 @@
         <a class="p-ghost" href="buscar.html?favs=1" aria-label="${BP.esc(BP.t('favoritos', 'Favoritos'))}">${BP.ico.heart}<span data-fav-count hidden></span></a>
         <div class="p-crear"><a class="p-btn p-btn-sm" href="publicar-aviso.html" data-crear>${BP.t('publicar', 'Publicar')}</a><div class="p-crear-pop" hidden><p class="t">${BP.t('quien_publica', '¿Quién publica?')}</p><a href="publicar-aviso.html?perfil=dueno">${BP.t('soy_dueno_directo', 'Soy dueño directo')}</a><a href="publicar-aviso.html?paso=perfil">${BP.t('soy_profesional', 'Inmobiliaria, corredor o desarrolladora')}</a></div></div>
         <div class="p-nav-menu" style="display:flex"><div><button type="button" class="p-btn p-btn-sm p-btn-fill" aria-haspopup="true" style="padding:0 14px">${avH} ${BP.t('mi_cuenta', 'Mi cuenta')} <span class="car" style="border-color:var(--navy-deeper)"></span></button>
-          <div class="p-dd p-dd-cuenta" style="left:auto;right:0"><div class="p-dd-ttl">${BP.esc(session.email)}${modeTag}</div>${vistas}<a href="curacion.html" data-curador hidden>${BP.t('curacion', 'Curación')}</a><a href="#" data-logout>${BP.t('cerrar_sesion', 'Cerrar sesión')}</a></div></div></div>`;
+          <div class="p-dd p-dd-cuenta" style="left:auto;right:0"><div class="p-dd-ttl">${BP.esc(session.email)}${modeTag}</div>${red}${vistas}<a href="curacion.html" data-curador hidden>${BP.t('curacion', 'Curación')}</a><a href="#" data-logout>${BP.t('cerrar_sesion', 'Cerrar sesión')}</a></div></div></div>`;
       if (mob) {
         const cta = mob.querySelector('.m-cta'); if (cta) cta.innerHTML = `<a class="p-btn p-btn-sm" href="publicar-aviso.html">${BP.t('publicar', 'Publicar')}</a><a class="p-btn p-btn-sm p-btn-fill" href="panel.html">${BP.t('mi_cuenta', 'Mi cuenta')}</a>`;
         const cuenta = mob.querySelector('.m-cuenta'); if (cuenta) { cuenta.hidden = false; cuenta.innerHTML = `<a href="buscar.html?favs=1">${BP.ico.heart} <span data-i18n="favoritos">Favoritos</span></a><a href="panel.html#contactos">${BP.ico.chat} <span data-i18n="mis_contactos">Mis contactos</span></a>`; }

@@ -4067,3 +4067,10 @@ body.p-home .h-navy .h-btn-oro:focus-visible{outline:2px solid var(--h-oro);outl
 /* Edificios: fotos planas, sin sombra; flechas cuadradas de filete fino */
 body.p-home .h-edif,body.p-home .h-foto-card{box-shadow:none}
 body.p-home .h-flecha{width:48px;height:48px;box-shadow:none;border-color:rgba(19,29,45,.2);background:#FBFAF6}
+
+/* 4/10/2026 · "Mi búsqueda" suma un ítem al menú de escritorio. Entre 900 y 1439 px no entraba al lado de
+   los botones de la derecha: menos espacio entre ítems y menos tracking, solo en ese tramo. */
+@media (min-width:900px) and (max-width:1439px){
+  .p-nav-principal{gap:8px !important}
+  .p-nav-principal a{letter-spacing:.03em !important}
+}
