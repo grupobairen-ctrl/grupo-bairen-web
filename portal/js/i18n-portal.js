@@ -26,7 +26,7 @@ window.BP_I18N = {
     ft_nav: 'Navigation', ft_zonas: 'Areas', ft_mas: 'More', ft_indice: 'BAIREN Index', ft_criterios: 'Selection criteria', ft_terminos: 'Terms and privacy',
     ft_uso: 'Terms of use', ft_priv: 'Privacy policy',
     /* portada */
-    hero_h1a: '<em>Selected</em> properties', hero_h1b: 'in Buenos Aires.', hero_sub: 'Live Buenos Aires at its finest.',
+    hero_h1a: '<em>Selected</em> properties', hero_h1b: 'in Buenos Aires.', hero_sub: 'Live Buenos Aires at its finest.', hero_otra: 'Or tell us what you are looking for',
     ph_zona: 'Neighborhood, building or area', buscar_aria: 'Search properties', ver_props: 'See properties',
     est_eyebrow: 'BAIREN Selection', est_h2: 'We follow a <em>standard.</em>', est_copy: 'Before listing each property, we check:', criterios: 'How we select',
     hito_ubicacion: 'Location', hito_estado: 'Condition', hito_distribucion: 'Layout', hito_calidad: 'Build quality',
@@ -262,7 +262,7 @@ window.BP_I18N = {
     ft_legend: 'A BAIREN seleciona e publica imóveis e oferece a gestão para administrá-los. Cada anúncio é responsabilidade de quem o publica.',
     ft_nav: 'Navegação', ft_zonas: 'Zonas', ft_mas: 'Mais', ft_indice: 'Índice BAIREN', ft_criterios: 'Critérios de seleção', ft_terminos: 'Termos e privacidade',
     ft_uso: 'Termos de uso', ft_priv: 'Política de privacidade',
-    hero_h1a: 'Imóveis <em>selecionados</em>', hero_h1b: 'em Buenos Aires.', hero_sub: 'Viva Buenos Aires no seu melhor.',
+    hero_h1a: 'Imóveis <em>selecionados</em>', hero_h1b: 'em Buenos Aires.', hero_sub: 'Viva Buenos Aires no seu melhor.', hero_otra: 'Ou conte o que você procura',
     ph_zona: 'Bairro, edifício ou zona', buscar_aria: 'Buscar imóveis', ver_props: 'Ver imóveis',
     est_eyebrow: 'Seleção BAIREN', est_h2: 'Seguimos um <em>padrão.</em>', est_copy: 'Antes de incorporar cada imóvel, verificamos:', criterios: 'Como selecionamos',
     hito_ubicacion: 'Localização', hito_estado: 'Estado', hito_distribucion: 'Distribuição', hito_calidad: 'Qualidade construtiva',
