@@ -371,7 +371,7 @@ textarea.fi{resize:vertical;min-height:96px;line-height:1.6;}
             <input type="file" id="photoInput" accept="image/*" multiple style="display:none">
             <p class="hint" style="margin-top:10px">Arrastrá imágenes al grid o click para seleccionar. Arrastrá entre slots para reordenar. Se comprimen automáticamente al subir.</p>
             <!-- Referencia de la prueba del 1/10/2026 con calidad alta; si cambia OPENAI_IMAGE_QUALITY en Vercel, actualizar -->
-            <p class="hint" style="margin-top:6px">Para mejorar una foto con IA, tocá "Embellecer" sobre esa foto, antes de guardar. Aprox. USD 0,06 por foto.</p>
+            <p class="hint" style="margin-top:6px">Para mejorar una foto con IA, tocá "Embellecer" sobre esa foto y después guardá. Si la foto ya estaba guardada, la embellecida reemplaza a la original. Aprox. USD 0,06 por foto.</p>
           </div>
         </div>
 
@@ -947,7 +947,7 @@ function renderPhotoGrid() {
       const uploading = ph._uploading ? '<div class="ph-uploading">Subiendo...</div>'
                       : ph._iaEnCola ? '<div class="ph-uploading">En espera...</div>'
                       : ph._iaWorking ? '<div class="ph-uploading">Embelleciendo...</div>' : '';
-      // Cada foto nueva se embellece por separado. Las ya guardadas no: no hay archivo local.
+      // Cada foto, nueva o guardada, se embellece por separado.
       const iaHTML = ph._ia ? '<span class="ph-ia-ok">Con IA</span>'
                    : (puedeEmbellecer(ph) && !ph._uploading)
                      ? `<button class="ph-ia" data-ia="${i}" type="button" title="Embellecer esta foto con IA (aprox. USD 0,06)">Embellecer</button>`
@@ -1071,16 +1071,25 @@ async function handleNewFiles(fileList) {
 
 // ════════════════════════════════════════════════════════════════════
 // FORM: embellecer fotos con IA (api/embellecer.js, se paga por foto en OpenAI)
-// Cada foto subida en esta edición tiene su propio botón "Embellecer". Las que se
+// Cada foto, nueva o ya guardada, tiene su propio botón "Embellecer". Las que se
 // tocan entran en una cola que procesa de a IA_PARALELO por vez (límite por minuto
 // de OpenAI). Cada una se reemplaza en la grilla y se sube al guardar, como
-// cualquier foto nueva.
+// cualquier foto nueva; si era una foto guardada, al guardar se borra la original.
 // ════════════════════════════════════════════════════════════════════
 const IA_PARALELO = 3;
 const ia = { cola: [], activas: 0, hechas: 0, fallas: 0, error: '', cortada: false };
 
 function puedeEmbellecer(ph) {
-  return !!(ph && ph._new && ph.file && !ph._ia && !ph._iaWorking);
+  return !!(ph && (ph.file || ph.url) && !ph._ia && !ph._iaWorking);
+}
+
+// Una foto ya guardada no tiene archivo local: se baja del storage (público) y se
+// pasa a JPG con el mismo compresor de la subida, que es lo que acepta la IA.
+async function archivoParaIA(ph) {
+  if (ph.file) return ph.file;
+  const r = await fetch(ph.url);
+  if (!r.ok) throw new Error('No se pudo leer la foto guardada.');
+  return compressImage(await r.blob());
 }
 
 // Mientras haya fotos en la IA no se guarda: se subiría la foto sin embellecer.
@@ -1108,8 +1117,8 @@ function dataURLToBlob(dataUrl) {
   return new Blob([bytes], { type });
 }
 
-async function embellecerFoto(ph, token) {
-  const body = JSON.stringify({ image: await blobToDataURL(ph.file) });
+async function embellecerFoto(archivo, token) {
+  const body = JSON.stringify({ image: await blobToDataURL(archivo) });
   for (let intento = 0; ; intento++) {
     const r = await fetch('/api/embellecer', {
       method: 'POST',
@@ -1165,11 +1174,18 @@ async function procesarIA(ph) {
       e.fatal = true;
       throw e;
     }
-    const blob = await embellecerFoto(ph, session.access_token);
-    URL.revokeObjectURL(ph.url);
+    const blob = await embellecerFoto(await archivoParaIA(ph), session.access_token);
+    if (ph._new) URL.revokeObjectURL(ph.url);
     ph.file = blob;
     ph.url = URL.createObjectURL(blob);
     ph._ia = true;
+    // Una guardada pasa a ser nueva: al guardar se sube la embellecida y
+    // deleteRemovedPhotos borra la original (ya no queda su id en la grilla).
+    if (!ph._new) {
+      ph._new = true;
+      delete ph.id;
+      delete ph.storage_path;
+    }
     ia.hechas++;
     saveDraftDebounced();
   } catch (e) {
