@@ -685,7 +685,7 @@ async function loadDashboard() {
   try {
     const { data, error } = await state.sb
       .from('propiedades')
-      .select('*, imagenes(id, url, storage_path, orden)')
+      .select('*, imagenes(id, url, storage_path, orden, con_ia)')
       .order('created_at', { ascending: false });
     if (error) throw error;
     state.properties = data || [];
@@ -878,7 +878,7 @@ function openForm(prop) {
     // fotos
     state.photos = (prop.imagenes || [])
       .sort((a,b) => a.orden - b.orden)
-      .map(i => ({ id: i.id, url: i.url, storage_path: i.storage_path }));
+      .map(i => ({ id: i.id, url: i.url, storage_path: i.storage_path, _ia: !!i.con_ia }));
 
     // portada especial del catálogo
     if (prop.portada_url) {
@@ -1562,6 +1562,8 @@ async function saveProperty(publicar) {
         url: p.url,
         storage_path: p.storage_path || null,
         orden: i,
+        // Marca de la IA (migración web 04): el botón "Embellecer" solo sale donde es false
+        con_ia: !!p._ia,
       }));
       const { error: imgErr } = await state.sb.from('imagenes').insert(rows);
       if (imgErr) throw imgErr;
@@ -1799,7 +1801,7 @@ async function restoreDraftIntoForm(draft) {
       if (r.blob) {
         return { _new: true, file: r.blob, url: URL.createObjectURL(r.blob), _ia: !!r.ia };
       }
-      return { id: r.id, url: r.url, storage_path: r.storage_path };
+      return { id: r.id, url: r.url, storage_path: r.storage_path, _ia: !!r.ia };
     });
     renderPhotoGrid();
   }
