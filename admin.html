@@ -134,6 +134,12 @@ textarea.fi{resize:vertical;min-height:96px;line-height:1.6;}
 .ph-add-icon{width:22px;height:22px;opacity:.3;}
 .hero-badge{position:absolute;bottom:4px;left:4px;background:var(--gold);color:var(--navy);font-size:.48rem;font-weight:700;letter-spacing:.12em;padding:2px 7px;text-transform:uppercase;pointer-events:none;}
 .ph-uploading{position:absolute;inset:0;background:rgba(42,58,82,.7);display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:.6rem;letter-spacing:.1em;}
+.ph-ia{position:absolute;bottom:4px;right:4px;background:rgba(42,58,82,.9);color:var(--gold);border:none;font-size:.5rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:5px 9px;line-height:1;z-index:2;transition:background .18s,color .18s;}
+.ph-ia:hover{background:var(--gold);color:var(--navy);}
+.ph-ia-ok{position:absolute;bottom:4px;right:4px;background:var(--navy);color:var(--gold-light);font-size:.48rem;font-weight:700;letter-spacing:.12em;padding:2px 7px;text-transform:uppercase;pointer-events:none;}
+.fi-row{display:flex;gap:6px;}
+.fi-clear{flex-shrink:0;font-size:.56rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:0 12px;background:transparent;color:var(--mid);border:1px solid rgba(42,58,82,.2);transition:all .18s;}
+.fi-clear:hover{color:var(--err);border-color:var(--err);}
 
 /* ─── PORTADA CATÁLOGO ──────────────────────────────────── */
 .portada-slot{aspect-ratio:16/9;max-width:420px;background:var(--off);border:1.5px dashed rgba(42,58,82,.2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;position:relative;overflow:hidden;transition:border-color .18s;}
@@ -180,7 +186,6 @@ textarea.fi{resize:vertical;min-height:96px;line-height:1.6;}
 .btn-sec{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:transparent;color:var(--navy);border:1px solid rgba(42,58,82,.22);padding:11px;font-size:.62rem;letter-spacing:.14em;font-weight:600;text-transform:uppercase;transition:all .18s;margin-bottom:8px;}
 .btn-sec:hover{background:var(--navy);color:var(--white);}
 .btn-sec:disabled{opacity:.5;cursor:not-allowed;}
-#btnEmbellecer:disabled,#btnEmbellecer:disabled:hover{opacity:1;cursor:progress;background:var(--off);color:var(--navy);}
 .btn-danger{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:transparent;color:var(--err);border:1px solid rgba(185,74,74,.3);padding:11px;font-size:.62rem;letter-spacing:.14em;font-weight:600;text-transform:uppercase;transition:all .18s;}
 .btn-danger:hover{background:var(--err);color:var(--white);border-color:var(--err);}
 
@@ -347,7 +352,13 @@ textarea.fi{resize:vertical;min-height:96px;line-height:1.6;}
             </div>
             <div class="row2">
               <div class="fg" id="fgPlazo"><label class="lbl" for="fPlazo">Plazo</label><input class="fi" id="fPlazo" type="text" placeholder="3-12 meses"></div>
-              <div></div>
+              <div class="fg"><label class="lbl" for="fLibera">Se libera el</label>
+                <div class="fi-row">
+                  <input class="fi" id="fLibera" type="date">
+                  <button class="fi-clear" id="btnLiberaQuitar" type="button" style="display:none">Quitar</button>
+                </div>
+                <span class="hint">Opcional. Con fecha, la ficha muestra el aviso "Se libera". Sin fecha, no aparece nada.</span>
+              </div>
             </div>
           </div>
         </div>
@@ -359,9 +370,8 @@ textarea.fi{resize:vertical;min-height:96px;line-height:1.6;}
             <div class="photo-grid" id="photoGrid"></div>
             <input type="file" id="photoInput" accept="image/*" multiple style="display:none">
             <p class="hint" style="margin-top:10px">Arrastrá imágenes al grid o click para seleccionar. Arrastrá entre slots para reordenar. Se comprimen automáticamente al subir.</p>
-            <button class="btn-sec" id="btnEmbellecer" type="button" style="width:auto;margin:12px 0 0;padding:11px 20px">Embellecer con IA</button>
             <!-- Referencia de la prueba del 1/10/2026 con calidad alta; si cambia OPENAI_IMAGE_QUALITY en Vercel, actualizar -->
-            <p class="hint" style="margin-top:6px">Aprox. USD 0,06 por foto.</p>
+            <p class="hint" style="margin-top:6px">Para mejorar una foto con IA, tocá "Embellecer" sobre esa foto, antes de guardar. Aprox. USD 0,06 por foto.</p>
           </div>
         </div>
 
@@ -839,7 +849,7 @@ function openForm(prop) {
   state.vType = 'bunny';
 
   // reset campos
-  ['fDir','fUnidad','fBarrio','fPrecioTemp','fPrecioTrad','fPrecioVenta','fAmb','fM2','fPlazo','fDesc','fDescPt','fDescEn','fVideo','fPortadaTitulo'].forEach(id => $(id).value = '');
+  ['fDir','fUnidad','fBarrio','fPrecioTemp','fPrecioTrad','fPrecioVenta','fAmb','fM2','fPlazo','fLibera','fDesc','fDescPt','fDescEn','fVideo','fPortadaTitulo'].forEach(id => $(id).value = '');
   $('fTipo').value = 'Temporal';
   $('fEstado').value = 'Disponible';
   $('fPlazo').value = defaultPlazoForTipo('Temporal');
@@ -858,6 +868,7 @@ function openForm(prop) {
     $('fM2').value          = prop.m2 || '';
     $('fEstado').value      = prop.estado || 'Disponible';
     $('fPlazo').value       = prop.plazo || defaultPlazoForTipo(prop.tipo || 'Temporal');
+    $('fLibera').value      = prop.fecha_liberacion || '';
     $('fDesc').value        = prop.descripcion || '';
     $('fDescPt').value      = prop.descripcion_pt || '';
     $('fDescEn').value      = prop.descripcion_en || '';
@@ -899,6 +910,7 @@ function openForm(prop) {
   renderAmenities();
   updateSidebar();
   togglePricesByTipo();
+  syncLiberaQuitar();
   showView('Form');
   updateDiscardBtn();
 }
@@ -933,11 +945,18 @@ function renderPhotoGrid() {
     if (state.photos[i]) {
       const ph = state.photos[i];
       const uploading = ph._uploading ? '<div class="ph-uploading">Subiendo...</div>'
+                      : ph._iaEnCola ? '<div class="ph-uploading">En espera...</div>'
                       : ph._iaWorking ? '<div class="ph-uploading">Embelleciendo...</div>' : '';
+      // Cada foto nueva se embellece por separado. Las ya guardadas no: no hay archivo local.
+      const iaHTML = ph._ia ? '<span class="ph-ia-ok">Con IA</span>'
+                   : (puedeEmbellecer(ph) && !ph._uploading)
+                     ? `<button class="ph-ia" data-ia="${i}" type="button" title="Embellecer esta foto con IA (aprox. USD 0,06)">Embellecer</button>`
+                     : '';
       s.innerHTML =
         `<img src="${ph.url}" alt="">
          <button class="ph-rm" data-rm="${i}" title="Quitar">×</button>
          ${i === 0 ? '<span class="hero-badge">Portada</span>' : ''}
+         ${iaHTML}
          ${uploading}`;
       s.draggable = true;
     } else {
@@ -959,6 +978,14 @@ function renderPhotoGrid() {
       renderPhotoGrid();
       updateSidebar();
       saveDraftDebounced();
+    });
+  });
+
+  // embellecer una foto
+  grid.querySelectorAll('.ph-ia').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      embellecerUna(state.photos[parseInt(btn.dataset.ia)]);
     });
   });
 
@@ -1044,10 +1071,24 @@ async function handleNewFiles(fileList) {
 
 // ════════════════════════════════════════════════════════════════════
 // FORM: embellecer fotos con IA (api/embellecer.js, se paga por foto en OpenAI)
-// Trabaja sobre las fotos subidas en esta edición que todavía no pasaron por la IA.
-// Cada una se reemplaza en la grilla y se sube al guardar, como cualquier foto nueva.
+// Cada foto subida en esta edición tiene su propio botón "Embellecer". Las que se
+// tocan entran en una cola que procesa de a IA_PARALELO por vez (límite por minuto
+// de OpenAI). Cada una se reemplaza en la grilla y se sube al guardar, como
+// cualquier foto nueva.
 // ════════════════════════════════════════════════════════════════════
 const IA_PARALELO = 3;
+const ia = { cola: [], activas: 0, hechas: 0, fallas: 0, error: '', cortada: false };
+
+function puedeEmbellecer(ph) {
+  return !!(ph && ph._new && ph.file && !ph._ia && !ph._iaWorking);
+}
+
+// Mientras haya fotos en la IA no se guarda: se subiría la foto sin embellecer.
+function bloquearGuardadoIA() {
+  const ocupada = ia.activas > 0 || ia.cola.length > 0;
+  [$('btnPublish'), $('btnDraft')].forEach(b => b.disabled = ocupada);
+  return ocupada;
+}
 
 function blobToDataURL(blob) {
   return new Promise((resolve, reject) => {
@@ -1089,55 +1130,59 @@ async function embellecerFoto(ph, token) {
   }
 }
 
-async function embellecerFotos() {
-  const pendientes = state.photos.filter(p => p._new && p.file && !p._ia && !p._iaWorking);
-  if (!pendientes.length) { toast('No hay fotos nuevas para embellecer.', 'err'); return; }
-  const { data: { session } } = await state.sb.auth.getSession();
-  if (!session) { toast('La sesión venció. Volvé a ingresar.', 'err'); return; }
+function embellecerUna(ph) {
+  if (!puedeEmbellecer(ph)) return;
+  ph._iaWorking = true;
+  ph._iaEnCola = true;
+  ia.cola.push(ph);
+  arrancarIA();
+}
 
-  const btn = $('btnEmbellecer');
-  const guardar = [$('btnPublish'), $('btnDraft')];
-  const total = pendientes.length;
-  let hechas = 0, fallas = 0, error = '', cortar = false;
-  const progreso = () => { btn.textContent = `Embelleciendo ${hechas + fallas} de ${total}...`; };
-  btn.disabled = true;
-  guardar.forEach(b => b.disabled = true);
-  pendientes.forEach(ph => ph._iaWorking = true);
-  progreso();
+function arrancarIA() {
+  while (ia.activas < IA_PARALELO && ia.cola.length) {
+    const ph = ia.cola.shift();
+    ph._iaEnCola = false;
+    // Si la quitaron de la grilla (o se abrió otra propiedad) mientras esperaba, no se paga.
+    if (!state.photos.includes(ph)) { ph._iaWorking = false; continue; }
+    ia.activas++;
+    procesarIA(ph).finally(() => { ia.activas--; arrancarIA(); });
+  }
   renderPhotoGrid();
+  if (bloquearGuardadoIA() || !(ia.hechas + ia.fallas)) return;
 
-  const cola = pendientes.slice();
-  async function trabajador() {
-    while (cola.length && !cortar) {
-      const ph = cola.shift();
-      try {
-        const blob = await embellecerFoto(ph, session.access_token);
-        URL.revokeObjectURL(ph.url);
-        ph.file = blob;
-        ph.url = URL.createObjectURL(blob);
-        ph._ia = true;
-        hechas++;
-      } catch (e) {
-        fallas++;
-        error = e.message;
-        if (e.fatal) cortar = true;
-      }
-      ph._iaWorking = false;
-      renderPhotoGrid();
-      progreso();
+  // Se vació la cola: un solo aviso por tanda
+  const total = ia.hechas + ia.fallas;
+  if (!ia.fallas) toast(total === 1 ? 'Foto embellecida.' : `${total} fotos embellecidas.`, 'ok');
+  else toast(`Listas ${ia.hechas} de ${total}. ${ia.error}` + (ia.cortada ? '' : ' Tocá "Embellecer" de nuevo en las que faltan.'), 'err');
+  Object.assign(ia, { hechas: 0, fallas: 0, error: '', cortada: false });
+}
+
+async function procesarIA(ph) {
+  try {
+    const { data: { session } } = await state.sb.auth.getSession();
+    if (!session) {
+      const e = new Error('La sesión venció. Volvé a ingresar.');
+      e.fatal = true;
+      throw e;
+    }
+    const blob = await embellecerFoto(ph, session.access_token);
+    URL.revokeObjectURL(ph.url);
+    ph.file = blob;
+    ph.url = URL.createObjectURL(blob);
+    ph._ia = true;
+    ia.hechas++;
+    saveDraftDebounced();
+  } catch (e) {
+    ia.fallas++;
+    ia.error = e.message;
+    // Sin sesión, sin permiso o sin configurar: las que esperan van a fallar igual
+    if (e.fatal) {
+      ia.cortada = true;
+      ia.cola.forEach(x => { x._iaWorking = false; x._iaEnCola = false; });
+      ia.cola = [];
     }
   }
-  await Promise.all(Array.from({ length: Math.min(IA_PARALELO, total) }, trabajador));
-
-  pendientes.forEach(ph => ph._iaWorking = false);
-  renderPhotoGrid();
-  saveDraftDebounced();
-  btn.disabled = false;
-  btn.textContent = 'Embellecer con IA';
-  guardar.forEach(b => b.disabled = false);
-
-  if (hechas === total) toast(total === 1 ? 'Foto embellecida.' : `${total} fotos embellecidas.`, 'ok');
-  else toast(`Listas ${hechas} de ${total}. ${error}` + (cortar ? '' : ' Tocá el botón de nuevo para reintentar las que faltan.'), 'err');
+  ph._iaWorking = false;
 }
 
 // ════════════════════════════════════════════════════════════════════
@@ -1304,6 +1349,11 @@ function togglePricesByTipo() {
   }
 }
 
+// "Quitar" solo aparece cuando hay una fecha cargada
+function syncLiberaQuitar() {
+  $('btnLiberaQuitar').style.display = $('fLibera').value ? '' : 'none';
+}
+
 // ════════════════════════════════════════════════════════════════════
 // TRADUCCIÓN AUTOMÁTICA (es → pt/en) al guardar
 // Usa el endpoint público de Google Translate; si falla, cae a MyMemory.
@@ -1375,6 +1425,8 @@ function collectFormData() {
     ambientes:    parseInt($('fAmb').value) || null,
     m2:           parseInt($('fM2').value) || null,
     plazo:        (tipo === 'Venta') ? null : ($('fPlazo').value.trim() || defaultPlazoForTipo(tipo)),
+    // Vacía = null: la ficha no muestra el aviso "Se libera"
+    fecha_liberacion: $('fLibera').value || null,
     estado:       $('fEstado').value,
     descripcion:  $('fDesc').value.trim() || null,
     descripcion_pt: $('fDescPt').value.trim() || null,
@@ -1642,6 +1694,7 @@ function snapshotForm() {
       m2:         $('fM2').value,
       estado:     $('fEstado').value,
       plazo:      $('fPlazo').value,
+      libera:     $('fLibera').value,
       desc:       $('fDesc').value,
       descPt:     $('fDescPt').value,
       descEn:     $('fDescEn').value,
@@ -1706,6 +1759,8 @@ async function restoreDraftIntoForm(draft) {
   $('fM2').value          = f.m2 || '';
   $('fEstado').value      = f.estado || 'Disponible';
   $('fPlazo').value       = f.plazo || defaultPlazoForTipo(f.tipo || 'Temporal');
+  $('fLibera').value      = f.libera || '';
+  syncLiberaQuitar();
   $('fDesc').value        = f.desc || '';
   $('fDescPt').value      = f.descPt || '';
   $('fDescEn').value      = f.descEn || '';
@@ -1804,7 +1859,7 @@ function showDraftBanner(draft) {
 
 function wireAutosave() {
   const ids = ['fDir','fUnidad','fBarrio','fTipo','fPrecioTemp','fPrecioTrad','fPrecioVenta',
-               'fAmb','fM2','fEstado','fPlazo','fDesc','fDescPt','fDescEn','fVideo','fPortadaTitulo'];
+               'fAmb','fM2','fEstado','fPlazo','fLibera','fDesc','fDescPt','fDescEn','fVideo','fPortadaTitulo'];
   ids.forEach(id => {
     const el = $(id);
     if (!el) return;
@@ -1860,7 +1915,15 @@ function wireUI() {
     handleNewFiles(e.target.files);
     e.target.value = '';
   });
-  $('btnEmbellecer').addEventListener('click', embellecerFotos);
+
+  // fecha en que se libera
+  $('fLibera').addEventListener('input', syncLiberaQuitar);
+  $('fLibera').addEventListener('change', syncLiberaQuitar);
+  $('btnLiberaQuitar').addEventListener('click', () => {
+    $('fLibera').value = '';
+    syncLiberaQuitar();
+    saveDraftDebounced();
+  });
 
   // portada del catálogo
   $('portadaInput').addEventListener('change', e => {

@@ -84,7 +84,6 @@ nav{position:fixed;inset:0 0 auto 0;z-index:1000;height:64px;background:var(--na
 /* HERO */
 .property-hero{margin-top:64px;height:68vh;min-height:420px;position:relative;overflow:hidden;display:flex;align-items:flex-end;transition:height .5s var(--ease);}
 .hero-badge{display:none;}
-.hero-badge-content{display:none;}
 .property-hero.video-mode{height:calc(100vh - 64px);}
 .hero-slides{position:absolute;inset:0;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-behavior:smooth;background:var(--navy-deeper);transition:opacity .5s var(--ease);scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;}
 .hero-slides::-webkit-scrollbar{display:none;}
@@ -98,8 +97,6 @@ nav{position:fixed;inset:0 0 auto 0;z-index:1000;height:64px;background:var(--na
 .hero-content{position:relative;z-index:4;padding:40px 60px;width:100%;display:flex;align-items:flex-end;justify-content:space-between;gap:20px;transition:opacity .4s var(--ease),transform .5s var(--ease);pointer-events:none;}
 .hero-content.hidden{opacity:0;transform:translateY(60px);pointer-events:none;}
 .hero-tag{display:inline-block;background:transparent;color:var(--gold-light);border:1px solid rgba(194,169,104,.6);font-size:.58rem;letter-spacing:.25em;font-weight:700;padding:4px 13px;margin-bottom:14px;}
-.hero-tag--liberacion{position:relative;overflow:hidden;background:rgba(19,29,45,.35);border-color:rgba(222,205,160,.75);backdrop-filter:blur(6px);}
-.hero-tag--liberacion::after{content:'';position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.55) 50%,rgba(222,205,160,.4) 58%,transparent 70%);transform:translateX(-100%);animation:luxury-sheen 3.5s cubic-bezier(0.22,1,0.36,1) infinite;pointer-events:none;}
 .hero-address{font-family:var(--font-display);font-size:clamp(2rem,5vw,3.4rem);font-weight:500;color:var(--white);line-height:1.05;margin-bottom:6px;}
 .hero-sub{font-size:.8rem;letter-spacing:.15em;color:var(--gold-light);}
 .hero-price-box{text-align:right;flex-shrink:0;}
@@ -218,56 +215,20 @@ footer{background:var(--navy-dark);border-top:1px solid var(--gold);padding:40px
 .lightbox-counter{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);font-size:.65rem;letter-spacing:.2em;color:rgba(255,255,255,.4);z-index:3;pointer-events:none;}
 
 
-/* ─── ALERT LIBERACIÓN ─────────────────────────────────────── */
-.liberacion-alert {
-  background: rgba(194, 169, 104, 0.08);
-  border: 1px solid rgba(194, 169, 104, 0.35);
-  padding: 16px 18px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  color: var(--gold-dark);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
-  font-family: var(--font-display);
-  animation: luxury-fade-in 0.8s cubic-bezier(0.22, 1, 0.36, 1);
-  backdrop-filter: blur(4px);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 4px 12px rgba(0, 0, 0, 0.04);
-  position: relative;
-  overflow: hidden;
-}
-
-.liberacion-alert::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.65) 50%, rgba(194, 169, 104, 0.25) 58%, transparent 70%);
-  transform: translateX(-100%);
-  animation: luxury-sheen 3.5s cubic-bezier(0.22, 1, 0.36, 1) infinite;
-  pointer-events: none;
-}
-
-@keyframes luxury-sheen {
-  0% { transform: translateX(-100%); }
-  55% { transform: translateX(100%); }
-  100% { transform: translateX(100%); }
-}
-
-.alert-icon {
-  flex-shrink: 0;
-  color: var(--gold-dark);
-  width: 16px;
-  height: 16px;
-  opacity: 0.75;
-}
-
-@keyframes luxury-fade-in {
-  from { opacity: 0; transform: translateY(-6px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+/* AVISO "SE LIBERA": la fecha la carga el admin. Sin fecha, o si ya pasó, no aparece.
+   Abajo a la izquierda en escritorio (la burbuja de WhatsApp está a la derecha);
+   en celular, arriba de la barra de consulta. */
+.libera-pop{position:fixed;left:24px;bottom:24px;z-index:850;display:flex;align-items:center;gap:14px;max-width:calc(100vw - 32px);padding:14px 12px 14px 18px;background:var(--navy-deeper);border:1px solid rgba(194,169,104,.55);box-shadow:0 14px 36px rgba(19,29,45,.35);opacity:0;transform:translateY(14px);transition:opacity .5s var(--ease),transform .6s var(--ease);}
+.libera-pop[hidden]{display:none;}
+.libera-pop.show{opacity:1;transform:none;}
+.libera-ico{flex-shrink:0;color:var(--gold);}
+.libera-txt{display:flex;flex-direction:column;gap:4px;min-width:0;}
+.libera-lbl{font-size:.58rem;letter-spacing:.25em;text-transform:uppercase;font-weight:600;color:var(--gold-light);}
+.libera-val{font-family:var(--font-display);font-size:1.15rem;line-height:1.15;color:var(--white);}
+.libera-x{flex-shrink:0;align-self:flex-start;width:28px;height:28px;margin:-8px -4px 0 6px;background:none;border:none;color:rgba(255,255,255,.45);font-size:1.3rem;line-height:1;cursor:pointer;transition:color .2s;}
+.libera-x:hover{color:var(--gold);}
+@media(max-width:960px){.libera-pop{left:16px;bottom:calc(56px + env(safe-area-inset-bottom,0px) + 12px);}}
+@media(prefers-reduced-motion:reduce){.libera-pop{transition:none;}}
 
 
 *:focus-visible{outline:2px solid var(--gold);outline-offset:3px;}
@@ -312,7 +273,6 @@ footer{background:var(--navy-dark);border-top:1px solid var(--gold);padding:40px
     <div class="hero-grad" id="heroGrad"></div>
     <div class="hero-content" id="heroContent">
       <div>
-        <div class="hero-badge-content" id="heroBadgeContent"></div>
         <div class="hero-tag" id="heroTag">—</div>
         <div class="hero-address" id="heroAddress">—</div>
         <div class="hero-sub" id="heroSub">—</div>
@@ -339,17 +299,6 @@ footer{background:var(--navy-dark);border-top:1px solid var(--gold);padding:40px
       <div class="map-wrap reveal"><iframe id="mapFrame" src="" allowfullscreen loading="lazy" title="Mapa de la ubicación de la propiedad"></iframe></div>
     </div>
 
-    <!-- Alert de Liberación -->
-    <div id="alertLiberacion" style="display: none;">
-      <div class="liberacion-alert">
-        <svg class="alert-icon" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none">
-          <circle cx="12" cy="12" r="10"></circle>
-          <polyline points="12 6 12 12 16 14"></polyline>
-        </svg>
-        <span id="alertLiberacionTexto"></span>
-      </div>
-    </div>
-
     <div class="action-card reveal">
       <div class="ac-header">
         <div class="ac-price-lbl" data-i18n="prop_price_m">Precio mensual</div>
@@ -367,6 +316,16 @@ footer{background:var(--navy-dark);border-top:1px solid var(--gold);padding:40px
     <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 0C7.163 0 0 7.163 0 16c0 2.83.736 5.487 2.023 7.793L0 32l8.438-2.01A15.93 15.93 0 0016 32c8.837 0 16-7.163 16-16S24.837 0 16 0zm0 29.333a13.278 13.278 0 01-6.77-1.848l-.484-.287-5.013 1.195 1.228-4.88-.317-.502A13.278 13.278 0 012.667 16C2.667 8.636 8.636 2.667 16 2.667S29.333 8.636 29.333 16 23.364 29.333 16 29.333zm7.3-9.96c-.4-.2-2.363-1.166-2.728-1.3-.366-.133-.633-.2-.9.2-.266.4-1.033 1.3-1.266 1.566-.233.267-.466.3-.866.1-2.367-1.183-3.917-2.117-5.475-4.8-.413-.712.413-.663 1.183-2.202.133-.267.067-.5-.033-.7-.1-.2-.9-2.163-1.233-2.963-.324-.778-.653-.672-.9-.685l-.767-.013a1.47 1.47 0 00-1.067.5c-.366.4-1.4 1.367-1.4 3.33s1.434 3.863 1.634 4.13c.2.267 2.823 4.312 6.837 6.05 2.54 1.097 3.534 1.19 4.804.999.773-.115 2.363-.966 2.696-1.9.333-.933.333-1.733.233-1.9-.1-.166-.366-.266-.766-.466z"/></svg>
     <span id="waBarTxt">Consultar por WhatsApp</span>
   </a>
+
+  <!-- AVISO "SE LIBERA" (solo si el admin cargó la fecha) -->
+  <div class="libera-pop" id="liberaPop" role="status" hidden>
+    <svg class="libera-ico" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>
+    <div class="libera-txt">
+      <span class="libera-lbl" id="liberaLbl">Se libera</span>
+      <span class="libera-val" id="liberaVal"></span>
+    </div>
+    <button class="libera-x" id="liberaX" type="button" aria-label="Cerrar">×</button>
+  </div>
 </main>
 
 <!-- NOT FOUND -->
@@ -429,7 +388,7 @@ const PROP_T = {
     wa_consulta:'Hola, me interesa {p}, que vi en la web. ¿Sigue disponible?',
     wa_venta:'Hola muy buenas, me interesa la propiedad en venta en {p}. Me gustaría coordinar una visita. Gracias!',
     default_desc:'{t} — unidad disponible en {b}, Buenos Aires. Listo para vivir desde el primer día.',
-    lib_hoy:'Se libera hoy', lib_manana:'Se libera mañana', lib_dias:'Se libera en {d} días', lib_fecha:'Se libera: {f}',
+    lib_lbl:'Se libera', lib_hoy:'hoy', lib_manana:'mañana', lib_dias:'en {d} días', lib_fecha:'el {f}',
     locale:'es-AR'
   },
   pt: {
@@ -456,7 +415,7 @@ const PROP_T = {
     wa_consulta:'Olá, tenho interesse em {p}, que vi no site. Ainda está disponível?',
     wa_venta:'Olá, tenho interesse no imóvel à venda em {p}. Gostaria de agendar uma visita. Obrigado!',
     default_desc:'{t} — unidade disponível em {b}, Buenos Aires. Pronta para morar desde o primeiro dia.',
-    lib_hoy:'Libera hoje', lib_manana:'Libera amanhã', lib_dias:'Libera em {d} dias', lib_fecha:'Libera em: {f}',
+    lib_lbl:'Disponível', lib_hoy:'hoje', lib_manana:'amanhã', lib_dias:'em {d} dias', lib_fecha:'a partir de {f}',
     locale:'pt-BR',
     amen:{'Pileta':'Piscina','Gimnasio':'Academia','Spa / Sauna':'Spa / Sauna','SUM':'Salão de festas','Cochera':'Garagem','Ascensor':'Elevador','Aire acond.':'Ar-condicionado','Jardín / Terraza':'Jardim / Terraço','Parrilla':'Churrasqueira','Laundry':'Lavanderia','Seguridad 24hs':'Segurança 24h','Conserje 24hs':'Portaria 24h','Bicicletero':'Bicicletário','Pet friendly':'Aceita pets','Calefacción central':'Aquecimento central','Baulera':'Depósito','Amoblado':'Mobiliado','All in':'Tudo incluído'}
   },
@@ -484,7 +443,7 @@ const PROP_T = {
     wa_consulta:'Hi, I am interested in {p}, which I saw on your website. Is it still available?',
     wa_venta:'Hello, I am interested in the property for sale at {p}. I would like to schedule a visit. Thank you!',
     default_desc:'{t} — unit available in {b}, Buenos Aires. Move-in ready from day one.',
-    lib_hoy:'Available today', lib_manana:'Available tomorrow', lib_dias:'Available in {d} days', lib_fecha:'Available: {f}',
+    lib_lbl:'Available', lib_hoy:'today', lib_manana:'tomorrow', lib_dias:'in {d} days', lib_fecha:'from {f}',
     locale:'en-US',
     amen:{'Pileta':'Pool','Gimnasio':'Gym','Spa / Sauna':'Spa / Sauna','SUM':'Common room','Cochera':'Parking','Ascensor':'Elevator','Aire acond.':'Air conditioning','Jardín / Terraza':'Garden / Terrace','Parrilla':'BBQ area','Laundry':'Laundry','Seguridad 24hs':'24h security','Conserje 24hs':'24h concierge','Bicicletero':'Bike storage','Pet friendly':'Pet friendly','Calefacción central':'Central heating','Baulera':'Storage room','Amoblado':'Furnished','All in':'All in'}
   }
@@ -773,13 +732,10 @@ function renderDynamicTexts(p) {
   const reservado = p.estado === 'Reservado';
 
   // ─── HERO TAG ───
-  if (reservado && p.fecha_liberacion) {
-    $('heroTag').textContent = formatFechaLiberacion(p.fecha_liberacion);
-    $('heroTag').classList.add('hero-tag--liberacion');
-  } else {
-    $('heroTag').textContent = isAmbos ? t.tag_ambos : (isVenta ? t.tag_venta : (isTemp ? t.tag_temporal : t.tag_tradicional));
-    $('heroTag').classList.remove('hero-tag--liberacion');
-  }
+  $('heroTag').textContent = isAmbos ? t.tag_ambos : (isVenta ? t.tag_venta : (isTemp ? t.tag_temporal : t.tag_tradicional));
+
+  // ─── AVISO "SE LIBERA" ───
+  renderLibera(p);
 
   // ─── PRECIOS ───
   const priceTempStr = fmtUSD(p.precio_temporal);
@@ -931,22 +887,6 @@ function renderActionCard(p, titleFull, unidadLbl, reservado, isTemp, isTrad) {
       <a class="btn-primary" href="${waFicha}" target="_blank" rel="noopener noreferrer">${t.btn_consultar}</a>
       <a class="btn-secondary" href="${filtro}">${t.btn_visita}</a>
     `;
-  }
-
-  // Mostrar/ocultar badge + alert de liberación
-  if (p.estado === 'Reservado' && p.fecha_liberacion) {
-    const textoLiberacion = formatFechaLiberacion(p.fecha_liberacion);
-
-    // Badge en heroContent (debajo del hero, arriba de la dirección)
-    const badgeHTML = `<div class="badge-liberacion"><span>${textoLiberacion}</span></div>`;
-    $('heroBadgeContent').innerHTML = badgeHTML;
-
-    // Alert abajo en action card
-    $('alertLiberacionTexto').textContent = textoLiberacion;
-    $('alertLiberacion').style.display = '';
-  } else {
-    $('heroBadgeContent').innerHTML = '';
-    $('alertLiberacion').style.display = 'none';
   }
 
   acBody.innerHTML = html;
@@ -1268,28 +1208,49 @@ $('burger').addEventListener('click', function() {
 });
 
 // ════════════════════════════════════════════════════════════════════
-// FECHA LIBERACIÓN
+// AVISO "SE LIBERA" — la fecha la carga el admin (columna fecha_liberacion).
+// Sin fecha, o con una fecha que ya pasó, no aparece nada.
 // ════════════════════════════════════════════════════════════════════
-function formatFechaLiberacion(fechaStr) {
-  if (!fechaStr) return null;
+let LIBERA_CERRADO = false;
 
-  const fecha = new Date(fechaStr);
+function textoLibera(fechaStr) {
+  // 'AAAA-MM-DD' se arma como fecha local: new Date('2026-11-15') es la medianoche
+  // UTC, que en Buenos Aires todavía es el 14, y el aviso saldría un día antes.
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(fechaStr || '');
+  if (!m) return null;
+  const fecha = new Date(+m[1], +m[2] - 1, +m[3]);
   const hoy = new Date();
   hoy.setHours(0, 0, 0, 0);
-  fecha.setHours(0, 0, 0, 0);
-
-  const diffMs = fecha - hoy;
-  const diffDias = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+  const dias = Math.round((fecha - hoy) / 86400000);
+  if (dias < 0) return null;
 
   const t = LT();
-  if (diffDias === 0) return t.lib_hoy;
-  if (diffDias === 1) return t.lib_manana;
-  if (diffDias > 1 && diffDias <= 7) return t.lib_dias.replace('{d}', diffDias);
-
-  const opciones = { month: 'long', day: 'numeric', year: 'numeric' };
-  const formatted = fecha.toLocaleDateString(t.locale, opciones);
-  return t.lib_fecha.replace('{f}', formatted);
+  if (dias === 0) return t.lib_hoy;
+  if (dias === 1) return t.lib_manana;
+  if (dias <= 7) return t.lib_dias.replace('{d}', dias);
+  const opciones = { day: 'numeric', month: 'long' };
+  if (fecha.getFullYear() !== hoy.getFullYear()) opciones.year = 'numeric';
+  return t.lib_fecha.replace('{f}', fecha.toLocaleDateString(t.locale, opciones));
 }
+
+function renderLibera(p) {
+  const pop = $('liberaPop');
+  const val = LIBERA_CERRADO ? null : textoLibera(p.fecha_liberacion);
+  if (!val) { pop.hidden = true; pop.classList.remove('show'); return; }
+  $('liberaLbl').textContent = LT().lib_lbl;
+  $('liberaVal').textContent = val;
+  if (pop.hidden) {
+    pop.hidden = false;
+    // aparece un momento después de la ficha, como un aviso
+    setTimeout(() => pop.classList.add('show'), 700);
+  }
+}
+
+$('liberaX').addEventListener('click', () => {
+  LIBERA_CERRADO = true;
+  $('liberaPop').classList.remove('show');
+  setTimeout(() => { $('liberaPop').hidden = true; }, 500);
+});
 
 // ════════════════════════════════════════════════════════════════════
 // BOOT
