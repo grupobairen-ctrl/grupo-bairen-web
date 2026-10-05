@@ -3,7 +3,8 @@
  *
  * Recibe UNA foto recién subida en admin.html y la devuelve "vuelta a sacar"
  * como lo haría un fotógrafo de arquitectura, sin cambiar la propiedad, con el
- * prompt de BAIREN. Corre por la API de OpenAI (se paga por foto, sin ChatGPT Plus).
+ * prompt de BAIREN. Si la foto trae marca de agua o logo encima, la saca (5/10/2026).
+ * Corre por la API de OpenAI (se paga por foto, sin ChatGPT Plus).
  *
  * Variables en Vercel (proyecto grupo-bairen-web, entorno Production):
  *   OPENAI_API_KEY        clave de platform.openai.com. Sin ella responde 501.
@@ -41,7 +42,9 @@ const PROMPT = `Re-shoot this exact photograph as if a world-class architectural
 
 - Same view through the windows.
 
-- Every visible text must remain identical, sharp and legible: signs, building name, unit numbers, posters, brand names.
+- Every text that physically exists in the place must remain identical, sharp and legible: signs, building name, unit numbers, posters, brand names.
+
+- Watermarks are NOT part of the place: if the photo has a watermark, logo, text, timestamp or stamp overlaid on top of the image (for example a real estate agency or listing portal logo, semi-transparent lettering, lines or a corner stamp), remove it completely and reconstruct what is behind it, so the result looks as if it was never there. This applies only to graphics added on top of the photo, never to real signs or objects in the scene.
 
 - If the new angle reveals areas not visible in the original photo, extend the existing architecture and surfaces logically and consistently; never invent new windows, doors, furniture or decor.
 
