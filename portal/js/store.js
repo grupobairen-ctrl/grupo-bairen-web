@@ -121,6 +121,9 @@
   S.PERFILES = ['busca', 'dueno', 'profesional'];
   /* 12/9 · Los rótulos del perfil se leen en el idioma de la página (getters: S.PERFIL_TXT[p] sigue funcionando igual) */
   S.PERFIL_TXT = { get busca(){ return T('perfil_busca', 'Busco propiedad'); }, get dueno(){ return T('perfil_dueno', 'Dueño directo'); }, get profesional(){ return T('perfil_profesional', 'Inmobiliaria, corredor o desarrolladora'); } };
+  /* 8/10/2026 · El rótulo de la cuenta según quién publica: un gestor de alquileres tiene perfil 'profesional' (publica
+     lo de otros), pero no es inmobiliaria, corredor ni desarrolladora. Con publicador gestor, dice Gestor de alquileres. */
+  S.perfilTxt = (p, pub) => p === 'profesional' && pub && pub.tipo === 'gestor' ? T('perfil_gestor', 'Gestor de alquileres') : (S.PERFIL_TXT[p] || '');
   /* 11/9 noche · El riel del panel y el desplegable "Mi cuenta" del header salen del mismo lugar: los ids de las
      vistas (avisos, propiedades, interesados, importar, contactos, favoritos, alertas, cuenta) según el perfil.
      Sin perfil (cuenta vieja, demo) la lista completa. El dueño lleva siempre Mis contactos: puede consultar
