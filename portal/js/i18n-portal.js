@@ -266,6 +266,7 @@ window.BP_I18N = {
     guard_vacio: "You haven't saved any properties yet.", guard_err: "We couldn't load your saved properties.", alertas_t: 'Alerts', guard_todas_ops: 'All listings', guard_hasta: 'up to {p}', guard_quitar_alerta: 'Remove the alert', guard_crear_alerta: 'Create an alert',
     /* lanz3-visitante · 8/10/2026 · Arreglos de la simulación de visitantes. Claves nuevas juntas, en este bloque */
     sugerencias_aria: 'Suggestions', ver_la_unidad: 'See the unit', edif_ver_unidades: 'See units',
+    alerta_corto: 'Alert', alerta_creada_toast: 'Alert created.', alerta_cuenta: 'With an account, the alert reaches you by email.',
     /* 8/10/2026 · del equipo de servidor (ingresar): el captcha */
     ing_err_captcha: "We couldn't verify that you're a person. Please try again.",
     /* Publicar en pantallas cortas (8/10/2026) */
@@ -722,6 +723,7 @@ window.BP_I18N = {
     guard_vacio: 'Você ainda não salvou imóveis.', guard_err: 'Não conseguimos carregar seus imóveis salvos.', alertas_t: 'Alertas', guard_todas_ops: 'Todas as operações', guard_hasta: 'até {p}', guard_quitar_alerta: 'Remover o alerta', guard_crear_alerta: 'Criar um alerta',
     /* lanz3-visitante · 8/10/2026 · Arreglos de la simulación de visitantes (portugués de Brasil). Claves nuevas juntas, en este bloque */
     sugerencias_aria: 'Sugestões', ver_la_unidad: 'Ver o imóvel', edif_ver_unidades: 'Ver unidades',
+    alerta_corto: 'Alerta', alerta_creada_toast: 'Alerta criado.', alerta_cuenta: 'Com uma conta, o alerta chega por e-mail.',
     /* 8/10/2026 · del equipo de servidor (ingresar): el captcha */
     ing_err_captcha: 'Não conseguimos verificar que você é uma pessoa. Tente de novo.',
     /* Publicar en pantallas cortas (8/10/2026) */

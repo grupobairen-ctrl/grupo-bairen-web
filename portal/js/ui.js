@@ -526,16 +526,23 @@
     const ses = window.BPStore && window.BPStore.session;
     const items = [
       ['inicio', 'index.html', BP.ico.home, BP.t('tab_inicio', 'Inicio')],
-      ['buscar', 'buscar.html', BP.ico.search, BP.t('tab_buscar', 'Buscar')],
+      ['buscar', BP.ultimaBusqueda(), BP.ico.search, BP.t('tab_buscar', 'Buscar')],
       ['guardados', 'guardados.html', BP.ico.heart, BP.t('tab_guardados', 'Guardados')],
       ['cuenta', ses ? 'panel.html' : 'ingresar.html', BP.ico.user, BP.t('tab_cuenta', 'Cuenta')]
     ];
     const bar = document.createElement('div');
     bar.id = 'pTabbar'; bar.className = 'p-tabbar'; bar.setAttribute('role', 'navigation'); bar.setAttribute('aria-label', BP.t('tab_aria', 'Accesos'));
-    bar.innerHTML = items.map(i => `<a href="${i[1]}" data-tab="${i[0]}"${i[0] === act ? ' class="on" aria-current="page"' : ''}>${i[2]}<span>${BP.esc(i[3])}</span></a>`).join('');
+    bar.innerHTML = items.map(i => `<a href="${BP.esc(i[1])}" data-tab="${i[0]}"${i[0] === act ? ' class="on" aria-current="page"' : ''}>${i[2]}<span>${BP.esc(i[3])}</span></a>`).join('');
     b.appendChild(bar);
     document.documentElement.classList.add('con-tabbar');
   };
+  /* lanz3-visitante · La pestaña Buscar vuelve a la última búsqueda de esta visita, con sus filtros (buscar.html la
+     anota en cada cambio). Sólo direcciones del catálogo dentro del portal; si no hay, el catálogo de siempre. */
+  BP.anotarBusqueda = url => { try { if (/^(buscar\.html|(departamentos|pisos|ph|casas|propiedades)-[a-z0-9-]+)(\?[^\s"'<>]*)?$/i.test(url)) sessionStorage.setItem('bp_ultima_busqueda', url); } catch (e) {} };
+  BP.ultimaBusqueda = () => { try { const u = sessionStorage.getItem('bp_ultima_busqueda') || ''; if (/^(buscar\.html|(departamentos|pisos|ph|casas|propiedades)-[a-z0-9-]+)(\?[^\s"'<>]*)?$/i.test(u)) return u; } catch (e) {} return 'buscar.html'; };
+  /* lanz3-visitante · Ingresar desde una acción (crear una alerta, guardar): después del código se vuelve a esta misma
+     página, con sus filtros. ingresar.html sólo acepta direcciones de este portal. */
+  BP.urlIngresar = () => { let aqui = 'index.html'; try { aqui = (location.pathname.split('/').pop() || 'index.html') + location.search; } catch (e) {} return 'ingresar.html?volver=' + encodeURIComponent(aqui); };
 
   /* ── 12/9 · La imagen de la cuenta ─────────────────────
      Lo que devuelve BPStore.getAvatar(): un ícono de img/avatares o la foto propia, siempre cuadrada, angular y con
