@@ -114,6 +114,16 @@ document.addEventListener('DOMContentLoaded', function(){
       ? (plazoTxt ? [plazoTxt, BPData.estadiaMinima(a) ? T('ficha_estadia_min', 'Estadía mínima') : T('num_estadia', 'Estadía')] : null)
       : (expensasAparte ? ['$ ' + BP.fmtN(a.expensas), T('ficha_expensas', 'Expensas')] : null)
   ].filter(Boolean);
+  /* 8/10/2026 (venta) · Lo que se cargó de más, en un renglón y solo con dato: dormitorios (desde 2 ambientes), m² cubiertos
+     (si no son los totales), antigüedad y cocheras */
+  const extras = [
+    a.dorm && a.amb > 1 ? (a.dorm === 1 ? T('ficha_x_dorm_1', '1 dormitorio') : TF('ficha_x_dorm_n', '{n} dormitorios', { n: a.dorm })) : null,
+    a.m2cub && a.m2 && a.m2cub !== a.m2 ? TF('ficha_x_m2_cub', '{n} m² cubiertos', { n: a.m2cub }) : null,
+    a.antiguedad === 0 ? T('ficha_a_estrenar', 'A estrenar') : a.antiguedad > 0 ? (a.antiguedad === 1 ? T('ficha_x_antig_1', '1 año de antigüedad') : TF('ficha_x_antig_n', '{n} años de antigüedad', { n: a.antiguedad })) : null,
+    a.cocheras > 0 ? (a.cocheras === 1 ? T('ficha_x_coch_1', '1 cochera') : TF('ficha_x_coch_n', '{n} cocheras', { n: a.cocheras })) : null
+  ].filter(Boolean);
+  /* Una unidad de un emprendimiento: el desarrollo (link a su página), el piso y unidad, la etapa y la entrega */
+  const empLinea = a.emprendimiento ? `<p class="p-femp"><a href="${BPData.urlEmp(a)}">${BP.esc(a.emprendimiento)}</a>${[a.unidad, BPData.etapaTxt(a)].filter(Boolean).map(x => '&nbsp;· ' + BP.esc(x)).join('')}</p>` : '';
   /* Condiciones, en una lista corta */
   const condiciones = [
     a.op === 'mediano' && plazoTxt ? (BPData.estadiaMinima(a) ? TF('cond_estadia_min', 'Estadía mínima de {p}', { p: plazoTxt }) : TF('cond_estadia', 'Estadía de {p}', { p: plazoTxt })) : null,
@@ -153,10 +163,12 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip" role="group" aria-label="$
         <div class="p-fh-acts"><button type="button" class="p-icon-btn ${BP.isFav(a.id)?'on':''}" data-fav="${BP.esc(a.id)}" aria-pressed="${BP.isFav(a.id)}" aria-label="${T('ficha_fav', 'Guardar en favoritos')}">${BP.isFav(a.id)?BP.ico.heartFill:BP.ico.heart}</button><button type="button" class="p-icon-btn" id="share" aria-label="${T('ficha_compartir', 'Compartir')}">${BP.ico.share}</button></div>
       </div>
       ${calle ? `<p class="p-fcalle">${BP.ico.pin}<span>${BP.esc(calle)}</span></p>` : ''}
+      ${empLinea}
       ${desde ? `<p class="p-fdesde">${BP.esc(desde)}</p>` : ''}
       ${a.reservado ? `<p class="p-reservada">${T('ficha_reservada_corto', 'Reservada. Por ahora no toma consultas.')}</p>` : ''}
     </div>
     ${numeros.length ? `<dl class="p-fnums">${numeros.map(n => `<div><dt>${n[1]}</dt><dd>${n[0]}</dd></div>`).join('')}</dl>` : ''}
+    ${extras.length ? `<p class="p-fextra">${extras.map(BP.esc).join('&nbsp;· ')}</p>` : ''}
     <div class="p-fdesc">
       <p class="p-text clamp" id="desc">${BP.esc((BP.lang === 'en' && a.descripcion_en) || (BP.lang === 'pt' && a.descripcion_pt) || a.descripcion || T('ficha_desc_prod', 'Descripción en producción.'))}</p>
       <button type="button" class="p-more" id="descMore">${T('ficha_leer_mas', 'Leer más')}</button>

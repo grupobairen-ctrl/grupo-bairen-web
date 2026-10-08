@@ -36,7 +36,11 @@
   /* Descripción y nombre del publicador en el idioma de la interfaz, si los tiene; si no, el castellano.
      El nombre 'Dueño directo' del ejemplo se traduce como dato fijo. */
   D.pubDesc = pub => (BP.lang !== 'es' && pub['desc_' + BP.lang]) || pub.desc || '';
-  D.pubNombre = pub => pub.tipo === 'dueno' && pub.nombre === 'Dueño directo' ? BP.t('ui_dato_dueno_directo', pub.nombre) : pub.nombre;
+  /* 8/10/2026 (venta) · El dueño directo figura con su nombre y la inicial del apellido ("Graciela P."): la regla de
+     portal.nombre_publico() (migracion-12-nombres-publicos.sql), que hasta ahora solo se aplicaba a los dueños que crea
+     el equipo. Un dueño que se registra solo escribe su nombre completo; en el portal se ve así. Idempotente. */
+  D.nombrePublico = n => { const w = String(n || '').trim().split(/\s+/).filter(Boolean); return w.length > 1 ? w.slice(0, -1).concat(w[w.length - 1].charAt(0).toUpperCase() + '.').join(' ') : w.join(' '); };
+  D.pubNombre = pub => pub.tipo === 'dueno' && pub.nombre === 'Dueño directo' ? BP.t('ui_dato_dueno_directo', pub.nombre) : pub.tipo === 'dueno' ? D.nombrePublico(pub.nombre) : pub.nombre;
   /* Una fila cruda de la base (joins del panel) → el publicador tal como lo muestra el portal */
   D.pubDeFila = fila => (fila && D.PUBLICADORES[fila.slug]) || fila || {};
   /* El portal nunca muestra la línea del corredor dentro de una descripción: quien publica se ve en la tarjeta del publicador. */
@@ -59,6 +63,10 @@
     return out;
   };
 
+  /* Dormitorios cuando el aviso no los trae: ambientes menos uno, con mínimo uno (como siempre con las unidades de la
+     web). 8/10/2026 (venta) · También para los avisos del portal sin el dato: antes quedaban en 0 y el filtro
+     "Dormitorios, mínimo" los sacaba a todos. Un aviso que trae el dato (también 0, un monoambiente) usa el suyo. */
+  D.dormDe = amb => amb == null ? null : Math.max(1, amb - 1);
   function fromUnit(p, op, precio){
     /* Fotos en orden, con la portada primera y sin fotos repetidas: lo mismo que fotosDeUnidad en api/_portal/sync.js,
        pero comparando por archivo (D.claveFoto) y no por la URL exacta */
@@ -76,7 +84,7 @@
       barrio: p.barrio, zona, ciudad: zona === 'GBA Norte' ? 'Zona Norte' : 'Capital Federal',
       precio, moneda:'USD', periodo: op === 'venta' ? '' : '/mes', expensas: null,
       m2: p.m2 || null, m2cub: p.m2 || null, amb,
-      dorm: amb == null ? null : Math.max(1, amb - 1), banos: amb == null ? null : (amb >= 4 ? 2 : 1),
+      dorm: D.dormDe(amb), banos: amb == null ? null : (amb >= 4 ? 2 : 1),
       cocheras: amen.indexOf('Cochera') > -1 ? 1 : 0, antiguedad: null,
       amoblado: op === 'mediano' || amen.indexOf('Amoblado') > -1, amenities: amen, cualidades: [],
       fotos, video: p.video_url ? { tipo: p.video_tipo, url: p.video_url } : null,
@@ -111,7 +119,7 @@
     const amb = r.ambientes || null;
     return { id: r.id, slug: r.slug, op: r.operacion, tipoProp: r.tipo || 'Departamento', dir: r.direccion, unidad: r.unidad || '', titulo: r.titulo || (r.direccion + (r.unidad ? ' · ' + r.unidad : '')), barrio: r.barrio, zona: (window.BairenZonas && window.BairenZonas.zonaDe(r.barrio)) || r.zona || r.barrio, ciudad: r.ciudad || 'Capital Federal',
       precio: r.precio == null ? null : Number(r.precio), moneda: r.moneda || 'USD', periodo: r.operacion === 'venta' ? '' : '/mes', expensas: r.expensas == null ? null : Number(r.expensas),
-      m2: r.m2_total || null, m2cub: r.m2_cubierto || null, amb, dorm: r.dormitorios || null, banos: r.banos || null, cocheras: r.cocheras || 0, antiguedad: r.antiguedad == null ? null : Number(r.antiguedad),
+      m2: r.m2_total || null, m2cub: r.m2_cubierto || null, amb, dorm: r.dormitorios != null ? Number(r.dormitorios) : D.dormDe(amb), dormDato: r.dormitorios != null, banos: r.banos || null, cocheras: r.cocheras || 0, antiguedad: r.antiguedad == null ? null : Number(r.antiguedad),
       amoblado: !!r.amoblado, amenities: r.amenities || [], caracteristicas: r.caracteristicas || [], cualidades: r.cualidades_verificadas || [], fotos, video: r.video_url ? { tipo: r.video_tipo || 'youtube', url: r.video_url } : null,
       descripcion: D.sinLineaCorredor(r.descripcion), descripcion_en: D.sinLineaCorredor(r.descripcion_en), descripcion_pt: D.sinLineaCorredor(r.descripcion_pt), plazo: r.plazo || '', emprendimiento: r.emprendimiento || null, etapa: r.etapa || null, entrega: r.entrega || null, propietarioEmail: r.propietario_email || null, publicadoEn: r.publicado_en || r.created_at, estado: r.estado, reservado: r.estado === 'reservado', publicadorId: pubId, destacado: !!(r.destacado_hasta && new Date(r.destacado_hasta) > new Date()), demo: false, codigo: r.codigo, apto: r.caracteristicas && r.caracteristicas.length ? r.caracteristicas.slice(0,3) : [], fromStore: true,
       /* 8/10/2026 · Tanda 2: cómo se muestra la calle ('exacta' | 'aproximada'; sin el dato, aproximada), el mapa
@@ -266,6 +274,15 @@
     a.banos ? a.banos + ' ' + (a.banos === 1 ? BP.t('card_bano', 'baño') : BP.t('card_banos', 'baños')) : null,
     a.cocheras ? a.cocheras + ' ' + (a.cocheras === 1 ? BP.t('card_coch_1', 'coch.') : BP.t('card_coch_n', 'coch.')) : null,
   ].filter(Boolean).join(' · ');
+  /* 8/10/2026 (venta) · Una unidad de un emprendimiento: el nombre del desarrollo y el piso y unidad ("Torre Ejemplo · 2° A"),
+     y la etapa con la entrega ("En construcción · entrega diciembre 2027"). La entrega es un dato escrito por la
+     desarrolladora: se traduce solo el nombre del mes. */
+  const MESES_LARGOS = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  D.mesTr = s => { const tr = BP.t('emp_meses', MESES_LARGOS.join('|')).split('|'); return String(s || '').replace(/[A-Za-zÁÉÍÓÚÑáéíóúñ]+/g, w => { const i = MESES_LARGOS.indexOf(w.toLowerCase()); if (i < 0 || !tr[i]) return w; const t = tr[i]; return w[0] === w[0].toUpperCase() ? t[0].toUpperCase() + t.slice(1) : t; }); };
+  D.etapaTxt = a => { if (!a || (!a.etapa && !a.entrega)) return ''; const et = { pozo: BP.t('emp_pozo', 'En pozo'), construccion: BP.t('emp_construccion', 'En construcción'), terminado: BP.t('emp_terminado', 'Terminado') }[a.etapa] || ''; return [et, a.entrega ? BP.tf('emp_entrega_min', 'entrega {d}', { d: D.mesTr(String(a.entrega).replace(/^[A-ZÁÉÍÓÚ][a-záéíóú]+/, w => MESES_LARGOS.indexOf(w.toLowerCase()) > -1 ? w.toLowerCase() : w)) }) : ''].filter(Boolean).join(' · ').replace(/^./, c => c.toUpperCase()); };
+  D.empUnidad = a => a && a.emprendimiento ? [a.emprendimiento, a.unidad].filter(Boolean).join(' · ') : '';
+  /* La página de un desarrollo: Desarrollos filtrado por ese nombre y ese publicador */
+  D.urlEmp = a => 'emprendimientos.html?emp=' + encodeURIComponent(a.emprendimiento || a.nombre || '') + (a.publicadorId ? '&pub=' + encodeURIComponent(a.publicadorId) : '');
   /* Precio corto: "USD 1.200 /mes", "$ 850.000 /mes", "USD 295.000" */
   D.precioCorto = a => a.precio ? `${BP.fmtPrecio(a.precio, a.moneda)}${a.periodo ? ' <small>' + BP.t('ui_por_mes', '/mes') + '</small>' : ''}` : BP.t('card_consultar_precio', 'Consultar precio');
   /* "Disponible desde 14 nov": sólo si el aviso trae disponible_desde y es una fecha futura. La fecha es un día (date),
@@ -288,7 +305,8 @@
     if (!pub || !pub.nombre) return '';
     const nombre = D.nombreVisible(D.pubNombre(pub)), rol = D.pubRol(pub);
     const check = pub.verificado ? `<span class="p-verif" role="img" aria-label="${BP.esc(BP.t('pub_verificado', 'verificado'))}">${BP.ico.check}</span>` : '';
-    return `<b>${BP.esc(nombre)}</b>${check}${rol && rol !== nombre ? ' · ' + BP.esc(rol) : ''}`;
+    /* El separador va pegado a lo anterior (espacio duro): si el renglón se corta, el "·" no queda suelto al principio */
+    return `<b>${BP.esc(nombre)}</b>${check}${rol && rol !== nombre ? '&nbsp;· ' + BP.esc(rol) : ''}`;
   };
   /* La operación del aviso como filtro del catálogo: el alquiler tradicional es 'largo' ('alquiler' abarca los dos plazos) */
   D.opFiltro = a => a.op === 'alquiler' ? 'largo' : a.op;
@@ -349,7 +367,10 @@
   D.cardV = function(a){
     const pub = D.pub(a.publicadorId);
     const href = BP.urlFicha(a);
-    const tit = D.titulo(a), calle = D.calle(a), desde = D.disponibleDesde(a), fav = BP.isFav(a.id);
+    /* Una unidad de un emprendimiento lleva arriba el desarrollo y el piso y unidad en vez de la calle, y sobre la foto la
+       etapa y la entrega en vez de "Disponible desde" */
+    const emp = D.empUnidad(a);
+    const tit = D.titulo(a), calle = emp || D.calle(a), desde = emp ? D.etapaTxt(a) : D.disponibleDesde(a), fav = BP.isFav(a.id);
     const foto = a.fotos[0] ? `<img src="${BP.sbImg(a.fotos[0], 700)}" alt="" loading="lazy" decoding="async" onerror="this.remove()">` : `<span class="tj-sinfoto">${BP.t('card_fotos_prod', 'Fotos en producción')}</span>`;
     const tag = a.reservado ? `<span class="tj-tag res">${BP.t('card_reservada', 'Reservada')}</span>` : `<span class="tj-tag tj-${a.op}">${D.opTag(a)}</span>`;
     const meta = D.metaCorta(a), linea = D.pubLinea(pub);
@@ -365,6 +386,28 @@
     </span>
   </a>
   <button type="button" class="tj-fav${fav ? ' on' : ''}" data-fav="${BP.esc(a.id)}" aria-label="${BP.esc(BP.tf('card_fav_de', 'Guardar {t}', { t: tit }))}" aria-pressed="${fav}">${fav ? BP.ico.heartFill : BP.ico.heart}</button>
+</article>`;
+  };
+
+  /* 8/10/2026 (venta) · La tarjeta de un desarrollo, con la misma forma que cardV: la foto con la etapa y la entrega, la
+     calle, el nombre, "Desde" el precio más bajo y las unidades con el rango de ambientes. La usa Revisar de un
+     emprendimiento (antes mostraba la tarjeta de la primera unidad). e es un grupo de D.emprendimientos. */
+  D.cardEmp = function(e){
+    const pub = D.pub(e.publicadorId), linea = D.pubLinea(pub), calle = D.calle({ dir: e.dir, mostrarDir: e.mostrarDir }), etapa = D.etapaTxt(e);
+    const foto = e.foto ? `<img src="${BP.sbImg(e.foto, 700)}" alt="" loading="lazy" decoding="async" onerror="this.remove()">` : `<span class="tj-sinfoto">${BP.t('card_fotos_prod', 'Fotos en producción')}</span>`;
+    const n = e.unidades.length, amb = e.ambmin ? (e.ambmin === e.ambmax ? BP.tf('emp_amb', '{n} amb.', { n: e.ambmin }) : BP.tf('emp_amb_rango', '{a} a {b} amb.', { a: e.ambmin, b: e.ambmax })) : '';
+    const meta = [n === 1 ? BP.t('emp_unidad_1', '1 unidad') : BP.tf('emp_unidades', '{n} unidades', { n }), amb].filter(Boolean).join(' · ');
+    return `
+<article class="prop-card p-tj p-tj-emp">
+  <div class="tj-link">
+    <span class="tj-foto">${foto}<span class="tj-tag tj-venta">${BP.t('card_venta', 'Venta')}</span>${etapa ? `<span class="tj-desde">${BP.esc(etapa)}</span>` : ''}</span>
+    <span class="tj-cuerpo">
+      ${calle ? `<span class="tj-calle">${BP.esc(calle)}</span>` : ''}
+      <span class="tj-titulo">${BP.esc(e.nombre)}</span>
+      <span class="tj-fila"><span class="tj-precio">${e.desde ? BP.tf('emp_desde', 'Desde {p}', { p: BP.fmtUSD(e.desde) }) : BP.t('card_consultar_precio', 'Consultar precio')}</span><span class="tj-meta">${BP.esc(meta)}</span></span>
+      ${linea ? `<span class="tj-pub">${linea}</span>` : ''}
+    </span>
+  </div>
 </article>`;
   };
 
@@ -451,7 +494,7 @@
     else l.sort((a,b)=>(b.destacado-a.destacado)||(a.reservado-b.reservado)||(t(b)-t(a)));
     return l;
   };
-  D.emprendimientos = avisos => { const g = {}; avisos.forEach(a => { if (!a.emprendimiento) return; const k = a.publicadorId + '|' + a.emprendimiento; (g[k] = g[k] || { key: k, nombre: a.emprendimiento, publicadorId: a.publicadorId, zona: a.zona, barrio: a.barrio, dir: a.dir, etapa: a.etapa, entrega: a.entrega, unidades: [] }).unidades.push(a); }); return Object.values(g).map(e => { const p = e.unidades.map(u => u.precio).filter(Boolean), m = e.unidades.map(u => u.m2).filter(Boolean), am = e.unidades.map(u => u.amb).filter(Boolean); e.desde = p.length ? Math.min.apply(null, p) : null; e.m2min = m.length ? Math.min.apply(null, m) : null; e.m2max = m.length ? Math.max.apply(null, m) : null; e.ambmin = am.length ? Math.min.apply(null, am) : null; e.ambmax = am.length ? Math.max.apply(null, am) : null; e.foto = (e.unidades.find(u => u.fotos.length) || {}).fotos; e.foto = e.foto ? e.foto[0] : null; return e; }); };
+  D.emprendimientos = avisos => { const g = {}; avisos.forEach(a => { if (!a.emprendimiento) return; const k = a.publicadorId + '|' + a.emprendimiento; (g[k] = g[k] || { key: k, nombre: a.emprendimiento, publicadorId: a.publicadorId, zona: a.zona, barrio: a.barrio, dir: a.dir, mostrarDir: a.mostrarDir, etapa: a.etapa, entrega: a.entrega, unidades: [] }).unidades.push(a); }); return Object.values(g).map(e => { const p = e.unidades.map(u => u.precio).filter(Boolean), m = e.unidades.map(u => u.m2).filter(Boolean), am = e.unidades.map(u => u.amb).filter(Boolean); e.desde = p.length ? Math.min.apply(null, p) : null; e.m2min = m.length ? Math.min.apply(null, m) : null; e.m2max = m.length ? Math.max.apply(null, m) : null; e.ambmin = am.length ? Math.min.apply(null, am) : null; e.ambmax = am.length ? Math.max.apply(null, am) : null; e.foto = (e.unidades.find(u => u.fotos.length) || {}).fotos; e.foto = e.foto ? e.foto[0] : null; return e; }); };
   D.countsByZona = (avisos, op) => { const c={}; avisos.forEach(a=>{ if (op && !D.opMatch(a, op)) return; if (a.reservado) return; c[a.zona]=(c[a.zona]||0)+1; }); return c; };
   D.countsByOp = avisos => { const c={ venta:0, alquiler:0, mediano:0 }; avisos.forEach(a => { if (!a.reservado && c[a.op] != null) c[a.op]++; }); return c; };
   D.opConMasInventario = avisos => { const c = D.countsByOp(avisos); return Object.keys(c).sort((a,b) => c[b]-c[a])[0]; };
