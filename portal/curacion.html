@@ -80,6 +80,7 @@ document.addEventListener('DOMContentLoaded', function(){
   if (TABS.indexOf(location.hash.slice(1)) > -1) { t = location.hash.slice(1); marcarTab(t); }
   /* Contrato de operación (8/10/2026) */
   const OP_TXT = { venta: 'Venta', alquiler: 'Alquiler tradicional', mediano: 'Mediano plazo (3 a 12 meses)' };
+  const precioTxt = a => a.moneda === 'ARS' && a.precio != null ? '$ ' + BP.fmtN(Math.round(Number(a.precio))) : BP.fmtUSD(a.precio == null ? null : Number(a.precio));
   const ok = (c, txt) => `<span class="${c?'ok':'no'}">${c ? BP.ico.check : BP.ico.x} ${txt}</span>`;
   /* Una acción de curación por vez: el botón queda ocupado y, si la base la rechaza (por ejemplo en demo), se avisa */
   async function accion(btn, fn, okMsg){ if (btn.disabled) return; const card = btn.closest('.p-cur'); const btns = card.querySelectorAll('button'); btns.forEach(x => x.disabled = true); btn.setAttribute('aria-busy', 'true'); try { await fn(); BP.toast(okMsg); return true; } catch (e) { btns.forEach(x => x.disabled = false); btn.removeAttribute('aria-busy'); BP.toast(BPStore.demo ? 'En modo demo no se guarda.' : 'No se pudo: ' + (e.message || e), 'error'); return false; } }
@@ -91,7 +92,7 @@ document.addEventListener('DOMContentLoaded', function(){
     for (const a of cola) { const fotos = []; for (const f of (a.fotos||[]).slice().sort((x,y)=>(x.orden||0)-(y.orden||0))) fotos.push(await BPStore.resolveFoto(f.url)); const p = a.publicador || {};
       const enZona = BP.ZONAS.indexOf(a.zona) > -1; const descOk = (a.descripcion||'').length >= 150; const fotosOk = fotos.length >= 8 || a.quiero_produccion; const datosOk = !!(a.m2_total && a.ambientes && a.precio);
       html += `<div class="p-cur" data-id="${a.id}"><div><div class="ph">${fotos[0] ? `<img src="${fotos[0]}" alt="">` : ''}</div><div class="thumbs">${fotos.slice(1,9).map(u => `<img src="${u}" alt="">`).join('')}</div></div>
-        <div><b>${BP.esc(a.titulo || a.direccion)}</b><div class="m">${OP_TXT[a.operacion] || OP_TXT.alquiler} · ${BP.esc(a.tipo||'')} · ${BP.esc(a.direccion)} ${BP.esc(a.unidad||'')}, ${BP.esc(a.barrio||'')} (${BP.zonaLabel(a.zona||'')}) · ${BP.fmtUSD(Number(a.precio))}${a.operacion !== 'venta' ? '/mes' : ''}${a.expensas ? ' · expensas $ ' + BP.fmtN(a.expensas) : ''}</div>
+        <div><b>${BP.esc(a.titulo || a.direccion)}</b><div class="m">${OP_TXT[a.operacion] || OP_TXT.alquiler} · ${BP.esc(a.tipo||'')} · ${BP.esc(a.direccion)} ${BP.esc(a.unidad||'')}, ${BP.esc(a.barrio||'')} (${BP.zonaLabel(a.zona||'')}) · ${precioTxt(a)}${a.operacion !== 'venta' ? '/mes' : ''}${a.expensas ? ' · expensas $ ' + BP.fmtN(a.expensas) : ''}</div>
         <div class="m" style="margin-top:4px">Publica: <b>${BP.esc(p.nombre||'?')}</b> · ${p.tipo === 'dueno' ? 'dueño directo' : BP.esc(p.matricula||p.tipo||'')} · ${p.verificado ? 'verificado' : '<span class="p-badge dueno">sin verificar</span>'} · ${a.codigo||''}</div>
         <div class="p-check">${ok(enZona,'Zona BAIREN')}${ok(datosOk,'Datos completos')}${ok(fotosOk, fotos.length + ' fotos' + (a.quiero_produccion ? ' (pide producción)' : ''))}${ok(descOk,'Descripción de 150 o más')}${ok((a.amenities||[]).length>0,'Amenities informados')}${ok(!!p.verificado,'Publicador verificado')}</div>
         <p class="p-text" style="font-size:.86rem;max-height:120px;overflow:auto">${BP.esc(a.descripcion||'')}</p>
