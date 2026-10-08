@@ -114,10 +114,10 @@ document.addEventListener('DOMContentLoaded', function(){
       ? (plazoTxt ? [plazoTxt, BPData.estadiaMinima(a) ? T('ficha_estadia_min', 'Estadía mínima') : T('num_estadia', 'Estadía')] : null)
       : (expensasAparte ? ['$ ' + BP.fmtN(a.expensas), T('ficha_expensas', 'Expensas')] : null)
   ].filter(Boolean);
-  /* 8/10/2026 (venta) · Lo que se cargó de más, en un renglón y solo con dato: dormitorios (desde 2 ambientes), m² cubiertos
-     (si no son los totales), antigüedad y cocheras */
+  /* 8/10/2026 (venta) · Lo que se cargó de más, en un renglón y solo con dato: dormitorios (cargados, no inferidos, y desde 2
+     ambientes), m² cubiertos (si no son los totales), antigüedad y cocheras */
   const extras = [
-    a.dorm && a.amb > 1 ? (a.dorm === 1 ? T('ficha_x_dorm_1', '1 dormitorio') : TF('ficha_x_dorm_n', '{n} dormitorios', { n: a.dorm })) : null,
+    a.dormDato && a.dorm && a.amb > 1 ? (a.dorm === 1 ? T('ficha_x_dorm_1', '1 dormitorio') : TF('ficha_x_dorm_n', '{n} dormitorios', { n: a.dorm })) : null,
     a.m2cub && a.m2 && a.m2cub !== a.m2 ? TF('ficha_x_m2_cub', '{n} m² cubiertos', { n: a.m2cub }) : null,
     a.antiguedad === 0 ? T('ficha_a_estrenar', 'A estrenar') : a.antiguedad > 0 ? (a.antiguedad === 1 ? T('ficha_x_antig_1', '1 año de antigüedad') : TF('ficha_x_antig_n', '{n} años de antigüedad', { n: a.antiguedad })) : null,
     a.cocheras > 0 ? (a.cocheras === 1 ? T('ficha_x_coch_1', '1 cochera') : TF('ficha_x_coch_n', '{n} cocheras', { n: a.cocheras })) : null
