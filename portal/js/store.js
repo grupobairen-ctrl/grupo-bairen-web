@@ -328,6 +328,9 @@
     if (S.mode === 'supabase') {
       /* El DNI es de la persona (portal.personas, migración 01), no del publicador: a la tabla publicadores no va, o PostgREST rechaza la fila entera. */
       const fila = Object.assign({}, rec); delete fila.dni;
+      /* 8/10/2026 (tanda 2) · Quien publica no decide si está verificado: el valor por defecto (false) de arriba no viaja.
+         En un alta la base pone false; al editar el perfil, no le saca la verificación a un publicador ya verificado. */
+      delete fila.verificado;
       const { data, error } = await S.sb.schema('portal').from('publicadores').upsert(fila, { onConflict: 'auth_user_id' }).select().single(); if (error) throw error; await S.vincularTitular(data, p); return data;
     }
     S.track('publicador_alta', { publicador_id: rec.id || null, datos: { tipo: rec.tipo } });
