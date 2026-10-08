@@ -4013,3 +4013,9 @@ body.p-home .footer .ft-col ul,.footer .ft-col ul{columns:1}
    (sólo donde puede haber pesos: alquiler tradicional o todas las operaciones). */
 .p-mon[hidden]{display:none !important}
 .p-pop .p-mon{margin:0 0 6px}
+/* Pantalla de carga con tope: a los 1,5 s de pintarse deja de verse aunque ningún script haya llegado
+   (ui.js la suelta antes cuando hay contenido, y a los 1050 ms como máximo). Igual con movimiento reducido,
+   sin la caída. */
+html.cargando .p-velo{animation:p-velo-tope .35s cubic-bezier(.22,1,.36,1) 1.15s forwards}
+@keyframes p-velo-tope{to{opacity:0;visibility:hidden}}
+@media(prefers-reduced-motion:reduce){html.cargando .p-velo{animation:p-velo-tope 0s linear 1.5s forwards}}

@@ -292,13 +292,17 @@
     opts = opts || {};
     var V = window.BPVelo, w = document.querySelector('.p-velo .w');
     if (!V || !w || !document.documentElement.classList.contains('cargando')) return;
+    /* 8/10/2026 · La pantalla de carga tiene un tope de 1,5 s (ui.js la suelta a los 1050 ms): la entrada se
+       acorta para entrar en lo que queda y, si quedan menos de 400 ms, no se hace (y queda para otra visita). */
+    var TOPE = Math.min(opts.tope || 780, 1050 - performance.now() - 320);
+    if (TOPE < 400) return;
     try { if (sessionStorage.getItem('bairen-entrada') === '1') return; sessionStorage.setItem('bairen-entrada', '1'); } catch (e) {}
     if (!ok) return;
     V.retener();
     palabra = (palabra || 'BAIREN').toUpperCase();
     w.style.animation = 'none'; w.style.opacity = '1';
     var glifos = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    var fijas = 0, t0 = performance.now(), TOPE = opts.tope || 780;
+    var fijas = 0, t0 = performance.now();
     (function tick(now) {
       var t = Math.min((now - t0) / TOPE, 1);
       fijas = Math.floor(t * t * palabra.length);

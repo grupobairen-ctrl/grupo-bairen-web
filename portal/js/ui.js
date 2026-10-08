@@ -333,6 +333,22 @@
     const io=new IntersectionObserver(en=>{ en.forEach(e=>{ if(e.isIntersecting){ io.unobserve(e.target); tanda.push(e.target); } }); if(tanda.length){ if(!t0) t0=Date.now(); clearTimeout(t); if(Date.now()-t0>120) soltar(); else t=setTimeout(soltar,40); } },{rootMargin:'0px 0px -8% 0px'});
     els.forEach(e=>io.observe(e)); };
 
+  /* 8/10/2026 · Pantalla de carga: se va apenas hay contenido y nunca dura más de 1,5 s.
+     El velo vive en un script del <head> copiado en cada página; acá se cambia en un solo lugar, para todas:
+     · "Lista" ya no espera al load ni a las fotos del primer pantallazo: alcanza con el HTML leído y ningún
+       esqueleto a la vista (los datos de la página ya están dibujados). Las fotos terminan de bajar a la vista.
+     · Tope: a los 1050 ms desde el inicio de la navegación se suelta igual; con la caída (0,45 s) a los 1,5 s
+       ya no se ve. Si este archivo llega tarde, el CSS (portal.css, "Lanzamiento") lo esconde a los 1,5 s de
+       haberse pintado, y esto solo avisa que cayó (bairen:velo) para que arranquen las apariciones. */
+  (function(){
+    const V = window.BPVelo; if (!V || !V.soltar) return;
+    const ESQ = '.p-skel,.p-skel-card,.p-skel-ficha,.p-skel-line,.p-skel-vcard,.p-skel-panel,.p-skel-form,.p-skel-bloque,.p-skel-cta,.p-fhero-skel,.h-esq';
+    const vis = e => e.checkVisibility ? e.checkVisibility({ contentVisibilityAuto: true, visibilityProperty: true }) : e.getClientRects().length > 0;
+    V.lista = function(){ if (document.readyState === 'loading') return false; const es = document.querySelectorAll(ESQ); for (let i = 0; i < es.length; i++) if (vis(es[i])) return false; return true; };
+    setTimeout(V.soltar, Math.max(0, 1050 - performance.now()));
+    if (V.seguir) V.seguir();   /* que se fije ya, por si el contenido está desde antes */
+  })();
+
   /* El destino del enlace de salto: la etiqueta main si existe, si no la primera
      sección de contenido después del header. La home no usa main. */
   BP._destino = () => document.querySelector('main')
