@@ -64,7 +64,7 @@ window.BP_I18N = {
     ui_dato_dueno_verificado: 'Verified owner', ui_dato_dueno_directo: 'Direct owner', ui_dato_corredor_inmobiliario_matriculado: 'Licensed real estate broker', ui_dato_venta_directa: 'Direct sale',
 
     /* tarjetas (data.js) */
-    card_venta: 'Sale', card_alq_mediano: 'Mid-term rental (3 to 12 months)', card_alq_largo: 'Long-term rental',
+    card_venta: 'Sale', card_alq_mediano: 'Mid-term', card_alq_largo: 'Long-term',
     card_reservada: 'Reserved', card_seleccionada: 'Selected', card_ejemplo: 'Sample', card_consultar_precio: 'Price on request', card_expensas: 'building fees',
     card_monoamb: 'Studio', card_amb: 'rooms', card_dorm_1: 'bed', card_dorm_n: 'beds', card_bano: 'bath', card_banos: 'baths', card_coch_1: 'parking space', card_coch_n: 'parking spaces',
     card_ver: 'View {t}', card_ver_en: 'View {t} in {b}', card_publica: 'Listed by', card_wa_aria: 'Message {p} on WhatsApp', card_contacto_pendiente: 'Contact pending', card_contactar: 'Contact',
@@ -255,6 +255,17 @@ window.BP_I18N = {
     psi_err_envio: 'We could not send your enquiry. Message us on WhatsApp.',
     /* 12/9 · varios */
     ui_modo_local_title: 'No database connected: data stays in this browser', psi_title: 'Personal Shopper Inmobiliario · BAIREN',
+    /* 8/10/2026 · Tanda 2 (visitante): tarjeta, ficha, barra de abajo, Guardados y pie */
+    tit_mono: 'Studio', tit_amb: '{n} rooms', tit_en: '{q} in {b}', disp_desde: 'Available from {f}', pub_verificado: 'verified', card_fav_de: 'Save {t}',
+    ui_dato_inmobiliaria: 'Real estate agency', ui_dato_desarrolladora: 'Developer',
+    num_ambiente: 'Room', num_ambientes: 'Rooms', num_bano: 'Bathroom', num_banos: 'Bathrooms', num_estadia: 'Stay',
+    cond_estadia_min: 'Minimum stay of {p}', cond_estadia: 'Stay of {p}', cond_todo_incluido: 'All included: building fees and utilities', cond_incluye: 'Includes: {x}',
+    ficha_todo_incl_corto: 'all included', ficha_exp_incl: 'building fees included', ficha_mas_exp: 'plus $ {n} in building fees',
+    ficha_volver: 'Back', ficha_reservada_corto: 'Reserved. Not taking inquiries for now.', ficha_condiciones: 'Terms', ficha_reportar_corto: 'Report a problem', ficha_mcta_visita: 'Visit',
+    tab_inicio: 'Home', tab_buscar: 'Search', tab_guardados: 'Saved', tab_cuenta: 'Account', tab_aria: 'Shortcuts',
+    guard_vacio: "You haven't saved any properties yet.", guard_err: "We couldn't load your saved properties.", alertas_t: 'Alerts', guard_todas_ops: 'All listings', guard_hasta: 'up to {p}', guard_quitar_alerta: 'Remove the alert', guard_crear_alerta: 'Create an alert',
+    /* 8/10/2026 · del equipo de servidor (ingresar): el captcha */
+    ing_err_captcha: "We couldn't verify that you're a person. Please try again.",
   },
   pt: {
     home_title: 'BAIREN · Imóveis selecionados em Buenos Aires',
@@ -304,7 +315,7 @@ window.BP_I18N = {
     ui_dato_dueno_verificado: 'Proprietário verificado', ui_dato_dueno_directo: 'Proprietário direto', ui_dato_corredor_inmobiliario_matriculado: 'Corretor de imóveis habilitado', ui_dato_venta_directa: 'Venda direta',
 
     /* tarjetas (data.js) */
-    card_venta: 'Venda', card_alq_mediano: 'Médio prazo (3 a 12 meses)', card_alq_largo: 'Aluguel tradicional',
+    card_venta: 'Venda', card_alq_mediano: 'Médio prazo', card_alq_largo: 'Tradicional',
     card_reservada: 'Reservado', card_seleccionada: 'Selecionado', card_ejemplo: 'Exemplo', card_consultar_precio: 'Preço sob consulta', card_expensas: 'de condomínio',
     card_monoamb: 'Studio', card_amb: 'amb.', card_dorm_1: 'dorm.', card_dorm_n: 'dorm.', card_bano: 'banheiro', card_banos: 'banheiros', card_coch_1: 'vaga', card_coch_n: 'vagas',
     card_ver: 'Ver {t}', card_ver_en: 'Ver {t} em {b}', card_publica: 'Publicado por', card_wa_aria: 'Escrever para {p} pelo WhatsApp', card_contacto_pendiente: 'Contato pendente', card_contactar: 'Contatar',
@@ -494,5 +505,16 @@ window.BP_I18N = {
     psi_err_envio: 'Não foi possível enviar sua consulta. Fale com a gente pelo WhatsApp.',
     /* 12/9 · varios */
     ui_modo_local_title: 'Sem banco de dados conectado: os dados ficam neste navegador', psi_title: 'Personal Shopper Inmobiliario · BAIREN',
+    /* 8/10/2026 · Tanda 2 (visitante): tarjeta, ficha, barra de abajo, Guardados y pie */
+    tit_mono: 'Studio', tit_amb: '{n} ambientes', tit_en: '{q} em {b}', disp_desde: 'Disponível a partir de {f}', pub_verificado: 'verificado', card_fav_de: 'Salvar {t}',
+    ui_dato_inmobiliaria: 'Imobiliária', ui_dato_desarrolladora: 'Incorporadora',
+    num_ambiente: 'Ambiente', num_ambientes: 'Ambientes', num_bano: 'Banheiro', num_banos: 'Banheiros', num_estadia: 'Estadia',
+    cond_estadia_min: 'Estadia mínima de {p}', cond_estadia: 'Estadia de {p}', cond_todo_incluido: 'Tudo incluído: condomínio e contas', cond_incluye: 'Inclui: {x}',
+    ficha_todo_incl_corto: 'tudo incluído', ficha_exp_incl: 'condomínio incluído', ficha_mas_exp: 'mais $ {n} de condomínio',
+    ficha_volver: 'Voltar', ficha_reservada_corto: 'Reservado. Por enquanto não recebe consultas.', ficha_condiciones: 'Condições', ficha_reportar_corto: 'Informar um problema', ficha_mcta_visita: 'Visita',
+    tab_inicio: 'Início', tab_buscar: 'Buscar', tab_guardados: 'Salvos', tab_cuenta: 'Conta', tab_aria: 'Atalhos',
+    guard_vacio: 'Você ainda não salvou imóveis.', guard_err: 'Não conseguimos carregar seus imóveis salvos.', alertas_t: 'Alertas', guard_todas_ops: 'Todas as operações', guard_hasta: 'até {p}', guard_quitar_alerta: 'Remover o alerta', guard_crear_alerta: 'Criar um alerta',
+    /* 8/10/2026 · del equipo de servidor (ingresar): el captcha */
+    ing_err_captcha: 'Não conseguimos verificar que você é uma pessoa. Tente de novo.',
   }
 };

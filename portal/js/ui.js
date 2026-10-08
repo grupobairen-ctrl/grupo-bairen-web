@@ -382,12 +382,15 @@
   </div>
   <button class="burger" id="burger" type="button" aria-label="Menú" data-i18n-aria="menu" aria-expanded="false" aria-controls="mobileMenu"><span></span><span></span><span></span></button>
 </nav>
+<!-- 8/10/2026 · Tanda 2 · Con la barra de abajo (celular), el menú lleva sólo lo que no está en ella: Desarrollos,
+     Cómo seleccionamos, Publicar y el idioma. Lo marcado m-sin-tabbar se ve sólo donde no hay barra (la ficha, una tableta). -->
 <div class="mobile-menu" id="mobileMenu" role="dialog" aria-modal="true" aria-label="${BP.t('menu', 'Menú')}">
-  <a href="buscar.html" class="m-link" data-sec="propiedades" data-i18n="nav_propiedades">Propiedades</a>
+  <a href="buscar.html" class="m-link m-sin-tabbar" data-sec="propiedades" data-i18n="nav_propiedades">Propiedades</a>
   <a href="emprendimientos.html" class="m-link" data-sec="emprendimientos" data-i18n="emprendimientos">Desarrollos</a>
   <a href="criterios.html" class="m-link" data-sec="criterios" data-i18n="criterios">Cómo seleccionamos</a>
-  <div class="m-cuenta" hidden></div>
-  <div class="m-cta"><a class="p-btn p-btn-sm" href="publicar.html" data-i18n="publicar">Publicar</a><a class="p-btn p-btn-sm p-btn-fill" href="ingresar.html" data-i18n="ingresar">Ingresar</a></div>
+  <div class="m-cuenta m-sin-tabbar" hidden></div>
+  <div class="m-cta"><a class="p-btn p-btn-sm" href="publicar.html" data-i18n="publicar">Publicar</a><a class="p-btn p-btn-sm p-btn-fill m-sin-tabbar" href="ingresar.html" data-i18n="ingresar">Ingresar</a></div>
+  <div class="p-lang m-lang" role="group" aria-label="Idioma" data-i18n-aria="idioma"><button type="button" data-lang="es">ES</button><button type="button" data-lang="pt">PT</button><button type="button" data-lang="en">EN</button></div>
 </div>
 <div class="m-velo" id="mVelo" aria-hidden="true"></div>`;
     const host = document.getElementById('pHeader'); if (host) host.innerHTML = html;
@@ -469,26 +472,56 @@
   };
 
   /* ── Footer ─────────────────────────────────────────────── */
-  BP.footer = function(){ setTimeout(() => { if (BP.i18n) BP.i18n.apply(document); }, 0);
-    const zonas = BP.ZONAS.map(z=>`<li><a href="${BP.urlBuscar({ op:'alquiler', zona:z })}">${BP.zonaLabel(z)}</a></li>`).join('');
+  /* 8/10/2026 · Tanda 2 · El pie es una columna corta de enlaces y el ©. Sin las diez zonas, sin el párrafo de marca
+     (la leyenda de plataforma sigue en la ficha, en "Información legal"). Con data-flujo en el body (las pantallas de
+     publicar) no se dibuja el pie ni la barra de abajo. */
+  BP.footer = function(){
+    if (document.body && document.body.hasAttribute('data-flujo')) return;
+    setTimeout(() => { if (BP.i18n) BP.i18n.apply(document); }, 0);
     const html = `
-<footer class="footer">
-  <div class="footer-grid">
-    <div>
-      <div><img src="../bairen_logo_96.png?v=1" alt="BAIREN" width="46" height="46" style="height:46px;width:46px;"></div>
-      <div class="ft-brand-rule"></div>
-      <p class="ft-brand-tag" data-i18n="ft_tag">Portal de propiedades seleccionadas en Buenos Aires.</p>
-      <p class="p-legend" data-i18n="ft_legend">BAIREN selecciona y publica propiedades, y da la gestión para administrarlas. Cada aviso es responsabilidad de quien lo publica.</p>
-    </div>
-    <div class="ft-col"><div class="ft-col-ttl" data-i18n="ft_nav">Navegación</div><ul>
-      <li><a href="${BP.urlBuscar({ op:'alquiler' })}" data-i18n="alquilar">Alquilar</a></li><li><a href="${BP.urlBuscar({ op:'venta' })}" data-i18n="comprar">Comprar</a></li><li><a href="publicar.html" data-i18n="publicar">Publicar</a></li></ul></div>
-    <div class="ft-col"><div class="ft-col-ttl" data-i18n="ft_zonas">Zonas</div><ul>${zonas}</ul></div>
-    <div class="ft-col"><div class="ft-col-ttl" data-i18n="ft_mas">Más</div><ul>
-      <li><a href="publicadores.html" data-i18n="publicadores">Publicadores</a></li><li><a href="membership.html">Membership</a></li><li><a href="emprendimientos.html" data-i18n="emprendimientos">Desarrollos</a></li><li><a href="criterios.html" data-i18n="ft_criterios">Criterios de selección</a></li><li><a href="legales.html" data-i18n="ft_terminos">Términos y privacidad</a></li><li><a href="mailto:portal@bairengroup.com">portal@bairengroup.com</a></li></ul></div>
-  </div>
-  <div class="footer-bottom"><span>© ${new Date().getFullYear()} BAIREN</span><span><a href="legales.html" data-i18n="ft_uso">Términos de uso</a> · <a href="legales.html#privacidad" data-i18n="ft_priv">Política de privacidad</a></span></div>
+<footer class="footer p-pie2">
+  <ul class="p-pie-links">
+    <li><a href="buscar.html" data-i18n="nav_propiedades">Propiedades</a></li>
+    <li><a href="emprendimientos.html" data-i18n="emprendimientos">Desarrollos</a></li>
+    <li><a href="publicar.html" data-i18n="publicar">Publicar</a></li>
+    <li><a href="criterios.html" data-i18n="criterios">Cómo seleccionamos</a></li>
+    <li><a href="publicadores.html" data-i18n="publicadores">Publicadores</a></li>
+    <li><a href="membership.html">Membership</a></li>
+    <li><a href="legales.html" data-i18n="ft_terminos">Términos y privacidad</a></li>
+    <li><a href="mailto:portal@bairengroup.com">portal@bairengroup.com</a></li>
+  </ul>
+  <p class="p-pie-copy">© ${new Date().getFullYear()} BAIREN</p>
 </footer>`;
     const host = document.getElementById('pFooter'); if (host) host.innerHTML = html;
+    BP.tabbar();
+  };
+
+  /* ── 8/10/2026 · Tanda 2 · La barra de abajo, como una app (sólo en el celular, por CSS: menos de 860 px) ──
+     Inicio, Buscar, Guardados y Cuenta (el panel con sesión; si no, ingresar). La activa va en oro. No va en la
+     ficha (tiene su barra de contacto), ni en las herramientas (curación, importar, el asistente de publicar),
+     ni con data-flujo. Al dibujarse marca <html class="con-tabbar">: el CSS deja lugar abajo y el menú de arriba
+     esconde lo que ya está en la barra. Es un div con role="navigation": el <nav> suelto lleva el estilo viejo
+     del header fijo (catalogo.css). */
+  BP.tabbar = function(){
+    const b = document.body;
+    if (!b || b.hasAttribute('data-flujo') || b.classList.contains('p-ficha-page') || b.classList.contains('p-herramienta') || document.getElementById('pTabbar')) return;
+    const pag = decodeURIComponent(location.pathname.split('/').pop() || '').toLowerCase();
+    const act = /^(index(\.html)?)?$/.test(pag) ? 'inicio'
+      : (/^buscar/.test(pag) || (BP.parsePretty && BP.parsePretty())) ? 'buscar'
+      : /^guardados/.test(pag) ? 'guardados'
+      : /^(panel|ingresar)/.test(pag) ? 'cuenta' : '';
+    const ses = window.BPStore && window.BPStore.session;
+    const items = [
+      ['inicio', 'index.html', BP.ico.home, BP.t('tab_inicio', 'Inicio')],
+      ['buscar', 'buscar.html', BP.ico.search, BP.t('tab_buscar', 'Buscar')],
+      ['guardados', 'guardados.html', BP.ico.heart, BP.t('tab_guardados', 'Guardados')],
+      ['cuenta', ses ? 'panel.html' : 'ingresar.html', BP.ico.user, BP.t('tab_cuenta', 'Cuenta')]
+    ];
+    const bar = document.createElement('div');
+    bar.id = 'pTabbar'; bar.className = 'p-tabbar'; bar.setAttribute('role', 'navigation'); bar.setAttribute('aria-label', BP.t('tab_aria', 'Accesos'));
+    bar.innerHTML = items.map(i => `<a href="${i[1]}" data-tab="${i[0]}"${i[0] === act ? ' class="on" aria-current="page"' : ''}>${i[2]}<span>${BP.esc(i[3])}</span></a>`).join('');
+    b.appendChild(bar);
+    document.documentElement.classList.add('con-tabbar');
   };
 
   /* ── 12/9 · La imagen de la cuenta ─────────────────────
@@ -533,10 +566,11 @@
         <div class="p-nav-menu" style="display:flex"><div><button type="button" class="p-btn p-btn-sm p-btn-fill" aria-haspopup="true" style="padding:0 14px">${avH} ${BP.t('mi_cuenta', 'Mi cuenta')} <span class="car" style="border-color:var(--navy-deeper)"></span></button>
           <div class="p-dd p-dd-cuenta" style="left:auto;right:0"><div class="p-dd-ttl">${BP.esc(session.email)}${modeTag}</div>${vistas}<a href="curacion.html" data-curador hidden>${BP.t('curacion', 'Curación')}</a><a href="#" data-logout>${BP.t('cerrar_sesion', 'Cerrar sesión')}</a></div></div></div>`;
       if (mob) {
-        const cta = mob.querySelector('.m-cta'); if (cta) cta.innerHTML = `<a class="p-btn p-btn-sm" href="publicar-aviso.html">${BP.t('publicar', 'Publicar')}</a><a class="p-btn p-btn-sm p-btn-fill" href="panel.html">${BP.t('mi_cuenta', 'Mi cuenta')}</a>`;
+        const cta = mob.querySelector('.m-cta'); if (cta) cta.innerHTML = `<a class="p-btn p-btn-sm" href="publicar-aviso.html">${BP.t('publicar', 'Publicar')}</a><a class="p-btn p-btn-sm p-btn-fill m-sin-tabbar" href="panel.html">${BP.t('mi_cuenta', 'Mi cuenta')}</a>`;
         const cuenta = mob.querySelector('.m-cuenta'); if (cuenta) { cuenta.hidden = false; cuenta.innerHTML = `<a href="buscar.html?favs=1">${BP.ico.heart} <span data-i18n="favoritos">Favoritos</span></a><a href="panel.html#contactos">${BP.ico.chat} <span data-i18n="mis_contactos">Mis contactos</span></a>`; }
       }
       BP.avatarFallback(right, session.email); if (mob) BP.avatarFallback(mob, session.email);
+      document.querySelectorAll('#pTabbar [data-tab="cuenta"]').forEach(a => { a.href = 'panel.html'; });
       right.querySelectorAll('[data-logout]').forEach(b => b.addEventListener('click', async e => { e.preventDefault(); await window.BPStore.signOut(); BP.toast(BP.t('ui_sesion_cerrada', 'Sesión cerrada.')); setTimeout(() => location.href = 'index.html', 600); }));
       if (window.BPStore) window.BPStore.isCurador().then(ok => { right.querySelectorAll('[data-curador]').forEach(a => a.hidden = !ok); });
     } else if (mode === 'local') {
