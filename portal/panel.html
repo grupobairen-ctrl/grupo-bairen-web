@@ -42,7 +42,7 @@
   <style>
     .p-panel{display:grid;grid-template-columns:240px 1fr;gap:28px;align-items:start}
     .p-side-nav{background:var(--p-card);border:1px solid var(--p-line);border-radius:var(--p-radius);padding:10px;position:sticky;top:84px}
-    .p-side-nav a{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:8px;color:var(--navy-deeper);font-size:.9rem} .p-side-nav a svg{width:16px;height:16px;color:var(--gold-dark)} .p-side-nav a.on{background:var(--p-tray);font-weight:500} .p-side-nav .who{padding:10px 12px 14px;border-bottom:1px solid var(--p-line);margin-bottom:8px;font-size:.8rem;color:var(--text-mid);word-break:break-all}
+    .p-side-nav a{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:8px;color:var(--navy-deeper);font-size:.9rem} .p-side-nav a svg{width:16px;height:16px;color:var(--gold-dark)} .p-side-nav a.on{background:var(--p-tray);font-weight:500} .p-side-nav .who{padding:10px 12px 14px;border-bottom:1px solid var(--p-line);margin-bottom:8px;font-size:.8rem;color:var(--text-mid);overflow-wrap:anywhere}
     .p-aviso-row{display:grid;grid-template-columns:120px 1fr auto;gap:16px;align-items:center;background:var(--p-card);border:1px solid var(--p-line);border-radius:var(--p-radius);padding:12px}
     .p-aviso-row .ph{aspect-ratio:4/3;border-radius:8px;overflow:hidden;background:var(--p-tray)} .p-aviso-row .ph img{width:100%;height:100%;object-fit:cover}
     .p-aviso-row b{display:block;color:var(--navy-deeper);font-weight:500} .p-aviso-row .m{font-size:.82rem;color:var(--text-mid);margin-top:2px} .p-aviso-row .stats{display:flex;gap:14px;font-size:.8rem;color:var(--text-mid);margin-top:8px} .p-aviso-row .stats b{display:inline;color:var(--navy-deeper)}
@@ -70,6 +70,12 @@ document.addEventListener('DOMContentLoaded', function(){
   if (!BPStore.requireSession('panel.html')) return;
   const pub = await BPStore.getMyPublicador();
   const curador = await BPStore.isCurador();
+  /* 8/10/2026 (venta) · El dueño directo sin verificar: qué documentos mandó (DNI y titularidad). null si no se pudo leer. */
+  const verifs = pub && pub.tipo === 'dueno' && !pub.verificado && BPStore.misVerificaciones ? await BPStore.misVerificaciones(pub.id) : null;
+  const docs = BPStore.docsEnviados ? BPStore.docsEnviados(verifs) : {};
+  const faltanDocs = Array.isArray(verifs) && !(docs.dni && docs.titularidad);
+  const faltanDocsTxt = () => !docs.dni && !docs.titularidad ? BP.t('pan_faltan_docs', 'Faltan tu DNI y el comprobante de titularidad.') : !docs.dni ? BP.t('pan_falta_dni', 'Falta tu DNI.') : BP.t('pan_falta_tit', 'Falta el comprobante de titularidad.');
+  const URL_DOCS = 'publicar-aviso.html?paso=documentos';
   /* 12/9 · Idioma: todo lo visible pasa por BP.t / BP.tf con el castellano como valor por defecto (en es no cambia nada).
      Los rótulos del riel usan las mismas claves que el desplegable "Mi cuenta" del header (ui.js). Las fechas siguen a
      BP.lang; los datos (títulos, barrios, nombres) no se traducen; los estados del aviso sí, por clave. */
@@ -84,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function(){
      11/9 noche · La lista de ids vive en BPStore.rielDe: la misma que usa el desplegable "Mi cuenta" del header. */
   let perfil = BPStore.getPerfil() || BPStore.perfilDePublicador(pub);   /* lo mismo que BPStore.perfilEfectivo(), sin volver a pedir el publicador */
   const ICO_IMPORTAR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 17v3h16v-3"/></svg>';
-  let riel = BPStore.rielDe(perfil);
+  let riel = BPStore.rielDe(perfil, pub);
   const primeraVista = () => riel.find(id => TABS.some(t => t[0] === id)) || 'avisos';
   /* Feedback de una visita: lo escribe el corredor, lo lee el propietario en "Mis propiedades". */
   content.addEventListener('submit', async e => {
@@ -113,7 +119,7 @@ document.addEventListener('DOMContentLoaded', function(){
     const ids = riel.slice(); if (TABS.some(t => t[0] === tab) && ids.indexOf(tab) === -1) ids.splice(Math.max(0, ids.indexOf('cuenta')), 0, tab);
     const item = id => { const t = TABS.find(x => x[0] === id); if (t) return `<a href="#${t[0]}" class="${t[0]===tab?'on':''}"${t[0]===tab?' aria-current="page"':''}>${BP.ico[t[2]]}<span>${BP.t(t[3], t[1])}</span>${contador(t[0])}</a>`; if (id === 'importar') return `<a href="importar.html">${ICO_IMPORTAR}<span>${BP.t('importar_cartera', 'Importar')}</span></a>`; if (id === 'os') return `<a href="${BPStore.OS_URL}" rel="noopener" title="${BP.esc(BP.t('pan_os_title', 'Visitas, reservas y cobros de tus unidades'))}">${BP.ico.arrow}<span>${BP.t('bairen_os', 'Bairen OS')}</span></a>`; return ''; };
     /* 12/9 · La imagen de la cuenta (48 px) a la izquierda del mail y el perfil; sin imagen, el ícono genérico */
-    nav.innerHTML = `<div class="who">${BP.avatar(BPStore.getAvatar(), 'p-avatar-who', 48)}<span class="txt"><span class="q">${BP.esc(BPStore.session.email)}</span>${perfil ? `<span class="rol">${BPStore.perfilTxt(perfil, pub)}</span>` : ''}${mode === 'local' ? `<span class="p-badge demo">${BP.t('pan_modo_local', 'modo local')}</span>` : ''}</span></div><div class="p-rail">` + ids.map(item).join('') + `</div><div class="p-rail p-rail-pie">` + (curador ? `<a href="curacion.html">${BP.ico.shield}<span>${BP.t('curacion', 'Curación')}</span></a>` : '') + `<a href="#" data-logout>${BP.ico.x}<span>${BP.t('cerrar_sesion', 'Cerrar sesión')}</span></a></div>`; BP.avatarFallback(nav, BPStore.session.email); nav.querySelector('[data-logout]').addEventListener('click', async e => { e.preventDefault(); await BPStore.signOut(); location.href = 'index.html'; }); }
+    nav.innerHTML = `<div class="who">${BP.avatar(BPStore.getAvatar(), 'p-avatar-who', 48)}<span class="txt"><span class="q">${BP.esc(BPStore.session.email).replace('@', '<wbr>@')}</span>${perfil ? `<span class="rol">${BPStore.perfilTxt(perfil, pub)}</span>` : ''}${mode === 'local' ? `<span class="p-badge demo">${BP.t('pan_modo_local', 'modo local')}</span>` : ''}</span></div><div class="p-rail">` + ids.map(item).join('') + `</div><div class="p-rail p-rail-pie">` + (curador ? `<a href="curacion.html">${BP.ico.shield}<span>${BP.t('curacion', 'Curación')}</span></a>` : '') + `<a href="#" data-logout>${BP.ico.x}<span>${BP.t('cerrar_sesion', 'Cerrar sesión')}</span></a></div>`; BP.avatarFallback(nav, BPStore.session.email); nav.querySelector('[data-logout]').addEventListener('click', async e => { e.preventDefault(); await BPStore.signOut(); location.href = 'index.html'; }); }
   function actualizarContador(k, n){ cuenta[k] = n; const a = nav.querySelector(`a[href="#${k}"]`); if (!a) return; let sp = a.querySelector('.n'); if (n > 0) { if (!sp) { sp = document.createElement('span'); sp.className = 'n'; a.appendChild(sp); } sp.textContent = n; } else if (sp) sp.remove(); }
   /* Cambiar de vista lleva siempre al título de esa vista, justo debajo del riel (en celular,
      debajo de las pastillas pegadas al header). Sin la navegación por ancla del navegador,
@@ -180,7 +186,7 @@ document.addEventListener('DOMContentLoaded', function(){
   function filtrarAvisos(avisos){
     const q = LA.q.trim().toLowerCase();
     const l = avisos.filter(a => {
-      if (q && [a.titulo, a.direccion, a.unidad, a.barrio, a.codigo].filter(Boolean).join(' ').toLowerCase().indexOf(q) === -1) return false;
+      if (q && [a.titulo, a.emprendimiento, a.direccion, a.unidad, a.barrio, a.codigo].filter(Boolean).join(' ').toLowerCase().indexOf(q) === -1) return false;
       if (LA.estado === 'reservado') { if (a.estado !== 'reservado') return false; }
       else if (LA.estado === 'pendiente') { if (['borrador','rechazado','en_revision'].indexOf(a.estado_curacion) === -1) return false; }
       else if (LA.estado && a.estado_curacion !== LA.estado) return false;
@@ -194,8 +200,35 @@ document.addEventListener('DOMContentLoaded', function(){
     else l.sort((a, b) => t(b) - t(a));
     return l;
   }
-  function filaAviso(a){
+  /* 8/10/2026 (venta) · Un emprendimiento en borrador es una fila con su lista de unidades ("Torre Ejemplo · 6 unidades").
+     La lista viaja con el borrador (unidades_borrador); sin esa columna en la base, la de este navegador. */
+  const listaBorrador = a => {
+    if (a.estado_curacion !== 'borrador' || !a.emprendimiento) return null;
+    let l = Array.isArray(a.unidades_borrador) ? a.unidades_borrador : null;
+    if (!l) { try { l = JSON.parse(localStorage.getItem('bp_pub_unidades_' + a.id) || 'null'); } catch (e) { l = null; } }
+    return Array.isArray(l) && l.length ? l : null;
+  };
+  /* Enviado, es un grupo con sus unidades: las filas de un mismo emprendimiento van juntas, donde aparece la primera */
+  function bloques(lista){
+    const out = [], grupos = {};
+    lista.forEach(a => {
+      const k = a.emprendimiento && !listaBorrador(a) ? String(a.emprendimiento).trim().toLowerCase() : null;
+      if (!k) { out.push({ a }); return; }
+      if (grupos[k]) { grupos[k].avisos.push(a); return; }
+      grupos[k] = { nombre: a.emprendimiento, avisos: [a] }; out.push(grupos[k]);
+    });
+    /* Dentro del grupo, por piso y unidad (2° A, 2° B, 5° A, 12° A) */
+    const porUnidad = (x, y) => String(x.unidad || '').localeCompare(String(y.unidad || ''), 'es', { numeric: true, sensitivity: 'base' });
+    return out.map(b => !b.avisos ? b : b.avisos.length === 1 ? { a: b.avisos[0] } : Object.assign(b, { avisos: b.avisos.slice().sort(porUnidad) }));
+  }
+  function grupoEmp(g){
+    const n = g.avisos.length, et = BPData.etapaTxt ? BPData.etapaTxt(g.avisos[0]) : '';
+    const cab = [n === 1 ? BP.t('emp_unidad_1', '1 unidad') : BP.tf('emp_unidades', '{n} unidades', { n }), et].filter(Boolean).map(BP.esc).join(' · ');
+    return `<section class="p-emp-grupo" aria-label="${BP.esc(g.nombre)}"><div class="p-emp-grupo-cab"><b>${BP.esc(g.nombre)}</b><span>${cab}</span></div><div class="p-emp-grupo-lista">${g.avisos.map(a => filaAviso(a, true)).join('')}</div></section>`;
+  }
+  function filaAviso(a, enGrupo){
     const publicado = a.estado_curacion === 'publicado';
+    const lista = listaBorrador(a), precios = lista ? lista.map(u => Number(u.precio)).filter(x => x > 0) : [];
     const primaria = publicado || a.estado_curacion === 'en_revision' ? `<a class="p-btn p-btn-sm" href="publicar-aviso.html?id=${encodeURIComponent(a.id)}">${BP.t('pan_editar', 'Editar')}</a>`
       : a.estado_curacion === 'pausado' ? `<button type="button" class="p-btn p-btn-sm p-btn-navy" data-act="reactivar" data-id="${a.id}">${BP.t('pan_reactivar', 'Reactivar')}</button>`
       : `<a class="p-btn p-btn-sm p-btn-fill" href="publicar-aviso.html?id=${encodeURIComponent(a.id)}">${BP.t('pan_completar', 'Completar y enviar')}</a>`;
@@ -203,15 +236,16 @@ document.addEventListener('DOMContentLoaded', function(){
       publicado ? `<a href="propiedad.html?id=${encodeURIComponent(a.id)}">${BP.t('pan_ver_ficha', 'Ver ficha')}</a>` : '',
       a.estado_curacion === 'pausado' ? `<a href="publicar-aviso.html?id=${encodeURIComponent(a.id)}">${BP.t('pan_editar', 'Editar')}</a>` : '',
       `<a href="publicar-aviso.html?copia=${encodeURIComponent(a.id)}">${BP.t('pan_publicar_parecida', 'Publicar otra parecida')}</a>`,   /* 8/10/2026 · para cargar varias unidades parecidas */
-      publicado ? `<button type="button" data-act="${a.estado === 'reservado' ? 'disponible' : 'reservar'}" data-id="${a.id}">${a.estado === 'reservado' ? BP.t('pan_marcar_disponible', 'Marcar disponible') : BP.t('pan_marcar_reservada', 'Marcar reservada')}</button>` : '',
+      /* 8/10/2026 (venta) · Reservada o disponible también mientras está en revisión */
+      publicado || a.estado_curacion === 'en_revision' ? `<button type="button" data-act="${a.estado === 'reservado' ? 'disponible' : 'reservar'}" data-id="${a.id}">${a.estado === 'reservado' ? BP.t('pan_marcar_disponible', 'Marcar disponible') : BP.t('pan_marcar_reservada', 'Marcar reservada')}</button>` : '',
       publicado ? `<button type="button" data-act="pausar" data-id="${a.id}">${BP.t('pan_pausar', 'Pausar')}</button>` : ''
     ].filter(Boolean).join('');
     const visitas = a._visitas;
     return `<div class="p-aviso-row v2" data-id="${a.id}">
       <a class="ph" href="${publicado ? 'propiedad.html?id=' + encodeURIComponent(a.id) : 'publicar-aviso.html?id=' + encodeURIComponent(a.id)}" tabindex="-1" aria-hidden="true">${a._foto ? `<img src="${a._foto}" alt="" loading="lazy">` : ''}</a>
       <div class="p-aviso-main">
-        <b>${BP.esc(a.titulo || [a.direccion, a.unidad].filter(Boolean).join(' · '))}</b>
-        <div class="m">${OP_TXT[a.operacion] || OP_TXT.alquiler} · ${BP.esc(a.barrio||'')} · ${precioTxt(a)}${a.operacion !== 'venta' ? POR_MES : ''}${a.codigo ? ' · ' + BP.esc(a.codigo) : ''}</div>
+        <b>${BP.esc(enGrupo && a.unidad ? a.unidad : lista ? [a.emprendimiento, lista.length === 1 ? BP.t('emp_unidad_1', '1 unidad') : BP.tf('emp_unidades', '{n} unidades', { n: lista.length })].join(' · ') : (a.titulo || [a.direccion, a.unidad].filter(Boolean).join(' · ')))}</b>
+        <div class="m">${OP_TXT[a.operacion] || OP_TXT.alquiler} · ${BP.esc(a.barrio||'')} · ${lista ? (precios.length ? BP.tf('emp_desde', 'Desde {p}', { p: BP.fmtUSD(Math.min.apply(null, precios)) }) : BP.t('pan_sin_precio', 'Sin precio')) : precioTxt(a) + (a.operacion !== 'venta' ? POR_MES : '')}${a.codigo && !lista ? ' · ' + BP.esc(a.codigo) : ''}</div>
         <div class="p-aviso-est">${estadoBadge(a.estado_curacion)}${a.estado === 'reservado' ? ` <span class="p-badge demo">${RESERVADA}</span>` : ''}</div>
         ${a.motivo_rechazo ? `<div class="p-note p-aviso-motivo">${BP.t('pan_motivo', 'Motivo: ')}${BP.esc(a.motivo_rechazo)}</div>` : ''}
         <details class="p-visitas"><summary>${BP.t('pan_visitas_reservas', 'Visitas y reservas')} <span class="n">${visitas.length}</span>${a.propietario_email ? ' <small>' + BP.tf('pan_las_ve', '· las ve {e}', { e: BP.esc(a.propietario_email) }) + '</small>' : ''}</summary>
@@ -227,9 +261,9 @@ document.addEventListener('DOMContentLoaded', function(){
     const { avisos, cons, vistasLocales } = cacheAvisos;
     const pubCount = avisos.filter(a => a.estado_curacion === 'publicado').length, rev = avisos.filter(a => a.estado_curacion === 'en_revision').length;
     const vistas = avisos.reduce((s, a) => s + a._vistas, 0);
-    const lista = filtrarAvisos(avisos); const visibles = lista.slice(0, LA.max);
+    const lista = filtrarAvisos(avisos); const todos = bloques(lista), visibles = todos.slice(0, LA.max);
     const hayFiltro = LA.q || LA.estado || LA.op;
-    let html = `<div class="p-head-row"><div><h1 class="p-h2">${BP.t('mis_avisos', 'Mis avisos')}</h1><p class="p-sub">${BP.esc(pub.nombre)} · ${pub.verificado ? BP.ico.check + ' ' + BP.t('pan_verificado_min', 'verificado') : BP.t('pan_verif_pendiente', 'verificación pendiente')}</p></div><div class="p-head-acts">${pub.tipo !== 'dueno' ? `<a class="p-btn" href="importar.html">${BP.t('importar_cartera', 'Importar cartera')}</a>` : ''}<a class="p-btn p-btn-fill" href="publicar-aviso.html">${BP.t('pan_publicar_otra', 'Publicar otra')}</a></div></div>
+    let html = `<div class="p-head-row"><div><h1 class="p-h2">${BP.t('mis_avisos', 'Mis avisos')}</h1><p class="p-sub">${BP.esc(pub.nombre)} · ${pub.verificado ? BP.ico.check + ' ' + BP.t('pan_verificado_min', 'verificado') : faltanDocs ? `<a class="p-link" href="${URL_DOCS}">${BP.t('pan_faltan_docs_corto', 'faltan tus documentos')}</a>` : BP.t('pan_verif_pendiente', 'verificación pendiente')}</p></div><div class="p-head-acts">${pub.tipo !== 'dueno' && pub.tipo !== 'desarrolladora' ? `<a class="p-btn" href="importar.html">${BP.t('importar_cartera', 'Importar cartera')}</a>` : ''}<a class="p-btn p-btn-fill" href="publicar-aviso.html">${BP.t('pan_publicar_otra', 'Publicar otra')}</a></div></div>
       ${vistasLocales && BPStore.mode !== 'supabase' ? `<p class="p-note p-nota-vistas">${BP.t('pan_nota_vistas', 'Vistas y consultas de este navegador. Con la base conectada, las de todos los visitantes.')}</p>` : ''}<div class="p-kpis"><div class="p-kpi"><b>${pubCount}</b><span>${BP.t('pan_kpi_publicados', 'Publicados')}</span></div><div class="p-kpi"><b>${rev}</b><span>${BP.t('pan_kpi_revision', 'En revisión')}</span></div><div class="p-kpi"><b>${vistas}</b><span>${BP.t('pan_vistas', 'Vistas')}${vistasLocales ? BP.t('pan_kpi_vistas_local', ' en este navegador') : ''}</span></div><div class="p-kpi"><b>${cons.length}</b><span>${BP.t('pan_consultas', 'Consultas')}</span></div></div>${pubCount ? `<p class="p-note p-nota-vistas">${BP.t('pan_nota_publicado', 'Los cambios en un aviso publicado se ven al instante en su ficha.')}</p>` : ''}`;
     if (!avisos.length) { html += `<div class="p-empty p-ensena"><b>${BP.t('pan_vacio_avisos_t', 'Todavía no cargaste ninguna propiedad.')}</b><p>${BP.t('pan_vacio_avisos_p', 'Pantallas cortas: qué publicás, la propiedad, el precio, las fotos y la descripción. Se guarda solo y podés seguir después.')}</p><a class="p-btn p-btn-fill" href="publicar-aviso.html">${BP.t('pan_publicar_primera', 'Publicar la primera')}</a></div>`; content.innerHTML = html; return; }
     html += `<form class="p-herr" id="herrAvisos" role="search" aria-label="${BP.esc(BP.t('pan_herr_aria', 'Buscar y filtrar avisos'))}">
@@ -240,8 +274,8 @@ document.addEventListener('DOMContentLoaded', function(){
       </form>
       <p class="p-herr-n" aria-live="polite">${lista.length === avisos.length ? (avisos.length === 1 ? BP.t('pan_n_aviso_1', '1 aviso') : BP.tf('pan_n_avisos', '{n} avisos', { n: avisos.length })) : BP.tf('pan_n_de', '{a} de {b}', { a: lista.length, b: avisos.length })}${hayFiltro ? ` · <button type="button" class="p-link" data-limpiar>${BP.t('pan_limpiar_filtros', 'Limpiar filtros')}</button>` : ''}</p>`;
     if (!lista.length) html += `<div class="p-empty">${BP.t('pan_sin_coincidencia', 'Ningún aviso coincide con la búsqueda.')} <button type="button" class="p-link" data-limpiar>${BP.t('pan_limpiar_filtros', 'Limpiar filtros')}</button></div>`;
-    html += `<div class="p-avisos-lista">${visibles.map(filaAviso).join('')}</div>`;
-    if (lista.length > LA.max) html += `<div class="p-vermas"><button type="button" class="p-btn" data-vermas>${BP.tf('pan_ver_mas', 'Ver {n} más', { n: Math.min(12, lista.length - LA.max) })}</button><span>${BP.tf('pan_n_de', '{a} de {b}', { a: visibles.length, b: lista.length })}</span></div>`;
+    html += `<div class="p-avisos-lista">${visibles.map(b => b.a ? filaAviso(b.a) : grupoEmp(b)).join('')}</div>`;
+    if (todos.length > LA.max) html += `<div class="p-vermas"><button type="button" class="p-btn" data-vermas>${BP.tf('pan_ver_mas', 'Ver {n} más', { n: Math.min(12, todos.length - LA.max) })}</button><span>${BP.tf('pan_n_de', '{a} de {b}', { a: visibles.length, b: todos.length })}</span></div>`;
     content.innerHTML = html;
     /* Herramientas de lista: buscar mientras escribís, filtros al cambiar; sin volver a la base */
     const herr = document.getElementById('herrAvisos');
@@ -251,11 +285,11 @@ document.addEventListener('DOMContentLoaded', function(){
       ['estado','op','orden'].forEach(k => herr[k].addEventListener('change', () => { LA[k] = herr[k].value; LA.max = 12; pintarAvisos(); }));
     }
     content.querySelectorAll('[data-limpiar]').forEach(b => b.addEventListener('click', () => { LA.q = ''; LA.estado = ''; LA.op = ''; LA.max = 12; pintarAvisos(); }));
-    const vm = content.querySelector('[data-vermas]'); if (vm) vm.addEventListener('click', () => { const antes = LA.max; LA.max += 12; pintarAvisos(); const filas = content.querySelectorAll('.p-aviso-row'); const f = filas[antes]; if (f) { const el = f.querySelector('.acts a, .acts button'); if (el) el.focus(); } });
+    const vm = content.querySelector('[data-vermas]'); if (vm) vm.addEventListener('click', () => { const antes = LA.max; LA.max += 12; pintarAvisos(); const filas = content.querySelectorAll('.p-avisos-lista > *'); const f = filas[antes]; if (f) { const el = f.querySelector('.acts a, .acts button'); if (el) el.focus(); } });
     /* Un solo menú "···" abierto por vez */
     content.querySelectorAll('details.p-mas').forEach(d => d.addEventListener('toggle', () => { if (d.open) content.querySelectorAll('details.p-mas[open]').forEach(o => { if (o !== d) o.open = false; }); }));
     content.querySelectorAll('.p-visita-form').forEach(f => f.addEventListener('submit', async e => { e.preventDefault(); if (!f.fecha.value) { BP.errorCampo(f.fecha, BP.t('pan_err_fecha', 'Elegí fecha y hora.')); return; } const bt = f.querySelector('[data-visita]'); bt.disabled = true; try { await BPStore.addVisita(f.dataset.aviso, { tipo: f.tipo.value, fecha: new Date(f.fecha.value).toISOString(), nota: f.nota.value.trim() }); BP.toast(BP.t('pan_registrado', 'Registrado. El propietario lo ve en su cuenta.')); await renderAvisos(); const d = content.querySelector(`.p-visita-form[data-aviso="${f.dataset.aviso}"]`); if (d) d.closest('details').open = true; } catch (err) { bt.disabled = false; BP.toast(BPStore.demo ? BP.t('img_demo', 'En modo demo no se guarda.') : BPStore.errorAlGuardar(err, BP.t('pan_no_registro', 'No se pudo registrar.')), 'error'); } }));
-    content.querySelectorAll('[data-act]').forEach(b => b.addEventListener('click', async () => { const act = b.dataset.act, id = b.dataset.id; b.disabled = true; if (act === 'reservar' && window.BPM && BPM.sello) { const fila = b.closest('.p-aviso-row'); if (fila) BPM.sello(fila, RESERVADA); } try { if (act === 'pausar') await BPStore.setEstado(id, 'pausado'); else if (act === 'reactivar') await BPStore.setEstado(id, 'publicado'); else if (act === 'reservar') await BPStore.setEstado(id, 'publicado', null, { estado: 'reservado' }); else if (act === 'disponible') await BPStore.setEstado(id, 'publicado', null, { estado: 'disponible' }); BP.toast(act === 'pausar' ? BP.t('pan_t_pausado', 'Aviso pausado. Ya no se muestra en los resultados.') : act === 'reactivar' ? BP.t('pan_t_reactivado', 'Aviso publicado de nuevo.') : act === 'reservar' ? BP.t('pan_t_reservada', 'Marcada como reservada.') : BP.t('pan_t_disponible', 'Marcada como disponible.')); renderAvisos(); } catch (e) { b.disabled = false; BP.toast(BPStore.demo ? BP.t('img_demo', 'En modo demo no se guarda.') : BPStore.errorAlGuardar(e), 'error'); } }));
+    content.querySelectorAll('[data-act]').forEach(b => b.addEventListener('click', async () => { const act = b.dataset.act, id = b.dataset.id; b.disabled = true; if (act === 'reservar' && window.BPM && BPM.sello) { const fila = b.closest('.p-aviso-row'); if (fila) BPM.sello(fila, RESERVADA); } try { if (act === 'pausar') await BPStore.setEstado(id, 'pausado'); else if (act === 'reactivar') await BPStore.setEstado(id, 'publicado'); else if (act === 'reservar') await BPStore.setDisponibilidad(id, 'reservado'); else if (act === 'disponible') await BPStore.setDisponibilidad(id, 'disponible'); BP.toast(act === 'pausar' ? BP.t('pan_t_pausado', 'Aviso pausado. Ya no se muestra en los resultados.') : act === 'reactivar' ? BP.t('pan_t_reactivado', 'Aviso publicado de nuevo.') : act === 'reservar' ? BP.t('pan_t_reservada', 'Marcada como reservada.') : BP.t('pan_t_disponible', 'Marcada como disponible.')); renderAvisos(); } catch (e) { b.disabled = false; BP.toast(BPStore.demo ? BP.t('img_demo', 'En modo demo no se guarda.') : BPStore.errorAlGuardar(e), 'error'); } }));
   }
   async function renderAvisos(){
     if (!pub) { content.innerHTML = `<h1 class="p-h2">${BP.t('mis_avisos', 'Mis avisos')}</h1><div class="p-empty p-ensena"><b>${BP.t('pan_sin_pub_t', 'Todavía no tenés perfil de publicador.')}</b><p>${BP.t('pan_sin_pub_p', 'Se crea en el primer paso al publicar: dueño directo, inmobiliaria o desarrolladora.')}</p><a class="p-btn p-btn-fill" href="publicar-aviso.html">${BP.t('pan_publicar_prop', 'Publicar una propiedad')}</a></div>`; return; }
@@ -331,7 +365,7 @@ document.addEventListener('DOMContentLoaded', function(){
         ${filaImagen}
         <div><dt>${BP.t('pan_mail', 'Mail')}</dt><dd>${BP.esc(BPStore.session.email)}</dd></div>
         <div><dt>${BP.t('pan_en_bairen', 'En BAIREN')}</dt><dd data-perfil-txt>${perfil ? BPStore.perfilTxt(perfil, pub) : BP.t('pan_sin_elegir', 'Sin elegir: el panel muestra todo')}</dd></div>
-        ${pub ? `<div><dt>${BP.t('pan_publicador', 'Publicador')}</dt><dd>${BP.esc(pub.nombre)}</dd></div><div><dt>${BP.t('pan_tipo', 'Tipo')}</dt><dd>${tipo}</dd></div><div><dt>${BP.t('pan_verificacion', 'Verificación')}</dt><dd>${pub.verificado ? BP.ico.check + BP.t('pan_verificado', ' Verificado') : BP.t('pan_verif_pend_bairen', 'Pendiente: la revisa BAIREN')}</dd></div>${pub.matricula ? `<div><dt>${BP.t('pan_matricula', 'Matrícula')}</dt><dd>${BP.esc(pub.matricula)}</dd></div>` : ''}` : `<div><dt>${BP.t('pan_publicador', 'Publicador')}</dt><dd>${BP.t('pan_sin_publicador', 'Sin perfil todavía. Se crea al publicar.')}</dd></div>`}
+        ${pub ? `<div><dt>${BP.t('pan_publicador', 'Publicador')}</dt><dd>${BP.esc(pub.nombre)}</dd></div><div><dt>${BP.t('pan_tipo', 'Tipo')}</dt><dd>${tipo}</dd></div><div><dt>${BP.t('pan_verificacion', 'Verificación')}</dt><dd>${pub.verificado ? BP.ico.check + BP.t('pan_verificado', ' Verificado') : faltanDocs ? `<span class="p-faltan-docs">${faltanDocsTxt()}</span> <a class="p-btn p-btn-sm p-btn-fill" href="${URL_DOCS}">${BP.t('pan_cargar_docs', 'Cargar documentos')}</a>` : BP.t('pan_verif_pend_bairen', 'Pendiente: la revisa BAIREN')}</dd></div>${pub.matricula ? `<div><dt>${BP.t('pan_matricula', 'Matrícula')}</dt><dd>${BP.esc(pub.matricula)}</dd></div>` : ''}` : `<div><dt>${BP.t('pan_publicador', 'Publicador')}</dt><dd>${BP.t('pan_sin_publicador', 'Sin perfil todavía. Se crea al publicar.')}</dd></div>`}
       </dl>
       <fieldset class="p-perfil-sel"><legend>${BP.t('pan_que_venis', 'Qué venís a hacer a BAIREN')}</legend><p class="p-note">${BP.t('pan_perfil_nota', 'Decide qué muestra el panel, no lo que podés hacer. Lo cambiás cuando quieras.')}</p><div class="ops">${BPStore.PERFILES.map(p => `<label${p === perfil ? ' class="on"' : ''}><input type="radio" name="perfil" value="${p}"${p === perfil ? ' checked' : ''}><span>${BPStore.perfilTxt(p, pub)}</span></label>`).join('')}</div></fieldset>
       <div class="p-head-acts p-cuenta-acts">${pub ? `<a class="p-btn" href="publicar-aviso.html?paso=perfil">${BP.t('pan_editar_publicador', 'Editar perfil de publicador')}</a>` : `<a class="p-btn p-btn-fill" href="publicar-aviso.html">${BP.t('pan_publicar_prop', 'Publicar una propiedad')}</a>`}<button type="button" class="p-btn p-btn-quiet" data-logout>${BP.t('cerrar_sesion', 'Cerrar sesión')}</button></div>
@@ -347,7 +381,7 @@ document.addEventListener('DOMContentLoaded', function(){
       try { await BPStore.setPerfil(r.value); }
       catch (e) { const prev = content.querySelector(`.p-perfil-sel [value="${antes}"]`); if (prev) prev.checked = true; else r.checked = false; marcarPerfil(); BP.toast(BPStore.errorAlGuardar(e), 'error'); return; }
       finally { fs.disabled = false; }
-      perfil = r.value; riel = BPStore.rielDe(perfil); renderNav(); marcarActiva();
+      perfil = r.value; riel = BPStore.rielDe(perfil, pub); renderNav(); marcarActiva();
       const dd = content.querySelector('[data-perfil-txt]'); if (dd) dd.textContent = BPStore.perfilTxt(perfil, pub);
       BP.toast(BPStore.session.demo ? BP.t('img_demo', 'En modo demo no se guarda.') : BP.t('pan_perfil_listo', 'Listo. El panel ya muestra lo que te sirve.'));
     }));
