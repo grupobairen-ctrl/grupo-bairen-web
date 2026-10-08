@@ -115,3 +115,16 @@ body.p-home .h-criterios{opacity:1;visibility:visible;transform:none;transition:
 /* Si del otro lado no hay foto (se volvió a una lista que se dibujó de nuevo), la que se va se funde en su lugar */
 ::view-transition-old(foto):only-child{animation:bp-vt-sale .22s cubic-bezier(.22,1,.36,1) both}
 @keyframes bp-vt-sale{to{opacity:0}}
+
+/* ══ Menos movimiento ═══════════════════════════════════════════════════════
+   Con "reducir movimiento" pedido en el sistema: sin desplazamientos ni escalas. Las páginas
+   solo se funden (150 ms), la foto no viaja y las barras no se separan; los paneles aparecen
+   en su lugar y las fotos, sin fundido. portal.css ya apaga el resto de las transiciones con
+   este pedido, y los scripts (bairen-motion.js, ui.js) dejan solo fundidos cortos o nada. */
+@media(prefers-reduced-motion:reduce){
+  .navbar.p-navbar,#pTabbar,.bp-vt-destino{view-transition-name:none}
+  ::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation-duration:.15s !important}
+  .p-drawer .panel,.p-drawer.open .panel,.p-msheet-wrap .p-msheet,.p-msheet-wrap.open .p-msheet{transform:none}
+  [data-reveal].bp-espera{transform:none}
+  .bp-carga{opacity:1}
+}
