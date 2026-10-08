@@ -788,5 +788,55 @@
     ['touchstart', 'pointerdown'].forEach(t => document.addEventListener(t, e => { const a = e.target.closest && e.target.closest('a[href]'); if (a) pedir(a); }, { passive: true, capture: true }));
   })();
 
+  /* ── 3 · Fotos que aparecen suave ──────────────────────────────────────────
+     Las fotos de las tarjetas y de la ficha entran con un fundido de 200 ms al terminar de bajar. Mientras
+     bajan no se ve nada distinto (el hueco ya tiene su fondo); si estaban en caché (bajan en menos de 80 ms)
+     aparecen sin fundido. Solo opacidad: el diseño no se mueve. Un observador liviano mira lo que se agrega. */
+  (function(){
+    if (QUIETO || !window.MutationObserver) return;
+    const SEL = '.tj-foto img, .p-card-photo img, .h-edif img, .p-strip img, .p-gallery img, .p-video-play img';
+    const RAPIDO = 80;
+    const mirarImg = img => {
+      if (img._bpFoto) return; img._bpFoto = true;
+      if (img.complete && img.naturalWidth) return;
+      const t0 = performance.now();
+      img.classList.add('bp-carga');
+      const fin = () => {
+        img.removeEventListener('load', fin); img.removeEventListener('error', fin);
+        if (performance.now() - t0 < RAPIDO) { img.classList.remove('bp-carga'); return; }
+        img.classList.add('bp-fundido');
+        requestAnimationFrame(() => { img.classList.remove('bp-carga'); setTimeout(() => img.classList.remove('bp-fundido'), 260); });
+      };
+      img.addEventListener('load', fin); img.addEventListener('error', fin);
+    };
+    /* La foto principal de la ficha es un fondo: se mira con una imagen aparte */
+    const mirarFondo = el => {
+      if (el._bpFoto) return; const m = /url\(['"]?([^'")]+)['"]?\)/.exec(el.style.backgroundImage || ''); if (!m) return; el._bpFoto = true;
+      const im = new Image(); im.src = m[1];
+      if (im.complete && im.naturalWidth) return;
+      const t0 = performance.now();
+      el.classList.add('bp-carga');
+      im.onload = im.onerror = () => {
+        if (performance.now() - t0 < RAPIDO) { el.classList.remove('bp-carga'); return; }
+        el.classList.add('bp-fundido'); requestAnimationFrame(() => { el.classList.remove('bp-carga'); setTimeout(() => el.classList.remove('bp-fundido'), 260); });
+      };
+    };
+    const revisar = root => {
+      if (!root.querySelectorAll) return;
+      if (root.matches && root.matches(SEL)) mirarImg(root);
+      root.querySelectorAll(SEL).forEach(mirarImg);
+      root.querySelectorAll('.p-fhero-slide[style*="background-image"]').forEach(mirarFondo);
+      if (root.matches && root.matches('.p-fhero-slide[style*="background-image"]')) mirarFondo(root);
+    };
+    const arrancar = () => {
+      revisar(document);
+      new MutationObserver(lista => lista.forEach(m => {
+        if (m.type === 'attributes') { if (m.target.classList && m.target.classList.contains('p-fhero-slide')) mirarFondo(m.target); return; }
+        m.addedNodes.forEach(n => { if (n.nodeType === 1) revisar(n); });
+      })).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['style'] });
+    };
+    if (document.body) arrancar(); else document.addEventListener('DOMContentLoaded', arrancar);
+  })();
+
   window.BP = BP;
 })();

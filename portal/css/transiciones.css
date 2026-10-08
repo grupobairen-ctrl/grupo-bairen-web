@@ -83,6 +83,12 @@ body.p-home .h-criterios{opacity:1;visibility:visible;transform:none;transition:
   @starting-style{.p-drawer.open .panel{transform:translateY(100%)}}
 }
 
+/* ══ Fotos que aparecen suave ═══════════════════════════════════════════════
+   ui.js marca la foto mientras baja (bp-carga) y la suelta al terminar con un fundido de
+   200 ms. Si ya estaba en caché, aparece sin fundido. Solo opacidad: no corre nada. */
+.bp-carga{opacity:0}
+.bp-fundido{transition:opacity .2s var(--t-curva)}
+
 /* ══ Transición entre páginas ═══════════════════════════════════════════════
    Navegar dentro del portal funde una página en la otra (220 ms). La foto de la tarjeta
    tocada crece hasta donde va la foto principal de la ficha, y al volver atrás se achica a
