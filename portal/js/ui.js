@@ -251,12 +251,13 @@
     document.body.style.overflow = 'hidden';
     var hoja = w.querySelector('.hoja');
     var movil = window.matchMedia('(max-width: 820px)').matches;
-    if (window.BPM && BPM.ok) { BPM.entrar(w.querySelector('.velo')); BPM.entrar(hoja, movil ? 'abajo' : null); }
+    /* La hoja sube desde abajo en el celular; en compu el panel aparece en su lugar. El fondo se funde. */
+    if (window.BPM && BPM.ok) { BPM.entrar(w.querySelector('.velo'), 'fundido'); BPM.entrar(hoja, movil ? 'hoja' : null); }
     var soltar = BP.focoAtrapado ? BP.focoAtrapado(w, { devolverA: document.activeElement, primero: w.querySelector('.op'), alCerrar: function () { quitar(); } }) : null;
     function quitar() {
       document.body.style.overflow = '';
       var fin = function () { w.remove(); };
-      if (window.BPM && BPM.ok) { BPM.salir(w.querySelector('.velo')); BPM.salir(hoja, movil ? 'abajo' : null).then(fin, fin); setTimeout(fin, 400); } else fin();
+      if (window.BPM && BPM.ok) { BPM.salir(w.querySelector('.velo'), 'fundido'); BPM.salir(hoja, movil ? 'hoja' : null).then(fin, fin); setTimeout(fin, 400); } else fin();
     }
     function cerrar() { if (soltar) { var f = soltar; soltar = null; f(); } else quitar(); }
     w.querySelectorAll('[data-cerrar]').forEach(function (b) { b.addEventListener('click', cerrar); });
@@ -347,14 +348,24 @@
     window.BAIREN_LANG = BP.lang;
   };
 
-  /* Mientras el velo de carga esté puesto, las apariciones esperan a que caiga: si no, se animan tapadas. */
-  BP.reveal = () => { if (document.documentElement.classList.contains('cargando')) { if (!BP._revealPend) { BP._revealPend = true; document.addEventListener('bairen:velo', () => { BP._revealPend = false; BP.reveal(); }, { once: true }); } return; }
-    const els=document.querySelectorAll('[data-reveal]:not(.in)'); if(!('IntersectionObserver' in window)){ els.forEach(e=>e.classList.add('in')); return; }
-    /* Se juntan los que entran en la misma tanda para que suban escalonados, no de a uno */
-    let tanda=[], t=null, t0=0;
-    const soltar=()=>{ const g=tanda; tanda=[]; t=null; t0=0; if(!g.length) return; if(window.BPM && BPM.ok) BPM.aparecer(g); else g.forEach(e=>e.classList.add('in')); };
-    const io=new IntersectionObserver(en=>{ en.forEach(e=>{ if(e.isIntersecting){ io.unobserve(e.target); tanda.push(e.target); } }); if(tanda.length){ if(!t0) t0=Date.now(); clearTimeout(t); if(Date.now()-t0>120) soltar(); else t=setTimeout(soltar,40); } },{rootMargin:'0px 0px -8% 0px'});
-    els.forEach(e=>io.observe(e)); };
+  /* ── a) Aparición al entrar ──────────────────────────────────────────────
+     8/10/2026 · Lo que está en pantalla al cargar se ve de entrada: no espera a ningún velo ni a una
+     animación. Solo lo que queda más abajo espera (clase bp-espera, en css/transiciones.css) y entra
+     cuando llega a la vista: sube 10 px y se revela en 280 ms; los que llegan juntos, de a 40 ms (tope 6). */
+  BP.reveal = () => {
+    const els = Array.from(document.querySelectorAll('[data-reveal]:not(.in):not(.bp-espera)'));
+    if (!els.length) return;
+    let quieto = false; try { quieto = matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+    if (quieto || !('IntersectionObserver' in window)) { els.forEach(e => e.classList.add('in')); return; }
+    const H = window.innerHeight || 800;
+    const abajo = els.filter(e => { const r = e.getBoundingClientRect(); const ve = r.top < H && r.bottom > 0; if (ve || !r.height) e.classList.add('in'); return !ve && r.height > 0; });
+    if (!abajo.length) return;
+    abajo.forEach(e => e.classList.add('bp-espera'));
+    let tanda = [], cuadro = 0;
+    const soltar = () => { cuadro = 0; tanda.forEach((e, i) => { e.style.setProperty('--bp-demora', (Math.min(i, 5) * 0.04) + 's'); e.classList.add('in'); }); tanda = []; };
+    const io = new IntersectionObserver(en => { en.forEach(x => { if (x.isIntersecting) { io.unobserve(x.target); tanda.push(x.target); } }); if (tanda.length && !cuadro) cuadro = requestAnimationFrame(soltar); }, { rootMargin: '0px 0px -6% 0px' });
+    abajo.forEach(e => io.observe(e));
+  };
 
   /* 8/10/2026 · Pantalla de carga: se va apenas hay contenido y nunca dura más de 1,5 s.
      El velo vive en un script del <head> copiado en cada página; acá se cambia en un solo lugar, para todas:
@@ -443,13 +454,9 @@
       dd.querySelectorAll('a,button').forEach(x => x.removeAttribute('tabindex'));
       dd.classList.add('abierto');
       const bt = dd.parentNode.querySelector('button[aria-haspopup]'); if (bt) bt.setAttribute('aria-expanded','true');
-      if (!(window.BPM && BPM.ok)) return;
-      const cols = dd.querySelectorAll('.col');
-      const alto = dd.scrollHeight;
-      Motion.animate(dd, { height: ['0px', alto + 'px'], opacity: [0, 1] }, { duration: BPM.DUR.rapido, ease: BPM.CURVA })
-        .finished.then(() => { dd.style.height = 'auto'; }, () => {});
-      if (cols.length) Motion.animate(cols, { opacity: [0, 1], transform: ['translateY(6px)', 'translateY(0px)'] },
-        { duration: BPM.DUR.normal, ease: BPM.CURVA, delay: Motion.stagger(0.035) });
+      /* Panel: se despliega en 300 ms con la curva de la casa (sin la biblioteca Motion) */
+      if (!(window.BPM && BPM.ok && BPM.anim) || BPM.quieto) return;
+      BPM.anim(dd, { height: ['0px', dd.scrollHeight + 'px'], opacity: [0, 1] }, { duration: BPM.DUR.panel });
     };
     /* Se puede volver a llamar: al abrir sesión el header se dibuja de nuevo
        y los desplegables nuevos necesitan su enganche. */
@@ -488,7 +495,6 @@
       const pintar = o => { b.classList.toggle('open', o); b.setAttribute('aria-expanded', o ? 'true' : 'false'); if (velo) velo.classList.toggle('on', o); document.documentElement.classList.toggle('menu-abierto', o); m.querySelectorAll('a,button').forEach(x => { if (o) x.removeAttribute('tabindex'); else x.tabIndex = -1; }); };
       b.addEventListener('click', () => {
         const o = m.classList.toggle('open'); pintar(o);
-        if (o && window.BPM && BPM.abrirMenuMovil) BPM.abrirMenuMovil();
         if (o) soltar = BP.focoAtrapado(m, { devolverA: b, alCerrar: () => { m.classList.remove('open'); pintar(false); } });
         else if (soltar) { soltar(); soltar = null; }
       });
@@ -610,6 +616,8 @@
       document.querySelectorAll('#pTabbar [data-tab="cuenta"]').forEach(a => { a.href = 'panel.html'; });
       document.querySelectorAll('.p-nav-right [data-logout], .mobile-menu [data-logout]').forEach(b => { if (b._salir) return; b._salir = true; b.addEventListener('click', async e => { e.preventDefault(); await window.BPStore.signOut(); BP.toast(BP.t('ui_sesion_cerrada', 'Sesión cerrada.')); setTimeout(() => location.href = 'index.html', 600); }); });
       if (window.BPStore) window.BPStore.isCurador().then(ok => { right.querySelectorAll('[data-curador]').forEach(a => a.hidden = !ok); });
+      /* El lado derecho se dibujó de nuevo: "Publicar" (¿Quién publica?), "Mi cuenta" y el idioma se enganchan ya */
+      BP.crear(right); if (BP.desplegables) BP.desplegables(right); BP.idioma(document);
     } else {
       if (mob) mob.querySelectorAll('.m-salir').forEach(b => b.remove());
       if (mode === 'local') { const ing = right.querySelector('a[href="ingresar.html"]'); if (ing && !ing.dataset.tagged) { ing.dataset.tagged = '1'; ing.insertAdjacentHTML('afterend', modeTag); } }
