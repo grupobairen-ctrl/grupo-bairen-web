@@ -1,0 +1,56 @@
+<!-- Supabase → Authentication → Emails → Templates → "Magic Link".
+     Asunto: Tu código de BAIREN: {{ .Token }}
+     Va también en "Confirm signup" (confirmar-cuenta.html), porque al que entra por primera vez le llega ese. -->
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
+<title>Tu código de BAIREN</title>
+</head>
+<body style="margin:0;padding:0;background:#EFEAE0;">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:#EFEAE0;">Tu código es {{ .Token }}. Vence en una hora.</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#EFEAE0;">
+  <tr>
+    <td align="center" style="padding:32px 16px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:520px;background:#FDFCF9;">
+        <tr>
+          <td align="center" style="background:#131D2D;padding:30px 24px 26px;">
+            <img src="https://www.bairengroup.com/bairen_logo.png" width="52" height="52" alt="" style="display:block;border:0;width:52px;height:52px;margin:0 auto 14px;">
+            <img src="https://www.bairengroup.com/bairen_wordmark.png" width="128" height="35" alt="BAIREN" style="display:block;border:0;width:128px;height:auto;margin:0 auto;">
+          </td>
+        </tr>
+        <tr><td style="background:#C2A968;height:2px;line-height:2px;font-size:0;">&nbsp;</td></tr>
+        <tr>
+          <td style="padding:40px 40px 12px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+            <p style="margin:0 0 10px;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#9C8340;font-weight:600;">Ingreso</p>
+            <h1 style="margin:0 0 12px;font-family:'Playfair Display',Georgia,'Times New Roman',serif;font-weight:500;font-size:28px;line-height:1.2;color:#131D2D;">Tu código para entrar</h1>
+            <p style="margin:0;font-size:15px;line-height:1.6;color:#4A5262;">Escribilo en la pantalla de BAIREN.</p>
+          </td>
+        </tr>
+        <tr>
+          <td align="center" style="padding:20px 40px 8px;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%;">
+              <tr>
+                <td align="center" style="border:1px solid #C2A968;background:#F6F1E6;padding:22px 12px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:38px;line-height:1;letter-spacing:12px;color:#131D2D;font-weight:500;">{{ .Token }}</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:14px 40px 40px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+            <p style="margin:0;font-size:13px;line-height:1.6;color:#7A8291;">Vence en una hora. Si no lo pediste, podés ignorar este mail.</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="border-top:1px solid #E6DFCF;padding:20px 40px 26px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+            <p style="margin:0;font-size:12px;line-height:1.6;color:#7A8291;">BAIREN · Propiedades seleccionadas en Buenos Aires<br><a href="https://portal.bairengroup.com" style="color:#9C8340;text-decoration:none;">portal.bairengroup.com</a></p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+</body>
+</html>
