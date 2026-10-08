@@ -4019,3 +4019,21 @@ body.p-home .footer .ft-col ul,.footer .ft-col ul{columns:1}
 html.cargando .p-velo{animation:p-velo-tope .35s cubic-bezier(.22,1,.36,1) 1.15s forwards}
 @keyframes p-velo-tope{to{opacity:0;visibility:hidden}}
 @media(prefers-reduced-motion:reduce){html.cargando .p-velo{animation:p-velo-tope 0s linear 1.5s forwards}}
+/* Ficha: con WhatsApp, las preguntas rápidas son enlaces que abren la charla; mismo aspecto que los botones */
+.p-ficha .p-quick a{display:inline-flex;align-items:center;min-height:44px;border:1px solid rgba(42,58,82,.25);background:transparent;color:var(--s-navy,#2A3A52);font:600 .75rem/1.2 var(--font-body);letter-spacing:.06em;text-transform:uppercase;padding:10px 12px;text-decoration:none;transition:background-color .2s cubic-bezier(.22,1,.36,1),color .2s cubic-bezier(.22,1,.36,1)}
+.p-ficha .p-quick a:hover,.p-ficha .p-quick a:focus-visible{background:var(--navy-deeper);border-color:var(--navy-deeper);color:#FBFAF6}
+.p-ficha .p-qrow a.p-btn{display:inline-flex;align-items:center;gap:8px;text-decoration:none}
+.p-ficha .p-qrow a.p-btn svg{width:16px;height:16px;flex:0 0 auto}
+/* Barra fija del celular: precio en dos líneas, Consultar como secundario (contorno) y WhatsApp como principal */
+@media(max-width:900px){
+  .p-mcta{gap:8px}
+  .p-mcta-price{line-height:1.15}
+  .p-mcta-price small{display:block;margin-top:2px}
+  .p-mcta .p-btn{padding:0 12px;letter-spacing:.1em;white-space:nowrap}
+  .p-mcta .p-mcta-sec{background:transparent;border-color:rgba(251,250,246,.35);color:#FBFAF6}
+  .p-mcta .p-mcta-wa,.p-mcta .p-btn-fill{display:inline-flex;align-items:center;gap:8px;background:var(--gold,#C2A968);border-color:var(--gold,#C2A968);color:var(--navy-deeper)}
+  .p-mcta .p-btn-fill svg{width:16px;height:16px;flex:0 0 auto}
+  .p-mcta .p-mcta-wa svg{width:17px;height:17px;flex:0 0 auto}
+}
+/* La confirmación de la consulta: "Seguir por WhatsApp" se leía oro sobre blanco; va en navy con el borde de oro */
+.p-ficha .p-form-ok .p-btn{color:var(--navy-deeper);border-color:var(--gold,#C2A968)}

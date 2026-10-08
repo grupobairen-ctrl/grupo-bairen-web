@@ -198,7 +198,7 @@
      plazo; "largo" es sólo largo (los avisos de largo plazo llevan op 'alquiler'). */
   D.opMatch = (a, op) => !op || (op === 'alquiler' ? a.op !== 'venta' : op === 'largo' ? a.op === 'alquiler' : a.op === op);
   /* 8/10/2026 · Con su moneda y "por mes" en palabras: "USD 1.100 por mes", "$ 850.000 por mes" */
-  D.precioHTML = a => a.precio ? `${BP.fmtPrecio(a.precio, a.moneda)}${a.periodo ? '<small> ' + BP.t('card_por_mes', 'por mes') + '</small>' : ''}` : BP.t('card_consultar_precio', 'Consultar precio');
+  D.precioHTML = a => a.precio ? `${BP.fmtPrecio(a.precio, a.moneda)}${a.periodo ? ' <small>' + BP.t('card_por_mes', 'por mes') + '</small>' : ''}` : BP.t('card_consultar_precio', 'Consultar precio');
   /* La insignia es un dato del publicador ('Dueño verificado', 'Corredor inmobiliario matriculado'…): se traduce como etiqueta fija; 'Selección BAIREN' es nombre propio y queda */
   /* 22/9/2026 · El sello del dueño se pinta SOLO si la titularidad está verificada de verdad.
      Antes se pintaba "Dueño verificado" con escudo por el mero hecho de ser tipo 'dueno', sin
