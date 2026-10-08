@@ -339,7 +339,8 @@
        esqueleto a la vista (los datos de la página ya están dibujados). Las fotos terminan de bajar a la vista.
      · Tope: a los 1050 ms desde el inicio de la navegación se suelta igual; con la caída (0,45 s) a los 1,5 s
        ya no se ve. Si este archivo llega tarde, el CSS (portal.css, "Lanzamiento") lo esconde a los 1,5 s de
-       haberse pintado, y esto solo avisa que cayó (bairen:velo) para que arranquen las apariciones. */
+       haberse pintado, y esto solo avisa que cayó (bairen:velo) para que arranquen las apariciones.
+       La entrada de la portada (BPM.entrada) ya no lo retiene. */
   (function(){
     const V = window.BPVelo; if (!V || !V.soltar) return;
     const ESQ = '.p-skel,.p-skel-card,.p-skel-ficha,.p-skel-line,.p-skel-vcard,.p-skel-panel,.p-skel-form,.p-skel-bloque,.p-skel-cta,.p-fhero-skel,.h-esq';

@@ -285,34 +285,31 @@
      sólo en la portada, con tope de tiempo. Una intro es un peaje: se cobra
      una sola vez y barato, o no se cobra. */
   BPM.entrada = function (palabra, opts) {
-    /* Usa el velo de carga del <head> (una sola capa navy, no dos): lo retiene,
-       arma la palabra letra por letra en su .w, y le devuelve el control: el
-       velo cae cuando la portada está lista, no antes. Si el velo ya se fue
-       (carga lentísima, lo soltó la salvaguarda), no hay entrada. */
+    /* Usa el velo de carga del <head> (una sola capa navy, no dos) y arma la
+       palabra letra por letra en su .w. Si el velo ya se fue, no hay entrada. */
     opts = opts || {};
     var V = window.BPVelo, w = document.querySelector('.p-velo .w');
     if (!V || !w || !document.documentElement.classList.contains('cargando')) return;
-    /* 8/10/2026 · La pantalla de carga tiene un tope de 1,5 s (ui.js la suelta a los 1050 ms): la entrada se
-       acorta para entrar en lo que queda y, si quedan menos de 400 ms, no se hace (y queda para otra visita). */
-    var TOPE = Math.min(opts.tope || 780, 1050 - performance.now() - 320);
-    if (TOPE < 400) return;
+    /* 8/10/2026 · La pantalla de carga se va apenas hay contenido y nunca dura más de 1,5 s (ui.js): la entrada
+       ya no la retiene. La palabra se arma mientras el velo esté puesto; si la portada está lista antes, el
+       velo cae igual y la entrada se corta. */
+    var TOPE = opts.tope || 780;
     try { if (sessionStorage.getItem('bairen-entrada') === '1') return; sessionStorage.setItem('bairen-entrada', '1'); } catch (e) {}
     if (!ok) return;
-    V.retener();
     palabra = (palabra || 'BAIREN').toUpperCase();
     w.style.animation = 'none'; w.style.opacity = '1';
     var glifos = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     var fijas = 0, t0 = performance.now();
     (function tick(now) {
+      if (!document.documentElement.classList.contains('cargando')) { w.textContent = palabra; return; }
       var t = Math.min((now - t0) / TOPE, 1);
       fijas = Math.floor(t * t * palabra.length);
       var out = '';
       for (var i = 0; i < palabra.length; i++) out += i < fijas ? palabra[i] : glifos[(Math.random() * glifos.length) | 0];
       w.textContent = out;
       if (t < 1) requestAnimationFrame(tick);
-      else { w.textContent = palabra; setTimeout(V.seguir, 320); }   /* la palabra queda; el velo cae cuando la portada está lista */
+      else w.textContent = palabra;
     })(t0);
-    setTimeout(V.seguir, TOPE + 1400);
   };
 
   /* ── Titular por palabras: cada una sube desde abajo detrás de una máscara.
