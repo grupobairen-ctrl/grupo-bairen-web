@@ -363,7 +363,10 @@
     /* 8/10/2026 · La base exige la dirección (direccion not null): sin ella no se manda nada, con un mensaje en castellano,
        y en modo local tampoco se crea un aviso vacío. */
     if (!String(a.direccion || '').trim()) throw new Error(T('err_sin_direccion', 'Falta la calle y la altura del aviso.'));
-    const rec = Object.assign({ estado: 'disponible', estado_curacion: 'borrador', moneda: 'USD', ciudad: a.zona === 'GBA Norte' ? 'Zona Norte' : 'Capital Federal', tipo: 'Departamento', mostrar_direccion: 'aproximada' }, a, { publicador_id: pub.id, updated_at: now() });
+    const rec = Object.assign({ estado: 'disponible', estado_curacion: 'borrador', moneda: 'USD', ciudad: a.zona === 'GBA Norte' ? 'Zona Norte' : 'Capital Federal', tipo: 'Departamento', mostrar_direccion: 'aproximada' }, a, { updated_at: now() });
+    /* 8/10/2026 · El aviso es de quien lo creó: al editar no se cambia el publicador. Antes, un curador que corregía
+       un aviso ajeno desde curación se lo quedaba (pasaba a su propio publicador). */
+    if (rec.id) delete rec.publicador_id; else rec.publicador_id = pub.id;
     /* 25/9/2026 · codigo_interno es único por publicador (índice de migracion-21): sin espacios, y vacío = null, porque
        dos filas importadas sin código ('') chocarían. Un alta con un código que el publicador ya tiene actualiza ese
        aviso en vez de crear otro: reimportar la cartera no duplica, aunque importar.html no lo haya encontrado en su
@@ -390,7 +393,7 @@
     S.track(rec.estado_curacion === 'en_revision' ? 'aviso_enviado' : 'aviso_creado', { aviso_id: rec.id || null, publicador_id: pub.id, datos: { operacion: rec.operacion, zona: rec.zona } });
     const all = L.avisos.get([]); const i = all.findIndex(x => x.id === rec.id); rec.fotos = fotos.map((f, i2) => ({ url: f.url, orden: i2 }));
     rec.updated_at = now();   /* en local también queda cuándo se editó: el panel ordena por eso */
-    if (i > -1) { rec.created_at = all[i].created_at; all[i] = rec; } else { rec.id = rec.id || uid(); rec.created_at = now(); all.push(rec); } L.avisos.set(all); return rec;
+    if (i > -1) { rec.created_at = all[i].created_at; rec.publicador_id = all[i].publicador_id; all[i] = rec; } else { rec.id = rec.id || uid(); rec.created_at = now(); all.push(rec); } L.avisos.set(all); return rec;
   };
   /* 8/10/2026 · Lo que contestan la base y el almacenamiento al guardar (inglés, códigos de Postgres: "null value in column
      ... violates not-null constraint", "new row violates row-level security policy") en una frase en castellano que dice
