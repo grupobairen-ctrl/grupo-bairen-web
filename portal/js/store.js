@@ -423,13 +423,26 @@
     if (!rec.slug) rec.slug = slugify((rec.direccion||'') + ' ' + (rec.unidad||'') + ' ' + (rec.barrio||''));
     if (!rec.codigo) rec.codigo = codigo(rec.slug, rec.operacion);
     const fotos = rec.fotos || []; delete rec.fotos;
+    /* 8/10/2026 (tanda 2) · disponible_desde (date, mediano plazo): vacío = null, nunca '' (Postgres no lo acepta como fecha) */
+    if ('disponible_desde' in rec) rec.disponible_desde = rec.disponible_desde ? String(rec.disponible_desde).slice(0, 10) : null;
     if (S.mode === 'supabase') {
+      /* La columna la crea la migración 23. Si la base ya avisó que no la tiene, ni se manda. */
+      if (S._sinDisponibleDesde) delete rec.disponible_desde;
       /* 8/10/2026 · Devuelve el aviso con columnas explícitas (S.COLS.AVISO): con la migración 23, `*` choca con la
          columna propietario_email cerrada. Si la base todavía no tiene alguna de esas columnas, repite con `*`: un
          error de columna frena la consulta entera antes de grabar, así que no hay doble alta. */
       const grabar = cols => { const q = S.sb.schema('portal').from('avisos'); return rec.id ? q.update(rec).eq('id', rec.id).select(cols).single() : q.insert(rec).select(cols).single(); };
-      let res = await grabar(S.COLS.AVISO);
-      if (res.error && /42703|PGRST204|column/i.test(String(res.error.code || '') + ' ' + String(res.error.message || ''))) res = await grabar('*');
+      const errCol = r => r.error && /42703|PGRST204|column/i.test(String(r.error.code || '') + ' ' + String(r.error.message || ''));
+      const nombraDD = r => /disponible_desde/i.test(String(r.error.message || '') + ' ' + String(r.error.details || '') + ' ' + String(r.error.hint || ''));
+      /* Sin la migración 23: si el aviso trae disponible_desde y la base contesta columna inexistente (42703, PGRST204 o
+         un mensaje que la nombra), se repite sin ese campo y el guardado sigue. Sigue valiendo el respaldo de `*` para el
+         .select(). Cada intento que falla por una columna frena antes de grabar: no hay doble alta. */
+      let cols = S.COLS.AVISO, res = await grabar(cols);
+      for (let intento = 0; intento < 3 && errCol(res); intento++) {
+        if ('disponible_desde' in rec && (nombraDD(res) || cols === '*')) { delete rec.disponible_desde; S._sinDisponibleDesde = true; res = await grabar(cols); }
+        else if (cols !== '*') { cols = '*'; res = await grabar(cols); }
+        else break;
+      }
       if (res.error) throw res.error; const saved = res.data;
       try { if (window.BPData && BPData.olvidarCatalogo) BPData.olvidarCatalogo(); } catch (e) { /* nada */ }
       if (fotos.length) { await S.sb.schema('portal').from('fotos').delete().eq('aviso_id', saved.id); const rows = fotos.map((f, i) => ({ aviso_id: saved.id, url: f.url, orden: i })); const { error } = await S.sb.schema('portal').from('fotos').insert(rows); if (error) throw error; }
