@@ -4060,3 +4060,33 @@ html.cargando .p-velo{animation:p-velo-tope .35s cubic-bezier(.22,1,.36,1) 1.15s
 }
 @keyframes p-hoja-sube{from{transform:translateY(100%)}to{transform:none}}
 @media(prefers-reduced-motion:reduce){.p-drawer .panel{animation:none !important}}
+/* Portada: "Lo último que entró", después del buscador. En el celular, un riel que se desliza; en la compu,
+   cuatro por fila. La tarjeta es la del catálogo, angular y sin sombra (las reglas viejas de la portada la
+   redondeaban). */
+body.p-home .h-ultimos{min-height:0;padding:clamp(28px,6vw,72px) 0}
+body.p-home .h-ultimos[hidden]{display:none}
+body.p-home .h-ultimos-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px}
+body.p-home .h-ultimos-head .h-h2{margin:0}
+body.p-home .h-ultimos-head .h-link{flex:0 0 auto;padding:12px 0;white-space:nowrap}
+body.p-home .h-ultimos-riel{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding:18px 18px 6px;scroll-padding-left:18px;scrollbar-width:none;overscroll-behavior-x:contain}
+body.p-home .h-ultimos-riel::-webkit-scrollbar{display:none}
+body.p-home .h-ultimos-riel > *{flex:0 0 80vw;max-width:330px;min-width:0;scroll-snap-align:start}
+body.p-home .h-ult-esq{display:block;aspect-ratio:4/5;background:#EEE9DD}
+@media(min-width:900px){
+  body.p-home .h-ultimos-riel{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:22px;overflow:visible;max-width:1180px;margin:0 auto;padding:30px 24px 8px;box-sizing:border-box}
+  body.p-home .h-ultimos-riel > *{max-width:none}
+}
+body.p-home .h-ultimos .prop-card{border-radius:0 !important;box-shadow:none;border:1px solid rgba(42,58,82,.07);background:#fff;color:var(--s-navy)}
+body.p-home .h-ultimos .prop-card .card-img{background:var(--s-navy)}
+body.p-home .h-ultimos .prop-card .card-tag{border-radius:0 !important;font:700 .75rem/1.2 var(--font-body);letter-spacing:.12em;text-transform:uppercase;padding:5px 11px;background:var(--s-navy);color:var(--s-white)}
+body.p-home .h-ultimos .prop-card .card-tag.tag-venta{background:var(--s-gold);color:var(--s-navy)}
+body.p-home .h-ultimos .prop-card .card-address{font-family:var(--font-display);font-weight:400;font-size:1.15rem;color:var(--s-navy);line-height:1.25}
+body.p-home .h-ultimos .prop-card .card-barrio{font:500 .75rem/1 var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:var(--s-gold-dark);margin:6px 0 12px}
+body.p-home .h-ultimos .prop-card .card-meta{font-size:.78rem;color:var(--s-mid);margin-bottom:14px;font-weight:300}
+body.p-home .h-ultimos .prop-card .card-divider{border-top:1px solid rgba(42,58,82,.1);margin-bottom:14px}
+body.p-home .h-ultimos .prop-card .card-footer{flex-wrap:wrap;gap:8px}
+body.p-home .h-ultimos .prop-card .card-price{font-family:var(--font-display);font-size:1.3rem;color:var(--s-navy);font-weight:400}
+body.p-home .h-ultimos .prop-card .card-price small{display:block;font:300 .75rem/1.2 var(--font-body);color:var(--s-mid);margin-top:3px}
+body.p-home .h-ultimos .prop-card .card-cta{border:1px solid rgba(42,58,82,.25);border-radius:0 !important;padding:9px 14px;font:600 .75rem/1 var(--font-body);letter-spacing:.12em;text-transform:uppercase;color:var(--s-navy);background:transparent}
+body.p-home .h-ultimos .prop-card .card-tag{letter-spacing:.06em;padding:5px 9px}
+body.p-home .h-ultimos .prop-card .p-card-pub .p-badge{color:var(--s-navy);border-color:rgba(42,58,82,.22);background:transparent}
