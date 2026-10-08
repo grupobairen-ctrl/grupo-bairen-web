@@ -4302,6 +4302,7 @@ body.p-panel-page .p-int-acc .p-btn{margin:0 6px 6px 0}
 body.p-panel-page .p-mas-menu .peligro{color:#9C3A34}
 /* Panel · el mail de la cuenta se corta antes de la arroba (el <wbr> del riel), no en medio de la palabra ("co / m") */
 body.p-panel-page .p-side-nav .who .txt .q{overflow-wrap:break-word;word-break:normal}
+body.p-panel-page .p-side-nav .who .q .dom{display:inline-block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}
 /* Panel · la fila de compu no corta el precio: el renglón de datos puede ir en dos líneas */
 body.p-panel-page .p-aviso-main .m{white-space:normal;overflow:visible;text-overflow:clip}
 /* Panel · envío en lote de los borradores completos */
