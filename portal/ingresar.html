@@ -27,7 +27,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260925a"><link rel="stylesheet" href="css/catalogo.css?v=20260925a"><link rel="stylesheet" href="css/portal.css?v=20260925a">
+  <link rel="stylesheet" href="css/base.css?v=20261008c"><link rel="stylesheet" href="css/catalogo.css?v=20261008c"><link rel="stylesheet" href="css/portal.css?v=20261008c">
 </head>
 <body class="p-ingresar">
 <div class="p-velo" aria-hidden="true"><span class="w">BAIREN</span></div>
@@ -38,7 +38,9 @@
     <h1 id="ttl">Ingresar</h1>
     <p class="p-sub" id="sub" style="margin-bottom:18px">Favoritos, alertas, tus contactos y, si publicás, tu panel. Sin contraseña: te mandamos un código al mail.</p>
     <form id="stepMail" novalidate><label class="p-sr" for="email" data-i18n="ing_mail">Mail</label><input type="email" name="email" id="email" placeholder="Tu mail" data-i18n-ph="ing_mail_ph" required autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false"><button type="submit" class="p-btn p-btn-fill" style="width:100%" id="btnMail">Continuar</button></form>
-    <form id="stepCode" hidden novalidate><p class="p-note" id="codeMsg" style="margin-bottom:10px" role="status"></p><label class="p-sr" for="code" data-i18n="ing_codigo">Código de ocho dígitos</label><input type="text" name="code" id="code" inputmode="numeric" pattern="[0-9]*" maxlength="8" placeholder="Código de ocho dígitos" data-i18n-ph="ing_codigo" required autocomplete="one-time-code" autocapitalize="off" spellcheck="false"><button type="submit" class="p-btn p-btn-fill" style="width:100%" id="btnCode">Ingresar</button><p class="p-note" style="text-align:center;margin-top:10px"><a href="#" id="again" style="text-decoration:underline">Reenviar código</a> · <a href="#" id="back" style="text-decoration:underline" data-i18n="ing_cambiar_mail">Cambiar mail</a></p></form>
+    <form id="stepCode" hidden novalidate><p class="p-note" id="codeMsg" style="margin-bottom:10px" role="status"></p><label class="p-sr" for="code" data-i18n="ing_codigo">Código de seis dígitos</label><input type="text" name="code" id="code" inputmode="numeric" pattern="[0-9]*" maxlength="8" placeholder="Código de seis dígitos" data-i18n-ph="ing_codigo" required autocomplete="one-time-code" autocapitalize="off" spellcheck="false"><button type="submit" class="p-btn p-btn-fill" style="width:100%" id="btnCode">Ingresar</button><p class="p-note" style="text-align:center;margin-top:10px"><a href="#" id="again" style="text-decoration:underline">Reenviar código</a> · <a href="#" id="back" style="text-decoration:underline" data-i18n="ing_cambiar_mail">Cambiar mail</a></p></form>
+    <!-- 8/10/2026 · Captcha (Cloudflare Turnstile): vacío y oculto mientras PORTAL_CAPTCHA_SITEKEY (supabase-portal.js) esté vacía. Con clave, el widget vive acá, debajo de Continuar y de Reenviar, y solo se ve si Cloudflare pide tocar la casilla. -->
+    <div id="captcha" hidden></div>
     <form id="stepPerfil" hidden novalidate>
       <fieldset class="p-quien" aria-labelledby="ttl">
         <label class="p-quien-op"><input type="radio" name="perfil" value="busca"><i aria-hidden="true">1</i><span class="tx"><b data-i18n="ing_op_busca">Busco propiedad</b><small data-i18n="ing_op_busca_s">Alquilar o comprar. Favoritos, alertas y tus consultas.</small></span></label>
@@ -54,7 +56,7 @@
   </div>
 </div></section>
 <div id="pFooter"></div>
-<script src="supabase-portal.js?v=20260925a" defer></script><script src="js/errores.js?v=20260925a" defer></script><script src="js/motion.js?v=20260925a" defer></script><script src="js/bairen-motion.js?v=20260925a" defer></script><script src="js/i18n-portal.js?v=20260925a" defer></script><script src="js/ui.js?v=20260925a" defer></script><script src="js/store.js?v=20260925a" defer></script><script src="js/data.js?v=20260925a" defer></script>
+<script src="supabase-portal.js?v=20261008c" defer></script><script src="js/errores.js?v=20261008c" defer></script><script src="js/motion.js?v=20261008c" defer></script><script src="js/bairen-motion.js?v=20261008c" defer></script><script src="js/i18n-portal.js?v=20261008c" defer></script><script src="js/ui.js?v=20261008c" defer></script><script src="js/store.js?v=20261008c" defer></script><script src="js/data.js?v=20261008c" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -93,7 +95,7 @@ document.addEventListener('DOMContentLoaded', function(){
   /* 16/9 · Después de elegir el perfil también se va a la landing (decisión de Tomás). El perfil queda guardado y Mi cuenta muestra el riel que corresponde; el profesional define inmobiliaria o desarrolladora cuando toca Publicar. */
   const irA = p => 'index.html';
   const hayQuePreguntar = async () => { if (volver === 'publicar' || volver === 'curacion' || (BPStore.session && BPStore.session.demo) || BPStore.getPerfil()) return false; try { return !(await BPStore.perfilEfectivo()); } catch (e) { return true; } };
-  const mostrarPregunta = () => { document.getElementById('ttl').textContent = BP.t('ing_pregunta', '¿Qué venís a hacer a BAIREN?'); document.getElementById('sub').textContent = BP.t('ing_pregunta_sub', 'Así el panel te muestra lo que te sirve. Lo cambiás cuando quieras.'); const caja = document.querySelector('.p-login'); caja.classList.add('pregunta'); const _paso = () => { fm.hidden = true; fc.hidden = true; document.getElementById('social').hidden = true; document.getElementById('legal').hidden = true; fp.hidden = false; }; if (window.BPM && BPM.cambioDePaso) BPM.cambioDePaso(caja, _paso, 1); else _paso(); const h = document.getElementById('ttl'); h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); };
+  const mostrarPregunta = () => { document.getElementById('ttl').textContent = BP.t('ing_pregunta', '¿Qué venís a hacer a BAIREN?'); document.getElementById('sub').textContent = BP.t('ing_pregunta_sub', 'Así el panel te muestra lo que te sirve. Lo cambiás cuando quieras.'); const caja = document.querySelector('.p-login'); caja.classList.add('pregunta'); const _paso = () => { fm.hidden = true; fc.hidden = true; document.getElementById('captcha').hidden = true; document.getElementById('social').hidden = true; document.getElementById('legal').hidden = true; fp.hidden = false; }; if (window.BPM && BPM.cambioDePaso) BPM.cambioDePaso(caja, _paso, 1); else _paso(); const h = document.getElementById('ttl'); h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); };
   /* La opción elegida lleva la clase .on además de :has(input:checked): el estilo no depende solo de :has() */
   fp.addEventListener('change', () => { fp.querySelectorAll('.p-quien-op').forEach(l => l.classList.toggle('on', !!l.querySelector('input:checked'))); document.getElementById('btnPerfil').disabled = !fp.querySelector('[name=perfil]:checked'); });
   fp.addEventListener('submit', async e => {
@@ -105,14 +107,76 @@ document.addEventListener('DOMContentLoaded', function(){
   });
   if (BPStore.session) { if (await hayQuePreguntar()) { mostrarPregunta(); return; } location.replace(destino()); return; }
   let mail = '';
-  async function send(){ const b = document.getElementById('btnMail'); if (b.disabled) return; if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.value.trim())) { BP.errorCampo('email', BP.t('ing_err_mail', 'Revisá el mail, por ejemplo nombre@dominio.com.')); return; } b.disabled = true; b.textContent = BP.t('ing_enviando', 'Enviando…'); await BPStore.init(); let r; try { r = await BPStore.sendCode(email.value); } catch (err) { r = { ok: false, msg: BPStore.errorHumano(err, 'enviar') }; } b.disabled = false; b.textContent = T.continuar; if (!r.ok) { BP.errorCampo('email', r.msg); return; } mail = email.value.trim().toLowerCase(); document.getElementById('codeMsg').textContent = r.msg; const _paso = () => { fm.hidden = true; document.getElementById('social').hidden = true; fc.hidden = false; }; if (window.BPM && BPM.cambioDePaso) BPM.cambioDePaso(document.querySelector('.p-login'), _paso, 1); else _paso(); const c = document.getElementById('code'); c.value = ''; c.focus(); }
+  /* 8/10/2026 · Captcha del pedido de código (Cloudflare Turnstile). Solo con clave en PORTAL_CAPTCHA_SITEKEY
+     (supabase-portal.js) y con la base conectada; sin clave no se carga nada de Cloudflare y todo sigue como antes.
+     El widget es "interaction-only": casi nadie lo ve, aparece debajo del botón solo si Cloudflare necesita que la
+     persona toque la casilla. El token se consigue mientras se escribe el mail y "Continuar" lo espera si todavía no
+     llegó. Cada token sirve una vez: después de cada pedido se reinicia y el reenvío usa uno nuevo. Google no pasa por acá. */
+  const CAPTCHA_ERR = () => BP.t('ing_err_captcha', 'No pudimos verificar que sos una persona. Probá de nuevo.');
+  const captcha = (() => {
+    const key = String(window.PORTAL_CAPTCHA_SITEKEY || '').trim();
+    if (!key || mode !== 'supabase') return null;
+    const caja = document.getElementById('captcha');
+    let wid = null, token = '', fallo = false, interactivo = false, carga = null, esperan = [];
+    const despertar = () => { const l = esperan; esperan = []; l.forEach(f => f()); };
+    const cargar = () => carga || (carga = new Promise((res, rej) => {
+      if (window.turnstile) return res();
+      const s = document.createElement('script'); s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'; s.async = true;
+      s.onload = () => window.turnstile ? res() : rej(new Error('turnstile'));
+      s.onerror = () => { carga = null; s.remove(); rej(new Error('turnstile')); };
+      document.head.appendChild(s);
+    }));
+    const dibujar = () => cargar().then(() => {
+      if (wid != null) return;
+      caja.hidden = false;
+      wid = window.turnstile.render(caja, {
+        sitekey: key, appearance: 'interaction-only', size: 'flexible', theme: 'dark', language: ({ en: 'en', pt: 'pt-br' })[BP.lang] || 'es',
+        callback: t => { token = t; fallo = false; despertar(); },
+        'expired-callback': () => { token = ''; },   /* vence a los 5 minutos; Turnstile pide otro solo */
+        'timeout-callback': () => { token = ''; fallo = true; despertar(); },
+        'error-callback': () => { token = ''; fallo = true; despertar(); },
+        'before-interactive-callback': () => { interactivo = true; caja.style.margin = '12px 0 4px'; },
+        'after-interactive-callback': () => { interactivo = false; caja.style.margin = ''; }
+      });
+    }).catch(() => { fallo = true; despertar(); });
+    const reiniciar = () => { token = ''; if (wid != null) { try { window.turnstile.reset(wid); } catch (e) { /* nada */ } } else dibujar(); };
+    dibujar();
+    return {
+      listo: () => !!token,
+      /* El token del próximo pedido: el que ya está o el que llegue. '' si falló, si la casilla quedó sin tocar o si
+         pasan 30 segundos sin token y sin casilla a la vista. */
+      token: () => new Promise(res => {
+        if (token) return res(token);
+        if (fallo) { fallo = false; reiniciar(); }
+        const t0 = Date.now();
+        const fin = () => { clearInterval(iv); res(token); };
+        const iv = setInterval(() => { if (!interactivo && Date.now() - t0 > 30000) { esperan = esperan.filter(f => f !== fin); fin(); } }, 500);
+        esperan.push(fin);
+      }),
+      usado: reiniciar   /* después de cada pedido: el token ya se gastó (o Supabase lo rechazó) */
+    };
+  })();
+  async function send(){ const b = document.getElementById('btnMail'); if (b.disabled) return; if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.value.trim())) { BP.errorCampo('email', BP.t('ing_err_mail', 'Revisá el mail, por ejemplo nombre@dominio.com.')); return; }
+    /* En un reenvío el formulario del mail está oculto: el error va debajo del código, que es lo que se ve */
+    const errorEnvio = msg => BP.errorCampo(fc.hidden ? 'email' : 'code', msg);
+    b.disabled = true; b.textContent = BP.t('ing_enviando', 'Enviando…'); await BPStore.init();
+    let captchaToken = '';
+    if (captcha) {
+      if (!captcha.listo()) b.textContent = BP.t('ing_verificando', 'Verificando…');
+      captchaToken = await captcha.token();
+      if (!captchaToken) { b.disabled = false; b.textContent = T.continuar; errorEnvio(CAPTCHA_ERR()); return; }
+      b.textContent = BP.t('ing_enviando', 'Enviando…');
+    }
+    let r; try { r = await BPStore.sendCode(email.value, captchaToken ? { captchaToken } : undefined); } catch (err) { r = { ok: false, msg: BPStore.errorHumano(err, 'enviar') }; }
+    if (captchaToken) captcha.usado();
+    b.disabled = false; b.textContent = T.continuar; if (!r.ok) { errorEnvio(r.msg); return; } mail = email.value.trim().toLowerCase(); document.getElementById('codeMsg').textContent = r.msg; const _paso = () => { fm.hidden = true; document.getElementById('social').hidden = true; fc.hidden = false; }; if (window.BPM && BPM.cambioDePaso) BPM.cambioDePaso(document.querySelector('.p-login'), _paso, 1); else _paso(); const c = document.getElementById('code'); c.value = ''; c.focus(); }
   fm.addEventListener('submit', e => { e.preventDefault(); send(); });
   let reenviando = false;
   document.getElementById('again').addEventListener('click', e => { e.preventDefault(); const ag = e.currentTarget; if (reenviando) return; reenviando = true; ag.setAttribute('aria-disabled', 'true'); send(); const t0 = ag.textContent; let seg = 30; const cuenta = n => BP.tf('ing_reenviar_en', 'Reenviar en {s} s', { s: n }); ag.textContent = cuenta(30); const iv = setInterval(() => { seg--; if (seg <= 0) { clearInterval(iv); reenviando = false; ag.textContent = t0; ag.removeAttribute('aria-disabled'); } else ag.textContent = cuenta(seg); }, 1000); });
   document.getElementById('back').addEventListener('click', e => { e.preventDefault(); const volver = () => { fc.hidden = true; fm.hidden = false; document.getElementById('social').hidden = false; }; if (window.BPM && BPM.cambioDePaso) BPM.cambioDePaso(document.querySelector('.p-login'), volver, -1); else volver(); });
   fc.addEventListener('submit', async e => {
     e.preventDefault(); const code = document.getElementById('code'), b = document.getElementById('btnCode');
-    if (!/^\d{6,8}$/.test(code.value.trim())) { BP.errorCampo('code', BP.t('ing_err_codigo', 'El código tiene ocho dígitos.')); return; }
+    if (!/^\d{6,8}$/.test(code.value.trim())) { BP.errorCampo('code', BP.t('ing_err_codigo', 'El código tiene seis dígitos.')); return; }
     b.disabled = true; b.textContent = BP.t('ing_verificando', 'Verificando…');
     let r; try { r = await BPStore.verifyCode(mail, code.value); } catch (err) { r = { ok: false, msg: BPStore.errorHumano(err, 'verificar') }; }
     if (!r.ok) { b.disabled = false; b.textContent = T.ingresar; BP.errorCampo('code', r.msg); code.select(); return; }

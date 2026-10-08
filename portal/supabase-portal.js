@@ -23,6 +23,15 @@
 const PORTAL_SUPABASE_URL = 'https://jdatlsrujgfmvyuhoffg.supabase.co';
 const PORTAL_SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkYXRsc3J1amdmbXZ5dWhvZmZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NzcyNTYsImV4cCI6MjA5NDQ1MzI1Nn0.g9B1EoHkVeAcDJ2KNuMjwMW2_5Y6Xk2IlWjdQRrob2o';
 
+/* 8/10/2026 · Captcha del ingreso por mail (Cloudflare Turnstile). Vacía = apagado: ingresar.html no carga
+   ningún script de Cloudflare ni muestra nada, y el código se pide como siempre.
+   La "Site key" sale de Cloudflare → Turnstile → Add site (modo Managed; dominios portal.bairengroup.com y el
+   .vercel.app del proyecto). Es pública, puede ir acá. La "Secret key" NO va acá: va en Supabase → Authentication →
+   Attack Protection → Captcha, proveedor Turnstile. Orden para prenderlo: portal/README.md, sección Captcha
+   (primero esta clave publicada, después el captcha en Supabase; al revés nadie puede entrar por mail). */
+const PORTAL_CAPTCHA_SITEKEY = '';
+window.PORTAL_CAPTCHA_SITEKEY = PORTAL_CAPTCHA_SITEKEY;
+
 window.bairenReady = new Promise((resolve, reject) => {
   if (!PORTAL_SUPABASE_URL || !PORTAL_SUPABASE_KEY) {
     reject(new Error('portal sin proyecto configurado'));

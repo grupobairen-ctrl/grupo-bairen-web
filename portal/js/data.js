@@ -29,7 +29,10 @@
       desc_en:'Sample lister: an owner showing their own unit, with title verified by BAIREN.', desc_pt:'Anunciante de exemplo: um proprietário que mostra sua própria unidade, com titularidade verificada pela BAIREN.' },
   };
   D.titulares = {};
-  D.pub = id => D.PUBLICADORES[id] || D.PUBLICADORES['bairen'];
+  /* 8/10/2026 · Un id que no está en la lista caía en 'bairen': el aviso de un publicador nuevo salía
+     firmado por BAIREN REALTY. Ahora devuelve un publicador vacío, sin nombre ni sello, y D.load no
+     muestra avisos de publicadores desconocidos (ver más abajo). */
+  D.pub = id => D.PUBLICADORES[id] || { id: '', nombre: '', tipo: '', verificado: false, inicial: '', desde: '', zonas: [], desc: '' };
   /* Descripción y nombre del publicador en el idioma de la interfaz, si los tiene; si no, el castellano.
      El nombre 'Dueño directo' del ejemplo se traduce como dato fijo. */
   D.pubDesc = pub => (BP.lang !== 'es' && pub['desc_' + BP.lang]) || pub.desc || '';
@@ -97,9 +100,12 @@
 
   /* aviso del esquema portal (o del modo local) → modelo del portal */
   D.fromStore = async function(r){
-    const pub = r.publicador || null; const pubId = pub ? (pub.slug || pub.id) : 'bairen';
+    /* 8/10/2026 · Sin publicador (no vino en la consulta, o la base no lo deja ver) el aviso caía en 'bairen'
+       y se mostraba como de BAIREN REALTY. Ahora queda sin publicador y D.load no lo muestra. La insignia
+       por defecto ("Corredor inmobiliario matriculado") se pone sólo si el publicador está verificado. */
+    const pub = r.publicador || null; const pubId = pub ? (pub.slug || pub.id || null) : null;
     const T = (pub && D.titulares[pub.id]) || null;   /* titular con matrícula, de la vista publicador_publico */
-    if (pub && !D.PUBLICADORES[pubId]) D.PUBLICADORES[pubId] = Object.assign({ storeId: pub.id, id: pubId, inicial: (pub.nombre||'P').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(), desde: (pub.created_at||'').slice(0,4) || '2026', zonas: pub.zonas || [], desc: pub.descripcion || '', responsable: pub.responsable || pub.nombre, badge: pub.badge || (pub.tipo === 'dueno' ? 'Dueño verificado' : 'Corredor inmobiliario matriculado') }, pub, { id: pubId }, T && T.titular_nombre ? { responsable: T.titular_nombre, matricula: T.titular_matricula ? ((T.titular_colegio || 'CUCICBA') + ' ' + T.titular_matricula) : pub.matricula } : {});
+    if (pub && !D.PUBLICADORES[pubId]) D.PUBLICADORES[pubId] = Object.assign({ storeId: pub.id, id: pubId, inicial: (pub.nombre||'P').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(), desde: (pub.created_at||'').slice(0,4) || '2026', zonas: pub.zonas || [], desc: pub.descripcion || '', responsable: pub.responsable || pub.nombre, badge: pub.badge || (!pub.verificado ? null : pub.tipo === 'dueno' ? 'Dueño verificado' : 'Corredor inmobiliario matriculado') }, pub, { id: pubId, zonas: pub.zonas || [] }, T && T.titular_nombre ? { responsable: T.titular_nombre, matricula: T.titular_matricula ? ((T.titular_colegio || 'CUCICBA') + ' ' + T.titular_matricula) : pub.matricula } : {});
     /* Sin repetidas (D.fotosUnicas): la tabla portal.fotos puede traer el mismo archivo varias veces */
     const fotos = []; for (const url of D.fotosUnicas((r.fotos||[]).slice().sort((a,b)=>(a.orden||0)-(b.orden||0)).map(f => f.url))) { const u = window.BPStore ? await window.BPStore.resolveFoto(url) : url; if (u) fotos.push(u); }
     const amb = r.ambientes || null;
@@ -107,46 +113,72 @@
       precio: r.precio == null ? null : Number(r.precio), moneda: r.moneda || 'USD', periodo: r.operacion === 'venta' ? '' : '/mes', expensas: r.expensas == null ? null : Number(r.expensas),
       m2: r.m2_total || null, m2cub: r.m2_cubierto || null, amb, dorm: r.dormitorios || null, banos: r.banos || null, cocheras: r.cocheras || 0, antiguedad: r.antiguedad == null ? null : Number(r.antiguedad),
       amoblado: !!r.amoblado, amenities: r.amenities || [], caracteristicas: r.caracteristicas || [], cualidades: r.cualidades_verificadas || [], fotos, video: r.video_url ? { tipo: r.video_tipo || 'youtube', url: r.video_url } : null,
-      descripcion: D.sinLineaCorredor(r.descripcion), descripcion_en: D.sinLineaCorredor(r.descripcion_en), descripcion_pt: D.sinLineaCorredor(r.descripcion_pt), plazo: r.plazo || '', emprendimiento: r.emprendimiento || null, etapa: r.etapa || null, entrega: r.entrega || null, propietarioEmail: r.propietario_email || null, publicadoEn: r.publicado_en || r.created_at, estado: r.estado, reservado: r.estado === 'reservado', publicadorId: pubId, destacado: !!(r.destacado_hasta && new Date(r.destacado_hasta) > new Date()), demo: false, codigo: r.codigo, apto: r.caracteristicas && r.caracteristicas.length ? r.caracteristicas.slice(0,3) : [], fromStore: true };
+      descripcion: D.sinLineaCorredor(r.descripcion), descripcion_en: D.sinLineaCorredor(r.descripcion_en), descripcion_pt: D.sinLineaCorredor(r.descripcion_pt), plazo: r.plazo || '', emprendimiento: r.emprendimiento || null, etapa: r.etapa || null, entrega: r.entrega || null, propietarioEmail: r.propietario_email || null, publicadoEn: r.publicado_en || r.created_at, estado: r.estado, reservado: r.estado === 'reservado', publicadorId: pubId, destacado: !!(r.destacado_hasta && new Date(r.destacado_hasta) > new Date()), demo: false, codigo: r.codigo, apto: r.caracteristicas && r.caracteristicas.length ? r.caracteristicas.slice(0,3) : [], fromStore: true,
+      /* 8/10/2026 · Tanda 2: cómo se muestra la calle ('exacta' | 'aproximada'; sin el dato, aproximada), el mapa
+         (lat/lng, si la consulta las trae) y desde cuándo se puede entrar (a.disponible_desde, si la base ya tiene la
+         columna; store.js la pide sólo cuando existe) */
+      mostrarDir: r.mostrar_direccion || null, lat: r.lat == null ? null : Number(r.lat), lng: r.lng == null ? null : Number(r.lng), disponible_desde: r.disponible_desde || null };
   };
 
+  /* 8/10/2026 · Cómo se piden los datos.
+     · Con la base andando, el catálogo sale solo de Supabase (BPStore.publishedAvisos: las columnas de la lista, por
+       tramos hasta tenerlo entero). data/avisos-src.json ya no se baja: queda como respaldo si la base no responde.
+       Antes se bajaba siempre (183 KB en cada página) para sumar unidades de la web que el portal todavía no tenía;
+       eso hoy lo hace la sincronización del cron cada 15 minutos.
+     · Lo que llegó de la base se guarda en sessionStorage por CACHE_MS: en la misma visita, pasar de la portada a
+       la búsqueda o volver de una ficha no vuelve a pedir el catálogo. Si no entra (cuota) o el navegador no deja,
+       sigue sin caché. BPData.olvidarCatalogo() la borra (por ejemplo, después de publicar).
+     · La ficha no usa esto: D.loadFicha pide un solo aviso y sus similares. */
   let cache = null;
+  const CACHE_CLAVE = 'bp_catalogo_v1', CACHE_MS = 5 * 60 * 1000;
+  const cacheLeer = () => { try { const c = JSON.parse(sessionStorage.getItem(CACHE_CLAVE)); if (c && Array.isArray(c.recs) && Date.now() - c.t >= 0 && Date.now() - c.t < CACHE_MS) return c; } catch (e) { /* sin sessionStorage */ } return null; };
+  const cacheGuardar = c => { try { sessionStorage.setItem(CACHE_CLAVE, JSON.stringify(Object.assign({ t: Date.now() }, c))); } catch (e) { try { sessionStorage.removeItem(CACHE_CLAVE); } catch (_) { /* nada */ } } };
+  D.olvidarCatalogo = () => { cache = null; try { sessionStorage.removeItem(CACHE_CLAVE); } catch (e) { /* nada */ } };
+  /* Los avisos de la base y sus titulares: de la caché de la visita o de Supabase. Lanza si la base falla. */
+  async function catalogoDeLaBase(){
+    const c = cacheLeer(); if (c) return c;
+    const recs = await window.BPStore.publishedAvisos();
+    /* Quién responde por cada publicador: la persona titular y su matrícula (migración 01). Solo los publicadores
+       del catálogo. Si la vista no existe todavía, se sigue con lo que trae la fila del publicador. */
+    let tit = []; try { tit = await window.BPStore.titularesDe(recs.map(r => r.publicador_id)); } catch (e) { /* sin migración */ }
+    const nuevo = { recs, tit }; cacheGuardar(nuevo); return nuevo;
+  }
   D.load = async function(){
     if (cache) return cache;
 
-    /* Supabase es la fuente de las unidades publicadas. El JSON local es el respaldo
-       de cuando el esquema `portal` todavía no existía: si Supabase responde con
-       avisos, no se lee, porque si no cada unidad aparecería dos veces. */
-    let publicados = [];
+    let publicados = [], conBase = false;
     try {
       if (window.BPStore) {
         await window.BPStore.init();
-        const recs = await window.BPStore.publishedAvisos();
-        /* Quién responde por cada publicador: la persona titular y su matrícula (migración 01).
-           Si la vista no existe todavía, se sigue con lo que trae la fila del publicador. */
-        try { if (window.BPStore.sb) { const { data: tit } = await window.BPStore.sb.schema('portal').from('publicador_publico').select('id,titular_nombre,titular_colegio,titular_matricula,titular_matricula_verificada'); (tit || []).forEach(t => { D.titulares[t.id] = t; }); } } catch (e) { /* sin migración */ }
-        for (const r of recs) publicados.push(await D.fromStore(r));
+        if (window.BPStore.mode === 'supabase') {
+          const { recs, tit } = await catalogoDeLaBase();
+          (tit || []).forEach(t => { D.titulares[t.id] = t; });
+          for (const r of recs) publicados.push(await D.fromStore(r));
+          conBase = true;
+        } else {
+          for (const r of await window.BPStore.publishedAvisos()) publicados.push(await D.fromStore(r));   /* modo local: lo cargado en este navegador */
+        }
       }
     } catch (e) { console.warn('store', e); }
 
-    /* Sin Supabase, el JSON es la fuente. Con Supabase, del JSON entran sólo las
-       unidades que la web cargó después del último seed (JSON_DESDE) y que el
-       portal todavía no tiene: así los lofts del Palacio Alcorta se ven aunque no
-       haya corrido seed-avisos-2026-09-10.sql. Al correr un seed nuevo, subir la
-       fecha. Nunca se duplica una unidad que el portal ya publica. */
-    const JSON_DESDE = '2026-09-03T18:22:31Z';
-    const ya = new Set(publicados.map(a => a.slug + '|' + a.op));
-    const soloNuevas = publicados.length > 0;
-    try {
-      const src = new URL('data/avisos-src.json', document.baseURI).href;
-      const res = await fetch(src); const units = await res.json();
-      units.forEach(p => {
-        if (soloNuevas && !(p.created_at > JSON_DESDE)) return;
-        if (p.precio_venta && !ya.has(p.slug + '|venta')) publicados.push(fromUnit(p, 'venta', Number(p.precio_venta)));
-        if (p.precio_tradicional && !ya.has(p.slug + '|alquiler')) publicados.push(fromUnit(p, 'alquiler', Number(p.precio_tradicional)));
-        if (p.precio_temporal && !ya.has(p.slug + '|mediano')) publicados.push(fromUnit(p, 'mediano', Number(p.precio_temporal)));
-      });
-    } catch (e) { if (!publicados.length) throw e; console.warn('avisos-src.json', e); }
+    /* Sin base (modo local, o Supabase no respondió), el JSON es la fuente. En modo local con avisos cargados en este
+       navegador, del JSON entran solo las unidades posteriores al último seed (JSON_DESDE), como siempre. Nunca se
+       duplica una unidad que ya está. Con la base andando no se pide. */
+    if (!conBase) {
+      const JSON_DESDE = '2026-09-03T18:22:31Z';
+      const ya = new Set(publicados.map(a => a.slug + '|' + a.op));
+      const soloNuevas = publicados.length > 0;
+      try {
+        const src = new URL('data/avisos-src.json', document.baseURI).href;
+        const res = await fetch(src); const units = await res.json();
+        units.forEach(p => {
+          if (soloNuevas && !(p.created_at > JSON_DESDE)) return;
+          if (p.precio_venta && !ya.has(p.slug + '|venta')) publicados.push(fromUnit(p, 'venta', Number(p.precio_venta)));
+          if (p.precio_tradicional && !ya.has(p.slug + '|alquiler')) publicados.push(fromUnit(p, 'alquiler', Number(p.precio_tradicional)));
+          if (p.precio_temporal && !ya.has(p.slug + '|mediano')) publicados.push(fromUnit(p, 'mediano', Number(p.precio_temporal)));
+        });
+      } catch (e) { if (!publicados.length) throw e; console.warn('avisos-src.json', e); }
+    }
 
     /* El nicho es el filtro: lo que cae fuera de BP.ZONAS no se publica (hoy, Centro
        y Almagro). zonaDe() vive en mapa-barrios.js y sabe que Palermo Hollywood es
@@ -155,6 +187,8 @@
     if (window.BairenZonas) {
       publicados = publicados.filter(a => BP.ZONAS.indexOf(a.zona) > -1);
     }
+    /* 8/10/2026 · Si no se puede saber quién publica, el aviso no se muestra: nunca se firma con otro nombre */
+    publicados = publicados.filter(a => a.publicadorId && D.PUBLICADORES[a.publicadorId]);
 
     // "Seleccionadas de la semana": las 6 con más fotos y disponibles
     publicados.filter(a=>!a.reservado).sort((a,b)=>b.fotos.length-a.fotos.length).slice(0,6).forEach(a=>a.destacado=true);
@@ -166,6 +200,35 @@
     const pubs = conEjemplos ? D.PUBLICADORES : Object.fromEntries(Object.entries(D.PUBLICADORES).filter(([, p]) => !p.demo));
     cache = { avisos: all, publicadores: pubs };
     return cache;
+  };
+
+  /* 8/10/2026 · La ficha pide lo suyo y nada más: el aviso (con fotos y publicador) en un pedido; después, en
+     paralelo, hasta 6 similares (misma operación y zona, con la portada sola) y el titular de su publicador.
+     Antes bajaba el catálogo entero, con las descripciones en tres idiomas de todos los avisos, para mostrar uno.
+     Devuelve { aviso, similares } con el modelo del portal; aviso null si no está publicado o cae fuera de las zonas.
+     Sin base (modo local) o si la base falla, cae al catálogo de siempre (D.load) y busca ahí. */
+  D.loadFicha = async function(ref){
+    ref = String(ref || '');
+    const S = window.BPStore;
+    const enZona = a => !window.BairenZonas || BP.ZONAS.indexOf(a.zona) > -1;   /* mismo nicho que D.load */
+    try {
+      if (S) {
+        await S.init();
+        if (S.mode === 'supabase') {
+          const r = await S.avisoPublicado(ref);
+          if (!r) return { aviso: null, similares: [] };
+          const [sims, tit] = await Promise.all([S.similaresDe(r, 6), S.titularesDe([r.publicador_id]).catch(() => [])]);
+          tit.forEach(t => { D.titulares[t.id] = t; });
+          const aviso = await D.fromStore(r);
+          if (!enZona(aviso)) return { aviso: null, similares: [] };
+          const similares = []; for (const s of sims) { const x = await D.fromStore(s); if (enZona(x)) similares.push(x); }
+          return { aviso, similares };
+        }
+      }
+    } catch (e) { console.warn('ficha: la base no respondió, se busca en el respaldo', e); }
+    const { avisos } = await D.load();
+    const aviso = avisos.find(x => x.id === ref) || avisos.find(x => x.slug === ref) || null;
+    return { aviso, similares: aviso ? avisos.filter(x => x.id !== aviso.id && x.op === aviso.op && (x.zona === aviso.zona || x.barrio === aviso.barrio)) : [] };
   };
 
   /* Todo lo visible de una tarjeta pasa por BP.t(clave, castellano): en es no cambia nada.
@@ -181,24 +244,74 @@
     a.banos ? a.banos + ' ' + (a.banos === 1 ? BP.t('card_bano', 'baño') : BP.t('card_banos', 'baños')) : null,
     a.cocheras ? a.cocheras + ' ' + (a.cocheras === 1 ? BP.t('card_coch_1', 'coch.') : BP.t('card_coch_n', 'coch.')) : null,
   ].filter(Boolean).join(' · ');
-  D.opTag = a => a.op === 'venta' ? BP.t('card_venta', 'Venta') : a.op === 'mediano' ? BP.t('card_alq_mediano', 'Alquiler, mediano plazo') : BP.t('card_alq_largo', 'Alquiler, largo plazo');
+  /* 8/10/2026 · Etiquetas de operación, cortas (contrato de la tanda 2): "Venta", "Tradicional" y "Mediano plazo".
+     En la base no cambia nada: 'venta' | 'alquiler' | 'mediano'. La tarjeta dice "Reservada" en su lugar si lo está. */
+  D.opTag = a => a.op === 'venta' ? BP.t('card_venta', 'Venta') : a.op === 'mediano' ? BP.t('card_alq_mediano', 'Mediano plazo') : BP.t('card_alq_largo', 'Tradicional');
+  /* La calle: con mostrar_direccion 'exacta', tal cual ("Peña 2528"); si no (aproximada o sin el dato), sin la altura
+     ("Peña"). Sólo se saca un número al final ("Av. 9 de Julio" queda entera). Nunca la unidad. */
+  D.calle = a => { const d = String((a && a.dir) || '').trim(); if (!d || a.mostrarDir === 'exacta') return d; return d.replace(/\s+(?:al\s+)?\d+(?:\s*bis)?\s*$/i, '').trim() || d; };
+  /* La altura redondeada a la cuadra, para el mapa de una dirección aproximada ("Peña 2500") */
+  D.cuadra = a => { const d = String((a && a.dir) || '').trim(); const m = d.match(/^(.*?\S)\s+(?:al\s+)?(\d+)(?:\s*bis)?\s*$/i); return m ? m[1] + ' ' + Math.floor(Number(m[2]) / 100) * 100 : d; };
+  /* Título humano: "Monoambiente en Recoleta", "2 ambientes en Palermo Soho"; sin ambientes, el tipo ("Casa en San Isidro") */
+  D.titulo = a => {
+    const b = a.barrio || BP.zonaLabel(a.zona || '') || '';
+    const que = a.amb === 1 ? BP.t('tit_mono', 'Monoambiente') : a.amb > 1 ? BP.tf('tit_amb', '{n} ambientes', { n: a.amb }) : BP.etiqueta(a.tipoProp || 'Departamento');
+    return b ? BP.tf('tit_en', '{q} en {b}', { q: que, b }) : que;
+  };
+  /* Lo que se nombra del aviso fuera de la ficha (alt de la foto, WhatsApp, compartir): el título humano y la calle */
+  D.nombre = a => [D.titulo(a), D.calle(a)].filter(Boolean).join(', ');
+  /* Datos de la tarjeta en una línea: superficie, baños y cocheras (los ambientes ya están en el título) */
+  D.metaCorta = a => [
+    a.m2 ? a.m2 + ' m²' : null,
+    a.banos ? a.banos + ' ' + (a.banos === 1 ? BP.t('card_bano', 'baño') : BP.t('card_banos', 'baños')) : null,
+    a.cocheras ? a.cocheras + ' ' + (a.cocheras === 1 ? BP.t('card_coch_1', 'coch.') : BP.t('card_coch_n', 'coch.')) : null,
+  ].filter(Boolean).join(' · ');
+  /* Precio corto: "USD 1.200 /mes", "$ 850.000 /mes", "USD 295.000" */
+  D.precioCorto = a => a.precio ? `${BP.fmtPrecio(a.precio, a.moneda)}${a.periodo ? ' <small>' + BP.t('ui_por_mes', '/mes') + '</small>' : ''}` : BP.t('card_consultar_precio', 'Consultar precio');
+  /* "Disponible desde 14 nov": sólo si el aviso trae disponible_desde y es una fecha futura. La fecha es un día (date),
+     se lee como día local y no como medianoche UTC (que en Buenos Aires es el día anterior). */
+  const MESES = { es: ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'], en: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'], pt: ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'] };
+  D.disponibleDesde = a => {
+    const m = String((a && a.disponible_desde) || '').match(/^(\d{4})-(\d{2})-(\d{2})/); if (!m) return '';
+    const f = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])); const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+    if (!(f > hoy)) return '';
+    const mes = (MESES[BP.lang] || MESES.es)[f.getMonth()];
+    const fecha = (BP.lang === 'en' ? mes + ' ' + f.getDate() : f.getDate() + ' ' + mes) + (f.getFullYear() !== hoy.getFullYear() ? ' ' + f.getFullYear() : '');
+    return BP.tf('disp_desde', 'Disponible desde {f}', { f: fecha });
+  };
+  /* Quién publica, en una línea de texto: "BAIREN Realty · Gestor de alquileres". El ✓ chico, sólo si está verificado.
+     Un nombre todo en mayúsculas se muestra con mayúscula inicial (BAIREN y las siglas de hasta tres letras quedan). */
+  D.nombreVisible = n => { n = String(n || ''); return /[a-záéíóúñ]/.test(n) || n.trim().split(/\s+/).length < 2 ? n : n.trim().split(/\s+/).map(w => w === 'BAIREN' || w.length <= 3 ? w : w.charAt(0) + w.slice(1).toLowerCase()).join(' '); };
+  D.pubRol = pub => !pub ? '' : pub.tipo === 'dueno' ? (pub.verificado ? BP.etiqueta(pub.badge || 'Dueño verificado') : BP.t('ui_dato_dueno_directo', 'Dueño directo'))
+    : !pub.verificado ? '' : BP.etiqueta(pub.badge || ({ gestor: 'Gestor de alquileres', desarrolladora: 'Desarrolladora', profesional: 'Inmobiliaria' })[pub.tipo] || '');
+  D.pubLinea = pub => {
+    if (!pub || !pub.nombre) return '';
+    const nombre = D.nombreVisible(D.pubNombre(pub)), rol = D.pubRol(pub);
+    const check = pub.verificado ? `<span class="p-verif" role="img" aria-label="${BP.esc(BP.t('pub_verificado', 'verificado'))}">${BP.ico.check}</span>` : '';
+    return `<b>${BP.esc(nombre)}</b>${check}${rol && rol !== nombre ? ' · ' + BP.esc(rol) : ''}`;
+  };
+  /* La operación del aviso como filtro del catálogo: el alquiler tradicional es 'largo' ('alquiler' abarca los dos plazos) */
+  D.opFiltro = a => a.op === 'alquiler' ? 'largo' : a.op;
   /* Operación como filtro (decisión de Tomás, 10/9/2026): "alquiler" abarca mediano y largo
      plazo; "largo" es sólo largo (los avisos de largo plazo llevan op 'alquiler'). */
   D.opMatch = (a, op) => !op || (op === 'alquiler' ? a.op !== 'venta' : op === 'largo' ? a.op === 'alquiler' : a.op === op);
-  D.precioHTML = a => a.precio ? `${BP.fmtUSD(a.precio)}${a.periodo ? '<small>' + BP.t('ui_por_mes', a.periodo) + '</small>' : ''}` : BP.t('card_consultar_precio', 'Consultar precio');
+  /* 8/10/2026 · Con su moneda y "por mes" en palabras: "USD 1.100 por mes", "$ 850.000 por mes" */
+  D.precioHTML = a => a.precio ? `${BP.fmtPrecio(a.precio, a.moneda)}${a.periodo ? ' <small>' + BP.t('card_por_mes', 'por mes') + '</small>' : ''}` : BP.t('card_consultar_precio', 'Consultar precio');
   /* La insignia es un dato del publicador ('Dueño verificado', 'Corredor inmobiliario matriculado'…): se traduce como etiqueta fija; 'Selección BAIREN' es nombre propio y queda */
   /* 22/9/2026 · El sello del dueño se pinta SOLO si la titularidad está verificada de verdad.
      Antes se pintaba "Dueño verificado" con escudo por el mero hecho de ser tipo 'dueno', sin
      mirar el flag: el sello, que es la promesa del portal, no lo respaldaba nada. Sin verificar
      se dice "Dueño directo", sin escudo, que es cierto y no promete lo que no se controló. */
-  D.badgeHTML = pub => !pub.matricula && pub.tipo !== 'dueno' ? `<span class="p-badge">${BP.ico.check} ${BP.esc(BP.etiqueta(pub.badge || 'Selección BAIREN'))}</span>`
+  /* 8/10/2026 · Publicador sin verificar: su nombre, sin sello. El dueño sin verificar sigue diciendo "Dueño directo". */
+  D.badgeHTML = pub => !pub || !pub.verificado ? (pub && pub.tipo === 'dueno' ? `<span class="p-badge dueno">${BP.esc(BP.t('ui_dato_dueno_directo', 'Dueño directo'))}</span>` : '')
+    : !pub.matricula && pub.tipo !== 'dueno' ? `<span class="p-badge">${BP.ico.check} ${BP.esc(BP.etiqueta(pub.badge || ({ gestor: 'Gestor de alquileres', desarrolladora: 'Desarrolladora', profesional: 'Inmobiliaria' })[pub.tipo] || 'Verificado'))}</span>`
     : pub.tipo === 'dueno'
     ? (pub.verificado
         ? `<span class="p-badge dueno">${BP.ico.shield} ${BP.esc(BP.etiqueta(pub.badge || 'Dueño verificado'))}</span>`
         : `<span class="p-badge dueno">${BP.esc(BP.t('ui_dato_dueno_directo', 'Dueño directo'))}</span>`)
     : pub.tipo === 'desarrolladora' ? `<span class="p-badge dueno">${BP.ico.building} ${BP.t('ui_dato_venta_directa', 'Venta directa')}</span>`
     : `<span class="p-badge">${BP.ico.shield} ${BP.esc(pub.matricula || '')}</span>`;
-  D.waLink = (a, pub) => pub.whatsapp ? 'https://wa.me/' + pub.whatsapp + '?text=' + encodeURIComponent(BP.tf('card_wa_msg', 'Hola, vi {t} ({c}) en BAIREN y quiero más información.', { t: a.titulo, c: a.codigo })) : null;
+  D.waLink = (a, pub) => pub.whatsapp ? 'https://wa.me/' + pub.whatsapp + '?text=' + encodeURIComponent(BP.tf('card_wa_msg', 'Hola, vi {t} ({c}) en BAIREN y quiero más información.', { t: D.nombre(a), c: a.codigo })) : null;
   D.sinContacto = pub => !pub.whatsapp && !pub.email;
 
   D.cardH = function(a){
@@ -219,7 +332,7 @@
     <div class="p-barrio">${[lugar, a.ciudad].filter(Boolean).map(BP.esc).join(', ')}</div>
     <p class="p-desc">${BP.esc(a.descripcion).slice(0, 220)}</p>
     <div class="p-card-foot">
-      <div class="p-publine">${BP.t('card_publica', 'Publica')} <b>${BP.esc(D.pubNombre(pub))}</b> ${D.badgeHTML(pub)}</div>
+      ${pub.nombre ? `<div class="p-publine">${BP.t('card_publica', 'Publica')} <b>${BP.esc(D.pubNombre(pub))}</b> ${D.badgeHTML(pub)}</div>` : '<div></div>'}
       <div class="acts">${a.reservado ? '' : `${D.waLink(a,pub) ? `<a class="p-icon-btn" href="${D.waLink(a,pub)}" target="_blank" rel="noopener" data-wa data-aviso="${BP.esc(a.id)}" data-pub="${BP.esc(pub.storeId || pub.id)}" aria-label="${BP.esc(BP.tf('card_wa_aria', 'Escribir por WhatsApp a {p}', { p: D.pubNombre(pub) }))}" title="WhatsApp">${BP.ico.wa}</a>` : ''}${D.sinContacto(pub) ? `<span class="p-sincontacto">${BP.t('card_contacto_pendiente', 'Contacto pendiente')}</span>` : `<a class="p-btn p-btn-sm p-btn-navy" href="${href}#contacto">${BP.ico.mail} ${BP.t('card_contactar', 'Contactar')}</a>`}`}</div>
     </div>
   </div>
@@ -227,29 +340,65 @@
 </article>`;
   };
 
+  /* 8/10/2026 · Tanda 2 · La tarjeta, más corta (como pidió Tomás: "demasiados textos y muchas cosas").
+     Sobre la foto, la operación corta (o "Reservada") y, si viene, "Disponible desde 14 nov". Abajo: la calle chica
+     en versalitas (sin altura si la dirección es aproximada), el título humano, el precio con su moneda y /mes,
+     los datos en una línea y quién publica en una línea de texto. Sin botón "Ver ficha": toda la tarjeta es un
+     solo enlace. El corazón queda afuera del enlace (un botón no puede ir adentro de un <a>), encima de la foto.
+     La clase prop-card queda en la raíz: la usan el catálogo (foco al cambiar de página) y otras grillas. */
   D.cardV = function(a){
     const pub = D.pub(a.publicadorId);
     const href = BP.urlFicha(a);
-    const lugar = a.barrio || BP.zonaLabel(a.zona) || '';   /* barrio vacío: la zona, o nada (ver cardH) */
-    const foto = a.fotos[0] ? `<img src="${BP.sbImg(a.fotos[0], 700)}" alt="${BP.esc([a.titulo, lugar].filter(Boolean).join(', '))}" loading="lazy">` : `<span class="card-img-placeholder">${BP.t('card_fotos_prod', 'Fotos en producción')}</span>`;
+    const tit = D.titulo(a), calle = D.calle(a), desde = D.disponibleDesde(a), fav = BP.isFav(a.id);
+    const foto = a.fotos[0] ? `<img src="${BP.sbImg(a.fotos[0], 700)}" alt="" loading="lazy" decoding="async" onerror="this.remove()">` : `<span class="tj-sinfoto">${BP.t('card_fotos_prod', 'Fotos en producción')}</span>`;
+    const tag = a.reservado ? `<span class="tj-tag res">${BP.t('card_reservada', 'Reservada')}</span>` : `<span class="tj-tag tj-${a.op}">${D.opTag(a)}</span>`;
+    const meta = D.metaCorta(a), linea = D.pubLinea(pub);
     return `
-<a class="prop-card" data-flip="${BP.esc(a.id)}" href="${href}" aria-label="${BP.esc(lugar ? BP.tf('card_ver_en', 'Ver {t} en {b}', { t: a.titulo, b: lugar }) : BP.tf('card_ver', 'Ver {t}', { t: a.titulo }))}">
-  <div class="card-img">${foto}<span class="card-tag tag-${a.op}">${D.opTag(a)}</span>${a.reservado?`<span class="card-status status-reservado">${BP.t('card_reservada', 'Reservada')}</span>`:''}</div>
-  <div class="card-body">
-    <div class="card-address">${BP.esc(a.titulo)}</div>
-    <div class="card-barrio">${BP.esc(lugar)}</div>
-    <div class="card-meta">${D.metaLine(a)}</div>
-    <div class="card-divider"></div>
-    <div class="card-footer"><div class="card-price"><span class="price-amount">${a.reservado ? BP.t('card_reservada', 'Reservada') : D.precioHTML(a)}</span></div><span class="card-cta">${BP.t('card_ver_ficha', 'Ver ficha')}</span></div>
-    <div class="p-card-pub">${BP.t('card_publica', 'Publica')} <b>${BP.esc(D.pubNombre(pub))}</b> ${D.badgeHTML(pub)}</div>
-  </div>
-</a>`;
+<article class="prop-card p-tj" data-flip="${BP.esc(a.id)}">
+  <a class="tj-link" href="${href}">
+    <span class="tj-foto">${foto}${tag}${desde ? `<span class="tj-desde">${BP.esc(desde)}</span>` : ''}</span>
+    <span class="tj-cuerpo">
+      ${calle ? `<span class="tj-calle">${BP.esc(calle)}</span>` : ''}
+      <span class="tj-titulo">${BP.esc(tit)}</span>
+      <span class="tj-fila"><span class="tj-precio">${D.precioCorto(a)}</span>${meta ? `<span class="tj-meta">${meta}</span>` : ''}</span>
+      ${linea ? `<span class="tj-pub">${linea}</span>` : ''}
+    </span>
+  </a>
+  <button type="button" class="tj-fav${fav ? ' on' : ''}" data-fav="${BP.esc(a.id)}" aria-label="${BP.esc(BP.tf('card_fav_de', 'Guardar {t}', { t: tit }))}" aria-pressed="${fav}">${fav ? BP.ico.heartFill : BP.ico.heart}</button>
+</article>`;
   };
 
-  D.bindFavs = root => { (root||document).querySelectorAll('[data-fav]').forEach(b => { if (b._bound) return; b._bound = true; b.addEventListener('click', e => { e.preventDefault(); const on = BP.toggleFav(b.dataset.fav); b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); b.innerHTML = on ? BP.ico.heartFill : BP.ico.heart; BP.toast(on ? BP.t('card_fav_on', 'Guardada en favoritos') : BP.t('card_fav_off', 'Quitada de favoritos')); }); }); };
+  /* El corazón, en cualquier tarjeta o ficha de cualquier página (también las grillas que no llamaban a bindFavs,
+     como el panel): un solo escucha en el documento. bindFavs queda para no romper a quien lo llama. */
+  let favsEnganchados = false;
+  D.bindFavs = () => {
+    if (favsEnganchados) return; favsEnganchados = true;
+    document.addEventListener('click', e => {
+      const b = e.target.closest && e.target.closest('[data-fav]'); if (!b) return;
+      e.preventDefault();
+      const on = BP.toggleFav(b.dataset.fav);
+      document.querySelectorAll('[data-fav]').forEach(x => { if (x.dataset.fav !== b.dataset.fav) return; x.classList.toggle('on', on); x.setAttribute('aria-pressed', on ? 'true' : 'false'); x.innerHTML = on ? BP.ico.heartFill : BP.ico.heart; });
+      BP.toast(on ? BP.t('card_fav_on', 'Guardada en favoritos') : BP.t('card_fav_off', 'Quitada de favoritos'));
+      try { document.dispatchEvent(new CustomEvent('bp:fav', { detail: { id: b.dataset.fav, on } })); } catch (err) { /* nada */ }
+    });
+  };
+  D.bindFavs();
 
-  /* El precio del aviso incluye expensas y servicios: el alquiler a mediano plazo (op 'mediano') */
-  D.todoIncluido = a => a.op === 'mediano';
+  /* 8/10/2026 · Regla de "todo incluido" (contrato del lanzamiento). Antes era todo el mediano plazo; ahora
+     publican también otras empresas. Se dice "todo incluido" en un aviso de mediano plazo de BAIREN REALTY
+     (publicador 'bairen') o cuando el aviso tiene a la vez 'Expensas incluidas' y 'Servicios incluidos'.
+     Si no, el precio va por mes y la ficha muestra lo que incluye (los textos de D.INCLUYE, si hay). */
+  D.INCLUYE = ['Expensas incluidas', 'Servicios incluidos', 'Internet incluido', 'Limpieza incluida', 'Ropa blanca incluida'];
+  D.incluye = a => (a.caracteristicas || []).filter(x => D.INCLUYE.indexOf(x) > -1);
+  D.todoIncluido = a => a.op === 'mediano' && (a.publicadorId === 'bairen' || (D.incluye(a).indexOf('Expensas incluidas') > -1 && D.incluye(a).indexOf('Servicios incluidos') > -1));
+  D.expensasIncluidas = a => D.todoIncluido(a) || D.incluye(a).indexOf('Expensas incluidas') > -1;
+  /* Condiciones de la ficha (tanda 2): sin garantía propietaria (el mediano plazo de BAIREN REALTY, o el aviso que lo
+     dice) y mascotas (la característica 'Permite mascotas', la amenity 'Pet friendly' o la cualidad verificada) */
+  D.sinGarantia = a => (a.apto || []).concat(a.caracteristicas || []).indexOf('Sin garantía propietaria') > -1 || (a.op === 'mediano' && a.publicadorId === 'bairen');
+  D.aceptaMascotas = a => (a.caracteristicas || []).indexOf('Permite mascotas') > -1 || (a.amenities || []).indexOf('Pet friendly') > -1 || (a.cualidades || []).indexOf('Acepta mascotas') > -1;
+  /* En mediano plazo, `plazo` es la estadía mínima ("3 meses"). Los avisos que vienen de la web traen el rango
+     entero ("3-12 meses"): eso no es un mínimo, y se sigue mostrando como "Plazo". */
+  D.estadiaMinima = a => a.op === 'mediano' && !!a.plazo && !/\d\s*(?:-|–|a|to)\s*\d/i.test(a.plazo);
   D.filter = function(avisos, f){
     return avisos.filter(a => {
       if (f.favs && !BP.isFav(a.id)) return false;
@@ -257,6 +406,9 @@
       if (f.op && !D.opMatch(a, f.op)) return false;
       if (f.tipo && f.tipo !== 'todos' && a.tipoProp.toLowerCase() !== f.tipo) return false;
       if (f.zonas && f.zonas.length && f.zonas.indexOf(a.zona) === -1) return false;
+      /* 8/10/2026 · El rango de precio es en una moneda (f.mon: '' es USD, 'ARS' pesos): los avisos en la otra no entran.
+         Sin rango de precio se ven todos. */
+      if ((f.pmin || f.pmax) && (a.moneda === 'ARS' ? 'ARS' : 'USD') !== (f.mon === 'ARS' ? 'ARS' : 'USD')) return false;
       if (f.pmin && (a.precio||0) < f.pmin) return false;
       if (f.pmax && (a.precio||0) > f.pmax) return false;
       /* 23/9/2026 · Antes decía `a.expensas &&`, o sea que los avisos SIN expensas cargadas
@@ -266,7 +418,7 @@
       /* 25/9/2026 · El precio del mediano plazo es todo incluido (la ficha lo dice: "por mes · todo
          incluido"; en los datos no hay otra marca, es la operación 'mediano'): ahí las expensas cuentan
          como 0 y el aviso pasa cualquier máximo. Si no es todo incluido y no hay dato, no pasa. */
-      if (f.expmax && !(D.todoIncluido(a) || (a.expensas > 0 && a.expensas <= f.expmax))) return false;
+      if (f.expmax && !(D.expensasIncluidas(a) || (a.expensas > 0 && a.expensas <= f.expmax))) return false;
       if (f.amb && (a.amb||0) < f.amb) return false;
       if (f.dorm && (a.dorm||0) < f.dorm) return false;
       if (f.banos && (a.banos||0) < f.banos) return false;
@@ -289,8 +441,11 @@
   D.sort = function(list, key){
     const l = list.slice();
     const t = a => new Date(a.publicadoEn||0).getTime();
-    if (key === 'precio_asc') l.sort((a,b)=>(a.precio||9e12)-(b.precio||9e12));
-    else if (key === 'precio_desc') l.sort((a,b)=>(b.precio||0)-(a.precio||0));
+    /* 8/10/2026 · Por precio no se mezclan monedas: primero los avisos en dólares, después los en pesos, y cada grupo
+       en su orden (300 pesos no es menos que 1.000 dólares). Sin precio, al final de su grupo. */
+    const grupo = a => a.moneda === 'ARS' ? 1 : 0;
+    if (key === 'precio_asc') l.sort((a,b)=>(grupo(a)-grupo(b))||((a.precio||9e15)-(b.precio||9e15)));
+    else if (key === 'precio_desc') l.sort((a,b)=>(grupo(a)-grupo(b))||((b.precio||0)-(a.precio||0)));
     else if (key === 'recientes') l.sort((a,b)=>t(b)-t(a));
     else if (key === 'm2') l.sort((a,b)=>(b.m2||0)-(a.m2||0));
     else l.sort((a,b)=>(b.destacado-a.destacado)||(a.reservado-b.reservado)||(t(b)-t(a)));

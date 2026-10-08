@@ -66,19 +66,21 @@
       }
       if (S.mode === 'local' && !DEMO) S.session = L.user.get(null);
       if (window.BP && BP.applySession) BP.applySession(S.session, S.mode);
-      S.pedirSync();
       return S.mode;
     })();
     return S.ready;
   };
-  /* Sincronización web → portal: se pide una vez por pestaña al abrir el portal con base real.
-     La función del servidor (api/portal-sync.js) decide si hace falta (freno de 10 minutos)
-     y trae altas, precios, reservas y bajas de la web. Si no está configurada o no existe
-     (dev server), no pasa nada: el portal sigue con lo que tiene. */
-  S.pedirSync = function(){
-    if (S.mode !== 'supabase') return;
-    try { if (sessionStorage.getItem('bp_sync_pedido')) return; sessionStorage.setItem('bp_sync_pedido', '1'); } catch (e) { return; }
-    try { fetch('/api/portal-sync', { method: 'POST', keepalive: true }).catch(() => {}); } catch (e) { /* sin red o sin función */ }
+  /* Sincronización web → portal. 8/10/2026 · El navegador del visitante ya no la pide: con tráfico de
+     anuncios eran un POST y dos escrituras en la base por cada pestaña nueva. La corre el cron de Vercel
+     cada 15 minutos (vercel.json) y, a mano, una sesión de curador (Curación → Sistema, que llama a
+     api/portal-sync.js con su token). Esta función queda para eso: sin base, sin sesión o sin ser curador
+     no hace nada y lo dice. Devuelve la respuesta de la función, o { omitida, motivo }. */
+  S.pedirSync = async function(){
+    if (S.mode !== 'supabase' || DEMO) return { omitida: true, motivo: 'sin base' };
+    if (!(await S.isCurador())) return { omitida: true, motivo: 'solo una sesión de curador' };
+    const token = await S.tokenAcceso(); if (!token) return { omitida: true, motivo: 'sin sesión' };
+    try { const r = await fetch('/api/portal-sync', { method: 'POST', headers: { Accept: 'application/json', Authorization: 'Bearer ' + token } }); return await r.json().catch(() => ({ ok: r.ok, status: r.status })); }
+    catch (e) { return { error: String(e) }; }
   };
   S.requireSession = function(volver){ if (!S.session) { location.href = 'ingresar.html?volver=' + encodeURIComponent(volver || location.pathname.split('/').pop() + location.search); return false; } return true; };
 
@@ -88,6 +90,9 @@
      una frase en castellano que dice qué hacer; lo desconocido cae en una frase genérica, nunca en el texto crudo. */
   const errorHumano = (e, contexto) => {
     const m = String(e && e.message || e || '').toLowerCase();
+    /* 8/10/2026 · Con el captcha prendido, Supabase rechaza el pedido sin token o con uno vencido o ya usado
+       (error_code captcha_failed, "captcha protection: request disallowed (...)"). */
+    if ((e && e.code === 'captcha_failed') || /captcha/.test(m)) return T('ing_err_captcha', 'No pudimos verificar que sos una persona. Probá de nuevo.');
     if (/rate limit|too many|over_email_send_rate_limit/.test(m)) return T('ing_err_limite', 'Estamos mandando muchos códigos en este momento. Esperá unos minutos y volvé a probar, o entrá con Google.');
     if (/is invalid|invalid email|unable to validate email/.test(m) && contexto === 'enviar') return T('ing_err_mail', 'Revisá el mail, por ejemplo nombre@dominio.com.');
     if (/expired|invalid|otp/.test(m) && contexto === 'verificar') return T('ing_codigo_vencido', 'El código venció o no coincide. Pedí uno nuevo con "Reenviar".');
@@ -96,12 +101,16 @@
     return contexto === 'verificar' ? T('ing_no_verifico', 'No se pudo verificar. Probá de nuevo en un momento.') : T('ing_no_envio', 'No se pudo enviar el código. Probá de nuevo en un momento.');
   };
   S.errorHumano = errorHumano;
-  S.sendCode = async function(email){
+  /* opts.captchaToken: el token de Turnstile (ingresar.html, solo con PORTAL_CAPTCHA_SITEKEY cargada). Sin token, el
+     pedido sale exactamente como antes del captcha. Cada token sirve una sola vez: un reenvío necesita otro. */
+  S.sendCode = async function(email, opts){
     email = (email||'').trim().toLowerCase(); if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return { ok:false, msg: T('ing_revisa_mail', 'Revisá el mail.') };
     /* 16/9 · Desde que el portal comparte proyecto de Auth con el OS, un link en el mail (si la plantilla lo trae) caería en la
        Site URL del proyecto (el OS). emailRedirectTo lo trae de vuelta al portal, a esta misma página, conservando ?volver=. */
     const volverA = location.origin + location.pathname.replace(/[^/]*$/, '') + 'ingresar.html' + location.search;
-    if (S.mode === 'supabase') { const { error } = await S.sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true, emailRedirectTo: volverA } }); return error ? { ok:false, msg: errorHumano(error, 'enviar') } : { ok:true, msg: T('ing_codigo_enviado', 'Te mandamos un código de ocho dígitos a {e}. Si no llega, revisá spam.', { e: email }) }; }
+    const options = { shouldCreateUser: true, emailRedirectTo: volverA };
+    if (opts && opts.captchaToken) options.captchaToken = String(opts.captchaToken);
+    if (S.mode === 'supabase') { const { error } = await S.sb.auth.signInWithOtp({ email, options }); return error ? { ok:false, msg: errorHumano(error, 'enviar') } : { ok:true, msg: T('ing_codigo_enviado', 'Te mandamos un código de seis dígitos a {e}. Si no llega, revisá spam.', { e: email }) }; }
     const code = String(Math.floor(100000 + Math.random() * 900000)); L.code.set({ email, code, t: Date.now() });
     return { ok:true, msg: T('ing_codigo_local', 'Modo local: tu código es {c}. Con Supabase conectado llega por mail.', { c: code }), code };
   };
@@ -121,6 +130,9 @@
   S.PERFILES = ['busca', 'dueno', 'profesional'];
   /* 12/9 · Los rótulos del perfil se leen en el idioma de la página (getters: S.PERFIL_TXT[p] sigue funcionando igual) */
   S.PERFIL_TXT = { get busca(){ return T('perfil_busca', 'Busco propiedad'); }, get dueno(){ return T('perfil_dueno', 'Dueño directo'); }, get profesional(){ return T('perfil_profesional', 'Inmobiliaria, corredor o desarrolladora'); } };
+  /* 8/10/2026 · El rótulo de la cuenta según quién publica: un gestor de alquileres tiene perfil 'profesional' (publica
+     lo de otros), pero no es inmobiliaria, corredor ni desarrolladora. Con publicador gestor, dice Gestor de alquileres. */
+  S.perfilTxt = (p, pub) => p === 'profesional' && pub && pub.tipo === 'gestor' ? T('perfil_gestor', 'Gestor de alquileres') : (S.PERFIL_TXT[p] || '');
   /* 11/9 noche · El riel del panel y el desplegable "Mi cuenta" del header salen del mismo lugar: los ids de las
      vistas (avisos, propiedades, interesados, importar, contactos, favoritos, alertas, cuenta) según el perfil.
      Sin perfil (cuenta vieja, demo) la lista completa. El dueño lleva siempre Mis contactos: puede consultar
@@ -323,6 +335,9 @@
     if (S.mode === 'supabase') {
       /* El DNI es de la persona (portal.personas, migración 01), no del publicador: a la tabla publicadores no va, o PostgREST rechaza la fila entera. */
       const fila = Object.assign({}, rec); delete fila.dni;
+      /* 8/10/2026 (tanda 2) · Quien publica no decide si está verificado: el valor por defecto (false) de arriba no viaja.
+         En un alta la base pone false; al editar el perfil, no le saca la verificación a un publicador ya verificado. */
+      delete fila.verificado;
       const { data, error } = await S.sb.schema('portal').from('publicadores').upsert(fila, { onConflict: 'auth_user_id' }).select().single(); if (error) throw error; await S.vincularTitular(data, p); return data;
     }
     S.track('publicador_alta', { publicador_id: rec.id || null, datos: { tipo: rec.tipo } });
@@ -338,26 +353,90 @@
     const all = L.verif.get([]); rec.id = uid(); all.push(rec); L.verif.set(all);
   };
 
+  /* ── 8/10/2026 · Qué columnas pide cada lectura ──────────
+     Ninguna lectura de portal.avisos pide `*`. La migración 23 deja a anon y authenticated con select por columna
+     sin propietario_email (el mail del dueño de la unidad), y con permisos por columna un `select=*` falla entero.
+     Ese mail lo ven solo el publicador del aviso, un curador y el propio propietario, por la vista
+     portal.avisos_propietario (id, publicador_id, propietario_email), que trae solo esas filas. Sin la 23 la vista
+     no existe y el mail se lee de la tabla, como antes: estas listas sirven antes y después de la migración.
+     S.COLS queda a mano para el resto del código (por ejemplo, el .select() que devuelve el aviso recién guardado,
+     que hoy pide `*` y con la 23 tiene que pedir S.COLS.AVISO). */
+  const COLS_PUB = 'id,slug,tipo,nombre,responsable,matricula,colegio,badge,verificado,descripcion,telefono,whatsapp,email,zonas,created_at';
+  /* Lo que usan tarjetas, filtros y búsqueda (data.js: fromStore, filter, cardH, cardV, emprendimientos). Sin las
+     descripciones en inglés y portugués, que solo muestra la ficha. cualidades_verificadas faltaba: el filtro de
+     cualidades y los sellos de la ficha no veían nunca las que marcó el curador. */
+  const COLS_LISTA = 'id,codigo,slug,publicador_id,operacion,tipo,titulo,direccion,unidad,barrio,zona,ciudad,precio,moneda,expensas,m2_total,m2_cubierto,ambientes,dormitorios,banos,cocheras,antiguedad,amoblado,amenities,caracteristicas,cualidades_verificadas,descripcion,video_url,video_tipo,plazo,estado,destacado_hasta,publicado_en,created_at,emprendimiento,etapa,entrega';
+  /* La ficha: lo de la lista más las traducciones y los datos que solo muestra ella */
+  const COLS_FICHA = COLS_LISTA + ',descripcion_en,descripcion_pt,mostrar_direccion,orientacion,disposicion,piso';
+  /* Una tarjeta de "Propiedades similares" (cardV) */
+  const COLS_TARJETA = 'id,codigo,slug,publicador_id,operacion,tipo,titulo,direccion,unidad,barrio,zona,ciudad,precio,moneda,expensas,m2_total,m2_cubierto,ambientes,dormitorios,banos,cocheras,amoblado,amenities,video_url,video_tipo,estado,destacado_hasta,publicado_en,created_at';
+  /* Todo el aviso menos propietario_email: panel, edición y curación */
+  const COLS_AVISO = 'id,codigo,slug,publicador_id,propiedad_id,operacion,tipo,titulo,direccion,unidad,barrio,zona,ciudad,mostrar_direccion,lat,lng,precio,moneda,expensas,m2_total,m2_cubierto,ambientes,dormitorios,banos,toilettes,cocheras,antiguedad,orientacion,disposicion,piso,amoblado,amenities,caracteristicas,descripcion,descripcion_en,descripcion_pt,video_url,video_tipo,plazo,estado,estado_curacion,motivo_rechazo,destacado_hasta,publicado_en,vence_en,created_at,updated_at,emprendimiento,etapa,entrega,quiero_produccion,codigo_interno,cualidades,cualidades_verificadas,cualidades_verificadas_por,cualidades_verificadas_en';
+  S.COLS = { PUB: COLS_PUB, LISTA: COLS_LISTA, FICHA: COLS_FICHA, TARJETA: COLS_TARJETA, AVISO: COLS_AVISO };
+  /* La tabla, vista o función todavía no existe en la base (migración sin correr) */
+  const faltaEnBase = e => !!e && (/^(PGRST20[0-9]|42P01|42883)$/.test(String(e.code || '')) || /does not exist|could not find/i.test(String(e.message || '')));
+  /* 8/10/2026 · Lo que trae la migración 23 y puede no estar todavía: la columna avisos.disponible_desde y la función
+     vistas_de(). Se pide como si estuviera; si la base contesta que no existe, se anota en sessionStorage y en el resto
+     de la visita no se vuelve a pedir. Con la 23 corrida no cuesta ningún pedido de más; sin ella, uno por visita.
+     (sessionStorage: una pestaña nueva vuelve a probar una vez; si la 23 se corre a mitad de una visita, esa pestaña la
+     ve en la próxima.) */
+  const FALTA_23 = { disp: 'bp_sin_disponible_desde', vistas: 'bp_sin_vistas_de' };
+  const falta23Aca = {};   /* copia en memoria, por si el navegador no deja usar sessionStorage */
+  const falta23 = k => { if (falta23Aca[k]) return true; try { return sessionStorage.getItem(FALTA_23[k]) === '1'; } catch (e) { return false; } };
+  const anotarFalta23 = k => { falta23Aca[k] = true; try { sessionStorage.setItem(FALTA_23[k], '1'); } catch (e) { /* queda la copia en memoria */ } };
+  /* PostgREST: 42703 "column avisos.disponible_desde does not exist" (select); PGRST204 "Could not find the
+     'disponible_desde' column" (cache de esquema). Solo cuenta si el error nombra la columna. */
+  const faltaDisponible = e => !!e && /^(42703|PGRST204)$/.test(String(e.code || '')) && /disponible_desde/.test(String(e.message || '') + ' ' + String(e.details || '') + ' ' + String(e.hint || ''));
+  /* armar(extra) devuelve la consulta con extra (',disponible_desde' o '') sumado a las columnas del aviso. */
+  async function conDisponible(armar){
+    if (falta23('disp')) return armar('');
+    const r = await armar(',disponible_desde');
+    if (r && r.error && faltaDisponible(r.error)) { anotarFalta23('disp'); return armar(''); }
+    return r;
+  }
+  S.hayDisponibleDesde = () => !falta23('disp');   /* false si esta visita ya sabe que la base no tiene la columna */
+  /* El mail del propietario de unas filas, solo las que esta cuenta puede ver. filtro(q) pone el filtro. { id: mail }.
+     Si no se pudo leer, {} y las filas quedan sin la clave: así guardar el aviso no pisa el mail con un vacío. */
+  async function mailsPropietario(filtro){
+    const m = {};
+    try {
+      let { data, error } = await filtro(S.sb.schema('portal').from('avisos_propietario').select('id,propietario_email'));
+      if (error && faltaEnBase(error)) ({ data, error } = await filtro(S.sb.schema('portal').from('avisos').select('id,propietario_email')));   /* sin la 23 */
+      if (error) throw error;
+      (data || []).forEach(r => { m[r.id] = r.propietario_email; });
+    } catch (e) { console.warn('mail del propietario no disponible', e); }
+    return m;
+  }
+  const conMails = (filas, m) => { (filas || []).forEach(a => { if (Object.prototype.hasOwnProperty.call(m, a.id)) a.propietario_email = m[a.id]; }); return filas || []; };
+
   /* ── avisos ───────────────────────────────────────────── */
   const codigo = (slug, op) => 'BA-' + (slug||'x').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8) + (op === 'venta' ? 'V' : op === 'alquiler' ? 'L' : 'M') + '-' + Math.random().toString(36).slice(2,5).toUpperCase();
   S.myAvisos = async function(){
-    if (DEMO && S.mode === 'supabase') {
-      const pub = await S.getMyPublicador();
-      if (!pub) return [];
-      const { data } = await S.sb.schema('portal').from('avisos').select('*, fotos(url, orden)').eq('publicador_id', pub.id).order('updated_at', { ascending:false });
-      return data || [];
-    }
     const pub = await S.getMyPublicador(); if (!pub) return [];
-    if (S.mode === 'supabase') { const { data } = await S.sb.schema('portal').from('avisos').select('*, fotos(url, orden)').eq('publicador_id', pub.id).order('updated_at', { ascending:false }); return data || []; }
+    if (S.mode === 'supabase') {
+      const { data } = await S.sb.schema('portal').from('avisos').select(COLS_AVISO + ',fotos(url,orden)').eq('publicador_id', pub.id).order('updated_at', { ascending:false });
+      if (!data || DEMO) return data || [];
+      return conMails(data, await mailsPropietario(q => q.eq('publicador_id', pub.id)));
+    }
     return L.avisos.get([]).filter(a => a.publicador_id === pub.id).sort((a,b) => (b.updated_at||'').localeCompare(a.updated_at||''));
   };
   S.getAviso = async function(id){
-    if (S.mode === 'supabase') { const { data } = await S.sb.schema('portal').from('avisos').select('*, fotos(url, orden)').eq('id', id).maybeSingle(); return data || null; }
+    if (S.mode === 'supabase') {
+      const { data } = await conDisponible(x => S.sb.schema('portal').from('avisos').select(COLS_AVISO + x + ',fotos(url,orden)').eq('id', id).maybeSingle());
+      if (!data) return null;
+      return DEMO ? data : conMails([data], await mailsPropietario(q => q.eq('id', id)))[0];
+    }
     return L.avisos.get([]).find(a => a.id === id) || null;
   };
   S.saveAviso = async function(a){
     const pub = await S.getMyPublicador(); if (!pub) throw new Error('Completá tu perfil de publicador primero.');
-    const rec = Object.assign({ estado: 'disponible', estado_curacion: 'borrador', moneda: 'USD', ciudad: a.zona === 'GBA Norte' ? 'Zona Norte' : 'Capital Federal', tipo: 'Departamento', mostrar_direccion: 'aproximada' }, a, { publicador_id: pub.id, updated_at: now() });
+    /* 8/10/2026 · La base exige la dirección (direccion not null): sin ella no se manda nada, con un mensaje en castellano,
+       y en modo local tampoco se crea un aviso vacío. */
+    if (!String(a.direccion || '').trim()) throw new Error(T('err_sin_direccion', 'Falta la calle y la altura del aviso.'));
+    const rec = Object.assign({ estado: 'disponible', estado_curacion: 'borrador', moneda: 'USD', ciudad: a.zona === 'GBA Norte' ? 'Zona Norte' : 'Capital Federal', tipo: 'Departamento', mostrar_direccion: 'aproximada' }, a, { updated_at: now() });
+    /* 8/10/2026 · El aviso es de quien lo creó: al editar no se cambia el publicador. Antes, un curador que corregía
+       un aviso ajeno desde curación se lo quedaba (pasaba a su propio publicador). */
+    if (rec.id) delete rec.publicador_id; else rec.publicador_id = pub.id;
     /* 25/9/2026 · codigo_interno es único por publicador (índice de migracion-21): sin espacios, y vacío = null, porque
        dos filas importadas sin código ('') chocarían. Un alta con un código que el publicador ya tiene actualiza ese
        aviso en vez de crear otro: reimportar la cartera no duplica, aunque importar.html no lo haya encontrado en su
@@ -374,17 +453,61 @@
     if (!rec.slug) rec.slug = slugify((rec.direccion||'') + ' ' + (rec.unidad||'') + ' ' + (rec.barrio||''));
     if (!rec.codigo) rec.codigo = codigo(rec.slug, rec.operacion);
     const fotos = rec.fotos || []; delete rec.fotos;
+    /* 8/10/2026 (tanda 2) · disponible_desde (date, mediano plazo): vacío = null, nunca '' (Postgres no lo acepta como fecha) */
+    if ('disponible_desde' in rec) rec.disponible_desde = rec.disponible_desde ? String(rec.disponible_desde).slice(0, 10) : null;
     if (S.mode === 'supabase') {
-      const q = S.sb.schema('portal').from('avisos'); let res;
-      if (rec.id) res = await q.update(rec).eq('id', rec.id).select().single(); else res = await q.insert(rec).select().single();
+      /* La columna la crea la migración 23. Si la base ya avisó que no la tiene, ni se manda. */
+      if (S._sinDisponibleDesde) delete rec.disponible_desde;
+      /* 8/10/2026 · Devuelve el aviso con columnas explícitas (S.COLS.AVISO): con la migración 23, `*` choca con la
+         columna propietario_email cerrada. Si la base todavía no tiene alguna de esas columnas, repite con `*`: un
+         error de columna frena la consulta entera antes de grabar, así que no hay doble alta. */
+      const grabar = cols => { const q = S.sb.schema('portal').from('avisos'); return rec.id ? q.update(rec).eq('id', rec.id).select(cols).single() : q.insert(rec).select(cols).single(); };
+      const errCol = r => r.error && /42703|PGRST204|column/i.test(String(r.error.code || '') + ' ' + String(r.error.message || ''));
+      const nombraDD = r => /disponible_desde/i.test(String(r.error.message || '') + ' ' + String(r.error.details || '') + ' ' + String(r.error.hint || ''));
+      /* Sin la migración 23: si el aviso trae disponible_desde y la base contesta columna inexistente (42703, PGRST204 o
+         un mensaje que la nombra), se repite sin ese campo y el guardado sigue. Sigue valiendo el respaldo de `*` para el
+         .select(). Cada intento que falla por una columna frena antes de grabar: no hay doble alta. */
+      let cols = S.COLS.AVISO, res = await grabar(cols);
+      for (let intento = 0; intento < 3 && errCol(res); intento++) {
+        if ('disponible_desde' in rec && (nombraDD(res) || cols === '*')) { delete rec.disponible_desde; S._sinDisponibleDesde = true; res = await grabar(cols); }
+        else if (cols !== '*') { cols = '*'; res = await grabar(cols); }
+        else break;
+      }
       if (res.error) throw res.error; const saved = res.data;
+      try { if (window.BPData && BPData.olvidarCatalogo) BPData.olvidarCatalogo(); } catch (e) { /* nada */ }
       if (fotos.length) { await S.sb.schema('portal').from('fotos').delete().eq('aviso_id', saved.id); const rows = fotos.map((f, i) => ({ aviso_id: saved.id, url: f.url, orden: i })); const { error } = await S.sb.schema('portal').from('fotos').insert(rows); if (error) throw error; }
       saved.fotos = fotos.map((f, i) => ({ url: f.url, orden: i })); return saved;
     }
     S.track(rec.estado_curacion === 'en_revision' ? 'aviso_enviado' : 'aviso_creado', { aviso_id: rec.id || null, publicador_id: pub.id, datos: { operacion: rec.operacion, zona: rec.zona } });
     const all = L.avisos.get([]); const i = all.findIndex(x => x.id === rec.id); rec.fotos = fotos.map((f, i2) => ({ url: f.url, orden: i2 }));
     rec.updated_at = now();   /* en local también queda cuándo se editó: el panel ordena por eso */
-    if (i > -1) { rec.created_at = all[i].created_at; all[i] = rec; } else { rec.id = rec.id || uid(); rec.created_at = now(); all.push(rec); } L.avisos.set(all); return rec;
+    if (i > -1) { rec.created_at = all[i].created_at; rec.publicador_id = all[i].publicador_id; all[i] = rec; } else { rec.id = rec.id || uid(); rec.created_at = now(); all.push(rec); } L.avisos.set(all); return rec;
+  };
+  /* 8/10/2026 · Lo que contestan la base y el almacenamiento al guardar (inglés, códigos de Postgres: "null value in column
+     ... violates not-null constraint", "new row violates row-level security policy") en una frase en castellano que dice
+     qué hacer. Lo que ya viene en castellano (mensajes propios) pasa igual; lo desconocido cae en una frase genérica, nunca
+     en el texto crudo, y el detalle queda en la consola. generico: la frase para ese caso ('No se pudo subir la foto.'). */
+  const CAMPO_TXT = { direccion: 'la calle y la altura', barrio: 'el barrio', zona: 'la zona', operacion: 'la operación', tipo: 'el tipo de propiedad', precio: 'el precio', moneda: 'la moneda', slug: 'la dirección', codigo: 'el código del aviso', nombre: 'el nombre', email: 'el mail', telefono: 'el teléfono', whatsapp: 'el WhatsApp', video_tipo: 'el video', etapa: 'la etapa de obra', estado: 'el estado', estado_curacion: 'el estado', mostrar_direccion: 'cómo se muestra la dirección' };
+  S.errorAlGuardar = function(e, generico){
+    const msg = String((e && typeof e === 'object' ? (e.message || e.error_description || e.msg || e.error) : e) || '');
+    const m = msg.toLowerCase(), code = String((e && e.code) || '');
+    const col = (msg.match(/column "?([a-z_]+)"?/i) || msg.match(/'([a-z_]+)' column/i) || msg.match(/_([a-z_]+?)_check"/i) || [])[1];
+    const campo = col && CAMPO_TXT[col.toLowerCase()];
+    if (code === '23502' || /null value in column/.test(m)) return campo ? T('err_falta_campo', 'Falta {c}.', { c: campo }) : T('err_falta_dato', 'Falta un dato obligatorio.');
+    if (code === '23505' || /duplicate key/.test(m)) return /codigo_interno/.test(m) ? T('err_dup_codigo_interno', 'Ya tenés otro aviso con ese código interno.') : T('err_dup', 'Ese registro ya existe. Probá guardar de nuevo.');
+    if (code === '23514' || /violates check constraint/.test(m)) return campo ? T('err_valor_campo', 'Hay un valor que no se acepta en {c}.', { c: campo }) : T('err_valor', 'Hay un dato con un valor que no se acepta.');
+    if (code === '22P02' || /invalid input syntax/.test(m)) return T('err_numero', 'Hay un número mal escrito. Revisá los campos numéricos, sin puntos ni letras.');
+    if (code === '22001' || /value too long/.test(m)) return T('err_largo', 'Un texto es demasiado largo. Acortalo y probá de nuevo.');
+    if (code === '42501' || /row-level security|permission denied|not authorized|unauthorized/.test(m)) return T('err_permiso', 'No tenés permiso para guardar esto. Volvé a entrar con tu cuenta; si sigue, escribinos a portal@bairengroup.com.');
+    if (/^pgrst2/i.test(code) || /schema cache/.test(m)) return T('err_esquema', 'La base todavía no tiene un dato que manda el formulario. Escribinos a portal@bairengroup.com.');
+    if (/jwt|token.*(expired|invalid)|auth session missing|not authenticated/.test(m)) return T('err_sesion', 'Tu sesión venció. Volvé a entrar y probá de nuevo.');
+    if (/failed to fetch|networkerror|network request failed|load failed|fetch failed/.test(m)) return T('err_red', 'No hay conexión. Revisá internet y probá de nuevo.');
+    if (/payload too large|maximum allowed size|entity too large/.test(m)) return T('err_pesado', 'El archivo pesa demasiado. Probá con uno más liviano.');
+    if (/mime type|invalid_mime/.test(m)) return T('err_formato', 'Ese formato de archivo no se acepta. Probá con JPG o PNG.');
+    if (/bucket not found/.test(m)) return T('err_bucket', 'Falta configurar dónde se guardan los archivos. Escribinos a portal@bairengroup.com.');
+    if (msg && (/[áéíóúñ¿¡]/i.test(msg) || /^(no |falta|complet|eleg|escrib|inici|esta |este |la |el |ese |tu |hacen |revis|en modo|para )/i.test(msg))) return msg;   /* ya está en castellano */
+    try { console.warn('[bairen] error al guardar:', e); } catch (x) {}
+    return generico ? T('err_generico_x', '{g} Probá de nuevo en un momento.', { g: generico }) : T('err_generico', 'No se pudo guardar. Probá de nuevo en un momento.');
   };
   /* Miniatura 16:9 de 320 × 180 (JPEG 60 %, 10 a 20 KB): recorte centrado. La usa Bairen OS en su lista
      de propiedades. Se guarda junto a la foto, en portal-fotos/miniaturas/<misma ruta>. */
@@ -392,7 +515,9 @@
   S.uploadFoto = async function(file, avisoKey, i){
     const blob = await S.shrink(file, 1600);
     if (S.mode === 'supabase') {
-      const path = avisoKey + '/' + Date.now() + '-' + i + '.jpg';
+      /* 8/10/2026 · Cada cuenta sube en su carpeta (<id de la cuenta>/<aviso>/...): con la migración 23, el bucket solo
+         deja escribir ahí. La ruta vieja (<aviso>/...) sigue sirviendo para las fotos que ya están. */
+      const path = (S.session && S.session.id ? S.session.id + '/' : '') + avisoKey + '/' + Date.now() + '-' + i + '.jpg';
       const { error } = await S.sb.storage.from('portal-fotos').upload(path, blob, { contentType: 'image/jpeg', upsert: true }); if (error) throw error;
       try { const mini = await S.miniatura(blob); if (mini) await S.sb.storage.from('portal-fotos').upload('miniaturas/' + path, mini, { contentType: 'image/jpeg', upsert: true, cacheControl: '31536000' }); } catch (e) { console.warn('miniatura:', e && e.message); }
       return S.sb.storage.from('portal-fotos').getPublicUrl(path).data.publicUrl;
@@ -402,12 +527,73 @@
   S.setEstado = async function(id, estado_curacion, motivo, extra){
     const patch = Object.assign({ estado_curacion, motivo_rechazo: motivo || null, updated_at: now() }, extra || {}); if (estado_curacion === 'publicado') patch.publicado_en = now();
     S.track(estado_curacion === 'publicado' ? 'aviso_aprobado' : estado_curacion === 'rechazado' ? 'aviso_rechazado' : 'aviso_estado', { aviso_id: id, datos: { estado_curacion, motivo: motivo || null } });
-    if (S.mode === 'supabase') { const { error } = await S.sb.schema('portal').from('avisos').update(patch).eq('id', id); if (error) throw error; if (estado_curacion === 'publicado' && !(extra && extra.estado)) S.notify('aprobado', { aviso_id: id }); else if (estado_curacion === 'rechazado') S.notify('rechazado', { aviso_id: id, datos: { motivo } }); else if (estado_curacion === 'borrador' && motivo) S.notify('cambios', { aviso_id: id, datos: { motivo } }); return; }
+    if (S.mode === 'supabase') { const { error } = await S.sb.schema('portal').from('avisos').update(patch).eq('id', id); if (error) throw error; try { if (window.BPData && BPData.olvidarCatalogo) BPData.olvidarCatalogo(); } catch (e) { /* nada */ } if (estado_curacion === 'publicado' && !(extra && extra.estado)) S.notify('aprobado', { aviso_id: id }); else if (estado_curacion === 'rechazado') S.notify('rechazado', { aviso_id: id, datos: { motivo } }); else if (estado_curacion === 'borrador' && motivo) S.notify('cambios', { aviso_id: id, datos: { motivo } }); return; }
     const all = L.avisos.get([]); const a = all.find(x => x.id === id); if (a) Object.assign(a, patch); L.avisos.set(all);
   };
+  /* 8/10/2026 · El catálogo: solo las columnas de la lista (COLS_LISTA) y TODO lo publicado, por tramos.
+     PostgREST corta en silencio en su tope de filas (1.000 en Supabase): antes, el aviso 1.001 no existía para nadie.
+     Ahora se pide por rangos con el total exacto en el primer pedido y se sigue hasta tenerlos todos. El rango
+     siguiente arranca donde terminó lo recibido (no en múltiplos de 1.000), así un tope más chico tampoco corta.
+     Orden estable (publicado_en, id) para que dos tramos no repitan ni salteen filas. Si la base falla, lanza:
+     data.js cae entonces al JSON de respaldo. */
+  const desembolsar = a => { a.publicador = a.publicadores; delete a.publicadores; return a; };
   S.publishedAvisos = async function(){
-    if (S.mode === 'supabase') { const { data } = await S.sb.schema('portal').from('avisos').select('id,codigo,slug,publicador_id,operacion,tipo,titulo,direccion,unidad,barrio,zona,ciudad,mostrar_direccion,precio,moneda,expensas,m2_total,m2_cubierto,ambientes,dormitorios,banos,cocheras,antiguedad,orientacion,disposicion,piso,amoblado,amenities,caracteristicas,descripcion,descripcion_en,descripcion_pt,video_url,video_tipo,plazo,estado,estado_curacion,destacado_hasta,publicado_en,created_at,emprendimiento,etapa,entrega, fotos(url, orden), publicadores(id,slug,tipo,nombre,responsable,matricula,colegio,badge,verificado,descripcion,telefono,whatsapp,email,zonas,created_at)').eq('estado_curacion', 'publicado').order('publicado_en', { ascending:false }); return (data || []).map(a => { a.publicador = a.publicadores; delete a.publicadores; return a; }); }
+    if (S.mode === 'supabase') {
+      const TRAMO = 1000, MAX_TRAMOS = 50, filas = []; let total = null;
+      for (let n = 0; n < MAX_TRAMOS; n++) {
+        const desde = filas.length;
+        const { data, error, count } = await conDisponible(x => S.sb.schema('portal').from('avisos')
+          .select(COLS_LISTA + x + ',fotos(url,orden),publicadores(' + COLS_PUB + ')', n === 0 ? { count: 'exact' } : undefined)
+          .eq('estado_curacion', 'publicado').order('publicado_en', { ascending: false, nullsFirst: false }).order('id', { ascending: true })
+          .range(desde, desde + TRAMO - 1));
+        if (error) throw error;
+        if (n === 0 && typeof count === 'number') total = count;
+        (data || []).forEach(a => filas.push(desembolsar(a)));
+        if (!data || !data.length) break;
+        if (total != null ? filas.length >= total : data.length < TRAMO) break;
+      }
+      return filas;
+    }
     const pubs = L.pubs.get([]); return L.avisos.get([]).filter(a => a.estado_curacion === 'publicado').map(a => Object.assign({}, a, { publicador: pubs.find(p => p.id === a.publicador_id) || null }));
+  };
+  /* 8/10/2026 · La ficha: un solo aviso publicado, con sus fotos y su publicador, en un pedido. Por id (uuid) o por
+     slug; un slug puede repetirse entre operaciones (la misma unidad en venta y en mediano plazo): gana el último
+     publicado, como hacía la búsqueda en el catálogo entero. Un enlace viejo "slug-operacion" (los avisos que salían
+     del JSON) se busca por slug y operación. null si no está publicado. Lanza si la base falla. */
+  S.avisoPublicado = async function(ref){
+    ref = String(ref || ''); if (!ref) return null;
+    if (S.mode !== 'supabase') { const l = await S.publishedAvisos(); return l.find(a => a.id === ref) || l.find(a => a.slug === ref) || null; }
+    const pedir = x => S.sb.schema('portal').from('avisos').select(COLS_FICHA + x + ',fotos(url,orden),publicadores(' + COLS_PUB + ')').eq('estado_curacion', 'publicado');
+    let r = await conDisponible(x => (esUUID(ref) ? pedir(x).eq('id', ref) : pedir(x).eq('slug', ref).order('publicado_en', { ascending: false, nullsFirst: false })).limit(1));
+    if (r.error) throw r.error;
+    let a = (r.data || [])[0] || null;
+    const viejo = !a && !esUUID(ref) && /^(.+)-(venta|alquiler|mediano)$/.exec(ref);
+    if (viejo) { r = await conDisponible(x => pedir(x).eq('slug', viejo[1]).eq('operacion', viejo[2]).limit(1)); if (r.error) throw r.error; a = (r.data || [])[0] || null; }
+    return a ? desembolsar(a) : null;
+  };
+  /* Similares de la ficha: misma operación y zona, publicados, hasta n (6), con la portada sola. Un pedido chico en
+     vez del catálogo entero. [] si algo falla: la ficha se muestra igual. */
+  S.similaresDe = async function(a, n){
+    if (S.mode !== 'supabase' || !a) return [];
+    try {
+      let q = S.sb.schema('portal').from('avisos').select(COLS_TARJETA + ',fotos(url,orden),publicadores(' + COLS_PUB + ')')
+        .eq('estado_curacion', 'publicado').eq('operacion', a.operacion).neq('id', a.id);
+      if (a.zona) q = q.eq('zona', a.zona);
+      const { data, error } = await q.order('orden', { referencedTable: 'fotos' }).limit(1, { referencedTable: 'fotos' })
+        .order('publicado_en', { ascending: false, nullsFirst: false }).limit(n || 6);
+      if (error) throw error;
+      return (data || []).map(desembolsar);
+    } catch (e) { console.warn('similares', e); return []; }
+  };
+  /* Titular y matrícula de unos publicadores (vista publicador_publico, migración 01). Solo los pedidos: antes se
+     bajaba la vista entera en cada página. Con muchos ids (una URL larga) se pide todo. Lanza si la vista no está. */
+  S.titularesDe = async function(ids){
+    if (S.mode !== 'supabase' || !S.sb) return [];
+    const u = Array.from(new Set((ids || []).filter(esUUID))); if (!u.length) return [];
+    let q = S.sb.schema('portal').from('publicador_publico').select('id,titular_nombre,titular_colegio,titular_matricula,titular_matricula_verificada');
+    if (u.length <= 60) q = q.in('id', u);
+    const { data, error } = await q; if (error) throw error;
+    return data || [];
   };
 
   /* ── 4.4 Registro de eventos: una sola puerta para todo lo que queremos medir ── */
@@ -436,7 +622,12 @@
       if (c.visita_deseada) fila.visita_deseada = c.visita_deseada;
       let { error } = await S.sb.schema('portal').from('consultas').insert(fila);
       if (error && (fila.visita_deseada || fila.canal === 'visita')) { /* sin migración 02: se guarda como consulta común y la fecha va en el mensaje */ fila.mensaje = ((fila.mensaje || '') + ' [Pide visita: ' + new Date(c.visita_deseada).toLocaleString('es-AR') + ']').trim(); delete fila.visita_deseada; fila.canal = 'formulario'; ({ error } = await S.sb.schema('portal').from('consultas').insert(fila)); }
-      if (error) console.warn('consulta no guardada', error);
+      if (error) {
+        console.warn('consulta no guardada', error);
+        /* 8/10/2026 · Sin el mailto de antes, una consulta que no se guarda se perdía mientras la persona veía "Listo".
+           Ahora el formulario se entera y lo dice; el clic en WhatsApp (canal 'whatsapp') solo registra y sigue. */
+        if (rec.canal !== 'whatsapp') throw new Error(T('err_consulta', 'No pudimos enviar la consulta. Probá de nuevo o escribile por WhatsApp.'));
+      }
       if (esUUID(c.aviso_id)) S.notify('consulta', { aviso_id: c.aviso_id, datos: { nombre: c.nombre, email: c.email, telefono: c.telefono, mensaje: c.mensaje } });
     }
     const all = L.consultas.get([]); rec.id = uid(); all.push(rec); L.consultas.set(all);
@@ -448,15 +639,37 @@
     return L.consultas.get([]).filter(c => c.publicador_id === pubId).reverse();
   };
   S.misConsultas = function(){ const e = S.session && S.session.email; return L.consultas.get([]).filter(c => !e || (c.email||'').toLowerCase() === e.toLowerCase()).reverse(); };
+  /* 8/10/2026 · Una ficha vista: una fila en portal.vistas y nada más. El evento 'vista_ficha' queda solo en este
+     navegador (bp_eventos): en la base era una segunda escritura por cada visita con el mismo dato (el resumen semanal
+     cuenta portal.vistas). El número se pide con la función vistas_de de la migración 23, que cuenta solo ese aviso
+     con índice. Sin la 23 no hay forma barata de contarlo (la vista vistas_por_aviso agrupa la tabla entera en cada
+     ficha), así que lanza después de registrar la vista y la ficha no muestra el número (su try lo deja vacío). */
   S.addVista = async function(avisoId){
     const v = L.vistas.get({}); v[avisoId] = (v[avisoId]||0) + 1; L.vistas.set(v);
-    if (S.mode === 'supabase') { const fila = esUUID(avisoId) ? { aviso_id: avisoId } : { aviso_ref: String(avisoId) }; S.sb.schema('portal').from('vistas').insert(fila).then(() => {}, () => {}); }
-    S.track('vista_ficha', { aviso_id: avisoId });
-    return S.mode === 'supabase' ? (await S.vistasDe([avisoId]))[String(avisoId)] || v[avisoId] : v[avisoId];
+    const local = LE.get([]); local.push({ evento: 'vista_ficha', aviso_id: avisoId, creado_en: now() }); if (local.length > 500) local.splice(0, local.length - 500); LE.set(local);
+    if (S.mode !== 'supabase') return v[avisoId];
+    const fila = esUUID(avisoId) ? { aviso_id: avisoId } : { aviso_ref: String(avisoId).slice(0, 200) };
+    try { await S.sb.schema('portal').from('vistas').insert(fila); } catch (e) { /* la vista no quedó; el conteo sigue */ }
+    const n = await contarVistas([avisoId]);
+    if (!n) throw new Error('conteo de vistas no disponible (falta la migración 23)');
+    return n[String(avisoId)] || 0;
   };
-  /* 4.3 Vistas reales del servidor, no las de este navegador */
+  /* { ref: vistas } con la función portal.vistas_de (migración 23), o null si la base no la tiene.
+     8/10/2026 · Sin la 23 la base contesta 404 (PGRST202) y la consola lo pinta en rojo: la primera vez se anota y en
+     el resto de la visita no se vuelve a llamar (ver FALTA_23). */
+  async function contarVistas(ids){
+    if (falta23('vistas')) return null;
+    try {
+      const { data, error, status } = await S.sb.schema('portal').rpc('vistas_de', { p_refs: ids.map(String) });
+      if (error) { if (status === 404 || /^(PGRST202|42883)$/.test(String(error.code || ''))) anotarFalta23('vistas'); return null; }
+      const r = {}; (data || []).forEach(x => { r[x.ref] = x.vistas; }); return r;
+    } catch (e) { return null; }
+  }
+  /* 4.3 Vistas reales del servidor, no las de este navegador. Las pide el panel para los avisos de la cuenta.
+     Con la 23, por la función que cuenta con índice; sin ella, por la vista de siempre. */
   S.vistasDe = async function(ids){
     if (S.mode !== 'supabase' || !ids || !ids.length) return {};
+    const r0 = await contarVistas(ids); if (r0) return r0;
     try { const { data } = await S.sb.schema('portal').from('vistas_por_aviso').select('ref,vistas').in('ref', ids.map(String)); const r = {}; (data||[]).forEach(x => r[x.ref] = x.vistas); return r; } catch (e) { return {}; }
   };
   S.consultasDe = async function(ids){
@@ -488,14 +701,29 @@
   S.avisosDePropietario = async function(){
     if (!S.session) return [];
     const e = S.session.email.toLowerCase();
-    if (S.mode === 'supabase') { const { data } = await S.sb.schema('portal').from('avisos').select('*, fotos(url, orden), publicadores(slug, nombre, tipo, matricula, badge)').ilike('propietario_email', e); return (data || []).map(a => { a.publicador = a.publicadores; delete a.publicadores; return a; }); }
+    if (S.mode === 'supabase') {
+      /* 8/10/2026 · Sin `*` y sin filtrar por propietario_email en la tabla (la 23 cierra esa columna): los ids salen de
+         la vista avisos_propietario; sin la 23, como antes. El mail va escapado: un "_" en un ilike es comodín. */
+      const cols = COLS_AVISO + ',fotos(url,orden),publicadores(slug,nombre,tipo,matricula,badge)';
+      const patron = e.replace(/[\\%_]/g, '\\$&');
+      const v = await S.sb.schema('portal').from('avisos_propietario').select('id,propietario_email').ilike('propietario_email', patron);
+      let filas;
+      if (v.error && faltaEnBase(v.error)) { const { data } = await S.sb.schema('portal').from('avisos').select(cols + ',propietario_email').ilike('propietario_email', patron); filas = data || []; }
+      else { const ids = (v.data || []).map(r => r.id); if (!ids.length) return []; const { data } = await S.sb.schema('portal').from('avisos').select(cols).in('id', ids); filas = conMails(data, Object.fromEntries((v.data || []).map(r => [r.id, r.propietario_email]))); }
+      return filas.map(desembolsar);
+    }
     const pubs = L.pubs.get([]); return L.avisos.get([]).filter(a => (a.propietario_email||'').toLowerCase() === e).map(a => Object.assign({}, a, { publicador: pubs.find(p => p.id === a.publicador_id) || null }));
   };
 
   /* ── mails al publicador (función de servidor; en modo local no hay envío) ── */
+  /* 8/10/2026 · Con la sesión, el token va en Authorization: api/portal-notify.js solo manda 'aprobado', 'rechazado',
+     'cambios' y 'verificado' si es la sesión de un curador, y 'revision' (al equipo) si es la del publicador del aviso.
+     'consulta' sigue sin sesión. */
   S.notify = async function(tipo, payload){
     if (S.mode !== 'supabase') return { skipped: true };
-    try { const r = await fetch('/api/portal-notify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign({ tipo }, payload)) }); return await r.json().catch(() => ({ ok: r.ok })); } catch (e) { return { error: String(e) }; }
+    const headers = { 'Content-Type': 'application/json' };
+    const token = DEMO ? null : await S.tokenAcceso(); if (token) headers.Authorization = 'Bearer ' + token;
+    try { const r = await fetch('/api/portal-notify', { method: 'POST', headers, body: JSON.stringify(Object.assign({ tipo }, payload)) }); return await r.json().catch(() => ({ ok: r.ok })); } catch (e) { return { error: String(e) }; }
   };
 
   /* ── 4.5 Lo que hoy vive en el navegador y tiene tabla propia ── */
@@ -603,7 +831,12 @@
     return true; /* modo local: cualquiera con sesión, para probar */
   };
   S.colaCuracion = async function(){
-    if (S.mode === 'supabase') { const { data } = await S.sb.schema('portal').from('avisos').select('*, fotos(url, orden), publicadores(*)').in('estado_curacion', ['en_revision']).order('updated_at', { ascending:true }); return (data || []).map(a => { a.publicador = a.publicadores; delete a.publicadores; return a; }); }
+    if (S.mode === 'supabase') {
+      const { data } = await S.sb.schema('portal').from('avisos').select(COLS_AVISO + ',fotos(url,orden),publicadores(*)').in('estado_curacion', ['en_revision']).order('updated_at', { ascending:true });
+      const filas = data || [];
+      if (filas.length && !DEMO) conMails(filas, await mailsPropietario(q => q.in('id', filas.map(a => a.id))));
+      return filas.map(desembolsar);
+    }
     const pubs = L.pubs.get([]); return L.avisos.get([]).filter(a => a.estado_curacion === 'en_revision').map(a => Object.assign({}, a, { publicador: pubs.find(p => p.id === a.publicador_id) || null }));
   };
   /* La persona titular de un publicador (migración 01). null si no hay migración o no tiene titular. */

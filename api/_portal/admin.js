@@ -9,8 +9,10 @@
  *   estado()                         qué variables están configuradas (booleanos, nunca los valores).
  *   enviarMail({to, subject, html, text})   Resend por HTTP, igual que portal-notify.
  *   emailDeUsuario(usuarioId)        mail de una cuenta de auth (GET /auth/v1/admin/users/{id}).
- *   curadorDeSesion(req)             si Authorization: Bearer <access_token> es la sesión de un
- *                                    curador (portal.curadores), su mail; si no, null. Lo usa portal-salud.
+ *   usuarioDeSesion(req)             la cuenta de Authorization: Bearer <access_token> ({id, email, token}) o null.
+ *   curadorDeSesion(req[, usuario])  si Authorization: Bearer <access_token> es la sesión de un
+ *                                    curador (portal.curadores), su mail; si no, null. Lo usan portal-salud,
+ *                                    portal-sync, portal-respaldo y portal-notify.
  *   origenPermitido(req)             misma lista de orígenes que portal-notify.
  *   sinLineaCorredor(s)              misma expresión que D.sinLineaCorredor en portal/js/data.js.
  *   esc, plantilla, json, leerClave, fechaBA, inicioDelDiaBA
@@ -28,6 +30,7 @@
  *   PORTAL_NOTIFY_KEY            clave del equipo: header x-portal-key para disparar a mano
  *   PORTAL_RESUMEN_A             destinatario del resumen diario (default portal@bairengroup.com)
  *   PORTAL_SITE                  raíz pública del portal para los links de los mails (default: el de hoy)
+ *   PORTAL_ORIGENES              opcional: orígenes exactos de más que pueden llamar a las funciones, separados por coma
  */
 const PORTAL_URL = process.env.PORTAL_SUPABASE_URL || 'https://jdatlsrujgfmvyuhoffg.supabase.co';
 const PORTAL_ANON = process.env.PORTAL_SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkYXRsc3J1amdmbXZ5dWhvZmZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NzcyNTYsImV4cCI6MjA5NDQ1MzI1Nn0.g9B1EoHkVeAcDJ2KNuMjwMW2_5Y6Xk2IlWjdQRrob2o';
@@ -45,7 +48,11 @@ const RESUMEN_A = process.env.PORTAL_RESUMEN_A || 'portal@bairengroup.com';
    Sin él, /api/portal-sync devolvía 403 en cada carga y la sincronización web → portal disparada
    por el navegador NUNCA corría en producción: los precios, las reservas y las bajas de
    bairengroup.com llegaban solo por el cron de las 10:00, o sea con hasta 24 horas de atraso. */
-const ORIGENES = [/^https:\/\/(www\.)?bairengroup\.com$/, /^https:\/\/portal\.bairengroup\.com$/, /^https:\/\/grupo-bairen[a-z0-9-]*\.vercel\.app$/, /^http:\/\/(localhost|127\.0\.0\.1):\d+$/];
+/* 8/10/2026 · PORTAL_ORIGENES (opcional): orígenes exactos de más, separados por coma, por ejemplo el dominio
+   *.vercel.app del proyecto propio del portal o un dominio nuevo, sin tocar el código. */
+const ORIGENES_EXTRA = String(process.env.PORTAL_ORIGENES || '').split(',').map(s => s.trim().replace(/\/+$/, '')).filter(s => /^https?:\/\/[^/\s]+$/.test(s))
+  .map(s => new RegExp('^' + s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$'));
+const ORIGENES = [/^https:\/\/(www\.)?bairengroup\.com$/, /^https:\/\/portal\.bairengroup\.com$/, /^https:\/\/grupo-bairen[a-z0-9-]*\.vercel\.app$/, /^http:\/\/(localhost|127\.0\.0\.1):\d+$/].concat(ORIGENES_EXTRA);
 const origenPermitido = req => { const o = (req.headers && req.headers.origin) || ''; return !o || ORIGENES.some(re => re.test(o)); };
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -116,21 +123,33 @@ async function emailDeUsuario(usuarioId) {
   return (u && u.email) || null;
 }
 
+/* La cuenta detrás de Authorization: Bearer <access_token>, validada en GET /auth/v1/user del portal:
+   { id, email, token } o null. Nunca lanza. El secreto del cron no es una sesión. */
+async function usuarioDeSesion(req) {
+  try {
+    const m = /^Bearer\s+(\S+)$/i.exec((req.headers && req.headers.authorization) || '');
+    if (!m) return null;
+    const token = m[1];
+    if (process.env.CRON_SECRET && token === process.env.CRON_SECRET) return null;
+    const r = await fetch(`${PORTAL_URL}/auth/v1/user`, { headers: { apikey: PORTAL_ANON, Authorization: `Bearer ${token}` } });
+    if (!r.ok) return null;
+    const u = await r.json();
+    return u && u.id && u.email ? { id: u.id, email: u.email, token } : null;
+  } catch (e) { return null; }
+}
+
 /**
  * Sesión de un curador. Lee Authorization: Bearer <access_token> (el de BPStore.sb.auth.getSession()
  * en el navegador), lo valida en GET /auth/v1/user con la clave anon del portal y comprueba que ese
  * mail esté en portal.curadores: con la service key si hay, si no con el mismo token (la política
  * "curadores se ven a si mismos" deja leer la fila propia). Devuelve el mail o null. Nunca lanza.
+ * usuario: el de usuarioDeSesion, si ya se validó (evita un segundo pedido a Auth).
  */
-async function curadorDeSesion(req) {
+async function curadorDeSesion(req, usuario) {
   try {
-    const m = /^Bearer\s+(\S+)$/i.exec((req.headers && req.headers.authorization) || '');
-    if (!m) return null;
-    const token = m[1];
-    if (process.env.CRON_SECRET && token === process.env.CRON_SECRET) return null;   // el secreto del cron no es una sesión
-    const r = await fetch(`${PORTAL_URL}/auth/v1/user`, { headers: { apikey: PORTAL_ANON, Authorization: `Bearer ${token}` } });
-    if (!r.ok) return null;
-    const u = await r.json(); const email = u && u.email; if (!email) return null;
+    const u = usuario || await usuarioDeSesion(req);
+    if (!u) return null;
+    const email = u.email, token = u.token;
     const path = `curadores?select=email&email=eq.${encodeURIComponent(email)}`;
     let filas;
     if (SERVICE_KEY) filas = await get(path);
@@ -172,4 +191,4 @@ function horaBA(d) { const ba = new Date((d ? new Date(d) : new Date()).getTime(
 const fmtUSD = n => n == null ? 'Consultar precio' : 'USD ' + Number(n).toLocaleString('es-AR', { maximumFractionDigits: 0 });
 const linkFicha = id => `${SITE}propiedad-${encodeURIComponent(id)}`;
 
-module.exports = { PORTAL_URL, WEB_URL, SITE, RESUMEN_A, ORIGENES, RestError, tieneServiceKey: () => !!SERVICE_KEY, rest, get, post, patch, del, contar, web, emailDeUsuario, curadorDeSesion, enviarMail, plantilla, estado, origenPermitido, preparar, conClave, conCron, query, esc, sinLineaCorredor, inicioDelDiaBA, fechaBA, horaBA, fmtUSD, linkFicha };
+module.exports = { PORTAL_URL, PORTAL_ANON, WEB_URL, SITE, RESUMEN_A, ORIGENES, RestError, tieneServiceKey: () => !!SERVICE_KEY, rest, get, post, patch, del, contar, web, emailDeUsuario, usuarioDeSesion, curadorDeSesion, enviarMail, plantilla, estado, origenPermitido, preparar, conClave, conCron, query, esc, sinLineaCorredor, inicioDelDiaBA, fechaBA, horaBA, fmtUSD, linkFicha };

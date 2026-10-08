@@ -34,8 +34,8 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20260925a"><link rel="stylesheet" href="css/catalogo.css?v=20260925a"><link rel="stylesheet" href="css/portal.css?v=20260925a">
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"BAIREN","url":"https://www.bairengroup.com","logo":"https://www.bairengroup.com/bairen_logo.png","description":"El portal de propiedades seleccionadas de Buenos Aires. Alquileres a mediano y largo plazo y departamentos en venta, seleccionados uno por uno antes de entrar al portal.","areaServed":[{"@type":"City","name":"Ciudad Autónoma de Buenos Aires"},{"@type":"AdministrativeArea","name":"Zona Norte, Buenos Aires"}]}</script>
+  <link rel="stylesheet" href="css/base.css?v=20261008c"><link rel="stylesheet" href="css/catalogo.css?v=20261008c"><link rel="stylesheet" href="css/portal.css?v=20261008c">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"BAIREN","url":"https://www.bairengroup.com","logo":"https://www.bairengroup.com/bairen_logo.png","description":"El portal de propiedades seleccionadas de Buenos Aires. Alquileres a mediano plazo (3 a 12 meses), alquileres tradicionales y departamentos en venta, seleccionados uno por uno antes de entrar al portal.","areaServed":[{"@type":"City","name":"Ciudad Autónoma de Buenos Aires"},{"@type":"AdministrativeArea","name":"Zona Norte, Buenos Aires"}]}</script>
 </head>
 <body class="p-home">
 <div class="p-velo" aria-hidden="true"><span class="w">BAIREN</span></div>
@@ -48,7 +48,6 @@
   <div class="h-hero-velo" aria-hidden="true"></div>
   <div class="h-hero-in">
     <h1><span class="hline" data-i18n="hero_h1a">Propiedades seleccionadas</span><span class="hline" data-i18n="hero_h1b">en Buenos Aires.</span></h1>
-    <p class="h-hero-sub" data-i18n="hero_sub">Viví Buenos Aires en su máximo esplendor.</p>
     <form class="h-search" id="searchForm" action="buscar.html" method="get" role="search" aria-label="Buscar propiedades" data-i18n-aria="buscar_aria">
       <input type="hidden" name="op" id="opInput" value="venta">
       <div class="h-seg" role="group" aria-label="Operación">
@@ -65,11 +64,19 @@
   </div>
 </section>
 
+<!-- 8/10/2026 · Lo último que entró: las unidades publicadas más nuevas, con los datos que la portada ya carga -->
+<section class="h-sec h-crema h-ultimos" id="ultimos" aria-labelledby="ultimosT">
+  <div class="h-in h-ultimos-head">
+    <h2 class="h-h2" id="ultimosT" data-i18n="ult_h2">Lo último que entró.</h2>
+    <a class="h-link" href="buscar.html?op=&amp;sort=recientes" data-i18n="ult_ver">Ver todas</a>
+  </div>
+  <div class="h-ultimos-riel" id="ultimosTrack" aria-busy="true" role="group" aria-label="Lo último que entró, deslizá para ver más" data-i18n-aria="ult_riel"><span class="h-ult-esq h-esq" aria-hidden="true"></span><span class="h-ult-esq h-esq" aria-hidden="true"></span></div>
+</section>
+
 <section class="h-sec h-navy h-estandar" id="estandar">
   <div class="h-in">
     <p class="h-eyebrow" data-i18n="est_eyebrow">Selección BAIREN</p>
     <h2 class="h-h2" data-i18n="est_h2">Seguimos un estándar.</h2>
-    <p class="h-copy" data-i18n="est_copy">Antes de incorporar cada propiedad corroboramos:</p>
     <div class="h-camino" id="camino">
       <svg class="h-camino-linea" aria-hidden="true" preserveAspectRatio="none"><path class="guia"/><path class="trazo"/></svg>
       <ol class="h-hitos">
@@ -96,6 +103,9 @@
 </section>
 
 
+<!-- 8/10/2026 · Tanda 2 · Sin las frases que explicaban: "Viví Buenos Aires en su máximo esplendor.", "Antes de
+     incorporar cada propiedad corroboramos:" y el párrafo de "¿Tu propiedad encaja en BAIREN?". Los cuatro íconos
+     quedan con su palabra; la pregunta, con su botón. -->
 <section class="h-sec h-crema h-borde" id="edificios">
   <div class="h-in">
     <h2 class="h-h2" data-i18n="edif_h2">Edificios y complejos de primera línea.</h2>
@@ -116,7 +126,6 @@
   <div class="h-in h-encaja-fila">
     <div class="h-encaja-txt">
       <h2 class="h-h2" data-i18n="pub_h2">¿Tu propiedad encaja en BAIREN?</h2>
-      <p class="h-copy" data-i18n-html="pub_copy">Revisamos la propiedad. Se sube al portal si cumple con los requisitos. Desde tu panel ves quién la mira, quién consulta y quién pide visita.</p>
     </div>
     <a class="h-btn h-btn-oro" href="publicar-aviso.html" data-i18n="pub_btn">Publicar propiedad</a>
   </div>
@@ -127,12 +136,12 @@
 </main>
 <div id="pFooter"></div>
 
-<script src="../mapa-barrios.js?v=20260925a" defer></script><script src="supabase-portal.js?v=20260925a" defer></script><script src="js/errores.js?v=20260925a" defer></script>
-<script src="js/motion.js?v=20260925a" defer></script>
-<script src="js/bairen-motion.js?v=20260925a" defer></script>
-<script src="js/i18n-portal.js?v=20260925a" defer></script><script src="js/ui.js?v=20260925a" defer></script>
-<script src="js/store.js?v=20260925a" defer></script>
-<script src="js/data.js?v=20260925a" defer></script>
+<script src="../mapa-barrios.js?v=20261008c" defer></script><script src="supabase-portal.js?v=20261008c" defer></script><script src="js/errores.js?v=20261008c" defer></script>
+<script src="js/motion.js?v=20261008c" defer></script>
+<script src="js/bairen-motion.js?v=20261008c" defer></script>
+<script src="js/i18n-portal.js?v=20261008c" defer></script><script src="js/ui.js?v=20261008c" defer></script>
+<script src="js/store.js?v=20261008c" defer></script>
+<script src="js/data.js?v=20261008c" defer></script>
 <script>
 document.addEventListener('DOMContentLoaded', function(){
 (async function(){
@@ -206,6 +215,7 @@ document.addEventListener('DOMContentLoaded', function(){
     console.error(err);
     /* El error se muestra donde iban las fachadas, con reintento; el resto de la portada ya está pintado */
     document.querySelectorAll('#edifCarrusel .h-flecha, #edifPuntos').forEach(el => { el.hidden = true; });
+    document.getElementById('ultimos').hidden = true;
     BP.estadoError(document.getElementById('edificiosTrack'), 'No pudimos cargar los edificios.', () => location.reload());
     return;
   }
@@ -215,6 +225,17 @@ document.addEventListener('DOMContentLoaded', function(){
 
 
   const counts = BPData.countsByZona(avisos, null); window.__counts = counts;
+
+  /* ── Lo último que entró: hasta 8 unidades disponibles, de la más nueva a la más vieja, con foto.
+     Sale de los avisos que la portada ya cargó (BPData.load): no hay pedido nuevo a la base. ── */
+  (function(){
+    const t = a => new Date(a.publicadoEn || 0).getTime();
+    const nuevas = reales.filter(a => !a.reservado && a.fotos && a.fotos.length).sort((a, b) => t(b) - t(a)).slice(0, 8);
+    const sec = document.getElementById('ultimos'), track = document.getElementById('ultimosTrack');
+    if (!nuevas.length) { sec.hidden = true; return; }
+    track.innerHTML = nuevas.map(BPData.cardV).join('');   /* el corazón de cada tarjeta lo atiende data.js (un escucha en el documento) */
+    track.removeAttribute('aria-busy');
+  })();
 
   /* ── Edificios: los tres de siempre, con su fachada. Si hoy no hay unidades,
      la tarjeta lo dice y ofrece avisar. ── */

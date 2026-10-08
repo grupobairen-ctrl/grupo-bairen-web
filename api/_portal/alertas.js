@@ -4,9 +4,13 @@
  * cumpleFiltros(fila, filtros)  replica D.filter de portal/js/data.js sobre una fila de
  *   portal.avisos (con publicadores(slug,tipo) embebido) y el objeto F que guarda
  *   buscar.html en portal.alertas.filtros. Claves cubiertas: op, tipo, zonas, q, pub, emp,
- *   reservadas, amb, dorm, banos, coch, pmin, pmax, expmax, m2min, m2max, antig, amen, cual,
+ *   reservadas, amb, dorm, banos, coch, pmin, pmax, mon, expmax, m2min, m2max, antig, amen, cual,
  *   amoblado, dueno, video, hace. 'favs' no se puede replicar (los favoritos viven en el
  *   navegador) y se ignora; 'sort' y 'page' no filtran. clavesIgnoradas(filtros) lo informa.
+ *   8/10/2026 · Con las mismas reglas que el catálogo: el rango de precio es en una moneda (mon: '' USD,
+ *   'ARS' pesos) y los avisos en la otra no entran; con expensas máximas, el aviso sin el dato no entra salvo
+ *   que tenga las expensas incluidas (todo incluido o 'Expensas incluidas', D.expensasIncluidas); sin
+ *   publicador no entra (D.load no lo muestra).
  * alertasDeBusqueda() y alertasDePrecio() hacen el trabajo del cron y devuelven el detalle.
  *
  * Cuándo "entró" un aviso: max(publicado_en, created_at). publicado_en viene de la web
@@ -20,9 +24,9 @@
 const A = require('./admin');
 const { zonaDe, ZONAS_PORTAL } = require('./zonas');
 
-const CLAVES = ['op', 'tipo', 'zonas', 'q', 'pub', 'emp', 'reservadas', 'amb', 'dorm', 'banos', 'coch', 'pmin', 'pmax', 'expmax', 'm2min', 'm2max', 'antig', 'amen', 'cual', 'amoblado', 'dueno', 'video', 'hace'];
+const CLAVES = ['op', 'tipo', 'zonas', 'q', 'pub', 'emp', 'reservadas', 'amb', 'dorm', 'banos', 'coch', 'pmin', 'pmax', 'mon', 'expmax', 'm2min', 'm2max', 'antig', 'amen', 'cual', 'amoblado', 'dueno', 'video', 'hace'];
 const NO_FILTRAN = ['sort', 'page', 'key', 'favs'];
-const SELECT_AVISOS = 'id,codigo,slug,operacion,tipo,titulo,direccion,unidad,barrio,zona,precio,moneda,expensas,m2_total,ambientes,dormitorios,banos,cocheras,antiguedad,amoblado,amenities,cualidades_verificadas,descripcion,video_url,estado,publicado_en,created_at,publicadores(slug,tipo)';
+const SELECT_AVISOS = 'id,codigo,slug,operacion,tipo,titulo,direccion,unidad,barrio,zona,precio,moneda,expensas,m2_total,ambientes,dormitorios,banos,cocheras,antiguedad,amoblado,amenities,caracteristicas,cualidades_verificadas,descripcion,video_url,estado,publicado_en,created_at,publicadores(slug,tipo)';
 const LOTE = 100;        // ids por consulta con in.(...)
 const PARALELO = 5;      // alertas procesadas a la vez
 const PRECIO_BUSQUEDA = 0;   // precio de alertas_enviadas en las alertas de búsqueda (la migración 04 lo deja not null default 0)
@@ -34,32 +38,44 @@ function clavesIgnoradas(f) { return Object.keys(f || {}).filter(k => CLAVES.ind
 /* Fila de la base → lo que D.filter mira (mismos nombres que fromStore). */
 function modelo(r) {
   const pub = r.publicadores || r.publicador || {};
-  const pubId = pub.slug || r.publicador_id || 'bairen';
+  /* 8/10/2026 · Como D.fromStore: sin publicador queda en null (antes caía en 'bairen', y con la regla de todo
+     incluido un aviso sin publicador habría pasado por uno de BAIREN REALTY). */
+  const pubId = pub.slug || pub.id || null;
   const zona = zonaDe(r.barrio) || r.zona || r.barrio;
   const dias = r.publicado_en ? Math.max(0, Math.floor((Date.now() - Date.parse(r.publicado_en)) / 864e5)) : null;
   return {
-    op: r.operacion, tipoProp: r.tipo || 'Departamento', zona, precio: r.precio == null ? null : Number(r.precio), expensas: r.expensas == null ? null : Number(r.expensas),
+    op: r.operacion, tipoProp: r.tipo || 'Departamento', zona, precio: r.precio == null ? null : Number(r.precio), moneda: r.moneda === 'ARS' ? 'ARS' : 'USD', expensas: r.expensas == null ? null : Number(r.expensas),
     amb: r.ambientes || null, dorm: r.dormitorios || null, banos: r.banos || null, cocheras: r.cocheras || 0, m2: r.m2_total || null, antiguedad: r.antiguedad == null ? null : Number(r.antiguedad),
-    amenities: r.amenities || [], cualidades: r.cualidades_verificadas || [], amoblado: !!r.amoblado, video: !!r.video_url, reservado: r.estado === 'reservado',
+    amenities: r.amenities || [], caracteristicas: r.caracteristicas || [], cualidades: r.cualidades_verificadas || [], amoblado: !!r.amoblado, video: !!r.video_url, reservado: r.estado === 'reservado',
     publicadorId: pubId, pubTipo: pub.tipo || 'profesional', dias,
     texto: [r.titulo || (r.direccion + (r.unidad ? ' · ' + r.unidad : '')), r.direccion, r.barrio, zona, r.descripcion, (r.amenities || []).join(' '), (r.cualidades_verificadas || []).join(' ')].join(' ').toLowerCase(),
   };
 }
 /* D.opMatch: 'alquiler' abarca mediano y largo; 'largo' es solo largo (op 'alquiler'). */
 const opMatch = (a, op) => !op || (op === 'alquiler' ? a.op !== 'venta' : op === 'largo' ? a.op === 'alquiler' : a.op === op);
+/* D.todoIncluido y D.expensasIncluidas (portal/js/data.js, contrato del lanzamiento): "todo incluido" es un aviso de
+   mediano plazo de BAIREN REALTY (publicador 'bairen') o uno que tiene a la vez 'Expensas incluidas' y 'Servicios
+   incluidos'. Si cambia allá, cambia acá. */
+const tiene = (a, x) => (a.caracteristicas || []).indexOf(x) > -1;
+const todoIncluido = a => a.op === 'mediano' && (a.publicadorId === 'bairen' || (tiene(a, 'Expensas incluidas') && tiene(a, 'Servicios incluidos')));
+const expensasIncluidas = a => todoIncluido(a) || tiene(a, 'Expensas incluidas');
 
 /* Misma semántica que D.filter (portal/js/data.js), más el nicho: fuera de ZONAS_PORTAL no se publica. */
 function cumpleFiltros(fila, f) {
   f = f || {};
   const a = fila.texto != null ? fila : modelo(fila);
   if (ZONAS_PORTAL.indexOf(a.zona) === -1) return false;
+  if (!a.publicadorId) return false;
   if (!f.reservadas && a.reservado) return false;
   if (f.op && !opMatch(a, f.op)) return false;
   if (f.tipo && f.tipo !== 'todos' && a.tipoProp.toLowerCase() !== String(f.tipo).toLowerCase()) return false;
   if (f.zonas && f.zonas.length && f.zonas.indexOf(a.zona) === -1) return false;
+  /* El rango de precio es en una moneda: un rango en dólares no trae avisos en pesos y al revés. Sin rango, todos. */
+  if ((f.pmin || f.pmax) && (a.moneda === 'ARS' ? 'ARS' : 'USD') !== (f.mon === 'ARS' ? 'ARS' : 'USD')) return false;
   if (f.pmin && (a.precio || 0) < f.pmin) return false;
   if (f.pmax && (a.precio || 0) > f.pmax) return false;
-  if (f.expmax && a.expensas && a.expensas > f.expmax) return false;
+  /* Con expensas máximas: el aviso sin el dato no entra, salvo que las tenga incluidas (cuentan como 0). */
+  if (f.expmax && !(expensasIncluidas(a) || (a.expensas > 0 && a.expensas <= f.expmax))) return false;
   if (f.amb && (a.amb || 0) < f.amb) return false;
   if (f.dorm && (a.dorm || 0) < f.dorm) return false;
   if (f.banos && (a.banos || 0) < f.banos) return false;
@@ -175,4 +191,4 @@ async function alertasDePrecio(opts) {
   return out;
 }
 
-module.exports = { cumpleFiltros, clavesIgnoradas, modelo, opMatch, alertasDeBusqueda, alertasDePrecio, precioTexto, tituloDe, CLAVES, _interno: { enLotes, enParalelo, instanteDe, LOTE, PARALELO, PRECIO_BUSQUEDA } };
+module.exports = { cumpleFiltros, clavesIgnoradas, modelo, opMatch, todoIncluido, expensasIncluidas, alertasDeBusqueda, alertasDePrecio, precioTexto, tituloDe, CLAVES, _interno: { enLotes, enParalelo, instanteDe, LOTE, PARALELO, PRECIO_BUSQUEDA } };
