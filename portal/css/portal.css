@@ -436,7 +436,10 @@ html{background:var(--navy-deeper)}
   --p-gold-ink:#75623C; --p-mid-ink:#59647A;
   --p-shadow-d:0 24px 60px rgba(0,0,0,.35); --p-focus:0 0 0 3px rgba(194,169,104,.35);
 }
-html,body{background:var(--p-canvas)}
+/* 8/10/2026 · El lienzo (html) navy y el contenido (body) crema: Safari del iPhone desde iOS 26 ignora theme-color y
+   pinta sus barras de arriba y de abajo con el color del lienzo, que era crema y se veía blanco */
+html{background:#131D2D}
+body{background:var(--p-canvas)}
 
 /* Texto sobre navy: Jost 400, más interlínea */
 .p-section:not(.alt),.p-page,.p-filters,.p-form,.p-dd,.p-pop,.p-drawer .panel,.p-search,.p-login{color:var(--p-ink);font-weight:400;line-height:1.7}
@@ -4685,8 +4688,8 @@ body.p-flujo-pub{--p-focus-b:#131D2D}
   .p-mcta .p-mcta-sec{border-color:rgba(251,250,246,.32)!important}
 }
 @supports ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
-  @media(max-width:859px){.p-tabbar{background:var(--p-barra);-webkit-backdrop-filter:blur(16px) saturate(140%);backdrop-filter:blur(16px) saturate(140%)}}
-  @media(max-width:900px){.p-mcta{background:var(--p-barra);-webkit-backdrop-filter:blur(16px) saturate(140%);backdrop-filter:blur(16px) saturate(140%)}}
+  /* 8/10/2026 · Las barras de abajo (navegación y precio de la ficha) quedan navy sólido: Safari del iPhone copia su color
+     para su propia barra de abajo solo si es opaco; translúcidas, la pintaba blanca y se cortaba la continuidad */
 }
 
 /* ── 5 · Ingresar: una caja con aire ─────────────────────────────────────────────────────────────────────── */
