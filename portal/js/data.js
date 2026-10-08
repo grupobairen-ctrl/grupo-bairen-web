@@ -382,14 +382,17 @@
     const foto = a.fotos[0] ? `<img src="${BP.sbImg(a.fotos[0], 700)}" alt="" loading="lazy" decoding="async" onerror="BPData.sinFoto(this)">` : `<span class="tj-sinfoto">${BP.t('card_fotos_prod', 'Fotos en producción')}</span>`;
     const tag = a.reservado ? `<span class="tj-tag res">${BP.t('card_reservada', 'Reservada')}</span>` : `<span class="tj-tag tj-${a.op}">${D.opTag(a)}</span>`;
     const meta = D.metaCorta(a), linea = D.pubLinea(pub);
+    /* escritorio simple · Cada dato en su span (el texto no cambia) para que la compu muestre solo los dos primeros, y la
+       tarjeta de BAIREN Realty marcada: en la compu no repite quién publica en cada tarjeta */
+    const metaHTML = meta ? meta.split(' · ').map((x, i) => `<span class="tj-m">${i ? ' · ' : ''}${x}</span>`).join('') : '';
     return `
-<article class="prop-card p-tj" data-flip="${BP.esc(a.id)}">
+<article class="prop-card p-tj${a.publicadorId === 'bairen' ? ' p-tj-realty' : ''}" data-flip="${BP.esc(a.id)}">
   <a class="tj-link" href="${href}">
     <span class="tj-foto">${foto}${tag}${desde ? `<span class="tj-desde">${BP.esc(desde)}</span>` : ''}</span>
     <span class="tj-cuerpo">
       <span class="tj-titulo">${BP.esc(tit)}</span>
       ${calle ? `<span class="tj-calle">${BP.esc(calle)}</span>` : ''}
-      <span class="tj-fila"><span class="tj-precio">${D.precioCorto(a)}</span>${meta ? `<span class="tj-meta">${meta}</span>` : ''}</span>
+      <span class="tj-fila"><span class="tj-precio">${D.precioCorto(a)}</span>${meta ? `<span class="tj-meta">${metaHTML}</span>` : ''}</span>
       ${linea ? `<span class="tj-pub">${linea}</span>` : ''}
     </span>
   </a>
