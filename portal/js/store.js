@@ -90,6 +90,9 @@
      una frase en castellano que dice qué hacer; lo desconocido cae en una frase genérica, nunca en el texto crudo. */
   const errorHumano = (e, contexto) => {
     const m = String(e && e.message || e || '').toLowerCase();
+    /* 8/10/2026 · Con el captcha prendido, Supabase rechaza el pedido sin token o con uno vencido o ya usado
+       (error_code captcha_failed, "captcha protection: request disallowed (...)"). */
+    if ((e && e.code === 'captcha_failed') || /captcha/.test(m)) return T('ing_err_captcha', 'No pudimos verificar que sos una persona. Probá de nuevo.');
     if (/rate limit|too many|over_email_send_rate_limit/.test(m)) return T('ing_err_limite', 'Estamos mandando muchos códigos en este momento. Esperá unos minutos y volvé a probar, o entrá con Google.');
     if (/is invalid|invalid email|unable to validate email/.test(m) && contexto === 'enviar') return T('ing_err_mail', 'Revisá el mail, por ejemplo nombre@dominio.com.');
     if (/expired|invalid|otp/.test(m) && contexto === 'verificar') return T('ing_codigo_vencido', 'El código venció o no coincide. Pedí uno nuevo con "Reenviar".');
@@ -98,12 +101,16 @@
     return contexto === 'verificar' ? T('ing_no_verifico', 'No se pudo verificar. Probá de nuevo en un momento.') : T('ing_no_envio', 'No se pudo enviar el código. Probá de nuevo en un momento.');
   };
   S.errorHumano = errorHumano;
-  S.sendCode = async function(email){
+  /* opts.captchaToken: el token de Turnstile (ingresar.html, solo con PORTAL_CAPTCHA_SITEKEY cargada). Sin token, el
+     pedido sale exactamente como antes del captcha. Cada token sirve una sola vez: un reenvío necesita otro. */
+  S.sendCode = async function(email, opts){
     email = (email||'').trim().toLowerCase(); if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return { ok:false, msg: T('ing_revisa_mail', 'Revisá el mail.') };
     /* 16/9 · Desde que el portal comparte proyecto de Auth con el OS, un link en el mail (si la plantilla lo trae) caería en la
        Site URL del proyecto (el OS). emailRedirectTo lo trae de vuelta al portal, a esta misma página, conservando ?volver=. */
     const volverA = location.origin + location.pathname.replace(/[^/]*$/, '') + 'ingresar.html' + location.search;
-    if (S.mode === 'supabase') { const { error } = await S.sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true, emailRedirectTo: volverA } }); return error ? { ok:false, msg: errorHumano(error, 'enviar') } : { ok:true, msg: T('ing_codigo_enviado', 'Te mandamos un código de seis dígitos a {e}. Si no llega, revisá spam.', { e: email }) }; }
+    const options = { shouldCreateUser: true, emailRedirectTo: volverA };
+    if (opts && opts.captchaToken) options.captchaToken = String(opts.captchaToken);
+    if (S.mode === 'supabase') { const { error } = await S.sb.auth.signInWithOtp({ email, options }); return error ? { ok:false, msg: errorHumano(error, 'enviar') } : { ok:true, msg: T('ing_codigo_enviado', 'Te mandamos un código de seis dígitos a {e}. Si no llega, revisá spam.', { e: email }) }; }
     const code = String(Math.floor(100000 + Math.random() * 900000)); L.code.set({ email, code, t: Date.now() });
     return { ok:true, msg: T('ing_codigo_local', 'Modo local: tu código es {c}. Con Supabase conectado llega por mail.', { c: code }), code };
   };
