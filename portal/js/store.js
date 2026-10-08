@@ -372,6 +372,26 @@
   S.COLS = { PUB: COLS_PUB, LISTA: COLS_LISTA, FICHA: COLS_FICHA, TARJETA: COLS_TARJETA, AVISO: COLS_AVISO };
   /* La tabla, vista o función todavía no existe en la base (migración sin correr) */
   const faltaEnBase = e => !!e && (/^(PGRST20[0-9]|42P01|42883)$/.test(String(e.code || '')) || /does not exist|could not find/i.test(String(e.message || '')));
+  /* 8/10/2026 · Lo que trae la migración 23 y puede no estar todavía: la columna avisos.disponible_desde y la función
+     vistas_de(). Se pide como si estuviera; si la base contesta que no existe, se anota en sessionStorage y en el resto
+     de la visita no se vuelve a pedir. Con la 23 corrida no cuesta ningún pedido de más; sin ella, uno por visita.
+     (sessionStorage: una pestaña nueva vuelve a probar una vez; si la 23 se corre a mitad de una visita, esa pestaña la
+     ve en la próxima.) */
+  const FALTA_23 = { disp: 'bp_sin_disponible_desde', vistas: 'bp_sin_vistas_de' };
+  const falta23Aca = {};   /* copia en memoria, por si el navegador no deja usar sessionStorage */
+  const falta23 = k => { if (falta23Aca[k]) return true; try { return sessionStorage.getItem(FALTA_23[k]) === '1'; } catch (e) { return false; } };
+  const anotarFalta23 = k => { falta23Aca[k] = true; try { sessionStorage.setItem(FALTA_23[k], '1'); } catch (e) { /* queda la copia en memoria */ } };
+  /* PostgREST: 42703 "column avisos.disponible_desde does not exist" (select); PGRST204 "Could not find the
+     'disponible_desde' column" (cache de esquema). Solo cuenta si el error nombra la columna. */
+  const faltaDisponible = e => !!e && /^(42703|PGRST204)$/.test(String(e.code || '')) && /disponible_desde/.test(String(e.message || '') + ' ' + String(e.details || '') + ' ' + String(e.hint || ''));
+  /* armar(extra) devuelve la consulta con extra (',disponible_desde' o '') sumado a las columnas del aviso. */
+  async function conDisponible(armar){
+    if (falta23('disp')) return armar('');
+    const r = await armar(',disponible_desde');
+    if (r && r.error && faltaDisponible(r.error)) { anotarFalta23('disp'); return armar(''); }
+    return r;
+  }
+  S.hayDisponibleDesde = () => !falta23('disp');   /* false si esta visita ya sabe que la base no tiene la columna */
   /* El mail del propietario de unas filas, solo las que esta cuenta puede ver. filtro(q) pone el filtro. { id: mail }.
      Si no se pudo leer, {} y las filas quedan sin la clave: así guardar el aviso no pisa el mail con un vacío. */
   async function mailsPropietario(filtro){
@@ -399,7 +419,7 @@
   };
   S.getAviso = async function(id){
     if (S.mode === 'supabase') {
-      const { data } = await S.sb.schema('portal').from('avisos').select(COLS_AVISO + ',fotos(url,orden)').eq('id', id).maybeSingle();
+      const { data } = await conDisponible(x => S.sb.schema('portal').from('avisos').select(COLS_AVISO + x + ',fotos(url,orden)').eq('id', id).maybeSingle());
       if (!data) return null;
       return DEMO ? data : conMails([data], await mailsPropietario(q => q.eq('id', id)))[0];
     }
@@ -506,10 +526,10 @@
       const TRAMO = 1000, MAX_TRAMOS = 50, filas = []; let total = null;
       for (let n = 0; n < MAX_TRAMOS; n++) {
         const desde = filas.length;
-        const { data, error, count } = await S.sb.schema('portal').from('avisos')
-          .select(COLS_LISTA + ',fotos(url,orden),publicadores(' + COLS_PUB + ')', n === 0 ? { count: 'exact' } : undefined)
+        const { data, error, count } = await conDisponible(x => S.sb.schema('portal').from('avisos')
+          .select(COLS_LISTA + x + ',fotos(url,orden),publicadores(' + COLS_PUB + ')', n === 0 ? { count: 'exact' } : undefined)
           .eq('estado_curacion', 'publicado').order('publicado_en', { ascending: false, nullsFirst: false }).order('id', { ascending: true })
-          .range(desde, desde + TRAMO - 1);
+          .range(desde, desde + TRAMO - 1));
         if (error) throw error;
         if (n === 0 && typeof count === 'number') total = count;
         (data || []).forEach(a => filas.push(desembolsar(a)));
@@ -527,12 +547,12 @@
   S.avisoPublicado = async function(ref){
     ref = String(ref || ''); if (!ref) return null;
     if (S.mode !== 'supabase') { const l = await S.publishedAvisos(); return l.find(a => a.id === ref) || l.find(a => a.slug === ref) || null; }
-    const pedir = () => S.sb.schema('portal').from('avisos').select(COLS_FICHA + ',fotos(url,orden),publicadores(' + COLS_PUB + ')').eq('estado_curacion', 'publicado');
-    let r = await (esUUID(ref) ? pedir().eq('id', ref) : pedir().eq('slug', ref).order('publicado_en', { ascending: false, nullsFirst: false })).limit(1);
+    const pedir = x => S.sb.schema('portal').from('avisos').select(COLS_FICHA + x + ',fotos(url,orden),publicadores(' + COLS_PUB + ')').eq('estado_curacion', 'publicado');
+    let r = await conDisponible(x => (esUUID(ref) ? pedir(x).eq('id', ref) : pedir(x).eq('slug', ref).order('publicado_en', { ascending: false, nullsFirst: false })).limit(1));
     if (r.error) throw r.error;
     let a = (r.data || [])[0] || null;
     const viejo = !a && !esUUID(ref) && /^(.+)-(venta|alquiler|mediano)$/.exec(ref);
-    if (viejo) { r = await pedir().eq('slug', viejo[1]).eq('operacion', viejo[2]).limit(1); if (r.error) throw r.error; a = (r.data || [])[0] || null; }
+    if (viejo) { r = await conDisponible(x => pedir(x).eq('slug', viejo[1]).eq('operacion', viejo[2]).limit(1)); if (r.error) throw r.error; a = (r.data || [])[0] || null; }
     return a ? desembolsar(a) : null;
   };
   /* Similares de la ficha: misma operación y zona, publicados, hasta n (6), con la portada sola. Un pedido chico en
@@ -618,10 +638,16 @@
     if (!n) throw new Error('conteo de vistas no disponible (falta la migración 23)');
     return n[String(avisoId)] || 0;
   };
-  /* { ref: vistas } con la función portal.vistas_de (migración 23), o null si la base no la tiene */
+  /* { ref: vistas } con la función portal.vistas_de (migración 23), o null si la base no la tiene.
+     8/10/2026 · Sin la 23 la base contesta 404 (PGRST202) y la consola lo pinta en rojo: la primera vez se anota y en
+     el resto de la visita no se vuelve a llamar (ver FALTA_23). */
   async function contarVistas(ids){
-    try { const { data, error } = await S.sb.schema('portal').rpc('vistas_de', { p_refs: ids.map(String) }); if (error) return null; const r = {}; (data || []).forEach(x => { r[x.ref] = x.vistas; }); return r; }
-    catch (e) { return null; }
+    if (falta23('vistas')) return null;
+    try {
+      const { data, error, status } = await S.sb.schema('portal').rpc('vistas_de', { p_refs: ids.map(String) });
+      if (error) { if (status === 404 || /^(PGRST202|42883)$/.test(String(error.code || ''))) anotarFalta23('vistas'); return null; }
+      const r = {}; (data || []).forEach(x => { r[x.ref] = x.vistas; }); return r;
+    } catch (e) { return null; }
   }
   /* 4.3 Vistas reales del servidor, no las de este navegador. Las pide el panel para los avisos de la cuenta.
      Con la 23, por la función que cuenta con índice; sin ella, por la vista de siempre. */
