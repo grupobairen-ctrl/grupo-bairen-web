@@ -43,8 +43,9 @@
 <main id="contenido">
 
 <section class="h-hero" id="inicio">
-  <video autoplay muted loop playsinline preload="metadata" poster="../hero-poster.jpg?v=2" aria-hidden="true"></video>
-  <script>/* El video del hero: 1,5 MB en celular (720p vertical), 1,7 MB en escritorio (720p apaisado, corte 16:9 del original). Se elige antes de que empiece a bajar. */(function(){var v=document.currentScript.previousElementSibling;if(v&&v.tagName==='VIDEO'){v.src=window.innerWidth<900?'../hero-m.mp4?v=1':'../hero-d.mp4?v=1';}})();</script>
+  <video autoplay muted loop playsinline preload="metadata" poster="img/landing-m.jpg?v=1" aria-hidden="true"></video>
+  <script>/* 8/10/2026 · El video de la portada (IMG_1829 de Tomás, a su velocidad original: 6,2 s a 30 cuadros, sin cambios de ritmo).
+     Celular: 720p vertical, 0,9 MB. Escritorio: 720p apaisado, corte 16:9 del original, 0,9 MB. Se elige antes de que empiece a bajar. */(function(){var v=document.currentScript.previousElementSibling;if(v&&v.tagName==='VIDEO'){var m=window.innerWidth<900;v.poster=m?'img/landing-m.jpg?v=1':'img/landing-d.jpg?v=1';v.src=m?'video/landing-m.mp4?v=1':'video/landing-d.mp4?v=1';}})();</script>
   <div class="h-hero-velo" aria-hidden="true"></div>
   <div class="h-hero-in">
     <h1><span class="hline" data-i18n="hero_h1a">Propiedades seleccionadas</span><span class="hline" data-i18n="hero_h1b">en Buenos Aires.</span></h1>
