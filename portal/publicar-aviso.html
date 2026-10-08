@@ -159,6 +159,9 @@ document.addEventListener('DOMContentLoaded', function(){
   const SUGERIDA = { gestor: 'mediano', desarrolladora: 'emprendimiento', profesional: 'venta', inmobiliaria: 'venta', corredor: 'venta', dueno: 'venta' };
   const CLASE_DE = { mediano: 'mediano', venta: 'tradicional', alquiler: 'tradicional', tradicional: 'tradicional', emprendimiento: 'emprendimiento' };
   const eleccionDe = a => { const c = claseDe(a); return c === 'tradicional' ? a.operacion : c; };
+  /* Lo elegido ahora: la clase vigente manda. Un emprendimiento recién elegido todavía no tiene nombre ni etapa y,
+     leído solo del aviso, pasaría por una venta (y al volver del ingreso se cargaba como una sola unidad). */
+  const eleccionActual = () => clase === 'tradicional' ? (eleccionDe(aviso) || 'venta') : (clase || eleccionDe(aviso) || null);
   let clase = claseDe(aviso) || CLASE_DE[vuelta && vuelta.q] || null;
   const modoPerfil = pasoQs === 'perfil' && !!pub;   /* "Editar perfil de publicador" desde el panel */
   const modoDocs = pasoQs === 'documentos' && !!pub && pub.tipo === 'dueno';   /* "Cargar documentos" desde el panel */
@@ -285,7 +288,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
   /* 1 · ¿Qué publicás? */
   PANT.que = function(){
-    const actualSel = clase ? eleccionDe(aviso) || clase : null;
+    const actualSel = clase ? eleccionActual() : null;
     let sel = actualSel || SUGERIDA[pub ? pub.tipo : perfilQs] || '';
     /* 8/10/2026 (venta) · Un dueño directo publica su unidad: "Emprendimiento" (varias unidades de un desarrollo) no va */
     const esDueno = (pub ? pub.tipo : perfilQs) === 'dueno' && clase !== 'emprendimiento';
@@ -831,7 +834,7 @@ document.addEventListener('DOMContentLoaded', function(){
       /* Desde Revisar, Continuar vuelve a Revisar; si en la pantalla 1 cambió lo que se publica, sigue en orden (el precio cambia) */
       if (desdeRevisar && actual === 'que' && claseCambio) desdeRevisar = false;
       const dest = desdeRevisar ? 'revisar' : siguiente(actual);
-      if (dest === 'ingreso') { sigue = true; irAIngresar(eleccionDe(aviso) || clase); return; }
+      if (dest === 'ingreso') { sigue = true; irAIngresar(eleccionActual()); return; }
       if (dest === 'revisar') desdeRevisar = false;
       sigue = true; ocupado = false; ir(dest, 1);
     } catch (e) { BP.toast(BPStore.errorAlGuardar(e), 'error'); }
