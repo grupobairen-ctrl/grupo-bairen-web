@@ -113,7 +113,11 @@
       precio: r.precio == null ? null : Number(r.precio), moneda: r.moneda || 'USD', periodo: r.operacion === 'venta' ? '' : '/mes', expensas: r.expensas == null ? null : Number(r.expensas),
       m2: r.m2_total || null, m2cub: r.m2_cubierto || null, amb, dorm: r.dormitorios || null, banos: r.banos || null, cocheras: r.cocheras || 0, antiguedad: r.antiguedad == null ? null : Number(r.antiguedad),
       amoblado: !!r.amoblado, amenities: r.amenities || [], caracteristicas: r.caracteristicas || [], cualidades: r.cualidades_verificadas || [], fotos, video: r.video_url ? { tipo: r.video_tipo || 'youtube', url: r.video_url } : null,
-      descripcion: D.sinLineaCorredor(r.descripcion), descripcion_en: D.sinLineaCorredor(r.descripcion_en), descripcion_pt: D.sinLineaCorredor(r.descripcion_pt), plazo: r.plazo || '', emprendimiento: r.emprendimiento || null, etapa: r.etapa || null, entrega: r.entrega || null, propietarioEmail: r.propietario_email || null, publicadoEn: r.publicado_en || r.created_at, estado: r.estado, reservado: r.estado === 'reservado', publicadorId: pubId, destacado: !!(r.destacado_hasta && new Date(r.destacado_hasta) > new Date()), demo: false, codigo: r.codigo, apto: r.caracteristicas && r.caracteristicas.length ? r.caracteristicas.slice(0,3) : [], fromStore: true };
+      descripcion: D.sinLineaCorredor(r.descripcion), descripcion_en: D.sinLineaCorredor(r.descripcion_en), descripcion_pt: D.sinLineaCorredor(r.descripcion_pt), plazo: r.plazo || '', emprendimiento: r.emprendimiento || null, etapa: r.etapa || null, entrega: r.entrega || null, propietarioEmail: r.propietario_email || null, publicadoEn: r.publicado_en || r.created_at, estado: r.estado, reservado: r.estado === 'reservado', publicadorId: pubId, destacado: !!(r.destacado_hasta && new Date(r.destacado_hasta) > new Date()), demo: false, codigo: r.codigo, apto: r.caracteristicas && r.caracteristicas.length ? r.caracteristicas.slice(0,3) : [], fromStore: true,
+      /* 8/10/2026 · Tanda 2: cómo se muestra la calle ('exacta' | 'aproximada'; sin el dato, aproximada), el mapa
+         (lat/lng, si la consulta las trae) y desde cuándo se puede entrar (a.disponible_desde, si la base ya tiene la
+         columna; store.js la pide sólo cuando existe) */
+      mostrarDir: r.mostrar_direccion || null, lat: r.lat == null ? null : Number(r.lat), lng: r.lng == null ? null : Number(r.lng), disponible_desde: r.disponible_desde || null };
   };
 
   /* 8/10/2026 · Cómo se piden los datos.
@@ -240,9 +244,52 @@
     a.banos ? a.banos + ' ' + (a.banos === 1 ? BP.t('card_bano', 'baño') : BP.t('card_banos', 'baños')) : null,
     a.cocheras ? a.cocheras + ' ' + (a.cocheras === 1 ? BP.t('card_coch_1', 'coch.') : BP.t('card_coch_n', 'coch.')) : null,
   ].filter(Boolean).join(' · ');
-  /* 8/10/2026 · Etiquetas de operación (contrato del lanzamiento): venta es "Venta", alquiler es "Alquiler tradicional"
-     y mediano es "Mediano plazo (3 a 12 meses)". En la base no cambia nada: 'venta' | 'alquiler' | 'mediano'. */
-  D.opTag = a => a.op === 'venta' ? BP.t('card_venta', 'Venta') : a.op === 'mediano' ? BP.t('card_alq_mediano', 'Mediano plazo (3 a 12 meses)') : BP.t('card_alq_largo', 'Alquiler tradicional');
+  /* 8/10/2026 · Etiquetas de operación, cortas (contrato de la tanda 2): "Venta", "Tradicional" y "Mediano plazo".
+     En la base no cambia nada: 'venta' | 'alquiler' | 'mediano'. La tarjeta dice "Reservada" en su lugar si lo está. */
+  D.opTag = a => a.op === 'venta' ? BP.t('card_venta', 'Venta') : a.op === 'mediano' ? BP.t('card_alq_mediano', 'Mediano plazo') : BP.t('card_alq_largo', 'Tradicional');
+  /* La calle: con mostrar_direccion 'exacta', tal cual ("Peña 2528"); si no (aproximada o sin el dato), sin la altura
+     ("Peña"). Sólo se saca un número al final ("Av. 9 de Julio" queda entera). Nunca la unidad. */
+  D.calle = a => { const d = String((a && a.dir) || '').trim(); if (!d || a.mostrarDir === 'exacta') return d; return d.replace(/\s+(?:al\s+)?\d+(?:\s*bis)?\s*$/i, '').trim() || d; };
+  /* La altura redondeada a la cuadra, para el mapa de una dirección aproximada ("Peña 2500") */
+  D.cuadra = a => { const d = String((a && a.dir) || '').trim(); const m = d.match(/^(.*?\S)\s+(?:al\s+)?(\d+)(?:\s*bis)?\s*$/i); return m ? m[1] + ' ' + Math.floor(Number(m[2]) / 100) * 100 : d; };
+  /* Título humano: "Monoambiente en Recoleta", "2 ambientes en Palermo Soho"; sin ambientes, el tipo ("Casa en San Isidro") */
+  D.titulo = a => {
+    const b = a.barrio || BP.zonaLabel(a.zona || '') || '';
+    const que = a.amb === 1 ? BP.t('tit_mono', 'Monoambiente') : a.amb > 1 ? BP.tf('tit_amb', '{n} ambientes', { n: a.amb }) : BP.etiqueta(a.tipoProp || 'Departamento');
+    return b ? BP.tf('tit_en', '{q} en {b}', { q: que, b }) : que;
+  };
+  /* Lo que se nombra del aviso fuera de la ficha (alt de la foto, WhatsApp, compartir): el título humano y la calle */
+  D.nombre = a => [D.titulo(a), D.calle(a)].filter(Boolean).join(', ');
+  /* Datos de la tarjeta en una línea: superficie, baños y cocheras (los ambientes ya están en el título) */
+  D.metaCorta = a => [
+    a.m2 ? a.m2 + ' m²' : null,
+    a.banos ? a.banos + ' ' + (a.banos === 1 ? BP.t('card_bano', 'baño') : BP.t('card_banos', 'baños')) : null,
+    a.cocheras ? a.cocheras + ' ' + (a.cocheras === 1 ? BP.t('card_coch_1', 'coch.') : BP.t('card_coch_n', 'coch.')) : null,
+  ].filter(Boolean).join(' · ');
+  /* Precio corto: "USD 1.200 /mes", "$ 850.000 /mes", "USD 295.000" */
+  D.precioCorto = a => a.precio ? `${BP.fmtPrecio(a.precio, a.moneda)}${a.periodo ? ' <small>' + BP.t('ui_por_mes', '/mes') + '</small>' : ''}` : BP.t('card_consultar_precio', 'Consultar precio');
+  /* "Disponible desde 14 nov": sólo si el aviso trae disponible_desde y es una fecha futura. La fecha es un día (date),
+     se lee como día local y no como medianoche UTC (que en Buenos Aires es el día anterior). */
+  const MESES = { es: ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'], en: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'], pt: ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'] };
+  D.disponibleDesde = a => {
+    const m = String((a && a.disponible_desde) || '').match(/^(\d{4})-(\d{2})-(\d{2})/); if (!m) return '';
+    const f = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])); const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+    if (!(f > hoy)) return '';
+    const mes = (MESES[BP.lang] || MESES.es)[f.getMonth()];
+    const fecha = (BP.lang === 'en' ? mes + ' ' + f.getDate() : f.getDate() + ' ' + mes) + (f.getFullYear() !== hoy.getFullYear() ? ' ' + f.getFullYear() : '');
+    return BP.tf('disp_desde', 'Disponible desde {f}', { f: fecha });
+  };
+  /* Quién publica, en una línea de texto: "BAIREN Realty · Gestor de alquileres". El ✓ chico, sólo si está verificado.
+     Un nombre todo en mayúsculas se muestra con mayúscula inicial (BAIREN y las siglas de hasta tres letras quedan). */
+  D.nombreVisible = n => { n = String(n || ''); return /[a-záéíóúñ]/.test(n) || n.trim().split(/\s+/).length < 2 ? n : n.trim().split(/\s+/).map(w => w === 'BAIREN' || w.length <= 3 ? w : w.charAt(0) + w.slice(1).toLowerCase()).join(' '); };
+  D.pubRol = pub => !pub ? '' : pub.tipo === 'dueno' ? (pub.verificado ? BP.etiqueta(pub.badge || 'Dueño verificado') : BP.t('ui_dato_dueno_directo', 'Dueño directo'))
+    : !pub.verificado ? '' : BP.etiqueta(pub.badge || ({ gestor: 'Gestor de alquileres', desarrolladora: 'Desarrolladora', profesional: 'Inmobiliaria' })[pub.tipo] || '');
+  D.pubLinea = pub => {
+    if (!pub || !pub.nombre) return '';
+    const nombre = D.nombreVisible(D.pubNombre(pub)), rol = D.pubRol(pub);
+    const check = pub.verificado ? `<span class="p-verif" role="img" aria-label="${BP.esc(BP.t('pub_verificado', 'verificado'))}">${BP.ico.check}</span>` : '';
+    return `<b>${BP.esc(nombre)}</b>${check}${rol && rol !== nombre ? ' · ' + BP.esc(rol) : ''}`;
+  };
   /* La operación del aviso como filtro del catálogo: el alquiler tradicional es 'largo' ('alquiler' abarca los dos plazos) */
   D.opFiltro = a => a.op === 'alquiler' ? 'largo' : a.op;
   /* Operación como filtro (decisión de Tomás, 10/9/2026): "alquiler" abarca mediano y largo
@@ -264,7 +311,7 @@
         : `<span class="p-badge dueno">${BP.esc(BP.t('ui_dato_dueno_directo', 'Dueño directo'))}</span>`)
     : pub.tipo === 'desarrolladora' ? `<span class="p-badge dueno">${BP.ico.building} ${BP.t('ui_dato_venta_directa', 'Venta directa')}</span>`
     : `<span class="p-badge">${BP.ico.shield} ${BP.esc(pub.matricula || '')}</span>`;
-  D.waLink = (a, pub) => pub.whatsapp ? 'https://wa.me/' + pub.whatsapp + '?text=' + encodeURIComponent(BP.tf('card_wa_msg', 'Hola, vi {t} ({c}) en BAIREN y quiero más información.', { t: a.titulo, c: a.codigo })) : null;
+  D.waLink = (a, pub) => pub.whatsapp ? 'https://wa.me/' + pub.whatsapp + '?text=' + encodeURIComponent(BP.tf('card_wa_msg', 'Hola, vi {t} ({c}) en BAIREN y quiero más información.', { t: D.nombre(a), c: a.codigo })) : null;
   D.sinContacto = pub => !pub.whatsapp && !pub.email;
 
   D.cardH = function(a){
@@ -293,26 +340,49 @@
 </article>`;
   };
 
+  /* 8/10/2026 · Tanda 2 · La tarjeta, más corta (como pidió Tomás: "demasiados textos y muchas cosas").
+     Sobre la foto, la operación corta (o "Reservada") y, si viene, "Disponible desde 14 nov". Abajo: la calle chica
+     en versalitas (sin altura si la dirección es aproximada), el título humano, el precio con su moneda y /mes,
+     los datos en una línea y quién publica en una línea de texto. Sin botón "Ver ficha": toda la tarjeta es un
+     solo enlace. El corazón queda afuera del enlace (un botón no puede ir adentro de un <a>), encima de la foto.
+     La clase prop-card queda en la raíz: la usan el catálogo (foco al cambiar de página) y otras grillas. */
   D.cardV = function(a){
     const pub = D.pub(a.publicadorId);
     const href = BP.urlFicha(a);
-    const lugar = a.barrio || BP.zonaLabel(a.zona) || '';   /* barrio vacío: la zona, o nada (ver cardH) */
-    const foto = a.fotos[0] ? `<img src="${BP.sbImg(a.fotos[0], 700)}" alt="${BP.esc([a.titulo, lugar].filter(Boolean).join(', '))}" loading="lazy">` : `<span class="card-img-placeholder">${BP.t('card_fotos_prod', 'Fotos en producción')}</span>`;
+    const tit = D.titulo(a), calle = D.calle(a), desde = D.disponibleDesde(a), fav = BP.isFav(a.id);
+    const foto = a.fotos[0] ? `<img src="${BP.sbImg(a.fotos[0], 700)}" alt="" loading="lazy" decoding="async" onerror="this.remove()">` : `<span class="tj-sinfoto">${BP.t('card_fotos_prod', 'Fotos en producción')}</span>`;
+    const tag = a.reservado ? `<span class="tj-tag res">${BP.t('card_reservada', 'Reservada')}</span>` : `<span class="tj-tag tj-${a.op}">${D.opTag(a)}</span>`;
+    const meta = D.metaCorta(a), linea = D.pubLinea(pub);
     return `
-<a class="prop-card" data-flip="${BP.esc(a.id)}" href="${href}" aria-label="${BP.esc(lugar ? BP.tf('card_ver_en', 'Ver {t} en {b}', { t: a.titulo, b: lugar }) : BP.tf('card_ver', 'Ver {t}', { t: a.titulo }))}">
-  <div class="card-img">${foto}<span class="card-tag tag-${a.op}">${D.opTag(a)}</span>${a.reservado?`<span class="card-status status-reservado">${BP.t('card_reservada', 'Reservada')}</span>`:''}</div>
-  <div class="card-body">
-    <div class="card-address">${BP.esc(a.titulo)}</div>
-    <div class="card-barrio">${BP.esc(lugar)}</div>
-    <div class="card-meta">${D.metaLine(a)}</div>
-    <div class="card-divider"></div>
-    <div class="card-footer"><div class="card-price"><span class="price-amount">${a.reservado ? BP.t('card_reservada', 'Reservada') : D.precioHTML(a)}</span></div><span class="card-cta">${BP.t('card_ver_ficha', 'Ver ficha')}</span></div>
-    ${pub.nombre ? `<div class="p-card-pub">${BP.t('card_publica', 'Publica')} <b>${BP.esc(D.pubNombre(pub))}</b> ${D.badgeHTML(pub)}</div>` : ''}
-  </div>
-</a>`;
+<article class="prop-card p-tj" data-flip="${BP.esc(a.id)}">
+  <a class="tj-link" href="${href}">
+    <span class="tj-foto">${foto}${tag}${desde ? `<span class="tj-desde">${BP.esc(desde)}</span>` : ''}</span>
+    <span class="tj-cuerpo">
+      ${calle ? `<span class="tj-calle">${BP.esc(calle)}</span>` : ''}
+      <span class="tj-titulo">${BP.esc(tit)}</span>
+      <span class="tj-fila"><span class="tj-precio">${D.precioCorto(a)}</span>${meta ? `<span class="tj-meta">${meta}</span>` : ''}</span>
+      ${linea ? `<span class="tj-pub">${linea}</span>` : ''}
+    </span>
+  </a>
+  <button type="button" class="tj-fav${fav ? ' on' : ''}" data-fav="${BP.esc(a.id)}" aria-label="${BP.esc(BP.tf('card_fav_de', 'Guardar {t}', { t: tit }))}" aria-pressed="${fav}">${fav ? BP.ico.heartFill : BP.ico.heart}</button>
+</article>`;
   };
 
-  D.bindFavs = root => { (root||document).querySelectorAll('[data-fav]').forEach(b => { if (b._bound) return; b._bound = true; b.addEventListener('click', e => { e.preventDefault(); const on = BP.toggleFav(b.dataset.fav); b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); b.innerHTML = on ? BP.ico.heartFill : BP.ico.heart; BP.toast(on ? BP.t('card_fav_on', 'Guardada en favoritos') : BP.t('card_fav_off', 'Quitada de favoritos')); }); }); };
+  /* El corazón, en cualquier tarjeta o ficha de cualquier página (también las grillas que no llamaban a bindFavs,
+     como el panel): un solo escucha en el documento. bindFavs queda para no romper a quien lo llama. */
+  let favsEnganchados = false;
+  D.bindFavs = () => {
+    if (favsEnganchados) return; favsEnganchados = true;
+    document.addEventListener('click', e => {
+      const b = e.target.closest && e.target.closest('[data-fav]'); if (!b) return;
+      e.preventDefault();
+      const on = BP.toggleFav(b.dataset.fav);
+      document.querySelectorAll('[data-fav]').forEach(x => { if (x.dataset.fav !== b.dataset.fav) return; x.classList.toggle('on', on); x.setAttribute('aria-pressed', on ? 'true' : 'false'); x.innerHTML = on ? BP.ico.heartFill : BP.ico.heart; });
+      BP.toast(on ? BP.t('card_fav_on', 'Guardada en favoritos') : BP.t('card_fav_off', 'Quitada de favoritos'));
+      try { document.dispatchEvent(new CustomEvent('bp:fav', { detail: { id: b.dataset.fav, on } })); } catch (err) { /* nada */ }
+    });
+  };
+  D.bindFavs();
 
   /* 8/10/2026 · Regla de "todo incluido" (contrato del lanzamiento). Antes era todo el mediano plazo; ahora
      publican también otras empresas. Se dice "todo incluido" en un aviso de mediano plazo de BAIREN REALTY
