@@ -31,6 +31,8 @@
   <div class="h-hero-velo" aria-hidden="true"></div>
   <div class="h-hero-in">
     <h1><span class="hline" data-i18n-html="hero_h1a">Propiedades <em>seleccionadas</em></span><span class="hline" data-i18n="hero_h1b">en Buenos Aires.</span></h1>
+    <!-- 8/10/2026 · En el celular (menos de 900 px) el buscador es esta barra; al tocarla, el mismo formulario se abre en una hoja a pantalla completa (#hHoja) -->
+    <button type="button" class="h-barra" id="hBarra" aria-haspopup="dialog" aria-controls="hHoja" aria-expanded="false"><svg class="lupa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.6"/><path d="m16.2 16.2 4.3 4.3"/></svg><span data-i18n="hero_barra">Buscá barrio o zona</span></button>
     <form class="h-search" id="searchForm" action="buscar.html" method="get" role="search" aria-label="Buscar propiedades" data-i18n-aria="buscar_aria">
       <input type="hidden" name="op" id="opInput" value="venta">
       <div class="h-seg" role="group" aria-label="Operación" data-i18n-aria="cat_op_aria">
@@ -46,6 +48,13 @@
     </form>
   </div>
 </section>
+
+<!-- 8/10/2026 · La hoja de búsqueda del celular. Vacía en el HTML: al abrirse recibe el formulario #searchForm de la portada
+     (el mismo, con su lógica) y al cerrarse se lo devuelve al hero. Se cierra con la X, con Atrás del celular y con Escape. -->
+<div class="h-hoja" id="hHoja" role="dialog" aria-modal="true" aria-labelledby="hHojaT" hidden>
+  <div class="h-hoja-cab"><p class="h-hoja-t" id="hHojaT" data-i18n="hero_hoja_t">Buscar</p><button type="button" class="h-hoja-x" id="hHojaX" aria-label="Cerrar la búsqueda" data-i18n-aria="hero_hoja_cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+  <div class="h-hoja-cuerpo" id="hHojaCuerpo"></div>
+</div>
 
 <!-- 8/10/2026 · Lo último que entró: las unidades publicadas más nuevas, con los datos que la portada ya carga -->
 <section class="h-sec h-crema h-ultimos" id="ultimos" aria-labelledby="ultimosT">
@@ -282,6 +291,58 @@ document.addEventListener('DOMContentLoaded', function(){
 
   if (window.BPM && BPM.init) BPM.init(document);
 })();
+});
+</script>
+<script>
+/* 8/10/2026 · La hoja de búsqueda del celular (menos de 900 px). No duplica la búsqueda: mueve el mismo formulario
+   #searchForm (con Comprar/Alquilar, el campo, las sugerencias y "Ver propiedades", y toda su lógica, que vive en el
+   script de arriba) a la hoja al abrirla, y lo devuelve al hero al cerrarla. Se cierra con la X, con Escape y con
+   Atrás del celular: abrirla suma una entrada al historial (#buscar). El campo recibe el foco al abrir, dentro del
+   mismo toque, para que el teclado del celular suba. */
+document.addEventListener('DOMContentLoaded', function(){
+  var barra = document.getElementById('hBarra'), hoja = document.getElementById('hHoja'), cuerpo = document.getElementById('hHojaCuerpo');
+  var x = document.getElementById('hHojaX'), form = document.getElementById('searchForm'), input = document.getElementById('zonaInput');
+  if (!barra || !hoja || !cuerpo || !form || !input) return;
+  var casa = form.parentNode, despues = form.nextSibling, mq = matchMedia('(max-width: 899px)');
+  var abierta = false, conHistoria = false;
+  if (location.hash === '#buscar') { try { history.replaceState(history.state, '', location.pathname + location.search); } catch (e) {} }
+  function enfocables(){ return Array.prototype.filter.call(hoja.querySelectorAll('button,input,a[href],select,[tabindex]:not([tabindex="-1"])'), function(el){ return !el.disabled && el.offsetParent !== null; }); }
+  function abrir(){
+    if (abierta || !mq.matches) return; abierta = true;
+    cuerpo.appendChild(form);
+    hoja.hidden = false; void hoja.offsetHeight; hoja.classList.add('on');
+    document.documentElement.classList.add('h-hoja-abierta');
+    barra.setAttribute('aria-expanded', 'true');
+    try { history.pushState({ hHoja: 1 }, '', '#buscar'); conHistoria = true; } catch (e) { conHistoria = false; }
+    try { input.focus({ preventScroll: true }); } catch (e) { input.focus(); }
+  }
+  function cerrar(desdeHistoria){
+    if (!abierta) return; abierta = false;
+    if (input._bpCerrarSugg) input._bpCerrarSugg();
+    hoja.classList.remove('on'); hoja.hidden = true;
+    casa.insertBefore(form, despues);
+    document.documentElement.classList.remove('h-hoja-abierta');
+    barra.setAttribute('aria-expanded', 'false');
+    var volver = conHistoria && !desdeHistoria; conHistoria = false;
+    if (volver) history.back();
+    if (mq.matches) { try { barra.focus({ preventScroll: true }); } catch (e) {} }
+  }
+  barra.addEventListener('click', abrir);
+  x.addEventListener('click', function(){ cerrar(false); });
+  window.addEventListener('popstate', function(){ if (abierta) cerrar(true); });
+  document.addEventListener('keydown', function(e){
+    if (!abierta) return;
+    if (e.key === 'Escape') { e.preventDefault(); cerrar(false); return; }
+    if (e.key !== 'Tab') return;
+    var f = enfocables(); if (!f.length) return;
+    var primero = f[0], ultimo = f[f.length - 1];
+    if (!hoja.contains(document.activeElement)) { e.preventDefault(); primero.focus(); return; }   /* elegida una sugerencia, el campo suelta el foco */
+    if (e.shiftKey && document.activeElement === primero) { e.preventDefault(); ultimo.focus(); }
+    else if (!e.shiftKey && document.activeElement === ultimo) { e.preventDefault(); primero.focus(); }
+  });
+  /* Si la pantalla pasa a ancho de compu con la hoja abierta, el formulario vuelve al hero */
+  var alCambiar = function(){ if (!mq.matches) cerrar(false); };
+  if (mq.addEventListener) mq.addEventListener('change', alCambiar); else if (mq.addListener) mq.addListener(alCambiar);
 });
 </script>
 </body>

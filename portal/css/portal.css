@@ -4450,3 +4450,73 @@ body.p-panel-page .p-emp-grupo .p-aviso-row.v2 .ph{display:none}
 @media(max-width:1023px){body.p-panel-page .p-emp-grupo .p-aviso-row.v2{grid-template-columns:minmax(0,1fr)}}
 body.p-panel-page .p-faltan-docs{color:#9C3A34}
 body.p-panel-page .p-ficha-cuenta dd .p-btn{margin-left:6px;vertical-align:middle}
+
+/* ══ 8/10/2026 · Pasada premium: tipografía y superficies ════════════════════════════════════════════════════
+   Tomás: "las mayúsculas son agresivas" y "el cuadrado pegado a las letras con sombra es raro". Esta capa va
+   última y fija un solo criterio para todo el portal:
+   · Mayúscula inicial en toda la interfaz. Un solo sobretítulo en mayúsculas (12 px, 500, .07em, apagado),
+     para la sección de una página, nunca en botones ni sobre fotos.
+   · Jost 500 para controles y rótulos; Playfair solo en títulos de página, de tarjeta y de ficha, y precios grandes.
+   · Radios por variable: controles 10, tarjetas y cajas 14, chips y etiquetas píldora. Las fotos toman el radio
+     de su tarjeta.
+   · Línea fina de 1 px en vez de sombra. Sombra amplia y suave solo para lo que flota (menús, hojas, carteles).
+   · Barras fijas translúcidas con desenfoque, y respaldo opaco donde no hay backdrop-filter.
+   Va en partes, una por tema: tipografía, la tarjeta, superficies (radios, líneas, aire y foco), barras fijas,
+   Ingresar y la portada del celular. */
+:root{
+  --r-ctl:10px; --r-box:14px; --r-pill:999px;
+  --p-hair:rgba(19,29,45,.10); --p-hair-2:rgba(19,29,45,.18); --p-hair-d:rgba(251,250,246,.12);
+  --p-flota:0 8px 32px rgba(10,20,40,.08); --p-flota-d:0 16px 48px rgba(0,0,0,.30);
+  --p-tinta-2:#59647A; --p-oro-tinta:#75623C;
+  --p-barra:rgba(19,29,45,.80); --p-barra-papel:rgba(251,250,246,.82);
+}
+
+/* ── 6 · Portada: el video con su luz real ────────────────────────────────────────────────────────────────
+   Tomás (8/10): en el celular la caja tapaba un tercio del video y un velo parejo lo apagaba entero. Fuera el velo
+   parejo y la opacidad del video: solo un degradé abajo, detrás del título y la barra, y uno chico arriba, detrás
+   del encabezado. En la compu la caja queda como estaba, con un degradé que la sostiene. */
+.h-barra,.h-hoja{display:none}
+body.p-home .h-hero video{opacity:1}
+body.p-home .h-hero h1{text-shadow:0 1px 18px rgba(10,14,22,.28)}
+@media(min-width:900px){
+  body.p-home .h-hero-velo{background:
+    linear-gradient(to bottom,rgba(19,29,45,.50) 0,rgba(19,29,45,0) 180px),
+    radial-gradient(ellipse 62% 46% at 50% 54%,rgba(19,29,45,.72) 0%,rgba(19,29,45,.58) 45%,rgba(19,29,45,.22) 78%,rgba(19,29,45,0) 100%)}
+}
+@media(max-width:899px){
+  body.p-home .h-hero{align-items:flex-end;padding:0 0 22px}
+  body.p-home .h-hero-velo{background:
+    linear-gradient(to top,rgba(19,29,45,.70) 0%,rgba(19,29,45,.64) 20%,rgba(19,29,45,.34) 31%,rgba(19,29,45,0) 40%),
+    linear-gradient(to bottom,rgba(19,29,45,.65) 0,rgba(19,29,45,.30) 90px,rgba(19,29,45,0) 160px)}
+  body.p-home .h-hero-in{padding:0 16px}
+  body.p-home .h-hero h1{font-size:1.75rem!important;line-height:1.16!important;margin:0 0 14px!important;letter-spacing:-.005em}
+  body.p-home .h-hero .h-search{display:none}
+  /* La barra: una píldora translúcida que abre la hoja */
+  :root body.p-home .h-barra{display:flex;align-items:center;gap:12px;width:100%;height:54px;margin:0;padding:0 22px 0 18px;border:1px solid rgba(251,250,246,.25);border-radius:var(--r-pill)!important;
+    background:rgba(19,29,45,.55);color:#FBFAF6;font:400 1rem/1 var(--font-body);letter-spacing:0;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background-color .2s,border-color .2s}
+  body.p-home .h-barra .lupa{width:20px;height:20px;flex:0 0 auto;color:#FBFAF6}
+  body.p-home .h-barra:active{background:rgba(251,250,246,.24)}
+  @supports ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+    body.p-home .h-barra{background:rgba(251,250,246,.16);-webkit-backdrop-filter:blur(16px) saturate(140%);backdrop-filter:blur(16px) saturate(140%)}
+  }
+  /* El encabezado, translúcido sobre el video mientras se está arriba de todo; al bajar vuelve a navy pleno */
+  body.p-home .p-navbar:not(.bajado){background:rgba(19,29,45,.38)!important;-webkit-backdrop-filter:blur(14px) saturate(140%)!important;backdrop-filter:blur(14px) saturate(140%)!important;border-bottom-color:rgba(251,250,246,.14)!important}
+  body.p-home .p-navbar:not(.bajado) > .p-pub-movil{color:#DECDA0!important}
+  /* La hoja de búsqueda: a pantalla completa, sube desde abajo */
+  .h-hoja{position:fixed;inset:0;z-index:3000;display:flex;flex-direction:column;background:#131D2D;color:#FBFAF6;
+    padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);overflow-y:auto;overscroll-behavior:contain;
+    transform:translateY(100%);transition:transform 280ms cubic-bezier(.22,1,.36,1)}
+  .h-hoja.on{transform:none}
+  .h-hoja[hidden]{display:none}
+  html.h-hoja-abierta,html.h-hoja-abierta body{overflow:hidden}
+  .h-hoja-cab{display:flex;align-items:center;justify-content:space-between;flex:0 0 auto;height:60px;padding:0 6px 0 20px;border-bottom:1px solid rgba(251,250,246,.10)}
+  .h-hoja-t{margin:0;font:500 1.0625rem/1 var(--font-body);color:#FBFAF6}
+  :root .h-hoja-x{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;padding:0;border:0;border-radius:50%!important;background:none;color:#FBFAF6;cursor:pointer}
+  .h-hoja-x svg{width:22px;height:22px}
+  .h-hoja-x:active{background:rgba(251,250,246,.08)}
+  .h-hoja-cuerpo{flex:1 1 auto;padding:20px 16px 28px}
+  :root body.p-home .h-hoja .h-search{display:grid;gap:12px;padding:0;background:none;border:0;border-radius:0!important;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
+  body.p-home .h-hoja .h-field input{height:52px;font-size:1rem}
+  body.p-home .h-hoja .h-cta{min-height:52px}
+}
+@media(max-width:899px) and (prefers-reduced-motion:reduce){.h-hoja{transition:none}}
