@@ -81,6 +81,15 @@ document.addEventListener('DOMContentLoaded', function(){
   /* Contrato de operación (8/10/2026) */
   const OP_TXT = { venta: 'Venta', alquiler: 'Alquiler tradicional', mediano: 'Mediano plazo (3 a 12 meses)' };
   const precioTxt = a => a.moneda === 'ARS' && a.precio != null ? '$ ' + BP.fmtN(Math.round(Number(a.precio))) : BP.fmtUSD(a.precio == null ? null : Number(a.precio));
+  /* 8/10/2026 (tanda 2) · Lo que el recorrido nuevo pide y la tarjeta no muestra: estadía mínima, disponible desde, qué
+     incluye y garantías (en caracteristicas), plazo del contrato, y el emprendimiento con su etapa, entrega y estado */
+  const ETAPA_TXT = { pozo: 'En pozo', construccion: 'En construcción', terminado: 'Terminado' };
+  const extraDe = a => { const l = [];
+    if (a.emprendimiento) l.push('Emprendimiento <b>' + BP.esc(a.emprendimiento) + '</b>' + (a.etapa ? ' · ' + (ETAPA_TXT[a.etapa] || BP.esc(a.etapa)) : '') + (a.entrega ? ' · entrega ' + BP.esc(a.entrega) : '') + (a.estado === 'reservado' ? ' · reservada' : ''));
+    if (a.plazo) l.push((a.operacion === 'mediano' ? 'Estadía mínima ' : 'Plazo ') + BP.esc(a.plazo));
+    if (a.disponible_desde) l.push('Disponible desde ' + String(a.disponible_desde).slice(0, 10).split('-').reverse().join('/'));
+    if ((a.caracteristicas || []).length) l.push(BP.esc(a.caracteristicas.join(', ')));
+    return l.length ? `<div class="m" style="margin-top:4px">${l.join(' · ')}</div>` : ''; };
   const ok = (c, txt) => `<span class="${c?'ok':'no'}">${c ? BP.ico.check : BP.ico.x} ${txt}</span>`;
   /* Una acción de curación por vez: el botón queda ocupado y, si la base la rechaza (por ejemplo en demo), se avisa */
   async function accion(btn, fn, okMsg){ if (btn.disabled) return; const card = btn.closest('.p-cur'); const btns = card.querySelectorAll('button'); btns.forEach(x => x.disabled = true); btn.setAttribute('aria-busy', 'true'); try { await fn(); BP.toast(okMsg); return true; } catch (e) { btns.forEach(x => x.disabled = false); btn.removeAttribute('aria-busy'); BP.toast(BPStore.demo ? 'En modo demo no se guarda.' : BPStore.errorAlGuardar(e), 'error'); return false; } }
@@ -93,7 +102,7 @@ document.addEventListener('DOMContentLoaded', function(){
       const enZona = BP.ZONAS.indexOf(a.zona) > -1; const descOk = (a.descripcion||'').length >= 150; const fotosOk = fotos.length >= 8 || a.quiero_produccion; const datosOk = !!(a.m2_total && a.ambientes && a.precio);
       html += `<div class="p-cur" data-id="${a.id}"><div><div class="ph">${fotos[0] ? `<img src="${fotos[0]}" alt="">` : ''}</div><div class="thumbs">${fotos.slice(1,9).map(u => `<img src="${u}" alt="">`).join('')}</div></div>
         <div><b>${BP.esc(a.titulo || a.direccion)}</b><div class="m">${OP_TXT[a.operacion] || OP_TXT.alquiler} · ${BP.esc(a.tipo||'')} · ${BP.esc(a.direccion)} ${BP.esc(a.unidad||'')}, ${BP.esc(a.barrio||'')} (${BP.zonaLabel(a.zona||'')}) · ${precioTxt(a)}${a.operacion !== 'venta' ? '/mes' : ''}${a.expensas ? ' · expensas $ ' + BP.fmtN(a.expensas) : ''}</div>
-        <div class="m" style="margin-top:4px">Publica: <b>${BP.esc(p.nombre||'?')}</b> · ${p.tipo === 'dueno' ? 'dueño directo' : BP.esc(p.matricula||p.tipo||'')} · ${p.verificado ? 'verificado' : '<span class="p-badge dueno">sin verificar</span>'} · ${a.codigo||''}</div>
+        <div class="m" style="margin-top:4px">Publica: <b>${BP.esc(p.nombre||'?')}</b> · ${p.tipo === 'dueno' ? 'dueño directo' : BP.esc(p.matricula||p.tipo||'')} · ${p.verificado ? 'verificado' : '<span class="p-badge dueno">sin verificar</span>'} · ${a.codigo||''}</div>${extraDe(a)}
         <div class="p-check">${ok(enZona,'Zona BAIREN')}${ok(datosOk,'Datos completos')}${ok(fotosOk, fotos.length + ' fotos' + (a.quiero_produccion ? ' (pide producción)' : ''))}${ok(descOk,'Descripción de 150 o más')}${ok((a.amenities||[]).length>0,'Amenities informados')}${ok(!!p.verificado,'Publicador verificado')}</div>
         <p class="p-text" style="font-size:.86rem;max-height:120px;overflow:auto">${BP.esc(a.descripcion||'')}</p>
         <div class="p-fld" style="margin:10px 0 6px"><label style="font-size:.8rem">Cualidades verificadas <span class="m">(el publicador declaró ${(a.cualidades||[]).length}; marcá solo lo que comprobaste)</span></label><div class="p-seg p-seg-sm">${BP.CUALIDADES.map(x => `<label><input type="checkbox" name="cv" value="${x}" ${((a.cualidades_verificadas&&a.cualidades_verificadas.length?a.cualidades_verificadas:(a.cualidades||[]))).indexOf(x)>-1?'checked':''}> ${x}</label>`).join('')}</div></div>
