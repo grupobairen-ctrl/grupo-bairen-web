@@ -49,6 +49,7 @@
     } catch (e) { return false; }
   })();
   S.demo = DEMO;
+  const EN_PRODUCCION = /(^|\.)bairengroup\.com$/.test(location.hostname) || location.hostname === 'bairen-portal.vercel.app';
 
   /* ── init ─────────────────────────────────────────────── */
   S.init = function(){
@@ -58,7 +59,7 @@
         if (window.bairenReady) {
           const sb = await Promise.race([window.bairenReady, new Promise((_, r) => setTimeout(() => r(new Error('sdk')), 15000))]);
           const probe = await sb.schema('portal').from('publicadores').select('id').limit(1);
-          if (!probe.error) { S.mode = 'supabase'; S.sb = sb; const { data } = await sb.auth.getUser(); S.session = data && data.user ? sesionDe(data.user) : null; sb.auth.onAuthStateChange((_, sess) => { if (DEMO) return; S.session = sess && sess.user ? sesionDe(sess.user) : null;
+          if (!probe.error) { S.mode = 'supabase'; S.sb = sb; const { data, error: errU } = await sb.auth.getUser(); S._authErr = errU ? String(errU.message || errU).slice(0, 160) : null; S.session = data && data.user ? sesionDe(data.user) : null; sb.auth.onAuthStateChange((_, sess) => { if (DEMO) return; S.session = sess && sess.user ? sesionDe(sess.user) : null;
             /* 8/10/2026 · Fuera del aviso de Auth (setTimeout): Supabase avisa con el candado de la sesión tomado, y
                applySession pregunta a la base si la cuenta es curadora. Esa consulta esperaba el mismo candado y todo lo
                que venía después (el panel entero) quedaba colgado cuando la sesión se renovaba al abrir la página. */
@@ -71,7 +72,10 @@
            que es justamente lo que tiene que pasar. */
         S.session = { id: 'demo', email: 'demo@bairen.local', demo: true };
       }
-      if (S.mode === 'local' && !DEMO) S.session = L.user.get(null);
+      /* 8/10/2026 · En el sitio real, si la base no conectó (Safari del iPhone con red lenta, por ejemplo) el modo local NO
+         toma la sesión de prueba guardada en el navegador: con una página en modo local "con sesión" y la otra conectada
+         "sin sesión", el panel y el ingreso se mandaban uno al otro sin fin. */
+      if (S.mode === 'local' && !DEMO) { if (EN_PRODUCCION) { S.session = null; S._localEnProduccion = true; } else S.session = L.user.get(null); }
       if (window.BP && BP.applySession) BP.applySession(S.session, S.mode);
       return S.mode;
     })();
@@ -89,7 +93,30 @@
     try { const r = await fetch('/api/portal-sync', { method: 'POST', headers: { Accept: 'application/json', Authorization: 'Bearer ' + token } }); return await r.json().catch(() => ({ ok: r.ok, status: r.status })); }
     catch (e) { return { error: String(e) }; }
   };
-  S.requireSession = function(volver){ if (!S.session) { location.href = 'ingresar.html?volver=' + encodeURIComponent(volver || location.pathname.split('/').pop() + location.search); return false; } return true; };
+  /* 8/10/2026 · Freno de rebote. Si en 15 segundos la página mandó más de dos veces al ingreso (o el ingreso devolvió más de
+     dos veces), la sesión no coincide entre páginas: en vez de recargar sin fin se corta, se cierra la sesión trabada en este
+     navegador y se pide volver a ingresar. Queda un evento 'rebote_sesion' para saber la causa. */
+  S.rebote = function(clave){ try { const ahora = Date.now(), k = 'bp_rebote_' + clave; const l = JSON.parse(sessionStorage.getItem(k) || '[]').filter(t => ahora - t < 15000); l.push(ahora); sessionStorage.setItem(k, JSON.stringify(l)); return l.length; } catch (e) { return 1; } };
+  S.avisarRebote = function(lugar){
+    try {
+      const url = (typeof PORTAL_SUPABASE_URL === 'string' && PORTAL_SUPABASE_URL) || '', key = (typeof PORTAL_SUPABASE_KEY === 'string' && PORTAL_SUPABASE_KEY) || '';
+      if (!url || !key || typeof fetch !== 'function') return;
+      let token = false; try { token = Object.keys(localStorage).some(k => /^sb-.*-auth-token$/.test(k)); } catch (e) {}
+      const datos = { lugar, modo: S.mode, sesion: !!S.session, token, auth_err: S._authErr || null, local_en_produccion: !!S._localEnProduccion, pagina: location.pathname, ua: String(navigator.userAgent || '').slice(0, 160) };
+      fetch(url.replace(/\/$/, '') + '/rest/v1/eventos', { method: 'POST', keepalive: true, headers: { apikey: key, Authorization: 'Bearer ' + key, 'Content-Profile': 'portal', 'Content-Type': 'application/json', Prefer: 'return=minimal' }, body: JSON.stringify({ evento: 'rebote_sesion', datos }) }).catch(() => {});
+    } catch (e) {}
+  };
+  S.cerrarSesionLocal = async function(){ try { if (S.sb) await S.sb.auth.signOut({ scope: 'local' }); } catch (e) {} S.session = null; try { L.user.set(null); } catch (e) {} };
+  S.requireSession = function(volver){
+    if (S.session) return true;
+    if (S.rebote('ida') > 2) {
+      S.avisarRebote('panel');
+      const c = document.getElementById('content') || document.querySelector('main') || document.body;
+      if (c) { c.removeAttribute('aria-busy'); c.innerHTML = '<div class="p-empty" style="margin:32px 0"><b>' + BP.esc(BP.t('rebote_t', 'No pudimos abrir tu cuenta.')) + '</b><p>' + BP.esc(BP.t('rebote_p', 'Volvé a ingresar con tu mail. Si se repite, escribinos.')) + '</p><a class="p-btn" href="ingresar.html?limpiar=1">' + BP.esc(BP.t('rebote_btn', 'Volver a ingresar')) + '</a></div>'; }
+      return false;
+    }
+    location.href = 'ingresar.html?volver=' + encodeURIComponent(volver || location.pathname.split('/').pop() + location.search); return false;
+  };
 
   /* ── auth ─────────────────────────────────────────────── */
   /* 23/9/2026 · Supabase contesta en inglés y en jerga ("email rate limit exceeded", "Email address ... is invalid",
