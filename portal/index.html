@@ -35,7 +35,7 @@
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/base.css?v=20260925a"><link rel="stylesheet" href="css/catalogo.css?v=20260925a"><link rel="stylesheet" href="css/portal.css?v=20260925a">
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"BAIREN","url":"https://www.bairengroup.com","logo":"https://www.bairengroup.com/bairen_logo.png","description":"El portal de propiedades seleccionadas de Buenos Aires. Alquileres a mediano y largo plazo y departamentos en venta, seleccionados uno por uno antes de entrar al portal.","areaServed":[{"@type":"City","name":"Ciudad Autónoma de Buenos Aires"},{"@type":"AdministrativeArea","name":"Zona Norte, Buenos Aires"}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"BAIREN","url":"https://www.bairengroup.com","logo":"https://www.bairengroup.com/bairen_logo.png","description":"El portal de propiedades seleccionadas de Buenos Aires. Alquileres a mediano plazo (3 a 12 meses), alquileres tradicionales y departamentos en venta, seleccionados uno por uno antes de entrar al portal.","areaServed":[{"@type":"City","name":"Ciudad Autónoma de Buenos Aires"},{"@type":"AdministrativeArea","name":"Zona Norte, Buenos Aires"}]}</script>
 </head>
 <body class="p-home">
 <div class="p-velo" aria-hidden="true"><span class="w">BAIREN</span></div>
@@ -63,6 +63,15 @@
       <button class="h-cta" type="submit" data-i18n="ver_props">Ver propiedades</button>
     </form>
   </div>
+</section>
+
+<!-- 8/10/2026 · Lo último que entró: las unidades publicadas más nuevas, con los datos que la portada ya carga -->
+<section class="h-sec h-crema h-ultimos" id="ultimos" aria-labelledby="ultimosT">
+  <div class="h-in h-ultimos-head">
+    <h2 class="h-h2" id="ultimosT" data-i18n="ult_h2">Lo último que entró.</h2>
+    <a class="h-link" href="buscar.html?op=&amp;sort=recientes" data-i18n="ult_ver">Ver todas</a>
+  </div>
+  <div class="h-ultimos-riel" id="ultimosTrack" aria-busy="true" role="group" aria-label="Lo último que entró, deslizá para ver más" data-i18n-aria="ult_riel"><span class="h-ult-esq h-esq" aria-hidden="true"></span><span class="h-ult-esq h-esq" aria-hidden="true"></span></div>
 </section>
 
 <section class="h-sec h-navy h-estandar" id="estandar">
@@ -206,6 +215,7 @@ document.addEventListener('DOMContentLoaded', function(){
     console.error(err);
     /* El error se muestra donde iban las fachadas, con reintento; el resto de la portada ya está pintado */
     document.querySelectorAll('#edifCarrusel .h-flecha, #edifPuntos').forEach(el => { el.hidden = true; });
+    document.getElementById('ultimos').hidden = true;
     BP.estadoError(document.getElementById('edificiosTrack'), 'No pudimos cargar los edificios.', () => location.reload());
     return;
   }
@@ -215,6 +225,17 @@ document.addEventListener('DOMContentLoaded', function(){
 
 
   const counts = BPData.countsByZona(avisos, null); window.__counts = counts;
+
+  /* ── Lo último que entró: hasta 8 unidades disponibles, de la más nueva a la más vieja, con foto.
+     Sale de los avisos que la portada ya cargó (BPData.load): no hay pedido nuevo a la base. ── */
+  (function(){
+    const t = a => new Date(a.publicadoEn || 0).getTime();
+    const nuevas = reales.filter(a => !a.reservado && a.fotos && a.fotos.length).sort((a, b) => t(b) - t(a)).slice(0, 8);
+    const sec = document.getElementById('ultimos'), track = document.getElementById('ultimosTrack');
+    if (!nuevas.length) { sec.hidden = true; return; }
+    track.innerHTML = nuevas.map(BPData.cardV).join('');
+    track.removeAttribute('aria-busy');
+  })();
 
   /* ── Edificios: los tres de siempre, con su fachada. Si hoy no hay unidades,
      la tarjeta lo dice y ofrece avisar. ── */

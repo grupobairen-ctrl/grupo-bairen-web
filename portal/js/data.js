@@ -29,7 +29,10 @@
       desc_en:'Sample lister: an owner showing their own unit, with title verified by BAIREN.', desc_pt:'Anunciante de exemplo: um proprietário que mostra sua própria unidade, com titularidade verificada pela BAIREN.' },
   };
   D.titulares = {};
-  D.pub = id => D.PUBLICADORES[id] || D.PUBLICADORES['bairen'];
+  /* 8/10/2026 · Un id que no está en la lista caía en 'bairen': el aviso de un publicador nuevo salía
+     firmado por BAIREN REALTY. Ahora devuelve un publicador vacío, sin nombre ni sello, y D.load no
+     muestra avisos de publicadores desconocidos (ver más abajo). */
+  D.pub = id => D.PUBLICADORES[id] || { id: '', nombre: '', tipo: '', verificado: false, inicial: '', desde: '', zonas: [], desc: '' };
   /* Descripción y nombre del publicador en el idioma de la interfaz, si los tiene; si no, el castellano.
      El nombre 'Dueño directo' del ejemplo se traduce como dato fijo. */
   D.pubDesc = pub => (BP.lang !== 'es' && pub['desc_' + BP.lang]) || pub.desc || '';
@@ -97,9 +100,12 @@
 
   /* aviso del esquema portal (o del modo local) → modelo del portal */
   D.fromStore = async function(r){
-    const pub = r.publicador || null; const pubId = pub ? (pub.slug || pub.id) : 'bairen';
+    /* 8/10/2026 · Sin publicador (no vino en la consulta, o la base no lo deja ver) el aviso caía en 'bairen'
+       y se mostraba como de BAIREN REALTY. Ahora queda sin publicador y D.load no lo muestra. La insignia
+       por defecto ("Corredor inmobiliario matriculado") se pone sólo si el publicador está verificado. */
+    const pub = r.publicador || null; const pubId = pub ? (pub.slug || pub.id || null) : null;
     const T = (pub && D.titulares[pub.id]) || null;   /* titular con matrícula, de la vista publicador_publico */
-    if (pub && !D.PUBLICADORES[pubId]) D.PUBLICADORES[pubId] = Object.assign({ storeId: pub.id, id: pubId, inicial: (pub.nombre||'P').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(), desde: (pub.created_at||'').slice(0,4) || '2026', zonas: pub.zonas || [], desc: pub.descripcion || '', responsable: pub.responsable || pub.nombre, badge: pub.badge || (pub.tipo === 'dueno' ? 'Dueño verificado' : 'Corredor inmobiliario matriculado') }, pub, { id: pubId }, T && T.titular_nombre ? { responsable: T.titular_nombre, matricula: T.titular_matricula ? ((T.titular_colegio || 'CUCICBA') + ' ' + T.titular_matricula) : pub.matricula } : {});
+    if (pub && !D.PUBLICADORES[pubId]) D.PUBLICADORES[pubId] = Object.assign({ storeId: pub.id, id: pubId, inicial: (pub.nombre||'P').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(), desde: (pub.created_at||'').slice(0,4) || '2026', zonas: pub.zonas || [], desc: pub.descripcion || '', responsable: pub.responsable || pub.nombre, badge: pub.badge || (!pub.verificado ? null : pub.tipo === 'dueno' ? 'Dueño verificado' : 'Corredor inmobiliario matriculado') }, pub, { id: pubId, zonas: pub.zonas || [] }, T && T.titular_nombre ? { responsable: T.titular_nombre, matricula: T.titular_matricula ? ((T.titular_colegio || 'CUCICBA') + ' ' + T.titular_matricula) : pub.matricula } : {});
     /* Sin repetidas (D.fotosUnicas): la tabla portal.fotos puede traer el mismo archivo varias veces */
     const fotos = []; for (const url of D.fotosUnicas((r.fotos||[]).slice().sort((a,b)=>(a.orden||0)-(b.orden||0)).map(f => f.url))) { const u = window.BPStore ? await window.BPStore.resolveFoto(url) : url; if (u) fotos.push(u); }
     const amb = r.ambientes || null;
@@ -155,6 +161,8 @@
     if (window.BairenZonas) {
       publicados = publicados.filter(a => BP.ZONAS.indexOf(a.zona) > -1);
     }
+    /* 8/10/2026 · Si no se puede saber quién publica, el aviso no se muestra: nunca se firma con otro nombre */
+    publicados = publicados.filter(a => a.publicadorId && D.PUBLICADORES[a.publicadorId]);
 
     // "Seleccionadas de la semana": las 6 con más fotos y disponibles
     publicados.filter(a=>!a.reservado).sort((a,b)=>b.fotos.length-a.fotos.length).slice(0,6).forEach(a=>a.destacado=true);
@@ -181,17 +189,24 @@
     a.banos ? a.banos + ' ' + (a.banos === 1 ? BP.t('card_bano', 'baño') : BP.t('card_banos', 'baños')) : null,
     a.cocheras ? a.cocheras + ' ' + (a.cocheras === 1 ? BP.t('card_coch_1', 'coch.') : BP.t('card_coch_n', 'coch.')) : null,
   ].filter(Boolean).join(' · ');
-  D.opTag = a => a.op === 'venta' ? BP.t('card_venta', 'Venta') : a.op === 'mediano' ? BP.t('card_alq_mediano', 'Alquiler, mediano plazo') : BP.t('card_alq_largo', 'Alquiler, largo plazo');
+  /* 8/10/2026 · Etiquetas de operación (contrato del lanzamiento): venta es "Venta", alquiler es "Alquiler tradicional"
+     y mediano es "Mediano plazo (3 a 12 meses)". En la base no cambia nada: 'venta' | 'alquiler' | 'mediano'. */
+  D.opTag = a => a.op === 'venta' ? BP.t('card_venta', 'Venta') : a.op === 'mediano' ? BP.t('card_alq_mediano', 'Mediano plazo (3 a 12 meses)') : BP.t('card_alq_largo', 'Alquiler tradicional');
+  /* La operación del aviso como filtro del catálogo: el alquiler tradicional es 'largo' ('alquiler' abarca los dos plazos) */
+  D.opFiltro = a => a.op === 'alquiler' ? 'largo' : a.op;
   /* Operación como filtro (decisión de Tomás, 10/9/2026): "alquiler" abarca mediano y largo
      plazo; "largo" es sólo largo (los avisos de largo plazo llevan op 'alquiler'). */
   D.opMatch = (a, op) => !op || (op === 'alquiler' ? a.op !== 'venta' : op === 'largo' ? a.op === 'alquiler' : a.op === op);
-  D.precioHTML = a => a.precio ? `${BP.fmtUSD(a.precio)}${a.periodo ? '<small>' + BP.t('ui_por_mes', a.periodo) + '</small>' : ''}` : BP.t('card_consultar_precio', 'Consultar precio');
+  /* 8/10/2026 · Con su moneda y "por mes" en palabras: "USD 1.100 por mes", "$ 850.000 por mes" */
+  D.precioHTML = a => a.precio ? `${BP.fmtPrecio(a.precio, a.moneda)}${a.periodo ? ' <small>' + BP.t('card_por_mes', 'por mes') + '</small>' : ''}` : BP.t('card_consultar_precio', 'Consultar precio');
   /* La insignia es un dato del publicador ('Dueño verificado', 'Corredor inmobiliario matriculado'…): se traduce como etiqueta fija; 'Selección BAIREN' es nombre propio y queda */
   /* 22/9/2026 · El sello del dueño se pinta SOLO si la titularidad está verificada de verdad.
      Antes se pintaba "Dueño verificado" con escudo por el mero hecho de ser tipo 'dueno', sin
      mirar el flag: el sello, que es la promesa del portal, no lo respaldaba nada. Sin verificar
      se dice "Dueño directo", sin escudo, que es cierto y no promete lo que no se controló. */
-  D.badgeHTML = pub => !pub.matricula && pub.tipo !== 'dueno' ? `<span class="p-badge">${BP.ico.check} ${BP.esc(BP.etiqueta(pub.badge || 'Selección BAIREN'))}</span>`
+  /* 8/10/2026 · Publicador sin verificar: su nombre, sin sello. El dueño sin verificar sigue diciendo "Dueño directo". */
+  D.badgeHTML = pub => !pub || !pub.verificado ? (pub && pub.tipo === 'dueno' ? `<span class="p-badge dueno">${BP.esc(BP.t('ui_dato_dueno_directo', 'Dueño directo'))}</span>` : '')
+    : !pub.matricula && pub.tipo !== 'dueno' ? `<span class="p-badge">${BP.ico.check} ${BP.esc(BP.etiqueta(pub.badge || 'Selección BAIREN'))}</span>`
     : pub.tipo === 'dueno'
     ? (pub.verificado
         ? `<span class="p-badge dueno">${BP.ico.shield} ${BP.esc(BP.etiqueta(pub.badge || 'Dueño verificado'))}</span>`
@@ -219,7 +234,7 @@
     <div class="p-barrio">${[lugar, a.ciudad].filter(Boolean).map(BP.esc).join(', ')}</div>
     <p class="p-desc">${BP.esc(a.descripcion).slice(0, 220)}</p>
     <div class="p-card-foot">
-      <div class="p-publine">${BP.t('card_publica', 'Publica')} <b>${BP.esc(D.pubNombre(pub))}</b> ${D.badgeHTML(pub)}</div>
+      ${pub.nombre ? `<div class="p-publine">${BP.t('card_publica', 'Publica')} <b>${BP.esc(D.pubNombre(pub))}</b> ${D.badgeHTML(pub)}</div>` : '<div></div>'}
       <div class="acts">${a.reservado ? '' : `${D.waLink(a,pub) ? `<a class="p-icon-btn" href="${D.waLink(a,pub)}" target="_blank" rel="noopener" data-wa data-aviso="${BP.esc(a.id)}" data-pub="${BP.esc(pub.storeId || pub.id)}" aria-label="${BP.esc(BP.tf('card_wa_aria', 'Escribir por WhatsApp a {p}', { p: D.pubNombre(pub) }))}" title="WhatsApp">${BP.ico.wa}</a>` : ''}${D.sinContacto(pub) ? `<span class="p-sincontacto">${BP.t('card_contacto_pendiente', 'Contacto pendiente')}</span>` : `<a class="p-btn p-btn-sm p-btn-navy" href="${href}#contacto">${BP.ico.mail} ${BP.t('card_contactar', 'Contactar')}</a>`}`}</div>
     </div>
   </div>
@@ -241,15 +256,24 @@
     <div class="card-meta">${D.metaLine(a)}</div>
     <div class="card-divider"></div>
     <div class="card-footer"><div class="card-price"><span class="price-amount">${a.reservado ? BP.t('card_reservada', 'Reservada') : D.precioHTML(a)}</span></div><span class="card-cta">${BP.t('card_ver_ficha', 'Ver ficha')}</span></div>
-    <div class="p-card-pub">${BP.t('card_publica', 'Publica')} <b>${BP.esc(D.pubNombre(pub))}</b> ${D.badgeHTML(pub)}</div>
+    ${pub.nombre ? `<div class="p-card-pub">${BP.t('card_publica', 'Publica')} <b>${BP.esc(D.pubNombre(pub))}</b> ${D.badgeHTML(pub)}</div>` : ''}
   </div>
 </a>`;
   };
 
   D.bindFavs = root => { (root||document).querySelectorAll('[data-fav]').forEach(b => { if (b._bound) return; b._bound = true; b.addEventListener('click', e => { e.preventDefault(); const on = BP.toggleFav(b.dataset.fav); b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); b.innerHTML = on ? BP.ico.heartFill : BP.ico.heart; BP.toast(on ? BP.t('card_fav_on', 'Guardada en favoritos') : BP.t('card_fav_off', 'Quitada de favoritos')); }); }); };
 
-  /* El precio del aviso incluye expensas y servicios: el alquiler a mediano plazo (op 'mediano') */
-  D.todoIncluido = a => a.op === 'mediano';
+  /* 8/10/2026 · Regla de "todo incluido" (contrato del lanzamiento). Antes era todo el mediano plazo; ahora
+     publican también otras empresas. Se dice "todo incluido" en un aviso de mediano plazo de BAIREN REALTY
+     (publicador 'bairen') o cuando el aviso tiene a la vez 'Expensas incluidas' y 'Servicios incluidos'.
+     Si no, el precio va por mes y la ficha muestra lo que incluye (los textos de D.INCLUYE, si hay). */
+  D.INCLUYE = ['Expensas incluidas', 'Servicios incluidos', 'Internet incluido', 'Limpieza incluida', 'Ropa blanca incluida'];
+  D.incluye = a => (a.caracteristicas || []).filter(x => D.INCLUYE.indexOf(x) > -1);
+  D.todoIncluido = a => a.op === 'mediano' && (a.publicadorId === 'bairen' || (D.incluye(a).indexOf('Expensas incluidas') > -1 && D.incluye(a).indexOf('Servicios incluidos') > -1));
+  D.expensasIncluidas = a => D.todoIncluido(a) || D.incluye(a).indexOf('Expensas incluidas') > -1;
+  /* En mediano plazo, `plazo` es la estadía mínima ("3 meses"). Los avisos que vienen de la web traen el rango
+     entero ("3-12 meses"): eso no es un mínimo, y se sigue mostrando como "Plazo". */
+  D.estadiaMinima = a => a.op === 'mediano' && !!a.plazo && !/\d\s*(?:-|–|a|to)\s*\d/i.test(a.plazo);
   D.filter = function(avisos, f){
     return avisos.filter(a => {
       if (f.favs && !BP.isFav(a.id)) return false;
@@ -257,6 +281,9 @@
       if (f.op && !D.opMatch(a, f.op)) return false;
       if (f.tipo && f.tipo !== 'todos' && a.tipoProp.toLowerCase() !== f.tipo) return false;
       if (f.zonas && f.zonas.length && f.zonas.indexOf(a.zona) === -1) return false;
+      /* 8/10/2026 · El rango de precio es en una moneda (f.mon: '' es USD, 'ARS' pesos): los avisos en la otra no entran.
+         Sin rango de precio se ven todos. */
+      if ((f.pmin || f.pmax) && (a.moneda === 'ARS' ? 'ARS' : 'USD') !== (f.mon === 'ARS' ? 'ARS' : 'USD')) return false;
       if (f.pmin && (a.precio||0) < f.pmin) return false;
       if (f.pmax && (a.precio||0) > f.pmax) return false;
       /* 23/9/2026 · Antes decía `a.expensas &&`, o sea que los avisos SIN expensas cargadas
@@ -266,7 +293,7 @@
       /* 25/9/2026 · El precio del mediano plazo es todo incluido (la ficha lo dice: "por mes · todo
          incluido"; en los datos no hay otra marca, es la operación 'mediano'): ahí las expensas cuentan
          como 0 y el aviso pasa cualquier máximo. Si no es todo incluido y no hay dato, no pasa. */
-      if (f.expmax && !(D.todoIncluido(a) || (a.expensas > 0 && a.expensas <= f.expmax))) return false;
+      if (f.expmax && !(D.expensasIncluidas(a) || (a.expensas > 0 && a.expensas <= f.expmax))) return false;
       if (f.amb && (a.amb||0) < f.amb) return false;
       if (f.dorm && (a.dorm||0) < f.dorm) return false;
       if (f.banos && (a.banos||0) < f.banos) return false;

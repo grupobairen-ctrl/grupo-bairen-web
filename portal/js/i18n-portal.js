@@ -31,6 +31,7 @@ window.BP_I18N = {
     est_eyebrow: 'BAIREN Selection', est_h2: 'We follow a standard.', est_copy: 'Before listing each property, we check:', criterios: 'How we select',
     hito_ubicacion: 'Location', hito_estado: 'Condition', hito_distribucion: 'Layout', hito_calidad: 'Build quality',
     edif_h2: 'First-rate buildings and complexes.', edif_copy: 'Today they have their place on BAIREN.',
+    ult_h2: 'Just in.', ult_ver: 'See all', ult_riel: 'Just in, swipe to see more',
     ver_unidades: 'See units', avisarme: 'Notify me', fachada_de: 'Facade of', publica_mas: 'List your property or development',
     edif_ant: 'Previous building', edif_sig: 'Next building', edif_riel: 'Buildings, swipe to see more',
     pub_h2: 'Does your property fit BAIREN?',
@@ -41,7 +42,7 @@ window.BP_I18N = {
 
     /* interfaz compartida (ui.js): fechas, precios, error, compartir, avisos */
     ui_pub_hoy: 'Listed today', ui_pub_ayer: 'Listed yesterday', ui_pub_dias: 'Listed {n} days ago', ui_pub_mes: 'Listed 1 month ago', ui_pub_meses: 'Listed {n} months ago',
-    ui_consultar: 'Price on request', ui_por_mes: '/mo',
+    ui_consultar: 'Price on request', ui_por_mes: '/mo', card_por_mes: 'per month',
     ui_error_default: 'We could not load the information.', ui_error_ayuda: 'It may be your connection or something on our side. Try again in a moment.', ui_reintentar: 'Retry',
     ui_compartir_aria: 'Share this property', ui_compartir: 'Share', ui_por_mail: 'By email', ui_copiar: 'Copy the link', ui_otras_apps: 'Other apps', ui_cerrar: 'Close', ui_copiado: 'Copied', ui_enlace_copiado: 'Link copied.',
     ui_ingresa_notif: 'Sign in to see your notifications.', ui_sin_notif: 'No new notifications.', ui_sesion_cerrada: 'Signed out.',
@@ -50,19 +51,20 @@ window.BP_I18N = {
     ui_dato_gestor_de_alquileres: 'Rental manager', pan_tipo_gestor: 'Rental manager', ing_crea_gestor: 'Create your rental manager account', ing_crea_gestor_sub: 'An email and a code. Then you add your details, an owner\'s mandate and your first listing.',
     ui_leyenda_alq_intro: 'Legal notice, Buenos Aires rental law:',
     /* operaciones: etiqueta del menú y complemento del título ("departamentos en venta") */
-    op_venta_label: 'Buy', op_venta_h: 'for sale', op_alquiler_label: 'Rent', op_alquiler_h: 'for rent', op_mediano_label: 'Rent · mid-term', op_mediano_h: 'for mid-term rent', op_largo_label: 'Rent · long-term', op_largo_h: 'for long-term rent',
+    op_venta_label: 'Buy', op_venta_h: 'for sale', op_alquiler_label: 'Rent', op_alquiler_h: 'for rent', op_mediano_label: 'Rent · mid-term (3 to 12 months)', op_mediano_h: 'for mid-term rent (3 to 12 months)', op_largo_label: 'Rent · long-term', op_largo_h: 'for long-term rent',
     /* etiquetas fijas de datos, por slug: cualidades verificadas */
     ui_dato_luminoso: 'Bright', ui_dato_silencioso: 'Quiet', ui_dato_terraza_propia: 'Private terrace', ui_dato_balcon: 'Balcony', ui_dato_vista_abierta: 'Open view', ui_dato_piso_alto: 'High floor', ui_dato_apto_home_office: 'Home office ready', ui_dato_acepta_mascotas: 'Pets allowed', ui_dato_reciclado_a_nuevo: 'Fully renovated', ui_dato_edificio_con_amenities: 'Building with amenities', ui_dato_cochera: 'Parking space', ui_dato_calefaccion_central: 'Central heating',
     /* amenities y características */
     ui_dato_pileta: 'Pool', ui_dato_gimnasio: 'Gym', ui_dato_sum: 'Multipurpose room', ui_dato_parrilla: 'Barbecue', ui_dato_seguridad_24hs: '24h security', ui_dato_terraza_o_jardin: 'Terrace or garden', ui_dato_jardin_terraza: 'Garden / terrace', ui_dato_ascensor: 'Elevator', ui_dato_laundry: 'Laundry', ui_dato_pet_friendly: 'Pet friendly', ui_dato_aire_acondicionado: 'Air conditioning', ui_dato_aire_acond: 'Air conditioning', ui_dato_baulera: 'Storage room', ui_dato_conserje_24hs: '24h concierge', ui_dato_bicicletero: 'Bike storage', ui_dato_spa_sauna: 'Spa / sauna', ui_dato_amoblado: 'Furnished', ui_dato_sin_amoblar: 'Unfurnished', ui_dato_amoblado_y_equipado: 'Furnished and equipped', ui_dato_pileta_climatizada: 'Heated pool', ui_dato_seguridad: 'Security',
     ui_dato_apto_credito: 'Mortgage eligible', ui_dato_apto_profesional: 'Professional use allowed', ui_dato_ofrece_financiacion: 'Financing available', ui_dato_permite_mascotas: 'Pets allowed', ui_dato_acepta_seguro_de_caucion: 'Accepts surety insurance', ui_dato_contrato_digital: 'Digital contract', ui_dato_sin_garantia_propietaria: 'No guarantor required', ui_dato_entrega_diciembre_2027: 'Delivery December 2027',
+    ui_dato_expensas_incluidas: 'Building fees included', ui_dato_servicios_incluidos: 'Utilities included', ui_dato_internet_incluido: 'Internet included', ui_dato_limpieza_incluida: 'Cleaning included', ui_dato_ropa_blanca_incluida: 'Bed linen included',
     /* plazos, tipos e insignias */
     ui_dato_3_12_meses: '3 to 12 months', ui_dato_a_partir_de_2_anos: 'From 2 years',
     ui_dato_departamento: 'Apartment', ui_dato_piso: 'Full-floor apartment', ui_dato_casa: 'House',
     ui_dato_dueno_verificado: 'Verified owner', ui_dato_dueno_directo: 'Direct owner', ui_dato_corredor_inmobiliario_matriculado: 'Licensed real estate broker', ui_dato_venta_directa: 'Direct sale',
 
     /* tarjetas (data.js) */
-    card_venta: 'Sale', card_alq_mediano: 'Mid-term rental', card_alq_largo: 'Long-term rental',
+    card_venta: 'Sale', card_alq_mediano: 'Mid-term rental (3 to 12 months)', card_alq_largo: 'Long-term rental',
     card_reservada: 'Reserved', card_seleccionada: 'Selected', card_ejemplo: 'Sample', card_consultar_precio: 'Price on request', card_expensas: 'building fees',
     card_monoamb: 'Studio', card_amb: 'rooms', card_dorm_1: 'bed', card_dorm_n: 'beds', card_bano: 'bath', card_banos: 'baths', card_coch_1: 'parking space', card_coch_n: 'parking spaces',
     card_ver: 'View {t}', card_ver_en: 'View {t} in {b}', card_publica: 'Listed by', card_wa_aria: 'Message {p} on WhatsApp', card_contacto_pendiente: 'Contact pending', card_contactar: 'Contact',
@@ -76,8 +78,9 @@ window.BP_I18N = {
     cat_plazo_aria: 'Rental term', cat_plazo_todos: 'Any term',
     cat_tipo_aria: 'Property type', cat_tipo_depto: 'Apartment', cat_tipo_piso: 'Full-floor', cat_tipo_casa: 'House', cat_tipo_todos: 'All types',
     cat_amb_dorm: 'Rooms | Beds', cat_amb_min: 'Rooms, minimum', cat_dorm_min: 'Bedrooms, minimum', cat_any: 'Any', cat_limpiar: 'Clear', cat_aplicar: 'Apply',
-    cat_precio: 'Price', cat_usd_rango: 'USD, from and to', cat_min_ph: 'Minimum', cat_max_ph: 'Maximum', cat_pmin_aria: 'Minimum price in USD', cat_pmax_aria: 'Maximum price in USD',
-    cat_barrios: 'Neighborhoods', cat_filtros: 'Filters', cat_mas_filtros: 'More filters',
+    cat_precio: 'Price', cat_usd_rango: 'USD, from and to', cat_min_ph: 'Minimum', cat_max_ph: 'Maximum', cat_pmin_aria: 'Minimum price in USD', cat_pmax_aria: 'Maximum price in USD', cat_moneda_aria: 'Currency', cat_pesos: 'Pesos', cat_ars_rango: 'Pesos, from and to', cat_pmin_aria_ars: 'Minimum price in pesos', cat_pmax_aria_ars: 'Maximum price in pesos',
+    cat_barrios: 'Neighborhoods', cat_filtros: 'Filters', cat_mas_filtros: 'More filters', cat_filtros_n: 'Filters, {n} active', cat_buscar_t: 'Search', cat_ver_n: 'See {n} properties', cat_ver_1: 'See 1 property', cat_ver_0: 'No results',
+    cat_op_alq_todos: 'Rent, any term', cat_op_mediano: 'Mid-term rental (3 to 12 months)', cat_op_largo: 'Long-term rental', cat_op_todas: 'All operations',
     cat_crear_alerta: 'Create alert', cat_alerta_creada: 'Alert created', cat_alerta_quitar: 'Alert created, tap to remove it',
     cat_ordenar: 'Sort by', cat_sort_relevancia: 'Most relevant', cat_sort_precio_asc: 'Lowest price', cat_sort_precio_desc: 'Highest price', cat_sort_recientes: 'Newest', cat_sort_m2: 'Largest area',
     cat_pager_aria: 'Result pages', cat_crumbs_aria: 'Breadcrumb', cat_cerrar: 'Close',
@@ -102,7 +105,7 @@ window.BP_I18N = {
     cat_pag_ant: 'Previous page', cat_pag_sig: 'Next page', cat_pag: 'Page {n}',
     cat_leyenda_alq: 'Legal notice, Buenos Aires rental law (Law 2340, art. 10 par. 8), for residential rental listings published by licensed brokers: ',
     cat_crumb_todas: 'All operations', cat_mapa_nd: 'Map not available.',
-    cat_amb_btn: '{n}+ rooms', cat_dorm_btn: '{n}+ beds', cat_precio_btn: 'USD {a} to {b}', cat_sin_max: 'no maximum',
+    cat_amb_btn: '{n}+ rooms', cat_dorm_btn: '{n}+ beds', cat_precio_btn: 'USD {a} to {b}', cat_precio_btn_m: '{m} {a} to {b}', cat_sin_max: 'no maximum',
     cat_quitar: 'Remove {z}', cat_err_max: 'The maximum has to be higher than the minimum.', cat_err_carga: 'We could not load the properties.',
     cat_toast_alerta_quitada: 'Alert removed.', cat_unidad: ' unit', cat_unidades: ' units',
 
@@ -118,22 +121,23 @@ window.BP_I18N = {
     ficha_detalle: 'The unit in detail', ficha_plazo_tile: 'Term {p}', ficha_ver_caract: 'See all {n} features', ficha_ver_menos: 'Show less',
     ficha_ubicacion: 'Location', ficha_mapa_title: 'Map of the property location', ficha_ubic_aprox: 'Approximate location. The exact address is confirmed by the lister.',
     /* ficha: preguntas, quién publica, reporte, legal */
-    ficha_preguntale: 'Ask the lister', ficha_elegi: 'Pick one or write your own. It goes straight to {p}.', ficha_q1: 'Is it still available?', ficha_q2: 'How much are the building fees?', ficha_q3: 'Which floor is it on?', ficha_q4: 'When can I visit?', ficha_q_ph: 'Write your question', ficha_q_aria: 'Your question', ficha_enviar: 'Send',
+    ficha_preguntale: 'Ask the lister', ficha_elegi: 'Pick one or write your own. It goes straight to {p}.', ficha_elegi_wa: 'Pick one or write your own and WhatsApp opens with {p}.', ficha_q1: 'Is it still available?', ficha_q2: 'How much are the building fees?', ficha_q3: 'Which floor is it on?', ficha_q4: 'When can I visit?', ficha_q_ph: 'Write your question', ficha_q_aria: 'Your question', ficha_enviar: 'Send',
     ficha_quien_publica: 'Listed by', ficha_dueno_verif: 'Direct owner, title verified by BAIREN', ficha_ficha_verif: 'Listing verified by BAIREN', ficha_pub_ejemplo: 'Sample lister', ficha_responde: 'The transaction is handled by {r}, {m}.', ficha_ver_todas: 'See all their properties', ficha_desde: 'Listing on BAIREN since {y}',
     ficha_reportar: 'Report a problem with this listing', ficha_rep_vendida: 'It is sold or reserved', ficha_rep_contacto: 'I cannot reach the lister', ficha_rep_otro: 'Other reason', ficha_fraudes: 'How to avoid fraud', ficha_rep_ok: 'Sent, thank you', ficha_rep_toast: 'Thank you. We review the listing within 24 hours.',
     ficha_vista_1: '1 view', ficha_vistas: '{n} views', ficha_legal: 'Legal information',
     /* ficha: tarjeta de contacto y formulario */
     ficha_lbl_venta: 'Sale price', ficha_lbl_mensual: 'Monthly rent',
     ficha_direccion: 'Address', ficha_barrio: 'Neighborhood', ficha_superficie: 'Area', ficha_ambientes_lbl: 'Rooms', ficha_monoamb_val: 'Studio', ficha_plazo_lbl: 'Term', ficha_exp_serv: 'Fees and utilities', ficha_todos_incl: 'All included', ficha_expensas: 'Building fees', ficha_exp_val: '$ {n} per month', ficha_disponible: 'Available',
+    ficha_estadia_min: 'Minimum stay', ficha_estadia_tile: 'Minimum stay {p}', ficha_incluye: 'Includes',
     ficha_publica: 'Listed by', ficha_dueno_v: 'Verified owner', ficha_venta_directa: 'Direct sale', ficha_corredor_resp: 'Responsible broker: {r}, {m}',
     ficha_cual_1: 'One quality verified by BAIREN', ficha_cual_n: '{n} qualities verified by BAIREN', ficha_revisada: 'Listing reviewed by BAIREN before going live',
     ficha_res_box: 'Reserved: not taking enquiries for now. If it frees up, it will be listed here again.', ficha_sin_contacto: 'Contact pending: {p} has not added a WhatsApp or email yet. BAIREN does not take part in the transaction, so the only valid contact is the lister.',
     ficha_alerta_creando: 'Creating alert', ficha_alerta_quitar: 'Alert created, tap to remove it', ficha_toast_baja_mail: 'Alert saved. We will email you if the price drops.', ficha_toast_baja_error: 'We could not save the alert. Try again.', cat_toast_alerta_no_quitada: 'We could not remove the alert. Try again.', cat_toast_alerta_sin_cuenta: 'We could not save the alert to your account. It stays in this browser.', cat_toast_alerta_mail: 'Alert saved. We will email you when a property like this comes in.', cat_toast_alerta_local: 'Alert saved in this browser. With an account, you get it by email.',
-    ficha_coordinar: 'Book a visit', ficha_consultar: 'Send an enquiry', ficha_ver_tel: 'Show phone', ficha_avisar_baja: 'Notify me if the price drops', ficha_alerta_creada: 'Alert created', ficha_toast_baja: 'We will let you know if the price drops. With an account, by email.',
+    ficha_coordinar: 'Book a visit', ficha_consultar: 'Send an enquiry', ficha_mcta_consultar: 'Enquire', ficha_ver_tel: 'Show phone', ficha_avisar_baja: 'Notify me if the price drops', ficha_alerta_creada: 'Alert created', ficha_toast_baja: 'We will let you know if the price drops. With an account, by email.',
     ficha_fav: 'Save to favorites', ficha_compartir: 'Share', ficha_foot_bairen: 'Your enquiry goes to BAIREN', ficha_foot_directo: 'Direct contact with the lister · BAIREN does not take part in the transaction',
     ficha_escribile: 'Message {p}', ficha_nombre: 'Name', ficha_mail: 'Email', ficha_tel: 'Phone with country and area code', ficha_mensaje: 'Message', ficha_quiero_visita: 'I would like to book a visit', ficha_dia_hora: 'Day and time that suit you. {p} will confirm.',
     ficha_acepto: 'I accept the <a href="legales.html#terminos">Terms</a> and the <a href="legales.html#privacidad">Privacy policy</a>, and that my details are sent to {p}{resp}.', ficha_acepto_resp: ', responsible for the transaction', ficha_enviar_consulta: 'Send enquiry', ficha_enviando: 'Sending…',
-    ficha_ok_t: 'Enquiry sent', ficha_ok_p: 'It goes straight to {p}, who will reply by email or WhatsApp.', ficha_ok_mail: ' If your email client did not open, write to <a href="mailto:{e}">{e}</a>.', ficha_seguir_wa: 'Continue on WhatsApp', ficha_otra: 'Send another enquiry',
+    ficha_ok_t: 'Enquiry sent', ficha_ok_p: 'It goes straight to {p}, who will reply by email or WhatsApp.', ficha_ok_listo: 'Done. It reached {p}, who will reply by WhatsApp or email.', ficha_ok_mail: ' If your email client did not open, write to <a href="mailto:{e}">{e}</a>.', ficha_seguir_wa: 'Continue on WhatsApp', ficha_otra: 'Send another enquiry',
     ficha_err_nombre: 'Tell us your name.', ficha_err_mail: 'Check the email, for example name@domain.com.', ficha_err_tel: 'Phone with area code, for example 11 5555 6666.', ficha_err_fecha: 'Pick a day and time.', ficha_err_acepto: 'To send the enquiry you need to accept the terms.', ficha_toast_enviada: 'Your enquiry goes straight to {p}.', ficha_toast_elegi: 'Pick a question or write your own.',
     ficha_mail_subject: 'Enquiry about {t} ({c}) from BAIREN', ficha_mail_visita: 'I would like to visit on {d}.', ficha_tel_copiado: 'Phone number copied.',
     /* ficha: similares, pie, errores */
@@ -257,7 +261,7 @@ window.BP_I18N = {
     home_desc: 'O portal de imóveis selecionados de Buenos Aires. Apartamentos à venda e para alugar em Palermo, Recoleta, Retiro, Belgrano, Núñez, Colegiales, Villa Crespo, Puerto Madero, Saavedra e Zona Norte, revisados um por um antes de entrar no portal.',
     skip: 'Ir para o conteúdo', menu: 'Menu', idioma: 'Idioma',
     publicar: 'Publicar', ingresar: 'Entrar', notificaciones: 'Notificações', mis_contactos: 'Meus contatos', favoritos: 'Favoritos',
-    nav_propiedades: 'Imóveis', comprar: 'Comprar', alquilar: 'Alugar', mediano: 'Médio prazo', largo: 'Longo prazo', emprendimientos: 'Empreendimentos', publicadores: 'Anunciantes',
+    nav_propiedades: 'Imóveis', comprar: 'Comprar', alquilar: 'Alugar', mediano: 'Médio prazo', largo: 'Tradicional', emprendimientos: 'Empreendimentos', publicadores: 'Anunciantes',
     ft_tag: 'Portal de imóveis selecionados em Buenos Aires.',
     ft_legend: 'A BAIREN seleciona e publica imóveis e oferece a gestão para administrá-los. Cada anúncio é responsabilidade de quem o publica.',
     ft_nav: 'Navegação', ft_zonas: 'Zonas', ft_mas: 'Mais', ft_indice: 'Índice BAIREN', ft_criterios: 'Critérios de seleção', ft_terminos: 'Termos e privacidade',
@@ -267,6 +271,7 @@ window.BP_I18N = {
     est_eyebrow: 'Seleção BAIREN', est_h2: 'Seguimos um padrão.', est_copy: 'Antes de incorporar cada imóvel, verificamos:', criterios: 'Como selecionamos',
     hito_ubicacion: 'Localização', hito_estado: 'Estado', hito_distribucion: 'Distribuição', hito_calidad: 'Qualidade construtiva',
     edif_h2: 'Edifícios e complexos de primeira linha.', edif_copy: 'Hoje encontram seu espaço na BAIREN.',
+    ult_h2: 'O que acabou de entrar.', ult_ver: 'Ver todos', ult_riel: 'O que acabou de entrar, deslize para ver mais',
     ver_unidades: 'Ver unidades', avisarme: 'Avise-me', fachada_de: 'Fachada do', publica_mas: 'Publique seu imóvel ou empreendimento',
     edif_ant: 'Edifício anterior', edif_sig: 'Próximo edifício', edif_riel: 'Edifícios, deslize para ver mais',
     pub_h2: 'Seu imóvel se encaixa na BAIREN?',
@@ -277,7 +282,7 @@ window.BP_I18N = {
 
     /* interfaz compartida (ui.js): fechas, precios, error, compartir, avisos */
     ui_pub_hoy: 'Publicado hoje', ui_pub_ayer: 'Publicado ontem', ui_pub_dias: 'Publicado há {n} dias', ui_pub_mes: 'Publicado há 1 mês', ui_pub_meses: 'Publicado há {n} meses',
-    ui_consultar: 'Preço sob consulta', ui_por_mes: '/mês',
+    ui_consultar: 'Preço sob consulta', ui_por_mes: '/mês', card_por_mes: 'por mês',
     ui_error_default: 'Não conseguimos carregar as informações.', ui_error_ayuda: 'Pode ser a sua conexão ou algo do nosso lado. Tente de novo em instantes.', ui_reintentar: 'Tentar de novo',
     ui_compartir_aria: 'Compartilhar este imóvel', ui_compartir: 'Compartilhar', ui_por_mail: 'Por e-mail', ui_copiar: 'Copiar o link', ui_otras_apps: 'Outros aplicativos', ui_cerrar: 'Fechar', ui_copiado: 'Copiado', ui_enlace_copiado: 'Link copiado.',
     ui_ingresa_notif: 'Entre para ver suas notificações.', ui_sin_notif: 'Você não tem notificações novas.', ui_sesion_cerrada: 'Sessão encerrada.',
@@ -286,19 +291,20 @@ window.BP_I18N = {
     ui_dato_gestor_de_alquileres: 'Gestor de aluguéis', pan_tipo_gestor: 'Gestor de aluguéis', ing_crea_gestor: 'Crie sua conta de gestor de aluguéis', ing_crea_gestor_sub: 'Um e-mail e um código. Depois você cadastra seus dados, o mandato de um proprietário e seu primeiro anúncio.',
     ui_leyenda_alq_intro: 'Aviso legal, lei de aluguéis de Buenos Aires:',
     /* operaciones */
-    op_venta_label: 'Comprar', op_venta_h: 'à venda', op_alquiler_label: 'Alugar', op_alquiler_h: 'para alugar', op_mediano_label: 'Alugar · médio prazo', op_mediano_h: 'para aluguel de médio prazo', op_largo_label: 'Alugar · longo prazo', op_largo_h: 'para aluguel de longo prazo',
+    op_venta_label: 'Comprar', op_venta_h: 'à venda', op_alquiler_label: 'Alugar', op_alquiler_h: 'para alugar', op_mediano_label: 'Alugar · médio prazo (3 a 12 meses)', op_mediano_h: 'para aluguel de médio prazo (3 a 12 meses)', op_largo_label: 'Alugar · tradicional', op_largo_h: 'para aluguel tradicional',
     /* etiquetas fijas de datos, por slug: cualidades verificadas */
     ui_dato_luminoso: 'Iluminado', ui_dato_silencioso: 'Silencioso', ui_dato_terraza_propia: 'Terraço privativo', ui_dato_balcon: 'Sacada', ui_dato_vista_abierta: 'Vista livre', ui_dato_piso_alto: 'Andar alto', ui_dato_apto_home_office: 'Pronto para home office', ui_dato_acepta_mascotas: 'Aceita pets', ui_dato_reciclado_a_nuevo: 'Totalmente reformado', ui_dato_edificio_con_amenities: 'Prédio com áreas de lazer', ui_dato_cochera: 'Vaga de garagem', ui_dato_calefaccion_central: 'Aquecimento central',
     /* amenities y características */
     ui_dato_pileta: 'Piscina', ui_dato_gimnasio: 'Academia', ui_dato_sum: 'Salão de festas', ui_dato_parrilla: 'Churrasqueira', ui_dato_seguridad_24hs: 'Segurança 24h', ui_dato_terraza_o_jardin: 'Terraço ou jardim', ui_dato_jardin_terraza: 'Jardim / terraço', ui_dato_ascensor: 'Elevador', ui_dato_laundry: 'Lavanderia', ui_dato_pet_friendly: 'Pet friendly', ui_dato_aire_acondicionado: 'Ar-condicionado', ui_dato_aire_acond: 'Ar-condicionado', ui_dato_baulera: 'Depósito', ui_dato_conserje_24hs: 'Portaria 24h', ui_dato_bicicletero: 'Bicicletário', ui_dato_spa_sauna: 'Spa / sauna', ui_dato_amoblado: 'Mobiliado', ui_dato_sin_amoblar: 'Sem mobília', ui_dato_amoblado_y_equipado: 'Mobiliado e equipado', ui_dato_pileta_climatizada: 'Piscina aquecida', ui_dato_seguridad: 'Segurança',
     ui_dato_apto_credito: 'Aceita financiamento', ui_dato_apto_profesional: 'Permite uso profissional', ui_dato_ofrece_financiacion: 'Oferece financiamento', ui_dato_permite_mascotas: 'Aceita pets', ui_dato_acepta_seguro_de_caucion: 'Aceita seguro-fiança', ui_dato_contrato_digital: 'Contrato digital', ui_dato_sin_garantia_propietaria: 'Sem fiador', ui_dato_entrega_diciembre_2027: 'Entrega em dezembro de 2027',
+    ui_dato_expensas_incluidas: 'Condomínio incluído', ui_dato_servicios_incluidos: 'Contas incluídas', ui_dato_internet_incluido: 'Internet incluída', ui_dato_limpieza_incluida: 'Limpeza incluída', ui_dato_ropa_blanca_incluida: 'Roupa de cama incluída',
     /* plazos, tipos e insignias */
     ui_dato_3_12_meses: '3 a 12 meses', ui_dato_a_partir_de_2_anos: 'A partir de 2 anos',
     ui_dato_departamento: 'Apartamento', ui_dato_piso: 'Andar inteiro', ui_dato_casa: 'Casa',
     ui_dato_dueno_verificado: 'Proprietário verificado', ui_dato_dueno_directo: 'Proprietário direto', ui_dato_corredor_inmobiliario_matriculado: 'Corretor de imóveis habilitado', ui_dato_venta_directa: 'Venda direta',
 
     /* tarjetas (data.js) */
-    card_venta: 'Venda', card_alq_mediano: 'Aluguel de médio prazo', card_alq_largo: 'Aluguel de longo prazo',
+    card_venta: 'Venda', card_alq_mediano: 'Médio prazo (3 a 12 meses)', card_alq_largo: 'Aluguel tradicional',
     card_reservada: 'Reservado', card_seleccionada: 'Selecionado', card_ejemplo: 'Exemplo', card_consultar_precio: 'Preço sob consulta', card_expensas: 'de condomínio',
     card_monoamb: 'Studio', card_amb: 'amb.', card_dorm_1: 'dorm.', card_dorm_n: 'dorm.', card_bano: 'banheiro', card_banos: 'banheiros', card_coch_1: 'vaga', card_coch_n: 'vagas',
     card_ver: 'Ver {t}', card_ver_en: 'Ver {t} em {b}', card_publica: 'Publicado por', card_wa_aria: 'Escrever para {p} pelo WhatsApp', card_contacto_pendiente: 'Contato pendente', card_contactar: 'Contatar',
@@ -312,8 +318,9 @@ window.BP_I18N = {
     cat_plazo_aria: 'Prazo do aluguel', cat_plazo_todos: 'Todos',
     cat_tipo_aria: 'Tipo de imóvel', cat_tipo_depto: 'Apartamento', cat_tipo_piso: 'Andar inteiro', cat_tipo_casa: 'Casa', cat_tipo_todos: 'Todos os tipos',
     cat_amb_dorm: 'Amb | Dorm', cat_amb_min: 'Ambientes, mínimo', cat_dorm_min: 'Dormitórios, mínimo', cat_any: 'Todos', cat_limpiar: 'Limpar', cat_aplicar: 'Aplicar',
-    cat_precio: 'Preço', cat_usd_rango: 'USD, de e até', cat_min_ph: 'Mínimo', cat_max_ph: 'Máximo', cat_pmin_aria: 'Preço mínimo em USD', cat_pmax_aria: 'Preço máximo em USD',
-    cat_barrios: 'Bairros', cat_filtros: 'Filtros', cat_mas_filtros: 'Mais filtros',
+    cat_precio: 'Preço', cat_usd_rango: 'USD, de e até', cat_min_ph: 'Mínimo', cat_max_ph: 'Máximo', cat_pmin_aria: 'Preço mínimo em USD', cat_pmax_aria: 'Preço máximo em USD', cat_moneda_aria: 'Moeda', cat_pesos: 'Pesos', cat_ars_rango: 'Pesos, de e até', cat_pmin_aria_ars: 'Preço mínimo em pesos', cat_pmax_aria_ars: 'Preço máximo em pesos',
+    cat_barrios: 'Bairros', cat_filtros: 'Filtros', cat_mas_filtros: 'Mais filtros', cat_filtros_n: 'Filtros, {n} ativos', cat_buscar_t: 'Buscar', cat_ver_n: 'Ver {n} imóveis', cat_ver_1: 'Ver 1 imóvel', cat_ver_0: 'Sem resultados',
+    cat_op_alq_todos: 'Alugar, todos os prazos', cat_op_mediano: 'Médio prazo (3 a 12 meses)', cat_op_largo: 'Aluguel tradicional', cat_op_todas: 'Todas as operações',
     cat_crear_alerta: 'Criar alerta', cat_alerta_creada: 'Alerta criado', cat_alerta_quitar: 'Alerta criado, toque para removê-lo',
     cat_ordenar: 'Ordenar', cat_sort_relevancia: 'Mais relevantes', cat_sort_precio_asc: 'Menor preço', cat_sort_precio_desc: 'Maior preço', cat_sort_recientes: 'Mais recentes', cat_sort_m2: 'Maior área',
     cat_pager_aria: 'Páginas de resultados', cat_crumbs_aria: 'Trilha de navegação', cat_cerrar: 'Fechar',
@@ -338,7 +345,7 @@ window.BP_I18N = {
     cat_pag_ant: 'Página anterior', cat_pag_sig: 'Próxima página', cat_pag: 'Página {n}',
     cat_leyenda_alq: 'Aviso legal, lei de aluguéis de Buenos Aires (Lei 2340, art. 10 inc. 8), para anúncios de aluguel residencial publicados por corretores habilitados: ',
     cat_crumb_todas: 'Todas as operações', cat_mapa_nd: 'Mapa indisponível.',
-    cat_amb_btn: '{n}+ amb.', cat_dorm_btn: '{n}+ dorm.', cat_precio_btn: 'USD {a} a {b}', cat_sin_max: 'sem máximo',
+    cat_amb_btn: '{n}+ amb.', cat_dorm_btn: '{n}+ dorm.', cat_precio_btn: 'USD {a} a {b}', cat_precio_btn_m: '{m} {a} a {b}', cat_sin_max: 'sem máximo',
     cat_quitar: 'Remover {z}', cat_err_max: 'O máximo tem que ser maior que o mínimo.', cat_err_carga: 'Não conseguimos carregar os imóveis.',
     cat_toast_alerta_quitada: 'Alerta removido.', cat_unidad: ' unidade', cat_unidades: ' unidades',
 
@@ -354,22 +361,23 @@ window.BP_I18N = {
     ficha_detalle: 'A unidade em detalhe', ficha_plazo_tile: 'Prazo {p}', ficha_ver_caract: 'Ver as {n} características', ficha_ver_menos: 'Ver menos',
     ficha_ubicacion: 'Localização', ficha_mapa_title: 'Mapa da localização do imóvel', ficha_ubic_aprox: 'Localização aproximada. O endereço exato é confirmado por quem publica.',
     /* ficha: preguntas, quién publica, reporte, legal */
-    ficha_preguntale: 'Pergunte a quem publica', ficha_elegi: 'Escolha uma ou escreva a sua. Chega direto para {p}.', ficha_q1: 'Ainda está disponível?', ficha_q2: 'Qual é o valor do condomínio?', ficha_q3: 'Em que andar fica?', ficha_q4: 'Quando posso visitar?', ficha_q_ph: 'Escreva sua pergunta', ficha_q_aria: 'Sua pergunta', ficha_enviar: 'Enviar',
+    ficha_preguntale: 'Pergunte a quem publica', ficha_elegi: 'Escolha uma ou escreva a sua. Chega direto para {p}.', ficha_elegi_wa: 'Escolha uma ou escreva a sua e o WhatsApp abre com {p}.', ficha_q1: 'Ainda está disponível?', ficha_q2: 'Qual é o valor do condomínio?', ficha_q3: 'Em que andar fica?', ficha_q4: 'Quando posso visitar?', ficha_q_ph: 'Escreva sua pergunta', ficha_q_aria: 'Sua pergunta', ficha_enviar: 'Enviar',
     ficha_quien_publica: 'Quem publica', ficha_dueno_verif: 'Proprietário direto, titularidade verificada pela BAIREN', ficha_ficha_verif: 'Anúncio verificado pela BAIREN', ficha_pub_ejemplo: 'Anunciante de exemplo', ficha_responde: 'Pela operação responde {r}, {m}.', ficha_ver_todas: 'Ver todos os seus imóveis', ficha_desde: 'Publica na BAIREN desde {y}',
     ficha_reportar: 'Reportar um problema com este anúncio', ficha_rep_vendida: 'Está vendido ou reservado', ficha_rep_contacto: 'Não consigo contato', ficha_rep_otro: 'Outro motivo', ficha_fraudes: 'Como evitar fraudes', ficha_rep_ok: 'Enviado, obrigado', ficha_rep_toast: 'Obrigado. Revisamos o anúncio em menos de 24 horas.',
     ficha_vista_1: '1 visualização', ficha_vistas: '{n} visualizações', ficha_legal: 'Informações legais',
     /* ficha: tarjeta de contacto y formulario */
     ficha_lbl_venta: 'Preço de venda', ficha_lbl_mensual: 'Aluguel mensal',
     ficha_direccion: 'Endereço', ficha_barrio: 'Bairro', ficha_superficie: 'Área', ficha_ambientes_lbl: 'Ambientes', ficha_monoamb_val: 'Studio', ficha_plazo_lbl: 'Prazo', ficha_exp_serv: 'Condomínio e serviços', ficha_todos_incl: 'Tudo incluído', ficha_expensas: 'Condomínio', ficha_exp_val: '$ {n} por mês', ficha_disponible: 'Disponível',
+    ficha_estadia_min: 'Estadia mínima', ficha_estadia_tile: 'Estadia mínima {p}', ficha_incluye: 'Inclui',
     ficha_publica: 'Publicado por', ficha_dueno_v: 'Proprietário verificado', ficha_venta_directa: 'Venda direta', ficha_corredor_resp: 'Corretor responsável: {r}, {m}',
     ficha_cual_1: 'Uma qualidade verificada pela BAIREN', ficha_cual_n: '{n} qualidades verificadas pela BAIREN', ficha_revisada: 'Anúncio revisado pela BAIREN antes de publicar',
     ficha_res_box: 'Reservado: por enquanto não recebe consultas. Se for liberado, volta a ser publicado aqui.', ficha_sin_contacto: 'Contato pendente: {p} ainda não cadastrou WhatsApp nem e-mail. A BAIREN não participa da operação, então o único contato válido é o de quem publica.',
     ficha_alerta_creando: 'Criando alerta', ficha_alerta_quitar: 'Alerta criado, toque para removê-lo', ficha_toast_baja_mail: 'Alerta salvo. Avisamos por e-mail se o preço baixar.', ficha_toast_baja_error: 'Não foi possível salvar o alerta. Tente de novo.', cat_toast_alerta_no_quitada: 'Não foi possível remover o alerta. Tente de novo.', cat_toast_alerta_sin_cuenta: 'Não foi possível salvar o alerta na sua conta. Ficou neste navegador.', cat_toast_alerta_mail: 'Alerta salvo. Avisamos por e-mail quando entrar um imóvel assim.', cat_toast_alerta_local: 'Alerta salvo neste navegador. Com a sua conta, chega por e-mail.',
-    ficha_coordinar: 'Agendar visita', ficha_consultar: 'Consultar', ficha_ver_tel: 'Ver telefone', ficha_avisar_baja: 'Avise-me se o preço baixar', ficha_alerta_creada: 'Alerta criado', ficha_toast_baja: 'Avisamos se o preço baixar. Com a sua conta, por e-mail.',
+    ficha_coordinar: 'Agendar visita', ficha_consultar: 'Consultar', ficha_mcta_consultar: 'Consultar', ficha_ver_tel: 'Ver telefone', ficha_avisar_baja: 'Avise-me se o preço baixar', ficha_alerta_creada: 'Alerta criado', ficha_toast_baja: 'Avisamos se o preço baixar. Com a sua conta, por e-mail.',
     ficha_fav: 'Salvar nos favoritos', ficha_compartir: 'Compartilhar', ficha_foot_bairen: 'Sua consulta chega à BAIREN', ficha_foot_directo: 'Contato direto com quem publica · a BAIREN não participa da operação',
     ficha_escribile: 'Escreva para {p}', ficha_nombre: 'Nome', ficha_mail: 'E-mail', ficha_tel: 'Telefone com código do país e da área', ficha_mensaje: 'Mensagem', ficha_quiero_visita: 'Quero agendar uma visita', ficha_dia_hora: 'Dia e hora que ficam bons para você. {p} confirma.',
     ficha_acepto: 'Aceito os <a href="legales.html#terminos">Termos</a> e a <a href="legales.html#privacidad">Política de privacidade</a>, e que meus dados sejam enviados a {p}{resp}.', ficha_acepto_resp: ', responsável pela operação', ficha_enviar_consulta: 'Enviar consulta', ficha_enviando: 'Enviando…',
-    ficha_ok_t: 'Consulta enviada', ficha_ok_p: 'Chega direto para {p}, que responde por e-mail ou WhatsApp.', ficha_ok_mail: ' Se o seu e-mail não abriu, escreva para <a href="mailto:{e}">{e}</a>.', ficha_seguir_wa: 'Continuar pelo WhatsApp', ficha_otra: 'Enviar outra consulta',
+    ficha_ok_t: 'Consulta enviada', ficha_ok_p: 'Chega direto para {p}, que responde por e-mail ou WhatsApp.', ficha_ok_listo: 'Pronto. Chegou para {p}, que responde por WhatsApp ou e-mail.', ficha_ok_mail: ' Se o seu e-mail não abriu, escreva para <a href="mailto:{e}">{e}</a>.', ficha_seguir_wa: 'Continuar pelo WhatsApp', ficha_otra: 'Enviar outra consulta',
     ficha_err_nombre: 'Diga seu nome.', ficha_err_mail: 'Confira o e-mail, por exemplo nome@dominio.com.', ficha_err_tel: 'Telefone com código de área, por exemplo 11 5555 6666.', ficha_err_fecha: 'Escolha dia e hora.', ficha_err_acepto: 'Para enviar a consulta é preciso aceitar os termos.', ficha_toast_enviada: 'Sua consulta vai direto para {p}.', ficha_toast_elegi: 'Escolha uma pergunta ou escreva a sua.',
     ficha_mail_subject: 'Consulta sobre {t} ({c}) pela BAIREN', ficha_mail_visita: 'Quero visitar em {d}.', ficha_tel_copiado: 'Telefone copiado.',
     /* ficha: similares, pie, errores */
