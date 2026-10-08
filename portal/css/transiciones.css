@@ -20,6 +20,10 @@
   --ease-snap:cubic-bezier(.22,1,.36,1);
 }
 
+/* ── Sin velo de carga. Tapaba la página entre 0,9 y 1,4 s esperando datos y fotos; ahora
+   el contenido se ve apenas llega y los esqueletos marcan lo que falta. ── */
+.p-velo{display:none !important}
+
 /* ── Curvas y tiempos que quedaban sueltos (ease, ease-out, 0,38 a 0,9 s) ── */
 .tj-fav,.p-icon-btn,.p-strip .thumb,.mobile-menu .m-link,.mobile-menu a,.burger span,#mapFrame,.p-skip,.p-lb .x,.p-lb .nav{transition-timing-function:var(--t-curva)}
 body.p-home .h-puntos i,body.p-home .h-puntos i:first-child{transition-duration:.24s}
