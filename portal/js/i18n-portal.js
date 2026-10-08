@@ -603,6 +603,8 @@ window.BP_I18N = {
     perfil_gestor: 'Rental manager', perfil_desarrolladora: 'Developer', perfil_inmobiliaria: 'Agency or broker',
     ficha_x_dorm_1: '1 bedroom', ficha_x_dorm_n: '{n} bedrooms', ficha_x_m2_cub: '{n} m² covered', ficha_x_antig_1: '1 year old', ficha_x_antig_n: '{n} years old', ficha_x_coch_1: '1 parking space', ficha_x_coch_n: '{n} parking spaces',
     emp_entrega_min: 'delivery {d}', emp_ver_todos: 'See all developments',
+    /* escritorio simple */
+    esc_op_mediano: 'Mid-term rentals', esc_op_largo: 'Long-term rentals', esc_op_alquiler: 'Rentals', esc_op_venta: 'For sale', esc_op_todas: 'Properties', esc_guardadas: 'Saved', esc_en: '{o} in {z}',
   },
   pt: {
     /* 8/10/2026 · freno de rebote da sessão */
@@ -1189,5 +1191,7 @@ window.BP_I18N = {
     perfil_gestor: 'Gestor de aluguéis', perfil_desarrolladora: 'Incorporadora', perfil_inmobiliaria: 'Imobiliária ou corretor',
     ficha_x_dorm_1: '1 dormitório', ficha_x_dorm_n: '{n} dormitórios', ficha_x_m2_cub: '{n} m² cobertos', ficha_x_antig_1: '1 ano de construção', ficha_x_antig_n: '{n} anos de construção', ficha_x_coch_1: '1 vaga', ficha_x_coch_n: '{n} vagas',
     emp_entrega_min: 'entrega {d}', emp_ver_todos: 'Ver todos os empreendimentos',
+    /* escritorio simple */
+    esc_op_mediano: 'Médio prazo', esc_op_largo: 'Aluguel tradicional', esc_op_alquiler: 'Aluguel', esc_op_venta: 'Venda', esc_op_todas: 'Imóveis', esc_guardadas: 'Salvos', esc_en: '{o} em {z}',
   }
 };

@@ -68,14 +68,16 @@
     <button type="button" class="x" data-close aria-label="Cerrar" data-i18n-aria="cat_cerrar">×</button>
     <h2 id="drawerTitle">Más filtros</h2>
     <p class="p-note" style="margin:0 0 6px" data-i18n="cat_drawer_note">Afiná la búsqueda.</p>
-    <!-- 8/10/2026 · Sólo en el celular: lo que en la compu está en la barra (búsqueda, barrios, tipo, ambientes y precio) -->
+    <!-- 8/10/2026 · Sólo en el celular: lo que en la compu está en la barra (búsqueda, barrios, tipo, ambientes y precio).
+         escritorio simple · En la compu de 1024 px o más la barra lleva operación, barrio y precio: tipo, ambientes y
+         dormitorios se muestran acá (g-buscar, g-barrios y g-precio siguen solo en el celular). -->
     <div class="p-solo-cel">
-      <div class="grp"><label class="t" for="qInputM" data-i18n="cat_buscar_t">Buscar</label><input type="text" id="qInputM" class="p-fsel" style="width:100%;padding-left:12px;background-image:none" placeholder="Barrio, calle o característica" data-i18n-ph="cat_q_ph" autocomplete="off" enterkeyhint="search"></div>
-      <div class="grp"><label class="t" data-i18n="cat_barrios">Barrios</label><div class="p-zonas-m" id="zonasM" role="group" aria-label="Barrios" data-i18n-aria="cat_barrios"></div></div>
+      <div class="grp g-buscar"><label class="t" for="qInputM" data-i18n="cat_buscar_t">Buscar</label><input type="text" id="qInputM" class="p-fsel" style="width:100%;padding-left:12px;background-image:none" placeholder="Barrio, calle o característica" data-i18n-ph="cat_q_ph" autocomplete="off" enterkeyhint="search"></div>
+      <div class="grp g-barrios"><label class="t" data-i18n="cat_barrios">Barrios</label><div class="p-zonas-m" id="zonasM" role="group" aria-label="Barrios" data-i18n-aria="cat_barrios"></div></div>
       <div class="grp"><label class="t" for="tipoSelM" data-i18n="cat_tipo_aria">Tipo de propiedad</label><select id="tipoSelM" class="p-fsel" style="width:100%"><option value="todos" data-i18n="cat_tipo_todos">Todos los tipos</option><option value="departamento" data-i18n="cat_tipo_depto">Departamento</option><option value="piso" data-i18n="cat_tipo_piso">Piso</option><option value="ph">PH</option><option value="casa" data-i18n="cat_tipo_casa">Casa</option></select></div>
       <div class="grp"><label class="t" data-i18n="cat_amb_min">Ambientes, mínimo</label><div class="seg" data-key="amb" style="display:flex;gap:6px;flex-wrap:wrap"><button type="button" class="p-fbtn" data-v="" data-i18n="cat_any">Todos</button><button type="button" class="p-fbtn" data-v="1">1+</button><button type="button" class="p-fbtn" data-v="2">2+</button><button type="button" class="p-fbtn" data-v="3">3+</button><button type="button" class="p-fbtn" data-v="4">4+</button></div></div>
       <div class="grp"><label class="t" data-i18n="cat_dorm_min">Dormitorios, mínimo</label><div class="seg" data-key="dorm" style="display:flex;gap:6px;flex-wrap:wrap"><button type="button" class="p-fbtn" data-v="" data-i18n="cat_any">Todos</button><button type="button" class="p-fbtn" data-v="1">1+</button><button type="button" class="p-fbtn" data-v="2">2+</button><button type="button" class="p-fbtn" data-v="3">3+</button></div></div>
-      <div class="grp"><label class="t" for="pminM" data-precio-lbl>USD, desde y hasta</label><div class="seg p-mon" role="group" aria-label="Moneda" data-i18n-aria="cat_moneda_aria" style="display:flex;gap:6px;margin-bottom:8px"><button type="button" class="p-fbtn" data-mon="">USD</button><button type="button" class="p-fbtn" data-mon="ARS" data-i18n="cat_pesos">Pesos</button></div><div style="display:flex;gap:8px"><input type="number" id="pminM" data-pmin class="p-fsel" style="flex:1;min-width:0;padding-left:12px;background-image:none" placeholder="Mínimo" data-i18n-ph="cat_min_ph" inputmode="numeric" min="0" aria-label="Precio mínimo en USD"><input type="number" id="pmaxM" data-pmax class="p-fsel" style="flex:1;min-width:0;padding-left:12px;background-image:none" placeholder="Máximo" data-i18n-ph="cat_max_ph" inputmode="numeric" min="0" aria-label="Precio máximo en USD"></div></div>
+      <div class="grp g-precio"><label class="t" for="pminM" data-precio-lbl>USD, desde y hasta</label><div class="seg p-mon" role="group" aria-label="Moneda" data-i18n-aria="cat_moneda_aria" style="display:flex;gap:6px;margin-bottom:8px"><button type="button" class="p-fbtn" data-mon="">USD</button><button type="button" class="p-fbtn" data-mon="ARS" data-i18n="cat_pesos">Pesos</button></div><div style="display:flex;gap:8px"><input type="number" id="pminM" data-pmin class="p-fsel" style="flex:1;min-width:0;padding-left:12px;background-image:none" placeholder="Mínimo" data-i18n-ph="cat_min_ph" inputmode="numeric" min="0" aria-label="Precio mínimo en USD"><input type="number" id="pmaxM" data-pmax class="p-fsel" style="flex:1;min-width:0;padding-left:12px;background-image:none" placeholder="Máximo" data-i18n-ph="cat_max_ph" inputmode="numeric" min="0" aria-label="Precio máximo en USD"></div></div>
     </div>
     <div class="grp"><label class="t" for="expmax" data-i18n="cat_expmax">Expensas máximas, pesos por mes</label><input type="number" id="expmax" class="p-fsel" style="width:100%;padding-left:12px;background-image:none" placeholder="Sin máximo" data-i18n-ph="cat_expmax_ph" inputmode="numeric" min="0"></div>
     <div class="grp"><label class="t" data-i18n="cat_banos_min">Baños, mínimo</label><div class="seg" data-key="banos" style="display:flex;gap:6px;flex-wrap:wrap"><button type="button" class="p-fbtn" data-v="" data-i18n="cat_any">Todos</button><button type="button" class="p-fbtn" data-v="1">1+</button><button type="button" class="p-fbtn" data-v="2">2+</button><button type="button" class="p-fbtn" data-v="3">3+</button></div></div>
@@ -139,6 +141,12 @@ document.addEventListener('DOMContentLoaded', function(){
   /* En venta y en mediano plazo todo es en dólares: si el rango venía en pesos, se descarta */
   const monAplica = () => F.op !== 'venta' && F.op !== 'mediano';
   const esCel = () => window.matchMedia('(max-width: 820px)').matches;
+  /* escritorio simple · En la compu ancha (1024 px o más) la barra lleva operación, barrio y precio; tipo, ambientes y
+     dormitorios pasan a Filtros, y el título va corto, en una línea, en la fila de resultados. El celular queda igual. */
+  const mqAncho = window.matchMedia('(min-width: 1024px)'); const esAncho = () => mqAncho.matches;
+  const resTit = document.getElementById('resTitle'), titCasa = resTit.parentNode, titSig = resTit.nextElementSibling;
+  function ubicarTitulo(){ const head = document.querySelector('.p-results-head'); if (!head) return; if (esAncho()) { if (resTit.parentNode !== head) head.prepend(resTit); } else if (resTit.parentNode !== titCasa) titCasa.insertBefore(resTit, titSig); }
+  ubicarTitulo();
   const normalizarMon = () => { if (F.mon && !monAplica()) { F.mon = ''; F.pmin = 0; F.pmax = 0; } };
   normalizarMon();
   /* Selector de moneda del precio: se ve sólo donde puede haber pesos; el rótulo y los textos de ayuda dicen la moneda elegida */
@@ -169,8 +177,8 @@ document.addEventListener('DOMContentLoaded', function(){
     document.getElementById('precioBtn').textContent = (F.pmin||F.pmax) ? BP.tf('cat_precio_btn_m', '{m} {a} a {b}', { m: F.mon === 'ARS' ? '$' : 'USD', a: F.pmin?BP.fmtN(F.pmin):'0', b: F.pmax?BP.fmtN(F.pmax):BP.t('cat_sin_max', 'sin máximo') }) : BP.t('cat_precio', 'Precio');
     pintarMon();
     /* En el celular, Filtros cuenta también lo que en la compu está en la barra (barrios, búsqueda, tipo, ambientes, dormitorios y precio) */
-    const more = [F.expmax,F.banos,F.coch,F.m2min,F.m2max,F.antig,F.amen.length,F.cual.length,F.amoblado,F.dueno,F.video,F.hace,F.reservadas].concat(esCel() ? [F.zonas.length, F.q, F.tipo !== 'todos', F.amb, F.dorm, F.pmin || F.pmax] : []).filter(Boolean).length; const cnt = document.getElementById('moreCnt'); cnt.textContent = more; cnt.hidden = !more;
-    document.getElementById('moreBtn').setAttribute('aria-label', more ? BP.tf('cat_filtros_n', 'Filtros, {n} activos', { n: more }) : (esCel() ? BP.t('cat_filtros', 'Filtros') : BP.t('cat_mas_filtros', 'Más filtros')));
+    const more = [F.expmax,F.banos,F.coch,F.m2min,F.m2max,F.antig,F.amen.length,F.cual.length,F.amoblado,F.dueno,F.video,F.hace,F.reservadas].concat(esCel() ? [F.zonas.length, F.q, F.tipo !== 'todos', F.amb, F.dorm, F.pmin || F.pmax] : esAncho() ? [F.tipo !== 'todos', F.amb, F.dorm] : []).filter(Boolean).length; const cnt = document.getElementById('moreCnt'); cnt.textContent = more; cnt.hidden = !more;
+    document.getElementById('moreBtn').setAttribute('aria-label', more ? BP.tf('cat_filtros_n', 'Filtros, {n} activos', { n: more }) : (esCel() || esAncho() ? BP.t('cat_filtros', 'Filtros') : BP.t('cat_mas_filtros', 'Más filtros')));
     document.getElementById('zonaChips').innerHTML = F.zonas.map(z => `<span class="p-chip">${BP.zonaLabel(z)}<button type="button" data-z="${z}" aria-label="${BP.esc(BP.tf('cat_quitar', 'Quitar {z}', { z: BP.zonaLabel(z) }))}">×</button></span>`).join('');
     document.querySelectorAll('#zonaChips button').forEach(b => b.addEventListener('click', () => { F.zonas = F.zonas.filter(z => z !== b.dataset.z); apply(); }));
   }
@@ -183,6 +191,17 @@ document.addEventListener('DOMContentLoaded', function(){
     /* lanz3-visitante · Filtrado por quien publica: "2 Propiedades de BAIREN Realty" (más la operación y el barrio, si los hay) */
     const pubN = pubNombreFiltro(); if (pubN) return `<span>${BP.fmtN(n)}</span> ${BP.tf('cat_t_de', '{t} de {p}', { t: tipo, p: BP.esc(pubN) })}${F.op && !F.favs ? ' ' + op : ''}${F.zonas.length ? where : ''}`;
     return `<span>${BP.fmtN(n)}</span> ${tipo} ${op}${where}`; }
+  /* escritorio simple · El título corto de la compu: "Mediano plazo · 20 propiedades", "Mediano plazo en Palermo · 7 propiedades",
+     lo buscado ("Huergo 475 · 2 propiedades"), quien publica o "Guardadas". La pestaña del navegador sigue con el largo. */
+  const OP_CORTO = { mediano: ['esc_op_mediano', 'Mediano plazo'], largo: ['esc_op_largo', 'Alquiler tradicional'], alquiler: ['esc_op_alquiler', 'Alquiler'], venta: ['esc_op_venta', 'Venta'] };
+  function tituloCorto(n){
+    const pubN = pubNombreFiltro(), oc = OP_CORTO[F.op];
+    let que = F.favs ? BP.t('esc_guardadas', 'Guardadas') : pubN ? BP.esc(pubN) : F.q ? BP.esc(F.q) : oc ? BP.t(oc[0], oc[1]) : BP.t('esc_op_todas', 'Propiedades');
+    if (F.zonas.length && !F.q) que = BP.tf('esc_en', '{o} en {z}', { o: que, z: F.zonas.map(BP.zonaLabel).join(', ') });
+    return `${que}<span class="p-tit-n"> · ${n === 1 ? BP.t('cat_n_1', '1 propiedad') : BP.tf('cat_n', '{n} propiedades', { n: BP.fmtN(n) })}</span>`;
+  }
+  let nTitulo = 0;
+  function pintarTitulo(n){ nTitulo = n; resTit.innerHTML = esAncho() ? tituloCorto(n) : titulo(n); }
   const pubNombreFiltro = () => { if (!F.pub) return ''; const p = BPData.pub(F.pub); return p && p.nombre ? BPData.nombreVisible(BPData.pubNombre(p)) : ''; };
   function pintarFiltroPub(){
     const box = document.getElementById('filtroPub'); if (!F.pub) { box.hidden = true; box.innerHTML = ''; return; }
@@ -211,7 +230,7 @@ document.addEventListener('DOMContentLoaded', function(){
     let list = BPData.filter(avisos, F); list = BPData.sort(list, F.sort);
     const n = list.length; const pages = Math.max(1, Math.ceil(n / PER_PAGE)); if (F.page > pages) F.page = pages;
     const slice = list.slice((F.page-1)*PER_PAGE, F.page*PER_PAGE);
-    document.getElementById('resTitle').innerHTML = titulo(n); document.title = titulo(n).replace(/<[^>]+>/g,'') + ' · BAIREN';
+    pintarTitulo(n); document.title = titulo(n).replace(/<[^>]+>/g,'') + ' · BAIREN';
     const el = document.getElementById('list');
     /* 8/10/2026 · Pasada premium: la operación filtrada queda marcada en la lista; la etiqueta igual sobre cada foto
        se oculta por CSS (#list[data-op-filtro]), porque repetirla en cada tarjeta es ruido. Solo presentación. */
@@ -230,7 +249,8 @@ document.addEventListener('DOMContentLoaded', function(){
     ley.innerHTML = BP.esc(BP.t('cat_leyenda_alq', 'Avisos de alquiler de vivienda publicados por corredores matriculados (Ley 2340, art. 10 inc. 8): ')) + '<span lang="es">' + BP.esc(BP.LEYENDA_ALQUILER) + '</span>';
     document.getElementById('crumbs').innerHTML = ['<a href="index.html">BAIREN</a>', F.tipo === 'todos' ? BP.t('cat_t_propiedades', 'Propiedades') : BP.t('cat_t_deptos', 'Departamentos'), F.op ? BP.opTxt(F.op, 'label').split(' ·')[0] : BP.t('cat_crumb_todas', 'Todas las operaciones'), 'Buenos Aires'].concat(F.zonas.map(BP.zonaLabel)).join(' › ');
     const counts = BPData.countsByZona(BPData.filter(avisos, Object.assign({}, F, {zonas: []})));
-    if (window.BairenMapa && window.innerWidth >= 1024) { const mel = document.getElementById('mapaResultados'); if (!mapa) { try { mapa = window.BairenMapa.mount(mel, { counts, modo:'lite', active: F.zonas[0] || null, onSelect: z => { F.zonas = F.zonas.indexOf(z) > -1 ? [] : [z]; apply(); } }); } catch (e) { mel.innerHTML = '<p class="p-note">' + BP.t('cat_mapa_nd', 'Mapa no disponible.') + '</p>'; } } else { mapa.setCounts(counts); mapa.setActive(F.zonas[0] || null); mapa.refresh && mapa.refresh(); } }
+    /* escritorio simple · La banda con el mapa ya no se ve en la compu: el mapa se arma solo si su lugar está a la vista */
+    if (window.BairenMapa && window.innerWidth >= 1024 && document.getElementById('mapaResultados').getClientRects().length) { const mel = document.getElementById('mapaResultados'); if (!mapa) { try { mapa = window.BairenMapa.mount(mel, { counts, modo:'lite', active: F.zonas[0] || null, onSelect: z => { F.zonas = F.zonas.indexOf(z) > -1 ? [] : [z]; apply(); } }); } catch (e) { mel.innerHTML = '<p class="p-note">' + BP.t('cat_mapa_nd', 'Mapa no disponible.') + '</p>'; } } else { mapa.setCounts(counts); mapa.setActive(F.zonas[0] || null); mapa.refresh && mapa.refresh(); } }
   }
   function apply(){ F.page = 1; normalizarMon(); syncControls(); pushURL(); render(); pintarAlerta(); pintarFiltroPub(); }
 
@@ -297,6 +317,7 @@ document.addEventListener('DOMContentLoaded', function(){
   function leerHoja(){
     const d = { expmax: Number(document.getElementById('expmax').value||0), m2min: Number(document.getElementById('m2min').value||0), m2max: Number(document.getElementById('m2max').value||0), antig: Number(document.getElementById('antig').value||0), hace: Number(document.getElementById('hace').value||0), reservadas: document.getElementById('reservadas').checked, amoblado: document.getElementById('amoblado').checked, dueno: document.getElementById('dueno').checked, video: document.getElementById('video').checked, amen: Array.from(document.querySelectorAll('[data-amen]:checked')).map(c => c.dataset.amen), cual: Array.from(document.querySelectorAll('[data-cual]:checked')).map(c => c.dataset.cual) };
     if (esCel()) Object.assign(d, { q: document.getElementById('qInputM').value.trim(), tipo: document.getElementById('tipoSelM').value, zonas: zonasHoja.slice(), pmin: Number(document.getElementById('pminM').value||0), pmax: Number(document.getElementById('pmaxM').value||0) });
+    else if (esAncho()) d.tipo = document.getElementById('tipoSelM').value;   /* escritorio simple: el tipo está en Filtros */
     return d;
   }
   /* "Ver N propiedades": cuántas quedan con lo que dice la hoja, antes de aplicarlo */
@@ -309,8 +330,9 @@ document.addEventListener('DOMContentLoaded', function(){
     host.querySelectorAll('[data-zm]').forEach(b => b.addEventListener('click', () => { const z = b.dataset.zm; zonasHoja = zonasHoja.indexOf(z) > -1 ? zonasHoja.filter(x => x !== z) : zonasHoja.concat(z); const on = zonasHoja.indexOf(z) > -1; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); }));
   }
   function pintarHoja(){
-    document.getElementById('drawerTitle').textContent = esCel() ? BP.t('cat_filtros', 'Filtros') : BP.t('cat_mas_filtros', 'Más filtros');
+    document.getElementById('drawerTitle').textContent = esCel() || esAncho() ? BP.t('cat_filtros', 'Filtros') : BP.t('cat_mas_filtros', 'Más filtros');
     if (esCel()) { zonasHoja = F.zonas.slice(); pintarZonasHoja(); document.getElementById('qInputM').value = F.q || ''; document.getElementById('tipoSelM').value = F.tipo; document.getElementById('pminM').value = F.pmin || ''; document.getElementById('pmaxM').value = F.pmax || ''; pintarMon(); }
+    else if (esAncho()) document.getElementById('tipoSelM').value = F.tipo;
     contarHoja();
   }
   let cuadroHoja = 0; const recontar = () => { if (cuadroHoja) return; cuadroHoja = requestAnimationFrame(() => { cuadroHoja = 0; contarHoja(); }); };
@@ -321,9 +343,11 @@ document.addEventListener('DOMContentLoaded', function(){
     if (d.pmin && d.pmax && d.pmax < d.pmin) { BP.errorCampo('pmaxM', BP.t('cat_err_max', 'El máximo tiene que ser mayor que el mínimo.')); return; }
     Object.assign(F, d); openDrawer(false); apply();
   });
-  document.getElementById('drawerTitle').textContent = esCel() ? BP.t('cat_filtros', 'Filtros') : BP.t('cat_mas_filtros', 'Más filtros');
+  document.getElementById('drawerTitle').textContent = esCel() || esAncho() ? BP.t('cat_filtros', 'Filtros') : BP.t('cat_mas_filtros', 'Más filtros');
   /* Al cruzar el ancho del celular cambia lo que cuenta Filtros */
   try { matchMedia('(max-width: 820px)').addEventListener('change', () => syncControls()); } catch (e) {}
+  /* escritorio simple · Al cruzar los 1024 px el título cambia de lugar y de largo, y Filtros cuenta otras cosas */
+  try { mqAncho.addEventListener('change', () => { ubicarTitulo(); syncControls(); pintarTitulo(nTitulo); }); } catch (e) {}
   document.getElementById('clearAll').addEventListener('click', () => { Object.assign(F, { zonas:[], q:'', amb:0, dorm:0, banos:0, coch:0, pmin:0, pmax:0, mon:'', expmax:0, m2min:0, m2max:0, antig:0, amen:[], cual:[], amoblado:false, dueno:false, video:false, hace:0, favs:false, reservadas:false, pub:'' }); openDrawer(false); apply(); });
   /* alerta: una por búsqueda; el botón muestra si ya existe y sirve para quitarla */
   const alertBtn = document.getElementById('alertBtn');
