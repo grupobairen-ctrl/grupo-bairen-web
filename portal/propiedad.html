@@ -121,6 +121,8 @@ document.addEventListener('DOMContentLoaded', function(){
     BPData.sinGarantia(a) ? T('ui_dato_sin_garantia_propietaria', 'Sin garantía propietaria') : null,
     BPData.aceptaMascotas(a) ? T('ui_dato_acepta_mascotas', 'Acepta mascotas') : null
   ].filter(Boolean);
+  /* 8/10/2026 · Lo que tiene la unidad y el edificio, en un renglón: la voz de Bairen pide mostrarlo (amenities). */
+  const tiene = (a.amenities || []).filter(x => x !== 'Pet friendly').slice(0, 10);
   /* La ubicación aparece sólo si hay con qué armar el mapa: coordenadas o una calle */
   const hayMapa = (a.lat != null && a.lng != null) || !!calle;
   /* Lo que acompaña al precio: todo incluido, expensas incluidas o, en mediano plazo, las expensas aparte */
@@ -161,6 +163,7 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip" role="group" aria-label="$
     </div>
     ${a.video ? `<div class="p-video" id="video"></div>` : ''}
     ${condiciones.length ? `<div class="p-fbloque"><h2 class="p-sec-t">${T('ficha_condiciones', 'Condiciones')}</h2><ul class="p-fcond">${condiciones.map(c => `<li>${BP.esc(c)}</li>`).join('')}</ul></div>` : ''}
+    ${tiene.length ? `<div class="p-fbloque"><h2 class="p-sec-t">${T('ficha_tiene', 'Lo que tiene')}</h2><p class="p-ftiene">${tiene.map(x => BP.esc(BP.etiqueta(x))).join(' · ')}</p></div>` : ''}
     ${hayMapa ? `<div class="p-fbloque"><h2 class="p-sec-t">${T('ficha_ubicacion', 'Ubicación')}</h2><div class="p-map-wrap">${BP.ico.pin}<iframe id="mapFrame" src="" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="${T('ficha_mapa_title', 'Mapa de la ubicación de la propiedad')}"></iframe></div></div>` : ''}
   </div>
   <aside class="p-side" id="contacto">

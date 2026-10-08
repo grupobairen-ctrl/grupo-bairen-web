@@ -261,7 +261,7 @@ window.BP_I18N = {
     num_ambiente: 'Room', num_ambientes: 'Rooms', num_bano: 'Bathroom', num_banos: 'Bathrooms', num_estadia: 'Stay',
     cond_estadia_min: 'Minimum stay of {p}', cond_estadia: 'Stay of {p}', cond_todo_incluido: 'All included: building fees and utilities', cond_incluye: 'Includes: {x}',
     ficha_todo_incl_corto: 'all included', ficha_exp_incl: 'building fees included', ficha_mas_exp: 'plus $ {n} in building fees',
-    ficha_volver: 'Back', ficha_reservada_corto: 'Reserved. Not taking inquiries for now.', ficha_condiciones: 'Terms', ficha_reportar_corto: 'Report a problem', ficha_mcta_visita: 'Visit',
+    ficha_volver: 'Back', ficha_reservada_corto: 'Reserved. Not taking inquiries for now.', ficha_condiciones: 'Terms', ficha_tiene: 'Features', ficha_reportar_corto: 'Report a problem', ficha_mcta_visita: 'Visit',
     tab_inicio: 'Home', tab_buscar: 'Search', tab_guardados: 'Saved', tab_cuenta: 'Account', tab_aria: 'Shortcuts',
     guard_vacio: "You haven't saved any properties yet.", guard_err: "We couldn't load your saved properties.", alertas_t: 'Alerts', guard_todas_ops: 'All listings', guard_hasta: 'up to {p}', guard_quitar_alerta: 'Remove the alert', guard_crear_alerta: 'Create an alert',
     /* 8/10/2026 · del equipo de servidor (ingresar): el captcha */
@@ -511,7 +511,7 @@ window.BP_I18N = {
     num_ambiente: 'Ambiente', num_ambientes: 'Ambientes', num_bano: 'Banheiro', num_banos: 'Banheiros', num_estadia: 'Estadia',
     cond_estadia_min: 'Estadia mínima de {p}', cond_estadia: 'Estadia de {p}', cond_todo_incluido: 'Tudo incluído: condomínio e contas', cond_incluye: 'Inclui: {x}',
     ficha_todo_incl_corto: 'tudo incluído', ficha_exp_incl: 'condomínio incluído', ficha_mas_exp: 'mais $ {n} de condomínio',
-    ficha_volver: 'Voltar', ficha_reservada_corto: 'Reservado. Por enquanto não recebe consultas.', ficha_condiciones: 'Condições', ficha_reportar_corto: 'Informar um problema', ficha_mcta_visita: 'Visita',
+    ficha_volver: 'Voltar', ficha_reservada_corto: 'Reservado. Por enquanto não recebe consultas.', ficha_condiciones: 'Condições', ficha_tiene: 'O que tem', ficha_reportar_corto: 'Informar um problema', ficha_mcta_visita: 'Visita',
     tab_inicio: 'Início', tab_buscar: 'Buscar', tab_guardados: 'Salvos', tab_cuenta: 'Conta', tab_aria: 'Atalhos',
     guard_vacio: 'Você ainda não salvou imóveis.', guard_err: 'Não conseguimos carregar seus imóveis salvos.', alertas_t: 'Alertas', guard_todas_ops: 'Todas as operações', guard_hasta: 'até {p}', guard_quitar_alerta: 'Remover o alerta', guard_crear_alerta: 'Criar um alerta',
     /* 8/10/2026 · del equipo de servidor (ingresar): el captcha */
