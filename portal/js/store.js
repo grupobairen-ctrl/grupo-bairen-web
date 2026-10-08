@@ -392,6 +392,32 @@
     rec.updated_at = now();   /* en local también queda cuándo se editó: el panel ordena por eso */
     if (i > -1) { rec.created_at = all[i].created_at; all[i] = rec; } else { rec.id = rec.id || uid(); rec.created_at = now(); all.push(rec); } L.avisos.set(all); return rec;
   };
+  /* 8/10/2026 · Lo que contestan la base y el almacenamiento al guardar (inglés, códigos de Postgres: "null value in column
+     ... violates not-null constraint", "new row violates row-level security policy") en una frase en castellano que dice
+     qué hacer. Lo que ya viene en castellano (mensajes propios) pasa igual; lo desconocido cae en una frase genérica, nunca
+     en el texto crudo, y el detalle queda en la consola. generico: la frase para ese caso ('No se pudo subir la foto.'). */
+  const CAMPO_TXT = { direccion: 'la calle y la altura', barrio: 'el barrio', zona: 'la zona', operacion: 'la operación', tipo: 'el tipo de propiedad', precio: 'el precio', moneda: 'la moneda', slug: 'la dirección', codigo: 'el código del aviso', nombre: 'el nombre', email: 'el mail', telefono: 'el teléfono', whatsapp: 'el WhatsApp', video_tipo: 'el video', etapa: 'la etapa de obra', estado: 'el estado', estado_curacion: 'el estado', mostrar_direccion: 'cómo se muestra la dirección' };
+  S.errorAlGuardar = function(e, generico){
+    const msg = String((e && typeof e === 'object' ? (e.message || e.error_description || e.msg || e.error) : e) || '');
+    const m = msg.toLowerCase(), code = String((e && e.code) || '');
+    const col = (msg.match(/column "?([a-z_]+)"?/i) || msg.match(/'([a-z_]+)' column/i) || msg.match(/_([a-z_]+?)_check"/i) || [])[1];
+    const campo = col && CAMPO_TXT[col.toLowerCase()];
+    if (code === '23502' || /null value in column/.test(m)) return campo ? T('err_falta_campo', 'Falta {c}.', { c: campo }) : T('err_falta_dato', 'Falta un dato obligatorio.');
+    if (code === '23505' || /duplicate key/.test(m)) return /codigo_interno/.test(m) ? T('err_dup_codigo_interno', 'Ya tenés otro aviso con ese código interno.') : T('err_dup', 'Ese registro ya existe. Probá guardar de nuevo.');
+    if (code === '23514' || /violates check constraint/.test(m)) return campo ? T('err_valor_campo', 'Hay un valor que no se acepta en {c}.', { c: campo }) : T('err_valor', 'Hay un dato con un valor que no se acepta.');
+    if (code === '22P02' || /invalid input syntax/.test(m)) return T('err_numero', 'Hay un número mal escrito. Revisá los campos numéricos, sin puntos ni letras.');
+    if (code === '22001' || /value too long/.test(m)) return T('err_largo', 'Un texto es demasiado largo. Acortalo y probá de nuevo.');
+    if (code === '42501' || /row-level security|permission denied|not authorized|unauthorized/.test(m)) return T('err_permiso', 'No tenés permiso para guardar esto. Volvé a entrar con tu cuenta; si sigue, escribinos a portal@bairengroup.com.');
+    if (/^pgrst2/i.test(code) || /schema cache/.test(m)) return T('err_esquema', 'La base todavía no tiene un dato que manda el formulario. Escribinos a portal@bairengroup.com.');
+    if (/jwt|token.*(expired|invalid)|auth session missing|not authenticated/.test(m)) return T('err_sesion', 'Tu sesión venció. Volvé a entrar y probá de nuevo.');
+    if (/failed to fetch|networkerror|network request failed|load failed|fetch failed/.test(m)) return T('err_red', 'No hay conexión. Revisá internet y probá de nuevo.');
+    if (/payload too large|maximum allowed size|entity too large/.test(m)) return T('err_pesado', 'El archivo pesa demasiado. Probá con uno más liviano.');
+    if (/mime type|invalid_mime/.test(m)) return T('err_formato', 'Ese formato de archivo no se acepta. Probá con JPG o PNG.');
+    if (/bucket not found/.test(m)) return T('err_bucket', 'Falta configurar dónde se guardan los archivos. Escribinos a portal@bairengroup.com.');
+    if (msg && (/[áéíóúñ¿¡]/i.test(msg) || /^(no |falta|complet|eleg|escrib|inici|esta |este |la |el |ese |tu |hacen |revis|en modo|para )/i.test(msg))) return msg;   /* ya está en castellano */
+    try { console.warn('[bairen] error al guardar:', e); } catch (x) {}
+    return generico ? T('err_generico_x', '{g} Probá de nuevo en un momento.', { g: generico }) : T('err_generico', 'No se pudo guardar. Probá de nuevo en un momento.');
+  };
   /* Miniatura 16:9 de 320 × 180 (JPEG 60 %, 10 a 20 KB): recorte centrado. La usa Bairen OS en su lista
      de propiedades. Se guarda junto a la foto, en portal-fotos/miniaturas/<misma ruta>. */
   S.miniatura = function(blob){ return new Promise(res => { const img = new Image(); const u = URL.createObjectURL(blob); img.onload = () => { const W = 320, H = 180; const r = img.width / img.height; let sw = img.width, sh = img.height; if (r > 16 / 9) sw = Math.round(img.height * 16 / 9); else sh = Math.round(img.width * 9 / 16); const sx = Math.round((img.width - sw) / 2), sy = Math.round((img.height - sh) / 2); const c = document.createElement('canvas'); c.width = W; c.height = H; c.getContext('2d').drawImage(img, sx, sy, sw, sh, 0, 0, W, H); c.toBlob(b => { URL.revokeObjectURL(u); res(b); }, 'image/jpeg', .6); }; img.onerror = () => res(null); img.src = u; }); };

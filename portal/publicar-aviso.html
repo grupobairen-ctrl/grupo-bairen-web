@@ -215,7 +215,7 @@ document.addEventListener('DOMContentLoaded', function(){
         /* 11/9 · El perfil de la cuenta sale de acá cuando se vino a publicar: dueño directo o profesional (inmobiliaria, desarrolladora). Si falla no frena la carga: el panel lo deduce del publicador igual.
            11/9 noche · Solo si todavía no eligió, o si había dicho "busco": una elección hecha en Mi cuenta no se pisa cada vez que edita el publicador. */
         try { const pa = BPStore.getPerfil(); if (!pa || pa === 'busca') await BPStore.setPerfil(t === 'dueno' ? 'dueno' : 'profesional'); } catch (e) { /* el publicador ya quedó; el panel deduce el perfil de ahí */ }
-        const files = Array.from(document.getElementById('docs').files || []); for (const f of files) { const path = await BPStore.uploadDoc(f, pub.id, t === 'dueno' ? 'titularidad' : t === 'profesional' ? 'matricula' : t === 'gestor' ? 'mandato' : 'cuit'); await BPStore.requestVerificacion(pub.id, t === 'dueno' ? 'titularidad' : t === 'profesional' ? 'matricula' : 'cuit', path); } if (!files.length && !pub.verificado) await BPStore.requestVerificacion(pub.id, t === 'profesional' ? 'matricula' : t === 'desarrolladora' ? 'cuit' : 'dni', null); BP.toast('Perfil guardado.'); return true; } catch (e) { BP.toast('No se pudo guardar: ' + (e.message || e)); return false; }
+        const files = Array.from(document.getElementById('docs').files || []); for (const f of files) { const path = await BPStore.uploadDoc(f, pub.id, t === 'dueno' ? 'titularidad' : t === 'profesional' ? 'matricula' : t === 'gestor' ? 'mandato' : 'cuit'); await BPStore.requestVerificacion(pub.id, t === 'dueno' ? 'titularidad' : t === 'profesional' ? 'matricula' : 'cuit', path); } if (!files.length && !pub.verificado) await BPStore.requestVerificacion(pub.id, t === 'profesional' ? 'matricula' : t === 'desarrolladora' ? 'cuit' : 'dni', null); BP.toast('Perfil guardado.'); return true; } catch (e) { BP.toast(BPStore.errorAlGuardar(e, 'No se pudo guardar el perfil.'), 'error'); return false; }
     });
   }
 
@@ -265,7 +265,7 @@ document.addEventListener('DOMContentLoaded', function(){
       collect(); const desc = (a.descripcion || '').trim(); if (desc.length < 40) { BP.toast('Escribí primero la descripción en castellano.', 'error'); return; }
       bt.disabled = true; const txt = bt.textContent; bt.textContent = 'Traduciendo…';
       try { const r = await BPStore.traducir(a.titulo || a.direccion || '', desc); a.descripcion_en = r.en.descripcion; a.descripcion_pt = r.pt.descripcion; const en = el.querySelector('[name=descripcion_en]'), pt = el.querySelector('[name=descripcion_pt]'); if (en) en.value = a.descripcion_en; if (pt) pt.value = a.descripcion_pt; document.getElementById('tradBox').open = true; BP.toast('Traducido con ' + (r.motor === 'deepl' ? 'DeepL' : 'MyMemory') + '. Revisá y corregí lo que haga falta.'); }
-      catch (e) { BP.toast(e.message || 'No se pudo traducir.', 'error'); }
+      catch (e) { BP.toast(BPStore.errorAlGuardar(e, 'No se pudo traducir.'), 'error'); }
       finally { bt.disabled = false; bt.textContent = txt; }
     });
     bindNav(async () => { collect(); const req = reqDe(aviso); let ok = true; req.forEach(k => { const f = document.querySelector(`[data-fld=${k}]`); const bad = !aviso[k] || (k === 'descripcion' && String(aviso[k]).length < 150); f.classList.toggle('err', bad); if (bad) ok = false; }); if (!ok) {
@@ -318,8 +318,8 @@ document.addEventListener('DOMContentLoaded', function(){
           const focoPrevio = document.activeElement; const escCmp = e => { if (e.key === 'Escape') cerrarCmp(); }; const cerrarCmp = () => { cmp.remove(); document.removeEventListener('keydown', escCmp); if (focoPrevio && focoPrevio.focus) focoPrevio.focus(); };
           document.addEventListener('keydown', escCmp); (cmp.querySelector('[data-usar]') || cmp).focus();
           cmp.querySelector('[data-cerrar]').addEventListener('click', cerrarCmp);
-          cmp.querySelector('[data-usar]').addEventListener('click', async () => { const u = cmp.querySelector('[data-usar]'); u.disabled = true; u.textContent = 'Guardando…'; try { const key = aviso.id || aviso.slug || ('nuevo-' + BPStore.session.id.slice(-4)); const url = await BPStore.subirDataUrl(r.image, key, Date.now() % 100000); a.fotos.splice(i + 1, 0, { url, ia: true }); cmp.remove(); BP.toast('Foto nueva agregada al lado de la original. Quitá la que no quieras.'); draw(); } catch (e) { u.disabled = false; u.textContent = 'Usar la nueva'; BP.toast('No se pudo guardar: ' + (e.message || e), 'error'); } });
-        } catch (e) { BP.toast(e.message || 'No se pudo producir la foto.', 'error'); }
+          cmp.querySelector('[data-usar]').addEventListener('click', async () => { const u = cmp.querySelector('[data-usar]'); u.disabled = true; u.textContent = 'Guardando…'; try { const key = aviso.id || aviso.slug || ('nuevo-' + BPStore.session.id.slice(-4)); const url = await BPStore.subirDataUrl(r.image, key, Date.now() % 100000); a.fotos.splice(i + 1, 0, { url, ia: true }); cmp.remove(); BP.toast('Foto nueva agregada al lado de la original. Quitá la que no quieras.'); draw(); } catch (e) { u.disabled = false; u.textContent = 'Usar la nueva'; BP.toast(BPStore.errorAlGuardar(e, 'No se pudo guardar la foto.'), 'error'); } });
+        } catch (e) { BP.toast(BPStore.errorAlGuardar(e, 'No se pudo producir la foto.'), 'error'); }
         finally { if (window.BPM && BPM.produciendo) BPM.produciendo(b, false); b.disabled = false; b.textContent = 'Mejorar con IA'; }
       }));
       let from = null;
@@ -330,7 +330,7 @@ document.addEventListener('DOMContentLoaded', function(){
       });
       document.body.dataset.fotos = a.fotos.length;
     };
-    const add = async files => { const key = aviso.id || aviso.slug || ('nuevo-' + BPStore.session.id.slice(-4)); let i = a.fotos.length; for (const f of Array.from(files)) { if (!/^image\//.test(f.type)) continue; try { BP.toast('Subiendo foto ' + (i + 1) + '…'); const url = await BPStore.uploadFoto(f, key, i++); a.fotos.push({ url }); } catch (e) { BP.toast('No se pudo subir una foto: ' + (e.message || e)); } } draw(); };
+    const add = async files => { const key = aviso.id || aviso.slug || ('nuevo-' + BPStore.session.id.slice(-4)); let i = a.fotos.length; for (const f of Array.from(files)) { if (!/^image\//.test(f.type)) continue; try { BP.toast('Subiendo foto ' + (i + 1) + '…'); const url = await BPStore.uploadFoto(f, key, i++); a.fotos.push({ url }); } catch (e) { BP.toast(BPStore.errorAlGuardar(e, 'No se pudo subir una foto.'), 'error'); } } draw(); };
     drop.addEventListener('click', () => inp.click()); inp.addEventListener('change', () => add(inp.files)); drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('sobre'); }); drop.addEventListener('dragleave', () => drop.classList.remove('sobre')); drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('sobre'); add(e.dataTransfer.files); });
     draw();
     bindNav(async () => { collect(); a.quiero_produccion = document.getElementById('quieroProd').checked; if (a.fotos.length < 8 && !a.quiero_produccion) { BP.toast('Hacen falta ocho fotos y hay ' + a.fotos.length + '. O pedí la producción de BAIREN.', 'error'); return false; } return true; });
@@ -361,7 +361,7 @@ document.addEventListener('DOMContentLoaded', function(){
       <div class="p-nav-steps"><button type="button" class="p-btn p-btn-dark" data-back>Volver</button><div class="p-nav-main"><button type="button" class="p-btn" data-save>${rotuloGuardar()}</button><button type="button" class="p-btn p-btn-fill" id="enviar">Enviar a revisión ${BP.ico.arrow}</button></div></div>`;
     (async () => { const m = await BPData.fromStore(Object.assign({}, a, { publicador: pub, id: a.id || 'prev', fotos: a.fotos.map((f, i) => ({ url: f.url, orden: i })) })); document.getElementById('prev').innerHTML = BPData.cardV(m).replace(/href="[^"]*"/, 'href="#"'); })();
     el.querySelector('[data-back]').addEventListener('click', () => { step = 3; render(); });
-    el.querySelector('[data-save]').addEventListener('click', async () => { if (!tieneDireccion()) { pedirDireccion(); return; } const cambios = enCurso(); await save(estadoAlGuardar()); BP.toast(cambios ? 'Cambios guardados.' : 'Borrador guardado en tu panel.'); });
+    el.querySelector('[data-save]').addEventListener('click', async e => { const b = e.currentTarget; if (b.disabled) return; if (!tieneDireccion()) { pedirDireccion(); return; } const cambios = enCurso(); ocupar(b, true, 'Guardando…'); try { await save(estadoAlGuardar()); BP.toast(cambios ? 'Cambios guardados.' : 'Borrador guardado en tu panel.'); } catch (x) { BP.toast(BPStore.errorAlGuardar(x), 'error'); } ocupar(b, false); });
     document.getElementById('enviar').addEventListener('click', async () => {
       const btn = document.getElementById('enviar');
       /* Antes de enviar se vuelve a mirar lo obligatorio de Principales: con el stepper se puede haber saltado el paso */
@@ -370,7 +370,7 @@ document.addEventListener('DOMContentLoaded', function(){
       if (a.fotos.length < 8 && !a.quiero_produccion) { step = 2; render(); BP.toast('Hacen falta ocho fotos y hay ' + a.fotos.length + '. O pedí la producción de BAIREN.', 'error'); return; }
       if (!document.getElementById('acepto').checked) { BP.errorCampo('acepto', 'Aceptá los términos para enviar.'); return; }
       ocupar(btn, true, 'Enviando…');
-      try { await save('en_revision'); terminado(); } catch (e) { ocupar(btn, false); BP.toast('No se pudo enviar: ' + (e.message || e), 'error'); }
+      try { await save('en_revision'); terminado(); } catch (e) { ocupar(btn, false); BP.toast(BPStore.errorAlGuardar(e, 'No se pudo enviar.'), 'error'); }
     });
   }
 
@@ -400,8 +400,8 @@ document.addEventListener('DOMContentLoaded', function(){
       /* Sin calle y altura no se crea un aviso vacío: en el paso 0 se guarda solo el perfil; en los otros, se pide la dirección */
       if (step === 0) { const ok = await validate(); if (!ok) return; if (!tieneDireccion()) { BP.toast('Perfil guardado. El borrador del aviso se guarda cuando tenga calle y altura: la cargás en el paso siguiente.'); return; } }
       else { collect(); if (!tieneDireccion()) { pedirDireccion(); return; } }
-      ocupar(bs, true, 'Guardando…'); try { const cambios = enCurso(); await save(estadoAlGuardar()); BP.toast(cambios ? 'Cambios guardados.' : 'Borrador guardado.'); } catch (e) { BP.toast(e.message || 'No se pudo guardar.', 'error'); } ocupar(bs, false); });
-    bn.addEventListener('click', async () => { if (bn.disabled) return; ocupar(bn, true, step === 0 ? 'Guardando…' : 'Guardando…'); const ok = await validate(); if (!ok) { ocupar(bn, false); return; } if (step > 0 && tieneDireccion()) { try { await save(estadoAlGuardar()); } catch (e) { ocupar(bn, false); BP.toast(e.message || 'No se pudo guardar.', 'error'); return; } } step++; render(); });
+      ocupar(bs, true, 'Guardando…'); try { const cambios = enCurso(); await save(estadoAlGuardar()); BP.toast(cambios ? 'Cambios guardados.' : 'Borrador guardado.'); } catch (e) { BP.toast(BPStore.errorAlGuardar(e), 'error'); } ocupar(bs, false); });
+    bn.addEventListener('click', async () => { if (bn.disabled) return; ocupar(bn, true, step === 0 ? 'Guardando…' : 'Guardando…'); const ok = await validate(); if (!ok) { ocupar(bn, false); return; } if (step > 0 && tieneDireccion()) { try { await save(estadoAlGuardar()); } catch (e) { ocupar(bn, false); BP.toast(BPStore.errorAlGuardar(e), 'error'); return; } } step++; render(); });
   }
 
   if (editId && aviso) document.getElementById('ttl').textContent = 'Editar aviso';
