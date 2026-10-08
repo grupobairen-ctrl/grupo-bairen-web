@@ -262,6 +262,7 @@ window.BP_I18N = {
     cond_estadia_min: 'Minimum stay of {p}', cond_estadia: 'Stay of {p}', cond_todo_incluido: 'All included: building fees and utilities', cond_incluye: 'Includes: {x}',
     ficha_todo_incl_corto: 'all included', ficha_exp_incl: 'building fees included', ficha_mas_exp: 'plus $ {n} in building fees',
     ficha_volver: 'Back', ficha_reservada_corto: 'Reserved. Not taking inquiries for now.', ficha_condiciones: 'Terms', ficha_reportar_corto: 'Report a problem', ficha_mcta_visita: 'Visit',
+    tab_inicio: 'Home', tab_buscar: 'Search', tab_guardados: 'Saved', tab_cuenta: 'Account', tab_aria: 'Shortcuts',
   },
   pt: {
     home_title: 'BAIREN · Imóveis selecionados em Buenos Aires',
@@ -508,5 +509,6 @@ window.BP_I18N = {
     cond_estadia_min: 'Estadia mínima de {p}', cond_estadia: 'Estadia de {p}', cond_todo_incluido: 'Tudo incluído: condomínio e contas', cond_incluye: 'Inclui: {x}',
     ficha_todo_incl_corto: 'tudo incluído', ficha_exp_incl: 'condomínio incluído', ficha_mas_exp: 'mais $ {n} de condomínio',
     ficha_volver: 'Voltar', ficha_reservada_corto: 'Reservado. Por enquanto não recebe consultas.', ficha_condiciones: 'Condições', ficha_reportar_corto: 'Informar um problema', ficha_mcta_visita: 'Visita',
+    tab_inicio: 'Início', tab_buscar: 'Buscar', tab_guardados: 'Salvos', tab_cuenta: 'Conta', tab_aria: 'Atalhos',
   }
 };
