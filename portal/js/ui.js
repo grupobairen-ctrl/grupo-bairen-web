@@ -380,6 +380,8 @@
     <a class="p-btn p-btn-sm" href="publicar.html" data-i18n="publicar">Publicar</a>
     <a class="p-btn p-btn-sm p-btn-fill" href="ingresar.html" data-i18n="ingresar">Ingresar</a>
   </div>
+  <!-- lanz3-visitante · En la portada del celular, Publicar a la vista sin abrir el menú -->
+  <a class="p-pub-movil" href="publicar.html" data-i18n="publicar">Publicar</a>
   <button class="burger" id="burger" type="button" aria-label="Menú" data-i18n-aria="menu" aria-expanded="false" aria-controls="mobileMenu"><span></span><span></span><span></span></button>
 </nav>
 <!-- 8/10/2026 · Tanda 2 · Con la barra de abajo (celular), el menú lleva sólo lo que no está en ella: Desarrollos,

@@ -4263,6 +4263,22 @@ body.p-ficha-page .p-legal-txt p{margin:0 0 8px;text-align:left}
 .mobile-menu .m-lang button.on{color:#FBFAF6;border-bottom-color:var(--gold,#C2A968)}
 @media(prefers-reduced-motion:reduce){.p-tabbar a{transition:none}}
 
+/* ══ lanz3-visitante · 8/10/2026 · Arreglos de la simulación de visitantes (lo que ve quien busca) ══════════ */
+
+/* Portada: Publicar a la vista en el header del celular, sin abrir el menú */
+.p-navbar > .p-pub-movil{display:none}
+@media(max-width:1023px){
+  body.p-home .p-navbar > .p-pub-movil{display:inline-flex;grid-column:2;grid-row:1;justify-self:end;align-items:center;min-height:44px;padding:0 4px;
+    font:600 .75rem/1 var(--font-body);letter-spacing:.16em;text-transform:uppercase;color:var(--gold,#C2A968);text-decoration:none;border:0;background:none}
+  body.p-home .p-navbar > .p-pub-movil:focus-visible{outline:2px solid var(--gold,#C2A968);outline-offset:2px}
+}
+/* Portada: en el celular las sugerencias empujan "Ver propiedades" hacia abajo en vez de taparlo */
+@media(max-width:1023px){
+  body.p-home .h-field .p-sugg{position:static;margin-top:8px;max-height:min(240px,34svh);overflow:auto;overscroll-behavior:contain}
+  body.p-home .h-field .p-sugg button{min-height:46px}
+  body.p-home .h-field-lupa .lupa{top:24px}   /* el campo mide 48 px: la lupa queda en el campo aunque la lista crezca abajo */
+}
+
 /* ── Guardados: la tercera pestaña ── */
 body.p-guardados{background:var(--s-white,#FBFAF6)}
 .p-guardados-in{max-width:var(--p-max,1200px);margin:0 auto;padding:calc(64px + env(safe-area-inset-top) + 28px) 24px 56px;box-sizing:border-box;min-height:60vh}
