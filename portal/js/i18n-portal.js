@@ -13,6 +13,8 @@
    Voz: par a par, sin mayúsculas sostenidas, sin exclamaciones. */
 window.BP_I18N = {
   en: {
+    /* 8/10/2026 · freno de rebote de la sesión */
+    rebote_t: 'We could not open your account.', rebote_p: 'Sign in again with your email. If it happens again, write to us.', rebote_btn: 'Sign in again', rebote_toast: 'Your session got stuck. Sign in again with your email.',
     /* 23/9/2026 · El título y la descripción de la portada quedaban en castellano en EN y PT:
        se ven en la pestaña del navegador y en la vista previa al compartir el link. */
     home_title: 'BAIREN · Selected properties in Buenos Aires',
@@ -601,6 +603,8 @@ window.BP_I18N = {
     emp_entrega_min: 'delivery {d}', emp_ver_todos: 'See all developments',
   },
   pt: {
+    /* 8/10/2026 · freno de rebote da sessão */
+    rebote_t: 'Não conseguimos abrir sua conta.', rebote_p: 'Entre de novo com seu e-mail. Se acontecer de novo, escreva para nós.', rebote_btn: 'Entrar de novo', rebote_toast: 'Sua sessão travou. Entre de novo com seu e-mail.',
     home_title: 'BAIREN · Imóveis selecionados em Buenos Aires',
     home_desc: 'O portal de imóveis selecionados de Buenos Aires. Apartamentos à venda e para alugar em Palermo, Recoleta, Retiro, Belgrano, Núñez, Colegiales, Villa Crespo, Puerto Madero, Saavedra e Zona Norte, revisados um por um antes de entrar no portal.',
     skip: 'Ir para o conteúdo', menu: 'Menu', idioma: 'Idioma',
