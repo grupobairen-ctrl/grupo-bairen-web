@@ -37,6 +37,8 @@
 --      `to authenticated` (anon deja de evaluarlas fila por fila) y con
 --      (select ...) para que la función se evalúe una vez por consulta. Y
 --      DELETE en portal.fotos para authenticated (reemplazar fotos fallaba).
+--      DELETE en portal.avisos solo de un borrador propio que nunca se publicó
+--      (el panel tiene "Borrar"; sin la 23 el borrador queda como vencido).
 --
 -- ANTES DE CORRER (sin esto el panel y la carga fallan):
 --   · El front de la rama tomas/lanz-servidor en producción: ninguna lectura
@@ -100,6 +102,10 @@ on conflict (clave) do nothing;
 
 insert into portal.respaldo_migracion_23 (clave, valor)
 values ('delete_fotos_authenticated', to_jsonb(has_table_privilege('authenticated', 'portal.fotos', 'DELETE')))
+on conflict (clave) do nothing;
+
+insert into portal.respaldo_migracion_23 (clave, valor)
+values ('delete_avisos_authenticated', to_jsonb(has_table_privilege('authenticated', 'portal.avisos', 'DELETE')))
 on conflict (clave) do nothing;
 
 insert into portal.respaldo_migracion_23 (clave, valor)
@@ -220,6 +226,8 @@ $$;
 --   · Un aviso publicado (o que se reactiva) vuelve a 'en_revision' si cambia la dirección, la unidad o la
 --     operación (es otro aviso), o si su portada ya no es la que vio el curador. Precio, estado (reservado,
 --     disponible, alquilado), descripción, fotos que no son la portada y el resto: libres, como dueño del aviso.
+--   · Editar un aviso pausado lo deja pausado (el panel ya no lo pasa a borrador). Si en la pausa cambia la
+--     dirección, la unidad o la operación, queda pausado_por = 'sistema': reactivarlo lo manda a revisión.
 -- No lanza errores: lo que no le corresponde se conserva o se corrige, igual que proteger_verificacion. Así el
 -- panel y la carga no se rompen; el resultado se ve en el estado del aviso.
 create or replace function portal.proteger_curacion_aviso() returns trigger
@@ -297,7 +305,14 @@ begin
   new.estado_curacion := v_destino;
 
   if v_destino = 'pausado' then
-    new.pausado_por := case when old.estado_curacion = 'pausado' then old.pausado_por else 'publicador' end;
+    if old.estado_curacion = 'pausado'
+       and (portal.texto_comparable(new.direccion) is distinct from portal.texto_comparable(old.direccion)
+            or portal.texto_comparable(new.unidad) is distinct from portal.texto_comparable(old.unidad)
+            or new.operacion is distinct from old.operacion) then
+      new.pausado_por := 'sistema';
+    else
+      new.pausado_por := case when old.estado_curacion = 'pausado' then old.pausado_por else 'publicador' end;
+    end if;
   else
     new.pausado_por := null;
   end if;
@@ -600,6 +615,14 @@ grant delete on portal.fotos to authenticated;
 create policy "fotos propias all" on portal.fotos for all to authenticated
   using (exists (select 1 from portal.avisos a where a.id = aviso_id
                   and (a.publicador_id = (select portal.mi_publicador()) or (select portal.es_curador()))));
+-- Borrar (panel → ··· → Borrar): solo un borrador propio que nunca estuvo publicado (sin publicado_en). Lo que estuvo
+-- en línea tiene consultas, favoritos y vistas que lo nombran: eso no se borra, se pausa. Fotos, alertas y el
+-- historial de precio se van con el aviso (on delete cascade).
+grant delete on portal.avisos to authenticated;
+drop policy if exists "avisos borrador se borra" on portal.avisos;
+create policy "avisos borrador se borra" on portal.avisos for delete to authenticated
+  using (estado_curacion = 'borrador' and publicado_en is null
+         and (publicador_id = (select portal.mi_publicador()) or portal.es_miembro(publicador_id)));
 
 commit;
 
@@ -633,6 +656,9 @@ select n, control, ok from (values
       (select count(*) from pg_indexes where schemaname = 'portal' and indexname in ('avisos_publicador_idx', 'avisos_catalogo_idx', 'avisos_publicado_en_idx', 'avisos_slug_idx', 'consultas_publicador_idx', 'consultas_aviso_idx', 'vistas_aviso_fecha_idx', 'visitas_reservas_aviso_idx')) = 8),
   (9, 'función vistas_de',
       to_regprocedure('portal.vistas_de(text[])') is not null),
+  (10, 'borrar: solo un borrador propio sin publicar (política de delete en avisos)',
+      exists (select 1 from pg_policies where schemaname = 'portal' and tablename = 'avisos' and policyname = 'avisos borrador se borra' and cmd = 'DELETE')
+      and has_table_privilege('authenticated', 'portal.avisos', 'DELETE')),
   (10, 'políticas de storage nuevas solo para authenticated',
       not exists (select 1 from pg_policies where schemaname = 'storage' and tablename = 'objects'
                    and policyname in ('fotos sube en su carpeta', 'fotos edita en su carpeta', 'fotos borra en su carpeta', 'docs sube en su carpeta', 'docs ve los suyos', 'docs edita los suyos', 'docs borra los suyos')
