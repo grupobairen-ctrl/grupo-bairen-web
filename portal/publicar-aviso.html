@@ -370,7 +370,7 @@ document.addEventListener('DOMContentLoaded', function(){
       if (a.fotos.length < 8 && !a.quiero_produccion) { step = 2; render(); BP.toast('Hacen falta ocho fotos y hay ' + a.fotos.length + '. O pedí la producción de BAIREN.', 'error'); return; }
       if (!document.getElementById('acepto').checked) { BP.errorCampo('acepto', 'Aceptá los términos para enviar.'); return; }
       ocupar(btn, true, 'Enviando…');
-      try { await save('en_revision'); terminado(); } catch (e) { ocupar(btn, false); BP.toast(BPStore.errorAlGuardar(e, 'No se pudo enviar.'), 'error'); }
+      try { await save('en_revision'); if (BPStore.notify && aviso.id) Promise.resolve(BPStore.notify('revision', { aviso_id: aviso.id })).catch(() => {}); terminado(); } catch (e) { ocupar(btn, false); BP.toast(BPStore.errorAlGuardar(e, 'No se pudo enviar.'), 'error'); }
     });
   }
 

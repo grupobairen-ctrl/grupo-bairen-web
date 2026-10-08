@@ -257,7 +257,7 @@
      se dice "Dueño directo", sin escudo, que es cierto y no promete lo que no se controló. */
   /* 8/10/2026 · Publicador sin verificar: su nombre, sin sello. El dueño sin verificar sigue diciendo "Dueño directo". */
   D.badgeHTML = pub => !pub || !pub.verificado ? (pub && pub.tipo === 'dueno' ? `<span class="p-badge dueno">${BP.esc(BP.t('ui_dato_dueno_directo', 'Dueño directo'))}</span>` : '')
-    : !pub.matricula && pub.tipo !== 'dueno' ? `<span class="p-badge">${BP.ico.check} ${BP.esc(BP.etiqueta(pub.badge || 'Selección BAIREN'))}</span>`
+    : !pub.matricula && pub.tipo !== 'dueno' ? `<span class="p-badge">${BP.ico.check} ${BP.esc(BP.etiqueta(pub.badge || ({ gestor: 'Gestor de alquileres', desarrolladora: 'Desarrolladora', profesional: 'Inmobiliaria' })[pub.tipo] || 'Verificado'))}</span>`
     : pub.tipo === 'dueno'
     ? (pub.verificado
         ? `<span class="p-badge dueno">${BP.ico.shield} ${BP.esc(BP.etiqueta(pub.badge || 'Dueño verificado'))}</span>`

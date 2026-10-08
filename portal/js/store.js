@@ -424,9 +424,14 @@
     if (!rec.codigo) rec.codigo = codigo(rec.slug, rec.operacion);
     const fotos = rec.fotos || []; delete rec.fotos;
     if (S.mode === 'supabase') {
-      const q = S.sb.schema('portal').from('avisos'); let res;
-      if (rec.id) res = await q.update(rec).eq('id', rec.id).select().single(); else res = await q.insert(rec).select().single();
+      /* 8/10/2026 · Devuelve el aviso con columnas explícitas (S.COLS.AVISO): con la migración 23, `*` choca con la
+         columna propietario_email cerrada. Si la base todavía no tiene alguna de esas columnas, repite con `*`: un
+         error de columna frena la consulta entera antes de grabar, así que no hay doble alta. */
+      const grabar = cols => { const q = S.sb.schema('portal').from('avisos'); return rec.id ? q.update(rec).eq('id', rec.id).select(cols).single() : q.insert(rec).select(cols).single(); };
+      let res = await grabar(S.COLS.AVISO);
+      if (res.error && /42703|PGRST204|column/i.test(String(res.error.code || '') + ' ' + String(res.error.message || ''))) res = await grabar('*');
       if (res.error) throw res.error; const saved = res.data;
+      try { if (window.BPData && BPData.olvidarCatalogo) BPData.olvidarCatalogo(); } catch (e) { /* nada */ }
       if (fotos.length) { await S.sb.schema('portal').from('fotos').delete().eq('aviso_id', saved.id); const rows = fotos.map((f, i) => ({ aviso_id: saved.id, url: f.url, orden: i })); const { error } = await S.sb.schema('portal').from('fotos').insert(rows); if (error) throw error; }
       saved.fotos = fotos.map((f, i) => ({ url: f.url, orden: i })); return saved;
     }
@@ -467,7 +472,9 @@
   S.uploadFoto = async function(file, avisoKey, i){
     const blob = await S.shrink(file, 1600);
     if (S.mode === 'supabase') {
-      const path = avisoKey + '/' + Date.now() + '-' + i + '.jpg';
+      /* 8/10/2026 · Cada cuenta sube en su carpeta (<id de la cuenta>/<aviso>/...): con la migración 23, el bucket solo
+         deja escribir ahí. La ruta vieja (<aviso>/...) sigue sirviendo para las fotos que ya están. */
+      const path = (S.session && S.session.id ? S.session.id + '/' : '') + avisoKey + '/' + Date.now() + '-' + i + '.jpg';
       const { error } = await S.sb.storage.from('portal-fotos').upload(path, blob, { contentType: 'image/jpeg', upsert: true }); if (error) throw error;
       try { const mini = await S.miniatura(blob); if (mini) await S.sb.storage.from('portal-fotos').upload('miniaturas/' + path, mini, { contentType: 'image/jpeg', upsert: true, cacheControl: '31536000' }); } catch (e) { console.warn('miniatura:', e && e.message); }
       return S.sb.storage.from('portal-fotos').getPublicUrl(path).data.publicUrl;
@@ -477,7 +484,7 @@
   S.setEstado = async function(id, estado_curacion, motivo, extra){
     const patch = Object.assign({ estado_curacion, motivo_rechazo: motivo || null, updated_at: now() }, extra || {}); if (estado_curacion === 'publicado') patch.publicado_en = now();
     S.track(estado_curacion === 'publicado' ? 'aviso_aprobado' : estado_curacion === 'rechazado' ? 'aviso_rechazado' : 'aviso_estado', { aviso_id: id, datos: { estado_curacion, motivo: motivo || null } });
-    if (S.mode === 'supabase') { const { error } = await S.sb.schema('portal').from('avisos').update(patch).eq('id', id); if (error) throw error; if (estado_curacion === 'publicado' && !(extra && extra.estado)) S.notify('aprobado', { aviso_id: id }); else if (estado_curacion === 'rechazado') S.notify('rechazado', { aviso_id: id, datos: { motivo } }); else if (estado_curacion === 'borrador' && motivo) S.notify('cambios', { aviso_id: id, datos: { motivo } }); return; }
+    if (S.mode === 'supabase') { const { error } = await S.sb.schema('portal').from('avisos').update(patch).eq('id', id); if (error) throw error; try { if (window.BPData && BPData.olvidarCatalogo) BPData.olvidarCatalogo(); } catch (e) { /* nada */ } if (estado_curacion === 'publicado' && !(extra && extra.estado)) S.notify('aprobado', { aviso_id: id }); else if (estado_curacion === 'rechazado') S.notify('rechazado', { aviso_id: id, datos: { motivo } }); else if (estado_curacion === 'borrador' && motivo) S.notify('cambios', { aviso_id: id, datos: { motivo } }); return; }
     const all = L.avisos.get([]); const a = all.find(x => x.id === id); if (a) Object.assign(a, patch); L.avisos.set(all);
   };
   /* 8/10/2026 · El catálogo: solo las columnas de la lista (COLS_LISTA) y TODO lo publicado, por tramos.
