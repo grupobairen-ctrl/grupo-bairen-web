@@ -64,11 +64,13 @@ document.addEventListener('DOMContentLoaded', function(){
       <div class="p-skel-line l"></div><div class="p-skel-line l"></div><div class="p-skel-line m"></div>
     </div><aside class="p-side"><div class="p-skel-cta"></div></aside></div>`;
   main.setAttribute('aria-busy', 'true');
-  const _datos = BPData.load(); await BP.probePretty(); const id = BP.qs().get('id') || BP.qs().get('slug') || BP.idFromPath();
-  let avisos;
-  try { ({ avisos } = await _datos); }
+  /* 8/10/2026 · Solo este aviso y sus similares (BPData.loadFicha), no el catálogo entero. `avisos` queda con el
+     aviso y sus similares, que es todo lo que el resto de la ficha lee de ahí. */
+  const id = BP.qs().get('id') || BP.qs().get('slug') || BP.idFromPath();
+  const _datos = BPData.loadFicha(id); await BP.probePretty();
+  let avisos, a;
+  try { const d = await _datos; a = d.aviso; avisos = a ? [a].concat(d.similares) : []; }
   catch (err) { console.error(err); BP.estadoError(main, BP.t('ficha_err_carga', 'No pudimos cargar esta propiedad.')); return; }
-  const a = avisos.find(x => x.id === id) || avisos.find(x => x.slug === id);
   if (!a) { main.innerHTML = `<section class="p-page"><div class="p-prose"><h1>${BP.t('ficha_no_encontrada', 'No encontramos esa propiedad')}</h1><p>${BP.t('ficha_no_encontrada_p', 'Puede que ya no esté publicada. <a href="buscar.html" style="text-decoration:underline">Volver a las propiedades</a>.')}</p></div></section>`; document.title = BP.t('ficha_no_encontrada_title', 'Propiedad no encontrada · BAIREN'); return; }
   const pub = BPData.pub(a.publicadorId);
   const esAlqCorredor = a.op !== 'venta' && pub.tipo !== 'dueno' && !!pub.matricula;

@@ -213,6 +213,10 @@
   },
   "crons": [
     {
+      "path": "/api/portal-sync",
+      "schedule": "*/15 * * * *"
+    },
+    {
       "path": "/api/portal-diario",
       "schedule": "0 10 * * *"
     },
