@@ -99,7 +99,7 @@ async function plantilla(req) {
 async function leerAviso(id) {
   if (!id) return null;
   const q = new URLSearchParams({
-    select: 'id,slug,operacion,tipo,titulo,direccion,unidad,barrio,precio,moneda,m2_total,ambientes,dormitorios,banos,cocheras,estado,descripcion,updated_at,fotos(url,orden),publicadores(nombre)',
+    select: 'id,slug,operacion,tipo,titulo,direccion,unidad,barrio,precio,moneda,m2_total,ambientes,dormitorios,banos,cocheras,estado,descripcion,updated_at,fotos(url,orden),publicadores(nombre,tipo)',
     estado_curacion: 'eq.publicado',
     'fotos.order': 'orden.asc',
     'fotos.limit': '1',
@@ -145,7 +145,9 @@ function metaLine(a) {
 }
 
 function descripcionDe(a) {
-  const pub = a.publicadores && a.publicadores.nombre ? a.publicadores.nombre : null;
+  /* 8/10/2026 (venta) · El dueño directo figura con su nombre y la inicial del apellido, como en el portal (BPData.nombrePublico) */
+  const nombrePublico = n => { const w = String(n || '').trim().split(/\s+/).filter(Boolean); return w.length > 1 ? w.slice(0, -1).concat(w[w.length - 1].charAt(0).toUpperCase() + '.').join(' ') : w.join(' '); };
+  const pub = a.publicadores && a.publicadores.nombre ? (a.publicadores.tipo === 'dueno' ? nombrePublico(a.publicadores.nombre) : a.publicadores.nombre) : null;
   return [opTag(a), precioTexto(a), metaLine(a) || null, a.barrio || null, pub ? 'Publica ' + pub : null].filter(Boolean).join(' · ');
 }
 

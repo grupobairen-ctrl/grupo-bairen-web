@@ -28,7 +28,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20261008d"><link rel="stylesheet" href="css/catalogo.css?v=20261008d"><link rel="stylesheet" href="css/portal.css?v=20261008d">
+  <link rel="stylesheet" href="css/base.css?v=20261008f"><link rel="stylesheet" href="css/catalogo.css?v=20261008f"><link rel="stylesheet" href="css/portal.css?v=20261008f">
   <style>body{padding-top:0}#ficha>.p-ficha-top,#ficha>.p-ficha,#ficha>section{max-width:var(--p-max);margin:0 auto;padding-left:24px;padding-right:24px}#ficha>.p-ficha-top{padding-top:88px}@media(max-width:900px){#ficha>.p-ficha-top{padding-top:76px}}.p-video{aspect-ratio:16/9;background:#0b1220;border-radius:16px;overflow:hidden}.p-video iframe,.p-video video{width:100%;height:100%;border:0;display:block}
   /* Fachada del video (25/9/2026): portada y botón de reproducir; el reproductor se pide al tocar */
   .p-video-play{position:relative;display:block;width:100%;height:100%;padding:0;border:0;background:#0b1220;cursor:pointer}
@@ -45,11 +45,11 @@
 <div class="p-lb" id="lb" aria-hidden="true"><div class="velo" data-lb-close></div><button type="button" class="x" data-lb-close aria-label="Cerrar las fotos" data-i18n-aria="ficha_lb_cerrar" data-i18n="ficha_lb_cerrar_txt">Cerrar</button><div class="marco" id="lbMarco"><img id="lbImg" alt="" draggable="false"></div><button type="button" class="nav prev" data-lb-prev aria-label="Foto anterior" data-i18n-aria="ficha_lb_prev"></button><button type="button" class="nav next" data-lb-next aria-label="Foto siguiente" data-i18n-aria="ficha_lb_next"></button><div class="pie"><span class="cuenta" id="lbCount"></span><div class="tiras" id="lbTiras"></div></div></div>
 <div id="pFooter"></div>
 
-<script src="supabase-portal.js?v=20261008d" defer></script><script src="js/errores.js?v=20261008d" defer></script>
+<script src="supabase-portal.js?v=20261008f" defer></script><script src="js/errores.js?v=20261008f" defer></script>
 <!-- 8/10/2026 · Sin este archivo la ficha no sabía que Palermo Hollywood es Palermo: "Ver más en Palermo Hollywood" daba 0 resultados -->
-<script src="../mapa-barrios.js?v=20261008d" defer></script>
-<script src="js/iconos-amenities.js?v=20261008d" defer></script><script src="js/motion.js?v=20261008d" defer></script><script src="js/bairen-motion.js?v=20261008d" defer></script><script src="js/i18n-portal.js?v=20261008d" defer></script><script src="js/ui.js?v=20261008d" defer></script><script src="js/store.js?v=20261008d" defer></script>
-<script src="js/data.js?v=20261008d" defer></script>
+<script src="../mapa-barrios.js?v=20261008f" defer></script>
+<script src="js/iconos-amenities.js?v=20261008f" defer></script><script src="js/motion.js?v=20261008f" defer></script><script src="js/bairen-motion.js?v=20261008f" defer></script><script src="js/i18n-portal.js?v=20261008f" defer></script><script src="js/ui.js?v=20261008f" defer></script><script src="js/store.js?v=20261008f" defer></script>
+<script src="js/data.js?v=20261008f" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -71,6 +71,14 @@ document.addEventListener('DOMContentLoaded', function(){
   let avisos, a;
   try { const d = await _datos; a = d.aviso; avisos = a ? [a].concat(d.similares) : []; }
   catch (err) { console.error(err); BP.estadoError(main, BP.t('ficha_err_carga', 'No pudimos cargar esta propiedad.')); return; }
+  /* lanz3-visitante · Una guardada que hoy no está publicada se pausó: se dice eso, no "no la encontramos". Quien
+     visita no puede ver el estado de un aviso ajeno (solo los publicados son públicos): alcanza con que la haya
+     guardado; en modo local se lee el estado. */
+  if (!a && id) {
+    let pausada = BP.isFav(id);
+    if (!pausada && window.BPStore && BPStore.getAviso) { try { const r = await BPStore.getAviso(id); pausada = !!(r && r.estado_curacion === 'pausado'); } catch (e) { /* sin dato */ } }
+    if (pausada) { const info = (BP.favInfo.get() || {})[id] || {}; main.innerHTML = `<section class="p-page"><div class="p-prose p-fpausada"><p class="p-fop">${BP.t('ficha_pausada_tag', 'Pausada por ahora')}</p><h1>${info.t ? BP.esc(info.t) : BP.t('ficha_pausada_t', 'Esta propiedad está pausada')}</h1><p>${BP.t('ficha_pausada_p', 'Quien la publica la pausó. Si vuelve, la vas a ver en Guardados.')}</p><p><a class="p-btn p-btn-fill" href="${BP.esc(BP.ultimaBusqueda())}">${BP.t('ficha_pausada_ver', 'Ver otras propiedades')}</a></p></div></section>`; document.title = BP.t('ficha_pausada_title', 'Propiedad pausada · BAIREN'); return; }
+  }
   if (!a) { main.innerHTML = `<section class="p-page"><div class="p-prose"><h1>${BP.t('ficha_no_encontrada', 'No encontramos esa propiedad')}</h1><p>${BP.t('ficha_no_encontrada_p', 'Puede que ya no esté publicada. <a href="buscar.html" style="text-decoration:underline">Volver a las propiedades</a>.')}</p></div></section>`; document.title = BP.t('ficha_no_encontrada_title', 'Propiedad no encontrada · BAIREN'); return; }
   const pub = BPData.pub(a.publicadorId);
   const esAlqCorredor = a.op !== 'venta' && pub.tipo !== 'dueno' && !!pub.matricula;
@@ -104,19 +112,37 @@ document.addEventListener('DOMContentLoaded', function(){
   document.title = `${tit} · ${BPData.opTag(a)} · BAIREN`;
   /* Cuatro números: superficie, ambientes, baños y, según la operación, la estadía (mediano) o las expensas
      (tradicional y venta; nunca si están incluidas). El que no tiene dato no se dibuja. */
-  const plazoTxt = a.plazo ? BP.etiqueta(a.plazo).replace(/(\d)\s*-\s*(\d)/, '$1 a $2') : '';   /* "3-12 meses" se lee "3 a 12 meses" (en, pt ya vienen traducidos) */
+  /* lanz3-visitante · "24 meses" en inglés se dice "24 months" (los plazos sueltos no tienen clave propia) */
+  const meses = x => BP.lang === 'en' ? String(x).replace(/\bmeses\b/i, 'months').replace(/\b1 months\b/, '1 month').replace(/(\d) a (\d)/, '$1 to $2') : x;
+  const plazoTxt = a.plazo ? meses(BP.etiqueta(a.plazo).replace(/(\d)\s*-\s*(\d)/, '$1 a $2')) : '';   /* "3-12 meses" se lee "3 a 12 meses" (en, pt ya vienen traducidos) */
   const expensasAparte = !!a.expensas && !BPData.expensasIncluidas(a);
   const numeros = [
     a.m2 ? [a.m2 + ' m²', T('ficha_superficie', 'Superficie')] : null,
-    a.amb ? [a.amb, a.amb === 1 ? T('num_ambiente', 'Ambiente') : T('num_ambientes', 'Ambientes')] : null,
+    /* lanz3-visitante · En inglés y portugués "2 ambientes" se lee como dos dormitorios: ahí van los dormitorios
+       (el dato, o ambientes menos uno), y el monoambiente es "Studio" */
+    BP.lang !== 'es' && a.amb ? [a.amb === 1 ? T('num_studio', 'Monoambiente') : BP.dormDe(a), BP.dormDe(a) === 1 ? T('num_dorm', 'Dormitorio') : T('num_dorms', 'Dormitorios')]
+      : a.amb ? [a.amb, a.amb === 1 ? T('num_ambiente', 'Ambiente') : T('num_ambientes', 'Ambientes')] : null,
     a.banos ? [a.banos, a.banos === 1 ? T('num_bano', 'Baño') : T('num_banos', 'Baños')] : null,
     a.op === 'mediano'
       ? (plazoTxt ? [plazoTxt, BPData.estadiaMinima(a) ? T('ficha_estadia_min', 'Estadía mínima') : T('num_estadia', 'Estadía')] : null)
       : (expensasAparte ? ['$ ' + BP.fmtN(a.expensas), T('ficha_expensas', 'Expensas')] : null)
   ].filter(Boolean);
+  /* 8/10/2026 (venta) · Lo que se cargó de más, en un renglón y solo con dato: dormitorios (cargados, no inferidos, y desde 2
+     ambientes), m² cubiertos (si no son los totales), antigüedad y cocheras */
+  const extras = [
+    a.dormDato && a.dorm && a.amb > 1 ? (a.dorm === 1 ? T('ficha_x_dorm_1', '1 dormitorio') : TF('ficha_x_dorm_n', '{n} dormitorios', { n: a.dorm })) : null,
+    a.m2cub && a.m2 && a.m2cub !== a.m2 ? TF('ficha_x_m2_cub', '{n} m² cubiertos', { n: a.m2cub }) : null,
+    a.antiguedad === 0 ? T('ficha_a_estrenar', 'A estrenar') : a.antiguedad > 0 ? (a.antiguedad === 1 ? T('ficha_x_antig_1', '1 año de antigüedad') : TF('ficha_x_antig_n', '{n} años de antigüedad', { n: a.antiguedad })) : null,
+    a.cocheras > 0 ? (a.cocheras === 1 ? T('ficha_x_coch_1', '1 cochera') : TF('ficha_x_coch_n', '{n} cocheras', { n: a.cocheras })) : null
+  ].filter(Boolean);
+  /* Una unidad de un emprendimiento: el desarrollo (link a su página), el piso y unidad, la etapa y la entrega */
+  const empLinea = a.emprendimiento ? `<p class="p-femp"><a href="${BPData.urlEmp(a)}">${BP.esc(a.emprendimiento)}</a>${[a.unidad, BPData.etapaTxt(a)].filter(Boolean).map(x => '&nbsp;· ' + BP.esc(x)).join('')}</p>` : '';
   /* Condiciones, en una lista corta */
   const condiciones = [
     a.op === 'mediano' && plazoTxt ? (BPData.estadiaMinima(a) ? TF('cond_estadia_min', 'Estadía mínima de {p}', { p: plazoTxt }) : TF('cond_estadia', 'Estadía de {p}', { p: plazoTxt })) : null,
+    /* lanz3-visitante · El alquiler tradicional: el plazo del contrato y las garantías que acepta (como las guarda Publicar) */
+    a.op === 'alquiler' && plazoTxt ? (/^\d/.test(plazoTxt) ? TF('cond_contrato', 'Contrato de {p}', { p: plazoTxt }) : TF('cond_contrato_libre', 'Contrato: {p}', { p: plazoTxt.charAt(0).toLowerCase() + plazoTxt.slice(1) })) : null,   /* "24 meses" o "Desde 2 años" */
+    ...(a.op === 'alquiler' ? ['Acepta seguro de caución', 'Acepta garantía propietaria'].filter(g => (a.caracteristicas || []).indexOf(g) > -1).map(g => BP.etiqueta(g)) : []),
     BPData.todoIncluido(a) ? T('cond_todo_incluido', 'Todo incluido: expensas y servicios') : (BPData.incluye(a).length ? TF('cond_incluye', 'Incluye: {x}', { x: BPData.incluye(a).map(x => BP.etiqueta(x)).join(', ') }) : null),
     BPData.sinGarantia(a) ? T('ui_dato_sin_garantia_propietaria', 'Sin garantía propietaria') : null,
     BPData.aceptaMascotas(a) ? T('ui_dato_acepta_mascotas', 'Acepta mascotas') : null
@@ -126,7 +152,9 @@ document.addEventListener('DOMContentLoaded', function(){
   /* La ubicación aparece sólo si hay con qué armar el mapa: coordenadas o una calle */
   const hayMapa = (a.lat != null && a.lng != null) || !!calle;
   /* Lo que acompaña al precio: todo incluido, expensas incluidas o, en mediano plazo, las expensas aparte */
-  const precioSub = a.reservado ? '' : [a.periodo ? T('ui_por_mes', '/mes') : '', BPData.todoIncluido(a) ? T('ficha_todo_incl_corto', 'todo incluido') : BPData.expensasIncluidas(a) ? T('ficha_exp_incl', 'expensas incluidas') : (expensasAparte && a.op === 'mediano' ? TF('ficha_mas_exp', 'más $ {n} de expensas', { n: BP.fmtN(a.expensas) }) : '')].filter(Boolean).join(' · ');
+  /* lanz3-visitante · En venta, el precio por m² cuando hay superficie */
+  const porM2 = a.op === 'venta' && a.precio && a.m2 ? TF('ficha_por_m2', '{p} por m²', { p: BP.fmtPrecio(a.precio / a.m2, a.moneda) }) : '';
+  const precioSub = a.reservado ? '' : [porM2, a.periodo ? T('ui_por_mes', '/mes') : '', BPData.todoIncluido(a) ? T('ficha_todo_incl_corto', 'todo incluido') : BPData.expensasIncluidas(a) ? T('ficha_exp_incl', 'expensas incluidas') : (expensasAparte && a.op === 'mediano' ? TF('ficha_mas_exp', 'más $ {n} de expensas', { n: BP.fmtN(a.expensas) }) : '')].filter(Boolean).join(' · ');
   const urlPub = 'buscar.html?op=&pub=' + encodeURIComponent(pub.id || '');
   const urlVolver = a.zona ? BP.urlBuscar({ op: BPData.opFiltro(a), zona: a.zona }) : 'buscar.html';
 
@@ -153,10 +181,12 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip" role="group" aria-label="$
         <div class="p-fh-acts"><button type="button" class="p-icon-btn ${BP.isFav(a.id)?'on':''}" data-fav="${BP.esc(a.id)}" aria-pressed="${BP.isFav(a.id)}" aria-label="${T('ficha_fav', 'Guardar en favoritos')}">${BP.isFav(a.id)?BP.ico.heartFill:BP.ico.heart}</button><button type="button" class="p-icon-btn" id="share" aria-label="${T('ficha_compartir', 'Compartir')}">${BP.ico.share}</button></div>
       </div>
       ${calle ? `<p class="p-fcalle">${BP.ico.pin}<span>${BP.esc(calle)}</span></p>` : ''}
+      ${empLinea}
       ${desde ? `<p class="p-fdesde">${BP.esc(desde)}</p>` : ''}
       ${a.reservado ? `<p class="p-reservada">${T('ficha_reservada_corto', 'Reservada. Por ahora no toma consultas.')}</p>` : ''}
     </div>
     ${numeros.length ? `<dl class="p-fnums">${numeros.map(n => `<div><dt>${n[1]}</dt><dd>${n[0]}</dd></div>`).join('')}</dl>` : ''}
+    ${extras.length ? `<p class="p-fextra">${extras.map(BP.esc).join('&nbsp;· ')}</p>` : ''}
     <div class="p-fdesc">
       <p class="p-text clamp" id="desc">${BP.esc((BP.lang === 'en' && a.descripcion_en) || (BP.lang === 'pt' && a.descripcion_pt) || a.descripcion || T('ficha_desc_prod', 'Descripción en producción.'))}</p>
       <button type="button" class="p-more" id="descMore">${T('ficha_leer_mas', 'Leer más')}</button>
@@ -189,6 +219,7 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip" role="group" aria-label="$
     <div class="p-form p-form-ok" id="contactOk" hidden tabindex="-1" role="status">
       <h3>${T('ficha_ok_t', 'Consulta enviada')}</h3>
       <p>${TF('ficha_ok_listo', 'Listo. Le llegó a {p}, que te responde por WhatsApp o mail.', { p: BP.esc(pubNombre) })}</p>
+      <p class="p-ok-visita" id="contactOkVisita" hidden></p>
       <button type="button" class="p-linkbtn" id="contactOtra">${T('ficha_otra', 'Enviar otra consulta')}</button>
     </div>`}
   </aside>
@@ -207,6 +238,22 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip" role="group" aria-label="$
 
   /* comportamiento */
   BPData.bindFavs(main);
+  /* lanz3-visitante · Si una foto no carga (archivo borrado en el almacenamiento), la diapositiva dice "Fotos en producción"
+     en vez de quedar como un bloque vacío; esa foto no abre el visor. Las miniaturas que fallan se apagan. */
+  const fotoRota = new Set();
+  /* Si ninguna carga, queda una sola diapositiva con el aviso, sin contador ni tira (se prueban las miniaturas, 200 px) */
+  const probarTodas = () => Promise.all(fotos.map(f => new Promise(res => { const im = new Image(); im.onload = () => res(true); im.onerror = () => res(false); im.src = BP.sbImg(f, 200); }))).then(oks => {
+    if (oks.some(Boolean)) return;
+    fotos.forEach((f, i) => fotoRota.add(i));
+    const hs = document.getElementById('heroSlides'); if (hs) { hs.removeAttribute('tabindex'); hs.innerHTML = `<div class="p-fhero-slide p-fhero-empty p-fhero-rota">${T('ficha_fotos_prod', 'Fotos en producción')}</div>`; }
+    ['fotoCont', 'strip'].forEach(x => { const e = document.getElementById(x); if (e) e.remove(); });
+  });
+  const probarFoto = el => { const m = /url\(['"]?([^'")]+)['"]?\)/.exec(el.style.backgroundImage || ''); if (!m) return; const im = new Image(); im.onerror = () => { const i = Number(el.dataset.i); fotoRota.add(i); el.classList.add('p-fhero-empty', 'p-fhero-rota'); el.style.backgroundImage = 'none'; el.removeAttribute('role'); el.removeAttribute('aria-label'); el.textContent = T('ficha_fotos_prod', 'Fotos en producción'); if (i === 0 && fotos.length > 1) probarTodas(); }; im.src = m[1]; };
+  document.querySelectorAll('.p-fhero-slide[data-i]').forEach(el => { if (el.style.backgroundImage) probarFoto(el); else new MutationObserver((l, o) => { if (el.style.backgroundImage) { o.disconnect(); probarFoto(el); } }).observe(el, { attributes: true, attributeFilter: ['style'] }); });
+  document.querySelectorAll('#strip img').forEach(img => img.addEventListener('error', () => { img.style.visibility = 'hidden'; }, { once: true }));
+  /* lanz3-visitante · Lo que se vio de esta propiedad, por si se guarda y después se pausa (Guardados la sigue mostrando) */
+  if (BP.isFav(a.id)) BP.recordarFav(a);
+  document.addEventListener('bp:fav', e => { if (!e.detail || !e.detail.on) return; const x = avisos.find(y => y.id === e.detail.id); if (x) BP.recordarFav(x); });
   /* 25/9/2026 · "Saltar al contenido" apuntaba al main, que empieza con la galería: el salto dejaba
      a la persona adentro de las fotos. Ahora va a la ficha propiamente dicha (#contenido), después. */
   const skip = document.getElementById('pSkip'); if (skip) skip.href = '#contenido';
@@ -274,7 +321,7 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip" role="group" aria-label="$
     lbMarco.addEventListener('pointercancel', () => { x0 = null; });
   }
   lb.querySelectorAll('button').forEach(x => x.tabIndex = -1);
-  gal.querySelectorAll('[data-i]').forEach(el => el.addEventListener('click', e => { e.preventDefault(); origenLb = el; showLb(Number(el.dataset.i)); }));
+  gal.querySelectorAll('[data-i]').forEach(el => el.addEventListener('click', e => { e.preventDefault(); if (fotoRota.has(Number(el.dataset.i))) return; origenLb = el; showLb(Number(el.dataset.i)); }));
   document.querySelectorAll('#strip [data-t]').forEach(th => th.addEventListener('dblclick', () => { origenLb = th; showLb(Number(th.dataset.t)); }));
   const heroSlides = document.getElementById('heroSlides'), strip = document.getElementById('strip');
   if (heroSlides && strip) {
@@ -382,6 +429,9 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip" role="group" aria-label="$
          de la ficha. La consulta queda guardada como siempre (BPStore.addConsulta, que también avisa a quien
          publica) y la confirmación se muestra acá mismo. */
       btn.disabled = false; btn.innerHTML = etiqueta;
+      /* lanz3-visitante · La confirmación repite el día y la hora pedidos */
+      const okVisita = document.getElementById('contactOkVisita');
+      if (okVisita) { okVisita.hidden = !pideVisita; if (pideVisita) { let cuando = f.visita_deseada.value; try { cuando = new Date(f.visita_deseada.value).toLocaleString(BP.LOCALE(), { weekday: 'long', day: 'numeric', month: 'long', hour: 'numeric', minute: '2-digit', hour12: BP.lang === 'en' }); } catch (err) { /* queda el valor del campo */ } okVisita.textContent = TF('ficha_ok_visita', 'Visita pedida: {f}.', { f: cuando }); } }
       f.hidden = true; contactOk.hidden = false; contactOk.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => contactOk.focus({ preventScroll: true }), 300);
       BP.toast(TF('ficha_toast_enviada', 'Tu consulta va directo a {p}.', { p: pubNombre }));
     });

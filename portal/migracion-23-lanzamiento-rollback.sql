@@ -5,7 +5,8 @@
 -- portal.respaldo_migracion_23 en su primera corrida:
 --   · trg_aviso_sincroniza_os vuelve a la definición que tenía (la del OS);
 --   · las políticas de avisos, fotos y storage que reemplazó vuelven tal
---     cual estaban, y se borran las nuevas;
+--     cual estaban, y se borran las nuevas (también "avisos borrador se
+--     borra", con el DELETE en avisos si antes no estaba);
 --   · los buckets vuelven a su tope y tipos de antes;
 --   · anon y authenticated vuelven a tener select de tabla en avisos (o sea,
 --     propietario_email vuelve a quedar a la vista, como antes);
@@ -13,8 +14,10 @@
 --     vistas_de, los topes de largo y los índices que creó (los que ya
 --     existían con ese nombre se dejan);
 --   · se borran las columnas portada_curada y pausado_por. disponible_desde
---     se borra solo si está vacía en todos los avisos; si alguien ya la usó,
---     queda y se avisa (no se borran datos).
+--     y unidades_borrador se borran solo si están vacías en todos los avisos;
+--     si alguien ya las usó, quedan y se avisa (no se borran datos). Sin
+--     unidades_borrador, el front vuelve a guardar la lista de unidades en el
+--     navegador y avisa que el envío se termina desde ese dispositivo.
 -- Al final borra portal.respaldo_migracion_23. Después se puede volver a
 -- correr la 23.
 --
@@ -41,6 +44,7 @@ drop policy if exists "avisos por membresia insert" on portal.avisos;
 drop policy if exists "avisos por membresia update" on portal.avisos;
 drop policy if exists "propietario ve su aviso" on portal.avisos;
 drop policy if exists "fotos propias all" on portal.fotos;
+drop policy if exists "avisos borrador se borra" on portal.avisos;
 drop policy if exists "fotos sube en su carpeta" on storage.objects;
 drop policy if exists "fotos edita en su carpeta" on storage.objects;
 drop policy if exists "fotos borra en su carpeta" on storage.objects;
@@ -94,6 +98,14 @@ do $$
 begin
   if coalesce((select (valor #>> '{}')::boolean from portal.respaldo_migracion_23 where clave = 'delete_fotos_authenticated'), false) is false then
     execute 'revoke delete on portal.fotos from authenticated';
+  end if;
+end $$;
+
+-- DELETE en avisos para authenticated, como estaba (la 23 lo dio para "Borrar" un borrador)
+do $$
+begin
+  if coalesce((select (valor #>> '{}')::boolean from portal.respaldo_migracion_23 where clave = 'delete_avisos_authenticated'), false) is false then
+    execute 'revoke delete on portal.avisos from authenticated';
   end if;
 end $$;
 
@@ -157,6 +169,14 @@ begin
       alter table portal.avisos drop column disponible_desde;
     end if;
   end if;
+  if exists (select 1 from information_schema.columns where table_schema = 'portal' and table_name = 'avisos' and column_name = 'unidades_borrador') then
+    if exists (select 1 from portal.avisos where unidades_borrador is not null) then
+      raise notice 'unidades_borrador tiene datos (emprendimientos en borrador): se deja la columna y su tope (no se borran datos).';
+    else
+      alter table portal.avisos drop constraint if exists avisos_unidades_borrador_check;
+      alter table portal.avisos drop column unidades_borrador;
+    end if;
+  end if;
 end $$;
 
 drop table portal.respaldo_migracion_23;
@@ -170,6 +190,8 @@ select control, ok from (values
   ('anon vuelve a tener select de tabla en avisos',
      has_table_privilege('anon', 'portal.avisos', 'SELECT')),
   ('sin vista avisos_propietario', to_regclass('portal.avisos_propietario') is null),
+  ('sin borrar avisos desde una cuenta (como antes)',
+     not exists (select 1 from pg_policies where schemaname = 'portal' and policyname = 'avisos borrador se borra')),
   ('sin topes m23_', not exists (select 1 from pg_constraint where conname like 'm23\_%')),
   ('trg_aviso_sincroniza_os como antes (o no existe)',
      to_regprocedure('portal.trg_aviso_sincroniza_os()') is null

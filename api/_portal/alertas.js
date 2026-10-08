@@ -45,7 +45,9 @@ function modelo(r) {
   const dias = r.publicado_en ? Math.max(0, Math.floor((Date.now() - Date.parse(r.publicado_en)) / 864e5)) : null;
   return {
     op: r.operacion, tipoProp: r.tipo || 'Departamento', zona, precio: r.precio == null ? null : Number(r.precio), moneda: r.moneda === 'ARS' ? 'ARS' : 'USD', expensas: r.expensas == null ? null : Number(r.expensas),
-    amb: r.ambientes || null, dorm: r.dormitorios || null, banos: r.banos || null, cocheras: r.cocheras || 0, m2: r.m2_total || null, antiguedad: r.antiguedad == null ? null : Number(r.antiguedad),
+    /* 8/10/2026 (venta) · Sin el dato de dormitorios, ambientes menos uno (mínimo uno), como D.fromStore: si no, el
+       filtro "Dormitorios, mínimo" dejaba afuera todo aviso nuevo. Un 0 cargado (monoambiente) se respeta. */
+    amb: r.ambientes || null, dorm: r.dormitorios != null ? Number(r.dormitorios) : (r.ambientes ? Math.max(1, r.ambientes - 1) : null), banos: r.banos || null, cocheras: r.cocheras || 0, m2: r.m2_total || null, antiguedad: r.antiguedad == null ? null : Number(r.antiguedad),
     amenities: r.amenities || [], caracteristicas: r.caracteristicas || [], cualidades: r.cualidades_verificadas || [], amoblado: !!r.amoblado, video: !!r.video_url, reservado: r.estado === 'reservado',
     publicadorId: pubId, pubTipo: pub.tipo || 'profesional', dias,
     texto: [r.titulo || (r.direccion + (r.unidad ? ' · ' + r.unidad : '')), r.direccion, r.barrio, zona, r.descripcion, (r.amenities || []).join(' '), (r.cualidades_verificadas || []).join(' ')].join(' ').toLowerCase(),

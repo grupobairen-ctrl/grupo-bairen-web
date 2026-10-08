@@ -28,7 +28,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20261008d"><link rel="stylesheet" href="css/catalogo.css?v=20261008d"><link rel="stylesheet" href="css/portal.css?v=20261008d">
+  <link rel="stylesheet" href="css/base.css?v=20261008f"><link rel="stylesheet" href="css/catalogo.css?v=20261008f"><link rel="stylesheet" href="css/portal.css?v=20261008f">
   <style>
     .p-emp{display:grid;grid-template-columns:minmax(260px,42%) 1fr;background:var(--p-card);border:1px solid var(--p-line);border-radius:var(--p-radius);overflow:hidden;margin-bottom:18px}
     .p-emp .ph{position:relative;min-height:260px;background:var(--p-tray)} .p-emp .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
@@ -37,7 +37,20 @@
     .p-emp .desde{font-family:var(--font-display);font-size:1.4rem;color:var(--navy-deeper);margin:8px 0 2px} .p-emp .desde small{font-family:var(--font-body);font-size:.8rem;color:var(--text-mid)}
     .p-emp .facts{display:flex;gap:14px;flex-wrap:wrap;font-size:.86rem;color:var(--navy-deeper);margin:8px 0}
     .p-emp .units{margin-top:14px;border-top:1px solid var(--p-line);padding-top:12px} .p-emp .units summary{cursor:pointer;font-size:.86rem;color:var(--navy-deeper)}
-    @media(max-width:760px){.p-emp{grid-template-columns:1fr}}
+    /* 8/10/2026 (venta) · Las unidades van debajo de la foto y los datos, a todo el ancho, como una lista corta: la foto ya
+       no se estira cuando se abren, y en el celular no son seis tarjetas enormes con la misma foto */
+    .p-emp > .units{grid-column:1/-1;margin:0;padding:0 24px 6px;border-top:1px solid var(--p-line)}
+    .p-emp > .units summary{min-height:48px;display:flex;align-items:center}
+    .p-emp-us{list-style:none;margin:0 0 12px;padding:0}
+    .p-emp-us a{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr) minmax(0,.8fr) minmax(0,1.3fr);gap:10px;align-items:center;min-height:48px;padding:6px 0;border-top:1px solid var(--p-line);color:var(--navy-deeper);text-decoration:none;font:400 .9rem/1.3 var(--font-body)}
+    .p-emp-us a:hover .u{text-decoration:underline;text-underline-offset:3px}
+    .p-emp-us a:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+    .p-emp-us .u{font-weight:500}
+    .p-emp-us .pr{text-align:right;font-family:var(--font-display);font-size:1rem}
+    .p-emp-us .res{font:500 .66rem/1 var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:var(--text-mid)}
+    .p-emp-todos{display:inline-block;margin:0 0 16px}
+    .p-emp-us a > span{white-space:nowrap}
+    @media(max-width:760px){.p-emp{grid-template-columns:1fr}.p-emp > .units{padding:0 16px 4px}.p-emp-us a{grid-template-columns:minmax(0,1fr) auto auto minmax(96px,auto);font-size:.86rem;gap:12px}.p-emp-us .pr{font-size:.95rem}}
   </style>
 </head>
 <body class="p-emprendimientos">
@@ -50,7 +63,7 @@
   <div id="lista"><div class="p-skel" style="height:260px;border-radius:var(--p-radius);background:#EEE9DD"></div></div>
 </div></section>
 <div id="pFooter"></div>
-<script src="supabase-portal.js?v=20261008d" defer></script><script src="js/errores.js?v=20261008d" defer></script><script src="../mapa-barrios.js?v=20261008d" defer></script><script src="js/motion.js?v=20261008d" defer></script><script src="js/bairen-motion.js?v=20261008d" defer></script><script src="js/i18n-portal.js?v=20261008d" defer></script><script src="js/ui.js?v=20261008d" defer></script><script src="js/store.js?v=20261008d" defer></script><script src="js/data.js?v=20261008d" defer></script>
+<script src="supabase-portal.js?v=20261008f" defer></script><script src="js/errores.js?v=20261008f" defer></script><script src="../mapa-barrios.js?v=20261008f" defer></script><script src="js/motion.js?v=20261008f" defer></script><script src="js/bairen-motion.js?v=20261008f" defer></script><script src="js/i18n-portal.js?v=20261008f" defer></script><script src="js/ui.js?v=20261008f" defer></script><script src="js/store.js?v=20261008f" defer></script><script src="js/data.js?v=20261008f" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -58,24 +71,27 @@ document.addEventListener('DOMContentLoaded', function(){
   BP.header('venta'); BP.footer(); BP.reveal(); await BP.probePretty();
   /* Interfaz en el idioma elegido: lo estático va con data-i18n (lo aplica BP.header); lo que se arma acá usa BP.t(clave, castellano), así en es nada cambia. */
   document.title = BP.t('emp_title', 'Desarrollos · BAIREN');
-  /* La entrega viene como dato ("Diciembre 2027"): se traduce sólo el nombre del mes, respetando la mayúscula; en castellano queda igual. */
-  const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
-  const mesTr = s => { const tr = BP.t('emp_meses', MESES.join('|')).split('|'); return String(s).replace(/[A-Za-zÁÉÍÓÚÑáéíóúñ]+/g, w => { const i = MESES.indexOf(w.toLowerCase()); if (i < 0 || !tr[i]) return w; const t = tr[i]; return w[0] === w[0].toUpperCase() ? t[0].toUpperCase() + t.slice(1) : t; }); };
+  /* La entrega viene como dato ("Diciembre 2027"): se traduce sólo el nombre del mes (BPData.mesTr); en castellano queda igual. */
   const zona = BP.qs().get('zona');
+  /* 8/10/2026 (venta) · La página de un desarrollo: ?emp=<nombre>&pub=<publicador> (el link de la ficha de cada unidad) */
+  const empQ = BP.qs().get('emp'), pubQ = BP.qs().get('pub');
   const { avisos } = await BPData.load();
   let emps = BPData.emprendimientos(avisos.filter(a => a.op === 'venta')); if (zona) emps = emps.filter(e => e.zona === zona);
+  if (empQ) { const uno = emps.filter(e => e.nombre === empQ && (!pubQ || e.publicadorId === pubQ)); if (uno.length) emps = uno; }
+  const solo = !!empQ && emps.length === 1;
   const ETAPA = { pozo: BP.t('emp_pozo', 'En pozo'), construccion: BP.t('emp_construccion', 'En construcción'), terminado: BP.t('emp_terminado', 'Terminado') };
   const el = document.getElementById('lista');
   if (!emps.length) { el.innerHTML = `<div class="p-empty">${BP.tf('emp_vacio', 'Todavía no hay desarrollos publicados{donde}. Si sos desarrolladora, <a href="publicar.html#desarrolladora" style="text-decoration:underline">publicá el tuyo</a>.', { donde: zona ? BP.tf('emp_vacio_en', ' en {z}', { z: BP.esc(BP.zonaLabel(zona)) }) : '' })}</div>`; return; }
-  el.innerHTML = emps.map(e => { const pub = BPData.pub(e.publicadorId); return `<article class="p-emp" data-emp="${BP.esc(e.nombre)}">
-    <div class="ph">${e.foto ? `<img src="${BP.sbImg(e.foto, 900)}" alt="${BP.esc(e.nombre)}">` : ''}<span class="tag">${ETAPA[e.etapa] || ETAPA.construccion}${e.entrega ? BP.tf('emp_entrega', ' · entrega {d}', { d: BP.esc(mesTr(e.entrega)) }) : ''}</span></div>
+  const fila = u => `<li><a href="${BP.urlFicha(u)}"><span class="u">${BP.esc(u.unidad || BPData.titulo(u))}</span><span>${u.amb ? (u.amb === 1 ? BP.t('emp_amb_1', '1 amb.') : BP.tf('emp_amb', '{n} amb.', { n: u.amb })) : ''}</span><span>${u.m2 ? u.m2 + ' m²' : ''}</span><span class="pr">${u.reservado ? `<span class="res">${BP.t('card_reservada', 'Reservada')}</span>` : u.precio ? BP.fmtUSD(u.precio) : BP.t('ui_consultar', 'Consultar')}</span></a></li>`;
+  el.innerHTML = (solo ? `<a class="p-link p-emp-todos" href="emprendimientos.html">${BP.t('emp_ver_todos', 'Ver todos los desarrollos')}</a>` : '') + emps.map(e => { const pub = BPData.pub(e.publicadorId); return `<article class="p-emp" data-emp="${BP.esc(e.nombre)}">
+    <div class="ph">${e.foto ? `<img src="${BP.sbImg(e.foto, 900)}" alt="${BP.esc(e.nombre)}">` : ''}<span class="tag">${ETAPA[e.etapa] || ETAPA.construccion}${e.entrega ? BP.tf('emp_entrega', ' · entrega {d}', { d: BP.esc(BPData.mesTr(e.entrega)) }) : ''}</span></div>
     <div class="body"><h2>${BP.esc(e.nombre)}</h2><div class="p-barrio">${BP.esc(e.dir)}, ${BP.esc(e.barrio)}</div>
       <div class="desde">${e.desde ? BP.tf('emp_desde', 'Desde {p}', { p: BP.fmtUSD(e.desde) }) : BP.t('ui_consultar', 'Consultar')}</div>
       <div class="facts"><span>${e.unidades.length === 1 ? BP.t('emp_unidad_1', '1 unidad') : BP.tf('emp_unidades', '{n} unidades', { n: e.unidades.length })}</span>${e.ambmin ? `<span>${e.ambmin === e.ambmax ? (e.ambmin === 1 ? BP.t('emp_amb_1', '1 amb.') : BP.tf('emp_amb', '{n} amb.', { n: e.ambmin })) : BP.tf('emp_amb_rango', '{a} a {b} amb.', { a: e.ambmin, b: e.ambmax })}</span>` : ''}${e.m2min ? `<span>${e.m2min === e.m2max ? e.m2min + ' m²' : BP.tf('emp_m2_rango', '{a} a {b} m²', { a: e.m2min, b: e.m2max })}</span>` : ''}</div>
       <div class="p-publine">${BP.t('card_publica', 'Publica')} <b>${BP.esc(BPData.pubNombre(pub))}</b> ${BPData.badgeHTML(pub)}${pub.demo ? '<span class="p-badge demo">' + BP.t('card_ejemplo', 'Ejemplo') + '</span>' : ''}</div>
       <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">${pub.whatsapp ? `<a class="p-btn p-btn-sm p-btn-dark" href="https://wa.me/${encodeURIComponent(pub.whatsapp)}?text=${encodeURIComponent(BP.tf('emp_wa_msg', 'Hola, vi {t} en BAIREN y quiero más información.', { t: e.nombre }))}" target="_blank" rel="noopener" aria-label="${BP.esc(BP.tf('card_wa_aria', 'Escribir por WhatsApp a {p}', { p: BPData.pubNombre(pub) }))}" data-wa data-aviso="${BP.esc(e.key)}" data-pub="${BP.esc(pub.storeId || pub.id)}">${BP.ico.wa} WhatsApp</a>` : ''}${pub.email ? `<a class="p-btn p-btn-sm p-btn-navy" href="mailto:${encodeURIComponent(pub.email)}?subject=${encodeURIComponent(BP.tf('emp_mail_subject', 'Consulta por {t} desde BAIREN', { t: e.nombre }))}">${BP.ico.mail} ${BP.t('card_contactar', 'Contactar')}</a>` : '<span class="p-sincontacto">' + BP.t('card_contacto_pendiente', 'Contacto pendiente') + '</span>'}</div>
-      <details class="units"><summary>${e.unidades.length === 1 ? BP.t('emp_ver_unidad_1', 'Ver la unidad') : BP.tf('emp_ver_unidades', 'Ver las {n} unidades', { n: e.unidades.length })}</summary><div class="p-grid" style="margin-top:12px">${e.unidades.map(BPData.cardV).join('')}</div></details>
-    </div></article>`; }).join('');
+    </div>
+    <details class="units"${solo ? ' open' : ''}><summary>${e.unidades.length === 1 ? BP.t('emp_ver_unidad_1', 'Ver la unidad') : BP.tf('emp_ver_unidades', 'Ver las {n} unidades', { n: e.unidades.length })}</summary><ul class="p-emp-us">${e.unidades.map(fila).join('')}</ul></details></article>`; }).join('');
 })();
 });
 </script>

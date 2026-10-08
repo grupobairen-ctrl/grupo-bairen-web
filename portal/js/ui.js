@@ -89,6 +89,16 @@
   /* almacenamiento local (convivencia por visitante) */
   const store = key => ({ get(){ try{ return JSON.parse(localStorage.getItem(key)||'[]'); }catch(e){ return []; } }, set(v){ try{ localStorage.setItem(key, JSON.stringify(v)); }catch(e){} } });
   BP.favs = store('bp_favs'); BP.alerts = store('bp_alertas'); BP.consultas = store('bp_consultas'); BP.reportes = store('bp_reportes');
+  /* lanz3-visitante · Lo que se vio de cada guardada (título, calle, foto): si después se pausa, Guardados la sigue
+     mostrando como "Pausada por ahora" en vez de hacerla desaparecer. Se guarda al ver la ficha o al tocar el corazón. */
+  BP.favInfo = { get(){ try { return JSON.parse(localStorage.getItem('bp_favs_info') || '{}') || {}; } catch (e) { return {}; } }, set(v){ try { localStorage.setItem('bp_favs_info', JSON.stringify(v)); } catch (e) {} } };
+  BP.recordarFav = a => {
+    if (!a || !a.id || !window.BPData) return;
+    const m = BP.favInfo.get();
+    m[a.id] = { t: BPData.titulo(a), c: BPData.calle ? BPData.calle(a) : '', f: (a.fotos && a.fotos[0]) || '', op: a.op || '' };
+    const ids = Object.keys(m); if (ids.length > 60) ids.slice(0, ids.length - 60).forEach(k => { delete m[k]; });
+    BP.favInfo.set(m);
+  };
   BP.isFav = id => BP.favs.get().indexOf(id) > -1;
   BP.toggleFav = id => { const f=BP.favs.get(); const i=f.indexOf(id); if(i>-1) f.splice(i,1); else f.push(id); BP.favs.set(f); BP.syncFavCount(); if (window.BPStore && BPStore.syncFavorito) BPStore.syncFavorito(id, i===-1); return i===-1; };
   /* Sin sesión, el corazón del header aparece recién cuando hay algo guardado: el header anónimo no anuncia funciones que todavía no sirven */
@@ -103,6 +113,10 @@
     t.setAttribute('aria-live', tipo === 'error' ? 'assertive' : 'polite');
     t.classList.toggle('err', tipo === 'error');
     t.textContent = ''; setTimeout(() => { t.textContent = msg; }, 40);
+    /* lanz3-visitante · Nunca encima de una barra fija de abajo (la de la ficha con Visita y WhatsApp, o la de pestañas) */
+    let alto = 0;
+    document.querySelectorAll('#mcta, #pTabbar, .p-barra-fija').forEach(b => { const r = b.getBoundingClientRect(); if (r.height > 0 && getComputedStyle(b).display !== 'none' && r.top < innerHeight) alto = Math.max(alto, innerHeight - r.top); });
+    t.style.bottom = alto ? Math.round(alto + 12) + 'px' : '';
     t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), tipo === 'error' ? 5200 : 2600);
   };
   /* Region viva aparte para lo que cambia en la pagina y no es un aviso flotante */
@@ -118,7 +132,12 @@
     if (!el) { BP.toast(msg, 'error'); return; }
     let id = el.id ? el.id + '-err' : 'err-' + Math.random().toString(36).slice(2, 8);
     let box = document.getElementById(id);
-    if (!box) { box = document.createElement('p'); box.id = id; box.className = 'p-err-campo'; const cont = el.closest('.p-fld, .p-field, .cfield, label'); if (cont) cont.appendChild(box); else el.insertAdjacentElement('afterend', box); /* pegado al campo, no al final del formulario */ }
+    if (!box) { box = document.createElement('p'); box.id = id; box.className = 'p-err-campo'; const cont = el.closest('.p-fld, .p-field, .cfield, label');
+      /* lanz3-visitante · Una casilla ("Acepto…") vive en un rótulo en fila: el error adentro aplastaba el texto a una
+         palabra por renglón. Va debajo del rótulo, a la altura de la casilla. */
+      const casilla = el.type === 'checkbox' || el.type === 'radio';
+      if (casilla && cont && cont.tagName === 'LABEL') { box.classList.add('p-err-casilla'); cont.insertAdjacentElement('afterend', box); }
+      else if (cont) cont.appendChild(box); else el.insertAdjacentElement('afterend', box); /* pegado al campo, no al final del formulario */ }
     box.textContent = msg; box.hidden = false;
     el.setAttribute('aria-invalid', 'true'); el.setAttribute('aria-describedby', ((el.getAttribute('aria-describedby') || '').split(' ').filter(x => x && x !== id).concat(id)).join(' '));
     el.classList.add('p-invalido');
@@ -289,15 +308,19 @@
       if (BP.lang === 'es' || !window.BP_I18N || !window.BP_I18N[BP.lang]) return;
       root = root || document;
       document.documentElement.lang = BP.lang;
-      root.querySelectorAll('[data-i18n]').forEach(n => { const v = BP.i18n.t(n.dataset.i18n); if (v != null) n.textContent = v; });
+      root.querySelectorAll('[data-i18n]').forEach(n => { const v = BP.i18n.t(n.dataset.i18n); if (typeof v === 'string') n.textContent = v; });
       root.querySelectorAll('[data-i18n-html]').forEach(n => { const v = BP.i18n.t(n.dataset.i18nHtml); if (v != null) n.innerHTML = v; });
       root.querySelectorAll('[data-i18n-ph]').forEach(n => { const v = BP.i18n.t(n.dataset.i18nPh); if (v != null) n.setAttribute('placeholder', v); });
       root.querySelectorAll('[data-i18n-aria]').forEach(n => { const v = BP.i18n.t(n.dataset.i18nAria); if (v != null) n.setAttribute('aria-label', v); });
     }
   };
-  BP.t = (key, es) => { const v = BP.i18n.t(key); return v != null ? v : es; };
-  /* Igual que t, con {marcadores} que se reemplazan por vars; el castellano lleva los mismos marcadores */
-  BP.tf = (key, es, vars) => String(BP.t(key, es)).replace(/\{(\w+)\}/g, (m, k) => vars && vars[k] != null ? vars[k] : m);
+  BP.t = (key, es) => { const v = BP.i18n.t(key); return typeof v === 'function' ? String(v({})) : v != null ? v : es; };
+  /* Igual que t, con {marcadores} que se reemplazan por vars; el castellano lleva los mismos marcadores.
+     lanz3-visitante · Una traducción puede ser una función de vars, para lo que no es un reemplazo de texto
+     (en inglés y portugués, "2 ambientes" se dice por dormitorios: "1 bedroom", "1 quarto"). */
+  BP.tf = (key, es, vars) => { const f = BP.i18n.t(key); if (typeof f === 'function') return String(f(vars || {})); return String(BP.t(key, es)).replace(/\{(\w+)\}/g, (m, k) => vars && vars[k] != null ? vars[k] : m); };
+  /* lanz3-visitante · Dormitorios de un aviso: el dato, o ambientes menos uno cuando no está (un monoambiente no tiene) */
+  BP.dormDe = a => !a ? null : a.amb === 1 ? 0 : (a.dorm != null && a.dorm > 0) ? a.dorm : (a.amb > 1 ? a.amb - 1 : null);
   BP.idioma = function (root) {
     /* La barra derecha se vuelve a dibujar al abrir sesión, así que el selector
        se crea si falta en vez de vivir sólo en la plantilla. */
@@ -376,16 +399,20 @@
     <div class="p-lang" role="group" aria-label="Idioma" data-i18n-aria="idioma"><button type="button" data-lang="es">ES</button><button type="button" data-lang="pt">PT</button><button type="button" data-lang="en">EN</button></div>
     <button type="button" class="p-ghost p-bell p-solo-sesion" aria-label="Notificaciones" data-i18n-aria="notificaciones" data-notif hidden>${BP.ico.bell}<span class="dot" hidden></span></button>
     <a class="p-ghost p-solo-sesion" href="ingresar.html?volver=contactos" hidden>${BP.ico.chat} <span data-i18n="mis_contactos">Mis contactos</span></a>
-    <a class="p-ghost p-fav-anon" href="buscar.html?favs=1" aria-label="Favoritos" data-i18n-aria="favoritos" hidden>${BP.ico.heart}<span data-fav-count hidden></span></a>
+    <a class="p-ghost p-fav-anon" href="guardados.html" aria-label="Guardados" data-i18n-aria="tab_guardados" hidden>${BP.ico.heart}<span data-fav-count hidden></span></a>
     <a class="p-btn p-btn-sm" href="publicar.html" data-i18n="publicar">Publicar</a>
     <a class="p-btn p-btn-sm p-btn-fill" href="ingresar.html" data-i18n="ingresar">Ingresar</a>
   </div>
+  <!-- lanz3-visitante · En la portada del celular, Publicar a la vista sin abrir el menú -->
+  <a class="p-pub-movil" href="publicar.html" data-i18n="publicar">Publicar</a>
   <button class="burger" id="burger" type="button" aria-label="Menú" data-i18n-aria="menu" aria-expanded="false" aria-controls="mobileMenu"><span></span><span></span><span></span></button>
 </nav>
 <!-- 8/10/2026 · Tanda 2 · Con la barra de abajo (celular), el menú lleva sólo lo que no está en ella: Desarrollos,
      Cómo seleccionamos, Publicar y el idioma. Lo marcado m-sin-tabbar se ve sólo donde no hay barra (la ficha, una tableta). -->
 <div class="mobile-menu" id="mobileMenu" role="dialog" aria-modal="true" aria-label="${BP.t('menu', 'Menú')}">
   <a href="buscar.html" class="m-link m-sin-tabbar" data-sec="propiedades" data-i18n="nav_propiedades">Propiedades</a>
+  <!-- lanz3-visitante · Donde no hay barra de abajo (la ficha), Guardados va en el menú -->
+  <a href="guardados.html" class="m-link m-sin-tabbar" data-i18n="tab_guardados">Guardados</a>
   <a href="emprendimientos.html" class="m-link" data-sec="emprendimientos" data-i18n="emprendimientos">Desarrollos</a>
   <a href="criterios.html" class="m-link" data-sec="criterios" data-i18n="criterios">Cómo seleccionamos</a>
   <div class="m-cuenta m-sin-tabbar" hidden></div>
@@ -513,16 +540,23 @@
     const ses = window.BPStore && window.BPStore.session;
     const items = [
       ['inicio', 'index.html', BP.ico.home, BP.t('tab_inicio', 'Inicio')],
-      ['buscar', 'buscar.html', BP.ico.search, BP.t('tab_buscar', 'Buscar')],
+      ['buscar', BP.ultimaBusqueda(), BP.ico.search, BP.t('tab_buscar', 'Buscar')],
       ['guardados', 'guardados.html', BP.ico.heart, BP.t('tab_guardados', 'Guardados')],
       ['cuenta', ses ? 'panel.html' : 'ingresar.html', BP.ico.user, BP.t('tab_cuenta', 'Cuenta')]
     ];
     const bar = document.createElement('div');
     bar.id = 'pTabbar'; bar.className = 'p-tabbar'; bar.setAttribute('role', 'navigation'); bar.setAttribute('aria-label', BP.t('tab_aria', 'Accesos'));
-    bar.innerHTML = items.map(i => `<a href="${i[1]}" data-tab="${i[0]}"${i[0] === act ? ' class="on" aria-current="page"' : ''}>${i[2]}<span>${BP.esc(i[3])}</span></a>`).join('');
+    bar.innerHTML = items.map(i => `<a href="${BP.esc(i[1])}" data-tab="${i[0]}"${i[0] === act ? ' class="on" aria-current="page"' : ''}>${i[2]}<span>${BP.esc(i[3])}</span></a>`).join('');
     b.appendChild(bar);
     document.documentElement.classList.add('con-tabbar');
   };
+  /* lanz3-visitante · La pestaña Buscar vuelve a la última búsqueda de esta visita, con sus filtros (buscar.html la
+     anota en cada cambio). Sólo direcciones del catálogo dentro del portal; si no hay, el catálogo de siempre. */
+  BP.anotarBusqueda = url => { try { if (/^(buscar\.html|(departamentos|pisos|ph|casas|propiedades)-[a-z0-9-]+)(\?[^\s"'<>]*)?$/i.test(url)) sessionStorage.setItem('bp_ultima_busqueda', url); } catch (e) {} };
+  BP.ultimaBusqueda = () => { try { const u = sessionStorage.getItem('bp_ultima_busqueda') || ''; if (/^(buscar\.html|(departamentos|pisos|ph|casas|propiedades)-[a-z0-9-]+)(\?[^\s"'<>]*)?$/i.test(u)) return u; } catch (e) {} return 'buscar.html'; };
+  /* lanz3-visitante · Ingresar desde una acción (crear una alerta, guardar): después del código se vuelve a esta misma
+     página, con sus filtros. ingresar.html sólo acepta direcciones de este portal. */
+  BP.urlIngresar = () => { let aqui = 'index.html'; try { aqui = (location.pathname.split('/').pop() || 'index.html') + location.search; } catch (e) {} return 'ingresar.html?volver=' + encodeURIComponent(aqui); };
 
   /* ── 12/9 · La imagen de la cuenta ─────────────────────
      Lo que devuelve BPStore.getAvatar(): un ícono de img/avatares o la foto propia, siempre cuadrada, angular y con
@@ -553,7 +587,7 @@
       /* 11/9 noche · El desplegable "Mi cuenta" muestra lo mismo que el riel del panel: las vistas según el perfil
          de la cuenta (BPStore.rielDe; sin perfil, la lista completa). Los rótulos van por BP.t, con las claves
          del bloque "header con sesión y perfil" de i18n-portal.js, así el header con sesión también habla EN y PT. */
-      const VISTAS = { avisos: ['mis_avisos', 'Mis avisos', 'panel.html#avisos'], propiedades: ['mis_propiedades', 'Mis propiedades', 'panel.html#propiedades'], interesados: ['interesados', 'Interesados', 'panel.html#interesados'], importar: ['importar_cartera', 'Importar cartera', 'importar.html'], os: ['bairen_os', 'Bairen OS', BP.OS_URL], contactos: ['mis_contactos', 'Mis contactos', 'panel.html#contactos'], favoritos: ['favoritos', 'Favoritos', 'buscar.html?favs=1'], alertas: ['alertas', 'Búsquedas y alertas', 'panel.html#alertas'], cuenta: ['mi_cuenta', 'Mi cuenta', 'panel.html#cuenta'] };
+      const VISTAS = { avisos: ['mis_avisos', 'Mis avisos', 'panel.html#avisos'], propiedades: ['mis_propiedades', 'Mis propiedades', 'panel.html#propiedades'], interesados: ['interesados', 'Interesados', 'panel.html#interesados'], importar: ['importar_cartera', 'Importar cartera', 'importar.html'], os: ['bairen_os', 'Bairen OS', BP.OS_URL], contactos: ['mis_contactos', 'Mis contactos', 'panel.html#contactos'], favoritos: ['favoritos', 'Favoritos', 'guardados.html'], alertas: ['alertas', 'Búsquedas y alertas', 'panel.html#alertas'], cuenta: ['mi_cuenta', 'Mi cuenta', 'panel.html#cuenta'] };
       const riel = (window.BPStore && BPStore.rielDe) ? BPStore.rielDe(session.perfil || null) : Object.keys(VISTAS);
       const vistas = riel.map(id => VISTAS[id]).filter(Boolean).map(v => `<a href="${v[2]}">${BP.t(v[0], v[1])}</a>`).join('');
       /* 12/9 · Con imagen elegida (ícono o foto), el botón la muestra a 22 px en lugar del ícono genérico; sin imagen, el ícono de siempre */
@@ -561,20 +595,24 @@
       const avH = BP.ico.user;   /* 12/9: la imagen de la cuenta se ve en el panel, no en el botón del header (pedido de Tomás) */
       right.innerHTML = `<button type="button" class="p-ghost p-bell" aria-label="${BP.esc(BP.t('notificaciones', 'Notificaciones'))}" data-notif>${BP.ico.bell}<span class="dot" hidden></span></button>
         <a class="p-ghost" href="panel.html#contactos">${BP.ico.chat} ${BP.t('mis_contactos', 'Mis contactos')}</a>
-        <a class="p-ghost" href="buscar.html?favs=1" aria-label="${BP.esc(BP.t('favoritos', 'Favoritos'))}">${BP.ico.heart}<span data-fav-count hidden></span></a>
+        <a class="p-ghost" href="guardados.html" aria-label="${BP.esc(BP.t('tab_guardados', 'Guardados'))}">${BP.ico.heart}<span data-fav-count hidden></span></a>
         <div class="p-crear"><a class="p-btn p-btn-sm" href="publicar-aviso.html" data-crear>${BP.t('publicar', 'Publicar')}</a><div class="p-crear-pop" hidden><p class="t">${BP.t('quien_publica', '¿Quién publica?')}</p><a href="publicar-aviso.html?perfil=dueno">${BP.t('soy_dueno_directo', 'Soy dueño directo')}</a><a href="publicar-aviso.html?paso=perfil">${BP.t('soy_profesional', 'Inmobiliaria, corredor o desarrolladora')}</a></div></div>
         <div class="p-nav-menu" style="display:flex"><div><button type="button" class="p-btn p-btn-sm p-btn-fill" aria-haspopup="true" style="padding:0 14px">${avH} ${BP.t('mi_cuenta', 'Mi cuenta')} <span class="car" style="border-color:var(--navy-deeper)"></span></button>
           <div class="p-dd p-dd-cuenta" style="left:auto;right:0"><div class="p-dd-ttl">${BP.esc(session.email)}${modeTag}</div>${vistas}<a href="curacion.html" data-curador hidden>${BP.t('curacion', 'Curación')}</a><a href="#" data-logout>${BP.t('cerrar_sesion', 'Cerrar sesión')}</a></div></div></div>`;
       if (mob) {
         const cta = mob.querySelector('.m-cta'); if (cta) cta.innerHTML = `<a class="p-btn p-btn-sm" href="publicar-aviso.html">${BP.t('publicar', 'Publicar')}</a><a class="p-btn p-btn-sm p-btn-fill m-sin-tabbar" href="panel.html">${BP.t('mi_cuenta', 'Mi cuenta')}</a>`;
-        const cuenta = mob.querySelector('.m-cuenta'); if (cuenta) { cuenta.hidden = false; cuenta.innerHTML = `<a href="buscar.html?favs=1">${BP.ico.heart} <span data-i18n="favoritos">Favoritos</span></a><a href="panel.html#contactos">${BP.ico.chat} <span data-i18n="mis_contactos">Mis contactos</span></a>`; }
+        /* lanz3-visitante · Guardados ya es un renglón del menú: acá quedan los contactos */
+        const cuenta = mob.querySelector('.m-cuenta'); if (cuenta) { cuenta.hidden = false; cuenta.innerHTML = `<a href="panel.html#contactos">${BP.ico.chat} <span data-i18n="mis_contactos">Mis contactos</span></a>`; }
+        /* lanz3-visitante · Cerrar sesión, a un toque desde el menú (antes eran cuatro gestos dentro del panel) */
+        if (!mob.querySelector('.m-salir')) { const ref = mob.querySelector('.m-cta'); if (ref) { ref.insertAdjacentHTML('afterend', `<button type="button" class="m-salir" data-logout>${BP.esc(BP.t('cerrar_sesion', 'Cerrar sesión'))}</button>`); if (!mob.classList.contains('open')) mob.querySelector('.m-salir').tabIndex = -1; } }
       }
       BP.avatarFallback(right, session.email); if (mob) BP.avatarFallback(mob, session.email);
       document.querySelectorAll('#pTabbar [data-tab="cuenta"]').forEach(a => { a.href = 'panel.html'; });
-      right.querySelectorAll('[data-logout]').forEach(b => b.addEventListener('click', async e => { e.preventDefault(); await window.BPStore.signOut(); BP.toast(BP.t('ui_sesion_cerrada', 'Sesión cerrada.')); setTimeout(() => location.href = 'index.html', 600); }));
+      document.querySelectorAll('.p-nav-right [data-logout], .mobile-menu [data-logout]').forEach(b => { if (b._salir) return; b._salir = true; b.addEventListener('click', async e => { e.preventDefault(); await window.BPStore.signOut(); BP.toast(BP.t('ui_sesion_cerrada', 'Sesión cerrada.')); setTimeout(() => location.href = 'index.html', 600); }); });
       if (window.BPStore) window.BPStore.isCurador().then(ok => { right.querySelectorAll('[data-curador]').forEach(a => a.hidden = !ok); });
-    } else if (mode === 'local') {
-      const ing = right.querySelector('a[href="ingresar.html"]'); if (ing && !ing.dataset.tagged) { ing.dataset.tagged = '1'; ing.insertAdjacentHTML('afterend', modeTag); }
+    } else {
+      if (mob) mob.querySelectorAll('.m-salir').forEach(b => b.remove());
+      if (mode === 'local') { const ing = right.querySelector('a[href="ingresar.html"]'); if (ing && !ing.dataset.tagged) { ing.dataset.tagged = '1'; ing.insertAdjacentHTML('afterend', modeTag); } }
     }
     document.querySelectorAll('[data-notif]').forEach(el => el.addEventListener('click', () => BP.toast(session ? BP.t('ui_sin_notif', 'No tenés notificaciones nuevas.') : BP.t('ui_ingresa_notif', 'Ingresá para ver tus notificaciones.'))));
     BP.syncFavCount(); if (BP.i18n) BP.i18n.apply(document);
@@ -591,6 +629,13 @@
   };
   BP.estadoLabel = e => ({ borrador:'Borrador', en_revision:'En revisión', publicado:'Publicado', rechazado:'Rechazado', pausado:'Pausado', vencido:'Vencido' })[e] || e;
   BP.estadoBadge = e => `<span class="p-badge ${e==='publicado'?'':e==='rechazado'?'demo':'dueno'}">${BP.estadoLabel(e)}</span>`;
+
+  /* lanz3-visitante · Al guardar desde una tarjeta, se anota qué era (para Guardados, si después se pausa). La ficha lo
+     anota sola; en el resto de las páginas el catálogo ya está cargado y BPData.load() lo devuelve sin pedir nada. */
+  document.addEventListener('bp:fav', e => {
+    if (!e.detail || !e.detail.on || !window.BPData || (document.body && document.body.classList.contains('p-ficha-page'))) return;
+    BPData.load().then(d => { const a = (d.avisos || []).find(x => x.id === e.detail.id); if (a) BP.recordarFav(a); }).catch(() => {});
+  });
 
   /* 4.2 El canal dominante es WhatsApp y no dejaba rastro. Se registra al salir, sin frenar el clic. */
   document.addEventListener('click', e => {

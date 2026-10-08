@@ -29,7 +29,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20261008d"><link rel="stylesheet" href="css/catalogo.css?v=20261008d"><link rel="stylesheet" href="css/portal.css?v=20261008d"><link rel="stylesheet" href="css/publicar.css?v=20261008d">
+  <link rel="stylesheet" href="css/base.css?v=20261008f"><link rel="stylesheet" href="css/catalogo.css?v=20261008f"><link rel="stylesheet" href="css/portal.css?v=20261008f"><link rel="stylesheet" href="css/publicar.css?v=20261008f">
 </head>
 <!-- data-flujo: ui.js no dibuja el pie ni la barra inferior de la app. Esta página tampoco llama a BP.header ni a BP.footer:
      arriba va su propia barra (Atrás, avance, Salir) y abajo el botón Continuar fijo. -->
@@ -48,10 +48,11 @@
   <p class="pf-modo" id="modeNote"></p>
 </main>
 <div class="pf-pie" id="pfPie"><div class="pf-pie-in" id="pfPieIn"><button type="button" class="pf-seguir" id="pfSeguir" disabled>Continuar</button></div></div>
-<script src="supabase-portal.js?v=20261008d" defer></script><script src="js/errores.js?v=20261008d" defer></script><script src="js/motion.js?v=20261008d" defer></script><script src="js/bairen-motion.js?v=20261008d" defer></script><script src="js/i18n-portal.js?v=20261008d" defer></script><script src="js/ui.js?v=20261008d" defer></script><script src="js/store.js?v=20261008d" defer></script><script src="js/data.js?v=20261008d" defer></script>
+<script src="supabase-portal.js?v=20261008f" defer></script><script src="js/errores.js?v=20261008f" defer></script><script src="js/motion.js?v=20261008f" defer></script><script src="js/bairen-motion.js?v=20261008f" defer></script><script src="js/i18n-portal.js?v=20261008f" defer></script><script src="js/ui.js?v=20261008f" defer></script><script src="js/store.js?v=20261008f" defer></script><script src="js/data.js?v=20261008f" defer></script>
 <script>
 /* Publicar · el recorrido en ocho pantallas cortas (8/10/2026, tanda 2 del lanzamiento).
    1 ¿Qué publicás?  2 Ingreso (si no hay sesión, a ingresar.html y vuelta acá)  3 Tu empresa (una vez por cuenta)
+   3b Tus documentos (solo el dueño directo, si faltan: DNI y titularidad; se puede dejar para después)
    4 La propiedad  5 Precio (según la operación; emprendimiento: unidades)  6 Fotos  7 Descripción y lo que tiene
    8 Revisar y enviar. Después, Recibido. Cada Continuar valida su pantalla y guarda el borrador (si ya tiene calle y altura).
    Editar un aviso abre directo la pantalla que le falta, o Revisar si está completo; desde Revisar, "Cambiar" lleva a
@@ -76,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function(){
     const perfil = perfilQs || (que === 'emprendimiento' ? 'desarrolladora' : '');
     location.href = 'ingresar.html?volver=publicar' + (perfil ? '&perfil=' + encodeURIComponent(perfil) : '');
   }
-  if ((editId || copiaId || pasoQs === 'perfil') && !haySesion()) { irAIngresar(null); return; }
+  if ((editId || copiaId || pasoQs === 'perfil' || pasoQs === 'documentos') && !haySesion()) { irAIngresar(null); return; }
   let vuelta = null;
   if (haySesion()) { try { vuelta = JSON.parse(sessionStorage.getItem(VUELTA) || 'null'); sessionStorage.removeItem(VUELTA); } catch (e) { vuelta = null; } }
   if (vuelta && !(Date.now() - (vuelta.t || 0) < 2 * 3600e3)) vuelta = null;   /* una vuelta vieja no decide nada */
@@ -88,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function(){
   /* Una zona sin lista ofrece la zona misma como barrio; el barrio que ya tiene el aviso (un importado) no se pierde */
   const barriosDe = (z, actual) => { const l = (BARRIOS[z] || [z]).slice(); if (actual && l.indexOf(actual) === -1) l.unshift(actual); return l; };
   /* Contrato de operación (8/10/2026): los valores de la base no cambian; estas son las etiquetas */
-  const OP_TXT = { venta: T('pub2_op_venta', 'Venta'), alquiler: T('pub2_op_alquiler', 'Alquiler tradicional'), mediano: T('pub2_op_mediano', 'Mediano plazo (3 a 12 meses)') };
+  const OP_TXT = { venta: T('pub2_op_venta', 'Venta'), alquiler: T('pub2_op_alq', 'Alquiler'), mediano: T('pub2_op_mediano', 'Mediano plazo (3 a 12 meses)') };
   /* Lo que incluye el mediano plazo y las garantías del tradicional van en caracteristicas, con estos textos exactos */
   const INCLUYE = ['Expensas incluidas', 'Servicios incluidos', 'Internet incluido', 'Limpieza incluida', 'Ropa blanca incluida'];
   const GARANTIAS = ['Acepta seguro de caución', 'Acepta garantía propietaria'];
@@ -102,29 +103,48 @@ document.addEventListener('DOMContentLoaded', function(){
   const ICO = {
     mediano: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 11V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v3"/><path d="M3 13a2 2 0 0 1 4 0v2h10v-2a2 2 0 0 1 4 0v5H3z"/><path d="M6 18v2M18 18v2"/></svg>',
     tradicional: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 11 9-7 9 7v10h-6v-6H9v6H3z"/></svg>',
+    venta: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M17 6l3 3M15 8l2 2"/></svg>',
     emprendimiento: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3h16v18H4z"/><path d="M8 7h2M14 7h2M8 11h2M14 11h2M8 15h2M14 15h2M10 21v-3h4v3"/></svg>',
     camara: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h4l2-3h6l2 3h4v12H3z"/><circle cx="12" cy="13.5" r="3.5"/></svg>',
     mas: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="19" cy="12" r="1.6" fill="currentColor"/></svg>',
     check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>'
   };
-  const precioTxt = (precio, moneda) => precio == null || precio === '' ? T('pub2_sin_precio', 'Sin precio') : moneda === 'ARS' ? '$ ' + BP.fmtN(Math.round(Number(precio))) : BP.fmtUSD(Number(precio));
+  const precioTxt = (precio, moneda) => precio == null || precio === '' ? T('pub2_sin_precio', 'Sin precio') : moneda === 'ARS' ? '$\u00a0' + BP.fmtN(Math.round(Number(precio))) : BP.fmtUSD(Number(precio));
   /* Números como los escribe la gente: "1.400", "1400", "45,5". Vacío = null. */
   const num = s => { const t = String(s == null ? '' : s).trim(); if (!t) return null; const d = t.replace(/\.(?=\d{3}(\D|$))/g, '').replace(',', '.').replace(/[^\d.]/g, ''); return d === '' || isNaN(Number(d)) ? null : Number(d); };
   const entero = s => { const n = num(s); return n == null ? null : Math.round(n); };
   const miles = n => n == null || n === '' ? '' : BP.fmtN(Math.round(Number(n)));
   const fechaTxt = s => { const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(s || '')); return m ? Number(m[3]) + '/' + Number(m[2]) + '/' + m[1] : ''; };
   /* WhatsApp: se acepta como lo escribe la gente (11 2345-6789, 011 15 2345 6789) y se guarda con 54 9 */
-  const waNorm = s => { let d = String(s || '').replace(/\D/g, ''); if (d.indexOf('00') === 0) d = d.slice(2); if (d.indexOf('54') === 0) return d.length === 12 && d[2] !== '9' ? '549' + d.slice(2) : d; if (d[0] === '0') d = d.slice(1); if (d.length === 12 && d.indexOf('1115') === 0) d = '11' + d.slice(4); return d.length === 10 ? '549' + d : d; };
+  /* 8/10/2026 (lanz3-publicador) · La misma función que usa Interesados para el enlace de WhatsApp (store.js) */
+  const waNorm = BPStore.waNorm;
+  /* Y se muestra como se escribe: 5491147820000 → "11 4782-0000". Fuera del 11, el número sin el 54 9. waNorm lo vuelve a leer igual. */
+  const waVer = s => { const d = String(s || '').replace(/\D/g, ''); if (/^54911\d{8}$/.test(d)) return '11 ' + d.slice(5, 9) + '-' + d.slice(9); if (/^549\d{10}$/.test(d)) return d.slice(3); return s || ''; };
 
   let pub = haySesion() ? await BPStore.getMyPublicador() : null;
   /* El DNI vive en la persona (migración 01): se trae para que el perfil no aparezca vacío */
   if (pub && !pub.dni && BPStore.getMyPersona) { try { const per = await BPStore.getMyPersona(); if (per && per.dni) pub = Object.assign({}, pub, { dni: per.dni }); } catch (e) { /* sin persona */ } }
+  /* 8/10/2026 (venta) · El dueño directo manda su DNI y un comprobante de titularidad. Qué mandó ya: sus verificaciones
+     con documento (null si no se pudieron leer: entonces no se le pide nada de más). */
+  let verifs = pub && pub.tipo === 'dueno' && BPStore.misVerificaciones ? await BPStore.misVerificaciones(pub.id) : null;
+  const docsDe = () => BPStore.docsEnviados ? BPStore.docsEnviados(verifs) : {};
+  const faltanDocs = () => !!(pub && pub.tipo === 'dueno' && !pub.verificado && Array.isArray(verifs) && !(docsDe().dni && docsDe().titularidad));
+  const DOCS_DESPUES = 'bp_docs_despues';   /* tocó "Los subo después": en esta visita no se le vuelve a pedir */
+  const docsDespues = () => { try { return sessionStorage.getItem(DOCS_DESPUES) === '1'; } catch (e) { return false; } };
   let aviso = editId ? await BPStore.getAviso(editId) : null;
   if (editId && !aviso) BP.toast(T('pub2_no_encontrado', 'No encontramos ese aviso. Podés cargar uno nuevo.'), 'error');
+  /* 8/10/2026 (lanz3-publicador) · Un curador que abre un aviso ajeno desde Curación lo corrige sin perfil de publicador:
+     no pasa por Tu empresa ni por Tus documentos (nunca se le crea un publicador), el aviso no cambia de estado ni de
+     dueño, la vista previa dice quién lo publica y al terminar vuelve a Curación. */
+  const modoCurador = !!(aviso && aviso.id && aviso.publicador_id && (!pub || aviso.publicador_id !== pub.id) && await BPStore.isCurador());
+  const pubAviso = modoCurador ? ((BPStore.getPublicador && await BPStore.getPublicador(aviso.publicador_id)) || { id: aviso.publicador_id, nombre: '' }) : null;
+  const pubVista = () => modoCurador ? pubAviso : pub;   /* a nombre de quién se ve el aviso */
+  /* El motivo de la curación, arriba del editor: cambios pedidos (borrador con motivo) o rechazo */
+  const motivoPrevio = !modoCurador && aviso && aviso.motivo_rechazo && (aviso.estado_curacion === 'borrador' || aviso.estado_curacion === 'rechazado') ? { txt: aviso.motivo_rechazo, rechazo: aviso.estado_curacion === 'rechazado' } : null;
   /* "Publicar otra parecida" (?copia=<id>): un aviso nuevo con los datos de uno propio. Dirección, unidad y fotos
      quedan vacías, y tampoco se copia lo que es de cada unidad (título, piso, cualidades, video, mail del propietario).
      En un emprendimiento la dirección es la del edificio: esa sí se copia. */
-  const COPIA = ['operacion','tipo','zona','barrio','precio','moneda','ambientes','dormitorios','banos','cocheras','antiguedad','m2_total','m2_cubierto','expensas','mostrar_direccion','amenities','caracteristicas','descripcion','plazo','emprendimiento','etapa','entrega'];
+  const COPIA = ['operacion','tipo','zona','barrio','precio','moneda','ambientes','dormitorios','banos','cocheras','antiguedad','m2_total','m2_cubierto','expensas','mostrar_direccion','amenities','caracteristicas','descripcion','plazo','disponible_desde','emprendimiento','etapa','entrega'];
   let copiaDe = null;
   if (!aviso && copiaId && pub) { const o = await BPStore.getAviso(copiaId); if (o && o.publicador_id === pub.id) { copiaDe = o; aviso = { amenities: [], caracteristicas: [], cualidades: [], fotos: [], estado_curacion: 'borrador' }; COPIA.forEach(k => { if (o[k] != null) aviso[k] = Array.isArray(o[k]) ? o[k].slice() : o[k]; }); if (o.emprendimiento) aviso.direccion = o.direccion; } }
   if (!aviso) aviso = { tipo: 'Departamento', zona: '', barrio: '', amenities: [], caracteristicas: [], cualidades: [], fotos: [], mostrar_direccion: 'aproximada', estado_curacion: 'borrador' };
@@ -133,24 +153,43 @@ document.addEventListener('DOMContentLoaded', function(){
 
   /* Qué se publica: mediano, tradicional (venta o alquiler) o emprendimiento (una desarrolladora que vende por unidades) */
   const claseDe = a => (a.emprendimiento || a.etapa) ? 'emprendimiento' : a.operacion === 'mediano' ? 'mediano' : (a.operacion === 'venta' || a.operacion === 'alquiler') ? 'tradicional' : null;
-  const SUGERIDA = { gestor: 'mediano', desarrolladora: 'emprendimiento', profesional: 'tradicional', inmobiliaria: 'tradicional', corredor: 'tradicional', dueno: 'tradicional' };
-  let clase = claseDe(aviso) || (vuelta && vuelta.q) || null;
+  /* 8/10/2026 (lanz3-publicador) · En la pantalla 1 venta y alquiler son dos opciones (antes una sola, "Venta o alquiler
+     tradicional", y la operación se elegía recién en Precio con Venta y dólares de entrada). Las dos son la clase
+     'tradicional'; lo elegido fija la operación, y un alquiler arranca en pesos. */
+  const SUGERIDA = { gestor: 'mediano', desarrolladora: 'emprendimiento', profesional: 'venta', inmobiliaria: 'venta', corredor: 'venta', dueno: 'venta' };
+  const CLASE_DE = { mediano: 'mediano', venta: 'tradicional', alquiler: 'tradicional', tradicional: 'tradicional', emprendimiento: 'emprendimiento' };
+  const eleccionDe = a => { const c = claseDe(a); return c === 'tradicional' ? a.operacion : c; };
+  /* Lo elegido ahora: la clase vigente manda. Un emprendimiento recién elegido todavía no tiene nombre ni etapa y,
+     leído solo del aviso, pasaría por una venta (y al volver del ingreso se cargaba como una sola unidad). */
+  const eleccionActual = () => clase === 'tradicional' ? (eleccionDe(aviso) || 'venta') : (clase || eleccionDe(aviso) || null);
+  let clase = claseDe(aviso) || CLASE_DE[vuelta && vuelta.q] || null;
   const modoPerfil = pasoQs === 'perfil' && !!pub;   /* "Editar perfil de publicador" desde el panel */
-  /* Editar o no cambia el estado: un aviso en revisión o publicado sigue igual al guardar */
-  const enCurso = () => aviso.estado_curacion === 'en_revision' || aviso.estado_curacion === 'publicado';
-  const estadoAlGuardar = () => enCurso() ? aviso.estado_curacion : 'borrador';
+  const modoDocs = pasoQs === 'documentos' && !!pub && pub.tipo === 'dueno';   /* "Cargar documentos" desde el panel */
+  /* Editar o no cambia el estado: un aviso en revisión, publicado o pausado sigue igual al guardar (8/10/2026,
+     lanz3-publicador: el pausado pasaba a borrador y perdía "Reactivar"). Uno rechazado sigue rechazado hasta que se
+     reenvía. En modo curador nunca cambia. */
+  const enCurso = () => modoCurador || ['en_revision', 'publicado', 'pausado'].indexOf(aviso.estado_curacion) > -1;
+  const estadoAlGuardar = () => enCurso() ? aviso.estado_curacion : aviso.estado_curacion === 'rechazado' ? 'rechazado' : 'borrador';
   const tieneDireccion = () => !!String(aviso.direccion || '').trim();
 
   /* ── Emprendimiento: las unidades. La primera es el aviso base (el borrador que se guarda al pasar de pantalla);
-     al enviar, cada una es un aviso de venta con las mismas fotos, descripción y nombre. La lista del borrador se
-     recuerda en este navegador hasta que se envía. Al editar una unidad ya enviada, se edita solo esa. ── */
+     al enviar, cada una es un aviso de venta con las mismas fotos, descripción y nombre. Al editar una unidad ya
+     enviada, se edita solo esa.
+     8/10/2026 (venta) · La lista del borrador se guarda con el aviso base, en la base (avisos.unidades_borrador,
+     migración 23): se sigue desde otro dispositivo. Mientras la base no tenga la columna, se recuerda en este
+     navegador (bp_pub_unidades_<id>) y el paso de unidades avisa que el envío se termina desde acá. ── */
   const UKEY = id => 'bp_pub_unidades_' + id;
   const unaUnidad = !!(editId && aviso.id && aviso.estado_curacion !== 'borrador');
   const unidadDe = a => ({ id: a.id || null, unidad: a.unidad || '', ambientes: a.ambientes || null, m2_total: a.m2_total || null, precio: a.precio != null && a.precio !== '' ? Number(a.precio) : null, estado: a.estado === 'reservado' ? 'reservado' : 'disponible' });
+  const listaEnBase = () => !BPStore.hayUnidadesBorrador || BPStore.hayUnidadesBorrador();
   let unidades = [];
   function iniciarUnidades(){
-    let guardadas = null; if (aviso.id && !unaUnidad) { try { guardadas = JSON.parse(localStorage.getItem(UKEY(aviso.id)) || 'null'); } catch (e) { guardadas = null; } }
-    unidades = Array.isArray(guardadas) && guardadas.length ? guardadas : [unidadDe(aviso)];
+    let guardadas = null;
+    if (aviso.id && !unaUnidad) {
+      if (Array.isArray(aviso.unidades_borrador) && aviso.unidades_borrador.length) guardadas = aviso.unidades_borrador;
+      else { try { guardadas = JSON.parse(localStorage.getItem(UKEY(aviso.id)) || 'null'); } catch (e) { guardadas = null; } }
+    }
+    unidades = Array.isArray(guardadas) && guardadas.length ? guardadas.map(u => Object.assign({ id: null, unidad: '', ambientes: null, m2_total: null, precio: null, estado: 'disponible' }, u)) : [unidadDe(aviso)];
     if (copiaDe) unidades = [Object.assign(unidadDe(aviso), { id: null, unidad: '' })];
     unidades[0].id = aviso.id || null;
   }
@@ -169,23 +208,27 @@ document.addEventListener('DOMContentLoaded', function(){
     a.moneda = a.operacion === 'alquiler' && a.moneda === 'ARS' ? 'ARS' : 'USD';
     a.amoblado = a.operacion === 'mediano' || a.amenities.indexOf('Amoblado') > -1;
   }
-  function cambiarOperacion(op){ if (aviso.operacion !== op) { aviso.plazo = null; aviso.operacion = op; } limpiarSegunOperacion(); }
-  function aplicarClase(c){
+  /* Un alquiler que todavía no tiene precio arranca en pesos (8/10/2026, lanz3-publicador) */
+  function cambiarOperacion(op){ if (aviso.operacion !== op) { aviso.plazo = null; if (op === 'alquiler' && !(Number(aviso.precio) > 0)) aviso.moneda = 'ARS'; aviso.operacion = op; } limpiarSegunOperacion(); }
+  function aplicarClase(c, op){
     const antes = clase; clase = c;
+    const tipoPub = (pubVista() || {}).tipo;
     if (c === 'mediano') cambiarOperacion('mediano');
     else if (c === 'emprendimiento') cambiarOperacion('venta');
-    else cambiarOperacion(aviso.operacion === 'venta' || aviso.operacion === 'alquiler' ? aviso.operacion : (pub && pub.tipo === 'gestor' ? 'alquiler' : 'venta'));
+    else cambiarOperacion(op || (aviso.operacion === 'venta' || aviso.operacion === 'alquiler' ? aviso.operacion : (tipoPub === 'gestor' ? 'alquiler' : 'venta')));
     if (c !== 'emprendimiento' && antes === 'emprendimiento') { aviso.emprendimiento = null; aviso.etapa = null; aviso.entrega = null; }
     if (c === 'emprendimiento' && !unidades.length) iniciarUnidades();
   }
-  if (clase && !aviso.operacion) aplicarClase(clase);
+  /* Lo elegido en la pantalla 1: mediano, alquiler, venta o emprendimiento */
+  const aplicarEleccion = sel => aplicarClase(CLASE_DE[sel] || sel, sel === 'venta' || sel === 'alquiler' ? sel : null);
+  if (clase && !aviso.operacion) aplicarEleccion((vuelta && vuelta.q) || clase);
 
   /* ── Qué falta en cada pantalla (lo usa la entrada al editar y el envío) ── */
   const empresaCompleta = p => !!(p && p.nombre && (p.whatsapp || p.telefono) && (p.tipo !== 'profesional' || p.matricula) && ((p.tipo !== 'gestor' && p.tipo !== 'desarrolladora') || p.cuit || p.dni));
   const unidadIncompleta = u => !String(u.unidad || '').trim() || !(u.ambientes >= 1) || !(u.m2_total > 0) || !(u.precio > 0);
   function incompletas(){
     const a = aviso, emp = clase === 'emprendimiento', l = [];
-    if (!empresaCompleta(pub)) l.push('empresa');
+    if (!modoCurador && !empresaCompleta(pub)) l.push('empresa');
     if (!a.zona || !a.barrio || !tieneDireccion() || (!emp && (!(a.m2_total > 0) || !(a.ambientes >= 1)))) l.push('propiedad');
     if (emp ? (!a.emprendimiento || !a.etapa || !unidades.length || unidades.some(unidadIncompleta)) : (!(Number(a.precio) > 0) || (a.operacion === 'mediano' && !a.plazo))) l.push('precio');
     if (a.fotos.length < 8 && !a.quiero_produccion) l.push('fotos');
@@ -202,7 +245,9 @@ document.addEventListener('DOMContentLoaded', function(){
   const chip = (name, val, label, on) => `<label class="pf-chip${on ? ' on' : ''}"><input type="radio" name="${name}" value="${esc(val)}" ${on ? 'checked' : ''}><span>${label}</span></label>`;
   const marca = (name, val, label, on) => `<label class="pf-toggle${on ? ' on' : ''}"><input type="checkbox" name="${name}" value="${esc(val)}" ${on ? 'checked' : ''}><span class="bx" aria-hidden="true"></span><span>${label}</span></label>`;
   const grupo = (id, legend, inner, cls) => `<fieldset class="pf-grupo pf-campo p-fld ${cls || ''}" id="${id}"><legend class="pf-rot">${legend}</legend>${inner}</fieldset>`;
-  const pasos = (name, label, val, max) => { const n = Number(val) || 0; return `<div class="pf-campo p-fld" data-fld="${name}"><span class="pf-rot" id="l-${name}">${label}</span><div class="pf-stepper" data-max="${max}"><button type="button" data-d="-1" ${n ? '' : 'disabled'} aria-label="${esc(TF('pub2_menos', 'Uno menos: {x}', { x: label }))}">&minus;</button><output id="f-${name}" tabindex="-1" aria-labelledby="l-${name}" aria-live="polite" class="${n ? '' : 'vacio'}">${n}</output><button type="button" data-d="1" ${n >= max ? 'disabled' : ''} aria-label="${esc(TF('pub2_mas', 'Uno más: {x}', { x: label }))}">+</button><input type="hidden" name="${name}" value="${n || ''}"></div></div>`; };
+  /* cero: el 0 es un dato (dormitorios de un monoambiente) y se guarda; sin cero, 0 es "sin cargar" */
+  const pasos = (name, label, val, max, cero) => { const n = Number(val) || 0, hay = val != null && val !== ''; return `<div class="pf-campo p-fld" data-fld="${name}"><span class="pf-rot" id="l-${name}">${label}</span><div class="pf-stepper" data-max="${max}"${cero ? ' data-cero="1"' : ''}><button type="button" data-d="-1" ${n ? '' : 'disabled'} aria-label="${esc(TF('pub2_menos', 'Uno menos: {x}', { x: label }))}">&minus;</button><output id="f-${name}" tabindex="-1" aria-labelledby="l-${name}" aria-live="polite" class="${n || (cero && hay) ? '' : 'vacio'}">${n}</output><button type="button" data-d="1" ${n >= max ? 'disabled' : ''} aria-label="${esc(TF('pub2_mas', 'Uno más: {x}', { x: label }))}">+</button><input type="hidden" name="${name}" value="${n || (cero && hay) ? n : ''}"></div></div>`; };
+  const ponerPaso = (s, n) => { const inp = s.querySelector('input'), out = s.querySelector('output'), max = Number(s.dataset.max); n = Math.max(0, Math.min(max, n)); inp.value = n || (s.dataset.cero ? '0' : ''); out.textContent = n; out.classList.toggle('vacio', !n && !s.dataset.cero); s.querySelector('[data-d="-1"]').disabled = !n; s.querySelector('[data-d="1"]').disabled = n >= max; };
   const cab = (t, sub) => `<div class="pf-cab"><h1 class="pf-t" id="pfT" tabindex="-1">${t}</h1>${sub ? `<p class="pf-sub">${sub}</p>` : ''}</div>`;
   const valor = name => { const i = el.querySelector(`[name="${name}"]`); return i ? String(i.value || '').trim() : ''; };
   const elegido = name => { const i = el.querySelector(`[name="${name}"]:checked`); return i ? i.value : ''; };
@@ -210,42 +255,100 @@ document.addEventListener('DOMContentLoaded', function(){
   /* caracteristicas y amenities guardan cosas de varias pantallas: cada una reemplaza solo lo suyo */
   const reemplazar = (lista, propias, nuevas) => (lista || []).filter(x => propias.indexOf(x) === -1).concat(nuevas);
   /* El error va al lado del campo. En un grupo de chips, al grupo entero (no adentro de un chip) y el foco a su primera opción. */
+  /* 8/10/2026 (venta) · El campo con error queda al centro de la pantalla: el aviso rojo flotante va abajo, sobre
+     Continuar, y en el celular tapaba justo lo que había que tocar. */
+  const centrar = x => { if (!x || !x.scrollIntoView) return; try { (x.closest('.p-fld,.pf-campo,.pf-u,.pf-doc,label') || x).scrollIntoView({ block: 'center', behavior: 'instant' }); } catch (e) { /* nada */ } };
+  /* 8/10/2026 (lanz3-publicador) · Con el error escrito al lado del campo, el aviso rojo flotante no se muestra: tapaba
+     el error del campo (y se quedaba aunque ya estuviera corregido). Sigue en la página para el lector de pantalla. */
+  const errorEn = (x, msg) => { BP.errorCampo(x, msg); apagarError(); centrar(x); return false; };
   const marcarError = (name, msg) => {
     const f = el.querySelector(`[data-fld="${name}"]`) || document.getElementById(name);
-    if (f && f.tagName === 'FIELDSET') { BP.errorCampo(f, msg); const i = f.querySelector('input'); if (i) { try { i.focus(); } catch (e) { /* nada */ } } return false; }
+    if (f && f.tagName === 'FIELDSET') { BP.errorCampo(f, msg); apagarError(); const i = f.querySelector('input'); if (i) { try { i.focus(); } catch (e) { /* nada */ } } centrar(f); return false; }
     const c = (f && (f.querySelector('#f-' + name) || f.querySelector('input:not([type=hidden]),select,textarea,output'))) || f;
-    BP.errorCampo(c, msg); return false;
+    return errorEn(c, msg);
   };
 
   /* Chips y casillas: la clase .on acompaña a :checked (no depende solo de :has). Menos y más. Números con puntos de miles. */
   el.addEventListener('change', e => { const i = e.target; if (!i.closest) return; if (i.matches('.pf-chip input')) el.querySelectorAll(`input[name="${i.name}"]`).forEach(x => x.closest('label').classList.toggle('on', x.checked)); else if (i.matches('.pf-toggle input')) i.closest('label').classList.toggle('on', i.checked); const f = i.closest('.p-fld'); if (f) { const er = f.querySelector('.p-err-campo'); if (er && i.type !== 'text') er.hidden = true; } });
   el.addEventListener('click', e => {
     const b = e.target.closest && e.target.closest('.pf-stepper button'); if (!b) return;
-    const s = b.closest('.pf-stepper'), inp = s.querySelector('input'), out = s.querySelector('output'), max = Number(s.dataset.max);
-    const n = Math.max(0, Math.min(max, (Number(inp.value) || 0) + Number(b.dataset.d)));
-    inp.value = n || ''; out.textContent = n; out.classList.toggle('vacio', !n);
-    s.querySelector('[data-d="-1"]').disabled = !n; s.querySelector('[data-d="1"]').disabled = n >= max;
+    const s = b.closest('.pf-stepper'), out = s.querySelector('output');
+    ponerPaso(s, (Number(s.querySelector('input').value) || 0) + Number(b.dataset.d));
     out.classList.remove('p-invalido'); out.removeAttribute('aria-invalid'); const er = s.closest('.p-fld').querySelector('.p-err-campo'); if (er) er.hidden = true;
+    s.dispatchEvent(new CustomEvent('pf-paso'));   /* para quien siga a este número (los dormitorios siguen a los ambientes) */
   });
   el.addEventListener('focusout', e => { const i = e.target; if (i.matches && i.matches('[data-miles]')) { const n = num(i.value); i.value = n == null ? '' : miles(n); } });
   /* Enter en un campo de una línea es Continuar, como en el celular */
   el.addEventListener('keydown', e => { if (e.key !== 'Enter' || e.isComposing) return; const t = e.target; if (t.matches && t.matches('input[type=text],input[type=tel],input[type=email],input[type=date],input:not([type])') && !t.closest('.pf-unidades')) { e.preventDefault(); continuar(); } });
 
   /* ── Las pantallas ── */
-  const ORDEN = ['que', 'ingreso', 'empresa', 'propiedad', 'precio', 'fotos', 'descripcion', 'revisar'];
-  let actual = null, pant = {}, desdeRevisar = false, mostroEmpresa = false, ocupado = false, claseCambio = false;
+  const ORDEN = ['que', 'ingreso', 'empresa', 'documentos', 'propiedad', 'precio', 'fotos', 'descripcion', 'revisar'];
+  let actual = null, pant = {}, desdeRevisar = false, mostroEmpresa = false, mostroDocs = false, ocupado = false, claseCambio = false;
   const PANT = {};
 
   /* 1 · ¿Qué publicás? */
   PANT.que = function(){
-    let sel = clase || SUGERIDA[pub ? pub.tipo : perfilQs] || '';
-    const op = (k, t, d) => `<button type="button" class="pf-opcion${sel === k ? ' on' : ''}" data-que="${k}" aria-pressed="${sel === k}">${ICO[k]}<span class="tx"><b>${t}</b><span>${d}</span></span><i class="ck" aria-hidden="true"></i></button>`;
+    const actualSel = clase ? eleccionActual() : null;
+    let sel = actualSel || SUGERIDA[pub ? pub.tipo : perfilQs] || '';
+    /* 8/10/2026 (venta) · Un dueño directo publica su unidad: "Emprendimiento" (varias unidades de un desarrollo) no va */
+    const esDueno = (pub ? pub.tipo : perfilQs) === 'dueno' && clase !== 'emprendimiento';
+    if (esDueno && sel === 'emprendimiento') sel = '';
+    const op = (k, t, d) => `<button type="button" class="pf-opcion${sel === k ? ' on' : ''}" data-que="${k}" aria-pressed="${sel === k}">${ICO[k] || ICO.tradicional}<span class="tx"><b>${t}</b><span>${d}</span></span><i class="ck" aria-hidden="true"></i></button>`;
     el.innerHTML = cab(T('pub2_que_t', '¿Qué publicás?')) + `<div class="pf-opciones" role="group" aria-labelledby="pfT">
       ${op('mediano', T('pub2_que_mediano', 'Mediano plazo (3 a 12 meses)'), T('pub2_que_mediano_d', 'Amoblado, con precio por mes en dólares.'))}
-      ${op('tradicional', T('pub2_que_trad', 'Venta o alquiler tradicional'), T('pub2_que_trad_d', 'Una unidad en venta o con contrato.'))}
-      ${op('emprendimiento', T('pub2_que_emp', 'Emprendimiento'), T('pub2_que_emp_d', 'Varias unidades de un mismo desarrollo.'))}</div>`;
+      ${op('alquiler', T('pub2_que_alq', 'Alquiler'), T('pub2_que_alq_d', 'Con contrato, en pesos o en dólares.'))}
+      ${op('venta', T('pub2_que_venta', 'Venta'), T('pub2_que_venta_d', 'Una unidad en venta.'))}
+      ${esDueno ? '' : op('emprendimiento', T('pub2_que_emp', 'Emprendimiento'), T('pub2_que_emp_d', 'Varias unidades de un mismo desarrollo.'))}</div>`;
     el.querySelectorAll('[data-que]').forEach(b => b.addEventListener('click', () => { sel = b.dataset.que; el.querySelectorAll('[data-que]').forEach(x => { const on = x === b; x.classList.toggle('on', on); x.setAttribute('aria-pressed', String(on)); }); }));
-    return { validar: () => { if (!sel) { BP.toast(T('pub2_que_err', 'Elegí una de las tres opciones.'), 'error'); return false; } claseCambio = sel !== clase; aplicarClase(sel); return true; } };
+    return { validar: () => { if (!sel) { BP.toast(T('pub2_que_err2', 'Elegí qué publicás.'), 'error'); return false; } claseCambio = sel !== actualSel; aplicarEleccion(sel); return true; } };
+  };
+
+  /* Documentos de verificación: una zona por documento. Cada zona junta sus archivos en su input (se pueden sumar de a
+     uno, arrastrar o quitar) y al guardar se suben con su clave, cada uno con su verificación pendiente. El dueño directo
+     tiene dos: DNI y titularidad; el resto, una sola (#docs). */
+  const ICO_DOC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8.5L19 7.5V21H6z"/><path d="M14.2 3v4.6H19"/><path d="M9 13h6M9 16.4h6"/></svg>';
+  const zonaDoc = (clave, titulo, sub, id) => { const ya = !!docsDe()[clave]; return `<div class="pf-doc${ya ? ' recibido' : ''}" data-doc="${clave}"><button type="button" class="p-carga" data-doc-btn id="${id === 'docs' ? 'docsZona' : 'docs-' + clave + '-btn'}">${ya ? ICO.check : ICO_DOC}<span class="p-carga-txt"><b>${titulo}</b><span>${ya ? T('pub2_doc_recibido', 'Ya lo recibimos.') : sub}</span></span></button><input type="file" id="${id || 'docs-' + clave}" multiple accept="image/*,.pdf" hidden aria-label="${esc(titulo)}"><ul class="pf-docs-lista"${id === 'docs' ? ' id="docsLista"' : ''} aria-live="polite"></ul></div>`; };
+  const zonasDueno = () => zonaDoc('dni', T('pub2_doc_dni', 'DNI'), T('pub2_doc_dni_d', 'Frente y dorso')) + zonaDoc('titularidad', T('pub2_doc_tit', 'Comprobante de titularidad'), T('pub2_doc_tit_d', 'Escritura o informe de dominio'));
+  const archivosDe = z => Array.from((z.querySelector('input[type=file]') || {}).files || []);
+  function engancharZona(z){
+    const zona = z.querySelector('[data-doc-btn]'), inp = z.querySelector('input[type=file]'), lista = z.querySelector('.pf-docs-lista'); if (!zona || !inp) return;
+    const kb = n => n < 1048576 ? Math.round(n / 1024) + ' KB' : (n / 1048576).toFixed(1) + ' MB';
+    const pintar = () => { lista.innerHTML = Array.from(inp.files || []).map((f, i) => `<li><span class="nom">${esc(f.name)}</span><span class="peso">${kb(f.size)}</span><button type="button" data-i="${i}" aria-label="${esc(TF('pub2_quitar_x', 'Quitar {x}', { x: f.name }))}">&times;</button></li>`).join(''); if (inp.files.length) { const er = z.querySelector('.p-err-campo'); if (er) er.hidden = true; zona.classList.remove('p-invalido'); zona.removeAttribute('aria-invalid'); } };
+    const poner = files => { const dt = new DataTransfer(); Array.from(inp.files || []).forEach(f => dt.items.add(f)); Array.from(files || []).forEach(f => { if (!Array.from(dt.files).some(x => x.name === f.name && x.size === f.size)) dt.items.add(f); }); inp.files = dt.files; pintar(); };
+    let previos = [];
+    zona.addEventListener('click', () => { previos = Array.from(inp.files || []); inp.click(); });
+    inp.addEventListener('change', () => { const nuevos = Array.from(inp.files || []); const dt = new DataTransfer(); previos.forEach(f => dt.items.add(f)); inp.files = dt.files; poner(nuevos); });
+    zona.addEventListener('dragover', e => { e.preventDefault(); }); zona.addEventListener('drop', e => { e.preventDefault(); poner(e.dataTransfer.files); });
+    lista.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; const dt = new DataTransfer(); Array.from(inp.files).forEach((f, i) => { if (i !== Number(b.dataset.i)) dt.items.add(f); }); inp.files = dt.files; pintar(); });
+  }
+  async function subirDocs(pubId, zonas){
+    for (const z of zonas) { const clave = z.dataset.doc; for (const f of archivosDe(z)) { const path = await BPStore.uploadDoc(f, pubId, clave); await BPStore.requestVerificacion(pubId, clave === 'mandato' ? 'cuit' : clave, path); } }
+  }
+
+  /* 3b · Tus documentos (dueño directo): DNI y comprobante de titularidad, con la subida del perfil. Se puede seguir sin
+     ellos ("Los subo después"): el panel dice que faltan y tiene el botón para cargarlos (?paso=documentos). */
+  PANT.documentos = function(){
+    el.innerHTML = cab(T('pub2_docs_t', 'Tus documentos'), T('pub2_docs_dueno', 'DNI y un comprobante de titularidad. Los revisamos y los borramos.'))
+      + `<div class="pf-docs pf-docs-dueno">${zonasDueno()}<p class="pf-ayuda">${T('pub2_docs_formatos', 'JPG, PNG o PDF, hasta 10 MB.')}</p></div>`;
+    const zonas = Array.from(el.querySelectorAll('.pf-doc')); zonas.forEach(engancharZona);
+    return {
+      boton: modoDocs ? T('pub2_docs_enviar', 'Enviar documentos') : null,
+      secundario: modoDocs ? null : T('pub2_docs_despues', 'Los subo después'),
+      validar: async () => {
+        const hayArchivos = zonas.some(z => archivosDe(z).length);
+        /* Si ya dijo "Los subo después" y vuelve por acá (Atrás) sin elegir nada, Continuar sigue igual */
+        if (!hayArchivos && docsDespues() && !modoDocs) return true;
+        const falta = zonas.find(z => !archivosDe(z).length && !docsDe()[z.dataset.doc]);
+        if (falta) return errorEn(falta.querySelector('[data-doc-btn]'), falta.dataset.doc === 'dni' ? T('pub2_err_doc_dni', 'Falta el DNI.') : T('pub2_err_doc_tit', 'Falta el comprobante de titularidad.'));
+        if (hayArchivos) {
+          botonOcupado(true, T('pub2_subiendo_docs', 'Subiendo los documentos…'));
+          try { await subirDocs(pub.id, zonas); } catch (e) { BP.toast(BPStore.errorAlGuardar(e, T('pub2_err_docs', 'No se pudieron subir los documentos.')), 'error'); return false; }
+          verifs = await BPStore.misVerificaciones(pub.id);
+        }
+        return true;
+      },
+      alContinuar: modoDocs ? async () => { BP.toast(T('pub2_docs_ok', 'Recibimos tus documentos.')); setTimeout(() => { location.href = 'panel.html#cuenta'; }, 700); return true; } : null
+    };
   };
 
   /* 3 · Tu empresa: una sola vez por cuenta. Desde el panel (?paso=perfil) suma los datos de contacto y los documentos. */
@@ -259,36 +362,30 @@ document.addEventListener('DOMContentLoaded', function(){
     el.innerHTML = cab(titulo(tipo), modoPerfil ? '' : T('pub2_emp_sub', 'Se carga una sola vez.'))
       + (fijo ? '' : grupo('tipoPub', T('pub2_emp_como', 'Publicás como'), `<div class="pf-chips cols-2">${TP.map(([k, l]) => chip('tipo_pub', k, l, k === tipo)).join('')}</div>`))
       + `<div class="pf-campos" id="empCampos" style="margin-top:20px"></div>`
-      + (modoPerfil ? '' : `<p class="pf-nota">${T('pub2_emp_docs', 'Los documentos los subís después, desde tu panel.')}</p>`);
-    const caja = document.getElementById('empCampos');
+      + (modoPerfil ? '' : `<p class="pf-nota" id="empNotaDocs">${T('pub2_emp_docs', 'Los documentos los subís después, desde tu panel.')}</p>`);
+    const caja = document.getElementById('empCampos'), notaDocs = document.getElementById('empNotaDocs');
+    /* El dueño directo: en el aviso se ve su nombre y la inicial del apellido (BPData.nombrePublico) */
+    const ayudaPublico = n => String(n || '').trim().split(/\s+/).length > 1 ? TF('pub2_nombre_publico', 'En el aviso se ve: {n}', { n: esc(BPData.nombrePublico(n)) }) : T('pub2_nombre_publico_h', 'En el aviso se ve tu nombre y la inicial del apellido.');
+    /* El colegio del corredor se elige: nada por defecto */
+    const COLEGIOS = [['', T('pub2_elegi', 'Elegí')], ['CUCICBA', 'CUCICBA, Ciudad de Buenos Aires'], ['CMCPSI', 'San Isidro, Provincia de Buenos Aires'], ['CMCPLZ', 'Lomas de Zamora, Provincia de Buenos Aires'], ['Otro', 'Otro colegio de Provincia']];
     const dibujar = t => {
+      if (notaDocs) notaDocs.hidden = !t || t === 'dueno';   /* el dueño los sube en la pantalla que sigue */
       if (!t) { caja.innerHTML = ''; return; }
       const nom = { profesional: T('pub2_nombre_prof', 'Nombre de la inmobiliaria o del corredor'), gestor: T('pub2_nombre_gestor', 'Nombre de la empresa'), desarrolladora: T('pub2_nombre_desa', 'Nombre de la desarrolladora'), dueno: T('pub2_nombre_dueno', 'Nombre y apellido') }[t];
-      let h = campo('nombre', nom, texto('nombre', p.nombre, `autocomplete="${t === 'dueno' ? 'name' : 'organization'}"`), 'full')
-        + campo('whatsapp', T('pub2_whatsapp', 'WhatsApp'), `<input id="f-whatsapp" name="whatsapp" type="tel" inputmode="tel" autocomplete="tel" value="${esc(p.whatsapp || '')}" aria-describedby="h-whatsapp" placeholder="11 2345 6789">`, 'full', T('pub2_whatsapp_h', 'Con código de área.'))
-        + (t === 'profesional' ? campo('matricula', T('pub2_matricula', 'Matrícula'), texto('matricula', p.matricula, 'placeholder="CUCICBA 0000" autocomplete="off"'), 'full') : '')
+      let h = campo('nombre', nom, texto('nombre', p.nombre, `autocomplete="${t === 'dueno' ? 'name' : 'organization'}"${t === 'dueno' ? ' aria-describedby="h-nombre"' : ''}`), 'full', t === 'dueno' ? ayudaPublico(p.nombre) : '')
+        + campo('whatsapp', T('pub2_whatsapp', 'WhatsApp'), `<input id="f-whatsapp" name="whatsapp" type="tel" inputmode="tel" autocomplete="tel" value="${esc(waVer(p.whatsapp))}" aria-describedby="h-whatsapp" placeholder="11 2345 6789">`, 'full', T('pub2_whatsapp_h', 'Con código de área.'))
+        + (t === 'profesional' ? campo('colegio', T('pub2_colegio', 'Colegio'), elegir('colegio', p.colegio || '', COLEGIOS), 'full') + campo('matricula', T('pub2_matricula', 'Matrícula'), texto('matricula', p.matricula, 'placeholder="1234" autocomplete="off" aria-describedby="h-matricula"'), 'full', T('pub2_matricula_h', 'La pide la ley para intermediar. Sin matrícula, publicá como gestor o dueño directo.')) : '')
         + (t === 'gestor' || t === 'desarrolladora' ? campo('cuit', T('pub2_cuit', 'CUIT'), texto('cuit', p.cuit, 'inputmode="numeric" autocomplete="off" placeholder="30-12345678-9"'), 'full') : '');
       if (modoPerfil) h += `<p class="pf-divisor pf-rot">${T('pub2_mas_datos', 'Más datos')}</p>`
         + campo('telefono', T('pub2_telefono', 'Teléfono'), `<input id="f-telefono" name="telefono" type="tel" inputmode="tel" autocomplete="tel" value="${esc(p.telefono || '')}">`, 'full')
         + campo('email', T('pub2_mail', 'Mail de contacto'), `<input id="f-email" name="email" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" value="${esc(p.email || BPStore.session.email || '')}">`, 'full')
         + (t === 'dueno' ? '' : campo('responsable', t === 'profesional' ? T('pub2_responsable_prof', 'Corredor responsable') : T('pub2_responsable', 'Responsable'), texto('responsable', p.responsable, 'autocomplete="name"'), 'full'))
-        + (t === 'profesional' ? campo('colegio', T('pub2_colegio', 'Colegio'), elegir('colegio', p.colegio || 'CUCICBA', [['CUCICBA', 'CUCICBA, Ciudad de Buenos Aires'], ['CMCPSI', 'San Isidro, Provincia de Buenos Aires'], ['CMCPLZ', 'Lomas de Zamora, Provincia de Buenos Aires'], ['Otro', 'Otro colegio de Provincia']]), 'full') : '')
         + campo('descripcion', T('pub2_presentacion', 'Presentación corta'), `<textarea id="f-descripcion" name="descripcion" maxlength="400" style="min-height:110px">${esc(p.descripcion || '')}</textarea>`, 'full')
-        + `<div class="pf-campo full pf-docs"><span class="pf-rot">${T('pub2_documentos', 'Documentos de verificación')}</span><p class="pf-ayuda" style="margin:0 0 10px">${t === 'dueno' ? T('pub2_docs_dueno', 'DNI y un comprobante de titularidad. Los revisamos y los borramos.') : t === 'gestor' ? T('pub2_docs_gestor', 'Constancia de CUIT y el mandato de un propietario. Los revisamos y los borramos.') : t === 'profesional' ? T('pub2_docs_prof', 'Con la matrícula alcanza. Si querés, sumá el certificado.') : T('pub2_docs_desa', 'Constancia de CUIT y un documento de la sociedad.')}</p><button type="button" class="p-carga" id="docsZona"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8.5L19 7.5V21H6z"/><path d="M14.2 3v4.6H19"/><path d="M9 13h6M9 16.4h6"/></svg><span class="p-carga-txt"><b>${T('pub2_docs_elegir', 'Elegí los documentos')}</b><span>${T('pub2_docs_formatos', 'JPG, PNG o PDF, hasta 10 MB.')}</span></span></button><input type="file" id="docs" multiple accept="image/*,.pdf" hidden aria-label="${esc(T('pub2_documentos', 'Documentos de verificación'))}"><ul class="pf-docs-lista" id="docsLista" aria-live="polite"></ul></div>`;
+        + `<div class="pf-campo full pf-docs"><span class="pf-rot">${T('pub2_documentos', 'Documentos de verificación')}</span><p class="pf-ayuda" style="margin:0 0 10px">${t === 'dueno' ? T('pub2_docs_dueno', 'DNI y un comprobante de titularidad. Los revisamos y los borramos.') : t === 'gestor' ? T('pub2_docs_gestor', 'Constancia de CUIT y el mandato de un propietario. Los revisamos y los borramos.') : t === 'profesional' ? T('pub2_docs_prof', 'Con la matrícula alcanza. Si querés, sumá el certificado.') : T('pub2_docs_desa', 'Constancia de CUIT y un documento de la sociedad.')}</p>${t === 'dueno' ? zonasDueno() : zonaDoc(t === 'profesional' ? 'matricula' : t === 'gestor' ? 'mandato' : 'cuit', T('pub2_docs_elegir', 'Elegí los documentos'), T('pub2_docs_formatos', 'JPG, PNG o PDF, hasta 10 MB.'), 'docs')}</div>`;
       caja.innerHTML = h;
-      if (modoPerfil) engancharDocs();
+      if (modoPerfil) caja.querySelectorAll('.pf-doc').forEach(engancharZona);
+      if (t === 'dueno') { const n = document.getElementById('f-nombre'), hn = document.getElementById('h-nombre'); if (n && hn) n.addEventListener('input', () => { hn.innerHTML = ayudaPublico(n.value); }); }
       const tt = document.getElementById('pfT'); if (tt) tt.textContent = titulo(t);
-    };
-    const engancharDocs = () => {
-      const zona = document.getElementById('docsZona'), inp = document.getElementById('docs'), lista = document.getElementById('docsLista'); if (!zona || !inp) return;
-      const kb = n => n < 1048576 ? Math.round(n / 1024) + ' KB' : (n / 1048576).toFixed(1) + ' MB';
-      const pintar = () => { lista.innerHTML = Array.from(inp.files || []).map((f, i) => `<li><span class="nom">${esc(f.name)}</span><span class="peso">${kb(f.size)}</span><button type="button" data-i="${i}" aria-label="${esc(TF('pub2_quitar_x', 'Quitar {x}', { x: f.name }))}">&times;</button></li>`).join(''); };
-      const poner = files => { const dt = new DataTransfer(); Array.from(inp.files || []).forEach(f => dt.items.add(f)); Array.from(files || []).forEach(f => { if (!Array.from(dt.files).some(x => x.name === f.name && x.size === f.size)) dt.items.add(f); }); inp.files = dt.files; pintar(); };
-      let previos = [];
-      zona.addEventListener('click', () => { previos = Array.from(inp.files || []); inp.click(); });
-      inp.addEventListener('change', () => { const nuevos = Array.from(inp.files || []); const dt = new DataTransfer(); previos.forEach(f => dt.items.add(f)); inp.files = dt.files; poner(nuevos); });
-      zona.addEventListener('dragover', e => { e.preventDefault(); }); zona.addEventListener('drop', e => { e.preventDefault(); poner(e.dataTransfer.files); });
-      lista.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; const dt = new DataTransfer(); Array.from(inp.files).forEach((f, i) => { if (i !== Number(b.dataset.i)) dt.items.add(f); }); inp.files = dt.files; pintar(); });
     };
     dibujar(tipo);
     el.querySelectorAll('[name=tipo_pub]').forEach(r => r.addEventListener('change', () => { tipo = r.value; dibujar(tipo); }));
@@ -299,8 +396,8 @@ document.addEventListener('DOMContentLoaded', function(){
         if (!t) return marcarError('tipoPub', T('pub2_err_tipo', 'Elegí cómo publicás.'));
         const data = { tipo: t };
         caja.querySelectorAll('input:not([type=file]),select,textarea').forEach(i => { if (i.name) data[i.name] = String(i.value || '').trim(); });
-        const req = ['nombre', 'whatsapp'].concat(t === 'profesional' ? ['matricula'] : (t === 'gestor' || t === 'desarrolladora') ? ['cuit'] : []);
-        const falta = req.find(k => !data[k]); if (falta) return marcarError(falta, T('pub2_err_dato', 'Falta este dato.'));
+        const req = ['nombre', 'whatsapp'].concat(t === 'profesional' ? ['colegio', 'matricula'] : (t === 'gestor' || t === 'desarrolladora') ? ['cuit'] : []);
+        const falta = req.find(k => !data[k]); if (falta) return marcarError(falta, falta === 'colegio' ? T('pub2_err_colegio', 'Elegí el colegio.') : falta === 'matricula' ? T('pub2_err_matricula', 'Falta la matrícula. Si no tenés, elegí Gestor de alquileres o Dueño directo.') : T('pub2_err_dato', 'Falta este dato.'));
         const wa = waNorm(data.whatsapp); if (wa.length < 11 || wa.length > 13) return marcarError('whatsapp', T('pub2_err_wa', 'Revisá el WhatsApp: con código de área y sin el 15.'));
         data.whatsapp = wa;
         if (data.cuit && (t === 'gestor' || t === 'desarrolladora') && data.cuit.replace(/\D/g, '').length !== 11) return marcarError('cuit', T('pub2_err_cuit', 'El CUIT tiene 11 números.'));
@@ -308,17 +405,16 @@ document.addEventListener('DOMContentLoaded', function(){
         if (!data.email) data.email = p.email || BPStore.session.email;
         if (p.slug) data.slug = p.slug;   /* el enlace público del publicador no cambia si cambia el nombre */
         data.zonas = p.zonas || [];
-        if (t === 'profesional' && !data.colegio) data.colegio = p.colegio || 'CUCICBA';
         data.badge = t === 'dueno' ? 'Dueño verificado' : t === 'desarrolladora' ? 'Venta directa' : t === 'gestor' ? 'Gestor de alquileres' : 'Corredor inmobiliario matriculado';
         const antes = pub;
         try {
           pub = await BPStore.savePublicador(data);
           /* El perfil de la cuenta sale de acá si todavía no eligió (o si había dicho "busco"); si falla, el panel lo deduce del publicador */
           try { const pa = BPStore.getPerfil(); if (!pa || pa === 'busca') await BPStore.setPerfil(t === 'dueno' ? 'dueno' : 'profesional'); } catch (e) { /* sigue */ }
-          const clave = t === 'dueno' ? 'titularidad' : t === 'profesional' ? 'matricula' : t === 'gestor' ? 'mandato' : 'cuit';
-          const files = Array.from((document.getElementById('docs') || {}).files || []);
-          for (const f of files) { const path = await BPStore.uploadDoc(f, pub.id, clave); await BPStore.requestVerificacion(pub.id, clave === 'mandato' ? 'cuit' : clave, path); }
-          if (!files.length && !antes && !pub.verificado) await BPStore.requestVerificacion(pub.id, t === 'profesional' ? 'matricula' : (t === 'desarrolladora' || t === 'gestor') ? 'cuit' : 'dni', null);
+          const zonas = Array.from(caja.querySelectorAll('.pf-doc')), files = zonas.reduce((n, z) => n + archivosDe(z).length, 0);
+          await subirDocs(pub.id, zonas);
+          if (!files && !antes && !pub.verificado) await BPStore.requestVerificacion(pub.id, t === 'profesional' ? 'matricula' : (t === 'desarrolladora' || t === 'gestor') ? 'cuit' : 'dni', null);
+          if (pub.tipo === 'dueno' && BPStore.misVerificaciones) verifs = await BPStore.misVerificaciones(pub.id);
         } catch (e) { BP.toast(BPStore.errorAlGuardar(e, T('pub2_err_perfil', 'No se pudo guardar el perfil.')), 'error'); return false; }
         return true;
       },
@@ -330,6 +426,12 @@ document.addEventListener('DOMContentLoaded', function(){
   PANT.propiedad = function(){
     const a = aviso, emp = clase === 'emprendimiento';
     const nota = copiaDe ? TF('pub2_copia_de', 'Copia de {x}.', { x: esc([copiaDe.direccion, copiaDe.unidad].filter(Boolean).join(', ')) }) : '';
+    /* 8/10/2026 (venta) · Los dormitorios: precargados con ambientes menos uno (mínimo 0) y editables; siguen a los
+       ambientes hasta que se tocan. En venta, plegados en "Más datos": m² cubiertos, antigüedad y cocheras (opcionales). */
+    const dormIni = a.dormitorios != null ? a.dormitorios : (a.ambientes ? Math.max(0, a.ambientes - 1) : null);
+    const masDatos = !emp && a.operacion === 'venta';
+    const abrirMas = a.m2_cubierto != null || a.antiguedad != null || Number(a.cocheras) > 0;
+    const numero = (name, val, modo, attrs) => `<input id="f-${name}" name="${name}" type="text" inputmode="${modo}" autocomplete="off" value="${esc(val == null ? '' : val)}" ${attrs || ''}>`;
     el.innerHTML = cab(emp ? T('pub2_prop_t_emp', 'El emprendimiento') : T('pub2_prop_t', 'La propiedad'), nota) + `<div class="pf-campos">
       ${campo('zona', T('pub2_zona', 'Zona'), elegir('zona', a.zona, [['', T('pub2_elegi', 'Elegí')]].concat(ZONAS.map(z => [z, BP.zonaLabel(z)]))))}
       ${campo('barrio', T('pub2_barrio', 'Barrio'), elegir('barrio', a.barrio, [['', T('pub2_elegi', 'Elegí')]]))}
@@ -337,16 +439,31 @@ document.addEventListener('DOMContentLoaded', function(){
       ${emp ? '' : campo('unidad', T('pub2_unidad', 'Piso y unidad'), texto('unidad', a.unidad, 'placeholder="4° B" autocomplete="off"'))}
       ${emp ? '' : campo('m2_total', T('pub2_m2', 'm² totales'), `<input id="f-m2_total" name="m2_total" type="text" inputmode="decimal" autocomplete="off" value="${esc(a.m2_total == null ? '' : a.m2_total)}">`)}
       ${grupo('g-tipo', T('pub2_tipo', 'Tipo'), `<div class="pf-chips cols-2 pf-cuatro">${TIPOS.concat(TIPOS.indexOf(a.tipo) === -1 && a.tipo ? [a.tipo] : []).map(x => chip('tipo', x, esc(BP.etiqueta ? BP.etiqueta(x) : x), (a.tipo || 'Departamento') === x)).join('')}</div>`, 'full')}
-      ${emp ? '' : pasos('ambientes', T('pub2_ambientes', 'Ambientes'), a.ambientes, 12) + pasos('banos', T('pub2_banos', 'Baños'), a.banos, 8)}
-    </div>`;
+      ${emp ? '' : pasos('ambientes', T('pub2_ambientes', 'Ambientes'), a.ambientes, 12) + pasos('dormitorios', T('pub2_dormitorios', 'Dormitorios'), dormIni, 10, true) + pasos('banos', T('pub2_banos', 'Baños'), a.banos, 8)}
+    </div>${masDatos ? `<details class="pf-plegado"${abrirMas ? ' open' : ''}><summary>${T('pub2_mas_datos', 'Más datos')}</summary><div class="pf-campos">
+      ${campo('m2_cubierto', T('pub2_m2_cub', 'm² cubiertos'), numero('m2_cubierto', a.m2_cubierto, 'decimal'))}
+      ${campo('antiguedad', T('pub2_antiguedad', 'Antigüedad, en años'), numero('antiguedad', a.antiguedad, 'numeric', `placeholder="${esc(T('pub2_antiguedad_ph', '0 si es a estrenar'))}"`))}
+      ${pasos('cocheras', T('pub2_cocheras', 'Cocheras'), Number(a.cocheras) || null, 6)}
+    </div></details>` : ''}`;
     const zs = document.getElementById('f-zona'), bs = document.getElementById('f-barrio');
     const llenar = () => { const z = zs.value; const l = z ? barriosDe(z, z === a.zona ? a.barrio : '') : []; bs.innerHTML = (l.length === 1 ? '' : `<option value="">${esc(T('pub2_elegi', 'Elegí'))}</option>`) + l.map(b => `<option value="${esc(b)}" ${b === a.barrio ? 'selected' : ''}>${esc(b)}</option>`).join(''); bs.disabled = !z; };
     llenar(); zs.addEventListener('change', llenar);
     const dir = document.getElementById('f-direccion'); dir.addEventListener('input', actualizarSalir);
+    const pasoDe = n => { const o = document.getElementById('f-' + n); return o ? o.closest('.pf-stepper') : null; };
+    const sAmb = pasoDe('ambientes'), sDorm = pasoDe('dormitorios');
+    if (sAmb && sDorm) {
+      if (a.dormitorios != null) sDorm.dataset.tocado = '1';
+      sDorm.addEventListener('pf-paso', () => { sDorm.dataset.tocado = '1'; });
+      sAmb.addEventListener('pf-paso', () => { if (!sDorm.dataset.tocado) ponerPaso(sDorm, Math.max(0, (Number(sAmb.querySelector('input').value) || 0) - 1)); });
+    }
     const leer = () => {
       a.zona = valor('zona'); a.barrio = valor('barrio'); a.direccion = valor('direccion'); a.tipo = elegido('tipo') || a.tipo || 'Departamento';
       a.ciudad = a.zona === 'GBA Norte' ? 'Zona Norte' : 'Capital Federal';
-      if (!emp) { a.unidad = valor('unidad'); a.m2_total = entero(valor('m2_total')); a.ambientes = entero(valor('ambientes')); a.banos = entero(valor('banos')); }
+      if (!emp) {
+        a.unidad = valor('unidad'); a.m2_total = entero(valor('m2_total')); a.ambientes = entero(valor('ambientes')); a.banos = entero(valor('banos'));
+        const d = entero(valor('dormitorios')); a.dormitorios = d != null ? d : (a.ambientes ? 0 : null);
+      }
+      if (masDatos) { a.m2_cubierto = entero(valor('m2_cubierto')); a.antiguedad = entero(valor('antiguedad')); a.cocheras = entero(valor('cocheras')) || 0; }
     };
     return { leer, validar: () => {
       if (!a.zona) return marcarError('zona', T('pub2_err_zona', 'Elegí la zona.'));
@@ -354,6 +471,8 @@ document.addEventListener('DOMContentLoaded', function(){
       if (!tieneDireccion()) return marcarError('direccion', T('pub2_err_direccion', 'Escribí la calle y la altura.'));
       if (!emp && !(a.m2_total > 0)) return marcarError('m2_total', T('pub2_err_m2', 'Escribí los m² totales.'));
       if (!emp && !(a.ambientes >= 1)) return marcarError('ambientes', T('pub2_err_ambientes', 'Marcá cuántos ambientes tiene.'));
+      if (!emp && a.dormitorios > a.ambientes) return marcarError('dormitorios', T('pub2_err_dorm', 'Son más dormitorios que ambientes. Revisá los dos.'));
+      if (masDatos && a.m2_cubierto > a.m2_total) { const d = el.querySelector('.pf-plegado'); if (d) d.open = true; return marcarError('m2_cubierto', T('pub2_err_m2_cub', 'Los m² cubiertos no pueden ser más que los totales.')); }
       return true;
     } };
   };
@@ -404,7 +523,7 @@ document.addEventListener('DOMContentLoaded', function(){
     el.querySelectorAll('[name=operacion]').forEach(r => r.addEventListener('change', () => { leer(); cambiarOperacion(r.value); dibujar(); }));
     dibujar();
     return { leer, validar: () => {
-      if (!(Number(a.precio) > 0)) return marcarError('precio', T('pub2_err_precio', 'Escribí el precio, sin puntos ni letras.'));
+      if (!(Number(a.precio) > 0)) return marcarError('precio', T('pub2_err_precio2', 'Escribí el precio.'));
       if (a.operacion === 'mediano' && !a.plazo) return marcarError('g-plazo', T('pub2_err_estadia', 'Elegí la estadía mínima.'));
       return true;
     } };
@@ -420,6 +539,7 @@ document.addEventListener('DOMContentLoaded', function(){
       ${campo('entrega', T('pub2_entrega', 'Entrega'), texto('entrega', a.entrega, 'placeholder="Diciembre 2027" autocomplete="off"'), 'full')}
     </div>
     <h2 class="pf-h2">${T('pub2_unidades', 'Unidades')} <small id="uCuenta"></small></h2>
+    ${!unaUnidad && !listaEnBase() ? `<p class="pf-nota pf-aviso-disp">${T('pub2_u_este_disp', 'La lista queda guardada en este dispositivo. Terminá el envío desde acá.')}</p>` : ''}
     <div class="pf-unidades" id="uLista"></div>
     ${unaUnidad ? '' : `<button type="button" class="pf-mas" id="uMas">${T('pub2_u_agregar', 'Agregar unidad')}</button>`}`;
     const lista = document.getElementById('uLista');
@@ -450,13 +570,16 @@ document.addEventListener('DOMContentLoaded', function(){
     return { leer, validar: () => {
       if (!a.emprendimiento) return marcarError('emprendimiento', T('pub2_err_emp', 'Escribí el nombre del emprendimiento.'));
       if (!a.etapa) return marcarError('g-etapa', T('pub2_err_etapa', 'Elegí la etapa de obra.'));
+      /* "2° A", "2°a" y "2 A" son la misma unidad */
+      const claveU = x => String(x || '').toLowerCase().replace(/[\s°º.,-]/g, '');
       for (let i = 0; i < unidades.length; i++) {
         const u = unidades[i], f = lista.querySelector(`.pf-u[data-i="${i}"]`), campoU = n => f.querySelector(`[name=${n}]`);
-        if (!u.unidad) { BP.errorCampo(campoU('u_unidad'), TF('pub2_err_u_unidad', 'Unidad {n}: falta el piso y la unidad.', { n: i + 1 })); return false; }
-        if (unidades.findIndex(x => x.unidad.toLowerCase() === u.unidad.toLowerCase()) !== i) { BP.errorCampo(campoU('u_unidad'), TF('pub2_err_u_repetida', 'Unidad {n}: ese piso y unidad ya está en la lista.', { n: i + 1 })); return false; }
-        if (!(u.ambientes >= 1)) { BP.errorCampo(campoU('u_ambientes'), TF('pub2_err_u_amb', 'Unidad {n}: faltan los ambientes.', { n: i + 1 })); return false; }
-        if (!(u.m2_total > 0)) { BP.errorCampo(campoU('u_m2'), TF('pub2_err_u_m2', 'Unidad {n}: faltan los m².', { n: i + 1 })); return false; }
-        if (!(u.precio > 0)) { BP.errorCampo(campoU('u_precio'), TF('pub2_err_u_precio', 'Unidad {n}: falta el precio.', { n: i + 1 })); return false; }
+        if (!u.unidad) return errorEn(campoU('u_unidad'), TF('pub2_err_u_unidad', 'Unidad {n}: falta el piso y la unidad.', { n: i + 1 }));
+        const j = unidades.findIndex(x => claveU(x.unidad) === claveU(u.unidad));
+        if (j !== i) return errorEn(campoU('u_unidad'), TF('pub2_err_u_repetida2', 'Unidad {n}: {u} ya está en la unidad {m}.', { n: i + 1, u: unidades[j].unidad, m: j + 1 }));
+        if (!(u.ambientes >= 1)) return errorEn(campoU('u_ambientes'), TF('pub2_err_u_amb', 'Unidad {n}: faltan los ambientes.', { n: i + 1 }));
+        if (!(u.m2_total > 0)) return errorEn(campoU('u_m2'), TF('pub2_err_u_m2', 'Unidad {n}: faltan los m².', { n: i + 1 }));
+        if (!(u.precio > 0)) return errorEn(campoU('u_precio'), TF('pub2_err_u_precio', 'Unidad {n}: falta el precio.', { n: i + 1 }));
       }
       return true;
     } };
@@ -471,7 +594,12 @@ document.addEventListener('DOMContentLoaded', function(){
       <input type="file" id="fotosIn" accept="image/*" multiple hidden aria-label="${esc(T('pub2_fotos_agregar', 'Agregar fotos'))}">
       <p class="pf-fotos-cuenta" id="fCuenta" aria-live="polite"></p>
       <div class="pf-fotos" id="fGrid"></div>
+      <p class="p-err-campo pf-err-fotos" id="fotosErr" role="alert" hidden></p>
       <label class="pf-toggle pf-toggle-sola${a.quiero_produccion ? ' on' : ''}"><input type="checkbox" id="quieroProd" name="quiero_produccion" ${a.quiero_produccion ? 'checked' : ''}><span class="bx" aria-hidden="true"></span><span>${T('pub2_fotos_bairen', 'Que las haga BAIREN, sin costo')}</span></label>`;
+    /* 8/10/2026 (venta) · Si faltan fotos, el aviso va escrito arriba de la casilla, no flotando: el aviso rojo de abajo
+       tapaba justo "Que las haga BAIREN" en el celular */
+    const errFotos = document.getElementById('fotosErr'), qp = document.getElementById('quieroProd');
+    qp.addEventListener('change', () => { if (qp.checked) errFotos.hidden = true; });
     const inp = document.getElementById('fotosIn'), add = document.getElementById('fAgregar');
     add.addEventListener('click', () => inp.click());
     inp.addEventListener('change', () => { agregarFotos(inp.files); inp.value = ''; });
@@ -482,7 +610,7 @@ document.addEventListener('DOMContentLoaded', function(){
     return { leer: () => { const q = document.getElementById('quieroProd'); if (q) a.quiero_produccion = q.checked; },
       validar: () => {
         if (subiendo) { BP.toast(T('pub2_espera_fotos', 'Esperá a que terminen de subir las fotos.')); return false; }
-        if (a.fotos.length < 8 && !a.quiero_produccion) { BP.toast(TF('pub2_err_fotos', 'Hacen falta ocho fotos y hay {n}. O marcá que las haga BAIREN.', { n: a.fotos.length }), 'error'); return false; }
+        if (a.fotos.length < 8 && !a.quiero_produccion) { errFotos.textContent = TF('pub2_err_fotos', 'Hacen falta ocho fotos y hay {n}. O marcá que las haga BAIREN.', { n: a.fotos.length }); errFotos.hidden = false; centrar(qp.closest('label')); try { qp.focus({ preventScroll: true }); } catch (e) { /* nada */ } return false; }
         return true;
       } };
   };
@@ -495,6 +623,7 @@ document.addEventListener('DOMContentLoaded', function(){
     const c = document.getElementById('fCuenta');
     if (c) c.innerHTML = subiendo ? `<b>${esc(TF('pub2_fotos_subiendo', 'Subiendo {n} de {t}', { n: lote.hechas + 1, t: lote.total }))}</b>` : n ? `<b>${n < 8 ? esc(TF('pub2_fotos_de8', '{n} de 8', { n })) : esc(TF('pub2_fotos_n', '{n} fotos', { n }))}</b><span>${n > 1 ? T('pub2_fotos_orden', 'Tocá ··· para moverlas') : ''}</span>` : '';
     const add = document.getElementById('fAgregar'); if (add) add.classList.toggle('chico', n + cola.length > 0);
+    const ef = document.getElementById('fotosErr'); if (ef && n >= 8) ef.hidden = true;
     document.body.dataset.fotos = n;
   }
   let lote = { hechas: 0, total: 0 };
@@ -559,20 +688,26 @@ document.addEventListener('DOMContentLoaded', function(){
   /* 7 · Descripción y una sola lista de lo que tiene */
   PANT.descripcion = function(){
     const a = aviso;
-    const tiene = x => x === 'Cochera' ? (a.amenities.indexOf('Cochera') > -1 || Number(a.cocheras) > 0) : x === 'Amoblado' ? (a.amenities.indexOf('Amoblado') > -1 || (!!a.amoblado && a.operacion !== 'mediano')) : (a.amenities.indexOf(x) > -1 || a.caracteristicas.indexOf(x) > -1);
+    const emp = clase === 'emprendimiento';
+    /* 8/10/2026 (lanz3-publicador) · El mediano plazo es amoblado siempre: la casilla no se repite */
+    const LQT = LO_QUE_TIENE.filter(x => !(x[0] === 'Amoblado' && a.operacion === 'mediano'));
+    const tiene = x => x === 'Cochera' ? (a.amenities.indexOf('Cochera') > -1 || (!emp && Number(a.cocheras) > 0)) : x === 'Amoblado' ? (a.amenities.indexOf('Amoblado') > -1 || (!!a.amoblado && a.operacion !== 'mediano')) : (a.amenities.indexOf(x) > -1 || a.caracteristicas.indexOf(x) > -1);
     el.innerHTML = cab(T('pub2_desc_t', 'Descripción')) + `<div class="pf-campo p-fld" data-fld="descripcion"><label for="f-descripcion" class="pf-sr">${T('pub2_desc_t', 'Descripción')}</label><textarea id="f-descripcion" name="descripcion" maxlength="4000" aria-describedby="dCuenta" placeholder="${esc(T('pub2_desc_ph', 'Luz, distribución, edificio y cuadra, como para alguien que la va a vivir.'))}">${esc(a.descripcion || '')}</textarea><p class="pf-contador" id="dCuenta" aria-live="polite"></p></div>
-      ${grupo('g-tiene', T('pub2_lo_que_tiene', 'Lo que tiene'), `<div class="pf-toggles">${LO_QUE_TIENE.map(([x, col, lbl]) => marca('lqt', x, lbl || esc(BP.etiqueta ? BP.etiqueta(x) : x), tiene(x))).join('')}</div>`)}`;
+      ${grupo('g-tiene', T('pub2_lo_que_tiene', 'Lo que tiene'), `<div class="pf-toggles">${LQT.map(([x, col, lbl]) => marca('lqt', x, lbl || esc(BP.etiqueta ? BP.etiqueta(x) : x), tiene(x))).join('')}</div>`)}`;
     el.querySelector('#g-tiene').style.marginTop = '26px';
     const ta = document.getElementById('f-descripcion'), cu = document.getElementById('dCuenta');
     const contar = () => { const n = ta.value.trim().length; cu.classList.toggle('ok', n >= 150); cu.textContent = n >= 150 ? TF('pub2_desc_ok', '{n} caracteres', { n }) : TF('pub2_desc_faltan', 'Faltan {n} caracteres para el mínimo de 150', { n: 150 - n }); };
     ta.addEventListener('input', contar); contar();
     const leer = () => {
       a.descripcion = ta.value.trim();
-      const m = marcados('lqt'), am = LO_QUE_TIENE.filter(x => x[1] === 'amenities').map(x => x[0]), ca = LO_QUE_TIENE.filter(x => x[1] === 'caracteristicas').map(x => x[0]);
+      const m = marcados('lqt'), am = LQT.filter(x => x[1] === 'amenities').map(x => x[0]), ca = LQT.filter(x => x[1] === 'caracteristicas').map(x => x[0]);
       a.amenities = reemplazar(a.amenities, am, m.filter(x => am.indexOf(x) > -1));
       a.caracteristicas = reemplazar(a.caracteristicas, ca, m.filter(x => ca.indexOf(x) > -1));
-      /* Cochera y Amoblado tienen además su columna: se mantienen de acuerdo con la casilla */
-      if (m.indexOf('Cochera') > -1) a.cocheras = Math.max(1, Number(a.cocheras) || 0); else a.cocheras = 0;
+      /* Cochera y Amoblado tienen además su columna: se mantienen de acuerdo con la casilla.
+         8/10/2026 (venta) · En un emprendimiento "Cochera" es del edificio, no de cada unidad: queda en lo que tiene y
+         la cantidad de cada unidad no se cuenta (antes ponía "1 coch." en todas). */
+      if (emp) a.cocheras = 0;
+      else if (m.indexOf('Cochera') > -1) a.cocheras = Math.max(1, Number(a.cocheras) || 0); else a.cocheras = 0;
       a.amoblado = a.operacion === 'mediano' || m.indexOf('Amoblado') > -1;
     };
     return { leer, validar: () => (a.descripcion.length >= 150) || marcarError('descripcion', T('pub2_err_desc', 'La descripción necesita al menos 150 caracteres.')) };
@@ -589,9 +724,12 @@ document.addEventListener('DOMContentLoaded', function(){
       if (a.operacion === 'mediano' && a.plazo) l.push(TF('pub2_rev_estadia', 'mínimo {p}', { p: esc(a.plazo) }));
       if (a.operacion === 'mediano' && a.disponible_desde) l.push(TF('pub2_rev_disponible', 'libre desde el {f}', { f: fechaTxt(a.disponible_desde) }));
       if (a.operacion === 'alquiler' && a.plazo) l.push(TF('pub2_rev_contrato', 'contrato de {p}', { p: esc(a.plazo) }));
+      /* 8/10/2026 (lanz3-publicador) · Las garantías que acepta, que se cargaban y no se veían en ningún lado */
+      if (a.operacion === 'alquiler') { const g = [GARANTIAS[0], GARANTIAS[1]].filter(x => a.caracteristicas.indexOf(x) > -1).map(x => x === GARANTIAS[0] ? T('pub2_gar_caucion_min', 'seguro de caución') : T('pub2_gar_propietaria_min', 'garantía propietaria')); if (g.length) l.push(TF('pub2_rev_garantias', 'acepta {g}', { g: g.join(T('pub2_y', ' y ')) })); }
       const inc = a.caracteristicas.filter(x => INCLUYE.indexOf(x) > -1); if (a.operacion === 'mediano' && inc.length) l.push(esc(inc.join(', ')));
       if (a.expensas) l.push(TF('pub2_rev_expensas', 'expensas $ {e}', { e: BP.fmtN(a.expensas) }));
-      return l.join(' · ');
+      /* "$ 120.000" y "USD 1.400" no se parten en dos renglones */
+      return l.join(' · ').replace(/(\$|USD) /g, '$1&nbsp;');
     };
     const filas = [
       ['que', T('pub2_rev_que', 'Qué'), esc([op, BP.etiqueta ? BP.etiqueta(a.tipo || 'Departamento') : a.tipo].concat(emp && a.emprendimiento ? [a.emprendimiento] : []).join(' · '))],
@@ -600,46 +738,83 @@ document.addEventListener('DOMContentLoaded', function(){
       ['fotos', T('pub2_fotos_t', 'Fotos'), a.fotos.length ? TF('pub2_fotos_n', '{n} fotos', { n: a.fotos.length }) + (a.quiero_produccion ? ' · ' + T('pub2_rev_bairen', 'las hace BAIREN') : '') : (a.quiero_produccion ? T('pub2_rev_bairen_todas', 'Las hace BAIREN') : '0')],
       ['descripcion', T('pub2_desc_t', 'Descripción'), esc(TF('pub2_rev_desc', '{n} caracteres', { n: String(a.descripcion || '').length })) + (a.amenities.length ? ' · ' + esc(a.amenities.slice(0, 4).map(etiquetaDe).join(', ')) + (a.amenities.length > 4 ? '…' : '') : '')]
     ];
+    /* 8/10/2026 (lanz3-publicador) · Datos que parecen un error de tipeo: se avisan, no frenan el envío */
+    const dudas = BPData.datosDudosos ? BPData.datosDudosos(emp ? Object.assign({}, a, { m2_total: null, ambientes: null, banos: null }) : a) : [];
     el.innerHTML = cab(cambios ? T('pub2_rev_t_cambios', 'Revisá los cambios') : T('pub2_rev_t', 'Revisá y enviá'))
       + `<div class="pf-rev"><div class="pf-prev" id="prev" aria-hidden="true"></div>
-      <div><dl class="pf-resumen">${filas.map(([p, t, val]) => `<div class="fila"><div><dt>${t}</dt><dd>${val}</dd></div><button type="button" class="pf-cambiar" data-ir="${p}" aria-label="${esc(TF('pub2_cambiar_x', 'Cambiar {x}', { x: t.toLowerCase() }))}">${T('pub2_cambiar', 'Cambiar')}</button></div>`).join('')}</dl>
-      ${cambios ? '' : `<label class="pf-acepto p-fld" for="acepto"><input type="checkbox" id="acepto"><span>${T('pub2_acepto', 'Confirmo que los datos son ciertos y acepto los <a href="legales.html#terminos" target="_blank" rel="noopener">términos</a> y los <a href="legales.html#criterios" target="_blank" rel="noopener">criterios de selección</a>.')}</span></label>`}</div></div>`;
-    (async () => { try { const m = await BPData.fromStore(Object.assign({}, a, { publicador: pub, id: a.id || 'prev', fotos: a.fotos.map((f, i) => ({ url: f.url, orden: i })) })); const p = document.getElementById('prev'); if (p) p.innerHTML = BPData.cardV(m).replace(/<a class="prop-card"([^>]*?) href="[^"]*"/, '<div class="prop-card"$1').replace(/<\/a>\s*$/, '</div>').replace(/<button[^>]*data-fav[\s\S]*?<\/button>/, ''); } catch (e) { /* sin vista previa: el resumen alcanza */ } })();
+      <div>${dudas.length ? `<p class="pf-dudas" role="note"><b>${esc(TF('pub2_revisa', 'Revisá: {x}.', { x: dudas.join(', ') }))}</b> ${T('pub2_revisa_igual', 'Si está bien, seguí igual.')}</p>` : ''}<dl class="pf-resumen">${filas.map(([p, t, val]) => `<div class="fila"><div><dt>${t}</dt><dd>${val}</dd></div><button type="button" class="pf-cambiar" data-ir="${p}" aria-label="${esc(TF('pub2_cambiar_x', 'Cambiar {x}', { x: t.toLowerCase() }))}">${T('pub2_cambiar', 'Cambiar')}</button></div>`).join('')}</dl>
+      ${cambios ? '' : `<label class="pf-acepto p-fld" for="acepto"><input type="checkbox" id="acepto"><span>${T('pub2_acepto2', 'Confirmo que los datos son ciertos y acepto los términos y los criterios de selección.')}</span></label><p class="pf-leer"><a href="legales.html#terminos" target="_blank" rel="noopener">${T('pub2_leer_terminos', 'Leer los términos')}</a><span aria-hidden="true"> · </span><a href="legales.html#criterios" target="_blank" rel="noopener">${T('pub2_leer_criterios', 'Leer los criterios')}</a></p>`}</div></div>`;
+    /* La tarjeta como se va a ver. Un emprendimiento muestra la del desarrollo (desde, unidades, etapa), no la de su
+       primera unidad (8/10/2026, venta). */
+    (async () => { try {
+      const m = await BPData.fromStore(Object.assign({}, a, { publicador: pubVista(), id: a.id || 'prev', fotos: a.fotos.map((f, i) => ({ url: f.url, orden: i })) }));
+      const p = document.getElementById('prev'); if (!p) return;
+      if (emp && !unaUnidad && BPData.cardEmp) {
+        const g = BPData.emprendimientos(unidades.map((u, i) => Object.assign({}, m, { id: m.id + '-' + i, unidad: u.unidad, amb: u.ambientes, m2: u.m2_total, precio: u.precio, reservado: u.estado === 'reservado' })))[0];
+        if (g) { p.innerHTML = BPData.cardEmp(g); return; }
+      }
+      p.innerHTML = BPData.cardV(m).replace(/<a class="tj-link"([^>]*?) href="[^"]*"/, '<div class="tj-link"$1').replace(/<\/a>(\s*<button)/, '</div>$1').replace(/<button[^>]*data-fav[\s\S]*?<\/button>/, '');
+    } catch (e) { /* sin vista previa: el resumen alcanza */ } })();
     el.querySelectorAll('[data-ir]').forEach(b => b.addEventListener('click', () => { desdeRevisar = true; ir(b.dataset.ir, -1); }));
     return { boton: cambios ? T('pub2_guardar_cambios', 'Guardar cambios') : T('pub2_enviar', 'Enviar a revisión'), botonClase: cambios ? '' : 'oro', alContinuar: enviar };
   };
 
   /* ── Navegación ── */
+  /* El dueño directo que todavía no mandó el DNI y la titularidad pasa por Tus documentos (salvo que en esta visita
+     haya dicho "Los subo después") */
+  const pedirDocs = () => !modoCurador && faltanDocs() && !docsDespues();
   function siguiente(p){
-    if (p === 'que') return !haySesion() ? 'ingreso' : empresaCompleta(pub) ? 'propiedad' : 'empresa';
-    if (p === 'empresa') return 'propiedad';
+    if (p === 'que') return !haySesion() ? 'ingreso' : modoCurador ? 'propiedad' : !empresaCompleta(pub) ? 'empresa' : pedirDocs() ? 'documentos' : 'propiedad';
+    if (p === 'empresa') return pedirDocs() ? 'documentos' : 'propiedad';
+    if (p === 'documentos') return 'propiedad';
     return ORDEN[ORDEN.indexOf(p) + 1] || 'revisar';
   }
   function anterior(p){
-    if (modoPerfil) return null;
-    if (p === 'propiedad') return mostroEmpresa ? 'empresa' : 'que';
+    if (modoPerfil || modoDocs) return null;
+    if (p === 'propiedad') return mostroDocs ? 'documentos' : mostroEmpresa ? 'empresa' : 'que';
+    if (p === 'documentos') return mostroEmpresa ? 'empresa' : 'que';
     if (p === 'empresa') return 'que';
     if (p === 'que') return null;
     return ORDEN[ORDEN.indexOf(p) - 1];
   }
   function ocupar(btn, on, label){ if (!btn) return; if (on) { if (!btn.dataset.label) btn.dataset.label = btn.innerHTML; btn.disabled = true; btn.setAttribute('aria-busy', 'true'); btn.textContent = label || T('pub2_guardando', 'Guardando…'); } else { btn.disabled = false; btn.removeAttribute('aria-busy'); if (btn.dataset.label) { btn.innerHTML = btn.dataset.label; delete btn.dataset.label; } } }
   function botonOcupado(on, label){ const b = document.getElementById('pfSeguir'); if (!b) return; if (on) { if (!b.dataset.label) b.dataset.label = b.innerHTML; b.disabled = true; b.setAttribute('aria-busy', 'true'); b.textContent = label; } else ocupar(b, false); }
-  function pie(txt, cls){ pieIn.className = 'pf-pie-in'; pieIn.innerHTML = `<button type="button" class="pf-seguir ${cls || ''}" id="pfSeguir">${txt}</button>`; document.getElementById('pfSeguir').addEventListener('click', continuar); }
+  /* sec: un segundo botón debajo (Tus documentos: "Los subo después"), que sigue sin validar */
+  function pie(txt, cls, sec){
+    pieIn.className = 'pf-pie-in' + (sec ? ' doble' : ''); document.body.classList.toggle('pf-doble', !!sec);
+    pieIn.innerHTML = `<button type="button" class="pf-seguir ${cls || ''}" id="pfSeguir">${txt}</button>` + (sec ? `<button type="button" class="pf-seg2" id="pfSeg2">${sec}</button>` : '');
+    document.getElementById('pfSeguir').addEventListener('click', continuar);
+    if (sec) document.getElementById('pfSeg2').addEventListener('click', saltar);
+  }
+  /* "Los subo después": queda anotado en esta visita y sigue */
+  function saltar(){ if (ocupado) return; try { sessionStorage.setItem(DOCS_DESPUES, '1'); } catch (e) { /* nada */ } const dest = desdeRevisar ? 'revisar' : siguiente(actual); if (dest === 'revisar') desdeRevisar = false; ir(dest, 1); }
   function actualizarSalir(){
-    const conAviso = haySesion() && !!pub && !modoPerfil && ['propiedad', 'precio', 'fotos', 'descripcion', 'revisar'].indexOf(actual) > -1;
+    const conAviso = haySesion() && !!pub && !enCurso() && !modoPerfil && !modoDocs && ['propiedad', 'precio', 'fotos', 'descripcion', 'revisar'].indexOf(actual) > -1;
     const dir = actual === 'propiedad' ? valor('direccion') : aviso.direccion;
     bSalir.textContent = conAviso && String(dir || '').trim() ? T('pub2_salir_guardado', 'Salir, queda guardado') : T('pub2_salir', 'Salir');
   }
-  /* Un error de la pantalla anterior no se queda flotando en la siguiente */
-  const apagarError = () => { const t = document.getElementById('bpToast'); if (t && t.classList.contains('err')) t.classList.remove('on'); };
+  /* Un error de la pantalla anterior no se queda flotando en la siguiente (ni mientras se corrige) */
+  function apagarError(){ const t = document.getElementById('bpToast'); if (t && t.classList.contains('err')) t.classList.remove('on'); }
+  el.addEventListener('input', apagarError); el.addEventListener('change', apagarError);
+  /* 8/10/2026 (lanz3-publicador) · Arriba de la pantalla: el motivo de la curación (cambios pedidos o rechazo) al abrir
+     el aviso y en Revisar; en modo curador, a nombre de quién está el aviso. */
+  let vecesIr = 0;
+  function avisoArriba(nombre){
+    const cabeza = el.querySelector('.pf-cab'); if (!cabeza) return;
+    vecesIr++;
+    if (modoCurador) { cabeza.insertAdjacentHTML('afterend', `<p class="pf-curador" role="note">${esc(TF('pub2_cur_nota', 'Corregís el aviso de {n}. Sigue a su nombre.', { n: (pubAviso && pubAviso.nombre) || T('pub2_su_publicador', 'su publicador') }))}</p>`); return; }
+    if (motivoPrevio && (vecesIr === 1 || nombre === 'revisar') && aviso.estado_curacion !== 'en_revision') cabeza.insertAdjacentHTML('afterend', `<div class="pf-motivo${motivoPrevio.rechazo ? ' rechazo' : ''}" role="note"><b>${motivoPrevio.rechazo ? T('pub2_motivo_rechazo', 'Rechazado') : T('pub2_motivo_cambios', 'Cambios pedidos')}</b><p>${esc(motivoPrevio.txt)}</p></div>`);
+  }
   function ir(nombre, dir){
-    actual = nombre; if (nombre === 'empresa') mostroEmpresa = true;
+    actual = nombre; if (nombre === 'empresa') mostroEmpresa = true; if (nombre === 'documentos') mostroDocs = true;
     apagarError(); document.body.classList.remove('pf-doble');
-    const i = ORDEN.indexOf(nombre);
-    prog.querySelector('i').style.width = ((i + 1) / ORDEN.length * 100) + '%'; prog.setAttribute('aria-valuenow', String(i + 1)); prog.setAttribute('aria-valuetext', TF('pub2_paso_de', 'Paso {n} de {t}', { n: i + 1, t: ORDEN.length }));
+    /* Tus documentos cuenta solo para el dueño que pasa por ahí */
+    const orden = ORDEN.filter(x => x !== 'documentos' || mostroDocs || modoDocs || pedirDocs()), i = orden.indexOf(nombre);
+    prog.querySelector('i').style.width = ((i + 1) / orden.length * 100) + '%'; prog.setAttribute('aria-valuemax', String(orden.length)); prog.setAttribute('aria-valuenow', String(i + 1)); prog.setAttribute('aria-valuetext', TF('pub2_paso_de', 'Paso {n} de {t}', { n: i + 1, t: orden.length }));
     document.body.classList.remove('pf-ancho'); bAtras.hidden = false;
     pant = PANT[nombre]() || {};
-    pie(pant.boton || (desdeRevisar ? T('pub2_listo', 'Listo') : T('pub2_continuar', 'Continuar')), pant.botonClase);
+    avisoArriba(nombre);
+    pie(pant.boton || (desdeRevisar ? T('pub2_listo', 'Listo') : T('pub2_continuar', 'Continuar')), pant.botonClase, pant.secundario);
     actualizarSalir();
     document.body.dataset.pantalla = nombre;
     el.classList.remove('entra-d', 'entra-i'); void el.offsetWidth; el.classList.add(dir === -1 ? 'entra-i' : 'entra-d');
@@ -659,7 +834,7 @@ document.addEventListener('DOMContentLoaded', function(){
       /* Desde Revisar, Continuar vuelve a Revisar; si en la pantalla 1 cambió lo que se publica, sigue en orden (el precio cambia) */
       if (desdeRevisar && actual === 'que' && claseCambio) desdeRevisar = false;
       const dest = desdeRevisar ? 'revisar' : siguiente(actual);
-      if (dest === 'ingreso') { sigue = true; irAIngresar(clase); return; }
+      if (dest === 'ingreso') { sigue = true; irAIngresar(eleccionActual()); return; }
       if (dest === 'revisar') desdeRevisar = false;
       sigue = true; ocupado = false; ir(dest, 1);
     } catch (e) { BP.toast(BPStore.errorAlGuardar(e), 'error'); }
@@ -668,7 +843,7 @@ document.addEventListener('DOMContentLoaded', function(){
   async function atras(){
     if (ocupado) return;
     if (subiendo) { BP.toast(T('pub2_espera_fotos', 'Esperá a que terminen de subir las fotos.')); return; }
-    if (actual === 'recibido') { location.href = 'panel.html#avisos'; return; }
+    if (actual === 'recibido') { location.href = modoCurador ? 'curacion.html#cola' : 'panel.html#avisos'; return; }
     if (pant && pant.leer) pant.leer();
     const prev = desdeRevisar ? 'revisar' : anterior(actual);
     if (!prev) { salir(); return; }
@@ -680,31 +855,39 @@ document.addEventListener('DOMContentLoaded', function(){
     if (subiendo) { BP.toast(T('pub2_espera_fotos', 'Esperá a que terminen de subir las fotos.')); return; }
     if (actual !== 'recibido' && pant && pant.leer) pant.leer();
     if (['propiedad', 'precio', 'fotos', 'descripcion', 'revisar'].indexOf(actual) > -1) { try { await autoguardar(false); } catch (e) { BP.toast(BPStore.errorAlGuardar(e), 'error'); return; } }
-    location.href = !haySesion() ? 'publicar.html' : modoPerfil ? 'panel.html#cuenta' : 'panel.html#avisos';
+    location.href = !haySesion() ? 'publicar.html' : modoCurador ? 'curacion.html#cola' : (modoPerfil || modoDocs) ? 'panel.html#cuenta' : 'panel.html#avisos';
   }
   bAtras.addEventListener('click', atras); bSalir.addEventListener('click', salir);
 
   /* ── Guardar ── */
   async function save(estado){
-    const rec = Object.assign({}, aviso); rec.estado_curacion = estado; delete rec.publicador; if (estado === 'en_revision') rec.motivo_rechazo = null;
+    /* 8/10/2026 (lanz3-publicador) · Al reenviar, el motivo anterior queda: Curación lo muestra como "Reenvío". La
+       aprobación lo borra (setEstado). */
+    const rec = Object.assign({}, aviso); rec.estado_curacion = estado; delete rec.publicador;
     if (clase === 'emprendimiento' && tituloAuto) rec.titulo = tituloUnidad(rec.emprendimiento, rec.unidad);
     /* El código lleva la operación (BA-…V-, L-, M-). En "Venta o alquiler" el borrador se guarda antes de elegir entre las
        dos: mientras nunca se envió, si la operación cambió, el código se rehace (saveAviso lo genera de nuevo). */
     const letra = { venta: 'V', alquiler: 'L', mediano: 'M' }[rec.operacion];
     if (rec.codigo && aviso.estado_curacion === 'borrador' && letra && !new RegExp(letra + '-[A-Z0-9]{3}$').test(rec.codigo)) delete rec.codigo;
-    const saved = await BPStore.saveAviso(rec);
+    const saved = await BPStore.saveAviso(rec, { estadoAntes: aviso.estado_curacion });
     aviso.id = saved.id; aviso.codigo = saved.codigo; aviso.slug = saved.slug; aviso.estado_curacion = estado;
     return saved;
   }
   /* El borrador se guarda al pasar de pantalla: con calle y altura (la base la exige; sin ella no se crea un aviso vacío).
      Un aviso en revisión o publicado se guarda solo con la pantalla validada, y conserva su estado. */
+  /* La lista de unidades viaja con el borrador (unidades_borrador). Un aviso que dejó de ser emprendimiento la borra. */
+  const conLista = () => clase === 'emprendimiento' && !unaUnidad && aviso.estado_curacion === 'borrador';
+  const listaLimpia = () => unidades.map(u => ({ id: u.id || null, unidad: u.unidad || '', ambientes: u.ambientes || null, m2_total: u.m2_total || null, precio: u.precio != null ? u.precio : null, estado: u.estado === 'reservado' ? 'reservado' : 'disponible' }));
   async function autoguardar(validado){
-    if (!haySesion() || !pub || modoPerfil) return false;
+    if (!haySesion() || !(pub || modoCurador) || modoPerfil || modoDocs) return false;
     if (clase === 'emprendimiento') aBase();
     if (!tieneDireccion()) return false;
     if (enCurso() && !validado) return false;
+    if (conLista()) { if (aviso.id) unidades[0].id = aviso.id; aviso.unidades_borrador = listaLimpia(); }
+    else if (aviso.unidades_borrador) aviso.unidades_borrador = null;
     await save(estadoAlGuardar());
-    if (clase === 'emprendimiento' && aviso.id && !unaUnidad) { unidades[0].id = aviso.id; try { localStorage.setItem(UKEY(aviso.id), JSON.stringify(unidades)); } catch (e) { /* sin lugar: la lista vive en esta pestaña */ } }
+    /* Sin la columna en la base (antes de la 23), la lista se recuerda en este navegador */
+    if (conLista() && aviso.id) { unidades[0].id = aviso.id; if (!listaEnBase()) { try { localStorage.setItem(UKEY(aviso.id), JSON.stringify(listaLimpia())); } catch (e) { /* sin lugar: la lista vive en esta pestaña */ } } }
     return true;
   }
   /* Enviar: se revisa todo otra vez (con "Cambiar" se pudo saltear algo), y un emprendimiento crea un aviso por unidad */
@@ -712,16 +895,18 @@ document.addEventListener('DOMContentLoaded', function(){
     const falta = incompletas()[0];
     if (falta) { desdeRevisar = false; ir(falta, -1); if (falta !== 'empresa') setTimeout(() => { if (pant.leer) pant.leer(); if (pant.validar) pant.validar(); }, 380); return; }
     const eraEnCurso = enCurso();
-    if (!eraEnCurso) { const c = document.getElementById('acepto'); if (!c || !c.checked) { BP.errorCampo('acepto', T('pub2_err_acepto', 'Marcá la casilla para enviar.')); return; } }
+    if (!eraEnCurso) { const c = document.getElementById('acepto'); if (!c || !c.checked) { BP.errorCampo('acepto', T('pub2_err_acepto', 'Marcá la casilla para enviar.')); apagarError(); centrar(c); return; } }
     const estado = eraEnCurso ? aviso.estado_curacion : 'en_revision';
     let n = 1;
     if (clase === 'emprendimiento') {
-      aBase(); await save(estado); unidades[0].id = aviso.id;
+      /* Enviada, la lista ya no hace falta: cada unidad es su aviso */
+      aBase(); if (aviso.unidades_borrador || 'unidades_borrador' in aviso) aviso.unidades_borrador = null;
+      await save(estado); unidades[0].id = aviso.id;
       const base = Object.assign({}, aviso);
       for (let i = 1; i < unidades.length; i++) {
         const u = unidades[i];
         const rec = Object.assign({}, base, { unidad: u.unidad, ambientes: u.ambientes, m2_total: u.m2_total, precio: u.precio, estado: u.estado, estado_curacion: estado, motivo_rechazo: null, titulo: tituloAuto ? tituloUnidad(base.emprendimiento, u.unidad) : base.titulo, fotos: base.fotos.map(f => ({ url: f.url })) });
-        delete rec.publicador; delete rec.id; delete rec.codigo; rec.slug = null;
+        delete rec.publicador; delete rec.id; delete rec.codigo; delete rec.unidades_borrador; rec.slug = null;
         if (u.id) { rec.id = u.id; rec.slug = u.slug || null; if (u.codigo) rec.codigo = u.codigo; }
         const s = await BPStore.saveAviso(rec); u.id = s.id; u.slug = s.slug; u.codigo = s.codigo;
         botonOcupado(true, TF('pub2_enviando_n', 'Enviando {n} de {t}…', { n: i + 1, t: unidades.length }));
@@ -734,9 +919,14 @@ document.addEventListener('DOMContentLoaded', function(){
     recibido(eraEnCurso, n);
   }
   function recibido(cambios, n){
+    if (modoCurador) {
+      const msg = TF('pub2_cur_guardado', 'Guardado. El aviso sigue a nombre de {n}.', { n: (pubAviso && pubAviso.nombre) || T('pub2_su_publicador', 'su publicador') });
+      try { sessionStorage.setItem('bp_cur_msg', msg); } catch (e) { /* sin almacenamiento: el aviso se ve igual acá */ }
+      BP.toast(msg); setTimeout(() => { location.href = 'curacion.html#cola'; }, 700); return;
+    }
     actual = 'recibido'; document.body.dataset.pantalla = 'recibido'; desdeRevisar = false;
-    prog.querySelector('i').style.width = '100%'; prog.setAttribute('aria-valuenow', '8'); bAtras.hidden = true; bSalir.textContent = T('pub2_salir', 'Salir');
-    const sub = cambios ? (aviso.estado_curacion === 'publicado' ? T('pub2_rec_publicado', 'Ya se ven en la ficha.') : T('pub2_rec_en_revision', 'Sigue en revisión. Te avisamos por mail cuando esté publicado.'))
+    prog.querySelector('i').style.width = '100%'; prog.setAttribute('aria-valuenow', prog.getAttribute('aria-valuemax') || '8'); bAtras.hidden = true; bSalir.textContent = T('pub2_salir', 'Salir');
+    const sub = cambios ? (aviso.estado_curacion === 'publicado' ? T('pub2_rec_publicado', 'Ya se ven en la ficha.') : aviso.estado_curacion === 'pausado' ? T('pub2_rec_pausado', 'Sigue pausado. Lo reactivás desde tu panel.') : T('pub2_rec_en_revision', 'Sigue en revisión. Te avisamos por mail cuando esté publicado.'))
       : n > 1 ? TF('pub2_rec_emp', 'Recibimos {n} unidades. Las revisamos en menos de 48 horas y te avisamos por mail.', { n }) : T('pub2_rec_sub', 'Lo revisamos en menos de 48 horas y te avisamos por mail.');
     el.innerHTML = `<div class="pf-recibido"><span class="sello" aria-hidden="true">${ICO.check}</span>${cab(cambios ? T('pub2_rec_cambios_t', 'Cambios guardados') : T('pub2_rec_t', 'Recibido'), sub)}</div>`;
     apagarError(); document.body.classList.remove('pf-ancho'); document.body.classList.add('pf-doble'); pieIn.className = 'pf-pie-in doble';
@@ -748,6 +938,7 @@ document.addEventListener('DOMContentLoaded', function(){
   /* ── Por dónde se entra ── */
   let inicio = 'que';
   if (modoPerfil) inicio = 'empresa';
+  else if (modoDocs) inicio = 'documentos';
   else if (!haySesion()) inicio = 'que';
   else if (aviso.id || copiaDe) inicio = clase ? (incompletas()[0] || 'revisar') : 'que';   /* editar o copia: directo a lo que falta */
   else if (clase && vuelta) inicio = siguiente('que');                                      /* volvió de Ingresar con la elección hecha */
