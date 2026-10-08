@@ -340,21 +340,59 @@
     const all = L.verif.get([]); rec.id = uid(); all.push(rec); L.verif.set(all);
   };
 
+  /* ── 8/10/2026 · Qué columnas pide cada lectura ──────────
+     Ninguna lectura de portal.avisos pide `*`. La migración 23 deja a anon y authenticated con select por columna
+     sin propietario_email (el mail del dueño de la unidad), y con permisos por columna un `select=*` falla entero.
+     Ese mail lo ven solo el publicador del aviso, un curador y el propio propietario, por la vista
+     portal.avisos_propietario (id, publicador_id, propietario_email), que trae solo esas filas. Sin la 23 la vista
+     no existe y el mail se lee de la tabla, como antes: estas listas sirven antes y después de la migración.
+     S.COLS queda a mano para el resto del código (por ejemplo, el .select() que devuelve el aviso recién guardado,
+     que hoy pide `*` y con la 23 tiene que pedir S.COLS.AVISO). */
+  const COLS_PUB = 'id,slug,tipo,nombre,responsable,matricula,colegio,badge,verificado,descripcion,telefono,whatsapp,email,zonas,created_at';
+  /* Lo que usan tarjetas, filtros y búsqueda (data.js: fromStore, filter, cardH, cardV, emprendimientos). Sin las
+     descripciones en inglés y portugués, que solo muestra la ficha. cualidades_verificadas faltaba: el filtro de
+     cualidades y los sellos de la ficha no veían nunca las que marcó el curador. */
+  const COLS_LISTA = 'id,codigo,slug,publicador_id,operacion,tipo,titulo,direccion,unidad,barrio,zona,ciudad,precio,moneda,expensas,m2_total,m2_cubierto,ambientes,dormitorios,banos,cocheras,antiguedad,amoblado,amenities,caracteristicas,cualidades_verificadas,descripcion,video_url,video_tipo,plazo,estado,destacado_hasta,publicado_en,created_at,emprendimiento,etapa,entrega';
+  /* La ficha: lo de la lista más las traducciones y los datos que solo muestra ella */
+  const COLS_FICHA = COLS_LISTA + ',descripcion_en,descripcion_pt,mostrar_direccion,orientacion,disposicion,piso';
+  /* Una tarjeta de "Propiedades similares" (cardV) */
+  const COLS_TARJETA = 'id,codigo,slug,publicador_id,operacion,tipo,titulo,direccion,unidad,barrio,zona,ciudad,precio,moneda,expensas,m2_total,m2_cubierto,ambientes,dormitorios,banos,cocheras,amoblado,amenities,video_url,video_tipo,estado,destacado_hasta,publicado_en,created_at';
+  /* Todo el aviso menos propietario_email: panel, edición y curación */
+  const COLS_AVISO = 'id,codigo,slug,publicador_id,propiedad_id,operacion,tipo,titulo,direccion,unidad,barrio,zona,ciudad,mostrar_direccion,lat,lng,precio,moneda,expensas,m2_total,m2_cubierto,ambientes,dormitorios,banos,toilettes,cocheras,antiguedad,orientacion,disposicion,piso,amoblado,amenities,caracteristicas,descripcion,descripcion_en,descripcion_pt,video_url,video_tipo,plazo,estado,estado_curacion,motivo_rechazo,destacado_hasta,publicado_en,vence_en,created_at,updated_at,emprendimiento,etapa,entrega,quiero_produccion,codigo_interno,cualidades,cualidades_verificadas,cualidades_verificadas_por,cualidades_verificadas_en';
+  S.COLS = { PUB: COLS_PUB, LISTA: COLS_LISTA, FICHA: COLS_FICHA, TARJETA: COLS_TARJETA, AVISO: COLS_AVISO };
+  /* La tabla, vista o función todavía no existe en la base (migración sin correr) */
+  const faltaEnBase = e => !!e && (/^(PGRST20[0-9]|42P01|42883)$/.test(String(e.code || '')) || /does not exist|could not find/i.test(String(e.message || '')));
+  /* El mail del propietario de unas filas, solo las que esta cuenta puede ver. filtro(q) pone el filtro. { id: mail }.
+     Si no se pudo leer, {} y las filas quedan sin la clave: así guardar el aviso no pisa el mail con un vacío. */
+  async function mailsPropietario(filtro){
+    const m = {};
+    try {
+      let { data, error } = await filtro(S.sb.schema('portal').from('avisos_propietario').select('id,propietario_email'));
+      if (error && faltaEnBase(error)) ({ data, error } = await filtro(S.sb.schema('portal').from('avisos').select('id,propietario_email')));   /* sin la 23 */
+      if (error) throw error;
+      (data || []).forEach(r => { m[r.id] = r.propietario_email; });
+    } catch (e) { console.warn('mail del propietario no disponible', e); }
+    return m;
+  }
+  const conMails = (filas, m) => { (filas || []).forEach(a => { if (Object.prototype.hasOwnProperty.call(m, a.id)) a.propietario_email = m[a.id]; }); return filas || []; };
+
   /* ── avisos ───────────────────────────────────────────── */
   const codigo = (slug, op) => 'BA-' + (slug||'x').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8) + (op === 'venta' ? 'V' : op === 'alquiler' ? 'L' : 'M') + '-' + Math.random().toString(36).slice(2,5).toUpperCase();
   S.myAvisos = async function(){
-    if (DEMO && S.mode === 'supabase') {
-      const pub = await S.getMyPublicador();
-      if (!pub) return [];
-      const { data } = await S.sb.schema('portal').from('avisos').select('*, fotos(url, orden)').eq('publicador_id', pub.id).order('updated_at', { ascending:false });
-      return data || [];
-    }
     const pub = await S.getMyPublicador(); if (!pub) return [];
-    if (S.mode === 'supabase') { const { data } = await S.sb.schema('portal').from('avisos').select('*, fotos(url, orden)').eq('publicador_id', pub.id).order('updated_at', { ascending:false }); return data || []; }
+    if (S.mode === 'supabase') {
+      const { data } = await S.sb.schema('portal').from('avisos').select(COLS_AVISO + ',fotos(url,orden)').eq('publicador_id', pub.id).order('updated_at', { ascending:false });
+      if (!data || DEMO) return data || [];
+      return conMails(data, await mailsPropietario(q => q.eq('publicador_id', pub.id)));
+    }
     return L.avisos.get([]).filter(a => a.publicador_id === pub.id).sort((a,b) => (b.updated_at||'').localeCompare(a.updated_at||''));
   };
   S.getAviso = async function(id){
-    if (S.mode === 'supabase') { const { data } = await S.sb.schema('portal').from('avisos').select('*, fotos(url, orden)').eq('id', id).maybeSingle(); return data || null; }
+    if (S.mode === 'supabase') {
+      const { data } = await S.sb.schema('portal').from('avisos').select(COLS_AVISO + ',fotos(url,orden)').eq('id', id).maybeSingle();
+      if (!data) return null;
+      return DEMO ? data : conMails([data], await mailsPropietario(q => q.eq('id', id)))[0];
+    }
     return L.avisos.get([]).find(a => a.id === id) || null;
   };
   S.saveAviso = async function(a){
@@ -407,9 +445,70 @@
     if (S.mode === 'supabase') { const { error } = await S.sb.schema('portal').from('avisos').update(patch).eq('id', id); if (error) throw error; if (estado_curacion === 'publicado' && !(extra && extra.estado)) S.notify('aprobado', { aviso_id: id }); else if (estado_curacion === 'rechazado') S.notify('rechazado', { aviso_id: id, datos: { motivo } }); else if (estado_curacion === 'borrador' && motivo) S.notify('cambios', { aviso_id: id, datos: { motivo } }); return; }
     const all = L.avisos.get([]); const a = all.find(x => x.id === id); if (a) Object.assign(a, patch); L.avisos.set(all);
   };
+  /* 8/10/2026 · El catálogo: solo las columnas de la lista (COLS_LISTA) y TODO lo publicado, por tramos.
+     PostgREST corta en silencio en su tope de filas (1.000 en Supabase): antes, el aviso 1.001 no existía para nadie.
+     Ahora se pide por rangos con el total exacto en el primer pedido y se sigue hasta tenerlos todos. El rango
+     siguiente arranca donde terminó lo recibido (no en múltiplos de 1.000), así un tope más chico tampoco corta.
+     Orden estable (publicado_en, id) para que dos tramos no repitan ni salteen filas. Si la base falla, lanza:
+     data.js cae entonces al JSON de respaldo. */
+  const desembolsar = a => { a.publicador = a.publicadores; delete a.publicadores; return a; };
   S.publishedAvisos = async function(){
-    if (S.mode === 'supabase') { const { data } = await S.sb.schema('portal').from('avisos').select('id,codigo,slug,publicador_id,operacion,tipo,titulo,direccion,unidad,barrio,zona,ciudad,mostrar_direccion,precio,moneda,expensas,m2_total,m2_cubierto,ambientes,dormitorios,banos,cocheras,antiguedad,orientacion,disposicion,piso,amoblado,amenities,caracteristicas,descripcion,descripcion_en,descripcion_pt,video_url,video_tipo,plazo,estado,estado_curacion,destacado_hasta,publicado_en,created_at,emprendimiento,etapa,entrega, fotos(url, orden), publicadores(id,slug,tipo,nombre,responsable,matricula,colegio,badge,verificado,descripcion,telefono,whatsapp,email,zonas,created_at)').eq('estado_curacion', 'publicado').order('publicado_en', { ascending:false }); return (data || []).map(a => { a.publicador = a.publicadores; delete a.publicadores; return a; }); }
+    if (S.mode === 'supabase') {
+      const TRAMO = 1000, MAX_TRAMOS = 50, filas = []; let total = null;
+      for (let n = 0; n < MAX_TRAMOS; n++) {
+        const desde = filas.length;
+        const { data, error, count } = await S.sb.schema('portal').from('avisos')
+          .select(COLS_LISTA + ',fotos(url,orden),publicadores(' + COLS_PUB + ')', n === 0 ? { count: 'exact' } : undefined)
+          .eq('estado_curacion', 'publicado').order('publicado_en', { ascending: false, nullsFirst: false }).order('id', { ascending: true })
+          .range(desde, desde + TRAMO - 1);
+        if (error) throw error;
+        if (n === 0 && typeof count === 'number') total = count;
+        (data || []).forEach(a => filas.push(desembolsar(a)));
+        if (!data || !data.length) break;
+        if (total != null ? filas.length >= total : data.length < TRAMO) break;
+      }
+      return filas;
+    }
     const pubs = L.pubs.get([]); return L.avisos.get([]).filter(a => a.estado_curacion === 'publicado').map(a => Object.assign({}, a, { publicador: pubs.find(p => p.id === a.publicador_id) || null }));
+  };
+  /* 8/10/2026 · La ficha: un solo aviso publicado, con sus fotos y su publicador, en un pedido. Por id (uuid) o por
+     slug; un slug puede repetirse entre operaciones (la misma unidad en venta y en mediano plazo): gana el último
+     publicado, como hacía la búsqueda en el catálogo entero. Un enlace viejo "slug-operacion" (los avisos que salían
+     del JSON) se busca por slug y operación. null si no está publicado. Lanza si la base falla. */
+  S.avisoPublicado = async function(ref){
+    ref = String(ref || ''); if (!ref) return null;
+    if (S.mode !== 'supabase') { const l = await S.publishedAvisos(); return l.find(a => a.id === ref) || l.find(a => a.slug === ref) || null; }
+    const pedir = () => S.sb.schema('portal').from('avisos').select(COLS_FICHA + ',fotos(url,orden),publicadores(' + COLS_PUB + ')').eq('estado_curacion', 'publicado');
+    let r = await (esUUID(ref) ? pedir().eq('id', ref) : pedir().eq('slug', ref).order('publicado_en', { ascending: false, nullsFirst: false })).limit(1);
+    if (r.error) throw r.error;
+    let a = (r.data || [])[0] || null;
+    const viejo = !a && !esUUID(ref) && /^(.+)-(venta|alquiler|mediano)$/.exec(ref);
+    if (viejo) { r = await pedir().eq('slug', viejo[1]).eq('operacion', viejo[2]).limit(1); if (r.error) throw r.error; a = (r.data || [])[0] || null; }
+    return a ? desembolsar(a) : null;
+  };
+  /* Similares de la ficha: misma operación y zona, publicados, hasta n (6), con la portada sola. Un pedido chico en
+     vez del catálogo entero. [] si algo falla: la ficha se muestra igual. */
+  S.similaresDe = async function(a, n){
+    if (S.mode !== 'supabase' || !a) return [];
+    try {
+      let q = S.sb.schema('portal').from('avisos').select(COLS_TARJETA + ',fotos(url,orden),publicadores(' + COLS_PUB + ')')
+        .eq('estado_curacion', 'publicado').eq('operacion', a.operacion).neq('id', a.id);
+      if (a.zona) q = q.eq('zona', a.zona);
+      const { data, error } = await q.order('orden', { referencedTable: 'fotos' }).limit(1, { referencedTable: 'fotos' })
+        .order('publicado_en', { ascending: false, nullsFirst: false }).limit(n || 6);
+      if (error) throw error;
+      return (data || []).map(desembolsar);
+    } catch (e) { console.warn('similares', e); return []; }
+  };
+  /* Titular y matrícula de unos publicadores (vista publicador_publico, migración 01). Solo los pedidos: antes se
+     bajaba la vista entera en cada página. Con muchos ids (una URL larga) se pide todo. Lanza si la vista no está. */
+  S.titularesDe = async function(ids){
+    if (S.mode !== 'supabase' || !S.sb) return [];
+    const u = Array.from(new Set((ids || []).filter(esUUID))); if (!u.length) return [];
+    let q = S.sb.schema('portal').from('publicador_publico').select('id,titular_nombre,titular_colegio,titular_matricula,titular_matricula_verificada');
+    if (u.length <= 60) q = q.in('id', u);
+    const { data, error } = await q; if (error) throw error;
+    return data || [];
   };
 
   /* ── 4.4 Registro de eventos: una sola puerta para todo lo que queremos medir ── */
@@ -450,15 +549,31 @@
     return L.consultas.get([]).filter(c => c.publicador_id === pubId).reverse();
   };
   S.misConsultas = function(){ const e = S.session && S.session.email; return L.consultas.get([]).filter(c => !e || (c.email||'').toLowerCase() === e.toLowerCase()).reverse(); };
+  /* 8/10/2026 · Una ficha vista: una fila en portal.vistas y nada más. El evento 'vista_ficha' queda solo en este
+     navegador (bp_eventos): en la base era una segunda escritura por cada visita con el mismo dato (el resumen semanal
+     cuenta portal.vistas). El número se pide con la función vistas_de de la migración 23, que cuenta solo ese aviso
+     con índice. Sin la 23 no hay forma barata de contarlo (la vista vistas_por_aviso agrupa la tabla entera en cada
+     ficha), así que lanza después de registrar la vista y la ficha no muestra el número (su try lo deja vacío). */
   S.addVista = async function(avisoId){
     const v = L.vistas.get({}); v[avisoId] = (v[avisoId]||0) + 1; L.vistas.set(v);
-    if (S.mode === 'supabase') { const fila = esUUID(avisoId) ? { aviso_id: avisoId } : { aviso_ref: String(avisoId) }; S.sb.schema('portal').from('vistas').insert(fila).then(() => {}, () => {}); }
-    S.track('vista_ficha', { aviso_id: avisoId });
-    return S.mode === 'supabase' ? (await S.vistasDe([avisoId]))[String(avisoId)] || v[avisoId] : v[avisoId];
+    const local = LE.get([]); local.push({ evento: 'vista_ficha', aviso_id: avisoId, creado_en: now() }); if (local.length > 500) local.splice(0, local.length - 500); LE.set(local);
+    if (S.mode !== 'supabase') return v[avisoId];
+    const fila = esUUID(avisoId) ? { aviso_id: avisoId } : { aviso_ref: String(avisoId).slice(0, 200) };
+    try { await S.sb.schema('portal').from('vistas').insert(fila); } catch (e) { /* la vista no quedó; el conteo sigue */ }
+    const n = await contarVistas([avisoId]);
+    if (!n) throw new Error('conteo de vistas no disponible (falta la migración 23)');
+    return n[String(avisoId)] || 0;
   };
-  /* 4.3 Vistas reales del servidor, no las de este navegador */
+  /* { ref: vistas } con la función portal.vistas_de (migración 23), o null si la base no la tiene */
+  async function contarVistas(ids){
+    try { const { data, error } = await S.sb.schema('portal').rpc('vistas_de', { p_refs: ids.map(String) }); if (error) return null; const r = {}; (data || []).forEach(x => { r[x.ref] = x.vistas; }); return r; }
+    catch (e) { return null; }
+  }
+  /* 4.3 Vistas reales del servidor, no las de este navegador. Las pide el panel para los avisos de la cuenta.
+     Con la 23, por la función que cuenta con índice; sin ella, por la vista de siempre. */
   S.vistasDe = async function(ids){
     if (S.mode !== 'supabase' || !ids || !ids.length) return {};
+    const r0 = await contarVistas(ids); if (r0) return r0;
     try { const { data } = await S.sb.schema('portal').from('vistas_por_aviso').select('ref,vistas').in('ref', ids.map(String)); const r = {}; (data||[]).forEach(x => r[x.ref] = x.vistas); return r; } catch (e) { return {}; }
   };
   S.consultasDe = async function(ids){
@@ -490,7 +605,17 @@
   S.avisosDePropietario = async function(){
     if (!S.session) return [];
     const e = S.session.email.toLowerCase();
-    if (S.mode === 'supabase') { const { data } = await S.sb.schema('portal').from('avisos').select('*, fotos(url, orden), publicadores(slug, nombre, tipo, matricula, badge)').ilike('propietario_email', e); return (data || []).map(a => { a.publicador = a.publicadores; delete a.publicadores; return a; }); }
+    if (S.mode === 'supabase') {
+      /* 8/10/2026 · Sin `*` y sin filtrar por propietario_email en la tabla (la 23 cierra esa columna): los ids salen de
+         la vista avisos_propietario; sin la 23, como antes. El mail va escapado: un "_" en un ilike es comodín. */
+      const cols = COLS_AVISO + ',fotos(url,orden),publicadores(slug,nombre,tipo,matricula,badge)';
+      const patron = e.replace(/[\\%_]/g, '\\$&');
+      const v = await S.sb.schema('portal').from('avisos_propietario').select('id,propietario_email').ilike('propietario_email', patron);
+      let filas;
+      if (v.error && faltaEnBase(v.error)) { const { data } = await S.sb.schema('portal').from('avisos').select(cols + ',propietario_email').ilike('propietario_email', patron); filas = data || []; }
+      else { const ids = (v.data || []).map(r => r.id); if (!ids.length) return []; const { data } = await S.sb.schema('portal').from('avisos').select(cols).in('id', ids); filas = conMails(data, Object.fromEntries((v.data || []).map(r => [r.id, r.propietario_email]))); }
+      return filas.map(desembolsar);
+    }
     const pubs = L.pubs.get([]); return L.avisos.get([]).filter(a => (a.propietario_email||'').toLowerCase() === e).map(a => Object.assign({}, a, { publicador: pubs.find(p => p.id === a.publicador_id) || null }));
   };
 
@@ -610,7 +735,12 @@
     return true; /* modo local: cualquiera con sesión, para probar */
   };
   S.colaCuracion = async function(){
-    if (S.mode === 'supabase') { const { data } = await S.sb.schema('portal').from('avisos').select('*, fotos(url, orden), publicadores(*)').in('estado_curacion', ['en_revision']).order('updated_at', { ascending:true }); return (data || []).map(a => { a.publicador = a.publicadores; delete a.publicadores; return a; }); }
+    if (S.mode === 'supabase') {
+      const { data } = await S.sb.schema('portal').from('avisos').select(COLS_AVISO + ',fotos(url,orden),publicadores(*)').in('estado_curacion', ['en_revision']).order('updated_at', { ascending:true });
+      const filas = data || [];
+      if (filas.length && !DEMO) conMails(filas, await mailsPropietario(q => q.in('id', filas.map(a => a.id))));
+      return filas.map(desembolsar);
+    }
     const pubs = L.pubs.get([]); return L.avisos.get([]).filter(a => a.estado_curacion === 'en_revision').map(a => Object.assign({}, a, { publicador: pubs.find(p => p.id === a.publicador_id) || null }));
   };
   /* La persona titular de un publicador (migración 01). null si no hay migración o no tiene titular. */

@@ -110,43 +110,65 @@
       descripcion: D.sinLineaCorredor(r.descripcion), descripcion_en: D.sinLineaCorredor(r.descripcion_en), descripcion_pt: D.sinLineaCorredor(r.descripcion_pt), plazo: r.plazo || '', emprendimiento: r.emprendimiento || null, etapa: r.etapa || null, entrega: r.entrega || null, propietarioEmail: r.propietario_email || null, publicadoEn: r.publicado_en || r.created_at, estado: r.estado, reservado: r.estado === 'reservado', publicadorId: pubId, destacado: !!(r.destacado_hasta && new Date(r.destacado_hasta) > new Date()), demo: false, codigo: r.codigo, apto: r.caracteristicas && r.caracteristicas.length ? r.caracteristicas.slice(0,3) : [], fromStore: true };
   };
 
+  /* 8/10/2026 · Cómo se piden los datos.
+     · Con la base andando, el catálogo sale solo de Supabase (BPStore.publishedAvisos: las columnas de la lista, por
+       tramos hasta tenerlo entero). data/avisos-src.json ya no se baja: queda como respaldo si la base no responde.
+       Antes se bajaba siempre (183 KB en cada página) para sumar unidades de la web que el portal todavía no tenía;
+       eso hoy lo hace la sincronización del cron cada 15 minutos.
+     · Lo que llegó de la base se guarda en sessionStorage por CACHE_MS: en la misma visita, pasar de la portada a
+       la búsqueda o volver de una ficha no vuelve a pedir el catálogo. Si no entra (cuota) o el navegador no deja,
+       sigue sin caché. BPData.olvidarCatalogo() la borra (por ejemplo, después de publicar).
+     · La ficha no usa esto: D.loadFicha pide un solo aviso y sus similares. */
   let cache = null;
+  const CACHE_CLAVE = 'bp_catalogo_v1', CACHE_MS = 5 * 60 * 1000;
+  const cacheLeer = () => { try { const c = JSON.parse(sessionStorage.getItem(CACHE_CLAVE)); if (c && Array.isArray(c.recs) && Date.now() - c.t >= 0 && Date.now() - c.t < CACHE_MS) return c; } catch (e) { /* sin sessionStorage */ } return null; };
+  const cacheGuardar = c => { try { sessionStorage.setItem(CACHE_CLAVE, JSON.stringify(Object.assign({ t: Date.now() }, c))); } catch (e) { try { sessionStorage.removeItem(CACHE_CLAVE); } catch (_) { /* nada */ } } };
+  D.olvidarCatalogo = () => { cache = null; try { sessionStorage.removeItem(CACHE_CLAVE); } catch (e) { /* nada */ } };
+  /* Los avisos de la base y sus titulares: de la caché de la visita o de Supabase. Lanza si la base falla. */
+  async function catalogoDeLaBase(){
+    const c = cacheLeer(); if (c) return c;
+    const recs = await window.BPStore.publishedAvisos();
+    /* Quién responde por cada publicador: la persona titular y su matrícula (migración 01). Solo los publicadores
+       del catálogo. Si la vista no existe todavía, se sigue con lo que trae la fila del publicador. */
+    let tit = []; try { tit = await window.BPStore.titularesDe(recs.map(r => r.publicador_id)); } catch (e) { /* sin migración */ }
+    const nuevo = { recs, tit }; cacheGuardar(nuevo); return nuevo;
+  }
   D.load = async function(){
     if (cache) return cache;
 
-    /* Supabase es la fuente de las unidades publicadas. El JSON local es el respaldo
-       de cuando el esquema `portal` todavía no existía: si Supabase responde con
-       avisos, no se lee, porque si no cada unidad aparecería dos veces. */
-    let publicados = [];
+    let publicados = [], conBase = false;
     try {
       if (window.BPStore) {
         await window.BPStore.init();
-        const recs = await window.BPStore.publishedAvisos();
-        /* Quién responde por cada publicador: la persona titular y su matrícula (migración 01).
-           Si la vista no existe todavía, se sigue con lo que trae la fila del publicador. */
-        try { if (window.BPStore.sb) { const { data: tit } = await window.BPStore.sb.schema('portal').from('publicador_publico').select('id,titular_nombre,titular_colegio,titular_matricula,titular_matricula_verificada'); (tit || []).forEach(t => { D.titulares[t.id] = t; }); } } catch (e) { /* sin migración */ }
-        for (const r of recs) publicados.push(await D.fromStore(r));
+        if (window.BPStore.mode === 'supabase') {
+          const { recs, tit } = await catalogoDeLaBase();
+          (tit || []).forEach(t => { D.titulares[t.id] = t; });
+          for (const r of recs) publicados.push(await D.fromStore(r));
+          conBase = true;
+        } else {
+          for (const r of await window.BPStore.publishedAvisos()) publicados.push(await D.fromStore(r));   /* modo local: lo cargado en este navegador */
+        }
       }
     } catch (e) { console.warn('store', e); }
 
-    /* Sin Supabase, el JSON es la fuente. Con Supabase, del JSON entran sólo las
-       unidades que la web cargó después del último seed (JSON_DESDE) y que el
-       portal todavía no tiene: así los lofts del Palacio Alcorta se ven aunque no
-       haya corrido seed-avisos-2026-09-10.sql. Al correr un seed nuevo, subir la
-       fecha. Nunca se duplica una unidad que el portal ya publica. */
-    const JSON_DESDE = '2026-09-03T18:22:31Z';
-    const ya = new Set(publicados.map(a => a.slug + '|' + a.op));
-    const soloNuevas = publicados.length > 0;
-    try {
-      const src = new URL('data/avisos-src.json', document.baseURI).href;
-      const res = await fetch(src); const units = await res.json();
-      units.forEach(p => {
-        if (soloNuevas && !(p.created_at > JSON_DESDE)) return;
-        if (p.precio_venta && !ya.has(p.slug + '|venta')) publicados.push(fromUnit(p, 'venta', Number(p.precio_venta)));
-        if (p.precio_tradicional && !ya.has(p.slug + '|alquiler')) publicados.push(fromUnit(p, 'alquiler', Number(p.precio_tradicional)));
-        if (p.precio_temporal && !ya.has(p.slug + '|mediano')) publicados.push(fromUnit(p, 'mediano', Number(p.precio_temporal)));
-      });
-    } catch (e) { if (!publicados.length) throw e; console.warn('avisos-src.json', e); }
+    /* Sin base (modo local, o Supabase no respondió), el JSON es la fuente. En modo local con avisos cargados en este
+       navegador, del JSON entran solo las unidades posteriores al último seed (JSON_DESDE), como siempre. Nunca se
+       duplica una unidad que ya está. Con la base andando no se pide. */
+    if (!conBase) {
+      const JSON_DESDE = '2026-09-03T18:22:31Z';
+      const ya = new Set(publicados.map(a => a.slug + '|' + a.op));
+      const soloNuevas = publicados.length > 0;
+      try {
+        const src = new URL('data/avisos-src.json', document.baseURI).href;
+        const res = await fetch(src); const units = await res.json();
+        units.forEach(p => {
+          if (soloNuevas && !(p.created_at > JSON_DESDE)) return;
+          if (p.precio_venta && !ya.has(p.slug + '|venta')) publicados.push(fromUnit(p, 'venta', Number(p.precio_venta)));
+          if (p.precio_tradicional && !ya.has(p.slug + '|alquiler')) publicados.push(fromUnit(p, 'alquiler', Number(p.precio_tradicional)));
+          if (p.precio_temporal && !ya.has(p.slug + '|mediano')) publicados.push(fromUnit(p, 'mediano', Number(p.precio_temporal)));
+        });
+      } catch (e) { if (!publicados.length) throw e; console.warn('avisos-src.json', e); }
+    }
 
     /* El nicho es el filtro: lo que cae fuera de BP.ZONAS no se publica (hoy, Centro
        y Almagro). zonaDe() vive en mapa-barrios.js y sabe que Palermo Hollywood es
@@ -166,6 +188,35 @@
     const pubs = conEjemplos ? D.PUBLICADORES : Object.fromEntries(Object.entries(D.PUBLICADORES).filter(([, p]) => !p.demo));
     cache = { avisos: all, publicadores: pubs };
     return cache;
+  };
+
+  /* 8/10/2026 · La ficha pide lo suyo y nada más: el aviso (con fotos y publicador) en un pedido; después, en
+     paralelo, hasta 6 similares (misma operación y zona, con la portada sola) y el titular de su publicador.
+     Antes bajaba el catálogo entero, con las descripciones en tres idiomas de todos los avisos, para mostrar uno.
+     Devuelve { aviso, similares } con el modelo del portal; aviso null si no está publicado o cae fuera de las zonas.
+     Sin base (modo local) o si la base falla, cae al catálogo de siempre (D.load) y busca ahí. */
+  D.loadFicha = async function(ref){
+    ref = String(ref || '');
+    const S = window.BPStore;
+    const enZona = a => !window.BairenZonas || BP.ZONAS.indexOf(a.zona) > -1;   /* mismo nicho que D.load */
+    try {
+      if (S) {
+        await S.init();
+        if (S.mode === 'supabase') {
+          const r = await S.avisoPublicado(ref);
+          if (!r) return { aviso: null, similares: [] };
+          const [sims, tit] = await Promise.all([S.similaresDe(r, 6), S.titularesDe([r.publicador_id]).catch(() => [])]);
+          tit.forEach(t => { D.titulares[t.id] = t; });
+          const aviso = await D.fromStore(r);
+          if (!enZona(aviso)) return { aviso: null, similares: [] };
+          const similares = []; for (const s of sims) { const x = await D.fromStore(s); if (enZona(x)) similares.push(x); }
+          return { aviso, similares };
+        }
+      }
+    } catch (e) { console.warn('ficha: la base no respondió, se busca en el respaldo', e); }
+    const { avisos } = await D.load();
+    const aviso = avisos.find(x => x.id === ref) || avisos.find(x => x.slug === ref) || null;
+    return { aviso, similares: aviso ? avisos.filter(x => x.id !== aviso.id && x.op === aviso.op && (x.zona === aviso.zona || x.barrio === aviso.barrio)) : [] };
   };
 
   /* Todo lo visible de una tarjeta pasa por BP.t(clave, castellano): en es no cambia nada.
