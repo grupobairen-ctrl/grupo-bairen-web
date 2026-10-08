@@ -112,6 +112,11 @@ document.addEventListener('DOMContentLoaded', function(){
   /* Moneda (contrato 8/10/2026): solo el alquiler tradicional puede ir en pesos; venta y mediano plazo, siempre USD */
   const conMoneda = op => op === 'alquiler';
   const PRECIO_LBL = { venta: 'Precio en USD', alquiler: 'Precio por mes', mediano: 'Precio por mes, en USD' };
+  /* Mediano plazo (contrato 8/10/2026): la estadía mínima va en plazo ("3 meses") y lo que incluye el precio, en
+     caracteristicas con estos cinco textos exactos. Se piden en Lo principal, al lado del precio, solo para 'mediano'. */
+  const INCLUYE = ['Expensas incluidas', 'Servicios incluidos', 'Internet incluido', 'Limpieza incluida', 'Ropa blanca incluida'];
+  const ESTADIAS = [3,4,5,6,7,8,9,10,11,12].map(n => n + ' meses');
+  const estadiaOpts = actual => [['', 'Elegí la estadía mínima']].concat(actual && ESTADIAS.indexOf(actual) === -1 ? [[actual, actual]] : []).concat(ESTADIAS.map(x => [x, x]));
   const precioTxt = (precio, moneda) => precio == null || precio === '' ? 'Sin precio' : moneda === 'ARS' ? '$ ' + BP.fmtN(Math.round(Number(precio))) : BP.fmtUSD(Number(precio));
   const CARACT = ['Apto crédito','Apto profesional','Ofrece financiación','Permite mascotas','Luminoso','Acepta seguro de caución','Contrato digital'];
   let pub = await BPStore.getMyPublicador();
@@ -193,6 +198,10 @@ document.addEventListener('DOMContentLoaded', function(){
       ${fld('unidad','Piso y unidad','text',a.unidad,{attrs:'placeholder="4° B"'})}
       ${fld('mostrar_direccion','Dirección en la ficha','select',a.mostrar_direccion,{opts:[['aproximada','Aproximada, solo la cuadra'],['exacta','Exacta']]})}
       <div class="p-fld" data-fld="precio"><label for="f-precio" id="l-precio">${PRECIO_LBL[a.operacion] || PRECIO_LBL.venta}</label><div class="p-precio"><select id="f-moneda" name="moneda" aria-label="Moneda" ${conMoneda(a.operacion) ? '' : 'hidden disabled'}><option value="USD" ${a.moneda !== 'ARS' ? 'selected' : ''}>USD</option><option value="ARS" ${a.moneda === 'ARS' ? 'selected' : ''}>ARS</option></select><input id="f-precio" name="precio" type="number" value="${BP.esc(v(a,'precio'))}" required min="0" step="1" inputmode="numeric" aria-describedby="h-precio"></div><div class="hint" id="h-precio">Sin puntos.</div></div>
+      <div class="full" id="bloqueMediano" ${a.operacion === 'mediano' ? '' : 'hidden'}>
+        <div class="p-formgrid">${fld('plazo','Estadía mínima','select',a.plazo||'',{opts:estadiaOpts(a.plazo),attrs:a.operacion === 'mediano' ? '' : 'disabled'})}</div>
+        <fieldset class="p-grupo" style="margin-top:14px"><legend>Qué incluye</legend><div class="p-checks">${INCLUYE.map(x => `<label><input type="checkbox" name="incl" value="${x}" ${(a.caracteristicas||[]).indexOf(x)>-1?'checked':''} ${a.operacion === 'mediano' ? '' : 'disabled'}> ${x}</label>`).join('')}</div></fieldset>
+      </div>
       ${fld('expensas','Expensas por mes, en pesos','number',a.expensas,{attrs:'min="0" step="1"'})}
       ${fld('m2_total','Superficie total, m²','number',a.m2_total,{attrs:'required min="10"'})}
       ${fld('m2_cubierto','Superficie cubierta, m²','number',a.m2_cubierto,{attrs:'min="10"'})}
@@ -216,7 +225,8 @@ document.addEventListener('DOMContentLoaded', function(){
     fillBarrios(); zs.addEventListener('change', fillBarrios);
     /* La operación decide el rótulo del precio y si se elige la moneda. Lo que no aplica queda oculto y deshabilitado: collect() no lo lee. */
     const os = document.getElementById('f-operacion');
-    const segunOperacion = () => { const op = os.value; document.getElementById('l-precio').textContent = PRECIO_LBL[op] || PRECIO_LBL.venta; const m = document.getElementById('f-moneda'); m.hidden = m.disabled = !conMoneda(op); };
+    const segunOperacion = () => { const op = os.value; document.getElementById('l-precio').textContent = PRECIO_LBL[op] || PRECIO_LBL.venta; const m = document.getElementById('f-moneda'); m.hidden = m.disabled = !conMoneda(op);
+      const bm = document.getElementById('bloqueMediano'); bm.hidden = op !== 'mediano'; bm.querySelectorAll('select,input').forEach(i => { i.disabled = op !== 'mediano'; }); };
     os.addEventListener('change', segunOperacion);
     const bt = document.getElementById('btnTraducir'); if (bt) bt.addEventListener('click', async () => {
       collect(); const desc = (a.descripcion || '').trim(); if (desc.length < 40) { BP.toast('Escribí primero la descripción en castellano.', 'error'); return; }
@@ -225,10 +235,10 @@ document.addEventListener('DOMContentLoaded', function(){
       catch (e) { BP.toast(e.message || 'No se pudo traducir.', 'error'); }
       finally { bt.disabled = false; bt.textContent = txt; }
     });
-    bindNav(async () => { collect(); const req = REQ; let ok = true; req.forEach(k => { const f = document.querySelector(`[data-fld=${k}]`); const bad = !aviso[k] || (k === 'descripcion' && String(aviso[k]).length < 150); f.classList.toggle('err', bad); if (bad) ok = false; }); if (!ok) {
+    bindNav(async () => { collect(); const req = reqDe(aviso); let ok = true; req.forEach(k => { const f = document.querySelector(`[data-fld=${k}]`); const bad = !aviso[k] || (k === 'descripcion' && String(aviso[k]).length < 150); f.classList.toggle('err', bad); if (bad) ok = false; }); if (!ok) {
         const k = req.find(x => !aviso[x] || (x === 'descripcion' && String(aviso[x]).length < 150));
         const el = document.querySelector(`[data-fld=${k}]`);
-        BP.errorCampo(el && (el.querySelector('#f-' + k) || el.querySelector('input,select,textarea') || el), k === 'descripcion' ? 'La descripción necesita al menos 150 caracteres.' : 'Falta este dato.');
+        BP.errorCampo(el && (el.querySelector('#f-' + k) || el.querySelector('input,select,textarea') || el), k === 'descripcion' ? 'La descripción necesita al menos 150 caracteres.' : k === 'plazo' ? 'Elegí la estadía mínima.' : 'Falta este dato.');
         return false; } return true; });
   }
 
@@ -303,7 +313,7 @@ document.addEventListener('DOMContentLoaded', function(){
       <fieldset class="p-grupo"><legend>Cualidades de la unidad</legend><p class="p-note">Marcá solo las ciertas. La curación las verifica; solo las verificadas aparecen en la ficha y en la búsqueda.</p><div class="p-checks">${BP.CUALIDADES.map(x => `<label><input type="checkbox" name="cual" value="${x}" ${(a.cualidades||[]).indexOf(x)>-1?'checked':''}> ${x}</label>`).join('')}</div></fieldset>
       ${pub && pub.tipo === 'desarrolladora' ? `<div class="p-fld" style="margin-top:18px"><label>Desarrollo</label></div><div class="p-formgrid">${fld('emprendimiento','Nombre del desarrollo','text',a.emprendimiento||'',{attrs:'placeholder="Torre Libertador 5600"'},'Las unidades con el mismo nombre se agrupan en su página.')}${fld('etapa','Etapa de obra','select',a.etapa||'construccion',{opts:[['pozo','En pozo'],['construccion','En construcción'],['terminado','Terminado']]})}${fld('entrega','Entrega','text',a.entrega||'',{attrs:'placeholder="Diciembre 2027"'})}</div>` : ''}
       ${pub && pub.tipo !== 'dueno' ? `<div class="p-formgrid" style="margin-top:18px">${fld('propietario_email','Mail del propietario (opcional)','email',a.propietario_email||'',{full:true,attrs:'placeholder="propietario@mail.com"'},'Con ese mail, el dueño entra a BAIREN y ve las visitas y reservas que registrás. No ve las consultas.')}</div>` : ''}
-      <div class="p-formgrid" style="margin-top:18px">${fld('orientacion','Orientación','select',a.orientacion||'',{opts:[['','No informada'],['Norte','Norte'],['Sur','Sur'],['Este','Este'],['Oeste','Oeste'],['Noreste','Noreste'],['Noroeste','Noroeste']]})}${fld('disposicion','Disposición','select',a.disposicion||'',{opts:[['','No informada'],['Frente','Frente'],['Contrafrente','Contrafrente'],['Lateral','Lateral'],['Interior','Interior']]})}${fld('piso','Piso','text',a.piso||'',{attrs:'placeholder="4"'})}${a.operacion !== 'venta' ? fld('plazo','Plazo','text',a.plazo||'',{attrs:'placeholder="3 a 24 meses"'}) : ''}</div>
+      <div class="p-formgrid" style="margin-top:18px">${fld('orientacion','Orientación','select',a.orientacion||'',{opts:[['','No informada'],['Norte','Norte'],['Sur','Sur'],['Este','Este'],['Oeste','Oeste'],['Noreste','Noreste'],['Noroeste','Noroeste']]})}${fld('disposicion','Disposición','select',a.disposicion||'',{opts:[['','No informada'],['Frente','Frente'],['Contrafrente','Contrafrente'],['Lateral','Lateral'],['Interior','Interior']]})}${fld('piso','Piso','text',a.piso||'',{attrs:'placeholder="4"'})}${a.operacion === 'alquiler' ? fld('plazo','Plazo','text',a.plazo||'',{attrs:'placeholder="24 meses"'}) : ''}</div>
       ${navBtns()}`;
     bindNav(async () => { collect(); return true; });
   }
@@ -313,7 +323,7 @@ document.addEventListener('DOMContentLoaded', function(){
     const a = aviso; const pubName = pub ? pub.nombre : '';
     el.innerHTML = `<h2 class="p-sec-t">Revisar y enviar</h2><p class="p-kicker" style="margin-bottom:10px">Así se va a ver. BAIREN lo revisa en menos de 48 horas y te avisa por mail.</p>
       <div class="p-grid" style="max-width:320px;margin:14px 0 18px" id="prev"></div>
-      <dl class="p-resumen" style="margin:0"><dt>Publica</dt><dd>${BP.esc(pubName)} ${pub && pub.matricula ? '· ' + BP.esc(pub.matricula) : ''} ${pub && !pub.verificado ? '<span class="p-badge dueno">Verificación pendiente</span>' : ''}</dd><dt>Operación</dt><dd>${OP_TXT[a.operacion] || OP_TXT.alquiler} · ${BP.esc(a.tipo)}</dd><dt>Ubicación</dt><dd>${BP.esc(a.direccion)} ${BP.esc(a.unidad||'')}, ${BP.esc(a.barrio)} (${BP.zonaLabel(a.zona)}) · dirección ${a.mostrar_direccion}</dd><dt>Precio</dt><dd>${precioTxt(a.precio, a.moneda)}${a.operacion !== 'venta' ? ' por mes' : ''}${a.expensas ? ' · expensas $ ' + BP.fmtN(a.expensas) : ''}</dd><dt>Datos</dt><dd>${[a.m2_total ? a.m2_total + ' m²' : null, a.ambientes ? a.ambientes + ' amb.' : null, a.dormitorios ? a.dormitorios + ' dorm.' : null, a.banos ? a.banos + ' baños' : null, a.cocheras ? a.cocheras + ' coch.' : null, a.antiguedad != null && a.antiguedad !== '' ? a.antiguedad + ' años' : null].filter(Boolean).join(' · ')}</dd><dt>Fotos</dt><dd>${a.fotos.length}${a.quiero_produccion ? ' · producción de BAIREN solicitada' : ''}</dd><dt>Amenities</dt><dd>${a.amenities.join(', ') || 'Sin informar'}</dd></dl>
+      <dl class="p-resumen" style="margin:0"><dt>Publica</dt><dd>${BP.esc(pubName)} ${pub && pub.matricula ? '· ' + BP.esc(pub.matricula) : ''} ${pub && !pub.verificado ? '<span class="p-badge dueno">Verificación pendiente</span>' : ''}</dd><dt>Operación</dt><dd>${OP_TXT[a.operacion] || OP_TXT.alquiler} · ${BP.esc(a.tipo)}</dd><dt>Ubicación</dt><dd>${BP.esc(a.direccion)} ${BP.esc(a.unidad||'')}, ${BP.esc(a.barrio)} (${BP.zonaLabel(a.zona)}) · dirección ${a.mostrar_direccion}</dd><dt>Precio</dt><dd>${precioTxt(a.precio, a.moneda)}${a.operacion !== 'venta' ? ' por mes' : ''}${a.operacion === 'mediano' && a.plazo ? ' · estadía mínima ' + BP.esc(a.plazo) : ''}${a.expensas ? ' · expensas $ ' + BP.fmtN(a.expensas) : ''}</dd><dt>Datos</dt><dd>${[a.m2_total ? a.m2_total + ' m²' : null, a.ambientes ? a.ambientes + ' amb.' : null, a.dormitorios ? a.dormitorios + ' dorm.' : null, a.banos ? a.banos + ' baños' : null, a.cocheras ? a.cocheras + ' coch.' : null, a.antiguedad != null && a.antiguedad !== '' ? a.antiguedad + ' años' : null].filter(Boolean).join(' · ')}</dd>${a.operacion === 'mediano' ? `<dt>Qué incluye</dt><dd>${(a.caracteristicas || []).filter(x => INCLUYE.indexOf(x) > -1).join(', ') || 'Sin informar'}</dd>` : ''}<dt>Fotos</dt><dd>${a.fotos.length}${a.quiero_produccion ? ' · producción de BAIREN solicitada' : ''}</dd><dt>Amenities</dt><dd>${a.amenities.join(', ') || 'Sin informar'}</dd></dl>
       <div class="p-prose" style="margin-top:18px"><div class="box"><b>Condiciones.</b> Al enviar confirmás que la propiedad está en una zona de BAIREN, que tenés derecho a publicarla (titularidad, mandato o matrícula) y que los datos son ciertos. Si no cumple el estándar, te decimos por qué.</div></div>
       <label style="display:flex;gap:10px;align-items:flex-start;margin-top:14px;color:var(--navy-deeper)"><input type="checkbox" id="acepto"><span>Acepto los <a href="legales.html#terminos" style="text-decoration:underline">Términos y condiciones</a> y los <a href="legales.html#criterios" style="text-decoration:underline">criterios de selección</a>.</span></label>
       <div class="p-nav-steps"><button type="button" class="p-btn p-btn-dark" data-back>Volver</button><div class="p-nav-main"><button type="button" class="p-btn" data-save>Guardar borrador</button><button type="button" class="p-btn p-btn-fill" id="enviar">Enviar a revisión ${BP.ico.arrow}</button></div></div>`;
@@ -323,8 +333,8 @@ document.addEventListener('DOMContentLoaded', function(){
     document.getElementById('enviar').addEventListener('click', async () => {
       const btn = document.getElementById('enviar');
       /* Antes de enviar se vuelve a mirar lo obligatorio de Principales: con el stepper se puede haber saltado el paso */
-      const falta = REQ.find(k => !a[k] || (k === 'descripcion' && String(a[k]).length < 150));
-      if (falta) { step = 1; render(); setTimeout(() => { const f = document.querySelector(`[data-fld=${falta}]`); if (f) { f.classList.add('err'); BP.errorCampo(f.querySelector('#f-' + falta) || f.querySelector('input,select,textarea') || f, falta === 'descripcion' ? 'La descripción tiene que tener al menos 150 caracteres.' : 'Falta este dato.'); } }, 350); return; }
+      const falta = reqDe(a).find(k => !a[k] || (k === 'descripcion' && String(a[k]).length < 150));
+      if (falta) { step = 1; render(); setTimeout(() => { const f = document.querySelector(`[data-fld=${falta}]`); if (f) { f.classList.add('err'); BP.errorCampo(f.querySelector('#f-' + falta) || f.querySelector('input,select,textarea') || f, falta === 'descripcion' ? 'La descripción tiene que tener al menos 150 caracteres.' : falta === 'plazo' ? 'Elegí la estadía mínima.' : 'Falta este dato.'); } }, 350); return; }
       if (a.fotos.length < 8 && !a.quiero_produccion) { step = 2; render(); BP.toast('Hacen falta ocho fotos y hay ' + a.fotos.length + '. O pedí la producción de BAIREN.', 'error'); return; }
       if (!document.getElementById('acepto').checked) { BP.errorCampo('acepto', 'Aceptá los términos para enviar.'); return; }
       ocupar(btn, true, 'Enviando…');
@@ -332,11 +342,16 @@ document.addEventListener('DOMContentLoaded', function(){
     });
   }
 
-  function collect(){ el.querySelectorAll('input[name]:not([type=checkbox]):not([type=radio]):not([type=file]):not(:disabled),select[name]:not(:disabled),textarea[name]:not(:disabled)').forEach(i => { const k = i.name; let val = i.value; if (i.type === 'number') val = val === '' ? null : Number(val); if (typeof val === 'string') val = val.trim(); aviso[k] = val; }); const am = el.querySelectorAll('[name=amen]:checked'); if (el.querySelector('[name=amen]')) aviso.amenities = Array.from(am).map(x => x.value); const ca = el.querySelectorAll('[name=car]:checked'); if (el.querySelector('[name=car]')) aviso.caracteristicas = Array.from(ca).map(x => x.value); const cu = el.querySelectorAll('[name=cual]:checked'); if (el.querySelector('[name=cual]')) aviso.cualidades = Array.from(cu).map(x => x.value); if (aviso.operacion === 'mediano') aviso.amoblado = true; else aviso.amoblado = aviso.amenities.indexOf('Amoblado') > -1; if (aviso.video_url) aviso.video_tipo = /youtu/.test(aviso.video_url) ? 'youtube' : /bunny|mediadelivery/.test(aviso.video_url) ? 'bunny' : 'mp4';
+  function collect(){ el.querySelectorAll('input[name]:not([type=checkbox]):not([type=radio]):not([type=file]):not(:disabled),select[name]:not(:disabled),textarea[name]:not(:disabled)').forEach(i => { const k = i.name; let val = i.value; if (i.type === 'number') val = val === '' ? null : Number(val); if (typeof val === 'string') val = val.trim(); aviso[k] = val; }); const am = el.querySelectorAll('[name=amen]:checked'); if (el.querySelector('[name=amen]')) aviso.amenities = Array.from(am).map(x => x.value); const ca = el.querySelectorAll('[name=car]:checked'); if (el.querySelector('[name=car]')) aviso.caracteristicas = (aviso.caracteristicas || []).filter(x => CARACT.indexOf(x) === -1).concat(Array.from(ca).map(x => x.value));
+    /* caracteristicas guarda dos cosas: las de Extras y lo que incluye el mediano plazo. Cada paso reemplaza solo lo suyo. */
+    if (el.querySelector('[name=incl]:not(:disabled)')) aviso.caracteristicas = (aviso.caracteristicas || []).filter(x => INCLUYE.indexOf(x) === -1).concat(Array.from(el.querySelectorAll('[name=incl]:checked')).map(x => x.value));
+    if (aviso.operacion !== 'mediano') aviso.caracteristicas = (aviso.caracteristicas || []).filter(x => INCLUYE.indexOf(x) === -1);
+    if (aviso.operacion === 'venta') aviso.plazo = null; const cu = el.querySelectorAll('[name=cual]:checked'); if (el.querySelector('[name=cual]')) aviso.cualidades = Array.from(cu).map(x => x.value); if (aviso.operacion === 'mediano') aviso.amoblado = true; else aviso.amoblado = aviso.amenities.indexOf('Amoblado') > -1; if (aviso.video_url) aviso.video_tipo = /youtu/.test(aviso.video_url) ? 'youtube' : /bunny|mediadelivery/.test(aviso.video_url) ? 'bunny' : 'mp4';
     aviso.moneda = conMoneda(aviso.operacion) && aviso.moneda === 'ARS' ? 'ARS' : 'USD'; }
   async function save(estado){ collect(); const rec = Object.assign({}, aviso); rec.estado_curacion = estado; delete rec.publicador; if (estado === 'en_revision') rec.motivo_rechazo = null; const saved = await BPStore.saveAviso(rec); aviso.id = saved.id; aviso.codigo = saved.codigo; aviso.slug = saved.slug; aviso.estado_curacion = estado; return saved; }
   /* Lo obligatorio del paso Principales; se revisa al avanzar y otra vez antes de enviar */
   const REQ = ['zona','barrio','direccion','precio','m2_total','ambientes','descripcion'];
+  const reqDe = a => a.operacion === 'mediano' ? REQ.concat('plazo') : REQ;   /* el mediano plazo pide además la estadía mínima */
   /* Un botón ocupado no se vuelve a apretar: queda deshabilitado y dice qué está haciendo */
   function ocupar(btn, on, label){ if (!btn) return; if (on) { btn.dataset.label = btn.innerHTML; btn.disabled = true; btn.setAttribute('aria-busy', 'true'); btn.textContent = label || 'Guardando…'; } else { btn.disabled = false; btn.removeAttribute('aria-busy'); if (btn.dataset.label) btn.innerHTML = btn.dataset.label; } }
   function bindNav(validate){
