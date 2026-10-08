@@ -197,7 +197,8 @@
   /* Operación como filtro (decisión de Tomás, 10/9/2026): "alquiler" abarca mediano y largo
      plazo; "largo" es sólo largo (los avisos de largo plazo llevan op 'alquiler'). */
   D.opMatch = (a, op) => !op || (op === 'alquiler' ? a.op !== 'venta' : op === 'largo' ? a.op === 'alquiler' : a.op === op);
-  D.precioHTML = a => a.precio ? `${BP.fmtUSD(a.precio)}${a.periodo ? '<small>' + BP.t('ui_por_mes', a.periodo) + '</small>' : ''}` : BP.t('card_consultar_precio', 'Consultar precio');
+  /* 8/10/2026 · Con su moneda y "por mes" en palabras: "USD 1.100 por mes", "$ 850.000 por mes" */
+  D.precioHTML = a => a.precio ? `${BP.fmtPrecio(a.precio, a.moneda)}${a.periodo ? '<small> ' + BP.t('card_por_mes', 'por mes') + '</small>' : ''}` : BP.t('card_consultar_precio', 'Consultar precio');
   /* La insignia es un dato del publicador ('Dueño verificado', 'Corredor inmobiliario matriculado'…): se traduce como etiqueta fija; 'Selección BAIREN' es nombre propio y queda */
   /* 22/9/2026 · El sello del dueño se pinta SOLO si la titularidad está verificada de verdad.
      Antes se pintaba "Dueño verificado" con escudo por el mero hecho de ser tipo 'dueno', sin
@@ -271,6 +272,9 @@
       if (f.op && !D.opMatch(a, f.op)) return false;
       if (f.tipo && f.tipo !== 'todos' && a.tipoProp.toLowerCase() !== f.tipo) return false;
       if (f.zonas && f.zonas.length && f.zonas.indexOf(a.zona) === -1) return false;
+      /* 8/10/2026 · El rango de precio es en una moneda (f.mon: '' es USD, 'ARS' pesos): los avisos en la otra no entran.
+         Sin rango de precio se ven todos. */
+      if ((f.pmin || f.pmax) && (a.moneda === 'ARS' ? 'ARS' : 'USD') !== (f.mon === 'ARS' ? 'ARS' : 'USD')) return false;
       if (f.pmin && (a.precio||0) < f.pmin) return false;
       if (f.pmax && (a.precio||0) > f.pmax) return false;
       /* 23/9/2026 · Antes decía `a.expensas &&`, o sea que los avisos SIN expensas cargadas

@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function(){
     </div>
     <div class="p-fhero-price-box">
       <div class="p-fhero-price-lbl">${a.reservado ? T('ficha_estado', 'Estado') : a.op === 'venta' ? T('ficha_precio', 'Precio') : T('ficha_precio_mensual', 'Precio mensual')}</div>
-      <div class="p-fhero-price">${a.reservado ? T('ficha_reservada', 'Reservada') : BP.fmtUSD(a.precio)}</div>
+      <div class="p-fhero-price">${a.reservado ? T('ficha_reservada', 'Reservada') : BP.fmtPrecio(a.precio, a.moneda)}</div>
       <div class="p-fhero-price-mo">${a.reservado ? T('ficha_no_consultas', 'no toma consultas') : (a.op === 'venta' ? '' : a.op === 'mediano' ? T('ficha_todo_incluido', 'por mes · todo incluido') : T('ficha_por_mes', 'por mes')) + (a.expensas ? (a.op === 'venta' ? '' : ' · ') + TF('ficha_mas_expensas', 'más $ {n} de expensas', { n: BP.fmtN(a.expensas) }) : '')}</div>
     </div>
   </div>
@@ -488,7 +488,7 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip" role="group" aria-label="$
     else if (mf) ponerMapa();
   } catch (e) {}
   /* JSON-LD */
-  const ld = { '@context':'https://schema.org', '@type':'RealEstateListing', name: a.titulo, description: (a.descripcion||'').slice(0,300), url: location.href, image: fotos.slice(0,3), datePosted: a.publicadoEn, offers: { '@type':'Offer', price: a.precio, priceCurrency: 'USD', availability: a.reservado ? 'https://schema.org/LimitedAvailability' : 'https://schema.org/InStock', /* 23/9/2026 · Un gestor no es una agencia inmobiliaria: declararlo como RealEstateAgent en los
+  const ld = { '@context':'https://schema.org', '@type':'RealEstateListing', name: a.titulo, description: (a.descripcion||'').slice(0,300), url: location.href, image: fotos.slice(0,3), datePosted: a.publicadoEn, offers: { '@type':'Offer', price: a.precio, priceCurrency: a.moneda === 'ARS' ? 'ARS' : 'USD', availability: a.reservado ? 'https://schema.org/LimitedAvailability' : 'https://schema.org/InStock', /* 23/9/2026 · Un gestor no es una agencia inmobiliaria: declararlo como RealEstateAgent en los
      datos estructurados sería afirmar que ejerce el corretaje, que es justo lo que no hace. Solo
      quien tiene matrícula se declara como tal. */
     offeredBy: { '@type': pub.tipo === 'dueno' ? 'Person' : (pub.matricula ? 'RealEstateAgent' : 'Organization'), name: pub.nombre, identifier: pub.matricula || pub.badge || 'Selección BAIREN' } }, address: { '@type':'PostalAddress', streetAddress: a.dir, addressLocality: lugar || undefined, addressRegion: a.ciudad, addressCountry: 'AR' } };

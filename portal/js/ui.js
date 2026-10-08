@@ -42,6 +42,8 @@
   };
   BP.LOCALE = () => ({ en: 'en-US', pt: 'pt-BR' })[BP.lang] || 'es-AR';
   BP.fmtUSD = n => n == null ? BP.t('ui_consultar', 'Consultar') : 'USD ' + Math.round(n).toLocaleString(BP.LOCALE());
+  /* 8/10/2026 · El precio con su moneda: 'USD 1.100' o '$ 850.000'. Sólo el alquiler tradicional puede estar en pesos. */
+  BP.fmtPrecio = (n, moneda) => n == null ? BP.t('ui_consultar', 'Consultar') : (moneda === 'ARS' ? '$ ' : 'USD ') + Math.round(n).toLocaleString(BP.LOCALE());
   BP.isoLocal = d => { const x = new Date(d); x.setMinutes(x.getMinutes() - x.getTimezoneOffset()); return x.toISOString().slice(0, 16); };
   BP.fmtN = n => n == null ? '' : Number(n).toLocaleString('es-AR');
   BP.esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

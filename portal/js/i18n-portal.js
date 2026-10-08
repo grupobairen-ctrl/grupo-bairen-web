@@ -41,7 +41,7 @@ window.BP_I18N = {
 
     /* interfaz compartida (ui.js): fechas, precios, error, compartir, avisos */
     ui_pub_hoy: 'Listed today', ui_pub_ayer: 'Listed yesterday', ui_pub_dias: 'Listed {n} days ago', ui_pub_mes: 'Listed 1 month ago', ui_pub_meses: 'Listed {n} months ago',
-    ui_consultar: 'Price on request', ui_por_mes: '/mo',
+    ui_consultar: 'Price on request', ui_por_mes: '/mo', card_por_mes: 'per month',
     ui_error_default: 'We could not load the information.', ui_error_ayuda: 'It may be your connection or something on our side. Try again in a moment.', ui_reintentar: 'Retry',
     ui_compartir_aria: 'Share this property', ui_compartir: 'Share', ui_por_mail: 'By email', ui_copiar: 'Copy the link', ui_otras_apps: 'Other apps', ui_cerrar: 'Close', ui_copiado: 'Copied', ui_enlace_copiado: 'Link copied.',
     ui_ingresa_notif: 'Sign in to see your notifications.', ui_sin_notif: 'No new notifications.', ui_sesion_cerrada: 'Signed out.',
@@ -76,7 +76,7 @@ window.BP_I18N = {
     cat_plazo_aria: 'Rental term', cat_plazo_todos: 'Any term',
     cat_tipo_aria: 'Property type', cat_tipo_depto: 'Apartment', cat_tipo_piso: 'Full-floor', cat_tipo_casa: 'House', cat_tipo_todos: 'All types',
     cat_amb_dorm: 'Rooms | Beds', cat_amb_min: 'Rooms, minimum', cat_dorm_min: 'Bedrooms, minimum', cat_any: 'Any', cat_limpiar: 'Clear', cat_aplicar: 'Apply',
-    cat_precio: 'Price', cat_usd_rango: 'USD, from and to', cat_min_ph: 'Minimum', cat_max_ph: 'Maximum', cat_pmin_aria: 'Minimum price in USD', cat_pmax_aria: 'Maximum price in USD',
+    cat_precio: 'Price', cat_usd_rango: 'USD, from and to', cat_min_ph: 'Minimum', cat_max_ph: 'Maximum', cat_pmin_aria: 'Minimum price in USD', cat_pmax_aria: 'Maximum price in USD', cat_moneda_aria: 'Currency', cat_pesos: 'Pesos', cat_ars_rango: 'Pesos, from and to', cat_pmin_aria_ars: 'Minimum price in pesos', cat_pmax_aria_ars: 'Maximum price in pesos',
     cat_barrios: 'Neighborhoods', cat_filtros: 'Filters', cat_mas_filtros: 'More filters',
     cat_crear_alerta: 'Create alert', cat_alerta_creada: 'Alert created', cat_alerta_quitar: 'Alert created, tap to remove it',
     cat_ordenar: 'Sort by', cat_sort_relevancia: 'Most relevant', cat_sort_precio_asc: 'Lowest price', cat_sort_precio_desc: 'Highest price', cat_sort_recientes: 'Newest', cat_sort_m2: 'Largest area',
@@ -102,7 +102,7 @@ window.BP_I18N = {
     cat_pag_ant: 'Previous page', cat_pag_sig: 'Next page', cat_pag: 'Page {n}',
     cat_leyenda_alq: 'Legal notice, Buenos Aires rental law (Law 2340, art. 10 par. 8), for residential rental listings published by licensed brokers: ',
     cat_crumb_todas: 'All operations', cat_mapa_nd: 'Map not available.',
-    cat_amb_btn: '{n}+ rooms', cat_dorm_btn: '{n}+ beds', cat_precio_btn: 'USD {a} to {b}', cat_sin_max: 'no maximum',
+    cat_amb_btn: '{n}+ rooms', cat_dorm_btn: '{n}+ beds', cat_precio_btn: 'USD {a} to {b}', cat_precio_btn_m: '{m} {a} to {b}', cat_sin_max: 'no maximum',
     cat_quitar: 'Remove {z}', cat_err_max: 'The maximum has to be higher than the minimum.', cat_err_carga: 'We could not load the properties.',
     cat_toast_alerta_quitada: 'Alert removed.', cat_unidad: ' unit', cat_unidades: ' units',
 
@@ -277,7 +277,7 @@ window.BP_I18N = {
 
     /* interfaz compartida (ui.js): fechas, precios, error, compartir, avisos */
     ui_pub_hoy: 'Publicado hoje', ui_pub_ayer: 'Publicado ontem', ui_pub_dias: 'Publicado há {n} dias', ui_pub_mes: 'Publicado há 1 mês', ui_pub_meses: 'Publicado há {n} meses',
-    ui_consultar: 'Preço sob consulta', ui_por_mes: '/mês',
+    ui_consultar: 'Preço sob consulta', ui_por_mes: '/mês', card_por_mes: 'por mês',
     ui_error_default: 'Não conseguimos carregar as informações.', ui_error_ayuda: 'Pode ser a sua conexão ou algo do nosso lado. Tente de novo em instantes.', ui_reintentar: 'Tentar de novo',
     ui_compartir_aria: 'Compartilhar este imóvel', ui_compartir: 'Compartilhar', ui_por_mail: 'Por e-mail', ui_copiar: 'Copiar o link', ui_otras_apps: 'Outros aplicativos', ui_cerrar: 'Fechar', ui_copiado: 'Copiado', ui_enlace_copiado: 'Link copiado.',
     ui_ingresa_notif: 'Entre para ver suas notificações.', ui_sin_notif: 'Você não tem notificações novas.', ui_sesion_cerrada: 'Sessão encerrada.',
@@ -312,7 +312,7 @@ window.BP_I18N = {
     cat_plazo_aria: 'Prazo do aluguel', cat_plazo_todos: 'Todos',
     cat_tipo_aria: 'Tipo de imóvel', cat_tipo_depto: 'Apartamento', cat_tipo_piso: 'Andar inteiro', cat_tipo_casa: 'Casa', cat_tipo_todos: 'Todos os tipos',
     cat_amb_dorm: 'Amb | Dorm', cat_amb_min: 'Ambientes, mínimo', cat_dorm_min: 'Dormitórios, mínimo', cat_any: 'Todos', cat_limpiar: 'Limpar', cat_aplicar: 'Aplicar',
-    cat_precio: 'Preço', cat_usd_rango: 'USD, de e até', cat_min_ph: 'Mínimo', cat_max_ph: 'Máximo', cat_pmin_aria: 'Preço mínimo em USD', cat_pmax_aria: 'Preço máximo em USD',
+    cat_precio: 'Preço', cat_usd_rango: 'USD, de e até', cat_min_ph: 'Mínimo', cat_max_ph: 'Máximo', cat_pmin_aria: 'Preço mínimo em USD', cat_pmax_aria: 'Preço máximo em USD', cat_moneda_aria: 'Moeda', cat_pesos: 'Pesos', cat_ars_rango: 'Pesos, de e até', cat_pmin_aria_ars: 'Preço mínimo em pesos', cat_pmax_aria_ars: 'Preço máximo em pesos',
     cat_barrios: 'Bairros', cat_filtros: 'Filtros', cat_mas_filtros: 'Mais filtros',
     cat_crear_alerta: 'Criar alerta', cat_alerta_creada: 'Alerta criado', cat_alerta_quitar: 'Alerta criado, toque para removê-lo',
     cat_ordenar: 'Ordenar', cat_sort_relevancia: 'Mais relevantes', cat_sort_precio_asc: 'Menor preço', cat_sort_precio_desc: 'Maior preço', cat_sort_recientes: 'Mais recentes', cat_sort_m2: 'Maior área',
@@ -338,7 +338,7 @@ window.BP_I18N = {
     cat_pag_ant: 'Página anterior', cat_pag_sig: 'Próxima página', cat_pag: 'Página {n}',
     cat_leyenda_alq: 'Aviso legal, lei de aluguéis de Buenos Aires (Lei 2340, art. 10 inc. 8), para anúncios de aluguel residencial publicados por corretores habilitados: ',
     cat_crumb_todas: 'Todas as operações', cat_mapa_nd: 'Mapa indisponível.',
-    cat_amb_btn: '{n}+ amb.', cat_dorm_btn: '{n}+ dorm.', cat_precio_btn: 'USD {a} a {b}', cat_sin_max: 'sem máximo',
+    cat_amb_btn: '{n}+ amb.', cat_dorm_btn: '{n}+ dorm.', cat_precio_btn: 'USD {a} a {b}', cat_precio_btn_m: '{m} {a} a {b}', cat_sin_max: 'sem máximo',
     cat_quitar: 'Remover {z}', cat_err_max: 'O máximo tem que ser maior que o mínimo.', cat_err_carga: 'Não conseguimos carregar os imóveis.',
     cat_toast_alerta_quitada: 'Alerta removido.', cat_unidad: ' unidade', cat_unidades: ' unidades',
 
