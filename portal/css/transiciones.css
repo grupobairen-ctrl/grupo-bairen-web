@@ -82,3 +82,36 @@ body.p-home .h-criterios{opacity:1;visibility:visible;transform:none;transition:
   .p-drawer.open .panel{transform:none}
   @starting-style{.p-drawer.open .panel{transform:translateY(100%)}}
 }
+
+/* ══ Fotos que aparecen suave ═══════════════════════════════════════════════
+   ui.js marca la foto mientras baja (bp-carga) y la suelta al terminar con un fundido de
+   200 ms. Si ya estaba en caché, aparece sin fundido. Solo opacidad: no corre nada. */
+.bp-carga{opacity:0}
+.bp-fundido{transition:opacity .2s var(--t-curva)}
+
+/* ══ Transición entre páginas ═══════════════════════════════════════════════
+   Navegar dentro del portal funde una página en la otra (220 ms). La foto de la tarjeta
+   tocada crece hasta donde va la foto principal de la ficha, y al volver atrás se achica a
+   su tarjeta. Los nombres los pone ui.js (y, en la ficha, un script del <head>); la barra de
+   arriba y la de abajo quedan quietas entre páginas. Cada página repite en línea, en su
+   <head>, la regla @view-transition: si solo está acá, Chrome a veces la saltea cuando
+   todavía faltan scripts al pintar el primer cuadro. Chrome 126+ y Safari 18.2+; los demás
+   navegan como siempre. */
+@view-transition{navigation:auto}
+.navbar.p-navbar{view-transition-name:bp-barra}
+#pTabbar{view-transition-name:bp-pestanas}
+/* La copia de la foto que llega a la ficha (la crea propiedad.html y la retira ui.js) */
+.bp-vt-destino{position:absolute;z-index:900;margin:0;max-width:none;object-fit:cover;pointer-events:none;view-transition-name:foto;background:#131D2D}
+
+::view-transition-old(root),::view-transition-new(root){animation-duration:.22s;animation-timing-function:cubic-bezier(.22,1,.36,1)}
+::view-transition-group(bp-barra),::view-transition-group(bp-pestanas){animation-duration:.22s;animation-timing-function:cubic-bezier(.22,1,.36,1)}
+::view-transition-group(foto){animation-duration:.3s;animation-timing-function:cubic-bezier(.22,1,.36,1)}
+/* La foto mantiene su encuadre mientras cambia de tamaño (la tarjeta es 4:3; la ficha, otra proporción) */
+::view-transition-old(foto),::view-transition-new(foto){height:100%;object-fit:cover;mix-blend-mode:normal}
+/* La de origen queda entera todo el viaje; la de destino se funde encima al final */
+::view-transition-old(foto){animation:none;opacity:1}
+::view-transition-new(foto){animation:bp-vt-foto .3s cubic-bezier(.22,1,.36,1) both}
+@keyframes bp-vt-foto{0%,45%{opacity:0}100%{opacity:1}}
+/* Si del otro lado no hay foto (se volvió a una lista que se dibujó de nuevo), la que se va se funde en su lugar */
+::view-transition-old(foto):only-child{animation:bp-vt-sale .22s cubic-bezier(.22,1,.36,1) both}
+@keyframes bp-vt-sale{to{opacity:0}}
