@@ -19,9 +19,27 @@
  *
  * El portal no agrega ninguna línea de corredor a las descripciones: quien
  * publica se muestra en la tarjeta del publicador.
+ *
+ * 8/10/2026 · Solo con sesión iniciada (si no, 401) y con tope: TOPE_DIA traducciones por IP por día de Buenos
+ * Aires (si no, 429). El cupo de MyMemory es uno solo para todo el portal: sin tope, una cuenta podía gastarlo
+ * entero. El conteo vive en la memoria de cada instancia de Vercel, como los otros límites (portal-notify): frena
+ * el abuso, no es una cuenta exacta.
  */
 const SUPABASE_URL = process.env.PORTAL_SUPABASE_URL || 'https://jdatlsrujgfmvyuhoffg.supabase.co';
 const SUPABASE_ANON_KEY = process.env.PORTAL_SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkYXRsc3J1amdmbXZ5dWhvZmZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NzcyNTYsImV4cCI6MjA5NDQ1MzI1Nn0.g9B1EoHkVeAcDJ2KNuMjwMW2_5Y6Xk2IlWjdQRrob2o';
+
+const TOPE_DIA = 30;
+const usos = new Map();   // 'AAAA-MM-DD|ip' → traducciones de ese día
+const diaBA = () => new Date(Date.now() - 3 * 3600 * 1000).toISOString().slice(0, 10);
+const ipDe = req => String((req.headers && (req.headers['x-forwarded-for'] || req.headers['x-real-ip'])) || '').split(',')[0].trim() || 'x';
+/* Suma un uso y dice si se pasó del tope. Al cambiar el día se olvida lo anterior. */
+function pasado(ip) {
+  const dia = diaBA(), clave = dia + '|' + ip;
+  for (const k of usos.keys()) { if (!k.startsWith(dia + '|')) usos.delete(k); else break; }
+  if (usos.size > 20000) usos.clear();
+  const n = (usos.get(clave) || 0) + 1; usos.set(clave, n);
+  return n > TOPE_DIA;
+}
 
 async function usuarioDe(req) {
   const auth = req.headers.authorization || '';
@@ -110,10 +128,12 @@ async function deepl(key, textos, target) {
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   if (req.method !== 'POST') { res.status(405).json({ ok: false, error: 'POST' }); return; }
-  const user = await usuarioDe(req);
-  if (!user) { res.status(401).json({ ok: false, error: 'Hace falta una sesión de publicador.' }); return; }
+  const user = await usuarioDe(req).catch(() => null);
+  if (!user) { res.status(401).json({ ok: false, error: 'Para traducir tenés que iniciar sesión.' }); return; }
+  if (pasado(ipDe(req))) { res.status(429).json({ ok: false, error: 'Llegaste al tope de traducciones de hoy. Probá mañana o escribí la traducción a mano.' }); return; }
 
-  const b = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
+  let b = {};
+  try { b = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {}); } catch (e) { res.status(400).json({ ok: false, error: 'No se entendió el pedido.' }); return; }
   const titulo = String(b.titulo || '').trim().slice(0, 200);
   const descripcion = String(b.descripcion || '').trim().slice(0, 6000);
   if (!descripcion && !titulo) { res.status(400).json({ ok: false, error: 'No hay texto para traducir.' }); return; }
@@ -133,3 +153,4 @@ module.exports = async (req, res) => {
     res.status(502).json({ ok: false, error: 'No se pudo traducir: ' + e.message });
   }
 };
+module.exports._interno = { TOPE_DIA, usos, pasado, diaBA };
