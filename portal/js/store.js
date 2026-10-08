@@ -358,6 +358,20 @@
     S.track('publicador_alta', { publicador_id: rec.id || null, datos: { tipo: rec.tipo } });
     const all = L.pubs.get([]); const i = all.findIndex(x => x.auth_user_id === S.session.id); if (i > -1) { rec.id = all[i].id; rec.created_at = all[i].created_at; rec.verificado = all[i].verificado; all[i] = Object.assign(all[i], rec); } else { rec.id = uid(); rec.created_at = now(); all.push(rec); } L.pubs.set(all); return rec;
   };
+  /* 8/10/2026 (lanz3-publicador) · Un publicador por id: el del aviso que abre un curador desde Curación, para que la
+     vista previa, los eventos y el mensaje final digan a nombre de quién está. Con base, la política "publicador propio
+     select" deja al curador ver cualquiera (y "publicadores visibles", a todos los verificados). null si no se ve. */
+  S.getPublicador = async function(id){
+    if (!id) return null;
+    if (S.mode === 'supabase') {
+      try { const { data, error } = await S.sb.schema('portal').from('publicadores').select(COLS_PUB).eq('id', id).maybeSingle(); if (error) throw error; return data || null; }
+      catch (e) { console.warn('publicador no disponible', e); return null; }
+    }
+    return L.pubs.get([]).find(p => p.id === id) || null;
+  };
+  /* WhatsApp: se acepta como lo escribe la gente (11 2345-6789, 011 15 2345 6789) y se guarda con 54 9. La usan la carga
+     (publicar-aviso.html) y el enlace de Interesados (panel.html): el mismo número da el mismo wa.me. */
+  S.waNorm = s => { let d = String(s || '').replace(/\D/g, ''); if (d.indexOf('00') === 0) d = d.slice(2); if (d.indexOf('54') === 0) return d.length === 12 && d[2] !== '9' ? '549' + d.slice(2) : d; if (d[0] === '0') d = d.slice(1); if (d.length === 12 && d.indexOf('1115') === 0) d = '11' + d.slice(4); return d.length === 10 ? '549' + d : d; };
   S.uploadDoc = async function(file, pubId, tipo){
     if (S.mode === 'supabase') { const path = pubId + '/' + tipo + '-' + Date.now() + '.' + (file.name.split('.').pop() || 'jpg'); const { error } = await S.sb.storage.from('portal-docs').upload(path, file, { upsert: true }); if (error) throw error; return path; }
     return 'local:' + file.name;
@@ -468,15 +482,33 @@
     }
     return L.avisos.get([]).find(a => a.id === id) || null;
   };
-  S.saveAviso = async function(a){
-    const pub = await S.getMyPublicador(); if (!pub) throw new Error('Completá tu perfil de publicador primero.');
+  /* 8/10/2026 (lanz3-publicador) · Los eventos del aviso, una vez cada uno: 'aviso_creado' solo al crearlo (antes, en cada
+     autoguardado: unos once por aviso, y con base no se registraba nunca), 'aviso_enviado' cuando pasa a revisión desde
+     otro estado y 'aviso_editado' (con el mail del curador en datos) la primera vez que un curador guarda un aviso ajeno
+     en esta página. opts.estadoAntes: el estado que tenía (la página lo sabe; en modo local se lee de lo guardado). */
+  const editadosPorCurador = new Set();
+  S.saveAviso = async function(a, opts){
+    opts = opts || {};
+    const pub = await S.getMyPublicador();
+    /* 8/10/2026 (lanz3-publicador) · Un curador corrige un aviso ajeno sin tener perfil de publicador (nunca se le crea
+       uno). Solo para editar (con id); un alta sigue pidiendo el perfil. */
+    const porCurador = !!(a.id && (!pub || (a.publicador_id && a.publicador_id !== pub.id)) && await S.isCurador());
+    if (!pub && !porCurador) throw new Error('Completá tu perfil de publicador primero.');
     /* 8/10/2026 · La base exige la dirección (direccion not null): sin ella no se manda nada, con un mensaje en castellano,
        y en modo local tampoco se crea un aviso vacío. */
     if (!String(a.direccion || '').trim()) throw new Error(T('err_sin_direccion', 'Falta la calle y la altura del aviso.'));
     const rec = Object.assign({ estado: 'disponible', estado_curacion: 'borrador', moneda: 'USD', ciudad: a.zona === 'GBA Norte' ? 'Zona Norte' : 'Capital Federal', tipo: 'Departamento', mostrar_direccion: 'aproximada' }, a, { updated_at: now() });
+    const pubDelAviso = a.publicador_id || (pub && pub.id) || null;
     /* 8/10/2026 · El aviso es de quien lo creó: al editar no se cambia el publicador. Antes, un curador que corregía
        un aviso ajeno desde curación se lo quedaba (pasaba a su propio publicador). */
     if (rec.id) delete rec.publicador_id; else rec.publicador_id = pub.id;
+    const eventos = guardado => {
+      const base = { aviso_id: guardado.id, publicador_id: pubDelAviso || guardado.publicador_id || null };
+      const datos = { operacion: guardado.operacion, zona: guardado.zona };
+      if (nuevo) S.track('aviso_creado', Object.assign({ datos }, base));
+      if (rec.estado_curacion === 'en_revision' && (nuevo || (estadoAntes != null && estadoAntes !== 'en_revision'))) S.track('aviso_enviado', Object.assign({ datos }, base));
+      if (porCurador && !editadosPorCurador.has(guardado.id)) { editadosPorCurador.add(guardado.id); S.track('aviso_editado', Object.assign({ datos: Object.assign({ curador: (S.session && S.session.email) || null, estado_curacion: rec.estado_curacion }, datos) }, base)); }
+    };
     /* 25/9/2026 · codigo_interno es único por publicador (índice de migracion-21): sin espacios, y vacío = null, porque
        dos filas importadas sin código ('') chocarían. Un alta con un código que el publicador ya tiene actualiza ese
        aviso en vez de crear otro: reimportar la cartera no duplica, aunque importar.html no lo haya encontrado en su
@@ -490,6 +522,9 @@
          no puede despublicar un aviso que está en línea. */
       if (ya) { rec.id = ya.id; rec.slug = ya.slug; rec.codigo = ya.codigo; if (ya.estado_curacion) rec.estado_curacion = ya.estado_curacion; }
     }
+    const nuevo = !rec.id;
+    let estadoAntes = opts.estadoAntes != null ? opts.estadoAntes : null;
+    if (estadoAntes == null && !nuevo && S.mode !== 'supabase') { const ant = L.avisos.get([]).find(x => x.id === rec.id); if (ant) estadoAntes = ant.estado_curacion; }
     if (!rec.slug) rec.slug = slugify((rec.direccion||'') + ' ' + (rec.unidad||'') + ' ' + (rec.barrio||''));
     if (!rec.codigo) rec.codigo = codigo(rec.slug, rec.operacion);
     const fotos = rec.fotos || []; delete rec.fotos;
@@ -523,12 +558,11 @@
       if (res.error) throw res.error; const saved = res.data;
       try { if (window.BPData && BPData.olvidarCatalogo) BPData.olvidarCatalogo(); } catch (e) { /* nada */ }
       if (fotos.length) { await S.sb.schema('portal').from('fotos').delete().eq('aviso_id', saved.id); const rows = fotos.map((f, i) => ({ aviso_id: saved.id, url: f.url, orden: i })); const { error } = await S.sb.schema('portal').from('fotos').insert(rows); if (error) throw error; }
-      saved.fotos = fotos.map((f, i) => ({ url: f.url, orden: i })); return saved;
+      saved.fotos = fotos.map((f, i) => ({ url: f.url, orden: i })); eventos(saved); return saved;
     }
-    S.track(rec.estado_curacion === 'en_revision' ? 'aviso_enviado' : 'aviso_creado', { aviso_id: rec.id || null, publicador_id: pub.id, datos: { operacion: rec.operacion, zona: rec.zona } });
     const all = L.avisos.get([]); const i = all.findIndex(x => x.id === rec.id); rec.fotos = fotos.map((f, i2) => ({ url: f.url, orden: i2 }));
     rec.updated_at = now();   /* en local también queda cuándo se editó: el panel ordena por eso */
-    if (i > -1) { rec.created_at = all[i].created_at; rec.publicador_id = all[i].publicador_id; all[i] = rec; } else { rec.id = rec.id || uid(); rec.created_at = now(); all.push(rec); } L.avisos.set(all); return rec;
+    if (i > -1) { rec.created_at = all[i].created_at; rec.publicador_id = all[i].publicador_id; all[i] = rec; } else { rec.id = rec.id || uid(); rec.created_at = now(); all.push(rec); } L.avisos.set(all); eventos(rec); return rec;
   };
   /* 8/10/2026 · Lo que contestan la base y el almacenamiento al guardar (inglés, códigos de Postgres: "null value in column
      ... violates not-null constraint", "new row violates row-level security policy") en una frase en castellano que dice
@@ -576,6 +610,65 @@
     S.track(estado_curacion === 'publicado' ? 'aviso_aprobado' : estado_curacion === 'rechazado' ? 'aviso_rechazado' : 'aviso_estado', { aviso_id: id, datos: { estado_curacion, motivo: motivo || null } });
     if (S.mode === 'supabase') { const { error } = await S.sb.schema('portal').from('avisos').update(patch).eq('id', id); if (error) throw error; try { if (window.BPData && BPData.olvidarCatalogo) BPData.olvidarCatalogo(); } catch (e) { /* nada */ } if (estado_curacion === 'publicado' && !(extra && extra.estado)) S.notify('aprobado', { aviso_id: id }); else if (estado_curacion === 'rechazado') S.notify('rechazado', { aviso_id: id, datos: { motivo } }); else if (estado_curacion === 'borrador' && motivo) S.notify('cambios', { aviso_id: id, datos: { motivo } }); return; }
     const all = L.avisos.get([]); const a = all.find(x => x.id === id); if (a) Object.assign(a, patch); L.avisos.set(all);
+  };
+  /* 8/10/2026 (lanz3-publicador) · Lo que el publicador hace con su aviso desde el panel, sin pasar por la curación.
+     Cada una cambia solo estado_curacion (y updated_at) y registra su evento. Con la 23, el disparador decide: reactivar
+     lo que pausó el sistema o un curador, o lo que cambió de dirección mientras estaba pausado, va a revisión. Por eso
+     reactivar devuelve el estado que quedó. */
+  async function cambiarEstadoPropio(id, estado, evento, soloDesde){
+    const patch = { estado_curacion: estado, updated_at: now() };
+    S.track(evento, { aviso_id: id, datos: { estado_curacion: estado } });
+    if (S.mode === 'supabase') {
+      let q = S.sb.schema('portal').from('avisos').update(patch).eq('id', id); if (soloDesde) q = q.in('estado_curacion', soloDesde);
+      const { data, error } = await q.select('estado_curacion').maybeSingle(); if (error) throw error;
+      try { if (window.BPData && BPData.olvidarCatalogo) BPData.olvidarCatalogo(); } catch (e) { /* nada */ }
+      return data ? data.estado_curacion : null;
+    }
+    const all = L.avisos.get([]); const a = all.find(x => x.id === id); if (!a || (soloDesde && soloDesde.indexOf(a.estado_curacion) === -1)) return a ? a.estado_curacion : null;
+    Object.assign(a, patch); L.avisos.set(all); return a.estado_curacion;
+  }
+  /* Reactivar un aviso pausado: vuelve a publicado sin tocar publicado_en (no salta al primer lugar de "Lo último que
+     entró") y sin registrar 'aviso_aprobado' ni mandar el mail de aprobación. */
+  S.reactivar = id => cambiarEstadoPropio(id, 'publicado', 'aviso_reactivado', ['pausado']);
+  /* Retirar de revisión: vuelve a borrador para seguir editándolo */
+  S.retirarDeRevision = id => cambiarEstadoPropio(id, 'borrador', 'aviso_retirado', ['en_revision']);
+  /* Enviar a revisión desde el panel (envío en lote de borradores completos) */
+  S.enviarARevision = id => cambiarEstadoPropio(id, 'en_revision', 'aviso_enviado', ['borrador', 'rechazado']);
+  /* Borrar un borrador que nunca se publicó. Con la 23 la base lo deja (política "avisos borrador se borra"); sin ella
+     authenticated no tiene DELETE en avisos: el borrador pasa a 'vencido', que el panel no muestra. Devuelve
+     { borrado } o { archivado }. */
+  S.borrarAviso = async function(id){
+    S.track('aviso_borrado', { aviso_id: id });
+    try { localStorage.removeItem('bp_pub_unidades_' + id); } catch (e) { /* nada */ }
+    if (S.mode === 'supabase') {
+      const { data, error } = await S.sb.schema('portal').from('avisos').delete().eq('id', id).eq('estado_curacion', 'borrador').is('publicado_en', null).select('id');
+      if (!error && data && data.length) return { borrado: true };
+      if (error && !/^(42501|PGRST)/.test(String(error.code || '')) && !/permission denied/i.test(String(error.message || ''))) throw error;
+      const { data: d2, error: e2 } = await S.sb.schema('portal').from('avisos').update({ estado_curacion: 'vencido', updated_at: now() }).eq('id', id).eq('estado_curacion', 'borrador').select('estado_curacion').maybeSingle();
+      if (e2) throw e2;
+      if (!d2 || d2.estado_curacion !== 'vencido') throw new Error(T('err_no_borra', 'No se pudo borrar el borrador. Probá de nuevo en un momento.'));
+      return { archivado: true };
+    }
+    const all = L.avisos.get([]); const i = all.findIndex(x => x.id === id && x.estado_curacion === 'borrador' && !x.publicado_en);
+    if (i === -1) throw new Error(T('err_no_borra', 'No se pudo borrar el borrador. Probá de nuevo en un momento.'));
+    all.splice(i, 1); L.avisos.set(all); return { borrado: true };
+  };
+  /* Lo que le falta a un aviso para mandarlo a revisión, con palabras cortas para el panel ("fotos, 3 de 8"). Las
+     mismas reglas que la carga (publicar-aviso.html, incompletas). Un emprendimiento con su lista de unidades se revisa
+     en la carga: acá no se juzga. */
+  S.faltanDatos = function(a){
+    const l = []; if (!a) return l;
+    if (!a.zona) l.push(a.barrio ? T('falta_fuera_zona', '{b} está fuera de las zonas de BAIREN', { b: a.barrio }) : T('falta_zona', 'la zona'));
+    else if (!a.barrio) l.push(T('falta_barrio', 'el barrio'));
+    if (!a.emprendimiento) {
+      if (!(Number(a.m2_total) > 0)) l.push(T('falta_m2', 'los m²'));
+      if (!(Number(a.ambientes) >= 1)) l.push(T('falta_ambientes', 'los ambientes'));
+    }
+    if (!(Number(a.precio) > 0)) l.push(T('falta_precio', 'el precio'));
+    if (a.operacion === 'mediano' && !a.plazo) l.push(T('falta_estadia', 'la estadía mínima'));
+    const nf = (a.fotos || []).length; if (nf < 8 && !a.quiero_produccion) l.push(T('falta_fotos', 'fotos, {n} de 8', { n: nf }));
+    if (String(a.descripcion || '').trim().length < 150) l.push(T('falta_descripcion', 'la descripción'));
+    return l;
   };
   /* 8/10/2026 (venta) · Reservada o disponible, sin tocar la curación: sirve igual en revisión que publicado. Antes el
      panel lo hacía con setEstado(id, 'publicado', ...), que además reiniciaba publicado_en (y en revisión lo habría
@@ -655,7 +748,7 @@
   /* ── 4.4 Registro de eventos: una sola puerta para todo lo que queremos medir ── */
   const esUUID = v => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(v || ''));
   const LE = LS('bp_eventos');
-  S.EVENTOS = ['aviso_creado','aviso_enviado','aviso_aprobado','aviso_rechazado','consulta','vista_ficha','publicador_alta','publicador_verificado','importacion','favorito','alerta','denuncia'];
+  S.EVENTOS = ['aviso_creado','aviso_enviado','aviso_aprobado','aviso_rechazado','aviso_editado','aviso_reactivado','aviso_retirado','aviso_borrado','consulta','vista_ficha','publicador_alta','publicador_verificado','importacion','favorito','alerta','denuncia'];
   S.track = async function(evento, campos){
     const rec = Object.assign({ evento, creado_en: now() }, campos || {});
     if (rec.aviso_id && !esUUID(rec.aviso_id)) { rec.aviso_ref = String(rec.aviso_id); delete rec.aviso_id; }
