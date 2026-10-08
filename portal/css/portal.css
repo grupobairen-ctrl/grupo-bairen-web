@@ -4225,3 +4225,15 @@ body.p-ficha-page .p-legal-txt p{margin:0 0 8px;text-align:left}
   body.p-ficha-page .p-fpie{margin-top:20px}
 }
 
+/* ── El pie: una columna corta de enlaces y el ©. En la compu, la misma lista en una fila. ── */
+.footer.p-pie2{display:block;padding:40px 24px 32px;border-top:1px solid rgba(194,169,104,.25)}
+.p-pie2 .p-pie-links{list-style:none;margin:0 auto;padding:0;max-width:1180px;display:flex;flex-direction:column;gap:2px}
+.p-pie2 .p-pie-links a{display:inline-flex;align-items:center;min-height:40px;font:300 .9rem/1.2 var(--font-body);letter-spacing:.02em;color:rgba(251,250,246,.78);text-decoration:none}
+.p-pie2 .p-pie-links a:hover,.p-pie2 .p-pie-links a:focus-visible{color:#DECDA0}
+.p-pie2 .p-pie-copy{max-width:1180px;margin:20px auto 0;padding-top:18px;border-top:1px solid rgba(255,255,255,.08);font:300 .75rem/1 var(--font-body);letter-spacing:.12em;color:rgba(251,250,246,.55)}
+@media(min-width:860px){
+  .footer.p-pie2{padding:36px 24px 28px}
+  .p-pie2 .p-pie-links{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:4px 28px}
+  .p-pie2 .p-pie-copy{text-align:center}
+}
+

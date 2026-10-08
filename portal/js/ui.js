@@ -469,24 +469,25 @@
   };
 
   /* ── Footer ─────────────────────────────────────────────── */
-  BP.footer = function(){ setTimeout(() => { if (BP.i18n) BP.i18n.apply(document); }, 0);
-    const zonas = BP.ZONAS.map(z=>`<li><a href="${BP.urlBuscar({ op:'alquiler', zona:z })}">${BP.zonaLabel(z)}</a></li>`).join('');
+  /* 8/10/2026 · Tanda 2 · El pie es una columna corta de enlaces y el ©. Sin las diez zonas, sin el párrafo de marca
+     (la leyenda de plataforma sigue en la ficha, en "Información legal"). Con data-flujo en el body (las pantallas de
+     publicar) no se dibuja el pie ni la barra de abajo. */
+  BP.footer = function(){
+    if (document.body && document.body.hasAttribute('data-flujo')) return;
+    setTimeout(() => { if (BP.i18n) BP.i18n.apply(document); }, 0);
     const html = `
-<footer class="footer">
-  <div class="footer-grid">
-    <div>
-      <div><img src="../bairen_logo_96.png?v=1" alt="BAIREN" width="46" height="46" style="height:46px;width:46px;"></div>
-      <div class="ft-brand-rule"></div>
-      <p class="ft-brand-tag" data-i18n="ft_tag">Portal de propiedades seleccionadas en Buenos Aires.</p>
-      <p class="p-legend" data-i18n="ft_legend">BAIREN selecciona y publica propiedades, y da la gestión para administrarlas. Cada aviso es responsabilidad de quien lo publica.</p>
-    </div>
-    <div class="ft-col"><div class="ft-col-ttl" data-i18n="ft_nav">Navegación</div><ul>
-      <li><a href="${BP.urlBuscar({ op:'alquiler' })}" data-i18n="alquilar">Alquilar</a></li><li><a href="${BP.urlBuscar({ op:'venta' })}" data-i18n="comprar">Comprar</a></li><li><a href="publicar.html" data-i18n="publicar">Publicar</a></li></ul></div>
-    <div class="ft-col"><div class="ft-col-ttl" data-i18n="ft_zonas">Zonas</div><ul>${zonas}</ul></div>
-    <div class="ft-col"><div class="ft-col-ttl" data-i18n="ft_mas">Más</div><ul>
-      <li><a href="publicadores.html" data-i18n="publicadores">Publicadores</a></li><li><a href="membership.html">Membership</a></li><li><a href="emprendimientos.html" data-i18n="emprendimientos">Desarrollos</a></li><li><a href="criterios.html" data-i18n="ft_criterios">Criterios de selección</a></li><li><a href="legales.html" data-i18n="ft_terminos">Términos y privacidad</a></li><li><a href="mailto:portal@bairengroup.com">portal@bairengroup.com</a></li></ul></div>
-  </div>
-  <div class="footer-bottom"><span>© ${new Date().getFullYear()} BAIREN</span><span><a href="legales.html" data-i18n="ft_uso">Términos de uso</a> · <a href="legales.html#privacidad" data-i18n="ft_priv">Política de privacidad</a></span></div>
+<footer class="footer p-pie2">
+  <ul class="p-pie-links">
+    <li><a href="buscar.html" data-i18n="nav_propiedades">Propiedades</a></li>
+    <li><a href="emprendimientos.html" data-i18n="emprendimientos">Desarrollos</a></li>
+    <li><a href="publicar.html" data-i18n="publicar">Publicar</a></li>
+    <li><a href="criterios.html" data-i18n="criterios">Cómo seleccionamos</a></li>
+    <li><a href="publicadores.html" data-i18n="publicadores">Publicadores</a></li>
+    <li><a href="membership.html">Membership</a></li>
+    <li><a href="legales.html" data-i18n="ft_terminos">Términos y privacidad</a></li>
+    <li><a href="mailto:portal@bairengroup.com">portal@bairengroup.com</a></li>
+  </ul>
+  <p class="p-pie-copy">© ${new Date().getFullYear()} BAIREN</p>
 </footer>`;
     const host = document.getElementById('pFooter'); if (host) host.innerHTML = html;
   };
