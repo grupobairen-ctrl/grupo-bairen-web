@@ -303,3 +303,20 @@ body.p-flujo-pub .p-toast{bottom:calc(var(--pf-pie) + 14px);max-width:calc(100vw
 .pf-stepper output,.pf-fotos-cuenta,.pf-contador{font-variant-numeric:tabular-nums}
 .pf-foto .num,.pf-foto .est{font-size:.75rem}
 @media(min-width:760px){.pf-u-acc button{font-size:.8125rem}}
+
+/* ── 8/10/2026 · Pasada premium: superficies (mismo criterio que el final de portal.css) ──
+   Controles 10 px, cajas 14 px, chips y marcas píldora. Los radios van con !important porque portal.css pone a 0
+   todo botón dentro de un elemento con clase p- ([class^="p-"] button), y acá el body es p-flujo-pub. */
+body.p-flujo-pub{--r-ctl:10px;--r-box:14px;--r-pill:999px}
+body.p-flujo-pub .pf-opcion,body.p-flujo-pub .pf-agregar,body.p-flujo-pub .pf-u,body.p-flujo-pub .pf-dudas,body.p-flujo-pub .pf-motivo,body.p-flujo-pub .pf-curador,body.p-flujo-pub .pf-recibido .sello{border-radius:var(--r-box)!important}
+body.p-flujo-pub .pf-campo input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=hidden]),body.p-flujo-pub .pf-campo select,body.p-flujo-pub .pf-campo textarea,body.p-flujo-pub .pf-u-c input,body.p-flujo-pub .pf-u-c select,body.p-flujo-pub .pf-chip,body.p-flujo-pub .pf-toggle,body.p-flujo-pub .pf-stepper,body.p-flujo-pub .pf-seguir,body.p-flujo-pub .pf-seg2,body.p-flujo-pub .pf-u-acc button,body.p-flujo-pub .pf-mas,body.p-flujo-pub .pf-pos button,body.p-flujo-pub .pf-docs .p-carga,body.p-flujo-pub .pf-doc .p-carga,body.p-flujo-pub .pf-foto{border-radius:var(--r-ctl)!important}
+.pf-stepper{overflow:hidden}
+body.p-flujo-pub .pf-precio .pre{border-radius:var(--r-ctl) 0 0 var(--r-ctl)!important}
+body.p-flujo-pub .pf-precio input:not([type=checkbox]){border-radius:0 var(--r-ctl) var(--r-ctl) 0!important}
+body.p-flujo-pub .pf-opcion .ck,body.p-flujo-pub .pf-toggle .bx{border-radius:6px!important}
+body.p-flujo-pub .pf-foto .portada{left:8px;top:8px;padding:5px 10px;border-radius:var(--r-pill)!important;font:500 .8125rem/1 var(--font-body)}
+body.p-flujo-pub .pf-foto .num,body.p-flujo-pub .pf-foto .est{border-radius:var(--r-pill)!important;padding:4px 8px}
+body.p-flujo-pub .pf-foto .mas{border-radius:var(--r-ctl) 0 0 0!important}
+body.p-flujo-pub .pf-hoja-caja{border-radius:var(--r-box) var(--r-box) 0 0!important;box-shadow:0 -8px 32px rgba(10,20,40,.12)}
+body.p-flujo-pub .pf-hoja-caja::before{border-radius:var(--r-pill)!important}
+@media(min-width:760px){body.p-flujo-pub .pf-unidades{border-radius:var(--r-box)!important;overflow:hidden}body.p-flujo-pub .pf-u{border-radius:0!important}}

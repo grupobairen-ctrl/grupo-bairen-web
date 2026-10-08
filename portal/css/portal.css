@@ -823,13 +823,13 @@ html{scroll-behavior:smooth}
    Ahora es instantáneo, está en todo lo que recibe foco y contrasta en los dos registros. */
 :root{--p-focus-a:#131D2D;--p-focus-b:#DECDA0}
 body.p-product{--p-focus-a:#F6F2E8;--p-focus-b:#131D2D}
+/* 8/10/2026 · Pasada premium: un anillo de 2 px con separación, sin el halo de 6 px, y el anillo sigue el radio
+   propio de cada elemento (antes forzaba 8 px o 999 px al enfocar). */
 :where(a,button,input,select,textarea,summary,[tabindex],[role=button],[role=option],[role=tab]):focus-visible{
-  outline:3px solid var(--p-focus-b);outline-offset:2px;border-radius:8px;
-  box-shadow:0 0 0 1px var(--p-focus-a),0 0 0 6px var(--p-focus-a)!important;
+  outline:2px solid var(--p-focus-b);outline-offset:2px;
+  box-shadow:none!important;
   transition:none!important;animation:none!important;position:relative;z-index:5
 }
-.p-btn:focus-visible,.p-icon-btn:focus-visible,.p-fav:focus-visible,.p-ghost:focus-visible{border-radius:999px}
-.p-card-h a:focus-visible,.p-card a:focus-visible,.p-zona:focus-visible,.p-perfil:focus-visible{border-radius:var(--p-radius)}
 /* que el navegador no herede el fundido de los botones al anillo */
 .p-btn,.p-icon-btn,.p-zona,.p-perfil,.p-fchip,.p-fsel,.p-fbtn{transition-property:background-color,color,border-color,transform,opacity}
 
@@ -1286,7 +1286,7 @@ body #panel.p-card-panel,body.p-product .p-page.after-band .p-card-panel{backgro
 [class^="p-"],[class*=" p-"],.prop-card,.card-img,.thumb,.tag,.card-tag,.card-status{border-radius:0 !important}
 .p-bell .dot,.p-fav .dot,[data-fav-count],.p-hero-site .p-doors,.p-zona-pin,.p-map-home svg *,.p-catband svg *{border-radius:50% !important}
 .p-doors,.p-doors a{border-radius:0 !important}
-.p-toast,.p-lb .x,.p-lb .ctl button{border-radius:0 !important}
+/* .p-toast y los botones del visor: el radio lo fija la pasada premium (final de este archivo) */
 /* La banda centra a sus hijos aunque traigan márgenes en línea */
 .p-band .p-container{display:flex;flex-direction:column;align-items:center}
 .p-band .p-container > *{max-width:100%}
@@ -1693,7 +1693,7 @@ body .p-nav-menu .p-dd-cuenta.abierto{display:block}
    La cápsula es sólo la del centro; la de la derecha vuelve a ser un grupo suelto. */
 .p-nav-right .p-nav-menu{position:static !important;left:auto !important;right:auto !important;top:auto !important;margin:0 !important;width:auto !important;padding:0 !important;gap:0 !important;background:transparent !important;border:0 !important;box-shadow:none !important;border-radius:0 !important}
 .p-nav-right .p-nav-menu::before{display:none}
-.p-nav-right .p-nav-menu > div > button{padding:0 14px;border-radius:2px !important}
+.p-nav-right .p-nav-menu > div > button{padding:0 14px;border-radius:var(--r-ctl,10px) !important}
 .p-nav-right .p-nav-menu .p-foco,.p-nav-right .p-nav-menu .p-ambiente{display:none}
 
 /* ── La cápsula, centrada por la grilla ────────────────────────────────────
@@ -3059,10 +3059,10 @@ html.cargando .p-velo .w{animation:p-velo-palabra .3s cubic-bezier(.22,1,.36,1) 
 /* ══ 11/9/2026 · Panel: geometría angular, como el sitio y como el resto de las
    páginas de herramienta (botones y filas a 0 px). Nada redondo: ni buscador,
    ni "···", ni fotos, ni pastillas, ni contadores. ═══════════════════════════ */
-body.p-panel-page .p-herr-q input,body.p-panel-page .p-herr .p-fsel,body.p-panel-page details.p-mas summary,body.p-panel-page .p-mas-menu,body.p-panel-page .p-mas-menu a,body.p-panel-page .p-mas-menu button,body.p-panel-page .p-aviso-row.v2,body.p-panel-page .p-aviso-row.v2 .ph,body.p-panel-page .p-empty.p-ensena,body.p-panel-page .p-ficha-cuenta,body.p-panel-page .p-visitas summary .n,body.p-panel-page .p-side-nav a .n,body.p-panel-page .p-side-nav a,body.p-panel-page .p-panel .p-side-nav a,body.p-panel-page .p-panel .p-side-nav a.on,body.p-herramienta .p-empty.p-ensena,body.p-herramienta .p-band .p-stepper button{border-radius:0 !important}
+/* 8/10/2026 · Pasada premium: esta regla ponía todo el panel a 0 px; ahora el radio lo fija el final de este archivo. */
 body.p-panel-page .p-side-nav a .n{min-width:20px;height:18px;line-height:18px;padding:0 5px}
 @media(max-width:1023px){
-  body.p-panel-page .p-side-nav a,body.p-panel-page .p-panel .p-side-nav a,body.p-panel-page .p-panel .p-side-nav a.on{border-radius:0 !important}
+  /* las pestañas del panel: el radio lo fija la pasada premium (final de este archivo) */
   body.p-herramienta .p-band .p-stepper button{border-radius:0}
 }
 /* El navegador no "ancla" el scroll cuando cambia la vista: el panel decide dónde queda */
@@ -3127,7 +3127,7 @@ body.p-catalogo .p-results-head .acts .p-fbtn svg{width:15px;height:15px}
   body.p-catalogo .p-catband-sub{display:none !important}
   /* Barra: filas ordenadas, todo a 44 px, angular */
   body.p-catalogo .p-filters-in{display:flex !important;flex-wrap:wrap;gap:8px;padding:12px 16px}
-  body.p-catalogo .p-filters .p-fsel,body.p-catalogo .p-filters .p-fbtn,body.p-catalogo .p-filters #barriosBtn,body.p-catalogo .p-filters .p-plazo-pills button{height:44px !important;min-height:44px !important;font-size:.66rem !important;letter-spacing:.01em !important;border-radius:0 !important}
+  body.p-catalogo .p-filters .p-fsel,body.p-catalogo .p-filters .p-fbtn,body.p-catalogo .p-filters #barriosBtn,body.p-catalogo .p-filters .p-plazo-pills button{height:44px !important;min-height:44px !important;font-size:.66rem !important;letter-spacing:.01em !important;}
   body.p-catalogo .p-filters #barriosBtn{order:1 !important;flex:1 1 calc(50% - 4px) !important;max-width:none !important;justify-content:center;padding:0 12px !important}
   body.p-catalogo .p-filters #opSel{order:2 !important;flex:1 1 calc(50% - 4px) !important;width:auto !important}
   body.p-catalogo .p-filters .p-plazo-pills{order:3;flex:1 1 100%;gap:6px}
@@ -4076,9 +4076,9 @@ body.p-home .h-ult-esq{display:block;aspect-ratio:4/5;background:#EEE9DD}
   body.p-home .h-ultimos-riel{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:22px;overflow:visible;max-width:1180px;margin:0 auto;padding:30px 24px 8px;box-sizing:border-box}
   body.p-home .h-ultimos-riel > *{max-width:none}
 }
-body.p-home .h-ultimos .prop-card{border-radius:0 !important;box-shadow:none;border:1px solid rgba(42,58,82,.07);background:#fff;color:var(--s-navy)}
+body.p-home .h-ultimos .prop-card{box-shadow:none;border:1px solid rgba(42,58,82,.07);background:#fff;color:var(--s-navy)}
 body.p-home .h-ultimos .prop-card .card-img{background:var(--s-navy)}
-body.p-home .h-ultimos .prop-card .card-tag{border-radius:0 !important;font:500 .8125rem/1.2 var(--font-body);letter-spacing:.01em;text-transform:none;padding:5px 11px;background:var(--s-navy);color:var(--s-white)}
+body.p-home .h-ultimos .prop-card .card-tag{font:500 .8125rem/1.2 var(--font-body);letter-spacing:.01em;text-transform:none;padding:5px 11px;background:var(--s-navy);color:var(--s-white)}
 body.p-home .h-ultimos .prop-card .card-tag.tag-venta{background:var(--s-gold);color:var(--s-navy)}
 body.p-home .h-ultimos .prop-card .card-address{font-family:var(--font-display);font-weight:400;font-size:1.15rem;color:var(--s-navy);line-height:1.25}
 body.p-home .h-ultimos .prop-card .card-barrio{font:500 .8125rem/1 var(--font-body);letter-spacing:.01em;text-transform:none;color:var(--s-gold-dark);margin:6px 0 12px}
@@ -4087,7 +4087,7 @@ body.p-home .h-ultimos .prop-card .card-divider{border-top:1px solid rgba(42,58,
 body.p-home .h-ultimos .prop-card .card-footer{flex-wrap:wrap;gap:8px}
 body.p-home .h-ultimos .prop-card .card-price{font-family:var(--font-display);font-size:1.3rem;color:var(--s-navy);font-weight:400}
 body.p-home .h-ultimos .prop-card .card-price small{display:block;font:300 .75rem/1.2 var(--font-body);color:var(--s-mid);margin-top:3px}
-body.p-home .h-ultimos .prop-card .card-cta{border:1px solid rgba(42,58,82,.25);border-radius:0 !important;padding:9px 14px;font:500 .8125rem/1 var(--font-body);letter-spacing:.01em;text-transform:none;color:var(--s-navy);background:transparent}
+body.p-home .h-ultimos .prop-card .card-cta{border:1px solid rgba(42,58,82,.25);padding:9px 14px;font:500 .8125rem/1 var(--font-body);letter-spacing:.01em;text-transform:none;color:var(--s-navy);background:transparent}
 body.p-home .h-ultimos .prop-card .card-tag{letter-spacing:.01em;padding:5px 9px}
 body.p-home .h-ultimos .prop-card .p-card-pub .p-badge{color:var(--s-navy);border-color:rgba(42,58,82,.22);background:transparent}
 
@@ -4389,7 +4389,7 @@ body.p-panel-page .p-lote span{font:400 .86rem/1.4 var(--font-body);color:var(--
 .p-conf-leer{margin:4px 0 0 30px;font:400 .8rem/1.4 var(--font-body)}
 .p-conf-leer a{color:var(--navy-deeper);text-decoration:underline;text-underline-offset:3px}
 .p-conf-acc{display:flex;gap:8px;margin-top:18px}
-.p-conf-acc .p-btn{flex:1 1 0;justify-content:center;min-height:44px;border-radius:0!important}
+.p-conf-acc .p-btn{flex:1 1 0;justify-content:center;min-height:44px;}
 .p-conf .p-btn-fill{background:var(--gold);border-color:var(--gold);color:var(--navy-deeper)}
 .p-conf .p-btn:not(.p-btn-fill):not(.p-btn-peligro){background:transparent;border-color:var(--navy-deeper);color:var(--navy-deeper)}
 .p-conf .p-btn-peligro{background:#9C3A34;border-color:#9C3A34;color:#FBFAF6}
@@ -4610,6 +4610,66 @@ body.p-catalogo .p-pop .lnk,body.p-catalogo .p-drawer .lnk{color:var(--p-tinta-2
 body.p-ficha-page .p-fsim .tj-tag:not(.res){display:none}
 /* El chip de la operación y el de "Disponible desde", en píldora */
 :root .p-tj .tj-tag,:root .p-tj .tj-desde{border-radius:var(--r-pill)!important}
+
+/* ── 3 · Superficies: radios, líneas, aire y foco ───────────────────────────────────────────────────────────
+   El anterior "esquinas rectas en todo" ([class^="p-"] a 0 px con !important) queda como base: lo que no
+   está nombrado acá sigue recto (bandas, filas, contenedores de ancho completo). */
+/* Controles: 10 */
+:root .p-btn,:root .p-btn-sm,:root .p-btn-fill,:root .p-icon-btn,:root .p-fsel,:root .p-fbtn,:root .p-tab,:root .p-ghost,:root .p-skip,:root .p-pub-movil,:root .p-pager button,:root .p-quick a,:root .p-quick button,:root .p-report .chips button,:root .p-fpliego .chips button,:root .p-fb button,:root .p-field select,:root .p-field input,:root .p-fld input,:root .p-fld select,:root .p-fld textarea,:root .p-form input,:root .p-form textarea,:root .p-form select,:root .p-login input,:root .p-login .soc,:root .p-qrow input,:root .p-pop input,:root .p-pop .seg,:root .p-drawer input,:root .p-drawer select,:root .p-filters input,:root .p-filters select,:root body.p-catalogo .p-filters .p-fchip,:root .p-fchip,:root body.p-home .h-btn,:root body.p-home .h-cta,:root body.p-home .h-seg,:root body.p-home .h-field input,:root body.p-home #zonaInput,:root .p-panel .p-side-nav a,:root body.p-panel-page .p-side-nav a,:root body .p-panel .p-side-nav a,:root body .p-panel .p-side-nav a.on,:root body.p-panel-page summary,:root body.p-panel-page input,:root body.p-panel-page select,:root body.p-panel-page textarea,:root body.p-panel-page .p-perfil-sel label,:root body.p-herramienta input,:root body.p-herramienta select,:root body.p-herramienta textarea,:root .p-toggle,:root .p-toggle button,:root details.units > summary,:root .p-carga,:root .p-drop,:root .p-ficha2 .p-fh-acts .p-icon-btn,:root .p-pager a,:root .p-crear-pop a,:root .mobile-menu .m-cta .p-btn,:root .psi-btn,:root .psi-form input,:root .psi-form select,:root .psi-form textarea{border-radius:var(--r-ctl)!important}
+/* El segmento de la portada: los botones de adentro siguen el radio del de afuera */
+:root body.p-home .h-seg button,:root .p-pop .seg button,:root .p-toggle button{border-radius:calc(var(--r-ctl) - 3px)!important}
+
+/* Tarjetas y cajas: 14 */
+:root .prop-card,:root .prop-card.p-tj,:root .p-card-h,:root .p-emp,:root .p-plan,:root .p-aviso-row,:root .p-empty,:root .p-error,:root .p-cur,:root .p-cta,:root .p-login,:root .p-map-wrap,:root .p-map-card,:root .p-map-ficha,:root .p-map-home,:root .p-indice-secciones,:root .p-imp,:root .p-imp-res,:root .p-ficha-cuenta,:root .p-perfil-sel,:root .p-perfiles,:root .p-pl-sec,:root .p-muro,:root .p-prose,:root .p-prose .box,:root .p-emp-grupo,:root .p-faq,:root .p-galertas,:root .p-mas-menu,:root .p-dd-cuenta,:root .p-pop,:root .p-sugg,:root .p-crear-pop,:root .p-toast,:root .p-compartir .hoja,:root .p-video,:root .p-sis-sec,:root .p-pub-card,:root .p-zona,:root .p-perfil,:root body.p-home .h-search,:root body.p-home .h-edif,:root body.p-home .h-tipo,:root body.p-home .h-ind-caja,:root body.p-home .h-ult-esq,:root .pf-opcion,:root .pf-agregar,:root .pf-u,:root .pf-unidades,:root .pf-hoja-caja,:root .pf-dudas,:root .pf-motivo,:root .pf-curador{border-radius:var(--r-box)!important}
+/* Chips y etiquetas: píldora */
+:root .tj-tag,:root .tj-desde,:root .p-badge,:root .p-chip,:root .p-alerta,:root .p-fcont,:root .p-side-nav .n,:root span.n,:root .p-emp .ph .tag,:root .p-card-photo .tag,:root .p-card-photo .ct,:root .p-catalogo #zonaChips .p-chip,:root .p-fbtn .cnt,:root [data-fav-count],:root .p-plazo-pills button,:root body.p-catalogo .p-plazo-pills button{border-radius:var(--r-pill)!important}
+/* Redondos de verdad */
+:root .p-pub-logo,:root .p-avatar,:root .mono,:root .p-bell .dot{border-radius:50%!important}
+
+/* Las fotos toman el radio de su tarjeta */
+.prop-card.p-tj,.p-emp,.p-card-h{overflow:hidden}
+.p-emp .ph,.p-emp .ph img{border-radius:0!important}
+body.p-ficha-page .p-fhero.p-fhero-solo{overflow:hidden}
+@media(min-width:860px){:root body.p-ficha-page .p-fhero.p-fhero-solo{border-radius:var(--r-box)!important}}
+
+/* ── Línea fina en vez de sombra ─────────────────────────────────────────────────────────── */
+.prop-card.p-tj,body.p-home .h-ultimos .prop-card.p-tj,.p-emp,.p-plan,.p-plan.p-plan-ac,.p-aviso-row,.p-aviso-row.v2,.p-empty,.p-cur,.p-card-h,
+.p-imp,.p-ficha-cuenta,.p-perfil-sel,.p-indice-secciones,body.p-ficha-page .p-ficha2 .p-cta{border:1px solid var(--p-hair)!important;box-shadow:none!important}
+body.p-home .h-edif{box-shadow:none!important}
+/* Lo que flota: sombra amplia y suave */
+.p-dd,.p-pop,.p-sugg,.p-mas-menu,.p-crear-pop,body.p-catalogo .p-pop,body.p-catalogo .p-dd,body.p-catalogo .p-sugg,body.p-home .h-field .p-sugg{box-shadow:var(--p-flota)!important;border:1px solid var(--p-hair)!important}
+.p-toast{box-shadow:var(--p-flota-d)!important;padding:12px 18px!important;font:400 .9375rem/1.4 var(--font-body)!important}
+
+
+/* Compartir: caja al centro en la compu, hoja desde abajo en el celular */
+.p-compartir .hoja{border:1px solid var(--p-hair)!important;box-shadow:var(--p-flota-d)!important;overflow:hidden}
+:root .p-compartir .op{position:relative;overflow:hidden;border-radius:var(--r-ctl)!important}
+@media(max-width:600px){:root .p-compartir .hoja{border-radius:var(--r-box) var(--r-box) 0 0!important;border-bottom:0!important}:root .p-compartir .tirador{border-radius:var(--r-pill)!important}}
+
+/* Ficha: la caja del precio con línea fina y aire; los íconos con borde fino */
+.p-ficha2 .p-fh-acts .p-icon-btn{border-color:var(--p-hair-2)}
+body.p-ficha-page .p-ficha2 .p-cta{overflow:hidden;padding:0 24px 24px;gap:12px}
+body.p-ficha-page .p-ficha2 .p-cta-price{margin:0 -24px 10px;padding:26px 24px 22px}
+body.p-ficha-page .p-ficha2 .p-cta .p-btn{min-height:50px}
+/* Las miniaturas de la galería, con el radio de los controles */
+:root body.p-ficha-page .p-strip .thumb{border-radius:var(--r-ctl)!important;overflow:hidden}
+:root body.p-panel-page .p-aviso-row .ph,:root body.p-panel-page .p-aviso-row .ph img{border-radius:var(--r-ctl)!important;overflow:hidden}
+/* Ítems dentro de un menú flotante: el radio concéntrico de la caja (14 menos 6 de aire) */
+body.p-panel-page .p-mas-menu a,body.p-panel-page .p-mas-menu button{border-radius:8px!important}
+/* Visor de fotos: cerrar y flechas, redondos como el corazón */
+:root .p-lb .x,:root .p-lb .ctl button{border-radius:50%!important}
+:root body.p-home .h-mas-ic{border-radius:50%!important}
+@media(max-width:820px){:root body.p-catalogo .p-drawer .panel{border-radius:var(--r-box) var(--r-box) 0 0!important;border-top:1px solid var(--p-hair)!important;box-shadow:0 -8px 32px rgba(10,20,40,.14)!important}}
+/* Publicar: la lista de perfiles es una sola caja; las filas de adentro no se redondean una por una */
+.p-perfiles{overflow:hidden}
+:root .p-perfiles .p-perfil{border-radius:0!important}
+
+/* ── Foco con teclado ───────────────────────────────────────────────────────────────────────────────
+   Un anillo de 2 px con separación, solo con :focus-visible. Varias reglas viejas lo apagaban (outline:0) y lo
+   dibujaban con una sombra; ahora el anillo es el outline, siempre. Navy sobre papel, oro claro sobre navy. */
+:root :is(a,button,input,select,textarea,summary,[tabindex],[role=button],[role=option],[role=tab]):not([tabindex="-1"]):focus-visible{outline:2px solid var(--p-focus-b)!important}
+body.p-flujo-pub{--p-focus-b:#131D2D}
+.pf-top,.p-catband,.p-mcta,.p-tabbar,.h-hoja,.h-hero,body.p-ficha-page .p-ficha2 .p-cta-price,.p-page.dark{--p-focus-b:#DECDA0}
 
 /* ── 6 · Portada: el video con su luz real ────────────────────────────────────────────────────────────────
    Tomás (8/10): en el celular la caja tapaba un tercio del video y un velo parejo lo apagaba entero. Fuera el velo
