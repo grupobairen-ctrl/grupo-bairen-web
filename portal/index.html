@@ -48,7 +48,6 @@
   <div class="h-hero-velo" aria-hidden="true"></div>
   <div class="h-hero-in">
     <h1><span class="hline" data-i18n="hero_h1a">Propiedades seleccionadas</span><span class="hline" data-i18n="hero_h1b">en Buenos Aires.</span></h1>
-    <p class="h-hero-sub" data-i18n="hero_sub">Viví Buenos Aires en su máximo esplendor.</p>
     <form class="h-search" id="searchForm" action="buscar.html" method="get" role="search" aria-label="Buscar propiedades" data-i18n-aria="buscar_aria">
       <input type="hidden" name="op" id="opInput" value="venta">
       <div class="h-seg" role="group" aria-label="Operación">
@@ -78,7 +77,6 @@
   <div class="h-in">
     <p class="h-eyebrow" data-i18n="est_eyebrow">Selección BAIREN</p>
     <h2 class="h-h2" data-i18n="est_h2">Seguimos un estándar.</h2>
-    <p class="h-copy" data-i18n="est_copy">Antes de incorporar cada propiedad corroboramos:</p>
     <div class="h-camino" id="camino">
       <svg class="h-camino-linea" aria-hidden="true" preserveAspectRatio="none"><path class="guia"/><path class="trazo"/></svg>
       <ol class="h-hitos">
@@ -105,6 +103,9 @@
 </section>
 
 
+<!-- 8/10/2026 · Tanda 2 · Sin las frases que explicaban: "Viví Buenos Aires en su máximo esplendor.", "Antes de
+     incorporar cada propiedad corroboramos:" y el párrafo de "¿Tu propiedad encaja en BAIREN?". Los cuatro íconos
+     quedan con su palabra; la pregunta, con su botón. -->
 <section class="h-sec h-crema h-borde" id="edificios">
   <div class="h-in">
     <h2 class="h-h2" data-i18n="edif_h2">Edificios y complejos de primera línea.</h2>
@@ -125,7 +126,6 @@
   <div class="h-in h-encaja-fila">
     <div class="h-encaja-txt">
       <h2 class="h-h2" data-i18n="pub_h2">¿Tu propiedad encaja en BAIREN?</h2>
-      <p class="h-copy" data-i18n-html="pub_copy">Revisamos la propiedad. Se sube al portal si cumple con los requisitos. Desde tu panel ves quién la mira, quién consulta y quién pide visita.</p>
     </div>
     <a class="h-btn h-btn-oro" href="publicar-aviso.html" data-i18n="pub_btn">Publicar propiedad</a>
   </div>
@@ -233,7 +233,7 @@ document.addEventListener('DOMContentLoaded', function(){
     const nuevas = reales.filter(a => !a.reservado && a.fotos && a.fotos.length).sort((a, b) => t(b) - t(a)).slice(0, 8);
     const sec = document.getElementById('ultimos'), track = document.getElementById('ultimosTrack');
     if (!nuevas.length) { sec.hidden = true; return; }
-    track.innerHTML = nuevas.map(BPData.cardV).join('');
+    track.innerHTML = nuevas.map(BPData.cardV).join('');   /* el corazón de cada tarjeta lo atiende data.js (un escucha en el documento) */
     track.removeAttribute('aria-busy');
   })();
 
