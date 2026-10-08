@@ -4777,3 +4777,75 @@ html.menu-abierto .mobile-menu{border-top:0}
 /* 8/10/2026 · El anillo de foco solo con teclado: al abrir el menú con el dedo, el primer enlace recibe el foco y Safari
    lo pintaba con un recuadro dorado. html.teclado lo pone ui.js con Tab y lo saca con el primer toque o clic. */
 html:not(.teclado) .mobile-menu a:focus-visible,html:not(.teclado) .mobile-menu button:focus-visible{outline:none!important;box-shadow:none!important}
+
+/* escritorio simple */
+/* ══ 8/10/2026 · Escritorio simple (1024 px o más) ═════════════════════════════════════════════════════════════
+   Tomás: "desde la compu se ven muchísimos textos y mucha info". Solo la compu ancha; el celular no cambia.
+   Va por página: buscar, ficha, portada y encabezado. */
+@media (min-width:1024px){
+  /* ── Buscar ─────────────────────────────────────────────────────────────────────────────────────────────── */
+  /* Sin la banda oscura ni el mapa ilustrativo: el título corto va en la fila de resultados (lo mueve buscar.html) */
+  body.p-catalogo .p-catband{display:none}
+  body.p-catalogo main.p-container{max-width:1256px;margin:0 auto;padding-top:0!important}
+  /* La barra: operación, barrio y precio a la vista; tipo, ambientes y dormitorios dentro de Filtros */
+  :root body.p-catalogo .p-filters{background:rgba(251,250,246,.94);border-top:0;border-bottom:1px solid var(--p-hair);box-shadow:none}
+  @supports ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+    :root body.p-catalogo .p-filters{background:rgba(251,250,246,.84);-webkit-backdrop-filter:blur(16px) saturate(140%);backdrop-filter:blur(16px) saturate(140%)}
+  }
+  :root body.p-catalogo .p-filters-in{max-width:1256px;margin:0 auto;padding:14px 28px;display:flex;flex-wrap:nowrap;align-items:center;justify-content:flex-start;gap:10px}
+  body.p-catalogo .p-filters #opSel,body.p-catalogo .p-filters #plazoPills,body.p-catalogo .p-filters #tipoSel,
+  body.p-catalogo .p-filters #ambBtn,body.p-catalogo .p-filters #ambPop,body.p-catalogo .p-filters #barriosBtn{display:none!important}
+  body.p-catalogo .p-filters .p-fwrap:has(#ambBtn){display:none}
+  body.p-catalogo .p-filters #opSelM{display:block;order:1;flex:0 0 auto}
+  body.p-catalogo .p-filters #zonaBox{order:2;flex:0 1 340px;min-width:260px}
+  body.p-catalogo .p-filters .p-fwrap:has(#precioBtn){order:3}
+  body.p-catalogo .p-filters #moreBtn{order:4}
+  :root body.p-catalogo .p-filters #opSelM,:root body.p-catalogo .p-filters .p-fbtn,:root body.p-catalogo .p-filters .p-fchip{
+    height:44px;min-height:44px;border:1px solid var(--p-hair-2);background-color:#FDFCF9;color:#131D2D;border-radius:var(--r-ctl)!important}
+  :root body.p-catalogo .p-filters #opSelM,:root body.p-catalogo .p-filters #precioBtn,:root body.p-catalogo .p-filters #moreBtn{font:500 .9375rem/1 var(--font-body)!important;letter-spacing:0!important}
+  :root body.p-catalogo .p-filters #opSelM{padding:0 38px 0 16px;background-position:right 16px center}
+  :root body.p-catalogo .p-filters .p-fbtn{padding:0 18px}
+  :root body.p-catalogo .p-filters #qInput{font:400 .9375rem/1.2 var(--font-body)!important;color:#131D2D;height:42px}
+  body.p-catalogo .p-filters #qInput::placeholder{color:var(--p-tinta-2)}
+  :root body.p-catalogo .p-filters .p-fchip{padding:0 12px}
+  :root body.p-catalogo .p-filters .p-fchip .p-chip{font:500 .875rem/1 var(--font-body)!important;padding:6px 10px;background:#EEE5D0;color:#131D2D}
+  :root body.p-catalogo .p-filters #opSelM:hover,:root body.p-catalogo .p-filters .p-fbtn:hover,:root body.p-catalogo .p-filters .p-fchip:hover{border-color:rgba(19,29,45,.42)}
+  :root body.p-catalogo .p-filters .p-fbtn[aria-expanded="true"]{background:#131D2D;border-color:#131D2D;color:#FBFAF6}
+  :root body.p-catalogo .p-filters #moreBtn .cnt{font:500 .8125rem/1 var(--font-body);padding:4px 8px;margin-left:2px;background:#131D2D;color:#FBFAF6}
+  body.p-catalogo .p-filters .p-pop{margin-top:8px}
+  /* El pin del barrio a la vista y la misma flecha fina en los tres desplegables */
+  body.p-catalogo .p-filters #zonaBox > span:first-child{flex:0 0 18px;width:18px;color:var(--p-tinta-2)!important}
+  body.p-catalogo .p-filters #zonaBox > span:first-child svg{width:18px;height:18px}
+  :root body.p-catalogo .p-filters #opSelM,:root body.p-catalogo .p-results-head #sortSel{-webkit-appearance:none;appearance:none;background-repeat:no-repeat;background-position:right 15px center;background-size:12px 8px;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1.5l5 5 5-5' fill='none' stroke='%23131D2D' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/></svg>")}
+  :root body.p-catalogo .p-results-head #sortSel{padding:0 38px 0 16px}
+  body.p-catalogo .p-filters #precioBtn::after{content:'';width:7px;height:7px;border-right:1.4px solid currentColor;border-bottom:1.4px solid currentColor;transform:rotate(45deg);margin:-4px 0 0 4px}
+  /* La fila de resultados: el título corto a la izquierda, la alerta y el orden a la derecha; la cantidad ya está en el título */
+  :root body.p-catalogo .p-results-head{display:flex;flex-wrap:nowrap;align-items:center;justify-content:space-between;gap:24px;margin:0;padding:34px 28px 4px;border-bottom:0}
+  :root body.p-catalogo .p-results-head #resTitle{flex:1 1 auto;min-width:0;margin:0;font:400 1.75rem/1.25 var(--font-display)!important;letter-spacing:-.005em;color:#131D2D;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  body.p-catalogo #resTitle .p-tit-n{font:400 1.0625rem/1 var(--font-body);color:var(--p-tinta-2);letter-spacing:0}
+  body.p-catalogo .p-results-head #resCount{display:none}
+  body.p-catalogo .p-results-head .acts{flex:0 0 auto;display:flex;gap:10px}
+  :root body.p-catalogo .p-results-head #alertBtn,:root body.p-catalogo .p-results-head #sortSel{height:44px;border:1px solid var(--p-hair-2);background-color:transparent;color:#131D2D;font-size:.9375rem!important}
+  :root body.p-catalogo .p-results-head #alertBtn.on{background:#131D2D;border-color:#131D2D;color:#FBFAF6}
+  body.p-catalogo .p-filtro-pub{padding:24px 28px 0}
+  /* Tres por fila, con la foto grande */
+  :root body.p-catalogo .p-results{padding:26px 28px 80px}
+  :root body.p-catalogo .p-list{grid-template-columns:repeat(3,minmax(0,1fr));gap:40px 28px}
+  body.p-catalogo .p-pager{margin-top:48px}
+  /* La hoja de Filtros: tipo, ambientes y dormitorios arriba (en el celular eso ya estaba ahí) */
+  body.p-catalogo .p-drawer .p-solo-cel{display:block}
+  body.p-catalogo .p-drawer .p-solo-cel .g-buscar,body.p-catalogo .p-drawer .p-solo-cel .g-barrios,body.p-catalogo .p-drawer .p-solo-cel .g-precio{display:none}
+  :root body.p-catalogo .p-drawer #tipoSelM,:root body.p-catalogo .p-drawer #antig{-webkit-appearance:none;appearance:none;background-repeat:no-repeat;background-position:right 15px center;background-size:12px 8px;padding-right:38px;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1.5l5 5 5-5' fill='none' stroke='%23131D2D' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/></svg>")}
+  /* Nada de texto de interfaz por debajo de 13 px, y la cantidad de cada barrio en la lista, legible */
+  body.p-catalogo .p-breadcrumb,body.p-catalogo .p-breadcrumb a,body.p-catalogo .p-legend{font-size:.8125rem}
+  :root body.p-catalogo .p-filters .p-sugg button small{font:400 .8125rem/1 var(--font-body);color:var(--p-tinta-2);opacity:1}
+
+  /* ── La tarjeta, en toda la compu: título, calle, precio y dos datos; quién publica, solo si no es BAIREN Realty ── */
+  .p-tj .tj-meta .tj-m:nth-child(n+3){display:none}
+  .p-tj.p-tj-realty .tj-pub{display:none}
+  .p-tj .tj-titulo{font-size:1.25rem}
+  .p-tj .tj-precio{font-size:1.125rem}
+  .p-tj .tj-meta{font-size:.875rem}
+}
