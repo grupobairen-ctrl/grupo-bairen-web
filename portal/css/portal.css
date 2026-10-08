@@ -4689,6 +4689,25 @@ body.p-flujo-pub{--p-focus-b:#131D2D}
   @media(max-width:900px){.p-mcta{background:var(--p-barra);-webkit-backdrop-filter:blur(16px) saturate(140%);backdrop-filter:blur(16px) saturate(140%)}}
 }
 
+/* ── 5 · Ingresar: una caja con aire ─────────────────────────────────────────────────────────────────────── */
+body .p-login{max-width:460px;margin:0 auto;padding:32px!important;background:#1A2538!important;border:1px solid var(--p-hair-d)!important;box-shadow:var(--p-flota-d)!important}
+body .p-login h1{font-size:clamp(1.9rem,4vw,2.4rem);margin:0 0 12px}
+body .p-login .p-sub{font:400 .9375rem/1.6 var(--font-body);margin:0 auto 26px!important;color:rgba(251,250,246,.74)}
+body .p-login input{height:52px;font:400 1rem/1.2 var(--font-body);margin-bottom:12px;background:rgba(251,250,246,.05);border:1px solid rgba(251,250,246,.18)}
+body .p-login .p-btn-fill{height:52px;min-height:52px}
+body .p-login .or{margin:20px 0;font-size:.8125rem}
+body .p-login .soc{height:50px;font-size:.9375rem!important}
+body .p-login #legal{margin-top:22px!important;font:400 .8125rem/1.65 var(--font-body);text-align:center;color:rgba(251,250,246,.62)}
+body .p-login #modeNote:empty{display:none}
+:root body .p-login .p-quien-op{border-radius:var(--r-ctl)!important}
+body .p-login .p-quien{display:grid;gap:8px}
+/* Los títulos que reciben el foco por código (tabindex -1, para el lector de pantalla) no son controles: sin anillo */
+h1[tabindex="-1"]:focus-visible,h2[tabindex="-1"]:focus-visible,.p-login h1:focus-visible{outline:none!important}
+@media(max-width:859px){
+  body.p-ingresar .p-page .p-container{padding-left:16px;padding-right:16px}
+  body .p-login{padding:28px 24px!important}
+}
+
 /* ── 6 · Portada: el video con su luz real ────────────────────────────────────────────────────────────────
    Tomás (8/10): en el celular la caja tapaba un tercio del video y un velo parejo lo apagaba entero. Fuera el velo
    parejo y la opacidad del video: solo un degradé abajo, detrás del título y la barra, y uno chico arriba, detrás
