@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function(){
   /* Una zona sin lista ofrece la zona misma como barrio; el barrio que ya tiene el aviso (un importado) no se pierde */
   const barriosDe = (z, actual) => { const l = (BARRIOS[z] || [z]).slice(); if (actual && l.indexOf(actual) === -1) l.unshift(actual); return l; };
   /* Contrato de operación (8/10/2026): los valores de la base no cambian; estas son las etiquetas */
-  const OP_TXT = { venta: T('pub2_op_venta', 'Venta'), alquiler: T('pub2_op_alquiler', 'Alquiler tradicional'), mediano: T('pub2_op_mediano', 'Mediano plazo (3 a 12 meses)') };
+  const OP_TXT = { venta: T('pub2_op_venta', 'Venta'), alquiler: T('pub2_op_alq', 'Alquiler'), mediano: T('pub2_op_mediano', 'Mediano plazo (3 a 12 meses)') };
   /* Lo que incluye el mediano plazo y las garantías del tradicional van en caracteristicas, con estos textos exactos */
   const INCLUYE = ['Expensas incluidas', 'Servicios incluidos', 'Internet incluido', 'Limpieza incluida', 'Ropa blanca incluida'];
   const GARANTIAS = ['Acepta seguro de caución', 'Acepta garantía propietaria'];
@@ -103,19 +103,21 @@ document.addEventListener('DOMContentLoaded', function(){
   const ICO = {
     mediano: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 11V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v3"/><path d="M3 13a2 2 0 0 1 4 0v2h10v-2a2 2 0 0 1 4 0v5H3z"/><path d="M6 18v2M18 18v2"/></svg>',
     tradicional: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 11 9-7 9 7v10h-6v-6H9v6H3z"/></svg>',
+    venta: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M17 6l3 3M15 8l2 2"/></svg>',
     emprendimiento: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3h16v18H4z"/><path d="M8 7h2M14 7h2M8 11h2M14 11h2M8 15h2M14 15h2M10 21v-3h4v3"/></svg>',
     camara: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h4l2-3h6l2 3h4v12H3z"/><circle cx="12" cy="13.5" r="3.5"/></svg>',
     mas: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="19" cy="12" r="1.6" fill="currentColor"/></svg>',
     check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>'
   };
-  const precioTxt = (precio, moneda) => precio == null || precio === '' ? T('pub2_sin_precio', 'Sin precio') : moneda === 'ARS' ? '$ ' + BP.fmtN(Math.round(Number(precio))) : BP.fmtUSD(Number(precio));
+  const precioTxt = (precio, moneda) => precio == null || precio === '' ? T('pub2_sin_precio', 'Sin precio') : moneda === 'ARS' ? '$\u00a0' + BP.fmtN(Math.round(Number(precio))) : BP.fmtUSD(Number(precio));
   /* Números como los escribe la gente: "1.400", "1400", "45,5". Vacío = null. */
   const num = s => { const t = String(s == null ? '' : s).trim(); if (!t) return null; const d = t.replace(/\.(?=\d{3}(\D|$))/g, '').replace(',', '.').replace(/[^\d.]/g, ''); return d === '' || isNaN(Number(d)) ? null : Number(d); };
   const entero = s => { const n = num(s); return n == null ? null : Math.round(n); };
   const miles = n => n == null || n === '' ? '' : BP.fmtN(Math.round(Number(n)));
   const fechaTxt = s => { const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(s || '')); return m ? Number(m[3]) + '/' + Number(m[2]) + '/' + m[1] : ''; };
   /* WhatsApp: se acepta como lo escribe la gente (11 2345-6789, 011 15 2345 6789) y se guarda con 54 9 */
-  const waNorm = s => { let d = String(s || '').replace(/\D/g, ''); if (d.indexOf('00') === 0) d = d.slice(2); if (d.indexOf('54') === 0) return d.length === 12 && d[2] !== '9' ? '549' + d.slice(2) : d; if (d[0] === '0') d = d.slice(1); if (d.length === 12 && d.indexOf('1115') === 0) d = '11' + d.slice(4); return d.length === 10 ? '549' + d : d; };
+  /* 8/10/2026 (lanz3-publicador) · La misma función que usa Interesados para el enlace de WhatsApp (store.js) */
+  const waNorm = BPStore.waNorm;
   /* Y se muestra como se escribe: 5491147820000 → "11 4782-0000". Fuera del 11, el número sin el 54 9. waNorm lo vuelve a leer igual. */
   const waVer = s => { const d = String(s || '').replace(/\D/g, ''); if (/^54911\d{8}$/.test(d)) return '11 ' + d.slice(5, 9) + '-' + d.slice(9); if (/^549\d{10}$/.test(d)) return d.slice(3); return s || ''; };
 
@@ -131,10 +133,18 @@ document.addEventListener('DOMContentLoaded', function(){
   const docsDespues = () => { try { return sessionStorage.getItem(DOCS_DESPUES) === '1'; } catch (e) { return false; } };
   let aviso = editId ? await BPStore.getAviso(editId) : null;
   if (editId && !aviso) BP.toast(T('pub2_no_encontrado', 'No encontramos ese aviso. Podés cargar uno nuevo.'), 'error');
+  /* 8/10/2026 (lanz3-publicador) · Un curador que abre un aviso ajeno desde Curación lo corrige sin perfil de publicador:
+     no pasa por Tu empresa ni por Tus documentos (nunca se le crea un publicador), el aviso no cambia de estado ni de
+     dueño, la vista previa dice quién lo publica y al terminar vuelve a Curación. */
+  const modoCurador = !!(aviso && aviso.id && aviso.publicador_id && (!pub || aviso.publicador_id !== pub.id) && await BPStore.isCurador());
+  const pubAviso = modoCurador ? ((BPStore.getPublicador && await BPStore.getPublicador(aviso.publicador_id)) || { id: aviso.publicador_id, nombre: '' }) : null;
+  const pubVista = () => modoCurador ? pubAviso : pub;   /* a nombre de quién se ve el aviso */
+  /* El motivo de la curación, arriba del editor: cambios pedidos (borrador con motivo) o rechazo */
+  const motivoPrevio = !modoCurador && aviso && aviso.motivo_rechazo && (aviso.estado_curacion === 'borrador' || aviso.estado_curacion === 'rechazado') ? { txt: aviso.motivo_rechazo, rechazo: aviso.estado_curacion === 'rechazado' } : null;
   /* "Publicar otra parecida" (?copia=<id>): un aviso nuevo con los datos de uno propio. Dirección, unidad y fotos
      quedan vacías, y tampoco se copia lo que es de cada unidad (título, piso, cualidades, video, mail del propietario).
      En un emprendimiento la dirección es la del edificio: esa sí se copia. */
-  const COPIA = ['operacion','tipo','zona','barrio','precio','moneda','ambientes','dormitorios','banos','cocheras','antiguedad','m2_total','m2_cubierto','expensas','mostrar_direccion','amenities','caracteristicas','descripcion','plazo','emprendimiento','etapa','entrega'];
+  const COPIA = ['operacion','tipo','zona','barrio','precio','moneda','ambientes','dormitorios','banos','cocheras','antiguedad','m2_total','m2_cubierto','expensas','mostrar_direccion','amenities','caracteristicas','descripcion','plazo','disponible_desde','emprendimiento','etapa','entrega'];
   let copiaDe = null;
   if (!aviso && copiaId && pub) { const o = await BPStore.getAviso(copiaId); if (o && o.publicador_id === pub.id) { copiaDe = o; aviso = { amenities: [], caracteristicas: [], cualidades: [], fotos: [], estado_curacion: 'borrador' }; COPIA.forEach(k => { if (o[k] != null) aviso[k] = Array.isArray(o[k]) ? o[k].slice() : o[k]; }); if (o.emprendimiento) aviso.direccion = o.direccion; } }
   if (!aviso) aviso = { tipo: 'Departamento', zona: '', barrio: '', amenities: [], caracteristicas: [], cualidades: [], fotos: [], mostrar_direccion: 'aproximada', estado_curacion: 'borrador' };
@@ -143,13 +153,20 @@ document.addEventListener('DOMContentLoaded', function(){
 
   /* Qué se publica: mediano, tradicional (venta o alquiler) o emprendimiento (una desarrolladora que vende por unidades) */
   const claseDe = a => (a.emprendimiento || a.etapa) ? 'emprendimiento' : a.operacion === 'mediano' ? 'mediano' : (a.operacion === 'venta' || a.operacion === 'alquiler') ? 'tradicional' : null;
-  const SUGERIDA = { gestor: 'mediano', desarrolladora: 'emprendimiento', profesional: 'tradicional', inmobiliaria: 'tradicional', corredor: 'tradicional', dueno: 'tradicional' };
-  let clase = claseDe(aviso) || (vuelta && vuelta.q) || null;
+  /* 8/10/2026 (lanz3-publicador) · En la pantalla 1 venta y alquiler son dos opciones (antes una sola, "Venta o alquiler
+     tradicional", y la operación se elegía recién en Precio con Venta y dólares de entrada). Las dos son la clase
+     'tradicional'; lo elegido fija la operación, y un alquiler arranca en pesos. */
+  const SUGERIDA = { gestor: 'mediano', desarrolladora: 'emprendimiento', profesional: 'venta', inmobiliaria: 'venta', corredor: 'venta', dueno: 'venta' };
+  const CLASE_DE = { mediano: 'mediano', venta: 'tradicional', alquiler: 'tradicional', tradicional: 'tradicional', emprendimiento: 'emprendimiento' };
+  const eleccionDe = a => { const c = claseDe(a); return c === 'tradicional' ? a.operacion : c; };
+  let clase = claseDe(aviso) || CLASE_DE[vuelta && vuelta.q] || null;
   const modoPerfil = pasoQs === 'perfil' && !!pub;   /* "Editar perfil de publicador" desde el panel */
   const modoDocs = pasoQs === 'documentos' && !!pub && pub.tipo === 'dueno';   /* "Cargar documentos" desde el panel */
-  /* Editar o no cambia el estado: un aviso en revisión o publicado sigue igual al guardar */
-  const enCurso = () => aviso.estado_curacion === 'en_revision' || aviso.estado_curacion === 'publicado';
-  const estadoAlGuardar = () => enCurso() ? aviso.estado_curacion : 'borrador';
+  /* Editar o no cambia el estado: un aviso en revisión, publicado o pausado sigue igual al guardar (8/10/2026,
+     lanz3-publicador: el pausado pasaba a borrador y perdía "Reactivar"). Uno rechazado sigue rechazado hasta que se
+     reenvía. En modo curador nunca cambia. */
+  const enCurso = () => modoCurador || ['en_revision', 'publicado', 'pausado'].indexOf(aviso.estado_curacion) > -1;
+  const estadoAlGuardar = () => enCurso() ? aviso.estado_curacion : aviso.estado_curacion === 'rechazado' ? 'rechazado' : 'borrador';
   const tieneDireccion = () => !!String(aviso.direccion || '').trim();
 
   /* ── Emprendimiento: las unidades. La primera es el aviso base (el borrador que se guarda al pasar de pantalla);
@@ -188,23 +205,27 @@ document.addEventListener('DOMContentLoaded', function(){
     a.moneda = a.operacion === 'alquiler' && a.moneda === 'ARS' ? 'ARS' : 'USD';
     a.amoblado = a.operacion === 'mediano' || a.amenities.indexOf('Amoblado') > -1;
   }
-  function cambiarOperacion(op){ if (aviso.operacion !== op) { aviso.plazo = null; aviso.operacion = op; } limpiarSegunOperacion(); }
-  function aplicarClase(c){
+  /* Un alquiler que todavía no tiene precio arranca en pesos (8/10/2026, lanz3-publicador) */
+  function cambiarOperacion(op){ if (aviso.operacion !== op) { aviso.plazo = null; if (op === 'alquiler' && !(Number(aviso.precio) > 0)) aviso.moneda = 'ARS'; aviso.operacion = op; } limpiarSegunOperacion(); }
+  function aplicarClase(c, op){
     const antes = clase; clase = c;
+    const tipoPub = (pubVista() || {}).tipo;
     if (c === 'mediano') cambiarOperacion('mediano');
     else if (c === 'emprendimiento') cambiarOperacion('venta');
-    else cambiarOperacion(aviso.operacion === 'venta' || aviso.operacion === 'alquiler' ? aviso.operacion : (pub && pub.tipo === 'gestor' ? 'alquiler' : 'venta'));
+    else cambiarOperacion(op || (aviso.operacion === 'venta' || aviso.operacion === 'alquiler' ? aviso.operacion : (tipoPub === 'gestor' ? 'alquiler' : 'venta')));
     if (c !== 'emprendimiento' && antes === 'emprendimiento') { aviso.emprendimiento = null; aviso.etapa = null; aviso.entrega = null; }
     if (c === 'emprendimiento' && !unidades.length) iniciarUnidades();
   }
-  if (clase && !aviso.operacion) aplicarClase(clase);
+  /* Lo elegido en la pantalla 1: mediano, alquiler, venta o emprendimiento */
+  const aplicarEleccion = sel => aplicarClase(CLASE_DE[sel] || sel, sel === 'venta' || sel === 'alquiler' ? sel : null);
+  if (clase && !aviso.operacion) aplicarEleccion((vuelta && vuelta.q) || clase);
 
   /* ── Qué falta en cada pantalla (lo usa la entrada al editar y el envío) ── */
   const empresaCompleta = p => !!(p && p.nombre && (p.whatsapp || p.telefono) && (p.tipo !== 'profesional' || p.matricula) && ((p.tipo !== 'gestor' && p.tipo !== 'desarrolladora') || p.cuit || p.dni));
   const unidadIncompleta = u => !String(u.unidad || '').trim() || !(u.ambientes >= 1) || !(u.m2_total > 0) || !(u.precio > 0);
   function incompletas(){
     const a = aviso, emp = clase === 'emprendimiento', l = [];
-    if (!empresaCompleta(pub)) l.push('empresa');
+    if (!modoCurador && !empresaCompleta(pub)) l.push('empresa');
     if (!a.zona || !a.barrio || !tieneDireccion() || (!emp && (!(a.m2_total > 0) || !(a.ambientes >= 1)))) l.push('propiedad');
     if (emp ? (!a.emprendimiento || !a.etapa || !unidades.length || unidades.some(unidadIncompleta)) : (!(Number(a.precio) > 0) || (a.operacion === 'mediano' && !a.plazo))) l.push('precio');
     if (a.fotos.length < 8 && !a.quiero_produccion) l.push('fotos');
@@ -234,10 +255,12 @@ document.addEventListener('DOMContentLoaded', function(){
   /* 8/10/2026 (venta) · El campo con error queda al centro de la pantalla: el aviso rojo flotante va abajo, sobre
      Continuar, y en el celular tapaba justo lo que había que tocar. */
   const centrar = x => { if (!x || !x.scrollIntoView) return; try { (x.closest('.p-fld,.pf-campo,.pf-u,.pf-doc,label') || x).scrollIntoView({ block: 'center', behavior: 'instant' }); } catch (e) { /* nada */ } };
-  const errorEn = (x, msg) => { BP.errorCampo(x, msg); centrar(x); return false; };
+  /* 8/10/2026 (lanz3-publicador) · Con el error escrito al lado del campo, el aviso rojo flotante no se muestra: tapaba
+     el error del campo (y se quedaba aunque ya estuviera corregido). Sigue en la página para el lector de pantalla. */
+  const errorEn = (x, msg) => { BP.errorCampo(x, msg); apagarError(); centrar(x); return false; };
   const marcarError = (name, msg) => {
     const f = el.querySelector(`[data-fld="${name}"]`) || document.getElementById(name);
-    if (f && f.tagName === 'FIELDSET') { BP.errorCampo(f, msg); const i = f.querySelector('input'); if (i) { try { i.focus(); } catch (e) { /* nada */ } } centrar(f); return false; }
+    if (f && f.tagName === 'FIELDSET') { BP.errorCampo(f, msg); apagarError(); const i = f.querySelector('input'); if (i) { try { i.focus(); } catch (e) { /* nada */ } } centrar(f); return false; }
     const c = (f && (f.querySelector('#f-' + name) || f.querySelector('input:not([type=hidden]),select,textarea,output'))) || f;
     return errorEn(c, msg);
   };
@@ -262,17 +285,19 @@ document.addEventListener('DOMContentLoaded', function(){
 
   /* 1 · ¿Qué publicás? */
   PANT.que = function(){
-    let sel = clase || SUGERIDA[pub ? pub.tipo : perfilQs] || '';
+    const actualSel = clase ? eleccionDe(aviso) || clase : null;
+    let sel = actualSel || SUGERIDA[pub ? pub.tipo : perfilQs] || '';
     /* 8/10/2026 (venta) · Un dueño directo publica su unidad: "Emprendimiento" (varias unidades de un desarrollo) no va */
     const esDueno = (pub ? pub.tipo : perfilQs) === 'dueno' && clase !== 'emprendimiento';
     if (esDueno && sel === 'emprendimiento') sel = '';
-    const op = (k, t, d) => `<button type="button" class="pf-opcion${sel === k ? ' on' : ''}" data-que="${k}" aria-pressed="${sel === k}">${ICO[k]}<span class="tx"><b>${t}</b><span>${d}</span></span><i class="ck" aria-hidden="true"></i></button>`;
+    const op = (k, t, d) => `<button type="button" class="pf-opcion${sel === k ? ' on' : ''}" data-que="${k}" aria-pressed="${sel === k}">${ICO[k] || ICO.tradicional}<span class="tx"><b>${t}</b><span>${d}</span></span><i class="ck" aria-hidden="true"></i></button>`;
     el.innerHTML = cab(T('pub2_que_t', '¿Qué publicás?')) + `<div class="pf-opciones" role="group" aria-labelledby="pfT">
       ${op('mediano', T('pub2_que_mediano', 'Mediano plazo (3 a 12 meses)'), T('pub2_que_mediano_d', 'Amoblado, con precio por mes en dólares.'))}
-      ${op('tradicional', T('pub2_que_trad', 'Venta o alquiler tradicional'), T('pub2_que_trad_d', 'Una unidad en venta o con contrato.'))}
+      ${op('alquiler', T('pub2_que_alq', 'Alquiler'), T('pub2_que_alq_d', 'Con contrato, en pesos o en dólares.'))}
+      ${op('venta', T('pub2_que_venta', 'Venta'), T('pub2_que_venta_d', 'Una unidad en venta.'))}
       ${esDueno ? '' : op('emprendimiento', T('pub2_que_emp', 'Emprendimiento'), T('pub2_que_emp_d', 'Varias unidades de un mismo desarrollo.'))}</div>`;
     el.querySelectorAll('[data-que]').forEach(b => b.addEventListener('click', () => { sel = b.dataset.que; el.querySelectorAll('[data-que]').forEach(x => { const on = x === b; x.classList.toggle('on', on); x.setAttribute('aria-pressed', String(on)); }); }));
-    return { validar: () => { if (!sel) { BP.toast(T('pub2_que_err2', 'Elegí qué publicás.'), 'error'); return false; } claseCambio = sel !== clase; aplicarClase(sel); return true; } };
+    return { validar: () => { if (!sel) { BP.toast(T('pub2_que_err2', 'Elegí qué publicás.'), 'error'); return false; } claseCambio = sel !== actualSel; aplicarEleccion(sel); return true; } };
   };
 
   /* Documentos de verificación: una zona por documento. Cada zona junta sus archivos en su input (se pueden sumar de a
@@ -346,7 +371,7 @@ document.addEventListener('DOMContentLoaded', function(){
       const nom = { profesional: T('pub2_nombre_prof', 'Nombre de la inmobiliaria o del corredor'), gestor: T('pub2_nombre_gestor', 'Nombre de la empresa'), desarrolladora: T('pub2_nombre_desa', 'Nombre de la desarrolladora'), dueno: T('pub2_nombre_dueno', 'Nombre y apellido') }[t];
       let h = campo('nombre', nom, texto('nombre', p.nombre, `autocomplete="${t === 'dueno' ? 'name' : 'organization'}"${t === 'dueno' ? ' aria-describedby="h-nombre"' : ''}`), 'full', t === 'dueno' ? ayudaPublico(p.nombre) : '')
         + campo('whatsapp', T('pub2_whatsapp', 'WhatsApp'), `<input id="f-whatsapp" name="whatsapp" type="tel" inputmode="tel" autocomplete="tel" value="${esc(waVer(p.whatsapp))}" aria-describedby="h-whatsapp" placeholder="11 2345 6789">`, 'full', T('pub2_whatsapp_h', 'Con código de área.'))
-        + (t === 'profesional' ? campo('colegio', T('pub2_colegio', 'Colegio'), elegir('colegio', p.colegio || '', COLEGIOS), 'full') + campo('matricula', T('pub2_matricula', 'Matrícula'), texto('matricula', p.matricula, 'placeholder="1234" autocomplete="off"'), 'full') : '')
+        + (t === 'profesional' ? campo('colegio', T('pub2_colegio', 'Colegio'), elegir('colegio', p.colegio || '', COLEGIOS), 'full') + campo('matricula', T('pub2_matricula', 'Matrícula'), texto('matricula', p.matricula, 'placeholder="1234" autocomplete="off" aria-describedby="h-matricula"'), 'full', T('pub2_matricula_h', 'La pide la ley para intermediar. Sin matrícula, publicá como gestor o dueño directo.')) : '')
         + (t === 'gestor' || t === 'desarrolladora' ? campo('cuit', T('pub2_cuit', 'CUIT'), texto('cuit', p.cuit, 'inputmode="numeric" autocomplete="off" placeholder="30-12345678-9"'), 'full') : '');
       if (modoPerfil) h += `<p class="pf-divisor pf-rot">${T('pub2_mas_datos', 'Más datos')}</p>`
         + campo('telefono', T('pub2_telefono', 'Teléfono'), `<input id="f-telefono" name="telefono" type="tel" inputmode="tel" autocomplete="tel" value="${esc(p.telefono || '')}">`, 'full')
@@ -369,7 +394,7 @@ document.addEventListener('DOMContentLoaded', function(){
         const data = { tipo: t };
         caja.querySelectorAll('input:not([type=file]),select,textarea').forEach(i => { if (i.name) data[i.name] = String(i.value || '').trim(); });
         const req = ['nombre', 'whatsapp'].concat(t === 'profesional' ? ['colegio', 'matricula'] : (t === 'gestor' || t === 'desarrolladora') ? ['cuit'] : []);
-        const falta = req.find(k => !data[k]); if (falta) return marcarError(falta, falta === 'colegio' ? T('pub2_err_colegio', 'Elegí el colegio.') : T('pub2_err_dato', 'Falta este dato.'));
+        const falta = req.find(k => !data[k]); if (falta) return marcarError(falta, falta === 'colegio' ? T('pub2_err_colegio', 'Elegí el colegio.') : falta === 'matricula' ? T('pub2_err_matricula', 'Falta la matrícula. Si no tenés, elegí Gestor de alquileres o Dueño directo.') : T('pub2_err_dato', 'Falta este dato.'));
         const wa = waNorm(data.whatsapp); if (wa.length < 11 || wa.length > 13) return marcarError('whatsapp', T('pub2_err_wa', 'Revisá el WhatsApp: con código de área y sin el 15.'));
         data.whatsapp = wa;
         if (data.cuit && (t === 'gestor' || t === 'desarrolladora') && data.cuit.replace(/\D/g, '').length !== 11) return marcarError('cuit', T('pub2_err_cuit', 'El CUIT tiene 11 números.'));
@@ -495,7 +520,7 @@ document.addEventListener('DOMContentLoaded', function(){
     el.querySelectorAll('[name=operacion]').forEach(r => r.addEventListener('change', () => { leer(); cambiarOperacion(r.value); dibujar(); }));
     dibujar();
     return { leer, validar: () => {
-      if (!(Number(a.precio) > 0)) return marcarError('precio', T('pub2_err_precio', 'Escribí el precio, sin puntos ni letras.'));
+      if (!(Number(a.precio) > 0)) return marcarError('precio', T('pub2_err_precio2', 'Escribí el precio.'));
       if (a.operacion === 'mediano' && !a.plazo) return marcarError('g-plazo', T('pub2_err_estadia', 'Elegí la estadía mínima.'));
       return true;
     } };
@@ -661,16 +686,18 @@ document.addEventListener('DOMContentLoaded', function(){
   PANT.descripcion = function(){
     const a = aviso;
     const emp = clase === 'emprendimiento';
+    /* 8/10/2026 (lanz3-publicador) · El mediano plazo es amoblado siempre: la casilla no se repite */
+    const LQT = LO_QUE_TIENE.filter(x => !(x[0] === 'Amoblado' && a.operacion === 'mediano'));
     const tiene = x => x === 'Cochera' ? (a.amenities.indexOf('Cochera') > -1 || (!emp && Number(a.cocheras) > 0)) : x === 'Amoblado' ? (a.amenities.indexOf('Amoblado') > -1 || (!!a.amoblado && a.operacion !== 'mediano')) : (a.amenities.indexOf(x) > -1 || a.caracteristicas.indexOf(x) > -1);
     el.innerHTML = cab(T('pub2_desc_t', 'Descripción')) + `<div class="pf-campo p-fld" data-fld="descripcion"><label for="f-descripcion" class="pf-sr">${T('pub2_desc_t', 'Descripción')}</label><textarea id="f-descripcion" name="descripcion" maxlength="4000" aria-describedby="dCuenta" placeholder="${esc(T('pub2_desc_ph', 'Luz, distribución, edificio y cuadra, como para alguien que la va a vivir.'))}">${esc(a.descripcion || '')}</textarea><p class="pf-contador" id="dCuenta" aria-live="polite"></p></div>
-      ${grupo('g-tiene', T('pub2_lo_que_tiene', 'Lo que tiene'), `<div class="pf-toggles">${LO_QUE_TIENE.map(([x, col, lbl]) => marca('lqt', x, lbl || esc(BP.etiqueta ? BP.etiqueta(x) : x), tiene(x))).join('')}</div>`)}`;
+      ${grupo('g-tiene', T('pub2_lo_que_tiene', 'Lo que tiene'), `<div class="pf-toggles">${LQT.map(([x, col, lbl]) => marca('lqt', x, lbl || esc(BP.etiqueta ? BP.etiqueta(x) : x), tiene(x))).join('')}</div>`)}`;
     el.querySelector('#g-tiene').style.marginTop = '26px';
     const ta = document.getElementById('f-descripcion'), cu = document.getElementById('dCuenta');
     const contar = () => { const n = ta.value.trim().length; cu.classList.toggle('ok', n >= 150); cu.textContent = n >= 150 ? TF('pub2_desc_ok', '{n} caracteres', { n }) : TF('pub2_desc_faltan', 'Faltan {n} caracteres para el mínimo de 150', { n: 150 - n }); };
     ta.addEventListener('input', contar); contar();
     const leer = () => {
       a.descripcion = ta.value.trim();
-      const m = marcados('lqt'), am = LO_QUE_TIENE.filter(x => x[1] === 'amenities').map(x => x[0]), ca = LO_QUE_TIENE.filter(x => x[1] === 'caracteristicas').map(x => x[0]);
+      const m = marcados('lqt'), am = LQT.filter(x => x[1] === 'amenities').map(x => x[0]), ca = LQT.filter(x => x[1] === 'caracteristicas').map(x => x[0]);
       a.amenities = reemplazar(a.amenities, am, m.filter(x => am.indexOf(x) > -1));
       a.caracteristicas = reemplazar(a.caracteristicas, ca, m.filter(x => ca.indexOf(x) > -1));
       /* Cochera y Amoblado tienen además su columna: se mantienen de acuerdo con la casilla.
@@ -694,9 +721,12 @@ document.addEventListener('DOMContentLoaded', function(){
       if (a.operacion === 'mediano' && a.plazo) l.push(TF('pub2_rev_estadia', 'mínimo {p}', { p: esc(a.plazo) }));
       if (a.operacion === 'mediano' && a.disponible_desde) l.push(TF('pub2_rev_disponible', 'libre desde el {f}', { f: fechaTxt(a.disponible_desde) }));
       if (a.operacion === 'alquiler' && a.plazo) l.push(TF('pub2_rev_contrato', 'contrato de {p}', { p: esc(a.plazo) }));
+      /* 8/10/2026 (lanz3-publicador) · Las garantías que acepta, que se cargaban y no se veían en ningún lado */
+      if (a.operacion === 'alquiler') { const g = [GARANTIAS[0], GARANTIAS[1]].filter(x => a.caracteristicas.indexOf(x) > -1).map(x => x === GARANTIAS[0] ? T('pub2_gar_caucion_min', 'seguro de caución') : T('pub2_gar_propietaria_min', 'garantía propietaria')); if (g.length) l.push(TF('pub2_rev_garantias', 'acepta {g}', { g: g.join(T('pub2_y', ' y ')) })); }
       const inc = a.caracteristicas.filter(x => INCLUYE.indexOf(x) > -1); if (a.operacion === 'mediano' && inc.length) l.push(esc(inc.join(', ')));
       if (a.expensas) l.push(TF('pub2_rev_expensas', 'expensas $ {e}', { e: BP.fmtN(a.expensas) }));
-      return l.join(' · ');
+      /* "$ 120.000" y "USD 1.400" no se parten en dos renglones */
+      return l.join(' · ').replace(/(\$|USD) /g, '$1&nbsp;');
     };
     const filas = [
       ['que', T('pub2_rev_que', 'Qué'), esc([op, BP.etiqueta ? BP.etiqueta(a.tipo || 'Departamento') : a.tipo].concat(emp && a.emprendimiento ? [a.emprendimiento] : []).join(' · '))],
@@ -705,14 +735,16 @@ document.addEventListener('DOMContentLoaded', function(){
       ['fotos', T('pub2_fotos_t', 'Fotos'), a.fotos.length ? TF('pub2_fotos_n', '{n} fotos', { n: a.fotos.length }) + (a.quiero_produccion ? ' · ' + T('pub2_rev_bairen', 'las hace BAIREN') : '') : (a.quiero_produccion ? T('pub2_rev_bairen_todas', 'Las hace BAIREN') : '0')],
       ['descripcion', T('pub2_desc_t', 'Descripción'), esc(TF('pub2_rev_desc', '{n} caracteres', { n: String(a.descripcion || '').length })) + (a.amenities.length ? ' · ' + esc(a.amenities.slice(0, 4).map(etiquetaDe).join(', ')) + (a.amenities.length > 4 ? '…' : '') : '')]
     ];
+    /* 8/10/2026 (lanz3-publicador) · Datos que parecen un error de tipeo: se avisan, no frenan el envío */
+    const dudas = BPData.datosDudosos ? BPData.datosDudosos(emp ? Object.assign({}, a, { m2_total: null, ambientes: null, banos: null }) : a) : [];
     el.innerHTML = cab(cambios ? T('pub2_rev_t_cambios', 'Revisá los cambios') : T('pub2_rev_t', 'Revisá y enviá'))
       + `<div class="pf-rev"><div class="pf-prev" id="prev" aria-hidden="true"></div>
-      <div><dl class="pf-resumen">${filas.map(([p, t, val]) => `<div class="fila"><div><dt>${t}</dt><dd>${val}</dd></div><button type="button" class="pf-cambiar" data-ir="${p}" aria-label="${esc(TF('pub2_cambiar_x', 'Cambiar {x}', { x: t.toLowerCase() }))}">${T('pub2_cambiar', 'Cambiar')}</button></div>`).join('')}</dl>
-      ${cambios ? '' : `<label class="pf-acepto p-fld" for="acepto"><input type="checkbox" id="acepto"><span>${T('pub2_acepto', 'Confirmo que los datos son ciertos y acepto los <a href="legales.html#terminos" target="_blank" rel="noopener">términos</a> y los <a href="legales.html#criterios" target="_blank" rel="noopener">criterios de selección</a>.')}</span></label>`}</div></div>`;
+      <div>${dudas.length ? `<p class="pf-dudas" role="note"><b>${esc(TF('pub2_revisa', 'Revisá: {x}.', { x: dudas.join(', ') }))}</b> ${T('pub2_revisa_igual', 'Si está bien, seguí igual.')}</p>` : ''}<dl class="pf-resumen">${filas.map(([p, t, val]) => `<div class="fila"><div><dt>${t}</dt><dd>${val}</dd></div><button type="button" class="pf-cambiar" data-ir="${p}" aria-label="${esc(TF('pub2_cambiar_x', 'Cambiar {x}', { x: t.toLowerCase() }))}">${T('pub2_cambiar', 'Cambiar')}</button></div>`).join('')}</dl>
+      ${cambios ? '' : `<label class="pf-acepto p-fld" for="acepto"><input type="checkbox" id="acepto"><span>${T('pub2_acepto2', 'Confirmo que los datos son ciertos y acepto los términos y los criterios de selección.')}</span></label><p class="pf-leer"><a href="legales.html#terminos" target="_blank" rel="noopener">${T('pub2_leer_terminos', 'Leer los términos')}</a><span aria-hidden="true"> · </span><a href="legales.html#criterios" target="_blank" rel="noopener">${T('pub2_leer_criterios', 'Leer los criterios')}</a></p>`}</div></div>`;
     /* La tarjeta como se va a ver. Un emprendimiento muestra la del desarrollo (desde, unidades, etapa), no la de su
        primera unidad (8/10/2026, venta). */
     (async () => { try {
-      const m = await BPData.fromStore(Object.assign({}, a, { publicador: pub, id: a.id || 'prev', fotos: a.fotos.map((f, i) => ({ url: f.url, orden: i })) }));
+      const m = await BPData.fromStore(Object.assign({}, a, { publicador: pubVista(), id: a.id || 'prev', fotos: a.fotos.map((f, i) => ({ url: f.url, orden: i })) }));
       const p = document.getElementById('prev'); if (!p) return;
       if (emp && !unaUnidad && BPData.cardEmp) {
         const g = BPData.emprendimientos(unidades.map((u, i) => Object.assign({}, m, { id: m.id + '-' + i, unidad: u.unidad, amb: u.ambientes, m2: u.m2_total, precio: u.precio, reservado: u.estado === 'reservado' })))[0];
@@ -727,9 +759,9 @@ document.addEventListener('DOMContentLoaded', function(){
   /* ── Navegación ── */
   /* El dueño directo que todavía no mandó el DNI y la titularidad pasa por Tus documentos (salvo que en esta visita
      haya dicho "Los subo después") */
-  const pedirDocs = () => faltanDocs() && !docsDespues();
+  const pedirDocs = () => !modoCurador && faltanDocs() && !docsDespues();
   function siguiente(p){
-    if (p === 'que') return !haySesion() ? 'ingreso' : !empresaCompleta(pub) ? 'empresa' : pedirDocs() ? 'documentos' : 'propiedad';
+    if (p === 'que') return !haySesion() ? 'ingreso' : modoCurador ? 'propiedad' : !empresaCompleta(pub) ? 'empresa' : pedirDocs() ? 'documentos' : 'propiedad';
     if (p === 'empresa') return pedirDocs() ? 'documentos' : 'propiedad';
     if (p === 'documentos') return 'propiedad';
     return ORDEN[ORDEN.indexOf(p) + 1] || 'revisar';
@@ -754,12 +786,22 @@ document.addEventListener('DOMContentLoaded', function(){
   /* "Los subo después": queda anotado en esta visita y sigue */
   function saltar(){ if (ocupado) return; try { sessionStorage.setItem(DOCS_DESPUES, '1'); } catch (e) { /* nada */ } const dest = desdeRevisar ? 'revisar' : siguiente(actual); if (dest === 'revisar') desdeRevisar = false; ir(dest, 1); }
   function actualizarSalir(){
-    const conAviso = haySesion() && !!pub && !modoPerfil && !modoDocs && ['propiedad', 'precio', 'fotos', 'descripcion', 'revisar'].indexOf(actual) > -1;
+    const conAviso = haySesion() && !!pub && !enCurso() && !modoPerfil && !modoDocs && ['propiedad', 'precio', 'fotos', 'descripcion', 'revisar'].indexOf(actual) > -1;
     const dir = actual === 'propiedad' ? valor('direccion') : aviso.direccion;
     bSalir.textContent = conAviso && String(dir || '').trim() ? T('pub2_salir_guardado', 'Salir, queda guardado') : T('pub2_salir', 'Salir');
   }
-  /* Un error de la pantalla anterior no se queda flotando en la siguiente */
-  const apagarError = () => { const t = document.getElementById('bpToast'); if (t && t.classList.contains('err')) t.classList.remove('on'); };
+  /* Un error de la pantalla anterior no se queda flotando en la siguiente (ni mientras se corrige) */
+  function apagarError(){ const t = document.getElementById('bpToast'); if (t && t.classList.contains('err')) t.classList.remove('on'); }
+  el.addEventListener('input', apagarError); el.addEventListener('change', apagarError);
+  /* 8/10/2026 (lanz3-publicador) · Arriba de la pantalla: el motivo de la curación (cambios pedidos o rechazo) al abrir
+     el aviso y en Revisar; en modo curador, a nombre de quién está el aviso. */
+  let vecesIr = 0;
+  function avisoArriba(nombre){
+    const cabeza = el.querySelector('.pf-cab'); if (!cabeza) return;
+    vecesIr++;
+    if (modoCurador) { cabeza.insertAdjacentHTML('afterend', `<p class="pf-curador" role="note">${esc(TF('pub2_cur_nota', 'Corregís el aviso de {n}. Sigue a su nombre.', { n: (pubAviso && pubAviso.nombre) || T('pub2_su_publicador', 'su publicador') }))}</p>`); return; }
+    if (motivoPrevio && (vecesIr === 1 || nombre === 'revisar') && aviso.estado_curacion !== 'en_revision') cabeza.insertAdjacentHTML('afterend', `<div class="pf-motivo${motivoPrevio.rechazo ? ' rechazo' : ''}" role="note"><b>${motivoPrevio.rechazo ? T('pub2_motivo_rechazo', 'Rechazado') : T('pub2_motivo_cambios', 'Cambios pedidos')}</b><p>${esc(motivoPrevio.txt)}</p></div>`);
+  }
   function ir(nombre, dir){
     actual = nombre; if (nombre === 'empresa') mostroEmpresa = true; if (nombre === 'documentos') mostroDocs = true;
     apagarError(); document.body.classList.remove('pf-doble');
@@ -768,6 +810,7 @@ document.addEventListener('DOMContentLoaded', function(){
     prog.querySelector('i').style.width = ((i + 1) / orden.length * 100) + '%'; prog.setAttribute('aria-valuemax', String(orden.length)); prog.setAttribute('aria-valuenow', String(i + 1)); prog.setAttribute('aria-valuetext', TF('pub2_paso_de', 'Paso {n} de {t}', { n: i + 1, t: orden.length }));
     document.body.classList.remove('pf-ancho'); bAtras.hidden = false;
     pant = PANT[nombre]() || {};
+    avisoArriba(nombre);
     pie(pant.boton || (desdeRevisar ? T('pub2_listo', 'Listo') : T('pub2_continuar', 'Continuar')), pant.botonClase, pant.secundario);
     actualizarSalir();
     document.body.dataset.pantalla = nombre;
@@ -788,7 +831,7 @@ document.addEventListener('DOMContentLoaded', function(){
       /* Desde Revisar, Continuar vuelve a Revisar; si en la pantalla 1 cambió lo que se publica, sigue en orden (el precio cambia) */
       if (desdeRevisar && actual === 'que' && claseCambio) desdeRevisar = false;
       const dest = desdeRevisar ? 'revisar' : siguiente(actual);
-      if (dest === 'ingreso') { sigue = true; irAIngresar(clase); return; }
+      if (dest === 'ingreso') { sigue = true; irAIngresar(eleccionDe(aviso) || clase); return; }
       if (dest === 'revisar') desdeRevisar = false;
       sigue = true; ocupado = false; ir(dest, 1);
     } catch (e) { BP.toast(BPStore.errorAlGuardar(e), 'error'); }
@@ -797,7 +840,7 @@ document.addEventListener('DOMContentLoaded', function(){
   async function atras(){
     if (ocupado) return;
     if (subiendo) { BP.toast(T('pub2_espera_fotos', 'Esperá a que terminen de subir las fotos.')); return; }
-    if (actual === 'recibido') { location.href = 'panel.html#avisos'; return; }
+    if (actual === 'recibido') { location.href = modoCurador ? 'curacion.html#cola' : 'panel.html#avisos'; return; }
     if (pant && pant.leer) pant.leer();
     const prev = desdeRevisar ? 'revisar' : anterior(actual);
     if (!prev) { salir(); return; }
@@ -809,19 +852,21 @@ document.addEventListener('DOMContentLoaded', function(){
     if (subiendo) { BP.toast(T('pub2_espera_fotos', 'Esperá a que terminen de subir las fotos.')); return; }
     if (actual !== 'recibido' && pant && pant.leer) pant.leer();
     if (['propiedad', 'precio', 'fotos', 'descripcion', 'revisar'].indexOf(actual) > -1) { try { await autoguardar(false); } catch (e) { BP.toast(BPStore.errorAlGuardar(e), 'error'); return; } }
-    location.href = !haySesion() ? 'publicar.html' : (modoPerfil || modoDocs) ? 'panel.html#cuenta' : 'panel.html#avisos';
+    location.href = !haySesion() ? 'publicar.html' : modoCurador ? 'curacion.html#cola' : (modoPerfil || modoDocs) ? 'panel.html#cuenta' : 'panel.html#avisos';
   }
   bAtras.addEventListener('click', atras); bSalir.addEventListener('click', salir);
 
   /* ── Guardar ── */
   async function save(estado){
-    const rec = Object.assign({}, aviso); rec.estado_curacion = estado; delete rec.publicador; if (estado === 'en_revision') rec.motivo_rechazo = null;
+    /* 8/10/2026 (lanz3-publicador) · Al reenviar, el motivo anterior queda: Curación lo muestra como "Reenvío". La
+       aprobación lo borra (setEstado). */
+    const rec = Object.assign({}, aviso); rec.estado_curacion = estado; delete rec.publicador;
     if (clase === 'emprendimiento' && tituloAuto) rec.titulo = tituloUnidad(rec.emprendimiento, rec.unidad);
     /* El código lleva la operación (BA-…V-, L-, M-). En "Venta o alquiler" el borrador se guarda antes de elegir entre las
        dos: mientras nunca se envió, si la operación cambió, el código se rehace (saveAviso lo genera de nuevo). */
     const letra = { venta: 'V', alquiler: 'L', mediano: 'M' }[rec.operacion];
     if (rec.codigo && aviso.estado_curacion === 'borrador' && letra && !new RegExp(letra + '-[A-Z0-9]{3}$').test(rec.codigo)) delete rec.codigo;
-    const saved = await BPStore.saveAviso(rec);
+    const saved = await BPStore.saveAviso(rec, { estadoAntes: aviso.estado_curacion });
     aviso.id = saved.id; aviso.codigo = saved.codigo; aviso.slug = saved.slug; aviso.estado_curacion = estado;
     return saved;
   }
@@ -831,7 +876,7 @@ document.addEventListener('DOMContentLoaded', function(){
   const conLista = () => clase === 'emprendimiento' && !unaUnidad && aviso.estado_curacion === 'borrador';
   const listaLimpia = () => unidades.map(u => ({ id: u.id || null, unidad: u.unidad || '', ambientes: u.ambientes || null, m2_total: u.m2_total || null, precio: u.precio != null ? u.precio : null, estado: u.estado === 'reservado' ? 'reservado' : 'disponible' }));
   async function autoguardar(validado){
-    if (!haySesion() || !pub || modoPerfil || modoDocs) return false;
+    if (!haySesion() || !(pub || modoCurador) || modoPerfil || modoDocs) return false;
     if (clase === 'emprendimiento') aBase();
     if (!tieneDireccion()) return false;
     if (enCurso() && !validado) return false;
@@ -847,7 +892,7 @@ document.addEventListener('DOMContentLoaded', function(){
     const falta = incompletas()[0];
     if (falta) { desdeRevisar = false; ir(falta, -1); if (falta !== 'empresa') setTimeout(() => { if (pant.leer) pant.leer(); if (pant.validar) pant.validar(); }, 380); return; }
     const eraEnCurso = enCurso();
-    if (!eraEnCurso) { const c = document.getElementById('acepto'); if (!c || !c.checked) { BP.errorCampo('acepto', T('pub2_err_acepto', 'Marcá la casilla para enviar.')); return; } }
+    if (!eraEnCurso) { const c = document.getElementById('acepto'); if (!c || !c.checked) { BP.errorCampo('acepto', T('pub2_err_acepto', 'Marcá la casilla para enviar.')); apagarError(); centrar(c); return; } }
     const estado = eraEnCurso ? aviso.estado_curacion : 'en_revision';
     let n = 1;
     if (clase === 'emprendimiento') {
@@ -871,9 +916,14 @@ document.addEventListener('DOMContentLoaded', function(){
     recibido(eraEnCurso, n);
   }
   function recibido(cambios, n){
+    if (modoCurador) {
+      const msg = TF('pub2_cur_guardado', 'Guardado. El aviso sigue a nombre de {n}.', { n: (pubAviso && pubAviso.nombre) || T('pub2_su_publicador', 'su publicador') });
+      try { sessionStorage.setItem('bp_cur_msg', msg); } catch (e) { /* sin almacenamiento: el aviso se ve igual acá */ }
+      BP.toast(msg); setTimeout(() => { location.href = 'curacion.html#cola'; }, 700); return;
+    }
     actual = 'recibido'; document.body.dataset.pantalla = 'recibido'; desdeRevisar = false;
     prog.querySelector('i').style.width = '100%'; prog.setAttribute('aria-valuenow', prog.getAttribute('aria-valuemax') || '8'); bAtras.hidden = true; bSalir.textContent = T('pub2_salir', 'Salir');
-    const sub = cambios ? (aviso.estado_curacion === 'publicado' ? T('pub2_rec_publicado', 'Ya se ven en la ficha.') : T('pub2_rec_en_revision', 'Sigue en revisión. Te avisamos por mail cuando esté publicado.'))
+    const sub = cambios ? (aviso.estado_curacion === 'publicado' ? T('pub2_rec_publicado', 'Ya se ven en la ficha.') : aviso.estado_curacion === 'pausado' ? T('pub2_rec_pausado', 'Sigue pausado. Lo reactivás desde tu panel.') : T('pub2_rec_en_revision', 'Sigue en revisión. Te avisamos por mail cuando esté publicado.'))
       : n > 1 ? TF('pub2_rec_emp', 'Recibimos {n} unidades. Las revisamos en menos de 48 horas y te avisamos por mail.', { n }) : T('pub2_rec_sub', 'Lo revisamos en menos de 48 horas y te avisamos por mail.');
     el.innerHTML = `<div class="pf-recibido"><span class="sello" aria-hidden="true">${ICO.check}</span>${cab(cambios ? T('pub2_rec_cambios_t', 'Cambios guardados') : T('pub2_rec_t', 'Recibido'), sub)}</div>`;
     apagarError(); document.body.classList.remove('pf-ancho'); document.body.classList.add('pf-doble'); pieIn.className = 'pf-pie-in doble';

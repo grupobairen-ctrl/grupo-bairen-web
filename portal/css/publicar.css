@@ -264,6 +264,25 @@ body.p-flujo-pub .p-toast{bottom:calc(var(--pf-pie) + 14px);max-width:calc(100vw
 .pf-err-fotos{margin:18px 0 0!important}
 .pf-err-fotos + .pf-toggle-sola{margin-top:8px}
 
+/* ── 8/10/2026 · lanz3-publicador ── */
+/* El título de cada pantalla recibe el foco al cambiar de pantalla (para el lector de pantalla), pero no es un control:
+   sin el marco grueso del foco, que aparecía después de escribir */
+.pf-t:focus,.pf-t:focus-visible{outline:0;box-shadow:none!important}
+/* Términos: tocar el texto marca la casilla; los enlaces van aparte, debajo */
+.pf-leer{margin:6px 0 0 34px;font-size:.84rem;color:var(--pf-medio)}
+.pf-leer a{display:inline-block;min-height:32px;line-height:32px;color:var(--pf-navy);text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--pf-oro)}
+/* El motivo de la curación, arriba del editor */
+.pf-motivo{margin:-6px 0 22px;padding:12px 14px;border-left:3px solid var(--pf-oro);background:var(--pf-papel)}
+.pf-motivo.rechazo{border-left-color:var(--pf-err)}
+.pf-motivo b{display:block;font:500 .66rem/1.3 var(--font-body);letter-spacing:.16em;text-transform:uppercase;color:var(--pf-oro-tinta)}
+.pf-motivo.rechazo b{color:var(--pf-err)}
+.pf-motivo p{margin:4px 0 0;font-size:.95rem;line-height:1.5;color:var(--pf-navy);overflow-wrap:anywhere}
+/* Modo curador: a nombre de quién está el aviso */
+.pf-curador{margin:-6px 0 20px;padding:8px 12px;background:var(--pf-navy);color:#FBFAF6;font-size:.86rem;line-height:1.45}
+/* Revisar: datos que parecen un error de tipeo */
+.pf-dudas{margin:0 0 14px;padding:10px 12px;border:1px solid rgba(156,58,52,.35);background:#FBF1EF;color:var(--pf-navy);font-size:.88rem;line-height:1.45}
+.pf-dudas b{font-weight:500;color:var(--pf-err)}
+
 @media(min-width:900px){
   .pf-main{padding-top:52px}
   .pf-t{font-size:2.15rem}
