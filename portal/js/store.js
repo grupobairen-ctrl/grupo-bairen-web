@@ -66,19 +66,21 @@
       }
       if (S.mode === 'local' && !DEMO) S.session = L.user.get(null);
       if (window.BP && BP.applySession) BP.applySession(S.session, S.mode);
-      S.pedirSync();
       return S.mode;
     })();
     return S.ready;
   };
-  /* Sincronización web → portal: se pide una vez por pestaña al abrir el portal con base real.
-     La función del servidor (api/portal-sync.js) decide si hace falta (freno de 10 minutos)
-     y trae altas, precios, reservas y bajas de la web. Si no está configurada o no existe
-     (dev server), no pasa nada: el portal sigue con lo que tiene. */
-  S.pedirSync = function(){
-    if (S.mode !== 'supabase') return;
-    try { if (sessionStorage.getItem('bp_sync_pedido')) return; sessionStorage.setItem('bp_sync_pedido', '1'); } catch (e) { return; }
-    try { fetch('/api/portal-sync', { method: 'POST', keepalive: true }).catch(() => {}); } catch (e) { /* sin red o sin función */ }
+  /* Sincronización web → portal. 8/10/2026 · El navegador del visitante ya no la pide: con tráfico de
+     anuncios eran un POST y dos escrituras en la base por cada pestaña nueva. La corre el cron de Vercel
+     cada 15 minutos (vercel.json) y, a mano, una sesión de curador (Curación → Sistema, que llama a
+     api/portal-sync.js con su token). Esta función queda para eso: sin base, sin sesión o sin ser curador
+     no hace nada y lo dice. Devuelve la respuesta de la función, o { omitida, motivo }. */
+  S.pedirSync = async function(){
+    if (S.mode !== 'supabase' || DEMO) return { omitida: true, motivo: 'sin base' };
+    if (!(await S.isCurador())) return { omitida: true, motivo: 'solo una sesión de curador' };
+    const token = await S.tokenAcceso(); if (!token) return { omitida: true, motivo: 'sin sesión' };
+    try { const r = await fetch('/api/portal-sync', { method: 'POST', headers: { Accept: 'application/json', Authorization: 'Bearer ' + token } }); return await r.json().catch(() => ({ ok: r.ok, status: r.status })); }
+    catch (e) { return { error: String(e) }; }
   };
   S.requireSession = function(volver){ if (!S.session) { location.href = 'ingresar.html?volver=' + encodeURIComponent(volver || location.pathname.split('/').pop() + location.search); return false; } return true; };
 

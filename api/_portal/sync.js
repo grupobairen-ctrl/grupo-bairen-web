@@ -216,11 +216,14 @@ async function sincronizar(opts) {
   opts = opts || {};
   const t0 = Date.now();
   let ultima, fila;
-  try {
-    await A.patch(`sincronizaciones?terminada=is.null&iniciada=lt.${encodeURIComponent(iso(t0 - CANDADO_MS))}`, { terminada: iso(t0), ok: false, error: 'abandonada' }, { prefer: 'return=minimal' });
-    ultima = await A.get('sincronizaciones?select=terminada,altas,cambios,bajas,sin_cambios&ok=eq.true&terminada=not.is.null&order=terminada.desc&limit=1');
-  } catch (e) { if (esTablaFaltante(e)) { const err = new Error('falta la tabla portal.sincronizaciones'); err.status = 503; err.falta = 'migracion-04-producto.sql'; throw err; } throw e; }
+  /* 8/10/2026 · Primero se mira el freno y recién después se escribe: dentro de los 10 minutos la corrida
+     omitida es una sola lectura, sin el PATCH de las abandonadas (que antes iba en cada llamada). */
+  const faltaTabla = e => { if (esTablaFaltante(e)) { const err = new Error('falta la tabla portal.sincronizaciones'); err.status = 503; err.falta = 'migracion-04-producto.sql'; return err; } return e; };
+  try { ultima = await A.get('sincronizaciones?select=terminada,altas,cambios,bajas,sin_cambios&ok=eq.true&terminada=not.is.null&order=terminada.desc&limit=1'); }
+  catch (e) { throw faltaTabla(e); }
   if (!opts.force && ultima[0] && Date.parse(ultima[0].terminada) > t0 - FRENO_MS) return { omitida: true, motivo: 'reciente', ultima: ultima[0] };
+  try { await A.patch(`sincronizaciones?terminada=is.null&iniciada=lt.${encodeURIComponent(iso(t0 - CANDADO_MS))}`, { terminada: iso(t0), ok: false, error: 'abandonada' }, { prefer: 'return=minimal' }); }
+  catch (e) { throw faltaTabla(e); }
 
   try { [fila] = await A.post('sincronizaciones', { origen: opts.origen || 'web' }); }
   catch (e) { if (esCandado(e)) return { omitida: true, motivo: 'en curso' }; throw e; }
