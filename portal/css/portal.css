@@ -4719,9 +4719,12 @@ h1[tabindex="-1"]:focus-visible,h2[tabindex="-1"]:focus-visible,.p-login h1:focu
 body.p-home .h-hero video{opacity:1}
 body.p-home .h-hero h1{text-shadow:0 1px 18px rgba(10,14,22,.28)}
 @media(min-width:900px){
+  /* 8/10/2026 · Tomás: el sombreado de la compu era muy notorio. Óvalo a menos de la mitad y casi sin banda arriba (la
+     barra ya es navy sólido); el título se sostiene con una sombra suave */
   body.p-home .h-hero-velo{background:
-    linear-gradient(to bottom,rgba(19,29,45,.50) 0,rgba(19,29,45,0) 180px),
-    radial-gradient(ellipse 62% 46% at 50% 54%,rgba(19,29,45,.72) 0%,rgba(19,29,45,.58) 45%,rgba(19,29,45,.22) 78%,rgba(19,29,45,0) 100%)}
+    linear-gradient(to bottom,rgba(19,29,45,.18) 0,rgba(19,29,45,0) 120px),
+    radial-gradient(ellipse 58% 42% at 50% 54%,rgba(19,29,45,.34) 0%,rgba(19,29,45,.24) 50%,rgba(19,29,45,.08) 80%,rgba(19,29,45,0) 100%)}
+  body.p-home .h-hero h1{text-shadow:0 2px 28px rgba(10,14,22,.50),0 1px 3px rgba(10,14,22,.35)}
 }
 @media(max-width:899px){
   body.p-home .h-hero{align-items:flex-end;padding:0 0 22px}
