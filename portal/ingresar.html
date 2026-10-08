@@ -27,7 +27,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20261008e"><link rel="stylesheet" href="css/catalogo.css?v=20261008e"><link rel="stylesheet" href="css/portal.css?v=20261008e">
+  <link rel="stylesheet" href="css/base.css?v=20261008f"><link rel="stylesheet" href="css/catalogo.css?v=20261008f"><link rel="stylesheet" href="css/portal.css?v=20261008f">
 </head>
 <body class="p-ingresar">
 <div class="p-velo" aria-hidden="true"><span class="w">BAIREN</span></div>
@@ -56,7 +56,7 @@
   </div>
 </div></section>
 <div id="pFooter"></div>
-<script src="supabase-portal.js?v=20261008e" defer></script><script src="js/errores.js?v=20261008e" defer></script><script src="js/motion.js?v=20261008e" defer></script><script src="js/bairen-motion.js?v=20261008e" defer></script><script src="js/i18n-portal.js?v=20261008e" defer></script><script src="js/ui.js?v=20261008e" defer></script><script src="js/store.js?v=20261008e" defer></script><script src="js/data.js?v=20261008e" defer></script>
+<script src="supabase-portal.js?v=20261008f" defer></script><script src="js/errores.js?v=20261008f" defer></script><script src="js/motion.js?v=20261008f" defer></script><script src="js/bairen-motion.js?v=20261008f" defer></script><script src="js/i18n-portal.js?v=20261008f" defer></script><script src="js/ui.js?v=20261008f" defer></script><script src="js/store.js?v=20261008f" defer></script><script src="js/data.js?v=20261008f" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -69,7 +69,11 @@ document.addEventListener('DOMContentLoaded', function(){
   document.getElementById('btnMail').textContent = T.continuar; document.getElementById('btnPerfil').textContent = T.continuar; document.getElementById('btnCode').textContent = T.ingresar;
   document.getElementById('again').textContent = BP.t('ing_reenviar', 'Reenviar código');
   const qs = BP.qs(); const volver = qs.get('volver') || 'panel'; const perfil = qs.get('perfil') || '';
-  const destino = () => { if (volver === 'publicar') return 'publicar-aviso.html' + (perfil ? '?perfil=' + perfil : ''); if (volver === 'contactos') return 'panel.html#contactos'; if (volver === 'curacion') return 'curacion.html'; if (/^[a-z0-9-]+\.html(#[\w-]*)?$/i.test(volver)) return volver; return 'index.html'; };   /* 16/9 · sin destino explícito, la landing del portal (decisión de Tomás); Mi cuenta queda a un clic */
+  /* lanz3-visitante · Quien vino desde una acción (crear una alerta, guardar) vuelve a esa misma página con sus filtros:
+     se acepta una dirección de este portal con su búsqueda (buscar.html?op=…, propiedad-…, guardados.html). Nada de
+     otro dominio ni de otra carpeta, y nunca de vuelta a ingresar. */
+  const volverSeguro = v => { try { const base = location.href.replace(/[?#].*$/, '').replace(/[^/]*$/, ''); const u = new URL(v, base); if (u.origin !== location.origin || u.href.indexOf(base) !== 0) return null; const rel = u.href.slice(base.length); return /^([a-z0-9-]+\.html|propiedad-[^/?#]+|(departamentos|pisos|ph|casas|propiedades)-[a-z0-9-]+)([?#]|$)/i.test(rel) && !/^ingresar\.html/i.test(rel) ? rel : null; } catch (e) { return null; } };
+  const destino = () => { if (volver === 'publicar') return 'publicar-aviso.html' + (perfil ? '?perfil=' + perfil : ''); if (volver === 'contactos') return 'panel.html#contactos'; if (volver === 'curacion') return 'curacion.html'; if (/^[a-z0-9-]+\.html(#[\w-]*)?$/i.test(volver)) return volver; return volverSeguro(volver) || 'index.html'; };   /* 16/9 · sin destino explícito, la landing del portal (decisión de Tomás); Mi cuenta queda a un clic */
   const fm = document.getElementById('stepMail'), fc = document.getElementById('stepCode'), fp = document.getElementById('stepPerfil'), email = document.getElementById('email');
   fm.addEventListener('submit', e => e.preventDefault()); fc.addEventListener('submit', e => e.preventDefault()); fp.addEventListener('submit', e => e.preventDefault());
   if (volver === 'publicar') {

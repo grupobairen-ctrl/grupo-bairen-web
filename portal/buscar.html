@@ -28,7 +28,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20261008e"><link rel="stylesheet" href="css/catalogo.css?v=20261008e"><link rel="stylesheet" href="css/portal.css?v=20261008e">
+  <link rel="stylesheet" href="css/base.css?v=20261008f"><link rel="stylesheet" href="css/catalogo.css?v=20261008f"><link rel="stylesheet" href="css/portal.css?v=20261008f">
   <style>body{padding-top:64px}</style>
 </head>
 <body class="p-product p-catalogo">
@@ -62,10 +62,14 @@
 </div>
 
 <main class="p-container" style="padding-top:26px">
+  <!-- lanz3-visitante · Quien publica, como filtro a la vista y con su cruz para sacarlo -->
+  <div class="p-filtro-pub" id="filtroPub" hidden></div>
   <div class="p-results-head">
     <span class="p-results-count" id="resCount" aria-live="polite"></span>
     <div class="acts"><button type="button" class="p-fbtn" id="alertBtn" aria-pressed="false">Crear alerta</button><select class="p-fsel" id="sortSel" aria-label="Ordenar" data-i18n-aria="cat_ordenar"><option value="relevancia" data-i18n="cat_sort_relevancia">Más relevantes</option><option value="precio_asc" data-i18n="cat_sort_precio_asc">Menor precio</option><option value="precio_desc" data-i18n="cat_sort_precio_desc">Mayor precio</option><option value="recientes" data-i18n="cat_sort_recientes">Más recientes</option><option value="m2" data-i18n="cat_sort_m2">Mayor superficie</option></select></div>
   </div>
+  <!-- lanz3-visitante · Alerta creada sin cuenta: una línea y el botón para ingresar, con vuelta a esta búsqueda -->
+  <p class="p-alerta-cuenta" id="alertaCuenta" hidden><span data-i18n="alerta_cuenta">Con tu cuenta, la alerta te llega por mail.</span> <a class="p-btn p-btn-sm p-btn-fill" id="alertaIngresar" href="ingresar.html" data-i18n="ingresar">Ingresar</a></p>
   <div class="p-results">
     <div>
       <div class="p-list" id="list" aria-busy="true"><div class="p-skel-card" aria-hidden="true"><div class="ph"></div><div class="bd"><div class="p-skel-line t"></div><div class="p-skel-line s"></div><div class="p-skel-line l"></div><div class="p-skel-line m"></div><div class="foot"><div class="p-skel-line"></div><div class="p-skel-line"></div></div></div></div><div class="p-skel-card" aria-hidden="true"><div class="ph"></div><div class="bd"><div class="p-skel-line t"></div><div class="p-skel-line s"></div><div class="p-skel-line l"></div><div class="p-skel-line m"></div><div class="foot"><div class="p-skel-line"></div><div class="p-skel-line"></div></div></div></div><div class="p-skel-card" aria-hidden="true"><div class="ph"></div><div class="bd"><div class="p-skel-line t"></div><div class="p-skel-line s"></div><div class="p-skel-line l"></div><div class="p-skel-line m"></div><div class="foot"><div class="p-skel-line"></div><div class="p-skel-line"></div></div></div></div></div>
@@ -114,10 +118,10 @@
 
 <div id="pFooter"></div>
 
-<script src="supabase-portal.js?v=20261008e" defer></script><script src="js/errores.js?v=20261008e" defer></script>
-<script src="../mapa-barrios.js?v=20261008e" defer></script>
-<script src="js/motion.js?v=20261008e" defer></script><script src="js/bairen-motion.js?v=20261008e" defer></script><script src="js/i18n-portal.js?v=20261008e" defer></script><script src="js/ui.js?v=20261008e" defer></script><script src="js/store.js?v=20261008e" defer></script>
-<script src="js/data.js?v=20261008e" defer></script>
+<script src="supabase-portal.js?v=20261008f" defer></script><script src="js/errores.js?v=20261008f" defer></script>
+<script src="../mapa-barrios.js?v=20261008f" defer></script>
+<script src="js/motion.js?v=20261008f" defer></script><script src="js/bairen-motion.js?v=20261008f" defer></script><script src="js/i18n-portal.js?v=20261008f" defer></script><script src="js/ui.js?v=20261008f" defer></script><script src="js/store.js?v=20261008f" defer></script>
+<script src="js/data.js?v=20261008f" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -130,7 +134,7 @@ document.addEventListener('DOMContentLoaded', function(){
   document.getElementById('resTitle').textContent = BP.t('cat_title', 'Propiedades en Buenos Aires');
   document.getElementById('ambBtn').textContent = BP.t('cat_amb_dorm', 'Amb | Dorm'); document.getElementById('precioBtn').textContent = BP.t('cat_precio', 'Precio');
   document.getElementById('moreBtn').innerHTML = BP.ico.filter + ' ' + BP.t('cat_filtros', 'Filtros') + ' <span class="cnt" id="moreCnt" hidden></span>';
-  document.getElementById('alertBtn').innerHTML = BP.ico.bell + '<span class="t"> ' + BP.t('cat_crear_alerta', 'Crear alerta') + '</span>'; document.getElementById('alertBtn').setAttribute('aria-label', BP.t('cat_crear_alerta', 'Crear alerta'));
+  document.getElementById('alertBtn').innerHTML = BP.ico.bell + '<span class="t"> ' + BP.t('cat_crear_alerta', 'Crear alerta') + '</span><span class="t-m">' + BP.t('alerta_corto', 'Alerta') + '</span>'; document.getElementById('alertBtn').setAttribute('aria-label', BP.t('cat_crear_alerta', 'Crear alerta'));
   const AMEN = ['Pileta','Gimnasio','SUM','Parrilla','Seguridad 24hs','Cochera','Terraza o jardín','Ascensor','Laundry','Pet friendly','Aire acondicionado','Baulera'];
   /* El valor que se filtra es el castellano (data-amen / data-cual); la etiqueta visible se traduce */
   document.getElementById('amenChecks').innerHTML = AMEN.map(a => `<label><input type="checkbox" data-amen="${a}"> ${BP.etiqueta(a)}</label>`).join('');
@@ -188,12 +192,23 @@ document.addEventListener('DOMContentLoaded', function(){
     document.getElementById('zonaChips').innerHTML = F.zonas.map(z => `<span class="p-chip">${BP.zonaLabel(z)}<button type="button" data-z="${z}" aria-label="${BP.esc(BP.tf('cat_quitar', 'Quitar {z}', { z: BP.zonaLabel(z) }))}">×</button></span>`).join('');
     document.querySelectorAll('#zonaChips button').forEach(b => b.addEventListener('click', () => { F.zonas = F.zonas.filter(z => z !== b.dataset.z); apply(); }));
   }
-  function pushURL(){ const p = new URLSearchParams(); if (F.op) p.set('op', F.op); if (F.tipo !== 'departamento') p.set('tipo', F.tipo); F.zonas.forEach(z => p.append('zona', z)); if (F.q) p.set('q', F.q); if (F.mon) p.set('mon', F.mon); ['amb','dorm','banos','coch','pmin','pmax','expmax','m2min','m2max','antig','hace'].forEach(k => { if (F[k]) p.set(k, F[k]); }); F.amen.forEach(a => p.append('amen', a)); F.cual.forEach(a => p.append('cual', a)); ['amoblado','dueno','video','favs','reservadas'].forEach(k => { if (F[k]) p.set(k, '1'); }); if (F.pub) p.set('pub', F.pub); if (F.emp) p.set('emp', '1'); if (F.sort !== 'relevancia') p.set('sort', F.sort); if (F.page > 1) p.set('page', F.page); const target = BP.pretty && F.op && F.zonas.length <= 1 && !F.q && !F.pub && !F.favs ? BP.urlBuscar(Object.assign({}, Object.fromEntries(p), { op: F.op, tipo: F.tipo, zonas: F.zonas })) : 'buscar.html' + (p.toString() ? '?' + p.toString() : ''); history.replaceState(null, '', target); }
+  function pushURL(){ const p = new URLSearchParams(); if (F.op) p.set('op', F.op); if (F.tipo !== 'departamento') p.set('tipo', F.tipo); F.zonas.forEach(z => p.append('zona', z)); if (F.q) p.set('q', F.q); if (F.mon) p.set('mon', F.mon); ['amb','dorm','banos','coch','pmin','pmax','expmax','m2min','m2max','antig','hace'].forEach(k => { if (F[k]) p.set(k, F[k]); }); F.amen.forEach(a => p.append('amen', a)); F.cual.forEach(a => p.append('cual', a)); ['amoblado','dueno','video','favs','reservadas'].forEach(k => { if (F[k]) p.set(k, '1'); }); if (F.pub) p.set('pub', F.pub); if (F.emp) p.set('emp', '1'); if (F.sort !== 'relevancia') p.set('sort', F.sort); if (F.page > 1) p.set('page', F.page); const target = BP.pretty && F.op && F.zonas.length <= 1 && !F.q && !F.pub && !F.favs ? BP.urlBuscar(Object.assign({}, Object.fromEntries(p), { op: F.op, tipo: F.tipo, zonas: F.zonas })) : 'buscar.html' + (p.toString() ? '?' + p.toString() : ''); history.replaceState(null, '', target); if (!F.favs) BP.anotarBusqueda(target); }
 
   /* Título del catálogo: con un solo resultado el tipo y "guardada" van en singular ("1 Departamento en venta");
      con cualquier otra cantidad el texto es el de siempre. Por tipo: [clave singular, castellano, clave plural, castellano]. */
   const TIPO_TITULO = { todos: ['cat_t_propiedad_1', 'Propiedad', 'cat_t_propiedades', 'Propiedades'], departamento: ['cat_t_depto_1', 'Departamento', 'cat_t_deptos', 'Departamentos'], piso: ['cat_t_piso_1', 'Piso', 'cat_t_pisos', 'Pisos'], ph: ['cat_t_ph_1', 'PH', 'cat_t_ph', 'PH'], casa: ['cat_t_casa_1', 'Casa', 'cat_t_casas', 'Casas'] };
-  function titulo(n){ const uno = n === 1; const tt = TIPO_TITULO[F.tipo] || TIPO_TITULO.casa; const tipo = uno ? BP.t(tt[0], tt[1]) : BP.t(tt[2], tt[3]); const op = F.favs ? (uno ? BP.t('cat_t_guardada_1', 'guardada') : BP.t('cat_t_guardadas', 'guardadas')) : F.op ? BP.opTxt(F.op, 'h') : BP.t('cat_t_venta_alq', 'en venta y alquiler'); const where = F.zonas.length ? ' ' + BP.t('cat_t_en', 'en') + ' ' + F.zonas.map(BP.zonaLabel).join(', ') : ' ' + BP.t('cat_t_ba', 'en Buenos Aires'); return `<span>${BP.fmtN(n)}</span> ${tipo} ${op}${where}`; }
+  function titulo(n){ const uno = n === 1; const tt = TIPO_TITULO[F.tipo] || TIPO_TITULO.casa; const tipo = uno ? BP.t(tt[0], tt[1]) : BP.t(tt[2], tt[3]); const op = F.favs ? (uno ? BP.t('cat_t_guardada_1', 'guardada') : BP.t('cat_t_guardadas', 'guardadas')) : F.op ? BP.opTxt(F.op, 'h') : BP.t('cat_t_venta_alq', 'en venta y alquiler'); const where = F.zonas.length ? ' ' + BP.t('cat_t_en', 'en') + ' ' + F.zonas.map(BP.zonaLabel).join(', ') : ' ' + BP.t('cat_t_ba', 'en Buenos Aires');
+    /* lanz3-visitante · Filtrado por quien publica: "2 Propiedades de BAIREN Realty" (más la operación y el barrio, si los hay) */
+    const pubN = pubNombreFiltro(); if (pubN) return `<span>${BP.fmtN(n)}</span> ${BP.tf('cat_t_de', '{t} de {p}', { t: tipo, p: BP.esc(pubN) })}${F.op && !F.favs ? ' ' + op : ''}${F.zonas.length ? where : ''}`;
+    return `<span>${BP.fmtN(n)}</span> ${tipo} ${op}${where}`; }
+  const pubNombreFiltro = () => { if (!F.pub) return ''; const p = BPData.pub(F.pub); return p && p.nombre ? BPData.nombreVisible(BPData.pubNombre(p)) : ''; };
+  function pintarFiltroPub(){
+    const box = document.getElementById('filtroPub'); if (!F.pub) { box.hidden = true; box.innerHTML = ''; return; }
+    const nom = pubNombreFiltro() || BP.t('cat_quien_publica', 'Quien publica');
+    box.innerHTML = `<span class="p-chip">${BP.esc(nom)}<button type="button" aria-label="${BP.esc(BP.tf('cat_quitar', 'Quitar {z}', { z: nom }))}">×</button></span>`;
+    box.hidden = false;
+    box.querySelector('button').addEventListener('click', () => { F.pub = ''; apply(); const t = document.getElementById('resTitle'); if (t) { t.setAttribute('tabindex', '-1'); try { t.focus({ preventScroll: true }); } catch (e) {} } });
+  }
 
   /* El vacío no es culpa de quien busca: acá entran pocas unidades por diseño.
      Se explica la curación y se ofrece la operación que sí tiene inventario en esa zona. */
@@ -232,7 +247,7 @@ document.addEventListener('DOMContentLoaded', function(){
     const counts = BPData.countsByZona(BPData.filter(avisos, Object.assign({}, F, {zonas: []})));
     if (window.BairenMapa && window.innerWidth >= 1024) { const mel = document.getElementById('mapaResultados'); if (!mapa) { try { mapa = window.BairenMapa.mount(mel, { counts, modo:'lite', active: F.zonas[0] || null, onSelect: z => { F.zonas = F.zonas.indexOf(z) > -1 ? [] : [z]; apply(); } }); } catch (e) { mel.innerHTML = '<p class="p-note">' + BP.t('cat_mapa_nd', 'Mapa no disponible.') + '</p>'; } } else { mapa.setCounts(counts); mapa.setActive(F.zonas[0] || null); mapa.refresh && mapa.refresh(); } }
   }
-  function apply(){ F.page = 1; normalizarMon(); syncControls(); pushURL(); render(); pintarAlerta(); }
+  function apply(){ F.page = 1; normalizarMon(); syncControls(); pushURL(); render(); pintarAlerta(); pintarFiltroPub(); }
 
   /* controles */
   document.getElementById('opSel').addEventListener('change', e => { F.op = e.target.value; F.favs = false; apply(); });
@@ -324,13 +339,16 @@ document.addEventListener('DOMContentLoaded', function(){
   document.getElementById('drawerTitle').textContent = esCel() ? BP.t('cat_filtros', 'Filtros') : BP.t('cat_mas_filtros', 'Más filtros');
   /* Al cruzar el ancho del celular cambia lo que cuenta Filtros */
   try { matchMedia('(max-width: 820px)').addEventListener('change', () => syncControls()); } catch (e) {}
-  document.getElementById('clearAll').addEventListener('click', () => { Object.assign(F, { zonas:[], q:'', amb:0, dorm:0, banos:0, coch:0, pmin:0, pmax:0, mon:'', expmax:0, m2min:0, m2max:0, antig:0, amen:[], cual:[], amoblado:false, dueno:false, video:false, hace:0, favs:false, reservadas:false }); openDrawer(false); apply(); });
+  document.getElementById('clearAll').addEventListener('click', () => { Object.assign(F, { zonas:[], q:'', amb:0, dorm:0, banos:0, coch:0, pmin:0, pmax:0, mon:'', expmax:0, m2min:0, m2max:0, antig:0, amen:[], cual:[], amoblado:false, dueno:false, video:false, hace:0, favs:false, reservadas:false, pub:'' }); openDrawer(false); apply(); });
   /* alerta: una por búsqueda; el botón muestra si ya existe y sirve para quitarla */
   const alertBtn = document.getElementById('alertBtn');
   /* La identidad de una alerta son sus filtros (no la URL: las rutas bonitas la reescriben). Claves ordenadas, arrays ordenados, sin page/sort/favs. */
   const alertKey = () => { const p = new URLSearchParams(); Object.keys(F).sort().forEach(k => { if (k === 'page' || k === 'sort' || k === 'favs') return; const v = F[k]; if (v == null || v === '' || v === false || (Array.isArray(v) && !v.length)) return; if (Array.isArray(v)) v.slice().sort().forEach(x => p.append(k, x)); else p.set(k, String(v)); }); return 'buscar?' + p.toString(); };
   const alertaIdx = () => BP.alerts.get().findIndex(x => x.tipo !== 'precio' && (x.key ? x.key === alertKey() : x.url === location.href));
-  function pintarAlerta(){ const on = alertaIdx() > -1; alertBtn.classList.toggle('on', on); alertBtn.setAttribute('aria-pressed', on ? 'true' : 'false'); alertBtn.innerHTML = BP.ico.bell + '<span class="t"> ' + (on ? BP.t('cat_alerta_creada', 'Alerta creada') : BP.t('cat_crear_alerta', 'Crear alerta')) + '</span>'; alertBtn.setAttribute('aria-label', on ? BP.t('cat_alerta_quitar', 'Alerta creada, tocá para quitarla') : BP.t('cat_crear_alerta', 'Crear alerta')); }
+  function pintarAlerta(){ const on = alertaIdx() > -1; alertBtn.classList.toggle('on', on); alertBtn.setAttribute('aria-pressed', on ? 'true' : 'false'); alertBtn.innerHTML = BP.ico.bell + '<span class="t"> ' + (on ? BP.t('cat_alerta_creada', 'Alerta creada') : BP.t('cat_crear_alerta', 'Crear alerta')) + '</span><span class="t-m">' + BP.t('alerta_corto', 'Alerta') + '</span>'; alertBtn.setAttribute('aria-label', on ? BP.t('cat_alerta_quitar', 'Alerta creada, tocá para quitarla') : BP.t('cat_crear_alerta', 'Crear alerta'));
+    /* lanz3-visitante · Sin cuenta, la alerta queda en este navegador: una línea con el botón para ingresar y volver acá */
+    const lineaCuenta = document.getElementById('alertaCuenta'); lineaCuenta.hidden = !(on && sinCuenta()); if (!lineaCuenta.hidden) document.getElementById('alertaIngresar').href = BP.urlIngresar(); }
+  const sinCuenta = () => !(window.BPStore && BPStore.session);
   /* 12/9 · Con sesión y base real la alerta vive también en portal.alertas (BPStore.syncAlerta guarda remoteId en la
      copia local); quitarla borra la fila (BPStore.borrarAlerta), si no el motor seguiría mandando mails. Si la base
      falla al quitar, la alerta vuelve a la lista y se avisa; si falla al crear, queda solo en este navegador y se avisa. */
@@ -343,13 +361,14 @@ document.addEventListener('DOMContentLoaded', function(){
     }
     const al = { creada: new Date().toISOString(), filtros: Object.assign({}, F), url: location.href, key: alertKey() };
     a.push(al); BP.alerts.set(a); pintarAlerta();
+    if (sinCuenta()) { BP.toast(BP.t('alerta_creada_toast', 'Alerta creada.')); if (window.BPStore && BPStore.syncAlerta) BPStore.syncAlerta(al).catch(() => {}); return; }
     if (!(window.BPStore && BPStore.syncAlerta)) BP.toast(BP.t('cat_toast_alerta_local', 'Alerta guardada en este navegador. Con tu cuenta, te llega por mail.'));
     if (window.BPStore && BPStore.syncAlerta) { alertBtn.disabled = true; BPStore.syncAlerta(al).then(id => { BP.toast(id ? BP.t('cat_toast_alerta_mail', 'Alerta guardada. Te avisamos por mail cuando entre una propiedad así.') : BP.t('cat_toast_alerta_local', 'Alerta guardada en este navegador. Con tu cuenta, te llega por mail.')); }).catch(() => { BP.toast(BP.t('cat_toast_alerta_sin_cuenta', 'No pudimos guardar la alerta en tu cuenta. Quedó en este navegador.'), 'error'); }).finally(() => { alertBtn.disabled = false; }); }
   });
   /* Las alertas de la cuenta (creadas en otro navegador) se traen sin frenar el render; el botón se repinta al llegar */
   const alertasCargadas = (window.BPStore && BPStore.cargarAlertas) ? BPStore.init().then(() => BPStore.cargarAlertas()).then(() => pintarAlerta()).catch(() => {}) : Promise.resolve();
 
-  syncControls();
+  syncControls(); pintarFiltroPub(); if (!F.favs) BP.anotarBusqueda((location.pathname.split('/').pop() || 'buscar.html') + location.search);
   try { render(); pintarAlerta(); } catch (err) { console.error(err); BP.estadoError(document.getElementById('list'), BP.t('cat_err_carga', 'No pudimos cargar las propiedades.'), () => location.reload()); }
   /* ?alerta=1 (desde "Avisarme" en la portada): se crea la alerta de esta búsqueda al llegar, una sola vez */
   if (qs.get('alerta') === '1') { try { const u = new URL(location.href); u.searchParams.delete('alerta'); history.replaceState(null, '', u); } catch (e) {} alertasCargadas.then(() => { if (alertaIdx() === -1) alertBtn.click(); }); }
