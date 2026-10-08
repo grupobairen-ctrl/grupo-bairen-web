@@ -50,7 +50,7 @@ window.BP_I18N = {
     ui_dato_gestor_de_alquileres: 'Rental manager', pan_tipo_gestor: 'Rental manager', ing_crea_gestor: 'Create your rental manager account', ing_crea_gestor_sub: 'An email and a code. Then you add your details, an owner\'s mandate and your first listing.',
     ui_leyenda_alq_intro: 'Legal notice, Buenos Aires rental law:',
     /* operaciones: etiqueta del menú y complemento del título ("departamentos en venta") */
-    op_venta_label: 'Buy', op_venta_h: 'for sale', op_alquiler_label: 'Rent', op_alquiler_h: 'for rent', op_mediano_label: 'Rent · mid-term', op_mediano_h: 'for mid-term rent', op_largo_label: 'Rent · long-term', op_largo_h: 'for long-term rent',
+    op_venta_label: 'Buy', op_venta_h: 'for sale', op_alquiler_label: 'Rent', op_alquiler_h: 'for rent', op_mediano_label: 'Rent · mid-term (3 to 12 months)', op_mediano_h: 'for mid-term rent (3 to 12 months)', op_largo_label: 'Rent · long-term', op_largo_h: 'for long-term rent',
     /* etiquetas fijas de datos, por slug: cualidades verificadas */
     ui_dato_luminoso: 'Bright', ui_dato_silencioso: 'Quiet', ui_dato_terraza_propia: 'Private terrace', ui_dato_balcon: 'Balcony', ui_dato_vista_abierta: 'Open view', ui_dato_piso_alto: 'High floor', ui_dato_apto_home_office: 'Home office ready', ui_dato_acepta_mascotas: 'Pets allowed', ui_dato_reciclado_a_nuevo: 'Fully renovated', ui_dato_edificio_con_amenities: 'Building with amenities', ui_dato_cochera: 'Parking space', ui_dato_calefaccion_central: 'Central heating',
     /* amenities y características */
@@ -62,7 +62,7 @@ window.BP_I18N = {
     ui_dato_dueno_verificado: 'Verified owner', ui_dato_dueno_directo: 'Direct owner', ui_dato_corredor_inmobiliario_matriculado: 'Licensed real estate broker', ui_dato_venta_directa: 'Direct sale',
 
     /* tarjetas (data.js) */
-    card_venta: 'Sale', card_alq_mediano: 'Mid-term rental', card_alq_largo: 'Long-term rental',
+    card_venta: 'Sale', card_alq_mediano: 'Mid-term rental (3 to 12 months)', card_alq_largo: 'Long-term rental',
     card_reservada: 'Reserved', card_seleccionada: 'Selected', card_ejemplo: 'Sample', card_consultar_precio: 'Price on request', card_expensas: 'building fees',
     card_monoamb: 'Studio', card_amb: 'rooms', card_dorm_1: 'bed', card_dorm_n: 'beds', card_bano: 'bath', card_banos: 'baths', card_coch_1: 'parking space', card_coch_n: 'parking spaces',
     card_ver: 'View {t}', card_ver_en: 'View {t} in {b}', card_publica: 'Listed by', card_wa_aria: 'Message {p} on WhatsApp', card_contacto_pendiente: 'Contact pending', card_contactar: 'Contact',
@@ -257,7 +257,7 @@ window.BP_I18N = {
     home_desc: 'O portal de imóveis selecionados de Buenos Aires. Apartamentos à venda e para alugar em Palermo, Recoleta, Retiro, Belgrano, Núñez, Colegiales, Villa Crespo, Puerto Madero, Saavedra e Zona Norte, revisados um por um antes de entrar no portal.',
     skip: 'Ir para o conteúdo', menu: 'Menu', idioma: 'Idioma',
     publicar: 'Publicar', ingresar: 'Entrar', notificaciones: 'Notificações', mis_contactos: 'Meus contatos', favoritos: 'Favoritos',
-    nav_propiedades: 'Imóveis', comprar: 'Comprar', alquilar: 'Alugar', mediano: 'Médio prazo', largo: 'Longo prazo', emprendimientos: 'Empreendimentos', publicadores: 'Anunciantes',
+    nav_propiedades: 'Imóveis', comprar: 'Comprar', alquilar: 'Alugar', mediano: 'Médio prazo', largo: 'Tradicional', emprendimientos: 'Empreendimentos', publicadores: 'Anunciantes',
     ft_tag: 'Portal de imóveis selecionados em Buenos Aires.',
     ft_legend: 'A BAIREN seleciona e publica imóveis e oferece a gestão para administrá-los. Cada anúncio é responsabilidade de quem o publica.',
     ft_nav: 'Navegação', ft_zonas: 'Zonas', ft_mas: 'Mais', ft_indice: 'Índice BAIREN', ft_criterios: 'Critérios de seleção', ft_terminos: 'Termos e privacidade',
@@ -286,7 +286,7 @@ window.BP_I18N = {
     ui_dato_gestor_de_alquileres: 'Gestor de aluguéis', pan_tipo_gestor: 'Gestor de aluguéis', ing_crea_gestor: 'Crie sua conta de gestor de aluguéis', ing_crea_gestor_sub: 'Um e-mail e um código. Depois você cadastra seus dados, o mandato de um proprietário e seu primeiro anúncio.',
     ui_leyenda_alq_intro: 'Aviso legal, lei de aluguéis de Buenos Aires:',
     /* operaciones */
-    op_venta_label: 'Comprar', op_venta_h: 'à venda', op_alquiler_label: 'Alugar', op_alquiler_h: 'para alugar', op_mediano_label: 'Alugar · médio prazo', op_mediano_h: 'para aluguel de médio prazo', op_largo_label: 'Alugar · longo prazo', op_largo_h: 'para aluguel de longo prazo',
+    op_venta_label: 'Comprar', op_venta_h: 'à venda', op_alquiler_label: 'Alugar', op_alquiler_h: 'para alugar', op_mediano_label: 'Alugar · médio prazo (3 a 12 meses)', op_mediano_h: 'para aluguel de médio prazo (3 a 12 meses)', op_largo_label: 'Alugar · tradicional', op_largo_h: 'para aluguel tradicional',
     /* etiquetas fijas de datos, por slug: cualidades verificadas */
     ui_dato_luminoso: 'Iluminado', ui_dato_silencioso: 'Silencioso', ui_dato_terraza_propia: 'Terraço privativo', ui_dato_balcon: 'Sacada', ui_dato_vista_abierta: 'Vista livre', ui_dato_piso_alto: 'Andar alto', ui_dato_apto_home_office: 'Pronto para home office', ui_dato_acepta_mascotas: 'Aceita pets', ui_dato_reciclado_a_nuevo: 'Totalmente reformado', ui_dato_edificio_con_amenities: 'Prédio com áreas de lazer', ui_dato_cochera: 'Vaga de garagem', ui_dato_calefaccion_central: 'Aquecimento central',
     /* amenities y características */
@@ -298,7 +298,7 @@ window.BP_I18N = {
     ui_dato_dueno_verificado: 'Proprietário verificado', ui_dato_dueno_directo: 'Proprietário direto', ui_dato_corredor_inmobiliario_matriculado: 'Corretor de imóveis habilitado', ui_dato_venta_directa: 'Venda direta',
 
     /* tarjetas (data.js) */
-    card_venta: 'Venda', card_alq_mediano: 'Aluguel de médio prazo', card_alq_largo: 'Aluguel de longo prazo',
+    card_venta: 'Venda', card_alq_mediano: 'Médio prazo (3 a 12 meses)', card_alq_largo: 'Aluguel tradicional',
     card_reservada: 'Reservado', card_seleccionada: 'Selecionado', card_ejemplo: 'Exemplo', card_consultar_precio: 'Preço sob consulta', card_expensas: 'de condomínio',
     card_monoamb: 'Studio', card_amb: 'amb.', card_dorm_1: 'dorm.', card_dorm_n: 'dorm.', card_bano: 'banheiro', card_banos: 'banheiros', card_coch_1: 'vaga', card_coch_n: 'vagas',
     card_ver: 'Ver {t}', card_ver_en: 'Ver {t} em {b}', card_publica: 'Publicado por', card_wa_aria: 'Escrever para {p} pelo WhatsApp', card_contacto_pendiente: 'Contato pendente', card_contactar: 'Contatar',

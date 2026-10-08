@@ -127,7 +127,7 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip" role="group" aria-label="$
   <div class="p-ficha-main">
     <div class="p-ficha-head">
       <div class="p-kicker">${BP.esc(BP.etiqueta(a.tipoProp))}${a.amb ? ' · ' + (a.amb === 1 ? T('ficha_monoamb', 'monoambiente') : TF('ficha_ambientes', '{n} ambientes', { n: a.amb })) : ''}${a.m2 ? ' · ' + a.m2 + ' m²' : ''}</div>
-      ${a.reservado ? `<p class="p-reservada">${BP.ico.flag} ${T('ficha_reservada_msg', 'Esta propiedad está reservada y por ahora no toma consultas.')}${a.zona ? ` <a href="${BP.urlBuscar({ op: a.op, zona: a.zona })}">${TF('ficha_ver_disponibles', 'Ver las disponibles en {z}', { z: BP.zonaLabel(a.zona) })}</a>.` : ''}</p>` : ''}
+      ${a.reservado ? `<p class="p-reservada">${BP.ico.flag} ${T('ficha_reservada_msg', 'Esta propiedad está reservada y por ahora no toma consultas.')}${a.zona ? ` <a href="${BP.urlBuscar({ op: BPData.opFiltro(a), zona: a.zona })}">${TF('ficha_ver_disponibles', 'Ver las disponibles en {z}', { z: BP.zonaLabel(a.zona) })}</a>.` : ''}</p>` : ''}
       ${(a.apto.length || (a.cualidades||[]).length || a.demo) ? `<p class="p-tags">${(a.cualidades||[]).map(x => `<span class="p-badge" title="${T('ficha_verificada_title', 'Verificada por BAIREN')}">${BP.ico.shield} ${BP.esc(BP.etiqueta(x))}</span>`).join('')}${a.apto.map(x => `<span class="p-badge">${BP.esc(BP.etiqueta(x))}</span>`).join('')}${a.demo ? `<span class="p-badge demo">${T('ficha_aviso_ejemplo', 'Aviso de ejemplo')}</span>` : ''}</p>` : ''}
     </div>
     <h2 class="p-sec-t">${T('ficha_la_unidad', 'La unidad')}</h2>
@@ -223,14 +223,14 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip" role="group" aria-label="$
   </aside>
 </div>
 <section style="padding:0 0 64px">
-  <div class="p-head-row"><h2 class="p-h2">${T('ficha_similares', 'Propiedades similares')}</h2>${a.zona ? `<a class="p-link" href="buscar.html?op=${a.op}&zona=${encodeURIComponent(a.zona)}">${TF('ficha_ver_mas_en', 'Ver más en {z}', { z: BP.zonaLabel(a.zona) })}</a>` : ''}</div>
+  <div class="p-head-row"><h2 class="p-h2">${T('ficha_similares', 'Propiedades similares')}</h2>${a.zona ? `<a class="p-link" href="buscar.html?op=${BPData.opFiltro(a)}&zona=${encodeURIComponent(a.zona)}">${TF('ficha_ver_mas_en', 'Ver más en {z}', { z: BP.zonaLabel(a.zona) })}</a>` : ''}</div>
   <div class="p-grid">${similares.map(BPData.cardV).join('') || `<p class="p-note">${T('ficha_sin_similares', 'Todavía no hay unidades similares.')}</p>`}</div>
   ${(a.reservado || BPData.sinContacto(pub)) ? '' : `<div class="p-mcta" id="mcta"><div class="p-mcta-price">${BPData.precioHTML(a)}</div><button type="button" class="p-btn p-btn-fill p-btn-sm" id="mctaBtn">${BP.ico.mail} ${T('ficha_contactar', 'Contactar')}</button>${BPData.waLink(a, pub) ? `<a class="p-icon-btn" href="${BPData.waLink(a, pub)}" target="_blank" rel="noopener" data-wa data-aviso="${BP.esc(a.id)}" data-pub="${BP.esc(pub.storeId || pub.id)}" aria-label="WhatsApp">${BP.ico.wa}</a>` : ''}</div>`}
   <!-- Las migas se arman como lista y se unen con ›: un tramo vacío (zona o barrio) no deja separadores sueltos -->
   <div class="p-breadcrumb" role="navigation" aria-label="${T('cat_crumbs_aria', 'Migas de pan')}">${[
     `<a href="index.html">BAIREN</a>`,
-    `<a href="buscar.html?op=${a.op}">${BPData.opTag(a)}</a>`,
-    a.zona ? `<a href="buscar.html?op=${a.op}&zona=${encodeURIComponent(a.zona)}">${BP.esc(BP.zonaLabel(a.zona))}</a>` : null,
+    `<a href="buscar.html?op=${BPData.opFiltro(a)}">${BPData.opTag(a)}</a>`,
+    a.zona ? `<a href="buscar.html?op=${BPData.opFiltro(a)}&zona=${encodeURIComponent(a.zona)}">${BP.esc(BP.zonaLabel(a.zona))}</a>` : null,
     (a.barrio && a.barrio !== a.zona) ? `<span>${BP.esc(a.barrio)}</span>` : null,
     `<span>${BP.esc(a.titulo)}</span>`
   ].filter(Boolean).join(' › ')}</div>

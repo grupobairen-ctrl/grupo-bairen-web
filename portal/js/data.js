@@ -189,7 +189,11 @@
     a.banos ? a.banos + ' ' + (a.banos === 1 ? BP.t('card_bano', 'baño') : BP.t('card_banos', 'baños')) : null,
     a.cocheras ? a.cocheras + ' ' + (a.cocheras === 1 ? BP.t('card_coch_1', 'coch.') : BP.t('card_coch_n', 'coch.')) : null,
   ].filter(Boolean).join(' · ');
-  D.opTag = a => a.op === 'venta' ? BP.t('card_venta', 'Venta') : a.op === 'mediano' ? BP.t('card_alq_mediano', 'Alquiler, mediano plazo') : BP.t('card_alq_largo', 'Alquiler, largo plazo');
+  /* 8/10/2026 · Etiquetas de operación (contrato del lanzamiento): venta es "Venta", alquiler es "Alquiler tradicional"
+     y mediano es "Mediano plazo (3 a 12 meses)". En la base no cambia nada: 'venta' | 'alquiler' | 'mediano'. */
+  D.opTag = a => a.op === 'venta' ? BP.t('card_venta', 'Venta') : a.op === 'mediano' ? BP.t('card_alq_mediano', 'Mediano plazo (3 a 12 meses)') : BP.t('card_alq_largo', 'Alquiler tradicional');
+  /* La operación del aviso como filtro del catálogo: el alquiler tradicional es 'largo' ('alquiler' abarca los dos plazos) */
+  D.opFiltro = a => a.op === 'alquiler' ? 'largo' : a.op;
   /* Operación como filtro (decisión de Tomás, 10/9/2026): "alquiler" abarca mediano y largo
      plazo; "largo" es sólo largo (los avisos de largo plazo llevan op 'alquiler'). */
   D.opMatch = (a, op) => !op || (op === 'alquiler' ? a.op !== 'venta' : op === 'largo' ? a.op === 'alquiler' : a.op === op);
