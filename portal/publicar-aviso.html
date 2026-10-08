@@ -61,7 +61,25 @@
     @media(max-width:340px){.p-checks{grid-template-columns:1fr}}
     .p-card-panel{background:var(--p-card);border:1px solid var(--p-line);border-radius:var(--p-radius);padding:26px}
     .p-seg{display:flex;gap:8px;flex-wrap:wrap} .p-seg label{border:1px solid var(--p-line);border-radius:999px;padding:9px 14px;font:500 .84rem var(--font-body);cursor:pointer;color:var(--navy-deeper);background:var(--p-card);display:inline-flex;gap:8px;align-items:center} .p-seg input{accent-color:var(--navy-deeper)} .p-seg label:has(input:checked){background:var(--navy-deeper);color:#fff;border-color:var(--navy-deeper)}
-    .p-fotos{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-top:12px} .p-foto{position:relative;aspect-ratio:4/3;border-radius:8px;overflow:hidden;background:var(--p-tray)} .p-foto img{width:100%;height:100%;object-fit:cover} .p-foto .x{position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;border:0;background:rgba(19,29,45,.8);color:#fff;cursor:pointer} .p-foto .main{position:absolute;left:6px;bottom:6px;background:var(--gold);color:var(--navy-deeper);font-size:.62rem;padding:3px 7px;border-radius:8px;letter-spacing:.1em;text-transform:uppercase}
+    /* 8/10/2026 · Fotos: los botones van debajo de la foto, no encima, y miden 44 px o más (antes 34, y en celular
+       se pisaban sobre fotos de 144 px). En celular, una fila por foto: miniatura a la izquierda, botones a la derecha. */
+    .p-fotos{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;margin-top:12px}
+    .p-fotos .p-foto{position:relative;display:flex;flex-direction:column;gap:8px;aspect-ratio:auto;overflow:visible;background:none;border-radius:0}
+    .p-fotos .p-foto .ph{position:relative;aspect-ratio:4/3;overflow:hidden;background:var(--p-tray)}
+    .p-fotos .p-foto .ph img{display:block;width:100%;height:100%;object-fit:cover}
+    .p-fotos .p-foto .ctl{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+    .p-fotos .p-foto .ctl button{position:static;display:inline-flex;align-items:center;justify-content:center;width:auto;min-width:44px;height:44px;padding:0 14px;border:1px solid rgba(19,29,45,.18);border-radius:0;background:#FFFDF8;color:var(--navy-deeper);font:500 .72rem/1 var(--font-body);letter-spacing:.1em;text-transform:uppercase;cursor:pointer;opacity:1}
+    .p-fotos .p-foto .ctl .mv,.p-fotos .p-foto .ctl .quitar{width:44px;padding:0;font-size:1.25rem;letter-spacing:0}
+    .p-fotos .p-foto .ctl .quitar{margin-left:auto}
+    .p-fotos .p-foto .ctl button:hover:not(:disabled){border-color:var(--navy-deeper)}
+    .p-fotos .p-foto .ctl button:disabled{opacity:.35;cursor:default}
+    .p-fotos .p-nota-fotos{grid-column:1/-1;margin:0}
+    @media(max-width:560px){
+      .p-fotos{grid-template-columns:1fr;gap:12px}
+      .p-fotos .p-foto{flex-direction:row;align-items:flex-start;gap:12px}
+      .p-fotos .p-foto .ph{flex:0 0 132px}
+      .p-fotos .p-foto .ctl{flex:1 1 auto;min-width:0}
+    }
     .p-drop{border:1px dashed var(--gold);border-radius:16px;padding:26px;text-align:center;color:var(--text-mid);cursor:pointer;background:var(--p-card)} .p-drop b{display:block;color:var(--navy-deeper);font-weight:500;margin-bottom:4px}
     .p-nav-steps{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:22px;flex-wrap:wrap}
     .p-nav-steps > div{display:flex;gap:8px;flex-wrap:wrap;min-width:0}
@@ -267,18 +285,17 @@ document.addEventListener('DOMContentLoaded', function(){
       for (let i = 0; i < a.fotos.length; i++) {
         const u = await BPStore.resolveFoto(a.fotos[i].url);
         items.push(`<div class="p-foto" draggable="true" data-i="${i}">
-          <img src="${u}" alt="Foto ${i+1} de ${a.fotos.length}">
-          ${i===0?'<span class="es-portada">Portada</span>':''}
-          <div class="mover">
-            <button type="button" data-mov="-1" data-i="${i}" ${i===0?'disabled':''} aria-label="Mover la foto ${i+1} hacia atrás">‹</button>
-            <button type="button" data-mov="1" data-i="${i}" ${i===a.fotos.length-1?'disabled':''} aria-label="Mover la foto ${i+1} hacia adelante">›</button>
+          <div class="ph"><img src="${u}" alt="Foto ${i+1} de ${a.fotos.length}">${i===0?'<span class="es-portada">Portada</span>':''}</div>
+          <div class="ctl">
+            <button type="button" class="mv" data-mov="-1" data-i="${i}" ${i===0?'disabled':''} aria-label="Mover la foto ${i+1} hacia atrás">‹</button>
+            <button type="button" class="mv" data-mov="1" data-i="${i}" ${i===a.fotos.length-1?'disabled':''} aria-label="Mover la foto ${i+1} hacia adelante">›</button>
+            ${i===0?'':`<button type="button" class="portada" data-portada="${i}" aria-label="Usar la foto ${i+1} como portada">Portada</button>`}
+            <button type="button" class="quitar" data-del="${i}" aria-label="Quitar la foto ${i+1}">×</button>
+            ${/^https?:/.test(a.fotos[i].url) ? `<button type="button" class="mejorar" data-ia="${i}" aria-label="Mejorar la foto ${i+1} con IA">Mejorar con IA</button>` : ''}
           </div>
-          ${i===0?'':`<button type="button" class="portada" data-portada="${i}" aria-label="Usar la foto ${i+1} como portada">Portada</button>`}
-          <button type="button" class="quitar" data-del="${i}" aria-label="Quitar la foto ${i+1}">×</button>
-          ${/^https?:/.test(a.fotos[i].url) ? `<button type="button" class="mejorar" data-ia="${i}" aria-label="Mejorar la foto ${i+1} con IA">Mejorar con IA</button>` : ''}
         </div>`);
       }
-      grid.innerHTML = items.join('') + (a.fotos.length ? `<p class="p-note" style="grid-column:1/-1">${a.fotos.length} de 8 como mínimo. Ordenalas con las flechas. La primera es la portada.</p>` : '');
+      grid.innerHTML = items.join('') + (a.fotos.length ? `<p class="p-note p-nota-fotos">${a.fotos.length} ${a.fotos.length === 1 ? 'foto' : 'fotos'} · mínimo 8. Ordenalas con las flechas. La primera es la portada.</p>` : '');
       const mover = (de, aI) => { if (aI < 0 || aI >= a.fotos.length) return; const m = a.fotos.splice(de, 1)[0]; a.fotos.splice(aI, 0, m); BP.anunciar('Foto movida al lugar ' + (aI + 1) + ' de ' + a.fotos.length); draw().then(() => { const b = grid.querySelector(`.p-foto[data-i="${aI}"] [data-mov="${aI > de ? 1 : -1}"]`); if (b && !b.disabled) b.focus(); }); };
       grid.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => { a.fotos.splice(Number(b.dataset.del), 1); BP.anunciar('Foto quitada, quedan ' + a.fotos.length); draw(); }));
       grid.querySelectorAll('[data-mov]').forEach(b => b.addEventListener('click', () => { const i = Number(b.dataset.i); mover(i, i + Number(b.dataset.mov)); }));
