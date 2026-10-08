@@ -30,6 +30,8 @@ window.BP_I18N = {
     /* portada */
     hero_h1a: '<em>Selected</em> properties', hero_h1b: 'in Buenos Aires.', hero_sub: 'Live Buenos Aires at its finest.',
     ph_zona: 'Neighborhood, building or area', buscar_aria: 'Search properties', ver_props: 'See properties',
+    /* 8/10/2026 · Portada en el celular: la barra de búsqueda y su hoja */
+    hero_barra: 'Search a neighborhood or area', hero_hoja_t: 'Search', hero_hoja_cerrar: 'Close search',
     est_eyebrow: 'BAIREN Selection', est_h2: 'We follow a standard.', est_copy: 'Before listing each property, we check:', criterios: 'How we select',
     hito_ubicacion: 'Location', hito_estado: 'Condition', hito_distribucion: 'Layout', hito_calidad: 'Build quality',
     edif_h2: 'First-rate buildings and complexes.', edif_copy: 'Today they have their place on BAIREN.',
@@ -616,6 +618,8 @@ window.BP_I18N = {
     ft_uso: 'Termos de uso', ft_priv: 'Política de privacidade',
     hero_h1a: 'Imóveis <em>selecionados</em>', hero_h1b: 'em Buenos Aires.', hero_sub: 'Viva Buenos Aires no seu melhor.',
     ph_zona: 'Bairro, edifício ou zona', buscar_aria: 'Buscar imóveis', ver_props: 'Ver imóveis',
+    /* 8/10/2026 · Portada no celular: a barra de busca e a sua folha */
+    hero_barra: 'Busque bairro ou zona', hero_hoja_t: 'Buscar', hero_hoja_cerrar: 'Fechar a busca',
     est_eyebrow: 'Seleção BAIREN', est_h2: 'Seguimos um padrão.', est_copy: 'Antes de incorporar cada imóvel, verificamos:', criterios: 'Como selecionamos',
     hito_ubicacion: 'Localização', hito_estado: 'Estado', hito_distribucion: 'Distribuição', hito_calidad: 'Qualidade construtiva',
     edif_h2: 'Edifícios e complexos de primeira linha.', edif_copy: 'Hoje encontram seu espaço na BAIREN.',
