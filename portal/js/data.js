@@ -254,7 +254,9 @@
   ].filter(Boolean).join(' · ');
   /* 8/10/2026 · Etiquetas de operación, cortas (contrato de la tanda 2): "Venta", "Tradicional" y "Mediano plazo".
      En la base no cambia nada: 'venta' | 'alquiler' | 'mediano'. La tarjeta dice "Reservada" en su lugar si lo está. */
-  D.opTag = a => a.op === 'venta' ? BP.t('card_venta', 'Venta') : a.op === 'mediano' ? BP.t('card_alq_mediano', 'Mediano plazo') : BP.t('card_alq_largo', 'Tradicional');
+  /* 8/10/2026 (lanz3-publicador) · El alquiler con contrato dice "Alquiler" (la voz de marca no usa "tradicional" en
+     texto visible). Clave nueva, card_alquiler; card_alq_largo queda para quien todavía la use. */
+  D.opTag = a => a.op === 'venta' ? BP.t('card_venta', 'Venta') : a.op === 'mediano' ? BP.t('card_alq_mediano', 'Mediano plazo') : BP.t('card_alquiler', 'Alquiler');
   /* La calle: con mostrar_direccion 'exacta', tal cual ("Peña 2528"); si no (aproximada o sin el dato), sin la altura
      ("Peña"). Sólo se saca un número al final ("Av. 9 de Julio" queda entera). Nunca la unidad. */
   D.calle = a => { const d = String((a && a.dir) || '').trim(); if (!d || a.mostrarDir === 'exacta') return d; return d.replace(/\s+(?:al\s+)?\d+(?:\s*bis)?\s*$/i, '').trim() || d; };
@@ -263,7 +265,9 @@
   /* Título humano: "Monoambiente en Recoleta", "2 ambientes en Palermo Soho"; sin ambientes, el tipo ("Casa en San Isidro") */
   D.titulo = a => {
     const b = a.barrio || BP.zonaLabel(a.zona || '') || '';
-    const que = a.amb === 1 ? BP.t('tit_mono', 'Monoambiente') : a.amb > 1 ? BP.tf('tit_amb', '{n} ambientes', { n: a.amb }) : BP.etiqueta(a.tipoProp || 'Departamento');
+    /* 8/10/2026 (lanz3-publicador) · Con los dormitorios cargados (dormDato), también d: la traducción del visitante dice
+       "1 bedroom" o "2 quartos" con el dato; sin él, calcula ambientes menos uno */
+    const que = a.amb === 1 ? BP.t('tit_mono', 'Monoambiente') : a.amb > 1 ? BP.tf('tit_amb', '{n} ambientes', a.dormDato && a.dorm != null ? { n: a.amb, d: a.dorm } : { n: a.amb }) : BP.etiqueta(a.tipoProp || 'Departamento');
     return b ? BP.tf('tit_en', '{q} en {b}', { q: que, b }) : que;
   };
   /* Lo que se nombra del aviso fuera de la ficha (alt de la foto, WhatsApp, compartir): el título humano y la calle */
@@ -364,6 +368,9 @@
      los datos en una línea y quién publica en una línea de texto. Sin botón "Ver ficha": toda la tarjeta es un
      solo enlace. El corazón queda afuera del enlace (un botón no puede ir adentro de un <a>), encima de la foto.
      La clase prop-card queda en la raíz: la usan el catálogo (foco al cambiar de página) y otras grillas. */
+  /* 8/10/2026 (lanz3-publicador) · Si la foto de la tarjeta no carga (un 404 del storage), en su lugar "Fotos en
+     producción", igual que una tarjeta sin fotos: nunca un hueco. */
+  D.sinFoto = img => { try { const s = document.createElement('span'); s.className = 'tj-sinfoto'; s.textContent = BP.t('card_fotos_prod', 'Fotos en producción'); img.replaceWith(s); } catch (e) { img.remove(); } };
   D.cardV = function(a){
     const pub = D.pub(a.publicadorId);
     const href = BP.urlFicha(a);
@@ -371,7 +378,7 @@
        etapa y la entrega en vez de "Disponible desde" */
     const emp = D.empUnidad(a);
     const tit = D.titulo(a), calle = emp || D.calle(a), desde = emp ? D.etapaTxt(a) : D.disponibleDesde(a), fav = BP.isFav(a.id);
-    const foto = a.fotos[0] ? `<img src="${BP.sbImg(a.fotos[0], 700)}" alt="" loading="lazy" decoding="async" onerror="this.remove()">` : `<span class="tj-sinfoto">${BP.t('card_fotos_prod', 'Fotos en producción')}</span>`;
+    const foto = a.fotos[0] ? `<img src="${BP.sbImg(a.fotos[0], 700)}" alt="" loading="lazy" decoding="async" onerror="BPData.sinFoto(this)">` : `<span class="tj-sinfoto">${BP.t('card_fotos_prod', 'Fotos en producción')}</span>`;
     const tag = a.reservado ? `<span class="tj-tag res">${BP.t('card_reservada', 'Reservada')}</span>` : `<span class="tj-tag tj-${a.op}">${D.opTag(a)}</span>`;
     const meta = D.metaCorta(a), linea = D.pubLinea(pub);
     return `
@@ -394,7 +401,7 @@
      emprendimiento (antes mostraba la tarjeta de la primera unidad). e es un grupo de D.emprendimientos. */
   D.cardEmp = function(e){
     const pub = D.pub(e.publicadorId), linea = D.pubLinea(pub), calle = D.calle({ dir: e.dir, mostrarDir: e.mostrarDir }), etapa = D.etapaTxt(e);
-    const foto = e.foto ? `<img src="${BP.sbImg(e.foto, 700)}" alt="" loading="lazy" decoding="async" onerror="this.remove()">` : `<span class="tj-sinfoto">${BP.t('card_fotos_prod', 'Fotos en producción')}</span>`;
+    const foto = e.foto ? `<img src="${BP.sbImg(e.foto, 700)}" alt="" loading="lazy" decoding="async" onerror="BPData.sinFoto(this)">` : `<span class="tj-sinfoto">${BP.t('card_fotos_prod', 'Fotos en producción')}</span>`;
     const n = e.unidades.length, amb = e.ambmin ? (e.ambmin === e.ambmax ? BP.tf('emp_amb', '{n} amb.', { n: e.ambmin }) : BP.tf('emp_amb_rango', '{a} a {b} amb.', { a: e.ambmin, b: e.ambmax })) : '';
     const meta = [n === 1 ? BP.t('emp_unidad_1', '1 unidad') : BP.tf('emp_unidades', '{n} unidades', { n }), amb].filter(Boolean).join(' · ');
     return `
@@ -500,5 +507,25 @@
   D.opConMasInventario = avisos => { const c = D.countsByOp(avisos); return Object.keys(c).sort((a,b) => c[b]-c[a])[0]; };
   D.opsConUnidades = (avisos, zona) => { const r = {}; avisos.forEach(a => { if (a.reservado) return; if (zona && a.zona !== zona) return; r[a.op] = (r[a.op]||0)+1; }); return r; };
 
+  /* 8/10/2026 (lanz3-publicador) · Datos que parecen un error de tipeo. No frenan el envío: el publicador ve "Revisá: …"
+     en Revisar y la cola de Curación los marca. a usa las columnas de la base (m2_total, ambientes, banos, precio,
+     moneda, operacion). Devuelve frases cortas, ya traducidas. */
+  D.datosDudosos = function(a){
+    const l = []; if (!a) return l;
+    const m2 = Number(a.m2_total) || 0, amb = Number(a.ambientes) || 0, banos = Number(a.banos) || 0, precio = Number(a.precio) || 0, op = a.operacion;
+    const minM2 = amb <= 1 ? 15 : amb * 12;
+    if (m2 > 0 && amb >= 1 && m2 < minM2) l.push(BP.tf('dud_m2_amb', '{m} m² para {a} ambientes', { m: m2, a: amb }));
+    if (m2 > 3000) l.push(BP.tf('dud_m2_mucho', '{m} m² totales', { m: BP.fmtN(m2) }));
+    if (banos > 0 && amb >= 1 && banos > amb) l.push(BP.tf('dud_banos', '{b} baños para {a} ambientes', { b: banos, a: amb }));
+    if (precio > 0) {
+      const ars = a.moneda === 'ARS', txt = ars ? '$ ' + BP.fmtN(Math.round(precio)) : 'USD ' + BP.fmtN(Math.round(precio));
+      const fuera = op === 'venta' ? (precio < 20000 || precio > 15000000)
+        : op === 'mediano' ? (precio < 300 || precio > 6000)
+        : op === 'alquiler' ? (ars ? (precio < 100000 || precio > 15000000) : (precio < 200 || precio > 8000)) : false;
+      if (fuera) l.push(op === 'venta' ? BP.tf('dud_precio_venta', '{p} para una venta', { p: txt }) : BP.tf('dud_precio_mes', '{p} por mes', { p: txt }));
+      else if (op === 'venta' && !ars && m2 >= 20) { const xm2 = precio / m2; if (xm2 < 600 || xm2 > 15000) l.push(BP.tf('dud_precio_m2', 'USD {p} por m²', { p: BP.fmtN(Math.round(xm2)) })); }
+    }
+    return l;
+  };
   window.BPData = D;
 })();
