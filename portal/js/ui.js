@@ -385,7 +385,7 @@
     <div class="p-lang" role="group" aria-label="Idioma" data-i18n-aria="idioma"><button type="button" data-lang="es">ES</button><button type="button" data-lang="pt">PT</button><button type="button" data-lang="en">EN</button></div>
     <button type="button" class="p-ghost p-bell p-solo-sesion" aria-label="Notificaciones" data-i18n-aria="notificaciones" data-notif hidden>${BP.ico.bell}<span class="dot" hidden></span></button>
     <a class="p-ghost p-solo-sesion" href="ingresar.html?volver=contactos" hidden>${BP.ico.chat} <span data-i18n="mis_contactos">Mis contactos</span></a>
-    <a class="p-ghost p-fav-anon" href="buscar.html?favs=1" aria-label="Favoritos" data-i18n-aria="favoritos" hidden>${BP.ico.heart}<span data-fav-count hidden></span></a>
+    <a class="p-ghost p-fav-anon" href="guardados.html" aria-label="Guardados" data-i18n-aria="tab_guardados" hidden>${BP.ico.heart}<span data-fav-count hidden></span></a>
     <a class="p-btn p-btn-sm" href="publicar.html" data-i18n="publicar">Publicar</a>
     <a class="p-btn p-btn-sm p-btn-fill" href="ingresar.html" data-i18n="ingresar">Ingresar</a>
   </div>
@@ -397,6 +397,8 @@
      Cómo seleccionamos, Publicar y el idioma. Lo marcado m-sin-tabbar se ve sólo donde no hay barra (la ficha, una tableta). -->
 <div class="mobile-menu" id="mobileMenu" role="dialog" aria-modal="true" aria-label="${BP.t('menu', 'Menú')}">
   <a href="buscar.html" class="m-link m-sin-tabbar" data-sec="propiedades" data-i18n="nav_propiedades">Propiedades</a>
+  <!-- lanz3-visitante · Donde no hay barra de abajo (la ficha), Guardados va en el menú -->
+  <a href="guardados.html" class="m-link m-sin-tabbar" data-i18n="tab_guardados">Guardados</a>
   <a href="emprendimientos.html" class="m-link" data-sec="emprendimientos" data-i18n="emprendimientos">Desarrollos</a>
   <a href="criterios.html" class="m-link" data-sec="criterios" data-i18n="criterios">Cómo seleccionamos</a>
   <div class="m-cuenta m-sin-tabbar" hidden></div>
@@ -564,7 +566,7 @@
       /* 11/9 noche · El desplegable "Mi cuenta" muestra lo mismo que el riel del panel: las vistas según el perfil
          de la cuenta (BPStore.rielDe; sin perfil, la lista completa). Los rótulos van por BP.t, con las claves
          del bloque "header con sesión y perfil" de i18n-portal.js, así el header con sesión también habla EN y PT. */
-      const VISTAS = { avisos: ['mis_avisos', 'Mis avisos', 'panel.html#avisos'], propiedades: ['mis_propiedades', 'Mis propiedades', 'panel.html#propiedades'], interesados: ['interesados', 'Interesados', 'panel.html#interesados'], importar: ['importar_cartera', 'Importar cartera', 'importar.html'], os: ['bairen_os', 'Bairen OS', BP.OS_URL], contactos: ['mis_contactos', 'Mis contactos', 'panel.html#contactos'], favoritos: ['favoritos', 'Favoritos', 'buscar.html?favs=1'], alertas: ['alertas', 'Búsquedas y alertas', 'panel.html#alertas'], cuenta: ['mi_cuenta', 'Mi cuenta', 'panel.html#cuenta'] };
+      const VISTAS = { avisos: ['mis_avisos', 'Mis avisos', 'panel.html#avisos'], propiedades: ['mis_propiedades', 'Mis propiedades', 'panel.html#propiedades'], interesados: ['interesados', 'Interesados', 'panel.html#interesados'], importar: ['importar_cartera', 'Importar cartera', 'importar.html'], os: ['bairen_os', 'Bairen OS', BP.OS_URL], contactos: ['mis_contactos', 'Mis contactos', 'panel.html#contactos'], favoritos: ['favoritos', 'Favoritos', 'guardados.html'], alertas: ['alertas', 'Búsquedas y alertas', 'panel.html#alertas'], cuenta: ['mi_cuenta', 'Mi cuenta', 'panel.html#cuenta'] };
       const riel = (window.BPStore && BPStore.rielDe) ? BPStore.rielDe(session.perfil || null) : Object.keys(VISTAS);
       const vistas = riel.map(id => VISTAS[id]).filter(Boolean).map(v => `<a href="${v[2]}">${BP.t(v[0], v[1])}</a>`).join('');
       /* 12/9 · Con imagen elegida (ícono o foto), el botón la muestra a 22 px en lugar del ícono genérico; sin imagen, el ícono de siempre */
@@ -572,20 +574,24 @@
       const avH = BP.ico.user;   /* 12/9: la imagen de la cuenta se ve en el panel, no en el botón del header (pedido de Tomás) */
       right.innerHTML = `<button type="button" class="p-ghost p-bell" aria-label="${BP.esc(BP.t('notificaciones', 'Notificaciones'))}" data-notif>${BP.ico.bell}<span class="dot" hidden></span></button>
         <a class="p-ghost" href="panel.html#contactos">${BP.ico.chat} ${BP.t('mis_contactos', 'Mis contactos')}</a>
-        <a class="p-ghost" href="buscar.html?favs=1" aria-label="${BP.esc(BP.t('favoritos', 'Favoritos'))}">${BP.ico.heart}<span data-fav-count hidden></span></a>
+        <a class="p-ghost" href="guardados.html" aria-label="${BP.esc(BP.t('tab_guardados', 'Guardados'))}">${BP.ico.heart}<span data-fav-count hidden></span></a>
         <div class="p-crear"><a class="p-btn p-btn-sm" href="publicar-aviso.html" data-crear>${BP.t('publicar', 'Publicar')}</a><div class="p-crear-pop" hidden><p class="t">${BP.t('quien_publica', '¿Quién publica?')}</p><a href="publicar-aviso.html?perfil=dueno">${BP.t('soy_dueno_directo', 'Soy dueño directo')}</a><a href="publicar-aviso.html?paso=perfil">${BP.t('soy_profesional', 'Inmobiliaria, corredor o desarrolladora')}</a></div></div>
         <div class="p-nav-menu" style="display:flex"><div><button type="button" class="p-btn p-btn-sm p-btn-fill" aria-haspopup="true" style="padding:0 14px">${avH} ${BP.t('mi_cuenta', 'Mi cuenta')} <span class="car" style="border-color:var(--navy-deeper)"></span></button>
           <div class="p-dd p-dd-cuenta" style="left:auto;right:0"><div class="p-dd-ttl">${BP.esc(session.email)}${modeTag}</div>${vistas}<a href="curacion.html" data-curador hidden>${BP.t('curacion', 'Curación')}</a><a href="#" data-logout>${BP.t('cerrar_sesion', 'Cerrar sesión')}</a></div></div></div>`;
       if (mob) {
         const cta = mob.querySelector('.m-cta'); if (cta) cta.innerHTML = `<a class="p-btn p-btn-sm" href="publicar-aviso.html">${BP.t('publicar', 'Publicar')}</a><a class="p-btn p-btn-sm p-btn-fill m-sin-tabbar" href="panel.html">${BP.t('mi_cuenta', 'Mi cuenta')}</a>`;
-        const cuenta = mob.querySelector('.m-cuenta'); if (cuenta) { cuenta.hidden = false; cuenta.innerHTML = `<a href="buscar.html?favs=1">${BP.ico.heart} <span data-i18n="favoritos">Favoritos</span></a><a href="panel.html#contactos">${BP.ico.chat} <span data-i18n="mis_contactos">Mis contactos</span></a>`; }
+        /* lanz3-visitante · Guardados ya es un renglón del menú: acá quedan los contactos */
+        const cuenta = mob.querySelector('.m-cuenta'); if (cuenta) { cuenta.hidden = false; cuenta.innerHTML = `<a href="panel.html#contactos">${BP.ico.chat} <span data-i18n="mis_contactos">Mis contactos</span></a>`; }
+        /* lanz3-visitante · Cerrar sesión, a un toque desde el menú (antes eran cuatro gestos dentro del panel) */
+        if (!mob.querySelector('.m-salir')) { const ref = mob.querySelector('.m-cta'); if (ref) { ref.insertAdjacentHTML('afterend', `<button type="button" class="m-salir" data-logout>${BP.esc(BP.t('cerrar_sesion', 'Cerrar sesión'))}</button>`); if (!mob.classList.contains('open')) mob.querySelector('.m-salir').tabIndex = -1; } }
       }
       BP.avatarFallback(right, session.email); if (mob) BP.avatarFallback(mob, session.email);
       document.querySelectorAll('#pTabbar [data-tab="cuenta"]').forEach(a => { a.href = 'panel.html'; });
-      right.querySelectorAll('[data-logout]').forEach(b => b.addEventListener('click', async e => { e.preventDefault(); await window.BPStore.signOut(); BP.toast(BP.t('ui_sesion_cerrada', 'Sesión cerrada.')); setTimeout(() => location.href = 'index.html', 600); }));
+      document.querySelectorAll('.p-nav-right [data-logout], .mobile-menu [data-logout]').forEach(b => { if (b._salir) return; b._salir = true; b.addEventListener('click', async e => { e.preventDefault(); await window.BPStore.signOut(); BP.toast(BP.t('ui_sesion_cerrada', 'Sesión cerrada.')); setTimeout(() => location.href = 'index.html', 600); }); });
       if (window.BPStore) window.BPStore.isCurador().then(ok => { right.querySelectorAll('[data-curador]').forEach(a => a.hidden = !ok); });
-    } else if (mode === 'local') {
-      const ing = right.querySelector('a[href="ingresar.html"]'); if (ing && !ing.dataset.tagged) { ing.dataset.tagged = '1'; ing.insertAdjacentHTML('afterend', modeTag); }
+    } else {
+      if (mob) mob.querySelectorAll('.m-salir').forEach(b => b.remove());
+      if (mode === 'local') { const ing = right.querySelector('a[href="ingresar.html"]'); if (ing && !ing.dataset.tagged) { ing.dataset.tagged = '1'; ing.insertAdjacentHTML('afterend', modeTag); } }
     }
     document.querySelectorAll('[data-notif]').forEach(el => el.addEventListener('click', () => BP.toast(session ? BP.t('ui_sin_notif', 'No tenés notificaciones nuevas.') : BP.t('ui_ingresa_notif', 'Ingresá para ver tus notificaciones.'))));
     BP.syncFavCount(); if (BP.i18n) BP.i18n.apply(document);
