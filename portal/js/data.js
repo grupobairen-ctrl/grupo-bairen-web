@@ -29,7 +29,10 @@
       desc_en:'Sample lister: an owner showing their own unit, with title verified by BAIREN.', desc_pt:'Anunciante de exemplo: um proprietário que mostra sua própria unidade, com titularidade verificada pela BAIREN.' },
   };
   D.titulares = {};
-  D.pub = id => D.PUBLICADORES[id] || D.PUBLICADORES['bairen'];
+  /* 8/10/2026 · Un id que no está en la lista caía en 'bairen': el aviso de un publicador nuevo salía
+     firmado por BAIREN REALTY. Ahora devuelve un publicador vacío, sin nombre ni sello, y D.load no
+     muestra avisos de publicadores desconocidos (ver más abajo). */
+  D.pub = id => D.PUBLICADORES[id] || { id: '', nombre: '', tipo: '', verificado: false, inicial: '', desde: '', zonas: [], desc: '' };
   /* Descripción y nombre del publicador en el idioma de la interfaz, si los tiene; si no, el castellano.
      El nombre 'Dueño directo' del ejemplo se traduce como dato fijo. */
   D.pubDesc = pub => (BP.lang !== 'es' && pub['desc_' + BP.lang]) || pub.desc || '';
@@ -97,9 +100,12 @@
 
   /* aviso del esquema portal (o del modo local) → modelo del portal */
   D.fromStore = async function(r){
-    const pub = r.publicador || null; const pubId = pub ? (pub.slug || pub.id) : 'bairen';
+    /* 8/10/2026 · Sin publicador (no vino en la consulta, o la base no lo deja ver) el aviso caía en 'bairen'
+       y se mostraba como de BAIREN REALTY. Ahora queda sin publicador y D.load no lo muestra. La insignia
+       por defecto ("Corredor inmobiliario matriculado") se pone sólo si el publicador está verificado. */
+    const pub = r.publicador || null; const pubId = pub ? (pub.slug || pub.id || null) : null;
     const T = (pub && D.titulares[pub.id]) || null;   /* titular con matrícula, de la vista publicador_publico */
-    if (pub && !D.PUBLICADORES[pubId]) D.PUBLICADORES[pubId] = Object.assign({ storeId: pub.id, id: pubId, inicial: (pub.nombre||'P').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(), desde: (pub.created_at||'').slice(0,4) || '2026', zonas: pub.zonas || [], desc: pub.descripcion || '', responsable: pub.responsable || pub.nombre, badge: pub.badge || (pub.tipo === 'dueno' ? 'Dueño verificado' : 'Corredor inmobiliario matriculado') }, pub, { id: pubId }, T && T.titular_nombre ? { responsable: T.titular_nombre, matricula: T.titular_matricula ? ((T.titular_colegio || 'CUCICBA') + ' ' + T.titular_matricula) : pub.matricula } : {});
+    if (pub && !D.PUBLICADORES[pubId]) D.PUBLICADORES[pubId] = Object.assign({ storeId: pub.id, id: pubId, inicial: (pub.nombre||'P').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(), desde: (pub.created_at||'').slice(0,4) || '2026', zonas: pub.zonas || [], desc: pub.descripcion || '', responsable: pub.responsable || pub.nombre, badge: pub.badge || (!pub.verificado ? null : pub.tipo === 'dueno' ? 'Dueño verificado' : 'Corredor inmobiliario matriculado') }, pub, { id: pubId, zonas: pub.zonas || [] }, T && T.titular_nombre ? { responsable: T.titular_nombre, matricula: T.titular_matricula ? ((T.titular_colegio || 'CUCICBA') + ' ' + T.titular_matricula) : pub.matricula } : {});
     /* Sin repetidas (D.fotosUnicas): la tabla portal.fotos puede traer el mismo archivo varias veces */
     const fotos = []; for (const url of D.fotosUnicas((r.fotos||[]).slice().sort((a,b)=>(a.orden||0)-(b.orden||0)).map(f => f.url))) { const u = window.BPStore ? await window.BPStore.resolveFoto(url) : url; if (u) fotos.push(u); }
     const amb = r.ambientes || null;
@@ -155,6 +161,8 @@
     if (window.BairenZonas) {
       publicados = publicados.filter(a => BP.ZONAS.indexOf(a.zona) > -1);
     }
+    /* 8/10/2026 · Si no se puede saber quién publica, el aviso no se muestra: nunca se firma con otro nombre */
+    publicados = publicados.filter(a => a.publicadorId && D.PUBLICADORES[a.publicadorId]);
 
     // "Seleccionadas de la semana": las 6 con más fotos y disponibles
     publicados.filter(a=>!a.reservado).sort((a,b)=>b.fotos.length-a.fotos.length).slice(0,6).forEach(a=>a.destacado=true);
@@ -191,7 +199,9 @@
      Antes se pintaba "Dueño verificado" con escudo por el mero hecho de ser tipo 'dueno', sin
      mirar el flag: el sello, que es la promesa del portal, no lo respaldaba nada. Sin verificar
      se dice "Dueño directo", sin escudo, que es cierto y no promete lo que no se controló. */
-  D.badgeHTML = pub => !pub.matricula && pub.tipo !== 'dueno' ? `<span class="p-badge">${BP.ico.check} ${BP.esc(BP.etiqueta(pub.badge || 'Selección BAIREN'))}</span>`
+  /* 8/10/2026 · Publicador sin verificar: su nombre, sin sello. El dueño sin verificar sigue diciendo "Dueño directo". */
+  D.badgeHTML = pub => !pub || !pub.verificado ? (pub && pub.tipo === 'dueno' ? `<span class="p-badge dueno">${BP.esc(BP.t('ui_dato_dueno_directo', 'Dueño directo'))}</span>` : '')
+    : !pub.matricula && pub.tipo !== 'dueno' ? `<span class="p-badge">${BP.ico.check} ${BP.esc(BP.etiqueta(pub.badge || 'Selección BAIREN'))}</span>`
     : pub.tipo === 'dueno'
     ? (pub.verificado
         ? `<span class="p-badge dueno">${BP.ico.shield} ${BP.esc(BP.etiqueta(pub.badge || 'Dueño verificado'))}</span>`
@@ -219,7 +229,7 @@
     <div class="p-barrio">${[lugar, a.ciudad].filter(Boolean).map(BP.esc).join(', ')}</div>
     <p class="p-desc">${BP.esc(a.descripcion).slice(0, 220)}</p>
     <div class="p-card-foot">
-      <div class="p-publine">${BP.t('card_publica', 'Publica')} <b>${BP.esc(D.pubNombre(pub))}</b> ${D.badgeHTML(pub)}</div>
+      ${pub.nombre ? `<div class="p-publine">${BP.t('card_publica', 'Publica')} <b>${BP.esc(D.pubNombre(pub))}</b> ${D.badgeHTML(pub)}</div>` : '<div></div>'}
       <div class="acts">${a.reservado ? '' : `${D.waLink(a,pub) ? `<a class="p-icon-btn" href="${D.waLink(a,pub)}" target="_blank" rel="noopener" data-wa data-aviso="${BP.esc(a.id)}" data-pub="${BP.esc(pub.storeId || pub.id)}" aria-label="${BP.esc(BP.tf('card_wa_aria', 'Escribir por WhatsApp a {p}', { p: D.pubNombre(pub) }))}" title="WhatsApp">${BP.ico.wa}</a>` : ''}${D.sinContacto(pub) ? `<span class="p-sincontacto">${BP.t('card_contacto_pendiente', 'Contacto pendiente')}</span>` : `<a class="p-btn p-btn-sm p-btn-navy" href="${href}#contacto">${BP.ico.mail} ${BP.t('card_contactar', 'Contactar')}</a>`}`}</div>
     </div>
   </div>
@@ -241,7 +251,7 @@
     <div class="card-meta">${D.metaLine(a)}</div>
     <div class="card-divider"></div>
     <div class="card-footer"><div class="card-price"><span class="price-amount">${a.reservado ? BP.t('card_reservada', 'Reservada') : D.precioHTML(a)}</span></div><span class="card-cta">${BP.t('card_ver_ficha', 'Ver ficha')}</span></div>
-    <div class="p-card-pub">${BP.t('card_publica', 'Publica')} <b>${BP.esc(D.pubNombre(pub))}</b> ${D.badgeHTML(pub)}</div>
+    ${pub.nombre ? `<div class="p-card-pub">${BP.t('card_publica', 'Publica')} <b>${BP.esc(D.pubNombre(pub))}</b> ${D.badgeHTML(pub)}</div>` : ''}
   </div>
 </a>`;
   };
