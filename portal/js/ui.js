@@ -348,11 +348,10 @@
   <div class="p-nav-left">
     <a class="nav-logo" href="index.html" aria-label="BAIREN, inicio" data-i18n-aria="ui_logo_aria"><img src="../bairen_logo_96.png?v=1" alt="BAIREN" width="44" height="44" style="height:44px;width:44px;"></a>
   </div>
+  <!-- 8/10/2026 · Arriba sólo lo que busca el visitante: Membership y Publicadores pasan al pie -->
   <div class="p-nav-principal">
     <a href="buscar.html" data-sec="propiedades" data-i18n="nav_propiedades">Propiedades</a>
     <a href="emprendimientos.html" data-sec="emprendimientos" data-i18n="emprendimientos">Desarrollos</a>
-    <a href="membership.html" class="p-nav-destacado" data-sec="membership">Membership</a>
-    <a href="publicadores.html" data-sec="publicadores" data-i18n="publicadores">Publicadores</a>
     <a href="criterios.html" data-sec="criterios" data-i18n="criterios">Cómo seleccionamos</a>
   </div>
   <div class="p-lang p-lang-movil" role="group" aria-label="Idioma" data-i18n-aria="idioma"><button type="button" data-lang="es">ES</button><button type="button" data-lang="pt">PT</button><button type="button" data-lang="en">EN</button></div>
@@ -369,8 +368,7 @@
 <div class="mobile-menu" id="mobileMenu" role="dialog" aria-modal="true" aria-label="${BP.t('menu', 'Menú')}">
   <a href="buscar.html" class="m-link" data-sec="propiedades" data-i18n="nav_propiedades">Propiedades</a>
   <a href="emprendimientos.html" class="m-link" data-sec="emprendimientos" data-i18n="emprendimientos">Desarrollos</a>
-  <a href="membership.html" class="m-link p-nav-destacado" data-sec="membership">Membership</a>
-  <div class="m-secundario"><a href="publicadores.html" data-sec="publicadores" data-i18n="publicadores">Publicadores</a><a href="criterios.html" data-sec="criterios" data-i18n="criterios">Cómo seleccionamos</a></div>
+  <a href="criterios.html" class="m-link" data-sec="criterios" data-i18n="criterios">Cómo seleccionamos</a>
   <div class="m-cuenta" hidden></div>
   <div class="m-cta"><a class="p-btn p-btn-sm" href="publicar.html" data-i18n="publicar">Publicar</a><a class="p-btn p-btn-sm p-btn-fill" href="ingresar.html" data-i18n="ingresar">Ingresar</a></div>
 </div>
@@ -469,7 +467,7 @@
       <li><a href="${BP.urlBuscar({ op:'alquiler' })}" data-i18n="alquilar">Alquilar</a></li><li><a href="${BP.urlBuscar({ op:'venta' })}" data-i18n="comprar">Comprar</a></li><li><a href="publicar.html" data-i18n="publicar">Publicar</a></li></ul></div>
     <div class="ft-col"><div class="ft-col-ttl" data-i18n="ft_zonas">Zonas</div><ul>${zonas}</ul></div>
     <div class="ft-col"><div class="ft-col-ttl" data-i18n="ft_mas">Más</div><ul>
-      <li><a href="publicadores.html" data-i18n="publicadores">Publicadores</a></li><li><a href="emprendimientos.html" data-i18n="emprendimientos">Desarrollos</a></li><li><a href="criterios.html" data-i18n="ft_criterios">Criterios de selección</a></li><li><a href="legales.html" data-i18n="ft_terminos">Términos y privacidad</a></li><li><a href="mailto:portal@bairengroup.com">portal@bairengroup.com</a></li></ul></div>
+      <li><a href="publicadores.html" data-i18n="publicadores">Publicadores</a></li><li><a href="membership.html">Membership</a></li><li><a href="emprendimientos.html" data-i18n="emprendimientos">Desarrollos</a></li><li><a href="criterios.html" data-i18n="ft_criterios">Criterios de selección</a></li><li><a href="legales.html" data-i18n="ft_terminos">Términos y privacidad</a></li><li><a href="mailto:portal@bairengroup.com">portal@bairengroup.com</a></li></ul></div>
   </div>
   <div class="footer-bottom"><span>© ${new Date().getFullYear()} BAIREN</span><span><a href="legales.html" data-i18n="ft_uso">Términos de uso</a> · <a href="legales.html#privacidad" data-i18n="ft_priv">Política de privacidad</a></span></div>
 </footer>`;
