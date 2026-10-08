@@ -32,14 +32,14 @@ nav {
 .nav-logo{display:flex;align-items:center;}
 .nav-links{display:flex;gap:24px;}
 .nav-links a{
-  font-size:.68rem;font-weight:500;letter-spacing:.18em;
-  text-transform:uppercase;color:rgba(255,255,255,.6);
+  font-size:.8125rem;font-weight:500;letter-spacing:.01em;
+  text-transform:none;color:rgba(255,255,255,.6);
   transition:color .22s;
 }
 .nav-links a:hover{color:var(--gold);}
 .nav-back{
-  font-size:.66rem;font-weight:600;letter-spacing:.15em;
-  text-transform:uppercase;color:var(--gold);
+  font-size:.8125rem;font-weight:500;letter-spacing:.01em;
+  text-transform:none;color:var(--gold);
   border:1px solid rgba(194,169,104,.35);padding:8px 16px;
   transition:background .22s,color .22s;white-space:nowrap;
   flex-shrink:0;
@@ -98,7 +98,7 @@ nav {
 }
 .cat-hero-inner{position:relative;z-index:1;}
 .cat-eyebrow{
-  font-size:.58rem;letter-spacing:.4em;text-transform:uppercase;
+  font-size:.75rem;letter-spacing:.07em;text-transform:uppercase;
   color:var(--gold);margin-bottom:12px;
   opacity:.8;
 }
@@ -110,7 +110,7 @@ nav {
 }
 .cat-sub{
   font-size:.85rem;color:var(--gold-light);
-  letter-spacing:.04em;opacity:.75;
+  letter-spacing:.01em;opacity:.75;
 }
 
 /* ─── TYPE BANNER ─────────────────────────────────────────────────────── */
@@ -125,8 +125,8 @@ nav {
   display:flex;align-items:center;gap:16px;
 }
 .type-banner-tag{
-  font-size:.54rem;font-weight:700;letter-spacing:.25em;
-  text-transform:uppercase;background:var(--gold);
+  font-size:.8125rem;font-weight:500;letter-spacing:.01em;
+  text-transform:none;background:var(--gold);
   color:var(--navy);padding:4px 10px;flex-shrink:0;
 }
 .type-banner-text{
@@ -149,8 +149,8 @@ nav {
 }
 .filter-select{
   -webkit-appearance:none;appearance:none;border-radius:0;
-  font-size:.66rem;font-weight:500;letter-spacing:.1em;
-  text-transform:uppercase;height:34px;padding:0 30px 0 14px;
+  font-size:.8125rem;font-weight:500;letter-spacing:.01em;
+  text-transform:none;height:34px;padding:0 30px 0 14px;
   border:1px solid rgba(42,58,82,.18);
   color:var(--navy);background:transparent;
   font-family:var(--font-body);cursor:pointer;transition:all .22s;
@@ -165,8 +165,8 @@ nav {
 .barrio-trigger {
   position:relative;
   display:flex;align-items:center;gap:7px;
-  font-size:.68rem;font-weight:500;letter-spacing:.12em;
-  text-transform:uppercase;
+  font-size:.8125rem;font-weight:500;letter-spacing:.01em;
+  text-transform:none;
   color:var(--navy);
   border:1px solid rgba(42,58,82,.2);
   background:transparent;
@@ -223,7 +223,7 @@ nav {
   opacity:1;transform:none;pointer-events:all;
 }
 .bd-head{
-  font-size:.58rem;letter-spacing:.3em;text-transform:uppercase;
+  font-size:.8125rem;letter-spacing:.01em;text-transform:none;
   color:var(--text-mid);margin-bottom:14px;
 }
 .bd-grid{
@@ -231,8 +231,8 @@ nav {
   margin-bottom:14px;
 }
 .bd-pill{
-  font-size:.66rem;font-weight:500;letter-spacing:.08em;
-  text-transform:uppercase;
+  font-size:.8125rem;font-weight:500;letter-spacing:.01em;
+  text-transform:none;
   padding:9px 12px;
   border:1px solid rgba(42,58,82,.15);
   color:var(--navy);background:transparent;
@@ -243,7 +243,7 @@ nav {
 .bd-pill:hover{border-color:var(--navy);background:var(--off-white);}
 .bd-pill.active{background:var(--navy);color:var(--white);border-color:var(--navy);}
 .bd-clear{
-  font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;
+  font-size:.8125rem;letter-spacing:.01em;text-transform:none;
   color:var(--gold-dark);background:none;border:none;
   padding:0;cursor:pointer;font-family:var(--font-body);
   transition:color .2s;
@@ -261,8 +261,8 @@ nav {
 /* ─── TIPO PILLS ──────────────────────────────────────────────────────── */
 .tipo-pills{display:flex;gap:6px;flex-shrink:0;}
 .pill-tipo{
-  font-size:.66rem;font-weight:500;letter-spacing:.1em;
-  text-transform:uppercase;padding:9px 14px;height:34px;
+  font-size:.8125rem;font-weight:500;letter-spacing:.01em;
+  text-transform:none;padding:9px 14px;height:34px;
   border:1px solid rgba(42,58,82,.18);
   color:var(--navy);background:transparent;
   transition:all .22s;display:flex;align-items:center;
@@ -313,8 +313,8 @@ nav {
   border-bottom:1px solid rgba(42,58,82,.05);
 }
 .results-count{
-  font-size:.7rem;letter-spacing:.1em;
-  text-transform:uppercase;color:var(--text-mid);
+  font-size:.8125rem;letter-spacing:.01em;
+  text-transform:none;color:var(--text-mid);
 }
 .sort-select{
   font-family:var(--font-body);font-size:.72rem;
@@ -366,21 +366,21 @@ nav {
   transition:transform .5s var(--ease);
 }
 .card-img-placeholder{
-  font-family:var(--font-display);font-size:.6rem;
-  letter-spacing:.22em;color:rgba(194,169,104,.25);
-  text-transform:uppercase;
+  font-family:var(--font-display);font-size:.8125rem;
+  letter-spacing:.01em;color:rgba(194,169,104,.25);
+  text-transform:none;
 }
 .card-tag{
   position:absolute;top:14px;left:14px;z-index:2;
-  font-size:.56rem;font-weight:700;letter-spacing:.2em;
-  text-transform:uppercase;padding:5px 11px;
+  font-size:.8125rem;font-weight:500;letter-spacing:.01em;
+  text-transform:none;padding:5px 11px;
 }
 .tag-temporal{background:var(--navy);color:var(--white);}
 .tag-tradicional{background:rgba(251,250,246,.92);color:var(--navy);border:1px solid rgba(42,58,82,.25);}
 .card-status{
   position:absolute;top:14px;right:14px;z-index:2;
-  font-size:.54rem;font-weight:600;letter-spacing:.22em;
-  text-transform:uppercase;padding:5px 11px;
+  font-size:.8125rem;font-weight:500;letter-spacing:.01em;
+  text-transform:none;padding:5px 11px;
   backdrop-filter:blur(8px);
   -webkit-backdrop-filter:blur(8px);
 }
@@ -393,20 +393,20 @@ nav {
   margin-bottom:3px;line-height:1.2;
 }
 .card-barrio{
-  font-size:.64rem;letter-spacing:.18em;
-  text-transform:uppercase;color:var(--gold-dark);
+  font-size:.8125rem;letter-spacing:.01em;
+  text-transform:none;color:var(--gold-dark);
   margin-bottom:16px;font-weight:500;
 }
-.card-meta{font-size:.76rem;color:var(--text-mid);letter-spacing:.03em;margin-bottom:16px;}
+.card-meta{font-size:.76rem;color:var(--text-mid);letter-spacing:.01em;margin-bottom:16px;}
 .card-divider{height:1px;background:rgba(42,58,82,.07);margin-bottom:16px;}
 .card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:auto;}
 .card-price{font-family:var(--font-display);}
 .price-amount{font-size:1.28rem;font-weight:700;color:var(--navy);}
 .price-consult{font-size:.85rem;font-weight:500;color:var(--text-mid);font-style:italic;}
-.price-period{font-size:.62rem;color:var(--text-mid);letter-spacing:.06em;}
+.price-period{font-size:.62rem;color:var(--text-mid);letter-spacing:.01em;}
 .card-cta{
-  font-size:.6rem;font-weight:600;letter-spacing:.16em;
-  text-transform:uppercase;color:var(--navy);
+  font-size:.8125rem;font-weight:500;letter-spacing:.01em;
+  text-transform:none;color:var(--navy);
   border:1px solid rgba(42,58,82,.25);padding:9px 14px;
   transition:all .22s;font-family:var(--font-body);
   background:transparent;
@@ -437,7 +437,7 @@ footer{
   display:flex;align-items:center;justify-content:space-between;
   flex-wrap:wrap;gap:16px;
 }
-.ft-copy{font-size:.65rem;color:rgba(255,255,255,.22);letter-spacing:.06em;}
+.ft-copy{font-size:.65rem;color:rgba(255,255,255,.22);letter-spacing:.01em;}
 
 /* ─── REDUCED MOTION ──────────────────────────────────────────────────── */
 @media(prefers-reduced-motion:reduce){
@@ -458,15 +458,15 @@ footer{
 .cat-title{margin-bottom:6px;}
 .cat-sub{margin-bottom:14px;}
 .cat-panel{min-height:120px;margin-top:4px;}
-.cp-default{font-size:.78rem;letter-spacing:.06em;color:rgba(255,255,255,.45);}
+.cp-default{font-size:.78rem;letter-spacing:.01em;color:rgba(255,255,255,.45);}
 .cp-default b{font-weight:500;color:var(--gold-light);}
 .cp-name{font-family:var(--font-display);font-size:1.5rem;font-weight:500;color:var(--white);line-height:1.15;display:block;}
-.cp-n{display:block;font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin:6px 0 10px;}
+.cp-n{display:block;font-size:.8125rem;letter-spacing:.01em;text-transform:none;color:var(--gold);margin:6px 0 10px;}
 .cp-desc{font-size:.92rem;line-height:1.65;color:rgba(255,255,255,.64);max-width:38ch;font-weight:300;}
-.cp-clear{display:inline-block;margin-top:14px;background:none;border:0;padding:0 0 2px;color:var(--gold-light);font-family:var(--font-body);font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;border-bottom:1px solid rgba(194,169,104,.35);cursor:pointer;transition:color .2s,border-color .2s;}
+.cp-clear{display:inline-block;margin-top:14px;background:none;border:0;padding:0 0 2px;color:var(--gold-light);font-family:var(--font-body);font-size:.8125rem;letter-spacing:.01em;text-transform:none;border-bottom:1px solid rgba(194,169,104,.35);cursor:pointer;transition:color .2s,border-color .2s;}
 .cp-clear:hover{color:var(--white);border-color:var(--gold-light);}
 .filter-clear{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 6px;margin-left:6px;border:0;background:transparent;color:rgba(107,117,137,.85);
-  font-family:var(--font-body);font-size:.66rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;cursor:pointer;transition:color .2s;-webkit-tap-highlight-color:transparent;}
+  font-family:var(--font-body);font-size:.8125rem;font-weight:500;letter-spacing:.01em;text-transform:none;white-space:nowrap;cursor:pointer;transition:color .2s;-webkit-tap-highlight-color:transparent;}
 .filter-clear span[aria-hidden]{font-size:1rem;line-height:1;font-weight:300;}
 .filter-clear:hover{color:var(--navy);}
 .filter-clear[hidden]{display:none;}
@@ -507,13 +507,13 @@ footer{
 .ms-list{list-style:none;margin:6px 20px 0;border-top:1px solid rgba(255,255,255,.08);}
 .ms-item{display:flex;flex-wrap:wrap;align-items:center;width:100%;min-height:50px;padding:11px 4px;border:0;border-bottom:1px solid rgba(255,255,255,.08);background:none;color:var(--white);font-family:var(--font-body);font-weight:300;font-size:.95rem;letter-spacing:.02em;cursor:pointer;text-align:left;-webkit-tap-highlight-color:transparent;}
 .ms-item .nm{flex:1;}
-.ms-item b{font-weight:400;font-size:.68rem;letter-spacing:.06em;color:var(--gold-light);opacity:.8;}
+.ms-item b{font-weight:400;font-size:.68rem;letter-spacing:.01em;color:var(--gold-light);opacity:.8;}
 .ms-item small{flex:0 0 100%;font-size:.74rem;line-height:1.45;color:rgba(255,255,255,.42);margin-top:3px;letter-spacing:.01em;}
 .ms-item.active{color:var(--gold-light);}
 .ms-item.active::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--gold);margin-right:10px;flex-shrink:0;}
 .ms-item:active{opacity:.7;}
 /* Pastilla flotante (mobile) */
-.mapa-fab{position:fixed;left:50%;bottom:22px;transform:translate(-50%,16px);z-index:900;display:none;align-items:center;gap:8px;height:44px;padding:0 18px;border:1px solid rgba(194,169,104,.6);background:var(--navy-deeper);color:var(--gold-light);font-family:var(--font-body);font-size:.7rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;box-shadow:0 8px 24px rgba(19,29,45,.35);opacity:0;pointer-events:none;transition:opacity .2s ease,transform .25s var(--ease);cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.mapa-fab{position:fixed;left:50%;bottom:22px;transform:translate(-50%,16px);z-index:900;display:none;align-items:center;gap:8px;height:44px;padding:0 18px;border:1px solid rgba(194,169,104,.6);background:var(--navy-deeper);color:var(--gold-light);font-family:var(--font-body);font-size:.8125rem;font-weight:500;letter-spacing:.01em;text-transform:none;box-shadow:0 8px 24px rgba(19,29,45,.35);opacity:0;pointer-events:none;transition:opacity .2s ease,transform .25s var(--ease);cursor:pointer;-webkit-tap-highlight-color:transparent;}
 
 .mapa-fab.show{opacity:1;pointer-events:auto;transform:translate(-50%,0);}
 @media(max-width:959px){.mapa-fab{display:inline-flex;}}
@@ -530,12 +530,12 @@ body.sheet-open{overflow:hidden;}
   border: 1px solid var(--gold-dark);
   border-radius: 1px;
   padding: 10px 14px;
-  font-size: 10px;
+  font-size:.8125rem;
   font-family: var(--font-display);
   font-weight: 500;
   color: var(--gold-dark);
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
+  letter-spacing:.01em;
+  text-transform:none;
   z-index: 15;
   backdrop-filter: blur(8px);
   display: flex;
