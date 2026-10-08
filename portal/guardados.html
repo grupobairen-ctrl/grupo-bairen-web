@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function(){
   const vacio = () => `<div class="p-gvacio"><p>${BP.t('guard_vacio', 'Todavía no guardaste propiedades.')}</p><a class="p-btn p-btn-fill" href="buscar.html">${BP.t('tab_buscar', 'Buscar')}</a></div>`;
   const pausada = (id, d) => `<article class="prop-card p-tj p-tj-pausada" data-flip="${BP.esc(id)}">
     <div class="tj-link"><span class="tj-foto">${d.f ? `<img src="${BP.esc(BP.sbImg(d.f, 700))}" alt="" loading="lazy" decoding="async" onerror="this.remove()">` : ''}<span class="tj-tag res">${BP.t('guard_pausada', 'Pausada por ahora')}</span></span>
-    <span class="tj-cuerpo">${d.c ? `<span class="tj-calle">${BP.esc(d.c)}</span>` : ''}<span class="tj-titulo">${BP.esc(d.t || BP.t('guard_una_guardada', 'Una propiedad guardada'))}</span></span></div>
+    <span class="tj-cuerpo"><span class="tj-titulo">${BP.esc(d.t || BP.t('guard_una_guardada', 'Una propiedad guardada'))}</span>${d.c ? `<span class="tj-calle">${BP.esc(d.c)}</span>` : ''}</span></div>
     <button type="button" class="tj-fav on" data-fav="${BP.esc(id)}" aria-pressed="true" aria-label="${BP.esc(BP.t('guard_quitar', 'Quitar de Guardados'))}">${BP.ico.heartFill}</button></article>`;
   /* Lo último que se guardó, primero */
   const ids = BP.favs.get().slice().reverse();
