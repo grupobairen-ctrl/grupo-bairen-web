@@ -4578,6 +4578,39 @@ body.p-catalogo .p-pop .lnk,body.p-catalogo .p-drawer .lnk{color:var(--p-tinta-2
 .p-pop .seg button,.p-drawer .seg button{font:500 .875rem/1 var(--font-body)!important;letter-spacing:0!important}
 .p-drawer h3{font:500 1.25rem/1.25 var(--font-body)!important;letter-spacing:0!important}
 
+/* ── 2 · La tarjeta de propiedad ─────────────────────────────────────────────────────────────────────────── */
+.p-tj .tj-cuerpo{gap:4px;padding:18px 20px 20px}
+@media(min-width:860px){.p-tj .tj-cuerpo{padding:22px 24px 24px}}
+.p-tj .tj-titulo{font:400 1.1875rem/1.3 var(--font-display);color:#131D2D;letter-spacing:0}
+/* La calle, debajo del título, en gris y con mayúscula inicial */
+.p-tj .tj-calle{order:0;font:400 .875rem/1.35 var(--font-body)!important;letter-spacing:0!important;text-transform:none!important;color:var(--p-tinta-2)!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p-tj .tj-fila{margin-top:auto;padding-top:14px;border-top:1px solid var(--p-hair)}
+.p-tj .tj-cuerpo .tj-titulo + .tj-fila,.p-tj .tj-cuerpo .tj-calle + .tj-fila{margin-top:12px}
+.p-tj .tj-precio{font:500 1.0625rem/1.2 var(--font-body);color:#131D2D;letter-spacing:0}
+.p-tj .tj-precio small{font:400 .8125rem/1 var(--font-body);color:var(--p-tinta-2);margin-left:2px}
+.p-tj .tj-meta{font:400 .8125rem/1.3 var(--font-body);color:var(--p-tinta-2)}
+/* Quién publica: se repite en muchas tarjetas, así que pesa poco */
+.p-tj .tj-pub{font:400 .8125rem/1.45 var(--font-body)!important;color:#6B7589!important;margin-top:6px}
+.p-tj .tj-pub b{font-weight:400!important;font-size:inherit!important;color:var(--p-tinta-2)!important}
+.p-tj .tj-pub .p-verif{color:#8A7547}
+/* La operación sobre la foto: un chip chico translúcido */
+.p-tj .tj-tag,.p-tj .tj-tag.tj-venta,.p-tj .tj-tag.tj-mediano,.p-tj .tj-tag.tj-alquiler{
+  left:12px;top:12px;padding:6px 11px;font:500 .8125rem/1 var(--font-body)!important;letter-spacing:0!important;text-transform:none!important;
+  background:rgba(251,250,246,.88);color:#131D2D;-webkit-backdrop-filter:blur(10px) saturate(140%);backdrop-filter:blur(10px) saturate(140%)}
+.p-tj .tj-tag.res{background:rgba(19,29,45,.78);color:#FBFAF6}
+.p-tj .tj-desde{left:12px;bottom:12px;padding:6px 11px;font:500 .8125rem/1 var(--font-body);letter-spacing:0;background:rgba(251,250,246,.88);color:#131D2D;-webkit-backdrop-filter:blur(10px) saturate(140%);backdrop-filter:blur(10px) saturate(140%)}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.p-tj .tj-tag,.p-tj .tj-desde{background:#FBFAF6}.p-tj .tj-tag.res{background:#131D2D}}
+.p-tj .tj-sinfoto{font:400 .875rem/1 var(--font-body)!important;letter-spacing:.01em!important;color:rgba(222,205,160,.8)}
+/* El corazón, redondo y translúcido como el chip */
+:root .p-tj .tj-fav{top:8px;right:8px;width:44px;height:44px;border-radius:50%!important;background:rgba(251,250,246,.88);-webkit-backdrop-filter:blur(10px) saturate(140%);backdrop-filter:blur(10px) saturate(140%)}
+.p-tj .tj-fav:focus-visible{outline-offset:2px}
+/* Si la búsqueda ya está filtrada por esa operación, la etiqueta no se repite en cada tarjeta */
+#list[data-op-filtro="mediano"] .tj-tag.tj-mediano,#list[data-op-filtro="largo"] .tj-tag.tj-alquiler,#list[data-op-filtro="venta"] .tj-tag.tj-venta{display:none}
+/* En la ficha, las similares son de la misma operación que la ficha */
+body.p-ficha-page .p-fsim .tj-tag:not(.res){display:none}
+/* El chip de la operación y el de "Disponible desde", en píldora */
+:root .p-tj .tj-tag,:root .p-tj .tj-desde{border-radius:var(--r-pill)!important}
+
 /* ── 6 · Portada: el video con su luz real ────────────────────────────────────────────────────────────────
    Tomás (8/10): en el celular la caja tapaba un tercio del video y un velo parejo lo apagaba entero. Fuera el velo
    parejo y la opacidad del video: solo un degradé abajo, detrás del título y la barra, y uno chico arriba, detrás
