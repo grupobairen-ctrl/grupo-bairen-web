@@ -268,6 +268,8 @@ window.BP_I18N = {
     sugerencias_aria: 'Suggestions', ver_la_unidad: 'See the unit', edif_ver_unidades: 'See units',
     alerta_corto: 'Alert', alerta_creada_toast: 'Alert created.', alerta_cuenta: 'With an account, the alert reaches you by email.',
     cat_t_de: '{t} listed by {p}', cat_quien_publica: 'Lister',
+    cond_contrato: 'Lease of {p}', cond_contrato_libre: 'Lease: {p}', ui_dato_acepta_garantia_propietaria: 'Accepts a property deed as guarantee',
+    ficha_por_m2: '{p} per m²', ficha_ok_visita: 'Visit requested: {f}.',
     /* 8/10/2026 · del equipo de servidor (ingresar): el captcha */
     ing_err_captcha: "We couldn't verify that you're a person. Please try again.",
     /* Publicar en pantallas cortas (8/10/2026) */
@@ -726,6 +728,8 @@ window.BP_I18N = {
     sugerencias_aria: 'Sugestões', ver_la_unidad: 'Ver o imóvel', edif_ver_unidades: 'Ver unidades',
     alerta_corto: 'Alerta', alerta_creada_toast: 'Alerta criado.', alerta_cuenta: 'Com uma conta, o alerta chega por e-mail.',
     cat_t_de: '{t} de {p}', cat_quien_publica: 'Anunciante',
+    cond_contrato: 'Contrato de {p}', cond_contrato_libre: 'Contrato: {p}', ui_dato_acepta_garantia_propietaria: 'Aceita fiador com imóvel',
+    ficha_por_m2: '{p} por m²', ficha_ok_visita: 'Visita solicitada: {f}.',
     /* 8/10/2026 · del equipo de servidor (ingresar): el captcha */
     ing_err_captcha: 'Não conseguimos verificar que você é uma pessoa. Tente de novo.',
     /* Publicar en pantallas cortas (8/10/2026) */

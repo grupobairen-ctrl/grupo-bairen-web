@@ -104,7 +104,9 @@ document.addEventListener('DOMContentLoaded', function(){
   document.title = `${tit} · ${BPData.opTag(a)} · BAIREN`;
   /* Cuatro números: superficie, ambientes, baños y, según la operación, la estadía (mediano) o las expensas
      (tradicional y venta; nunca si están incluidas). El que no tiene dato no se dibuja. */
-  const plazoTxt = a.plazo ? BP.etiqueta(a.plazo).replace(/(\d)\s*-\s*(\d)/, '$1 a $2') : '';   /* "3-12 meses" se lee "3 a 12 meses" (en, pt ya vienen traducidos) */
+  /* lanz3-visitante · "24 meses" en inglés se dice "24 months" (los plazos sueltos no tienen clave propia) */
+  const meses = x => BP.lang === 'en' ? String(x).replace(/\bmeses\b/i, 'months').replace(/\b1 months\b/, '1 month').replace(/(\d) a (\d)/, '$1 to $2') : x;
+  const plazoTxt = a.plazo ? meses(BP.etiqueta(a.plazo).replace(/(\d)\s*-\s*(\d)/, '$1 a $2')) : '';   /* "3-12 meses" se lee "3 a 12 meses" (en, pt ya vienen traducidos) */
   const expensasAparte = !!a.expensas && !BPData.expensasIncluidas(a);
   const numeros = [
     a.m2 ? [a.m2 + ' m²', T('ficha_superficie', 'Superficie')] : null,
@@ -117,6 +119,9 @@ document.addEventListener('DOMContentLoaded', function(){
   /* Condiciones, en una lista corta */
   const condiciones = [
     a.op === 'mediano' && plazoTxt ? (BPData.estadiaMinima(a) ? TF('cond_estadia_min', 'Estadía mínima de {p}', { p: plazoTxt }) : TF('cond_estadia', 'Estadía de {p}', { p: plazoTxt })) : null,
+    /* lanz3-visitante · El alquiler tradicional: el plazo del contrato y las garantías que acepta (como las guarda Publicar) */
+    a.op === 'alquiler' && plazoTxt ? (/^\d/.test(plazoTxt) ? TF('cond_contrato', 'Contrato de {p}', { p: plazoTxt }) : TF('cond_contrato_libre', 'Contrato: {p}', { p: plazoTxt.charAt(0).toLowerCase() + plazoTxt.slice(1) })) : null,   /* "24 meses" o "Desde 2 años" */
+    ...(a.op === 'alquiler' ? ['Acepta seguro de caución', 'Acepta garantía propietaria'].filter(g => (a.caracteristicas || []).indexOf(g) > -1).map(g => BP.etiqueta(g)) : []),
     BPData.todoIncluido(a) ? T('cond_todo_incluido', 'Todo incluido: expensas y servicios') : (BPData.incluye(a).length ? TF('cond_incluye', 'Incluye: {x}', { x: BPData.incluye(a).map(x => BP.etiqueta(x)).join(', ') }) : null),
     BPData.sinGarantia(a) ? T('ui_dato_sin_garantia_propietaria', 'Sin garantía propietaria') : null,
     BPData.aceptaMascotas(a) ? T('ui_dato_acepta_mascotas', 'Acepta mascotas') : null
@@ -126,7 +131,9 @@ document.addEventListener('DOMContentLoaded', function(){
   /* La ubicación aparece sólo si hay con qué armar el mapa: coordenadas o una calle */
   const hayMapa = (a.lat != null && a.lng != null) || !!calle;
   /* Lo que acompaña al precio: todo incluido, expensas incluidas o, en mediano plazo, las expensas aparte */
-  const precioSub = a.reservado ? '' : [a.periodo ? T('ui_por_mes', '/mes') : '', BPData.todoIncluido(a) ? T('ficha_todo_incl_corto', 'todo incluido') : BPData.expensasIncluidas(a) ? T('ficha_exp_incl', 'expensas incluidas') : (expensasAparte && a.op === 'mediano' ? TF('ficha_mas_exp', 'más $ {n} de expensas', { n: BP.fmtN(a.expensas) }) : '')].filter(Boolean).join(' · ');
+  /* lanz3-visitante · En venta, el precio por m² cuando hay superficie */
+  const porM2 = a.op === 'venta' && a.precio && a.m2 ? TF('ficha_por_m2', '{p} por m²', { p: BP.fmtPrecio(a.precio / a.m2, a.moneda) }) : '';
+  const precioSub = a.reservado ? '' : [porM2, a.periodo ? T('ui_por_mes', '/mes') : '', BPData.todoIncluido(a) ? T('ficha_todo_incl_corto', 'todo incluido') : BPData.expensasIncluidas(a) ? T('ficha_exp_incl', 'expensas incluidas') : (expensasAparte && a.op === 'mediano' ? TF('ficha_mas_exp', 'más $ {n} de expensas', { n: BP.fmtN(a.expensas) }) : '')].filter(Boolean).join(' · ');
   const urlPub = 'buscar.html?op=&pub=' + encodeURIComponent(pub.id || '');
   const urlVolver = a.zona ? BP.urlBuscar({ op: BPData.opFiltro(a), zona: a.zona }) : 'buscar.html';
 
@@ -189,6 +196,7 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip" role="group" aria-label="$
     <div class="p-form p-form-ok" id="contactOk" hidden tabindex="-1" role="status">
       <h3>${T('ficha_ok_t', 'Consulta enviada')}</h3>
       <p>${TF('ficha_ok_listo', 'Listo. Le llegó a {p}, que te responde por WhatsApp o mail.', { p: BP.esc(pubNombre) })}</p>
+      <p class="p-ok-visita" id="contactOkVisita" hidden></p>
       <button type="button" class="p-linkbtn" id="contactOtra">${T('ficha_otra', 'Enviar otra consulta')}</button>
     </div>`}
   </aside>
@@ -207,6 +215,19 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip" role="group" aria-label="$
 
   /* comportamiento */
   BPData.bindFavs(main);
+  /* lanz3-visitante · Si una foto no carga (archivo borrado en el almacenamiento), la diapositiva dice "Fotos en producción"
+     en vez de quedar como un bloque vacío; esa foto no abre el visor. Las miniaturas que fallan se apagan. */
+  const fotoRota = new Set();
+  /* Si ninguna carga, queda una sola diapositiva con el aviso, sin contador ni tira (se prueban las miniaturas, 200 px) */
+  const probarTodas = () => Promise.all(fotos.map(f => new Promise(res => { const im = new Image(); im.onload = () => res(true); im.onerror = () => res(false); im.src = BP.sbImg(f, 200); }))).then(oks => {
+    if (oks.some(Boolean)) return;
+    fotos.forEach((f, i) => fotoRota.add(i));
+    const hs = document.getElementById('heroSlides'); if (hs) { hs.removeAttribute('tabindex'); hs.innerHTML = `<div class="p-fhero-slide p-fhero-empty p-fhero-rota">${T('ficha_fotos_prod', 'Fotos en producción')}</div>`; }
+    ['fotoCont', 'strip'].forEach(x => { const e = document.getElementById(x); if (e) e.remove(); });
+  });
+  const probarFoto = el => { const m = /url\(['"]?([^'")]+)['"]?\)/.exec(el.style.backgroundImage || ''); if (!m) return; const im = new Image(); im.onerror = () => { const i = Number(el.dataset.i); fotoRota.add(i); el.classList.add('p-fhero-empty', 'p-fhero-rota'); el.style.backgroundImage = 'none'; el.removeAttribute('role'); el.removeAttribute('aria-label'); el.textContent = T('ficha_fotos_prod', 'Fotos en producción'); if (i === 0 && fotos.length > 1) probarTodas(); }; im.src = m[1]; };
+  document.querySelectorAll('.p-fhero-slide[data-i]').forEach(el => { if (el.style.backgroundImage) probarFoto(el); else new MutationObserver((l, o) => { if (el.style.backgroundImage) { o.disconnect(); probarFoto(el); } }).observe(el, { attributes: true, attributeFilter: ['style'] }); });
+  document.querySelectorAll('#strip img').forEach(img => img.addEventListener('error', () => { img.style.visibility = 'hidden'; }, { once: true }));
   /* 25/9/2026 · "Saltar al contenido" apuntaba al main, que empieza con la galería: el salto dejaba
      a la persona adentro de las fotos. Ahora va a la ficha propiamente dicha (#contenido), después. */
   const skip = document.getElementById('pSkip'); if (skip) skip.href = '#contenido';
@@ -274,7 +295,7 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip" role="group" aria-label="$
     lbMarco.addEventListener('pointercancel', () => { x0 = null; });
   }
   lb.querySelectorAll('button').forEach(x => x.tabIndex = -1);
-  gal.querySelectorAll('[data-i]').forEach(el => el.addEventListener('click', e => { e.preventDefault(); origenLb = el; showLb(Number(el.dataset.i)); }));
+  gal.querySelectorAll('[data-i]').forEach(el => el.addEventListener('click', e => { e.preventDefault(); if (fotoRota.has(Number(el.dataset.i))) return; origenLb = el; showLb(Number(el.dataset.i)); }));
   document.querySelectorAll('#strip [data-t]').forEach(th => th.addEventListener('dblclick', () => { origenLb = th; showLb(Number(th.dataset.t)); }));
   const heroSlides = document.getElementById('heroSlides'), strip = document.getElementById('strip');
   if (heroSlides && strip) {
@@ -382,6 +403,9 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip" role="group" aria-label="$
          de la ficha. La consulta queda guardada como siempre (BPStore.addConsulta, que también avisa a quien
          publica) y la confirmación se muestra acá mismo. */
       btn.disabled = false; btn.innerHTML = etiqueta;
+      /* lanz3-visitante · La confirmación repite el día y la hora pedidos */
+      const okVisita = document.getElementById('contactOkVisita');
+      if (okVisita) { okVisita.hidden = !pideVisita; if (pideVisita) { let cuando = f.visita_deseada.value; try { cuando = new Date(f.visita_deseada.value).toLocaleString(BP.LOCALE(), { weekday: 'long', day: 'numeric', month: 'long', hour: 'numeric', minute: '2-digit', hour12: BP.lang === 'en' }); } catch (err) { /* queda el valor del campo */ } okVisita.textContent = TF('ficha_ok_visita', 'Visita pedida: {f}.', { f: cuando }); } }
       f.hidden = true; contactOk.hidden = false; contactOk.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => contactOk.focus({ preventScroll: true }), 300);
       BP.toast(TF('ficha_toast_enviada', 'Tu consulta va directo a {p}.', { p: pubNombre }));
     });
