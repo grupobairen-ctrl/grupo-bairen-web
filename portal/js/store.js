@@ -122,7 +122,7 @@
     const av = L.avatares.get({})[email] || {};   /* 12/9 · la imagen también se recuerda por mail (bp_avatares) */
     S.session = { id: 'local-' + slugify(email), email, perfil: L.perfiles.get({})[email] || null, avatar: av.avatar || null, avatar_url: av.avatar_url || null }; L.user.set(S.session); if (window.BP && BP.applySession) BP.applySession(S.session, S.mode); return { ok:true };
   };
-  S.signOut = async function(){ if (S.mode === 'supabase') await S.sb.auth.signOut(); S.session = null; L.user.set(null); if (window.BP && BP.applySession) BP.applySession(null, S.mode); };
+  S.signOut = async function(){ if (S.mode === 'supabase') await S.sb.auth.signOut(); S.session = null; L.user.set(null); anotarTipoPub(null); if (window.BP && BP.applySession) BP.applySession(null, S.mode); };
 
   /* ── perfil de la cuenta ──────────────────────────────
      Una preferencia, no un permiso: 'busca' (alquilar o comprar), 'dueno' (publicar su propiedad),
@@ -132,7 +132,18 @@
   S.PERFIL_TXT = { get busca(){ return T('perfil_busca', 'Busco propiedad'); }, get dueno(){ return T('perfil_dueno', 'Dueño directo'); }, get profesional(){ return T('perfil_profesional', 'Inmobiliaria, corredor o desarrolladora'); } };
   /* 8/10/2026 · El rótulo de la cuenta según quién publica: un gestor de alquileres tiene perfil 'profesional' (publica
      lo de otros), pero no es inmobiliaria, corredor ni desarrolladora. Con publicador gestor, dice Gestor de alquileres. */
-  S.perfilTxt = (p, pub) => p === 'profesional' && pub && pub.tipo === 'gestor' ? T('perfil_gestor', 'Gestor de alquileres') : (S.PERFIL_TXT[p] || '');
+  /* 8/10/2026 (venta) · Lo mismo para una desarrolladora (decía "Inmobiliaria, corredor o desarrolladora") y para una
+     inmobiliaria o un corredor. Sin publicador, el rótulo general. */
+  S.perfilTxt = (p, pub) => {
+    const t = p === 'profesional' ? tipoPub(pub) : null;
+    return t === 'gestor' ? T('perfil_gestor', 'Gestor de alquileres') : t === 'desarrolladora' ? T('perfil_desarrolladora', 'Desarrolladora')
+      : t === 'profesional' ? T('perfil_inmobiliaria', 'Inmobiliaria o corredor') : (S.PERFIL_TXT[p] || '');
+  };
+  /* El tipo del publicador de la cuenta: el del publicador que se pasa o, si no, el último que leyó esta pestaña
+     (getMyPublicador lo anota en sessionStorage). Así el desplegable del header también sabe si es desarrolladora. */
+  const TIPO_PUB = 'bp_pub_tipo';
+  function tipoPub(pub){ if (pub) return pub.tipo || null; try { return sessionStorage.getItem(TIPO_PUB); } catch (e) { return null; } }
+  const anotarTipoPub = pub => { try { if (pub && pub.tipo) sessionStorage.setItem(TIPO_PUB, pub.tipo); else sessionStorage.removeItem(TIPO_PUB); } catch (e) { /* sin sessionStorage */ } };
   /* 11/9 noche · El riel del panel y el desplegable "Mi cuenta" del header salen del mismo lugar: los ids de las
      vistas (avisos, propiedades, interesados, importar, contactos, favoritos, alertas, cuenta) según el perfil.
      Sin perfil (cuenta vieja, demo) la lista completa. El dueño lleva siempre Mis contactos: puede consultar
@@ -150,7 +161,9 @@
        · profesional  corredor, inmobiliaria, gestor o desarrolladora. Publica lo de otros, así
                       que NO tiene "Mis propiedades": no es dueño de nada de lo que publica.
                       Sí lleva importación de cartera y Bairen OS, que es lo que paga. */
-  S.rielDe = function(p){
+  /* 8/10/2026 (venta) · Una desarrolladora no importa cartera: carga sus unidades como emprendimiento */
+  S.rielDe = (p, pub) => { const l = rielDePerfil(p); return tipoPub(pub) === 'desarrolladora' ? l.filter(x => x !== 'importar') : l; };
+  function rielDePerfil(p){
     if (p === 'busca') return ['favoritos', 'alertas', 'contactos', 'cuenta'];
     if (p === 'dueno') return ['avisos', 'propiedades', 'interesados', 'contactos', 'cuenta'];
     /* 23/9/2026 · 'os' fuera del menú hasta que el puente esté verificado. Hoy un profesional que
@@ -159,7 +172,7 @@
        que ninguna. Vuelve cuando el alta deje plan y rol por defecto, y se pruebe con un login real. */
     if (p === 'profesional') return ['avisos', 'interesados', 'importar', 'cuenta'];
     return S.RIEL_COMPLETO.slice();
-  };
+  }
   S.getPerfil = function(){ const p = S.session && S.session.perfil; return S.PERFILES.indexOf(p) > -1 ? p : null; };
   S.setPerfil = async function(p){
     if (!S.session) throw new Error('sin sesión');
@@ -274,7 +287,8 @@
   };
 
   /* ── publicador ───────────────────────────────────────── */
-  S.getMyPublicador = async function(){
+  S.getMyPublicador = async function(){ const p = await buscarPublicador(); if (S.session) anotarTipoPub(p); return p; };
+  async function buscarPublicador(){
     if (DEMO && S.mode === 'supabase') {
       const { data } = await S.sb.schema('portal').from('publicadores').select('*').eq('slug', 'bairen').maybeSingle();
       return data || null;
@@ -302,7 +316,7 @@
       return null;
     }
     return L.pubs.get([]).find(p => p.auth_user_id === S.session.id) || null;
-  };
+  }
   /* La persona detrás de la cuenta (modelo nuevo). null si no hay migración o no se registró. */
   S.getMyPersona = async function(){
     if (!S.session || S.mode !== 'supabase' || DEMO) return null;
@@ -318,7 +332,8 @@
         auth_user_id: S.session.id,
         nombre: (datos && datos.responsable) || pub.responsable || pub.nombre,
         email: pub.email || S.session.email, telefono: pub.telefono || null, whatsapp: pub.whatsapp || null,
-        matricula: (mat.replace(/\D/g, '') || null), colegio: mat ? (/cucicba/i.test(mat) ? 'CUCICBA' : (pub.colegio || null)) : null,
+        /* 8/10/2026 (venta) · El colegio se elige en Tu empresa: manda el elegido; si no hay, el que diga la matrícula */
+        matricula: (mat.replace(/\D/g, '') || null), colegio: mat ? (pub.colegio || (datos && datos.colegio) || (/cucicba/i.test(mat) ? 'CUCICBA' : null)) : null,
       };
       const dni = datos && datos.dni ? String(datos.dni).replace(/\D/g, '') : '';
       if (dni) persona.dni = dni;
@@ -352,6 +367,18 @@
     if (S.mode === 'supabase') { const { error } = await S.sb.schema('portal').from('verificaciones').insert(rec); if (error) throw error; return; }
     const all = L.verif.get([]); rec.id = uid(); all.push(rec); L.verif.set(all);
   };
+  /* 8/10/2026 (venta) · Las verificaciones del publicador (política "verif propias"): qué documentos mandó y cómo
+     quedaron. null si no se pudieron leer (el panel no afirma nada). Un documento enviado es una fila con nota
+     "Documento: <ruta>" (requestVerificacion) que no fue rechazada. */
+  S.misVerificaciones = async function(pubId){
+    if (!pubId) return [];
+    if (S.mode === 'supabase') {
+      try { const { data, error } = await S.sb.schema('portal').from('verificaciones').select('tipo,resultado,nota,created_at').eq('publicador_id', pubId).order('created_at', { ascending: false }); if (error) throw error; return data || []; }
+      catch (e) { console.warn('verificaciones no disponibles', e); return null; }
+    }
+    return L.verif.get([]).filter(v => v.publicador_id === pubId);
+  };
+  S.docsEnviados = lista => { const t = {}; (lista || []).forEach(v => { if (v && /^Documento:/.test(v.nota || '') && v.resultado !== 'rechazada') t[v.tipo] = true; }); return t; };
 
   /* ── 8/10/2026 · Qué columnas pide cada lectura ──────────
      Ninguna lectura de portal.avisos pide `*`. La migración 23 deja a anon y authenticated con select por columna
@@ -380,21 +407,34 @@
      de la visita no se vuelve a pedir. Con la 23 corrida no cuesta ningún pedido de más; sin ella, uno por visita.
      (sessionStorage: una pestaña nueva vuelve a probar una vez; si la 23 se corre a mitad de una visita, esa pestaña la
      ve en la próxima.) */
-  const FALTA_23 = { disp: 'bp_sin_disponible_desde', vistas: 'bp_sin_vistas_de' };
+  const FALTA_23 = { disp: 'bp_sin_disponible_desde', vistas: 'bp_sin_vistas_de', unid: 'bp_sin_unidades_borrador' };
   const falta23Aca = {};   /* copia en memoria, por si el navegador no deja usar sessionStorage */
   const falta23 = k => { if (falta23Aca[k]) return true; try { return sessionStorage.getItem(FALTA_23[k]) === '1'; } catch (e) { return false; } };
   const anotarFalta23 = k => { falta23Aca[k] = true; try { sessionStorage.setItem(FALTA_23[k], '1'); } catch (e) { /* queda la copia en memoria */ } };
   /* PostgREST: 42703 "column avisos.disponible_desde does not exist" (select); PGRST204 "Could not find the
      'disponible_desde' column" (cache de esquema). Solo cuenta si el error nombra la columna. */
-  const faltaDisponible = e => !!e && /^(42703|PGRST204)$/.test(String(e.code || '')) && /disponible_desde/.test(String(e.message || '') + ' ' + String(e.details || '') + ' ' + String(e.hint || ''));
-  /* armar(extra) devuelve la consulta con extra (',disponible_desde' o '') sumado a las columnas del aviso. */
-  async function conDisponible(armar){
-    if (falta23('disp')) return armar('');
-    const r = await armar(',disponible_desde');
-    if (r && r.error && faltaDisponible(r.error)) { anotarFalta23('disp'); return armar(''); }
-    return r;
+  const textoError = e => String(e.message || '') + ' ' + String(e.details || '') + ' ' + String(e.hint || '');
+  const faltaColumna = (e, col) => !!e && /^(42703|PGRST204)$/.test(String(e.code || '')) && textoError(e).indexOf(col) > -1;
+  /* 8/10/2026 (venta) · Las columnas de avisos que trae la 23: disponible_desde (mediano plazo) y unidades_borrador (la
+     lista de unidades de un emprendimiento en borrador). armar(extra) devuelve la consulta con extra (',disponible_desde',
+     ',unidades_borrador', las dos o '') sumado a las columnas del aviso. Si la base contesta que una no existe, se anota
+     (FALTA_23) y se repite sin ella. */
+  const COL_23 = { disponible_desde: 'disp', unidades_borrador: 'unid' };
+  async function conColumnas23(armar, cols){
+    let extra = cols.filter(c => !falta23(COL_23[c]));
+    for (let i = 0; i <= cols.length; i++) {
+      const r = await armar(extra.map(c => ',' + c).join(''));
+      const cae = r && r.error ? extra.find(c => faltaColumna(r.error, c)) : null;
+      if (!cae) return r;
+      anotarFalta23(COL_23[cae]); extra = extra.filter(c => c !== cae);
+    }
+    return armar('');
   }
+  const conDisponible = armar => conColumnas23(armar, ['disponible_desde']);
   S.hayDisponibleDesde = () => !falta23('disp');   /* false si esta visita ya sabe que la base no tiene la columna */
+  /* false si la base no tiene unidades_borrador (sin la 23): la lista de unidades se guarda entonces en este navegador.
+     En modo local la base es este navegador y la columna "existe", salvo que una prueba anote lo contrario. */
+  S.hayUnidadesBorrador = () => !falta23('unid');
   /* El mail del propietario de unas filas, solo las que esta cuenta puede ver. filtro(q) pone el filtro. { id: mail }.
      Si no se pudo leer, {} y las filas quedan sin la clave: así guardar el aviso no pisa el mail con un vacío. */
   async function mailsPropietario(filtro){
@@ -414,7 +454,7 @@
   S.myAvisos = async function(){
     const pub = await S.getMyPublicador(); if (!pub) return [];
     if (S.mode === 'supabase') {
-      const { data } = await S.sb.schema('portal').from('avisos').select(COLS_AVISO + ',fotos(url,orden)').eq('publicador_id', pub.id).order('updated_at', { ascending:false });
+      const { data } = await conColumnas23(x => S.sb.schema('portal').from('avisos').select(COLS_AVISO + x + ',fotos(url,orden)').eq('publicador_id', pub.id).order('updated_at', { ascending:false }), ['unidades_borrador']);
       if (!data || DEMO) return data || [];
       return conMails(data, await mailsPropietario(q => q.eq('publicador_id', pub.id)));
     }
@@ -422,7 +462,7 @@
   };
   S.getAviso = async function(id){
     if (S.mode === 'supabase') {
-      const { data } = await conDisponible(x => S.sb.schema('portal').from('avisos').select(COLS_AVISO + x + ',fotos(url,orden)').eq('id', id).maybeSingle());
+      const { data } = await conColumnas23(x => S.sb.schema('portal').from('avisos').select(COLS_AVISO + x + ',fotos(url,orden)').eq('id', id).maybeSingle(), ['disponible_desde', 'unidades_borrador']);
       if (!data) return null;
       return DEMO ? data : conMails([data], await mailsPropietario(q => q.eq('id', id)))[0];
     }
@@ -455,6 +495,10 @@
     const fotos = rec.fotos || []; delete rec.fotos;
     /* 8/10/2026 (tanda 2) · disponible_desde (date, mediano plazo): vacío = null, nunca '' (Postgres no lo acepta como fecha) */
     if ('disponible_desde' in rec) rec.disponible_desde = rec.disponible_desde ? String(rec.disponible_desde).slice(0, 10) : null;
+    /* 8/10/2026 (venta) · unidades_borrador (jsonb, migración 23): una lista o null, nunca vacía. Si la base no tiene la
+       columna (o, en modo local, una prueba lo simula), no se manda: la página la guarda en el navegador. */
+    if ('unidades_borrador' in rec) rec.unidades_borrador = Array.isArray(rec.unidades_borrador) && rec.unidades_borrador.length ? rec.unidades_borrador : null;
+    if (falta23('unid')) delete rec.unidades_borrador;
     if (S.mode === 'supabase') {
       /* La columna la crea la migración 23. Si la base ya avisó que no la tiene, ni se manda. */
       if (S._sinDisponibleDesde) delete rec.disponible_desde;
@@ -463,13 +507,16 @@
          error de columna frena la consulta entera antes de grabar, así que no hay doble alta. */
       const grabar = cols => { const q = S.sb.schema('portal').from('avisos'); return rec.id ? q.update(rec).eq('id', rec.id).select(cols).single() : q.insert(rec).select(cols).single(); };
       const errCol = r => r.error && /42703|PGRST204|column/i.test(String(r.error.code || '') + ' ' + String(r.error.message || ''));
-      const nombraDD = r => /disponible_desde/i.test(String(r.error.message || '') + ' ' + String(r.error.details || '') + ' ' + String(r.error.hint || ''));
-      /* Sin la migración 23: si el aviso trae disponible_desde y la base contesta columna inexistente (42703, PGRST204 o
-         un mensaje que la nombra), se repite sin ese campo y el guardado sigue. Sigue valiendo el respaldo de `*` para el
-         .select(). Cada intento que falla por una columna frena antes de grabar: no hay doble alta. */
+      const nombra = (r, col) => textoError(r.error).toLowerCase().indexOf(col) > -1;
+      /* Sin la migración 23: si el aviso trae disponible_desde o unidades_borrador y la base contesta columna inexistente
+         (42703, PGRST204 o un mensaje que la nombra), se repite sin ese campo y el guardado sigue (y se anota, para no
+         volver a mandarlo). Sigue valiendo el respaldo de `*` para el .select(). Cada intento que falla por una columna
+         frena antes de grabar: no hay doble alta. */
+      const OPC = ['disponible_desde', 'unidades_borrador'];
       let cols = S.COLS.AVISO, res = await grabar(cols);
-      for (let intento = 0; intento < 3 && errCol(res); intento++) {
-        if ('disponible_desde' in rec && (nombraDD(res) || cols === '*')) { delete rec.disponible_desde; S._sinDisponibleDesde = true; res = await grabar(cols); }
+      for (let intento = 0; intento < 4 && errCol(res); intento++) {
+        const quitar = OPC.find(k => k in rec && nombra(res, k)) || (cols === '*' ? OPC.find(k => k in rec) : null);
+        if (quitar) { delete rec[quitar]; if (quitar === 'disponible_desde') S._sinDisponibleDesde = true; else anotarFalta23('unid'); res = await grabar(cols); }
         else if (cols !== '*') { cols = '*'; res = await grabar(cols); }
         else break;
       }
@@ -528,6 +575,15 @@
     const patch = Object.assign({ estado_curacion, motivo_rechazo: motivo || null, updated_at: now() }, extra || {}); if (estado_curacion === 'publicado') patch.publicado_en = now();
     S.track(estado_curacion === 'publicado' ? 'aviso_aprobado' : estado_curacion === 'rechazado' ? 'aviso_rechazado' : 'aviso_estado', { aviso_id: id, datos: { estado_curacion, motivo: motivo || null } });
     if (S.mode === 'supabase') { const { error } = await S.sb.schema('portal').from('avisos').update(patch).eq('id', id); if (error) throw error; try { if (window.BPData && BPData.olvidarCatalogo) BPData.olvidarCatalogo(); } catch (e) { /* nada */ } if (estado_curacion === 'publicado' && !(extra && extra.estado)) S.notify('aprobado', { aviso_id: id }); else if (estado_curacion === 'rechazado') S.notify('rechazado', { aviso_id: id, datos: { motivo } }); else if (estado_curacion === 'borrador' && motivo) S.notify('cambios', { aviso_id: id, datos: { motivo } }); return; }
+    const all = L.avisos.get([]); const a = all.find(x => x.id === id); if (a) Object.assign(a, patch); L.avisos.set(all);
+  };
+  /* 8/10/2026 (venta) · Reservada o disponible, sin tocar la curación: sirve igual en revisión que publicado. Antes el
+     panel lo hacía con setEstado(id, 'publicado', ...), que además reiniciaba publicado_en (y en revisión lo habría
+     publicado). Con la 23, cambiar el estado es libre para el dueño del aviso. */
+  S.setDisponibilidad = async function(id, estado){
+    if (['disponible', 'reservado'].indexOf(estado) === -1) throw new Error('estado desconocido');
+    const patch = { estado, updated_at: now() };
+    if (S.mode === 'supabase') { const { error } = await S.sb.schema('portal').from('avisos').update(patch).eq('id', id); if (error) throw error; try { if (window.BPData && BPData.olvidarCatalogo) BPData.olvidarCatalogo(); } catch (e) { /* nada */ } return; }
     const all = L.avisos.get([]); const a = all.find(x => x.id === id); if (a) Object.assign(a, patch); L.avisos.set(all);
   };
   /* 8/10/2026 · El catálogo: solo las columnas de la lista (COLS_LISTA) y TODO lo publicado, por tramos.
