@@ -1,32 +1,41 @@
 /* ── El movimiento de BAIREN ────────────────────────────────────────────────
-   Un solo lugar donde se decide cómo se mueve todo: el portal hoy y el OS después.
-   Sobre Motion (motion.dev), fijado en la versión 12.23.12 y servido desde el repo.
+   Un solo lugar donde se decide cómo se mueve todo. Sin bibliotecas: Web Animations
+   del navegador y CSS (css/transiciones.css). 8/10/2026 · Antes iba sobre Motion
+   (motion.js, 81 KB en cada página) y tenía doce efectos; quedan tres familias:
+
+   a) Aparición al entrar: opacidad de 0 a 1 y 10 px de subida, 280 ms, una vez por
+      elemento, escalonado de 40 ms con tope en 6.
+   b) Respuesta al toque: lo que se aprieta baja a .98 en 120 ms y vuelve.
+   c) Paneles: menú, hojas, filtros y visor se deslizan en 300 ms con fondo que se oscurece.
 
    Reglas de la casa
-   1. El movimiento aparece donde algo CAMBIA. Lo que simplemente está, está quieto.
-   2. Nada rebota. La curva es la misma de bairengroup.com: expo, decidida, sin volver.
-   3. El precio no se anima nunca (regla de Tomás, 19/8/2026: el precio se declara quieto).
-   4. Ninguna animación hace esperar. Si tarda, es un error, no un efecto.
-   5. Si la persona pidió menos movimiento en su sistema, no hay movimiento.
-   6. Si la librería no carga, la web funciona igual. Esto es un agregado, no un cimiento.
+   1. Una sola curva: cubic-bezier(.22,1,.36,1). Nada rebota.
+   2. El precio no se anima nunca (regla de Tomás, 19/8/2026).
+   3. Ninguna animación hace esperar: lo que está en pantalla ya se ve.
+   4. Con "menos movimiento" pedido en el sistema: sin desplazamientos ni escalas,
+      solo fundidos de hasta 150 ms.
+   5. Si esto no carga, la web funciona igual. Es un agregado, no un cimiento.
+
+   Salieron (eran de lucimiento): el titular que se armaba por palabras, la entrada
+   que barajaba letras, el hilo del estándar que se dibujaba, los contadores, los
+   sellos que se asentaban, la profundidad del hero, el rótulo que rodaba, la luz que
+   seguía al cursor en la barra y en el muro. El estándar queda dibujado y quieto.
    ───────────────────────────────────────────────────────────────────────── */
 (function () {
   'use strict';
 
-  var M = window.Motion || null;
   var quieto = false;
   try { quieto = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
-  var ok = !!(M && M.animate) && !quieto;
+  var hayWAAPI = typeof Element !== 'undefined' && typeof Element.prototype.animate === 'function';
+  var ok = hayWAAPI;   /* con menos movimiento igual hay fundidos cortos: anim() saca desplazamientos y escalas */
 
-  /* Vocabulario: duraciones en segundos, una sola curva, un solo resorte */
-  var CURVA = [0.22, 1, 0.36, 1];
-  var DUR = { toque: 0.18, rapido: 0.28, normal: 0.55, lento: 0.9 };
-  var RESORTE = { type: 'spring', stiffness: 220, damping: 40, mass: 1 }; // sólo para lo que se arrastra: hojas y cajones. Amortiguado, no rebota.
-  var SUBE = 20;      // cuánto sube algo al aparecer
-  var PASO = 0.055;   // demora entre hermanos
-  var TOPE = 8;       // a partir de acá el escalonado no crece más, para no hacer esperar
+  var CURVA = 'cubic-bezier(.22,1,.36,1)';
+  var DUR = { toque: 120, foto: 220, aparece: 280, panel: 300, sale: 240 };
+  var SUBE = 10;      // cuánto sube algo al aparecer (px)
+  var PASO = 40;      // demora entre hermanos (ms)
+  var TOPE = 5;       // escalonados: del 1 al 6, el resto entra con el sexto
 
-  var BPM = { ok: ok, hayMotion: !!M, CURVA: CURVA, DUR: DUR, RESORTE: RESORTE };
+  var BPM = { ok: ok, quieto: quieto, CURVA: CURVA, DUR: DUR };
 
   function lista(x) {
     if (!x) return [];
@@ -34,178 +43,150 @@
     if (x.length !== undefined && !x.tagName) return Array.prototype.slice.call(x);
     return [x];
   }
-  function escalonado(i) { return Math.min(i, TOPE) * PASO; }
 
-  /* ── Aparecer: lo que entra en pantalla sube y se revela ──────────────────
-     Reemplaza al observador viejo. Los hermanos de una misma grilla entran
-     escalonados; los bloques sueltos entran solos. */
+  /* Una animación con la curva de la casa. Con menos movimiento: solo la opacidad, 150 ms como mucho.
+     Devuelve una promesa que se cumple al terminar (o enseguida si no hay nada que animar). */
+  /* Lo que dejó una animación anterior de la casa (una salida queda "puesta" hasta que se cierra el panel) */
+  function limpiar(el) {
+    try { el.getAnimations().forEach(function (a) { if (a.id === 'bp') a.cancel(); }); } catch (e) {}
+  }
+  function anim(el, kf, o) {
+    o = o || {};
+    if (!el || !hayWAAPI) return Promise.resolve();
+    limpiar(el);
+    if (quieto) {
+      if (!kf.opacity) return Promise.resolve();
+      kf = { opacity: kf.opacity };
+      o = { duration: Math.min(o.duration || 150, 150), fill: o.fill };
+    }
+    try {
+      var a = el.animate(kf, { id: 'bp', duration: o.duration || DUR.aparece, delay: o.delay || 0, easing: o.easing || CURVA, fill: o.fill || 'none' });
+      /* Una salida queda puesta hasta que quien la pidió esconde el panel; después se suelta, para no
+         dejar un estado viejo pegado a la próxima vez que se abra */
+      if (o.fill === 'forwards') a.finished.then(function () { requestAnimationFrame(function () { requestAnimationFrame(function () { try { a.cancel(); } catch (e) {} }); }); }, function () {});
+      return a.finished.then(function () { return a; }, function () { return a; });
+    } catch (e) { return Promise.resolve(); }
+  }
+  BPM.anim = anim;
+
+  function enPantalla(el) {
+    var r = el.getBoundingClientRect();
+    return r.bottom > 0 && r.top < (window.innerHeight || 800) && r.width > 0;
+  }
+
+  /* ── a) Aparecer: sube 10 px y se revela, escalonado corto ────────────── */
   BPM.aparecer = function (els, opts) {
     els = lista(els); if (!els.length) return;
-    if (!ok) { els.forEach(function (e) { e.style.opacity = ''; e.style.transform = ''; e.classList.add('in'); }); return; }
     opts = opts || {};
-    els.forEach(function (e) { e.style.transition = 'none'; e.classList.add('in'); });
-    M.animate(els,
-      { opacity: [0, 1], transform: ['translateY(' + (opts.sube || SUBE) + 'px)', 'translateY(0px)'] },
-      { duration: opts.duracion || DUR.normal, ease: CURVA, delay: M.stagger ? M.stagger(Math.min(opts.paso || PASO, 0.4 / Math.max(1, els.length - 1))) : 0 }
-    ).finished.then(function () { els.forEach(function (e) { e.style.transition = ''; }); }, function () {});
+    els.forEach(function (e, i) {
+      e.classList.add('in');
+      anim(e, { opacity: [0, 1], transform: ['translateY(' + (opts.sube || SUBE) + 'px)', 'translateY(0px)'] },
+        { duration: opts.duracion || DUR.aparece, delay: Math.min(i, TOPE) * PASO, fill: 'backwards' });
+    });
   };
 
-  /* ── Reacomodar (FLIP): al filtrar, las tarjetas viajan a su lugar nuevo ──
-     Se mide dónde estaba cada una, se vuelve a dibujar la lista, y se anima
-     la diferencia. Las que llegan nuevas suben y se revelan. */
+  /* Al filtrar se vuelve a dibujar la lista: las tarjetas que llegan nuevas y se ven, aparecen.
+     Las que ya estaban no viajan (antes había un FLIP de 550 ms): el resultado está al instante. */
   BPM.reacomodar = function (cont, dibujar) {
     if (!cont || typeof dibujar !== 'function') return;
-    if (!ok) { dibujar(); return; }
     var antes = {};
-    lista(cont.querySelectorAll('[data-flip]')).forEach(function (el) {
-      antes[el.getAttribute('data-flip')] = el.getBoundingClientRect();
-    });
+    lista(cont.querySelectorAll('[data-flip]')).forEach(function (el) { antes[el.getAttribute('data-flip')] = 1; });
     dibujar();
-    var nuevos = [];
-    lista(cont.querySelectorAll('[data-flip]')).forEach(function (el) {
-      var b = antes[el.getAttribute('data-flip')];
-      var a = el.getBoundingClientRect();
-      if (!b) { nuevos.push(el); return; }
-      var dx = Math.round(b.left - a.left), dy = Math.round(b.top - a.top);
-      if (Math.abs(dx) < 2 && Math.abs(dy) < 2) return;
-      M.animate(el,
-        { transform: ['translate(' + dx + 'px,' + dy + 'px)', 'translate(0px,0px)'] },
-        { duration: DUR.normal, ease: CURVA }
-      );
-    });
-    if (nuevos.length) BPM.aparecer(nuevos, { sube: 16, duracion: DUR.normal });
+    if (!ok || quieto) return;
+    var nuevos = lista(cont.querySelectorAll('[data-flip]')).filter(function (el) { return !antes[el.getAttribute('data-flip')] && enPantalla(el); });
+    if (nuevos.length) BPM.aparecer(nuevos.slice(0, 12));
   };
 
-  /* ── Entrar y salir: diálogos, cajón de filtros, hoja de barrios, visor ── */
-  BPM.entrar = function (el, desde) {
-    el = lista(el)[0]; if (!el || !ok) return Promise.resolve();
-    var de = desde === 'abajo' ? { transform: ['translateY(24px)', 'translateY(0px)'], opacity: [0, 1] }
-           : desde === 'derecha' ? { transform: ['translateX(28px)', 'translateX(0px)'], opacity: [0, 1] }
-           : { transform: ['translateY(10px)', 'translateY(0px)'], opacity: [0, 1] };
-    return M.animate(el, de, { duration: DUR.rapido, ease: CURVA }).finished;
+  /* ── c) Paneles: entrar y salir (diálogos, hoja de compartir, visor, "¿Quién publica?") ── */
+  function desde(lado, cuanto) {
+    return lado === 'hoja' ? 'translateY(100%)'
+      : lado === 'abajo' ? 'translateY(' + (cuanto || 16) + 'px)'
+      : lado === 'derecha' ? 'translateX(' + (cuanto || 24) + 'px)'
+      : 'translateY(' + (cuanto || 8) + 'px)';
+  }
+  /* lado: 'hoja' (sube entera desde abajo), 'abajo' (16 px), 'derecha' (24 px), 'fundido' (solo opacidad,
+     para los fondos que oscurecen) o nada (8 px). */
+  var opacidad = function (el) { var o = parseFloat(getComputedStyle(el).opacity); return isNaN(o) ? 1 : o; };
+  var esFondo = function (el, lado) { return lado === 'fundido' || (!lado && el.classList && el.classList.contains('velo')); };
+  BPM.entrar = function (el, lado) {
+    el = lista(el)[0]; if (!el) return Promise.resolve();
+    limpiar(el);
+    if (esFondo(el, lado)) lado = 'fundido';
+    var kf = lado === 'fundido' ? {} : { transform: [desde(lado), 'translateY(0px)'] };
+    if (lado !== 'hoja') kf.opacity = [0, lado === 'fundido' ? opacidad(el) : 1];
+    return anim(el, kf, { duration: DUR.panel });
   };
-  BPM.salir = function (el, desde) {
-    el = lista(el)[0]; if (!el || !ok) return Promise.resolve();
-    var a = desde === 'abajo' ? { transform: 'translateY(16px)', opacity: 0 }
-          : desde === 'derecha' ? { transform: 'translateX(20px)', opacity: 0 }
-          : { transform: 'translateY(6px)', opacity: 0 };
-    return M.animate(el, a, { duration: DUR.toque, ease: 'easeIn' }).finished;
-  };
-
-  /* ── Profundidad: la foto del hero va más lenta que el scroll, el titular se retira.
-     Sutil a propósito: 8 % de recorrido. Se nota como calidad, no como efecto. */
-  BPM.profundidad = function (contenedor, foto, titular) {
-    if (!ok || !M.scroll) return;
-    var cont = lista(contenedor)[0]; if (!cont) return;
-    var f = lista(foto)[0], t = lista(titular)[0];
-    try {
-      if (f) M.scroll(M.animate(f, { transform: ['translateY(0%)', 'translateY(8%)'] }, { ease: 'linear' }),
-        { target: cont, offset: ['start start', 'end start'] });
-      if (t) M.scroll(M.animate(t, { opacity: [1, 0], transform: ['translateY(0px)', 'translateY(28px)'] }, { ease: 'linear' }),
-        { target: cont, offset: ['start start', 'end start'] });
-    } catch (e) {}
+  BPM.salir = function (el, lado) {
+    el = lista(el)[0]; if (!el) return Promise.resolve();
+    limpiar(el);
+    if (esFondo(el, lado)) lado = 'fundido';
+    var kf = lado === 'fundido' ? {} : { transform: ['translateY(0px)', desde(lado, lado === 'abajo' ? 12 : 6)] };
+    if (lado !== 'hoja') kf.opacity = [lado === 'fundido' ? opacidad(el) : 1, 0];
+    return anim(el, kf, { duration: DUR.sale, fill: 'forwards' });
   };
 
-  /* ── Sello: la verificación se asienta al entrar en pantalla.
-     Es la tesis de BAIREN hecha visible: alguien revisó esto. Una sola vez. */
-  BPM.sellos = function (root) {
-    if (!ok || !M.inView) return;
-    lista((root || document).querySelectorAll('.p-badge, .p-cta-verif, .amenity')).forEach(function (el, i) {
-      if (el._sello) return; el._sello = true;
-      M.inView(el, function () {
-        M.animate(el, { opacity: [0, 1], transform: ['translateY(6px)', 'translateY(0px)'] },
-          { duration: DUR.normal, ease: CURVA, delay: escalonado(i % 6) });
-      }, { amount: 0.6 });
-    });
-  };
-
-  /* ── Contar: sólo estadísticas de mercado. Nunca un precio. ─────────────── */
-  BPM.contar = function (root) {
-    if (!ok || !M.inView) return;
-    lista((root || document).querySelectorAll('[data-countup]')).forEach(function (el) {
-      if (el._cont) return; el._cont = true;
-      M.inView(el, function () {
-        var fin = el.textContent, m = fin.match(/([\d.,]{2,})/); if (!m) return;
-        var meta = parseInt(m[1].replace(/[.,]/g, ''), 10); if (!meta) return;
-        var sep = m[1].indexOf('.') > -1 ? '.' : (m[1].indexOf(',') > -1 ? ',' : '');
-        el.style.fontVariantNumeric = 'tabular-nums';
-        M.animate(0, meta, {
-          duration: 1.4, ease: CURVA,
-          onUpdate: function (v) {
-            var s = Math.round(v).toString();
-            if (sep) s = s.replace(/\B(?=(\d{3})+(?!\d))/g, sep);
-            el.textContent = fin.replace(m[1], s);
-          },
-          onComplete: function () { el.textContent = fin; el.style.fontVariantNumeric = ''; }
-        });
-      }, { amount: 0.6 });
-    });
-  };
-
-  /* ── El dedo y el cursor ────────────────────────────────────────────────
-     Nada de hundidos ni de resortes: eso lee a aplicación, no a inmobiliaria.
-     Lo que se aprieta baja un punto de luz durante un instante y vuelve.
-     Es lo que hace una marca cara: se siente, no se ve. */
-  BPM.tacto = function (root) {
-    if (!ok || !M.press) return;
-    var sel = '.p-btn, .p-btn-fill, .p-fbtn, .p-icon-btn, .card-cta, .camino, .p-tab, .p-chip, .p-quick button, .p-report .chips button, .p-ac-link, .soc, button.p-linkbtn';
-    lista((root || document).querySelectorAll(sel)).forEach(function (el) {
-      if (el._tacto) return; el._tacto = true;
-      try {
-        M.press(el, function () {
-          M.animate(el, { opacity: 0.82 }, { duration: 0.08, ease: 'linear' });
-          return function () { M.animate(el, { opacity: 1 }, { duration: 0.22, ease: CURVA }); };
-        });
-      } catch (e) { el._tacto = false; }
-    });
-  };
-
-  /* ── Abrir desde: el elemento crece desde donde estaba, no aparece de la nada.
-     Es la transición que usan las casas de subastas para mostrar una obra:
-     el ojo no pierde de vista la foto que eligió. */
+  /* El visor crece desde la foto que se tocó, y vuelve a ella al cerrarse */
+  function viaje(a, b) {
+    var o = a.getBoundingClientRect(), d = b.getBoundingClientRect();
+    if (!o.width || !d.width) return null;
+    return 'translate(' + ((o.left + o.width / 2) - (d.left + d.width / 2)) + 'px,' + ((o.top + o.height / 2) - (d.top + d.height / 2)) + 'px) scale(' + (o.width / d.width).toFixed(4) + ',' + (o.height / d.height).toFixed(4) + ')';
+  }
   BPM.abrirDesde = function (destino, origen) {
     destino = lista(destino)[0]; origen = lista(origen)[0];
-    if (!ok || !destino || !origen) return Promise.resolve();
-    var o = origen.getBoundingClientRect(), d = destino.getBoundingClientRect();
-    if (!o.width || !d.width) return Promise.resolve();
-    var sx = o.width / d.width, sy = o.height / d.height;
-    var dx = (o.left + o.width / 2) - (d.left + d.width / 2);
-    var dy = (o.top + o.height / 2) - (d.top + d.height / 2);
-    return M.animate(destino, {
-      transform: ['translate(' + dx + 'px,' + dy + 'px) scale(' + sx.toFixed(4) + ',' + sy.toFixed(4) + ')', 'translate(0px,0px) scale(1,1)'],
-      opacity: [0.55, 1]
-    }, { duration: DUR.normal, ease: CURVA }).finished;
+    if (!destino) return Promise.resolve();
+    var t = origen ? viaje(origen, destino) : null;
+    if (!t) return anim(destino, { opacity: [0, 1], transform: ['scale(.98)', 'scale(1)'] }, { duration: DUR.panel });
+    return anim(destino, { transform: [t, 'translate(0px,0px) scale(1,1)'], opacity: [0.6, 1] }, { duration: DUR.panel });
   };
-  BPM.cerrarHacia = function (origenDelViaje, destinoFisico) {
-    var el = lista(origenDelViaje)[0], dst = lista(destinoFisico)[0];
-    if (!ok || !el) return Promise.resolve();
-    if (!dst) return M.animate(el, { opacity: 0 }, { duration: DUR.toque, ease: 'easeIn' }).finished;
-    var o = dst.getBoundingClientRect(), d = el.getBoundingClientRect();
-    if (!o.width || !d.width) return M.animate(el, { opacity: 0 }, { duration: DUR.toque }).finished;
-    var sx = o.width / d.width, sy = o.height / d.height;
-    var dx = (o.left + o.width / 2) - (d.left + d.width / 2);
-    var dy = (o.top + o.height / 2) - (d.top + d.height / 2);
-    return M.animate(el, {
-      transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + sx.toFixed(4) + ',' + sy.toFixed(4) + ')',
-      opacity: 0.4
-    }, { duration: DUR.rapido, ease: CURVA }).finished;
+  BPM.cerrarHacia = function (el, dst) {
+    el = lista(el)[0]; dst = lista(dst)[0];
+    if (!el) return Promise.resolve();
+    var t = dst ? viaje(dst, el) : null;
+    if (!t) return anim(el, { opacity: [1, 0] }, { duration: DUR.sale, fill: 'forwards' });
+    return anim(el, { transform: ['translate(0px,0px) scale(1,1)', t], opacity: [1, 0.4] }, { duration: DUR.sale, fill: 'forwards' });
   };
 
-  /* ── Cambiar de foto: la que sale se va para un lado, la que entra llega del otro. */
+  /* ── El visor sigue al dedo: la foto se corre con el arrastre; si no alcanza para pasar, vuelve.
+     Pasar de foto (el umbral y el cambio) lo decide la ficha; acá solo se acompaña el gesto. */
   BPM.pasarFoto = function (el, direccion) {
-    el = lista(el)[0]; if (!ok || !el) return;
+    el = lista(el)[0]; if (!el) return;
+    el._pasada = performance.now();
+    var arr = parseFloat(el.style.translate) || 0;
+    el.style.translate = ''; el.style.opacity = '';
     var d = direccion < 0 ? -1 : 1;
-    M.animate(el, {
-      transform: ['translateX(' + (26 * d) + 'px)', 'translateX(0px)'],
-      opacity: [0, 1]
-    }, { duration: DUR.rapido, ease: CURVA });
+    anim(el, { translate: [(40 * d) + 'px 0px', '0px 0px'], opacity: [arr ? 0.35 : 0.2, 1] }, { duration: DUR.foto });
+  };
+  BPM.arrastrar = function (marco, img) {
+    marco = lista(marco)[0]; img = lista(img)[0];
+    if (!marco || !img || marco._arrastre || quieto) return; marco._arrastre = true;
+    var x0 = null, id = null, dx = 0;
+    marco.addEventListener('pointerdown', function (e) { if (e.button > 0) return; x0 = e.clientX; id = e.pointerId; dx = 0; }, { passive: true });
+    marco.addEventListener('pointermove', function (e) {
+      if (x0 === null || e.pointerId !== id) return;
+      dx = e.clientX - x0; if (Math.abs(dx) < 4) return;
+      img.style.translate = Math.round(dx * 0.9) + 'px 0px';
+      img.style.opacity = String(1 - Math.min(Math.abs(dx) / 700, 0.3));
+    }, { passive: true });
+    var soltar = function () {
+      if (x0 === null) return; x0 = null;
+      var hecho = dx; dx = 0;
+      if (Math.abs(hecho) < 4) return;
+      /* La ficha escucha el mismo gesto: si pasó de foto, pasarFoto ya se ocupó */
+      setTimeout(function () {
+        if (img._pasada && performance.now() - img._pasada < 200) return;
+        var desdeX = img.style.translate || '0px 0px', op = parseFloat(img.style.opacity) || 1;
+        img.style.translate = ''; img.style.opacity = '';
+        anim(img, { translate: [desdeX, '0px 0px'], opacity: [op, 1] }, { duration: DUR.foto });
+      }, 0);
+    };
+    marco.addEventListener('pointerup', soltar);
+    marco.addEventListener('pointercancel', soltar);
   };
 
   /* ── Copiar: el ícono se cambia por una tilde y el rótulo lo dice. Sin festejos. */
   BPM.copiar = function (boton, texto, rotulo) {
     if (!boton) return Promise.resolve(false);
-    var previo = boton.getAttribute('data-copiado') === '1';
-    if (previo) return Promise.resolve(true);
+    if (boton.getAttribute('data-copiado') === '1') return Promise.resolve(true);
     var hacer = navigator.clipboard && navigator.clipboard.writeText
       ? navigator.clipboard.writeText(texto)
       : new Promise(function (res, rej) {
@@ -216,14 +197,12 @@
       var original = boton.innerHTML;
       boton.setAttribute('data-copiado', '1');
       boton.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>' + (rotulo || 'Copiado');
-      if (ok) M.animate(boton.firstChild, { opacity: [0, 1], transform: ['translateY(4px)', 'translateY(0px)'] }, { duration: DUR.rapido, ease: CURVA });
       setTimeout(function () { boton.innerHTML = original; boton.removeAttribute('data-copiado'); }, 2000);
       return true;
     }, function () { return false; });
   };
 
-  /* ── Cambio de paso: la tarjeta cambia de alto y el contenido cruza de lado.
-     Es lo que separa un formulario de un producto: el paso no salta, se corre. */
+  /* ── Cambio de paso (Ingresar): la caja cambia de alto y el paso nuevo entra de costado */
   BPM.cambioDePaso = function (cont, cambiar, dir) {
     cont = lista(cont)[0];
     if (!cont || typeof cambiar !== 'function') return;
@@ -231,350 +210,139 @@
     var h0 = cont.getBoundingClientRect().height;
     cambiar();
     var h1 = cont.getBoundingClientRect().height;
-    cont.style.overflow = 'hidden';
-    M.animate(cont, { height: [h0 + 'px', h1 + 'px'] }, { duration: DUR.rapido, ease: CURVA })
-      .finished.then(function () { cont.style.height = ''; cont.style.overflow = ''; },
-                     function () { cont.style.height = ''; cont.style.overflow = ''; });
+    if (!quieto && Math.abs(h1 - h0) > 1) {
+      cont.style.overflow = 'hidden';
+      anim(cont, { height: [h0 + 'px', h1 + 'px'] }, { duration: DUR.panel }).then(function () { cont.style.overflow = ''; });
+    }
     var visible = cont.querySelector('form:not([hidden]), [data-paso]:not([hidden])');
-    if (visible) M.animate(visible,
-      { opacity: [0, 1], transform: ['translateX(' + (14 * (dir === -1 ? -1 : 1)) + 'px)', 'translateX(0px)'] },
-      { duration: DUR.normal, ease: CURVA });
+    if (visible) anim(visible, { opacity: [0, 1], transform: ['translateX(' + (10 * (dir === -1 ? -1 : 1)) + 'px)', 'translateX(0px)'] }, { duration: DUR.aparece });
   };
 
-  /* ── Sello: BAIREN no festeja una operación, la deja asentada.
-     Una palabra en oro se estampa sobre la unidad y después la fila se apaga.
-     Es un registro, no una fiesta: la operación es de quien publica, no nuestra. */
-  BPM.sello = function (destino, texto) {
+  /* ── Reservar (panel): la fila queda apagada. Ya no se estampa una palabra encima. */
+  BPM.sello = function (destino) {
     destino = lista(destino)[0];
-    if (!destino) return Promise.resolve();
-    if (getComputedStyle(destino).position === 'static') destino.style.position = 'relative';
-    var el = document.createElement('span');
-    el.className = 'p-sello'; el.textContent = texto || 'Reservada'; el.setAttribute('aria-hidden', 'true');
-    destino.appendChild(el);
-    var sacar = function () { el.remove(); destino.classList.add('sellado'); };
-    if (!ok) { setTimeout(sacar, 1400); return Promise.resolve(); }
-    return M.animate(el,
-      { opacity: [0, 1], transform: ['rotate(-8deg) scale(1.3)', 'rotate(-8deg) scale(1)'] },
-      { duration: 0.34, ease: CURVA }
-    ).finished.then(function () {
-      return M.animate(el, { opacity: 0 }, { duration: 0.5, delay: 1.1, ease: 'easeIn' }).finished;
-    }).then(sacar, sacar);
+    if (destino) destino.classList.add('sellado');
+    return Promise.resolve();
   };
 
-  /* ── Rodar: el rótulo sube y una copia llega desde abajo. Un solo giro,
-     nunca en bucle: en bucle deja de ser un botón y pasa a ser una marquesina. */
-  BPM.rodar = function (root) {
-    if (!ok) return;
-    lista((root || document).querySelectorAll('[data-rueda]')).forEach(function (b) {
-      if (b._rueda) return; b._rueda = true;
-      var txt = b.getAttribute('data-rueda') || b.textContent.trim();
-      b.innerHTML = '<span class="rd"><span class="a">' + txt + '</span><span class="b" aria-hidden="true">' + txt + '</span></span>';
-      var caja = b.querySelector('.rd');
-      var girando = false;
-      var girar = function () {
-        if (girando) return; girando = true;
-        M.animate(caja, { transform: ['translateY(0%)', 'translateY(-50%)'] }, { duration: 0.42, ease: CURVA })
-          .finished.then(function () { caja.style.transform = 'translateY(0%)'; girando = false; }, function () { girando = false; });
-      };
-      b.addEventListener('mouseenter', girar);
-      b.addEventListener('focus', girar);
-    });
-  };
-
-  /* ── Entrada: el nombre se arma desde el ruido y queda. Una vez por sesión,
-     sólo en la portada, con tope de tiempo. Una intro es un peaje: se cobra
-     una sola vez y barato, o no se cobra. */
-  BPM.entrada = function (palabra, opts) {
-    /* Usa el velo de carga del <head> (una sola capa navy, no dos) y arma la
-       palabra letra por letra en su .w. Si el velo ya se fue, no hay entrada. */
-    opts = opts || {};
-    var V = window.BPVelo, w = document.querySelector('.p-velo .w');
-    if (!V || !w || !document.documentElement.classList.contains('cargando')) return;
-    /* 8/10/2026 · La pantalla de carga se va apenas hay contenido y nunca dura más de 1,5 s (ui.js): la entrada
-       ya no la retiene. La palabra se arma mientras el velo esté puesto; si la portada está lista antes, el
-       velo cae igual y la entrada se corta. */
-    var TOPE = opts.tope || 780;
-    try { if (sessionStorage.getItem('bairen-entrada') === '1') return; sessionStorage.setItem('bairen-entrada', '1'); } catch (e) {}
-    if (!ok) return;
-    palabra = (palabra || 'BAIREN').toUpperCase();
-    w.style.animation = 'none'; w.style.opacity = '1';
-    var glifos = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    var fijas = 0, t0 = performance.now();
-    (function tick(now) {
-      if (!document.documentElement.classList.contains('cargando')) { w.textContent = palabra; return; }
-      var t = Math.min((now - t0) / TOPE, 1);
-      fijas = Math.floor(t * t * palabra.length);
-      var out = '';
-      for (var i = 0; i < palabra.length; i++) out += i < fijas ? palabra[i] : glifos[(Math.random() * glifos.length) | 0];
-      w.textContent = out;
-      if (t < 1) requestAnimationFrame(tick);
-      else w.textContent = palabra;
-    })(t0);
-  };
-
-  /* ── Titular por palabras: cada una sube desde abajo detrás de una máscara.
-     Es el gesto de las casas de moda y de las galerías. No aparece: entra. */
-  BPM.titular = function (el, opts) {
-    el = lista(el)[0]; if (!el) return;
-    if (el._titular) return; el._titular = true;
-    opts = opts || {};
-    var lineas = el.querySelectorAll('.hline');
-    var fuentes = lineas.length ? lineas : [el];
-    var piezas = [];
-    Array.prototype.forEach.call(fuentes, function (ln) {
-      var palabras = (ln.textContent || '').trim().split(/\s+/);
-      ln.textContent = '';
-      palabras.forEach(function (w, i) {
-        var caja = document.createElement('span'); caja.className = 'p-msk';
-        var dentro = document.createElement('span'); dentro.className = 'p-msk-in';
-        dentro.textContent = w + (i < palabras.length - 1 ? '\u00A0' : '');
-        caja.appendChild(dentro); ln.appendChild(caja); piezas.push(dentro);
-      });
-    });
-    if (!ok) { piezas.forEach(function (x) { x.style.transform = 'none'; }); return; }
-    piezas.forEach(function (x) { x.style.transform = 'translateY(110%)'; });
-    M.animate(piezas, { transform: ['translateY(110%)', 'translateY(0%)'] },
-      { duration: 0.6, ease: CURVA, delay: M.stagger(0.05, { startDelay: opts.demora || 0 }) });
-  };
-
-  /* ── La barra de arriba con las dos luces del spotlight navbar:
-     una sigue al cursor desde abajo; la otra marca dónde estás con una línea
-     de oro que se desliza de una sección a la otra, con su halo encima. */
-  BPM.foco = function (barra) {
-    barra = lista(barra)[0]; if (!barra || barra._foco) return; barra._foco = true;
-    var nav = barra.querySelector(':scope > .p-nav-menu') || barra.querySelector('.p-nav-menu:not(.p-nav-right .p-nav-menu)') || barra;
-    var luz = nav.querySelector('.p-foco'), haz = nav.querySelector('.p-ambiente');
-    if (!luz) { luz = document.createElement('span'); luz.className = 'p-foco'; luz.setAttribute('aria-hidden', 'true'); nav.insertBefore(luz, nav.firstChild); }
-    if (!haz) { haz = document.createElement('span'); haz.className = 'p-ambiente'; haz.setAttribute('aria-hidden', 'true'); nav.insertBefore(haz, nav.firstChild); }
-    var items = function () { return nav.querySelectorAll(':scope > div > button, :scope > a'); };
-    var medir = function (el) { if (!el) return null; var r = el.getBoundingClientRect(), n = nav.getBoundingClientRect(); if (!r.width) return null; return { x: r.left - n.left, w: r.width }; };
-    var elActivo = function () {
-      return nav.querySelector('[aria-expanded="true"]')
-          || nav.querySelector('[aria-current="page"]')
-          || items()[0];
-    };
-    var poner = function (x, w) { nav.style.setProperty('--ambiente-x', x + 'px'); nav.style.setProperty('--ambiente-w', w + 'px'); };
-    var mover = function (el, rapido) {
-      var m = medir(el); if (!m) { haz.style.opacity = '0'; return; }
-      haz.style.opacity = '1';
-      var x0 = parseFloat(nav.style.getPropertyValue('--ambiente-x'));
-      var w0 = parseFloat(nav.style.getPropertyValue('--ambiente-w'));
-      if (!ok || isNaN(x0)) { poner(m.x, m.w); return; }
-      var cfg = { type: 'spring', stiffness: rapido ? 300 : 200, damping: 32 };
-      M.animate(x0, m.x, Object.assign({ onUpdate: function (v) { nav.style.setProperty('--ambiente-x', v + 'px'); } }, cfg));
-      M.animate(isNaN(w0) ? m.w : w0, m.w, Object.assign({ onUpdate: function (v) { nav.style.setProperty('--ambiente-w', v + 'px'); } }, cfg));
-    };
-    var alActivo = function () { mover(elActivo()); };
-    alActivo();
-    window.addEventListener('resize', alActivo);
-    setTimeout(alActivo, 400);
-    if (!ok) return;
-    nav.addEventListener('pointermove', function (e) {
-      if (e.pointerType === 'touch') return;
-      var n = nav.getBoundingClientRect();
-      nav.style.setProperty('--foco-x', (e.clientX - n.left) + 'px');
-      luz.style.opacity = '1';
-    });
-    nav.addEventListener('pointerover', function (e) {
-      var it = e.target.closest && e.target.closest('button, a');
-      if (it && nav.contains(it)) mover(it, true);
-    });
-    nav.addEventListener('pointerleave', function () { luz.style.opacity = '0'; alActivo(); });
-    /* Arriba de todo la barra es navy pleno; apenas se baja pasa a vidrio */
-    var marcar = function () { barra.classList.toggle('bajado', (window.scrollY || 0) > 8); };
-    marcar(); window.addEventListener('scroll', marcar, { passive: true });
-  };
-
-  /* ── Muro de publicadores: cuadrícula con líneas de separación y una luz que
-     sigue al cursor. Si son más de los que entran, las tandas se alternan.
-     Nunca inventa: sólo entran los publicadores reales. */
+  /* ── Muro de publicadores: si son más de los que entran, las tandas se alternan con un fundido.
+     La de atrás no recibe toques. Con menos movimiento, queda la primera tanda quieta. */
   BPM.muro = function (cont, opts) {
     cont = lista(cont)[0]; if (!cont || cont._muro) return; cont._muro = true;
     opts = opts || {};
-    var tandas = cont.querySelectorAll('.tanda');
-    cont.addEventListener('pointermove', function (e) {
-      if (e.pointerType === 'touch') return;
-      var r = cont.getBoundingClientRect();
-      cont.style.setProperty('--mx', (e.clientX - r.left) + 'px');
-      cont.style.setProperty('--my', (e.clientY - r.top) + 'px');
-      cont.classList.add('con-luz');
-    });
-    cont.addEventListener('pointerleave', function () { cont.classList.remove('con-luz'); });
-    if (!ok || tandas.length < 2) return;
+    var tandas = lista(cont.querySelectorAll('.tanda'));
+    var mostrar = function (t, si) { t.style.opacity = si ? '1' : '0'; t.style.visibility = si ? 'visible' : 'hidden'; t.style.zIndex = si ? '2' : '1'; t.setAttribute('aria-hidden', si ? 'false' : 'true'); };
+    tandas.forEach(function (t, n) { mostrar(t, n === 0); });
+    if (tandas.length < 2 || quieto) return;
     var i = 0;
     setInterval(function () {
-      if (document.hidden) return;
+      if (document.hidden || cont.matches(':hover') || cont.contains(document.activeElement)) return;
       var sale = tandas[i], entra = tandas[(i + 1) % tandas.length];
-      M.animate(sale, { opacity: [1, 0], transform: ['translateY(0px)', 'translateY(-10px)'] }, { duration: DUR.normal, ease: CURVA });
-      entra.style.zIndex = '2'; sale.style.zIndex = '1';
-      M.animate(entra, { opacity: [0, 1], transform: ['translateY(10px)', 'translateY(0px)'] }, { duration: DUR.normal, ease: CURVA, delay: 0.08 });
+      mostrar(entra, true); mostrar(sale, false); sale.style.visibility = 'visible';
+      anim(entra, { opacity: [0, 1] }, { duration: DUR.panel });
+      anim(sale, { opacity: [1, 0] }, { duration: DUR.panel }).then(function () { if (sale.style.opacity === '0') sale.style.visibility = 'hidden'; });
       i = (i + 1) % tandas.length;
     }, (opts.cada || 4.2) * 1000);
   };
 
-  /* ── Botón de producción con IA: mientras trabaja, una luz de oro recorre el
-     rótulo. Sin destellos de neón: acá la IA vuelve a sacar una foto, no hace magia. */
-  BPM.produciendo = function (b, encendido) {
-    b = lista(b)[0]; if (!b) return;
-    b.classList.toggle('p-gen', !!encendido);
-    b.setAttribute('aria-busy', encendido ? 'true' : 'false');
-    if (!encendido || !ok) return;
-    M.animate(b, { opacity: [1, 1] }, { duration: 0.01 });
-  };
-
-  /* ── El mismo foco, en el menú del celular. Sin cursor, la luz marca dónde
-     estás y viaja al ítem que tocás; los enlaces entran escalonados al abrir. */
-  BPM.focoMovil = function (menu) {
-    menu = lista(menu)[0]; if (!menu || menu._focoM) return; menu._focoM = true;
-    var haz = document.createElement('span'); haz.className = 'p-ambiente-m'; haz.setAttribute('aria-hidden', 'true');
-    menu.insertBefore(haz, menu.firstChild);
-    var links = function () { return menu.querySelectorAll('.m-link'); };
-    var actual = location.pathname.split('/').pop() + location.search;
-    var activo = function () {
-      var l = links(); for (var i = 0; i < l.length; i++) { var h = l[i].getAttribute('href') || ''; if (h && actual.indexOf(h) === 0) return l[i]; }
-      return l[0];
-    };
-    var poner = function (y, h) { menu.style.setProperty('--haz-y', y + 'px'); menu.style.setProperty('--haz-h', h + 'px'); };
-    var mover = function (el, rapido) {
-      if (!el) { haz.style.opacity = '0'; return; }
-      var r = el.getBoundingClientRect(), n = menu.getBoundingClientRect();
-      if (!r.height) { haz.style.opacity = '0'; return; }
-      haz.style.opacity = '1';
-      var y = r.top - n.top + menu.scrollTop, y0 = parseFloat(menu.style.getPropertyValue('--haz-y'));
-      if (!ok || isNaN(y0)) { poner(y, r.height); return; }
-      poner(y0, r.height);
-      M.animate(y0, y, { type: 'spring', stiffness: rapido ? 320 : 210, damping: 32, onUpdate: function (v) { menu.style.setProperty('--haz-y', v + 'px'); } });
-    };
-    BPM.abrirMenuMovil = function () {
-      mover(activo());
-      if (!ok) return;
-      var l = Array.prototype.slice.call(links());
-      M.animate(l, { opacity: [0, 1], transform: ['translateX(-14px)', 'translateX(0px)'] },
-        { duration: DUR.normal, ease: CURVA, delay: M.stagger(Math.min(0.045, 0.36 / Math.max(1, l.length - 1))) });
-    };
-    menu.addEventListener('pointerdown', function (e) {
-      var it = e.target.closest && e.target.closest('.m-link');
-      if (it) mover(it, true);
-    });
-  };
-
-  /* ── El camino del estándar ───────────────────────────────────────────────
-     Una sola coreografía, una vez, cuando el camino entra en pantalla. El hilo
-     de oro va de hito en hito con la curva de la casa y un punto de luz viaja
-     en la punta; en cada llegada el hito se enciende: el anillo se dibuja, el
-     ícono pasa a oro, el nombre sube. No depende de la velocidad del scroll:
-     antes sí, y con un scroll rápido se dibujaba de golpe. Sin Motion o con
-     menos movimiento pedido, se ve el estado final. */
+  /* ── El camino del estándar: dibujado y quieto. El hilo de oro une los cuatro hitos,
+     todos encendidos. Se vuelve a trazar si cambia el ancho. */
   BPM.camino = function (cont) {
     cont = lista(cont)[0]; if (!cont || cont._camino) return; cont._camino = true;
     var svg = cont.querySelector('.h-camino-linea');
-    var guia = svg && svg.querySelector('.guia');
-    var trazo = svg && svg.querySelector('.trazo');
+    var guia = svg && svg.querySelector('.guia'), trazo = svg && svg.querySelector('.trazo');
     var hitos = lista(cont.querySelectorAll('[data-hito]'));
-    if (!svg || !trazo || hitos.length < 2) return;
     var NS = 'http://www.w3.org/2000/svg';
-    function nodo(tag, cls, attrs) { var n = document.createElementNS(NS, tag); n.setAttribute('class', cls); for (var k in attrs) n.setAttribute(k, attrs[k]); return n; }
-    var medida = svg.querySelector('.medida') || svg.appendChild(nodo('path', 'medida', { fill: 'none', stroke: 'none' }));
-    var halo = svg.querySelector('.halo') || svg.appendChild(nodo('circle', 'halo', { r: 11 }));
-    var punta = svg.querySelector('.punta') || svg.appendChild(nodo('circle', 'punta', { r: 3 }));
     hitos.forEach(function (h) {
-      var pt = h.querySelector('.pt'); if (!pt || pt.querySelector('.anillo')) return;
-      var a = nodo('svg', 'anillo', { viewBox: '0 0 64 64', 'aria-hidden': 'true' });
-      a.appendChild(nodo('circle', '', { cx: 32, cy: 32, r: 31 })); pt.appendChild(a);
+      var pt = h.querySelector('.pt');
+      if (pt && !pt.querySelector('.anillo')) {   /* el anillo de oro de cada hito, ya cerrado */
+        var a = document.createElementNS(NS, 'svg'); a.setAttribute('class', 'anillo'); a.setAttribute('viewBox', '0 0 64 64'); a.setAttribute('aria-hidden', 'true');
+        var ci = document.createElementNS(NS, 'circle'); ci.setAttribute('cx', '32'); ci.setAttribute('cy', '32'); ci.setAttribute('r', '31');
+        a.appendChild(ci); pt.appendChild(a);
+      }
+      h.classList.add('on');
     });
-
-    var total = 0, largos = [], hecho = false;
-    function puntos() {
-      var c = cont.getBoundingClientRect();
-      return hitos.map(function (h) {
-        var pt = h.querySelector('.pt') || h;
-        var r = pt.getBoundingClientRect();
-        return { x: r.left - c.left + r.width / 2, y: r.top - c.top + r.height / 2 };
-      });
-    }
-    function curva(ps) {
-      if (!ps.length) return '';
+    cont.classList.add('completo');
+    if (!svg || !trazo || hitos.length < 2) return;
+    function dibujar() {
+      var c = cont.getBoundingClientRect(); if (!c.width) return;
+      var ps = hitos.map(function (h) { var r = (h.querySelector('.pt') || h).getBoundingClientRect(); return { x: r.left - c.left + r.width / 2, y: r.top - c.top + r.height / 2 }; });
       var d = 'M ' + ps[0].x.toFixed(1) + ' ' + ps[0].y.toFixed(1);
       for (var i = 1; i < ps.length; i++) {
-        var a = ps[i - 1], b = ps[i];
-        var mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
-        d += ' Q ' + a.x.toFixed(1) + ' ' + my.toFixed(1) + ' ' + mx.toFixed(1) + ' ' + my.toFixed(1);
-        d += ' Q ' + b.x.toFixed(1) + ' ' + my.toFixed(1) + ' ' + b.x.toFixed(1) + ' ' + b.y.toFixed(1);
+        var a = ps[i - 1], b = ps[i], mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+        d += ' Q ' + a.x.toFixed(1) + ' ' + my.toFixed(1) + ' ' + mx.toFixed(1) + ' ' + my.toFixed(1) + ' Q ' + b.x.toFixed(1) + ' ' + my.toFixed(1) + ' ' + b.x.toFixed(1) + ' ' + b.y.toFixed(1);
       }
-      return d;
-    }
-    function ubicarPunta(L) {
-      var p = trazo.getPointAtLength(Math.max(0, Math.min(total, L)));
-      punta.setAttribute('cx', p.x); punta.setAttribute('cy', p.y); halo.setAttribute('cx', p.x); halo.setAttribute('cy', p.y);
-    }
-    function dibujar() {
-      var c = cont.getBoundingClientRect();
-      if (!c.width) return;
       svg.setAttribute('viewBox', '0 0 ' + Math.round(c.width) + ' ' + Math.round(c.height));
       svg.style.width = c.width + 'px'; svg.style.height = c.height + 'px';
-      var ps = puntos(), d = curva(ps);
       trazo.setAttribute('d', d); if (guia) guia.setAttribute('d', d);
-      total = trazo.getTotalLength ? trazo.getTotalLength() : 1000;
-      /* Largo del hilo en cada hito: el largo del camino hasta ahí */
-      largos = ps.map(function (_, i) { medida.setAttribute('d', curva(ps.slice(0, i + 1))); return medida.getTotalLength ? medida.getTotalLength() : 0; });
-      trazo.style.strokeDasharray = total;
-      trazo.style.strokeDashoffset = (ok && !hecho) ? total : 0;
-      ubicarPunta(hecho ? total : largos[0]);
+      trazo.style.strokeDasharray = ''; trazo.style.strokeDashoffset = '0';
     }
     dibujar();
-    function final() { hitos.forEach(function (h) { h.classList.add('on'); }); cont.classList.add('completo'); hecho = true; trazo.style.strokeDashoffset = 0; }
-    if (!ok || !M.inView) { final(); return; }
-
-    function tramo(desde, hasta) {
-      return new Promise(function (res) {
-        M.animate(desde, hasta, { duration: DUR.normal, ease: CURVA,
-          onUpdate: function (L) { trazo.style.strokeDashoffset = total - L; ubicarPunta(L); },
-          onComplete: res });
-      });
-    }
-    function pausa(s) { return new Promise(function (res) { setTimeout(res, s * 1000); }); }
-    function correr() {
-      if (hecho) return; hecho = true;
-      punta.style.opacity = 1; halo.style.opacity = 1; ubicarPunta(largos[0]);
-      hitos[0].classList.add('on');
-      var i = 1;
-      function siguiente() {
-        if (i >= hitos.length) {
-          punta.style.opacity = 0; halo.style.opacity = 0;   /* se funde en el último hito; la transición está en el CSS */
-          cont.classList.add('completo');
-          return;
-        }
-        pausa(0.14).then(function () { return tramo(largos[i - 1], largos[i]); }).then(function () { hitos[i].classList.add('on'); i++; siguiente(); });
-      }
-      siguiente();
-    }
-    M.inView(cont, function () { correr(); }, { amount: 0.55 });
-
     var t = null;
     window.addEventListener('resize', function () { clearTimeout(t); t = setTimeout(dibujar, 160); });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(dibujar, function () {});
+  };
+
+  /* ── b) El toque: lo que se aprieta baja a .98 en 120 ms y vuelve igual.
+     Sobre la propiedad scale (no transform), así no pisa los hover ni las transiciones del CSS.
+     Con el dedo espera 60 ms: si en ese tiempo empieza un desplazamiento, no se hunde nada. */
+  var CONTROLES = '.p-btn, .p-fbtn, .p-chip, .p-icon-btn, .tj-fav, .h-cta, .h-seg button, .h-btn, .h-flecha, .p-tabbar a, .p-plazo-pills button, .p-quick button, .p-tab, .p-pill, button.p-linkbtn, .p-compartir .op, .p-crear-pop a, .card-cta, .thumb, .p-lb .nav, .p-pg button, #pager button, .m-cta a, .p-perfil';
+  var TARJETAS = '.prop-card, .h-edif';
+  BPM.toque = function () {
+    if (BPM._toque || quieto || !hayWAAPI) return; BPM._toque = true;
+    var actual = null, timer = null, x0 = 0, y0 = 0;
+    var soltar = function () {
+      clearTimeout(timer); timer = null;
+      var el = actual; actual = null; if (!el || !el._toque) return;
+      var abajo = el._toque; el._toque = null;
+      var s = getComputedStyle(el).scale; var desdeS = s && s !== 'none' ? s : '0.98';
+      var a = el.animate({ scale: [desdeS, '1'] }, { duration: DUR.toque, easing: CURVA });
+      a.finished.then(function () { abajo.cancel(); }, function () { abajo.cancel(); });
+      setTimeout(function () { try { abajo.cancel(); } catch (e) {} }, DUR.toque + 60);
+    };
+    var hundir = function (el) {
+      if (!el.isConnected) return;
+      el._toque = el.animate({ scale: ['1', '0.98'] }, { duration: DUR.toque, easing: CURVA, fill: 'forwards' });
+    };
+    document.addEventListener('pointerdown', function (e) {
+      if (e.button > 0 || !e.target.closest) return;
+      var el = e.target.closest(CONTROLES) || e.target.closest(TARJETAS);
+      if (!el || el.disabled || el.getAttribute('aria-disabled') === 'true') return;
+      soltar(); actual = el; x0 = e.clientX; y0 = e.clientY;
+      if (e.pointerType === 'touch') timer = setTimeout(function () { timer = null; if (actual === el) hundir(el); }, 60);
+      else hundir(el);
+    }, { passive: true, capture: true });
+    document.addEventListener('pointermove', function (e) {
+      if (actual && (Math.abs(e.clientX - x0) > 10 || Math.abs(e.clientY - y0) > 10)) soltar();
+    }, { passive: true, capture: true });
+    ['pointerup', 'pointercancel', 'dragstart'].forEach(function (t) { document.addEventListener(t, soltar, { passive: true, capture: true }); });
+    window.addEventListener('blur', soltar);
   };
 
   /* ── Puesta en marcha ───────────────────────────────────────────────────── */
   BPM.init = function (root) {
     root = root || document;
-    BPM.tacto(root); BPM.sellos(root); BPM.contar(root); BPM.rodar(root);
+    BPM.toque();
     if (window.BP && BP.crear) BP.crear(root); // el header se vuelve a dibujar al abrir sesión
     if (window.BP && BP.desplegables) BP.desplegables(root);
     if (window.BP && BP.idioma) BP.idioma(root);
+    var lb = document.getElementById('lbMarco'), lbImg = document.getElementById('lbImg');
+    if (lb && lbImg) BPM.arrastrar(lb, lbImg);
   };
 
   window.BPM = BPM;
 
-  /* Se engancha solo: al cargar y cada vez que una página dibuja contenido nuevo.
-     Así ninguna página tiene que acordarse de llamarlo. */
+  /* Se engancha solo, al cargar. Si el header se vuelve a dibujar (al abrir sesión), se engancha de nuevo:
+     el observador mira solo el header, no la página entera. */
   function arrancar() {
     BPM.init(document);
-    if (!ok || !window.MutationObserver) return;
+    var h = document.getElementById('pHeader');
+    if (!h || !window.MutationObserver) return;
     var pend = null;
     new MutationObserver(function () {
       clearTimeout(pend);
-      pend = setTimeout(function () { BPM.init(document); }, 80);
-    }).observe(document.body, { childList: true, subtree: true });
+      pend = setTimeout(function () { BPM.init(h); }, 60);
+    }).observe(h, { childList: true, subtree: true });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', arrancar);
   else arrancar();
