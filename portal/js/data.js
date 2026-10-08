@@ -367,8 +367,11 @@
   D.sort = function(list, key){
     const l = list.slice();
     const t = a => new Date(a.publicadoEn||0).getTime();
-    if (key === 'precio_asc') l.sort((a,b)=>(a.precio||9e12)-(b.precio||9e12));
-    else if (key === 'precio_desc') l.sort((a,b)=>(b.precio||0)-(a.precio||0));
+    /* 8/10/2026 · Por precio no se mezclan monedas: primero los avisos en dólares, después los en pesos, y cada grupo
+       en su orden (300 pesos no es menos que 1.000 dólares). Sin precio, al final de su grupo. */
+    const grupo = a => a.moneda === 'ARS' ? 1 : 0;
+    if (key === 'precio_asc') l.sort((a,b)=>(grupo(a)-grupo(b))||((a.precio||9e15)-(b.precio||9e15)));
+    else if (key === 'precio_desc') l.sort((a,b)=>(grupo(a)-grupo(b))||((b.precio||0)-(a.precio||0)));
     else if (key === 'recientes') l.sort((a,b)=>t(b)-t(a));
     else if (key === 'm2') l.sort((a,b)=>(b.m2||0)-(a.m2||0));
     else l.sort((a,b)=>(b.destacado-a.destacado)||(a.reservado-b.reservado)||(t(b)-t(a)));
