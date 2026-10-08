@@ -4287,6 +4287,81 @@ body.p-guardados{background:var(--s-white,#FBFAF6)}
   .p-guardados-in .p-grid{grid-template-columns:minmax(0,1fr);gap:16px}
 }
 
+/* ══ lanz3-publicador · 8/10/2026 · Publicador y curación: lo que pidieron las simulaciones del circuito y de alquiler ══ */
+/* Panel · el motivo de la curación se lee (antes gris chico), lo que le falta a un borrador, la visita confirmada */
+body.p-panel-page .p-aviso-motivo{margin:8px 0 0;padding:8px 10px;border-left:3px solid var(--gold);background:#F7F1E2}
+body.p-panel-page .p-aviso-motivo.rechazo{border-left-color:#B3423C;background:#FBF1EF}
+body.p-panel-page .p-aviso-motivo b{display:block;font:500 .64rem/1.3 var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:var(--p-gold-ink,#75623C)}
+body.p-panel-page .p-aviso-motivo.rechazo b{color:#9C3A34}
+body.p-panel-page .p-aviso-motivo p{margin:3px 0 0;font:400 .9rem/1.45 var(--font-body);color:var(--navy-deeper);overflow-wrap:anywhere}
+body.p-panel-page .p-aviso-faltan{margin:6px 0 0;font:400 .8rem/1.4 var(--font-body);color:#9C3A34}
+body.p-panel-page .p-visita-ok{display:inline-flex;align-items:center;gap:4px;margin-top:6px;border-color:rgba(60,122,74,.5);color:#2F6A3D;background:#EEF5EF}
+body.p-panel-page .p-visita-ok svg{width:12px;height:12px}
+body.p-panel-page .p-int-acc{white-space:nowrap}
+body.p-panel-page .p-int-acc .p-btn{margin:0 6px 6px 0}
+body.p-panel-page .p-mas-menu .peligro{color:#9C3A34}
+/* Panel · el mail de la cuenta se corta antes de la arroba (el <wbr> del riel), no en medio de la palabra ("co / m") */
+body.p-panel-page .p-side-nav .who .txt .q{overflow-wrap:break-word;word-break:normal}
+/* Panel · la fila de compu no corta el precio: el renglón de datos puede ir en dos líneas */
+body.p-panel-page .p-aviso-main .m{white-space:normal;overflow:visible;text-overflow:clip}
+/* Panel · envío en lote de los borradores completos */
+body.p-panel-page .p-lote{display:flex;align-items:center;justify-content:space-between;gap:10px 16px;flex-wrap:wrap;margin:0 0 12px;padding:10px 12px;background:#F7F1E2;border:1px solid rgba(138,117,71,.3)}
+body.p-panel-page .p-lote span{font:400 .86rem/1.4 var(--font-body);color:var(--navy-deeper)}
+/* Confirmación dentro de la página (Borrar, Enviar en lote): hoja desde abajo en el celular, caja al centro en la compu */
+.p-conf{position:fixed;inset:0;z-index:3000;display:flex;align-items:flex-end;justify-content:center}
+.p-conf-fondo{position:absolute;inset:0;background:rgba(19,29,45,.55)}
+.p-conf-caja{position:relative;width:100%;max-width:440px;max-height:85vh;overflow:auto;padding:22px 20px calc(20px + env(safe-area-inset-bottom,0px));background:#FDFCF9;color:var(--navy-deeper);box-shadow:0 -12px 40px rgba(0,0,0,.25)}
+.p-conf-caja h2{margin:0 0 8px;font:400 1.35rem/1.25 var(--font-display);color:var(--navy-deeper)}
+.p-conf-tx{margin:0 0 14px;font:400 .92rem/1.5 var(--font-body);color:#59647A}
+.p-conf-lista{margin:0 0 14px;padding:0;list-style:none;max-height:180px;overflow:auto;border-top:1px solid rgba(19,29,45,.1)}
+.p-conf-lista li{padding:8px 0;border-bottom:1px solid rgba(19,29,45,.08);font:400 .86rem/1.35 var(--font-body)}
+.p-conf-acepto{display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap;margin:4px 0 0;font:400 .88rem/1.45 var(--font-body);cursor:pointer}
+.p-conf-acepto input{flex:0 0 auto;width:20px;height:20px;margin:1px 0 0;accent-color:var(--navy-deeper)}
+.p-conf-acepto > span{flex:1 1 0;min-width:0}
+.p-conf-acepto .p-err-campo{flex:0 0 100%;margin:4px 0 0 30px}
+.p-conf-leer{margin:4px 0 0 30px;font:400 .8rem/1.4 var(--font-body)}
+.p-conf-leer a{color:var(--navy-deeper);text-decoration:underline;text-underline-offset:3px}
+.p-conf-acc{display:flex;gap:8px;margin-top:18px}
+.p-conf-acc .p-btn{flex:1 1 0;justify-content:center;min-height:44px;border-radius:0!important}
+.p-conf .p-btn-fill{background:var(--gold);border-color:var(--gold);color:var(--navy-deeper)}
+.p-conf .p-btn:not(.p-btn-fill):not(.p-btn-peligro){background:transparent;border-color:var(--navy-deeper);color:var(--navy-deeper)}
+.p-conf .p-btn-peligro{background:#9C3A34;border-color:#9C3A34;color:#FBFAF6}
+@media(min-width:700px){.p-conf{align-items:center}.p-conf-caja{padding:26px 26px 22px;box-shadow:0 24px 60px rgba(0,0,0,.3)}}
+/* Panel en el celular: las pestañas entran sin cortarse (si son más de las que entran, se deslizan) y los filtros no cortan el texto */
+@media(max-width:1023px){
+  body.p-panel-page .p-side-nav .p-rail:not(.p-rail-pie){display:grid;grid-auto-flow:column;grid-auto-columns:minmax(max-content,1fr);gap:4px}
+  body.p-panel-page .p-side-nav .p-rail a,body.p-panel-page .p-panel .p-side-nav .p-rail a,body.p-panel-page .p-panel .p-side-nav .p-rail a.on{justify-content:center;gap:5px;padding:8px 9px;font-size:.8rem}
+  body.p-panel-page .p-side-nav .p-rail a span:not(.n){flex:0 0 auto;overflow:visible}
+  body.p-panel-page .p-side-nav .p-rail a .n{min-width:18px;height:18px;padding:0 5px;font-size:.66rem;line-height:18px}
+  /* El campo de 16 px (sin zoom en Safari) no entra en media fila: la operación va sola, estado y orden comparten la de abajo */
+  body.p-panel-page .p-herr select[name=op]{grid-column:1 / -1}
+}
+/* Curación · cualidades con su casilla y su rótulo, una al lado de la otra; reenvío y datos dudosos a la vista */
+body.p-herramienta .p-cual{margin:12px 0 8px;padding:0;border:0;min-width:0}
+body.p-herramienta .p-cual legend{padding:0;margin:0 0 8px;font:500 .8rem/1.4 var(--font-body);color:var(--navy-deeper)}
+body.p-herramienta .p-cual legend .m{font-weight:400}
+body.p-herramienta .p-cual-ops{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px}
+body.p-herramienta .p-cual-op{display:flex;align-items:center;gap:8px;min-height:40px;padding:6px 10px;border:1px solid rgba(19,29,45,.16);background:#FFFDF8;font:400 .84rem/1.25 var(--font-body);color:var(--navy-deeper);cursor:pointer}
+body.p-herramienta .p-cual-op input{flex:0 0 auto;width:18px;height:18px;margin:0;accent-color:var(--navy-deeper)}
+body.p-herramienta .p-cual-op:has(input:checked){border-color:var(--navy-deeper);background:#F2ECDD}
+body.p-herramienta .p-cual-op:has(input:focus-visible){outline:2px solid var(--gold);outline-offset:2px}
+@media(max-width:700px){body.p-herramienta .p-cual-ops{grid-template-columns:1fr 1fr}}
+body.p-herramienta .p-cur .p-badge.p-cur-reenvio{border-color:rgba(138,117,71,.6);color:#75623C;background:#F7F1E2;vertical-align:2px}
+body.p-herramienta .p-cur .p-badge.p-cur-dudoso{border-color:#B3423C;color:#9C3A34;background:#FBF1EF;vertical-align:2px}
+body.p-herramienta .p-cur-anterior{margin:6px 0 4px;padding:8px 10px;border-left:3px solid var(--gold);background:#F7F1E2;font:400 .86rem/1.45 var(--font-body);color:var(--navy-deeper)}
+body.p-herramienta .p-cur-anterior b{display:block;font:500 .64rem/1.3 var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:var(--p-gold-ink,#75623C)}
+body.p-herramienta .p-check .p-check-ancho{grid-column:1 / -1;font-weight:500}
+body.p-herramienta .p-cur-revisar{margin:8px 0 0;padding:8px 10px;border:1px dashed rgba(19,29,45,.2);font:400 .84rem/1.45 var(--font-body);color:var(--navy-deeper)}
+body.p-herramienta .p-cur-revisar b{font-weight:500}
+/* Importar · el resultado queda escrito, fila por fila */
+body.p-herramienta .p-imp-res{margin-top:18px;padding:16px 18px;border:1px solid rgba(19,29,45,.12);background:#FFFDF8}
+body.p-herramienta .p-imp-res:focus{outline:none}
+body.p-herramienta .p-imp-res-t{margin:0 0 8px;font:500 1rem/1.4 var(--font-body);color:var(--navy-deeper)}
+body.p-herramienta .p-imp-res-s{margin:12px 0 4px;font:500 .8rem/1.4 var(--font-body);letter-spacing:.04em;color:var(--navy-deeper)}
+body.p-herramienta .p-imp-res-s.err{color:#9C3A34}
+body.p-herramienta .p-imp-res ul{margin:0 0 6px;padding-left:18px;font:400 .86rem/1.5 var(--font-body);color:#59647A}
+body.p-herramienta .p-imp-res .p-btn{margin-top:10px}
+
 /* ── 8/10/2026 (venta) · Lo que pidió la simulación de publicadores de venta ── */
 /* El tilde de verificado va en línea (inline-block): como inline-flex cortaba el texto y el " · " quedaba suelto */
 .p-verif{display:inline-block;vertical-align:-1px}
