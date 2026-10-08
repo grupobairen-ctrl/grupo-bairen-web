@@ -142,6 +142,12 @@ document.addEventListener('DOMContentLoaded', function(){
   /* El DNI vive en la persona (migración 01): se trae para que al editar el perfil no aparezca vacío */
   if (pub && !pub.dni && BPStore.getMyPersona) { try { const per = await BPStore.getMyPersona(); if (per && per.dni) pub = Object.assign({}, pub, { dni: per.dni }); } catch (e) {} }
   let aviso = editId ? (await BPStore.getAviso(editId)) : null;
+  /* 8/10/2026 · "Publicar otra parecida" (?copia=<id>): un aviso nuevo con los datos de uno propio, para cargar varias
+     unidades parecidas sin rehacer todo. Dirección, unidad y fotos quedan vacías; tampoco se copia lo que es de cada
+     unidad (título, piso, orientación, cualidades, video, mail del propietario, código interno). */
+  const COPIA = ['operacion','tipo','zona','barrio','precio','moneda','ambientes','dormitorios','banos','cocheras','antiguedad','m2_total','m2_cubierto','expensas','mostrar_direccion','amenities','caracteristicas','descripcion','plazo'];
+  let copiaDe = null;
+  if (!aviso && qs.get('copia') && pub) { const o = await BPStore.getAviso(qs.get('copia')); if (o && o.publicador_id === pub.id) { copiaDe = o; aviso = { amenities: [], caracteristicas: [], cualidades: [], fotos: [], estado_curacion: 'borrador' }; COPIA.forEach(k => { if (o[k] != null) aviso[k] = Array.isArray(o[k]) ? o[k].slice() : o[k]; }); } }
   if (!aviso) aviso = { operacion: 'venta', tipo: 'Departamento', zona: '', barrio: '', amenities: [], caracteristicas: [], cualidades: [], fotos: [], mostrar_direccion: 'aproximada', estado_curacion: 'borrador' };
   if (!perfil && pub) perfil = pub.tipo;
   let step = pub ? 1 : 0;
@@ -364,7 +370,7 @@ document.addEventListener('DOMContentLoaded', function(){
       if (a.fotos.length < 8 && !a.quiero_produccion) { step = 2; render(); BP.toast('Hacen falta ocho fotos y hay ' + a.fotos.length + '. O pedí la producción de BAIREN.', 'error'); return; }
       if (!document.getElementById('acepto').checked) { BP.errorCampo('acepto', 'Aceptá los términos para enviar.'); return; }
       ocupar(btn, true, 'Enviando…');
-      try { await save('en_revision'); BP.toast('Enviado. Te avisamos por mail cuando esté publicado.'); setTimeout(() => location.href = 'panel.html#avisos', 900); } catch (e) { ocupar(btn, false); BP.toast('No se pudo enviar: ' + (e.message || e), 'error'); }
+      try { await save('en_revision'); terminado(); } catch (e) { ocupar(btn, false); BP.toast('No se pudo enviar: ' + (e.message || e), 'error'); }
     });
   }
 
@@ -388,6 +394,14 @@ document.addEventListener('DOMContentLoaded', function(){
   }
 
   if (editId && aviso) document.getElementById('ttl').textContent = 'Editar aviso';
+  if (copiaDe) { document.getElementById('ttl').textContent = 'Publicar otra parecida'; document.getElementById('sub').textContent = 'Es una copia de ' + [copiaDe.direccion, copiaDe.unidad].filter(Boolean).join(', ') + '. Revisá los datos y completá la dirección, la unidad y las fotos.'; }
+  /* Al enviar: en vez de volver solo al panel, se ofrece cargar otra unidad parecida a esta */
+  function terminado(){
+    document.getElementById('stepper').innerHTML = '';
+    el.innerHTML = `<h2 class="p-sec-t" tabindex="-1" id="listoT">Enviado a revisión</h2><p class="p-kicker">BAIREN lo revisa en menos de 48 horas. Te avisamos por mail cuando esté publicado.</p>
+      <div class="p-nav-steps"><div></div><div class="p-nav-main"><a class="p-btn" href="panel.html#avisos">Ir a mi panel</a><a class="p-btn p-btn-fill" href="publicar-aviso.html?copia=${encodeURIComponent(aviso.id)}">Publicar otra parecida</a></div></div>`;
+    window.scrollTo({ top: 0, behavior: 'smooth' }); const h = document.getElementById('listoT'); if (h) h.focus({ preventScroll: true });
+  }
   render();
 })();
 });

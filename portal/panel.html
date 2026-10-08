@@ -202,6 +202,7 @@ document.addEventListener('DOMContentLoaded', function(){
     const mas = [
       publicado ? `<a href="propiedad.html?id=${encodeURIComponent(a.id)}">${BP.t('pan_ver_ficha', 'Ver ficha')}</a>` : '',
       a.estado_curacion === 'pausado' ? `<a href="publicar-aviso.html?id=${encodeURIComponent(a.id)}">${BP.t('pan_editar', 'Editar')}</a>` : '',
+      `<a href="publicar-aviso.html?copia=${encodeURIComponent(a.id)}">${BP.t('pan_publicar_parecida', 'Publicar otra parecida')}</a>`,   /* 8/10/2026 · para cargar varias unidades parecidas */
       publicado ? `<button type="button" data-act="${a.estado === 'reservado' ? 'disponible' : 'reservar'}" data-id="${a.id}">${a.estado === 'reservado' ? BP.t('pan_marcar_disponible', 'Marcar disponible') : BP.t('pan_marcar_reservada', 'Marcar reservada')}</button>` : '',
       publicado ? `<button type="button" data-act="pausar" data-id="${a.id}">${BP.t('pan_pausar', 'Pausar')}</button>` : ''
     ].filter(Boolean).join('');
@@ -209,7 +210,7 @@ document.addEventListener('DOMContentLoaded', function(){
     return `<div class="p-aviso-row v2" data-id="${a.id}">
       <a class="ph" href="${publicado ? 'propiedad.html?id=' + encodeURIComponent(a.id) : 'publicar-aviso.html?id=' + encodeURIComponent(a.id)}" tabindex="-1" aria-hidden="true">${a._foto ? `<img src="${a._foto}" alt="" loading="lazy">` : ''}</a>
       <div class="p-aviso-main">
-        <b>${BP.esc(a.titulo || a.direccion)}</b>
+        <b>${BP.esc(a.titulo || [a.direccion, a.unidad].filter(Boolean).join(' · '))}</b>
         <div class="m">${OP_TXT[a.operacion] || OP_TXT.alquiler} · ${BP.esc(a.barrio||'')} · ${precioTxt(a)}${a.operacion !== 'venta' ? POR_MES : ''}${a.codigo ? ' · ' + BP.esc(a.codigo) : ''}</div>
         <div class="p-aviso-est">${estadoBadge(a.estado_curacion)}${a.estado === 'reservado' ? ` <span class="p-badge demo">${RESERVADA}</span>` : ''}</div>
         ${a.motivo_rechazo ? `<div class="p-note p-aviso-motivo">${BP.t('pan_motivo', 'Motivo: ')}${BP.esc(a.motivo_rechazo)}</div>` : ''}
