@@ -380,7 +380,7 @@
     const html = `
 <nav class="navbar p-navbar" aria-label="Principal" data-i18n-aria="ui_nav_principal">
   <div class="p-nav-left">
-    <a class="nav-logo" href="index.html" aria-label="BAIREN, inicio" data-i18n-aria="ui_logo_aria"><img src="../bairen_logo_96.png?v=1" alt="BAIREN" width="44" height="44" style="height:44px;width:44px;"></a>
+    <a class="nav-logo" href="index.html" aria-label="BAIREN, inicio" data-i18n-aria="ui_logo_aria"><img class="marca" src="img/bairen-marca.png?v=1" alt="BAIREN" width="81" height="22" style="height:22px;width:auto;"></a>
   </div>
   <!-- 8/10/2026 · Arriba sólo lo que busca el visitante: Membership y Publicadores pasan al pie -->
   <div class="p-nav-principal">
@@ -568,6 +568,9 @@
   };
 
   /* ── Sesión en el header ───────────────────────────────── */
+  /* 8/10/2026 · Modo de entrada: html.teclado mientras se navega con Tab; el primer toque o clic lo saca (ver portal.css) */
+  document.addEventListener('keydown', e => { if (e.key === 'Tab') document.documentElement.classList.add('teclado'); }, true);
+  document.addEventListener('pointerdown', () => document.documentElement.classList.remove('teclado'), true);
   BP.applySession = function(session, mode){
     const right = document.querySelector('.p-nav-right'); const mob = document.getElementById('mobileMenu');
     if (!right) return;

@@ -4757,3 +4757,15 @@ body.p-home .h-hero h1{text-shadow:0 1px 18px rgba(10,14,22,.28)}
   body.p-home .h-hoja .h-cta{min-height:52px}
 }
 @media(max-width:899px) and (prefers-reduced-motion:reduce){.h-hoja{transition:none}}
+
+/* 8/10/2026 · La marca BAIREN en palabra (sin fondo) en vez del emblema redondo: 22 px de alto en el celular, 26 en la compu */
+@media(min-width:1024px){.nav-logo img.marca{height:26px!important}}
+/* 8/10/2026 · Menú del celular abierto: la barra de arriba pasa, de a poco, al mismo navy del menú y sin la línea clara,
+   así barra y menú se leen como una sola pieza (en la portada la barra es translúcida sobre el video) */
+body.p-home .p-navbar{transition:background-color .28s cubic-bezier(.22,1,.36,1),border-color .28s cubic-bezier(.22,1,.36,1)}
+html.menu-abierto body.p-home .p-navbar,html.menu-abierto body.p-home .p-navbar:not(.bajado){background:#131D2D!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border-bottom-color:transparent!important}
+html.menu-abierto .mobile-menu{border-top:0}
+@media(prefers-reduced-motion:reduce){body.p-home .p-navbar{transition:none}}
+/* 8/10/2026 · El anillo de foco solo con teclado: al abrir el menú con el dedo, el primer enlace recibe el foco y Safari
+   lo pintaba con un recuadro dorado. html.teclado lo pone ui.js con Tab y lo saca con el primer toque o clic. */
+html:not(.teclado) .mobile-menu a:focus-visible,html:not(.teclado) .mobile-menu button:focus-visible{outline:none!important;box-shadow:none!important}
