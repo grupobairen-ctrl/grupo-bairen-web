@@ -4740,7 +4740,9 @@ body.p-home .h-hero h1{text-shadow:0 1px 18px rgba(10,14,22,.28)}
     body.p-home .h-barra{background:rgba(251,250,246,.16);-webkit-backdrop-filter:blur(16px) saturate(140%);backdrop-filter:blur(16px) saturate(140%)}
   }
   /* El encabezado, translúcido sobre el video mientras se está arriba de todo; al bajar vuelve a navy pleno */
-  body.p-home .p-navbar:not(.bajado){background:rgba(19,29,45,.38)!important;-webkit-backdrop-filter:blur(14px) saturate(140%)!important;backdrop-filter:blur(14px) saturate(140%)!important;border-bottom-color:rgba(251,250,246,.14)!important}
+  /* 8/10/2026 · A pedido de Tomás, la barra de arriba de la portada también navy sólido: Safari del iPhone copia ese color
+     para su propia barra de arriba y se ve todo continuo (translúcida, la pintaba blanca) */
+  body.p-home .p-navbar:not(.bajado){background:#131D2D!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border-bottom-color:rgba(251,250,246,.10)!important}
   body.p-home .p-navbar:not(.bajado) > .p-pub-movil{color:#DECDA0!important}
   /* La hoja de búsqueda: a pantalla completa, sube desde abajo */
   .h-hoja{position:fixed;inset:0;z-index:3000;display:flex;flex-direction:column;background:#131D2D;color:#FBFAF6;
