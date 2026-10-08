@@ -298,15 +298,19 @@
       if (BP.lang === 'es' || !window.BP_I18N || !window.BP_I18N[BP.lang]) return;
       root = root || document;
       document.documentElement.lang = BP.lang;
-      root.querySelectorAll('[data-i18n]').forEach(n => { const v = BP.i18n.t(n.dataset.i18n); if (v != null) n.textContent = v; });
+      root.querySelectorAll('[data-i18n]').forEach(n => { const v = BP.i18n.t(n.dataset.i18n); if (typeof v === 'string') n.textContent = v; });
       root.querySelectorAll('[data-i18n-html]').forEach(n => { const v = BP.i18n.t(n.dataset.i18nHtml); if (v != null) n.innerHTML = v; });
       root.querySelectorAll('[data-i18n-ph]').forEach(n => { const v = BP.i18n.t(n.dataset.i18nPh); if (v != null) n.setAttribute('placeholder', v); });
       root.querySelectorAll('[data-i18n-aria]').forEach(n => { const v = BP.i18n.t(n.dataset.i18nAria); if (v != null) n.setAttribute('aria-label', v); });
     }
   };
-  BP.t = (key, es) => { const v = BP.i18n.t(key); return v != null ? v : es; };
-  /* Igual que t, con {marcadores} que se reemplazan por vars; el castellano lleva los mismos marcadores */
-  BP.tf = (key, es, vars) => String(BP.t(key, es)).replace(/\{(\w+)\}/g, (m, k) => vars && vars[k] != null ? vars[k] : m);
+  BP.t = (key, es) => { const v = BP.i18n.t(key); return typeof v === 'function' ? String(v({})) : v != null ? v : es; };
+  /* Igual que t, con {marcadores} que se reemplazan por vars; el castellano lleva los mismos marcadores.
+     lanz3-visitante · Una traducción puede ser una función de vars, para lo que no es un reemplazo de texto
+     (en inglés y portugués, "2 ambientes" se dice por dormitorios: "1 bedroom", "1 quarto"). */
+  BP.tf = (key, es, vars) => { const f = BP.i18n.t(key); if (typeof f === 'function') return String(f(vars || {})); return String(BP.t(key, es)).replace(/\{(\w+)\}/g, (m, k) => vars && vars[k] != null ? vars[k] : m); };
+  /* lanz3-visitante · Dormitorios de un aviso: el dato, o ambientes menos uno cuando no está (un monoambiente no tiene) */
+  BP.dormDe = a => !a ? null : a.amb === 1 ? 0 : (a.dorm != null && a.dorm > 0) ? a.dorm : (a.amb > 1 ? a.amb - 1 : null);
   BP.idioma = function (root) {
     /* La barra derecha se vuelve a dibujar al abrir sesión, así que el selector
        se crea si falta en vez de vivir sólo en la plantilla. */

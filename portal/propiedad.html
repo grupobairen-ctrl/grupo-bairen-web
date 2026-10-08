@@ -110,7 +110,10 @@ document.addEventListener('DOMContentLoaded', function(){
   const expensasAparte = !!a.expensas && !BPData.expensasIncluidas(a);
   const numeros = [
     a.m2 ? [a.m2 + ' m²', T('ficha_superficie', 'Superficie')] : null,
-    a.amb ? [a.amb, a.amb === 1 ? T('num_ambiente', 'Ambiente') : T('num_ambientes', 'Ambientes')] : null,
+    /* lanz3-visitante · En inglés y portugués "2 ambientes" se lee como dos dormitorios: ahí van los dormitorios
+       (el dato, o ambientes menos uno), y el monoambiente es "Studio" */
+    BP.lang !== 'es' && a.amb ? [a.amb === 1 ? T('num_studio', 'Monoambiente') : BP.dormDe(a), BP.dormDe(a) === 1 ? T('num_dorm', 'Dormitorio') : T('num_dorms', 'Dormitorios')]
+      : a.amb ? [a.amb, a.amb === 1 ? T('num_ambiente', 'Ambiente') : T('num_ambientes', 'Ambientes')] : null,
     a.banos ? [a.banos, a.banos === 1 ? T('num_bano', 'Baño') : T('num_banos', 'Baños')] : null,
     a.op === 'mediano'
       ? (plazoTxt ? [plazoTxt, BPData.estadiaMinima(a) ? T('ficha_estadia_min', 'Estadía mínima') : T('num_estadia', 'Estadía')] : null)

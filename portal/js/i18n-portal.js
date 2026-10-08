@@ -268,6 +268,10 @@ window.BP_I18N = {
     sugerencias_aria: 'Suggestions', ver_la_unidad: 'See the unit', edif_ver_unidades: 'See units',
     alerta_corto: 'Alert', alerta_creada_toast: 'Alert created.', alerta_cuenta: 'With an account, the alert reaches you by email.',
     cat_t_de: '{t} listed by {p}', cat_quien_publica: 'Lister',
+    /* pisa el tit_amb de la tanda 2: en inglés "2 ambientes" se lee como dos dormitorios. Se dice por dormitorios
+       (el dato d si viene, o ambientes menos uno) */
+    tit_amb: function (v) { var d = v.d != null ? v.d : v.n - 1; return d === 1 ? '1 bedroom' : d + ' bedrooms'; },
+    num_dorm: 'Bedroom', num_dorms: 'Bedrooms', num_studio: 'Studio',
     cond_contrato: 'Lease of {p}', cond_contrato_libre: 'Lease: {p}', ui_dato_acepta_garantia_propietaria: 'Accepts a property deed as guarantee',
     ficha_por_m2: '{p} per m²', ficha_ok_visita: 'Visit requested: {f}.',
     /* 8/10/2026 · del equipo de servidor (ingresar): el captcha */
@@ -728,6 +732,9 @@ window.BP_I18N = {
     sugerencias_aria: 'Sugestões', ver_la_unidad: 'Ver o imóvel', edif_ver_unidades: 'Ver unidades',
     alerta_corto: 'Alerta', alerta_creada_toast: 'Alerta criado.', alerta_cuenta: 'Com uma conta, o alerta chega por e-mail.',
     cat_t_de: '{t} de {p}', cat_quien_publica: 'Anunciante',
+    /* pisa el tit_amb de la tanda 2: "2 ambientes" se dice por quartos (el dato d si viene, o ambientes menos uno) */
+    tit_amb: function (v) { var d = v.d != null ? v.d : v.n - 1; return d === 1 ? '1 quarto' : d + ' quartos'; },
+    num_dorm: 'Quarto', num_dorms: 'Quartos', num_studio: 'Studio',
     cond_contrato: 'Contrato de {p}', cond_contrato_libre: 'Contrato: {p}', ui_dato_acepta_garantia_propietaria: 'Aceita fiador com imóvel',
     ficha_por_m2: '{p} por m²', ficha_ok_visita: 'Visita solicitada: {f}.',
     /* 8/10/2026 · del equipo de servidor (ingresar): el captcha */
