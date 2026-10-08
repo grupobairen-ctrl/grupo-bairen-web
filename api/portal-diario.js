@@ -18,6 +18,8 @@
  *   d. resumen a BAIREN (PORTAL_RESUMEN_A o contacto@bairengroup.com): en revisión, verificaciones
  *      pendientes, consultas de 24 h, resultado de la sincronización, alertas enviadas hoy.
  *      Si no hay nada, manda "Sin novedades" igual, para saber que el cron corre.
+ *   (lunes) resumen semanal a cada publicador (api/_portal/semanal.js): APAGADO salvo PORTAL_SEMANAL=1 en Vercel;
+ *      sin la variable el paso responde {omitido:true, motivo:'apagado (falta PORTAL_SEMANAL=1)'} y no manda nada.
  *   e. copia de seguridad de la base (api/_portal/respaldo.js): todas las tablas del esquema portal
  *      y las cuentas de Auth a portal-respaldos/<año>/<fecha>.json, con retención (30 diarios y el
  *      primero de cada mes de los últimos 12 meses). Corre antes del resumen, así el resumen dice
@@ -25,6 +27,7 @@
  *
  * Variables de entorno (ver api/_portal/admin.js): PORTAL_SUPABASE_SERVICE_KEY, CRON_SECRET,
  *   PORTAL_NOTIFY_KEY, RESEND_API_KEY, PORTAL_MAIL_FROM, PORTAL_RESUMEN_A, y las URL/claves con default.
+ *   PORTAL_SEMANAL=1 prende el resumen semanal de los lunes (sin ella, apagado).
  * Necesita portal/migracion-04-producto.sql (sincronizaciones, precios_historial, alertas_enviadas, alertas.ultimo_envio)
  * y portal/migracion-07-respaldos.sql (el bucket de las copias; sin él el paso e falla y el resumen lo dice).
  *
@@ -117,9 +120,14 @@ module.exports = async (req, res) => {
      vieron sus unidades, cuántas consultaron y qué visitas hay. Va colgado del diario y no en su
      propia tarea automática porque Vercel limita cuántas se pueden tener, y esta ya corre igual.
      Con su propio try/catch: si falla, no se lleva puesto el resto del diario. */
-  const semanal = esLunes()
-    ? await paso(() => resumenSemanal({ ensayo: simular }))
-    : { omitido: true, motivo: 'solo los lunes' };
+  /* 8/10/2026 · APAGADO salvo PORTAL_SEMANAL=1 en Vercel. El portal pasa a producción con crons y, sin esto, cada
+     lunes saldrían mails a publicadores y propietarios reales sin que el dueño lo haya decidido. A mano sigue
+     andando como siempre: api/portal-semanal.js (curador, clave, ?ensayo=1, ?prueba=). */
+  const semanal = process.env.PORTAL_SEMANAL !== '1'
+    ? { omitido: true, motivo: 'apagado (falta PORTAL_SEMANAL=1)' }
+    : esLunes()
+      ? await paso(() => resumenSemanal({ ensayo: simular }))
+      : { omitido: true, motivo: 'solo los lunes' };
 
   const resumen = await paso(() => armarResumen(sync, busqueda, precio, respaldo));
   let mail;
