@@ -4279,6 +4279,9 @@ body.p-ficha-page .p-legal-txt p{margin:0 0 8px;text-align:left}
   body.p-home .h-field-lupa .lupa{top:24px}   /* el campo mide 48 px: la lupa queda en el campo aunque la lista crezca abajo */
 }
 
+/* El error de una casilla ("Acepto…") va debajo del rótulo, a la altura de la casilla, sin aplastar el texto */
+.p-err-campo.p-err-casilla{margin:-2px 0 12px;padding-left:0}
+
 /* ── Guardados: la tercera pestaña ── */
 body.p-guardados{background:var(--s-white,#FBFAF6)}
 .p-guardados-in{max-width:var(--p-max,1200px);margin:0 auto;padding:calc(64px + env(safe-area-inset-top) + 28px) 24px 56px;box-sizing:border-box;min-height:60vh}

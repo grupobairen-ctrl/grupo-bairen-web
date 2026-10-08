@@ -103,6 +103,10 @@
     t.setAttribute('aria-live', tipo === 'error' ? 'assertive' : 'polite');
     t.classList.toggle('err', tipo === 'error');
     t.textContent = ''; setTimeout(() => { t.textContent = msg; }, 40);
+    /* lanz3-visitante · Nunca encima de una barra fija de abajo (la de la ficha con Visita y WhatsApp, o la de pestañas) */
+    let alto = 0;
+    document.querySelectorAll('#mcta, #pTabbar, .p-barra-fija').forEach(b => { const r = b.getBoundingClientRect(); if (r.height > 0 && getComputedStyle(b).display !== 'none' && r.top < innerHeight) alto = Math.max(alto, innerHeight - r.top); });
+    t.style.bottom = alto ? Math.round(alto + 12) + 'px' : '';
     t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), tipo === 'error' ? 5200 : 2600);
   };
   /* Region viva aparte para lo que cambia en la pagina y no es un aviso flotante */
@@ -118,7 +122,12 @@
     if (!el) { BP.toast(msg, 'error'); return; }
     let id = el.id ? el.id + '-err' : 'err-' + Math.random().toString(36).slice(2, 8);
     let box = document.getElementById(id);
-    if (!box) { box = document.createElement('p'); box.id = id; box.className = 'p-err-campo'; const cont = el.closest('.p-fld, .p-field, .cfield, label'); if (cont) cont.appendChild(box); else el.insertAdjacentElement('afterend', box); /* pegado al campo, no al final del formulario */ }
+    if (!box) { box = document.createElement('p'); box.id = id; box.className = 'p-err-campo'; const cont = el.closest('.p-fld, .p-field, .cfield, label');
+      /* lanz3-visitante · Una casilla ("Acepto…") vive en un rótulo en fila: el error adentro aplastaba el texto a una
+         palabra por renglón. Va debajo del rótulo, a la altura de la casilla. */
+      const casilla = el.type === 'checkbox' || el.type === 'radio';
+      if (casilla && cont && cont.tagName === 'LABEL') { box.classList.add('p-err-casilla'); cont.insertAdjacentElement('afterend', box); }
+      else if (cont) cont.appendChild(box); else el.insertAdjacentElement('afterend', box); /* pegado al campo, no al final del formulario */ }
     box.textContent = msg; box.hidden = false;
     el.setAttribute('aria-invalid', 'true'); el.setAttribute('aria-describedby', ((el.getAttribute('aria-describedby') || '').split(' ').filter(x => x && x !== id).concat(id)).join(' '));
     el.classList.add('p-invalido');
