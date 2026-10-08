@@ -258,6 +258,10 @@ window.BP_I18N = {
     /* 8/10/2026 · Tanda 2 (visitante): tarjeta, ficha, barra de abajo, Guardados y pie */
     tit_mono: 'Studio', tit_amb: '{n} rooms', tit_en: '{q} in {b}', disp_desde: 'Available from {f}', pub_verificado: 'verified', card_fav_de: 'Save {t}',
     ui_dato_inmobiliaria: 'Real estate agency', ui_dato_desarrolladora: 'Developer',
+    num_ambiente: 'Room', num_ambientes: 'Rooms', num_bano: 'Bathroom', num_banos: 'Bathrooms', num_estadia: 'Stay',
+    cond_estadia_min: 'Minimum stay of {p}', cond_estadia: 'Stay of {p}', cond_todo_incluido: 'All included: building fees and utilities', cond_incluye: 'Includes: {x}',
+    ficha_todo_incl_corto: 'all included', ficha_exp_incl: 'building fees included', ficha_mas_exp: 'plus $ {n} in building fees',
+    ficha_volver: 'Back', ficha_reservada_corto: 'Reserved. Not taking inquiries for now.', ficha_condiciones: 'Terms', ficha_reportar_corto: 'Report a problem', ficha_mcta_visita: 'Visit',
   },
   pt: {
     home_title: 'BAIREN · Imóveis selecionados em Buenos Aires',
@@ -500,5 +504,9 @@ window.BP_I18N = {
     /* 8/10/2026 · Tanda 2 (visitante): tarjeta, ficha, barra de abajo, Guardados y pie */
     tit_mono: 'Studio', tit_amb: '{n} ambientes', tit_en: '{q} em {b}', disp_desde: 'Disponível a partir de {f}', pub_verificado: 'verificado', card_fav_de: 'Salvar {t}',
     ui_dato_inmobiliaria: 'Imobiliária', ui_dato_desarrolladora: 'Incorporadora',
+    num_ambiente: 'Ambiente', num_ambientes: 'Ambientes', num_bano: 'Banheiro', num_banos: 'Banheiros', num_estadia: 'Estadia',
+    cond_estadia_min: 'Estadia mínima de {p}', cond_estadia: 'Estadia de {p}', cond_todo_incluido: 'Tudo incluído: condomínio e contas', cond_incluye: 'Inclui: {x}',
+    ficha_todo_incl_corto: 'tudo incluído', ficha_exp_incl: 'condomínio incluído', ficha_mas_exp: 'mais $ {n} de condomínio',
+    ficha_volver: 'Voltar', ficha_reservada_corto: 'Reservado. Por enquanto não recebe consultas.', ficha_condiciones: 'Condições', ficha_reportar_corto: 'Informar um problema', ficha_mcta_visita: 'Visita',
   }
 };

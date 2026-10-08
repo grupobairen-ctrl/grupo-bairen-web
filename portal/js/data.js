@@ -392,6 +392,10 @@
   D.incluye = a => (a.caracteristicas || []).filter(x => D.INCLUYE.indexOf(x) > -1);
   D.todoIncluido = a => a.op === 'mediano' && (a.publicadorId === 'bairen' || (D.incluye(a).indexOf('Expensas incluidas') > -1 && D.incluye(a).indexOf('Servicios incluidos') > -1));
   D.expensasIncluidas = a => D.todoIncluido(a) || D.incluye(a).indexOf('Expensas incluidas') > -1;
+  /* Condiciones de la ficha (tanda 2): sin garantía propietaria (el mediano plazo de BAIREN REALTY, o el aviso que lo
+     dice) y mascotas (la característica 'Permite mascotas', la amenity 'Pet friendly' o la cualidad verificada) */
+  D.sinGarantia = a => (a.apto || []).concat(a.caracteristicas || []).indexOf('Sin garantía propietaria') > -1 || (a.op === 'mediano' && a.publicadorId === 'bairen');
+  D.aceptaMascotas = a => (a.caracteristicas || []).indexOf('Permite mascotas') > -1 || (a.amenities || []).indexOf('Pet friendly') > -1 || (a.cualidades || []).indexOf('Acepta mascotas') > -1;
   /* En mediano plazo, `plazo` es la estadía mínima ("3 meses"). Los avisos que vienen de la web traen el rango
      entero ("3-12 meses"): eso no es un mínimo, y se sigue mostrando como "Plazo". */
   D.estadiaMinima = a => a.op === 'mediano' && !!a.plazo && !/\d\s*(?:-|–|a|to)\s*\d/i.test(a.plazo);
