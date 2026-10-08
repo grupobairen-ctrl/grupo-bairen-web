@@ -274,6 +274,8 @@ window.BP_I18N = {
     num_dorm: 'Bedroom', num_dorms: 'Bedrooms', num_studio: 'Studio',
     cond_contrato: 'Lease of {p}', cond_contrato_libre: 'Lease: {p}', ui_dato_acepta_garantia_propietaria: 'Accepts a property deed as guarantee',
     ficha_por_m2: '{p} per m²', ficha_ok_visita: 'Visit requested: {f}.',
+    ficha_pausada_tag: 'Paused for now', ficha_pausada_t: 'This property is paused', ficha_pausada_p: 'The lister paused it. If it comes back, you will see it in Saved.', ficha_pausada_ver: 'See other properties', ficha_pausada_title: 'Paused property · BAIREN',
+    guard_pausada: 'Paused for now', guard_una_guardada: 'A saved property', guard_quitar: 'Remove from Saved',
     /* 8/10/2026 · del equipo de servidor (ingresar): el captcha */
     ing_err_captcha: "We couldn't verify that you're a person. Please try again.",
     /* Publicar en pantallas cortas (8/10/2026) */
@@ -737,6 +739,8 @@ window.BP_I18N = {
     num_dorm: 'Quarto', num_dorms: 'Quartos', num_studio: 'Studio',
     cond_contrato: 'Contrato de {p}', cond_contrato_libre: 'Contrato: {p}', ui_dato_acepta_garantia_propietaria: 'Aceita fiador com imóvel',
     ficha_por_m2: '{p} por m²', ficha_ok_visita: 'Visita solicitada: {f}.',
+    ficha_pausada_tag: 'Pausado por enquanto', ficha_pausada_t: 'Este imóvel está pausado', ficha_pausada_p: 'Quem anuncia pausou o anúncio. Se ele voltar, você vai vê-lo em Salvos.', ficha_pausada_ver: 'Ver outros imóveis', ficha_pausada_title: 'Imóvel pausado · BAIREN',
+    guard_pausada: 'Pausado por enquanto', guard_una_guardada: 'Um imóvel salvo', guard_quitar: 'Remover de Salvos',
     /* 8/10/2026 · del equipo de servidor (ingresar): el captcha */
     ing_err_captcha: 'Não conseguimos verificar que você é uma pessoa. Tente de novo.',
     /* Publicar en pantallas cortas (8/10/2026) */

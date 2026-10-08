@@ -89,6 +89,16 @@
   /* almacenamiento local (convivencia por visitante) */
   const store = key => ({ get(){ try{ return JSON.parse(localStorage.getItem(key)||'[]'); }catch(e){ return []; } }, set(v){ try{ localStorage.setItem(key, JSON.stringify(v)); }catch(e){} } });
   BP.favs = store('bp_favs'); BP.alerts = store('bp_alertas'); BP.consultas = store('bp_consultas'); BP.reportes = store('bp_reportes');
+  /* lanz3-visitante · Lo que se vio de cada guardada (título, calle, foto): si después se pausa, Guardados la sigue
+     mostrando como "Pausada por ahora" en vez de hacerla desaparecer. Se guarda al ver la ficha o al tocar el corazón. */
+  BP.favInfo = { get(){ try { return JSON.parse(localStorage.getItem('bp_favs_info') || '{}') || {}; } catch (e) { return {}; } }, set(v){ try { localStorage.setItem('bp_favs_info', JSON.stringify(v)); } catch (e) {} } };
+  BP.recordarFav = a => {
+    if (!a || !a.id || !window.BPData) return;
+    const m = BP.favInfo.get();
+    m[a.id] = { t: BPData.titulo(a), c: BPData.calle ? BPData.calle(a) : '', f: (a.fotos && a.fotos[0]) || '', op: a.op || '' };
+    const ids = Object.keys(m); if (ids.length > 60) ids.slice(0, ids.length - 60).forEach(k => { delete m[k]; });
+    BP.favInfo.set(m);
+  };
   BP.isFav = id => BP.favs.get().indexOf(id) > -1;
   BP.toggleFav = id => { const f=BP.favs.get(); const i=f.indexOf(id); if(i>-1) f.splice(i,1); else f.push(id); BP.favs.set(f); BP.syncFavCount(); if (window.BPStore && BPStore.syncFavorito) BPStore.syncFavorito(id, i===-1); return i===-1; };
   /* Sin sesión, el corazón del header aparece recién cuando hay algo guardado: el header anónimo no anuncia funciones que todavía no sirven */
@@ -619,6 +629,13 @@
   };
   BP.estadoLabel = e => ({ borrador:'Borrador', en_revision:'En revisión', publicado:'Publicado', rechazado:'Rechazado', pausado:'Pausado', vencido:'Vencido' })[e] || e;
   BP.estadoBadge = e => `<span class="p-badge ${e==='publicado'?'':e==='rechazado'?'demo':'dueno'}">${BP.estadoLabel(e)}</span>`;
+
+  /* lanz3-visitante · Al guardar desde una tarjeta, se anota qué era (para Guardados, si después se pausa). La ficha lo
+     anota sola; en el resto de las páginas el catálogo ya está cargado y BPData.load() lo devuelve sin pedir nada. */
+  document.addEventListener('bp:fav', e => {
+    if (!e.detail || !e.detail.on || !window.BPData || (document.body && document.body.classList.contains('p-ficha-page'))) return;
+    BPData.load().then(d => { const a = (d.avisos || []).find(x => x.id === e.detail.id); if (a) BP.recordarFav(a); }).catch(() => {});
+  });
 
   /* 4.2 El canal dominante es WhatsApp y no dejaba rastro. Se registra al salir, sin frenar el clic. */
   document.addEventListener('click', e => {

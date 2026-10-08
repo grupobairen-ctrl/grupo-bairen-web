@@ -71,6 +71,14 @@ document.addEventListener('DOMContentLoaded', function(){
   let avisos, a;
   try { const d = await _datos; a = d.aviso; avisos = a ? [a].concat(d.similares) : []; }
   catch (err) { console.error(err); BP.estadoError(main, BP.t('ficha_err_carga', 'No pudimos cargar esta propiedad.')); return; }
+  /* lanz3-visitante · Una guardada que hoy no está publicada se pausó: se dice eso, no "no la encontramos". Quien
+     visita no puede ver el estado de un aviso ajeno (solo los publicados son públicos): alcanza con que la haya
+     guardado; en modo local se lee el estado. */
+  if (!a && id) {
+    let pausada = BP.isFav(id);
+    if (!pausada && window.BPStore && BPStore.getAviso) { try { const r = await BPStore.getAviso(id); pausada = !!(r && r.estado_curacion === 'pausado'); } catch (e) { /* sin dato */ } }
+    if (pausada) { const info = (BP.favInfo.get() || {})[id] || {}; main.innerHTML = `<section class="p-page"><div class="p-prose p-fpausada"><p class="p-fop">${BP.t('ficha_pausada_tag', 'Pausada por ahora')}</p><h1>${info.t ? BP.esc(info.t) : BP.t('ficha_pausada_t', 'Esta propiedad está pausada')}</h1><p>${BP.t('ficha_pausada_p', 'Quien la publica la pausó. Si vuelve, la vas a ver en Guardados.')}</p><p><a class="p-btn p-btn-fill" href="${BP.esc(BP.ultimaBusqueda())}">${BP.t('ficha_pausada_ver', 'Ver otras propiedades')}</a></p></div></section>`; document.title = BP.t('ficha_pausada_title', 'Propiedad pausada · BAIREN'); return; }
+  }
   if (!a) { main.innerHTML = `<section class="p-page"><div class="p-prose"><h1>${BP.t('ficha_no_encontrada', 'No encontramos esa propiedad')}</h1><p>${BP.t('ficha_no_encontrada_p', 'Puede que ya no esté publicada. <a href="buscar.html" style="text-decoration:underline">Volver a las propiedades</a>.')}</p></div></section>`; document.title = BP.t('ficha_no_encontrada_title', 'Propiedad no encontrada · BAIREN'); return; }
   const pub = BPData.pub(a.publicadorId);
   const esAlqCorredor = a.op !== 'venta' && pub.tipo !== 'dueno' && !!pub.matricula;
@@ -231,6 +239,9 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip" role="group" aria-label="$
   const probarFoto = el => { const m = /url\(['"]?([^'")]+)['"]?\)/.exec(el.style.backgroundImage || ''); if (!m) return; const im = new Image(); im.onerror = () => { const i = Number(el.dataset.i); fotoRota.add(i); el.classList.add('p-fhero-empty', 'p-fhero-rota'); el.style.backgroundImage = 'none'; el.removeAttribute('role'); el.removeAttribute('aria-label'); el.textContent = T('ficha_fotos_prod', 'Fotos en producción'); if (i === 0 && fotos.length > 1) probarTodas(); }; im.src = m[1]; };
   document.querySelectorAll('.p-fhero-slide[data-i]').forEach(el => { if (el.style.backgroundImage) probarFoto(el); else new MutationObserver((l, o) => { if (el.style.backgroundImage) { o.disconnect(); probarFoto(el); } }).observe(el, { attributes: true, attributeFilter: ['style'] }); });
   document.querySelectorAll('#strip img').forEach(img => img.addEventListener('error', () => { img.style.visibility = 'hidden'; }, { once: true }));
+  /* lanz3-visitante · Lo que se vio de esta propiedad, por si se guarda y después se pausa (Guardados la sigue mostrando) */
+  if (BP.isFav(a.id)) BP.recordarFav(a);
+  document.addEventListener('bp:fav', e => { if (!e.detail || !e.detail.on) return; const x = avisos.find(y => y.id === e.detail.id); if (x) BP.recordarFav(x); });
   /* 25/9/2026 · "Saltar al contenido" apuntaba al main, que empieza con la galería: el salto dejaba
      a la persona adentro de las fotos. Ahora va a la ficha propiamente dicha (#contenido), después. */
   const skip = document.getElementById('pSkip'); if (skip) skip.href = '#contenido';

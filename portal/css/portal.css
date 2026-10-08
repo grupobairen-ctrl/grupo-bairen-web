@@ -4309,6 +4309,17 @@ body.p-ficha-page .p-fhero-slide.p-fhero-rota{background:#131D2D;cursor:default}
 }
 /* Ficha: la confirmación repite la visita pedida */
 body.p-ficha-page .p-form-ok .p-ok-visita{margin:8px 0 0;font:500 .95rem/1.45 var(--font-body);color:#131D2D}
+/* Ficha de una guardada que hoy está pausada */
+body.p-ficha-page .p-fpausada{max-width:640px;margin:0 auto 24px}
+body.p-ficha-page .p-fpausada h1{line-height:1.15}
+body.p-ficha-page .p-fpausada .p-fop{margin:0 0 8px;font:500 .75rem/1.2 var(--font-body);letter-spacing:.16em;text-transform:uppercase;color:#8A7547}
+body.p-ficha-page .p-fpausada .p-btn{display:inline-flex;align-items:center;min-height:48px;padding:0 24px;margin-top:8px}
+
+/* Guardados: la guardada pausada, con su foto apagada y la marca arriba; el corazón la saca */
+.p-tj.p-tj-pausada .tj-link{cursor:default}
+.p-tj.p-tj-pausada .tj-foto img{filter:grayscale(.6);opacity:.55}
+.p-tj.p-tj-pausada .tj-titulo{color:#565E6E}
+
 /* Menú del celular con sesión: Cerrar sesión a un toque */
 .mobile-menu .m-salir{display:block;width:100%;min-height:44px;margin:14px 0 0;padding:0;background:none;border:0;border-top:1px solid rgba(255,255,255,.07);
   text-align:left;font:400 .85rem/1.3 var(--font-body);letter-spacing:.02em;color:rgba(251,250,246,.62);cursor:pointer}
