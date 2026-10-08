@@ -745,5 +745,48 @@
     setTimeout(() => { mo.disconnect(); document.querySelectorAll('.bp-vt-destino').forEach(x => irse(x)); }, 8000);
   })();
 
+  /* ── 2 · Precarga al tocar ──────────────────────────────────────────────────
+     Cuando el mouse se apoya en un enlace (o el dedo lo toca), la página de destino se pide antes del clic.
+     Chrome: reglas de especulación, "prefetch" con eagerness moderate (baja el HTML y nada más: no corre
+     código ajeno, no cuenta visitas ni toca la sesión). Safari y el resto: un <link rel="prefetch"> al
+     apoyar el dedo o el mouse. Solo páginas de lectura del portal, del mismo origen: la ficha, el catálogo
+     (también sus direcciones limpias), guardados, el panel y la portada. Nunca Ingresar, WhatsApp, mail,
+     enlaces externos, ni lo que hace algo al abrirse (crear una alerta, cerrar sesión). */
+  const PRECARGA_RUTAS = /\/(propiedad(\.html)?|propiedad-[^/]+|buscar(\.html)?|guardados(\.html)?|panel(\.html)?|index\.html|(departamentos|pisos|ph|casas|propiedades)-[a-z0-9-]+)?$/i;
+  const SIN_PRECARGA = 'a[target="_blank"], a[download], a[data-wa], a[data-logout], a[href^="#"], a[href*="ingresar"], a[href*="alerta="], a[href*="logout"], a[data-no-precarga]';
+  const sePrecarga = a => {
+    if (!a || !a.href || a.matches(SIN_PRECARGA)) return false;
+    try {
+      const u = new URL(a.href, location.href);
+      if (u.origin !== location.origin || !/^https?:$/.test(u.protocol)) return false;
+      if (u.pathname === location.pathname && u.search === location.search) return false;
+      const base = BP.SITIO.replace(location.origin, '');
+      if (u.pathname.indexOf(base) !== 0) return false;
+      return PRECARGA_RUTAS.test('/' + u.pathname.slice(base.length));
+    } catch (e) { return false; }
+  };
+  (function(){
+    const conReglas = window.HTMLScriptElement && HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules');
+    if (conReglas) {
+      const s = document.createElement('script'); s.type = 'speculationrules';
+      s.textContent = JSON.stringify({ prefetch: [{ source: 'document', eagerness: 'moderate', where: { and: [
+        { href_matches: ['propiedad*', 'buscar*', 'guardados*', 'panel*', 'index.html', 'departamentos-*', 'pisos-*', 'ph-*', 'casas-*', 'propiedades-*'], relative_to: 'document' },
+        { not: { selector_matches: SIN_PRECARGA } }
+      ] } }] });
+      document.head.appendChild(s);
+      return;
+    }
+    const pedidas = new Set();
+    const pedir = a => {
+      if (!sePrecarga(a)) return;
+      const u = a.href.split('#')[0]; if (pedidas.has(u) || pedidas.size > 40) return; pedidas.add(u);
+      const l = document.createElement('link'); l.rel = 'prefetch'; l.href = u; document.head.appendChild(l);
+    };
+    let espera = null;
+    document.addEventListener('pointerover', e => { if (e.pointerType !== 'mouse') return; const a = e.target.closest && e.target.closest('a[href]'); clearTimeout(espera); if (a) espera = setTimeout(() => pedir(a), 80); }, { passive: true });
+    document.addEventListener('pointerout', () => clearTimeout(espera), { passive: true });
+    ['touchstart', 'pointerdown'].forEach(t => document.addEventListener(t, e => { const a = e.target.closest && e.target.closest('a[href]'); if (a) pedir(a); }, { passive: true, capture: true }));
+  })();
+
   window.BP = BP;
 })();
