@@ -14,6 +14,9 @@
   const uid = () => 'l' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
   const now = () => new Date().toISOString();
   const slugify = t => (t||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  /* 8/10/2026 · Nombre con la inicial del apellido ("Graciela P."), igual que portal.nombre_publico() de la migración 12 */
+  const conInicial = n => { const w = String(n || '').trim().split(/\s+/).filter(Boolean); return w.length > 1 ? w.slice(0, -1).concat(w[w.length - 1].charAt(0).toUpperCase() + '.').join(' ') : w.join(' '); };
+  const yaConInicial = n => /\s\S\.$/.test(String(n || '').trim());
   /* 12/9 · Idioma: los textos que el store le muestra a la gente (mensajes del código, del perfil, de la imagen) pasan por
      BP.tf con el castellano por defecto; si ui.js no está (un script suelto), queda el castellano. */
   const T = (k, es, vars) => (window.BP && BP.tf) ? BP.tf(k, es, vars) : String(es).replace(/\{(\w+)\}/g, (m, x) => vars && vars[x] != null ? vars[x] : m);
@@ -334,11 +337,13 @@
       const mat = (datos && datos.matricula) ? String(datos.matricula) : (pub.matricula || '');
       const persona = {
         auth_user_id: S.session.id,
-        nombre: (datos && datos.responsable) || pub.responsable || pub.nombre,
+        nombre: (datos && datos.responsable) || pub.responsable || pub.nombre,   /* el dueño: ver abajo */
         email: pub.email || S.session.email, telefono: pub.telefono || null, whatsapp: pub.whatsapp || null,
         /* 8/10/2026 (venta) · El colegio se elige en Tu empresa: manda el elegido; si no hay, el que diga la matrícula */
         matricula: (mat.replace(/\D/g, '') || null), colegio: mat ? (pub.colegio || (datos && datos.colegio) || (/cucicba/i.test(mat) ? 'CUCICBA' : null)) : null,
       };
+      /* 8/10/2026 · Un dueño que edita su perfil manda el nombre ya abreviado (es el que ve): la persona conserva el completo */
+      if (pub.tipo === 'dueno' && yaConInicial(persona.nombre)) { const { data: ya } = await S.sb.schema('portal').from('personas').select('nombre').eq('auth_user_id', S.session.id).maybeSingle(); if (ya && ya.nombre) persona.nombre = ya.nombre; }
       const dni = datos && datos.dni ? String(datos.dni).replace(/\D/g, '') : '';
       if (dni) persona.dni = dni;
       const { data: per, error } = await S.sb.schema('portal').from('personas').upsert(persona, { onConflict: 'auth_user_id' }).select().single();
@@ -350,6 +355,10 @@
   };
   S.savePublicador = async function(p){
     if (!S.session) throw new Error('sin sesión');
+    /* 8/10/2026 · El dueño directo: publicadores (que se lee con la clave pública) lleva el nombre con la inicial del
+       apellido, también en el slug. El nombre completo va solo a portal.personas, que ve la persona y el equipo. */
+    const completoDueno = (p.tipo || 'dueno') === 'dueno' ? String(p.nombre || '').trim() : '';
+    if (completoDueno) p = Object.assign({}, p, { nombre: conInicial(completoDueno) });
     const rec = Object.assign({ tipo:'dueno', verificado:false, zonas:[], badge: p.tipo === 'dueno' ? 'Dueño verificado' : p.tipo === 'desarrolladora' ? 'Venta directa' : p.tipo === 'gestor' ? 'Gestor de alquileres' : 'Corredor inmobiliario matriculado' }, p, { auth_user_id: S.session.id, email: p.email || S.session.email, slug: p.slug || slugify(p.nombre) + '-' + (S.session.id||'').slice(-4), updated_at: now() });
     if (S.mode === 'supabase') {
       /* El DNI es de la persona (portal.personas, migración 01), no del publicador: a la tabla publicadores no va, o PostgREST rechaza la fila entera. */
@@ -357,7 +366,7 @@
       /* 8/10/2026 (tanda 2) · Quien publica no decide si está verificado: el valor por defecto (false) de arriba no viaja.
          En un alta la base pone false; al editar el perfil, no le saca la verificación a un publicador ya verificado. */
       delete fila.verificado;
-      const { data, error } = await S.sb.schema('portal').from('publicadores').upsert(fila, { onConflict: 'auth_user_id' }).select().single(); if (error) throw error; await S.vincularTitular(data, p); return data;
+      const { data, error } = await S.sb.schema('portal').from('publicadores').upsert(fila, { onConflict: 'auth_user_id' }).select().single(); if (error) throw error; await S.vincularTitular(data, completoDueno && completoDueno !== p.nombre ? Object.assign({}, p, { responsable: completoDueno }) : p); return data;
     }
     S.track('publicador_alta', { publicador_id: rec.id || null, datos: { tipo: rec.tipo } });
     const all = L.pubs.get([]); const i = all.findIndex(x => x.auth_user_id === S.session.id); if (i > -1) { rec.id = all[i].id; rec.created_at = all[i].created_at; rec.verificado = all[i].verificado; all[i] = Object.assign(all[i], rec); } else { rec.id = uid(); rec.created_at = now(); all.push(rec); } L.pubs.set(all); return rec;
