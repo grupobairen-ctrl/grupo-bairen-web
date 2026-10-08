@@ -495,9 +495,14 @@
   };
 
   /* ── mails al publicador (función de servidor; en modo local no hay envío) ── */
+  /* 8/10/2026 · Con la sesión, el token va en Authorization: api/portal-notify.js solo manda 'aprobado', 'rechazado',
+     'cambios' y 'verificado' si es la sesión de un curador, y 'revision' (al equipo) si es la del publicador del aviso.
+     'consulta' sigue sin sesión. */
   S.notify = async function(tipo, payload){
     if (S.mode !== 'supabase') return { skipped: true };
-    try { const r = await fetch('/api/portal-notify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign({ tipo }, payload)) }); return await r.json().catch(() => ({ ok: r.ok })); } catch (e) { return { error: String(e) }; }
+    const headers = { 'Content-Type': 'application/json' };
+    const token = DEMO ? null : await S.tokenAcceso(); if (token) headers.Authorization = 'Bearer ' + token;
+    try { const r = await fetch('/api/portal-notify', { method: 'POST', headers, body: JSON.stringify(Object.assign({ tipo }, payload)) }); return await r.json().catch(() => ({ ok: r.ok })); } catch (e) { return { error: String(e) }; }
   };
 
   /* ── 4.5 Lo que hoy vive en el navegador y tiene tabla propia ── */
