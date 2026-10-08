@@ -56,6 +56,7 @@ window.BP_I18N = {
     /* amenities y características */
     ui_dato_pileta: 'Pool', ui_dato_gimnasio: 'Gym', ui_dato_sum: 'Multipurpose room', ui_dato_parrilla: 'Barbecue', ui_dato_seguridad_24hs: '24h security', ui_dato_terraza_o_jardin: 'Terrace or garden', ui_dato_jardin_terraza: 'Garden / terrace', ui_dato_ascensor: 'Elevator', ui_dato_laundry: 'Laundry', ui_dato_pet_friendly: 'Pet friendly', ui_dato_aire_acondicionado: 'Air conditioning', ui_dato_aire_acond: 'Air conditioning', ui_dato_baulera: 'Storage room', ui_dato_conserje_24hs: '24h concierge', ui_dato_bicicletero: 'Bike storage', ui_dato_spa_sauna: 'Spa / sauna', ui_dato_amoblado: 'Furnished', ui_dato_sin_amoblar: 'Unfurnished', ui_dato_amoblado_y_equipado: 'Furnished and equipped', ui_dato_pileta_climatizada: 'Heated pool', ui_dato_seguridad: 'Security',
     ui_dato_apto_credito: 'Mortgage eligible', ui_dato_apto_profesional: 'Professional use allowed', ui_dato_ofrece_financiacion: 'Financing available', ui_dato_permite_mascotas: 'Pets allowed', ui_dato_acepta_seguro_de_caucion: 'Accepts surety insurance', ui_dato_contrato_digital: 'Digital contract', ui_dato_sin_garantia_propietaria: 'No guarantor required', ui_dato_entrega_diciembre_2027: 'Delivery December 2027',
+    ui_dato_expensas_incluidas: 'Building fees included', ui_dato_servicios_incluidos: 'Utilities included', ui_dato_internet_incluido: 'Internet included', ui_dato_limpieza_incluida: 'Cleaning included', ui_dato_ropa_blanca_incluida: 'Bed linen included',
     /* plazos, tipos e insignias */
     ui_dato_3_12_meses: '3 to 12 months', ui_dato_a_partir_de_2_anos: 'From 2 years',
     ui_dato_departamento: 'Apartment', ui_dato_piso: 'Full-floor apartment', ui_dato_casa: 'House',
@@ -125,6 +126,7 @@ window.BP_I18N = {
     /* ficha: tarjeta de contacto y formulario */
     ficha_lbl_venta: 'Sale price', ficha_lbl_mensual: 'Monthly rent',
     ficha_direccion: 'Address', ficha_barrio: 'Neighborhood', ficha_superficie: 'Area', ficha_ambientes_lbl: 'Rooms', ficha_monoamb_val: 'Studio', ficha_plazo_lbl: 'Term', ficha_exp_serv: 'Fees and utilities', ficha_todos_incl: 'All included', ficha_expensas: 'Building fees', ficha_exp_val: '$ {n} per month', ficha_disponible: 'Available',
+    ficha_estadia_min: 'Minimum stay', ficha_estadia_tile: 'Minimum stay {p}', ficha_incluye: 'Includes',
     ficha_publica: 'Listed by', ficha_dueno_v: 'Verified owner', ficha_venta_directa: 'Direct sale', ficha_corredor_resp: 'Responsible broker: {r}, {m}',
     ficha_cual_1: 'One quality verified by BAIREN', ficha_cual_n: '{n} qualities verified by BAIREN', ficha_revisada: 'Listing reviewed by BAIREN before going live',
     ficha_res_box: 'Reserved: not taking enquiries for now. If it frees up, it will be listed here again.', ficha_sin_contacto: 'Contact pending: {p} has not added a WhatsApp or email yet. BAIREN does not take part in the transaction, so the only valid contact is the lister.',
@@ -292,6 +294,7 @@ window.BP_I18N = {
     /* amenities y características */
     ui_dato_pileta: 'Piscina', ui_dato_gimnasio: 'Academia', ui_dato_sum: 'Salão de festas', ui_dato_parrilla: 'Churrasqueira', ui_dato_seguridad_24hs: 'Segurança 24h', ui_dato_terraza_o_jardin: 'Terraço ou jardim', ui_dato_jardin_terraza: 'Jardim / terraço', ui_dato_ascensor: 'Elevador', ui_dato_laundry: 'Lavanderia', ui_dato_pet_friendly: 'Pet friendly', ui_dato_aire_acondicionado: 'Ar-condicionado', ui_dato_aire_acond: 'Ar-condicionado', ui_dato_baulera: 'Depósito', ui_dato_conserje_24hs: 'Portaria 24h', ui_dato_bicicletero: 'Bicicletário', ui_dato_spa_sauna: 'Spa / sauna', ui_dato_amoblado: 'Mobiliado', ui_dato_sin_amoblar: 'Sem mobília', ui_dato_amoblado_y_equipado: 'Mobiliado e equipado', ui_dato_pileta_climatizada: 'Piscina aquecida', ui_dato_seguridad: 'Segurança',
     ui_dato_apto_credito: 'Aceita financiamento', ui_dato_apto_profesional: 'Permite uso profissional', ui_dato_ofrece_financiacion: 'Oferece financiamento', ui_dato_permite_mascotas: 'Aceita pets', ui_dato_acepta_seguro_de_caucion: 'Aceita seguro-fiança', ui_dato_contrato_digital: 'Contrato digital', ui_dato_sin_garantia_propietaria: 'Sem fiador', ui_dato_entrega_diciembre_2027: 'Entrega em dezembro de 2027',
+    ui_dato_expensas_incluidas: 'Condomínio incluído', ui_dato_servicios_incluidos: 'Contas incluídas', ui_dato_internet_incluido: 'Internet incluída', ui_dato_limpieza_incluida: 'Limpeza incluída', ui_dato_ropa_blanca_incluida: 'Roupa de cama incluída',
     /* plazos, tipos e insignias */
     ui_dato_3_12_meses: '3 a 12 meses', ui_dato_a_partir_de_2_anos: 'A partir de 2 anos',
     ui_dato_departamento: 'Apartamento', ui_dato_piso: 'Andar inteiro', ui_dato_casa: 'Casa',
@@ -361,6 +364,7 @@ window.BP_I18N = {
     /* ficha: tarjeta de contacto y formulario */
     ficha_lbl_venta: 'Preço de venda', ficha_lbl_mensual: 'Aluguel mensal',
     ficha_direccion: 'Endereço', ficha_barrio: 'Bairro', ficha_superficie: 'Área', ficha_ambientes_lbl: 'Ambientes', ficha_monoamb_val: 'Studio', ficha_plazo_lbl: 'Prazo', ficha_exp_serv: 'Condomínio e serviços', ficha_todos_incl: 'Tudo incluído', ficha_expensas: 'Condomínio', ficha_exp_val: '$ {n} por mês', ficha_disponible: 'Disponível',
+    ficha_estadia_min: 'Estadia mínima', ficha_estadia_tile: 'Estadia mínima {p}', ficha_incluye: 'Inclui',
     ficha_publica: 'Publicado por', ficha_dueno_v: 'Proprietário verificado', ficha_venta_directa: 'Venda direta', ficha_corredor_resp: 'Corretor responsável: {r}, {m}',
     ficha_cual_1: 'Uma qualidade verificada pela BAIREN', ficha_cual_n: '{n} qualidades verificadas pela BAIREN', ficha_revisada: 'Anúncio revisado pela BAIREN antes de publicar',
     ficha_res_box: 'Reservado: por enquanto não recebe consultas. Se for liberado, volta a ser publicado aqui.', ficha_sin_contacto: 'Contato pendente: {p} ainda não cadastrou WhatsApp nem e-mail. A BAIREN não participa da operação, então o único contato válido é o de quem publica.',

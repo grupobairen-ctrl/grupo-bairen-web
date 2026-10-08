@@ -263,8 +263,17 @@
 
   D.bindFavs = root => { (root||document).querySelectorAll('[data-fav]').forEach(b => { if (b._bound) return; b._bound = true; b.addEventListener('click', e => { e.preventDefault(); const on = BP.toggleFav(b.dataset.fav); b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); b.innerHTML = on ? BP.ico.heartFill : BP.ico.heart; BP.toast(on ? BP.t('card_fav_on', 'Guardada en favoritos') : BP.t('card_fav_off', 'Quitada de favoritos')); }); }); };
 
-  /* El precio del aviso incluye expensas y servicios: el alquiler a mediano plazo (op 'mediano') */
-  D.todoIncluido = a => a.op === 'mediano';
+  /* 8/10/2026 · Regla de "todo incluido" (contrato del lanzamiento). Antes era todo el mediano plazo; ahora
+     publican también otras empresas. Se dice "todo incluido" en un aviso de mediano plazo de BAIREN REALTY
+     (publicador 'bairen') o cuando el aviso tiene a la vez 'Expensas incluidas' y 'Servicios incluidos'.
+     Si no, el precio va por mes y la ficha muestra lo que incluye (los textos de D.INCLUYE, si hay). */
+  D.INCLUYE = ['Expensas incluidas', 'Servicios incluidos', 'Internet incluido', 'Limpieza incluida', 'Ropa blanca incluida'];
+  D.incluye = a => (a.caracteristicas || []).filter(x => D.INCLUYE.indexOf(x) > -1);
+  D.todoIncluido = a => a.op === 'mediano' && (a.publicadorId === 'bairen' || (D.incluye(a).indexOf('Expensas incluidas') > -1 && D.incluye(a).indexOf('Servicios incluidos') > -1));
+  D.expensasIncluidas = a => D.todoIncluido(a) || D.incluye(a).indexOf('Expensas incluidas') > -1;
+  /* En mediano plazo, `plazo` es la estadía mínima ("3 meses"). Los avisos que vienen de la web traen el rango
+     entero ("3-12 meses"): eso no es un mínimo, y se sigue mostrando como "Plazo". */
+  D.estadiaMinima = a => a.op === 'mediano' && !!a.plazo && !/\d\s*(?:-|–|a|to)\s*\d/i.test(a.plazo);
   D.filter = function(avisos, f){
     return avisos.filter(a => {
       if (f.favs && !BP.isFav(a.id)) return false;
@@ -284,7 +293,7 @@
       /* 25/9/2026 · El precio del mediano plazo es todo incluido (la ficha lo dice: "por mes · todo
          incluido"; en los datos no hay otra marca, es la operación 'mediano'): ahí las expensas cuentan
          como 0 y el aviso pasa cualquier máximo. Si no es todo incluido y no hay dato, no pasa. */
-      if (f.expmax && !(D.todoIncluido(a) || (a.expensas > 0 && a.expensas <= f.expmax))) return false;
+      if (f.expmax && !(D.expensasIncluidas(a) || (a.expensas > 0 && a.expensas <= f.expmax))) return false;
       if (f.amb && (a.amb||0) < f.amb) return false;
       if (f.dorm && (a.dorm||0) < f.dorm) return false;
       if (f.banos && (a.banos||0) < f.banos) return false;
