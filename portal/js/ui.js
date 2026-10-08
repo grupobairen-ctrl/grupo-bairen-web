@@ -38,7 +38,7 @@
 
   BP.sbImg = function(u, w){
     if (!u || u.indexOf('/storage/v1/object/public/') === -1) return u;
-    return u.replace('/storage/v1/object/public/','/storage/v1/render/image/public/') + (u.indexOf('?')>-1?'&':'?') + 'width=' + w + '&quality=75';
+    return u.replace('/storage/v1/object/public/','/storage/v1/render/image/public/') + (u.indexOf('?')>-1?'&':'?') + 'width=' + w + '&resize=contain&quality=75';
   };
   BP.LOCALE = () => ({ en: 'en-US', pt: 'pt-BR' })[BP.lang] || 'es-AR';
   BP.fmtUSD = n => n == null ? BP.t('ui_consultar', 'Consultar') : 'USD ' + Math.round(n).toLocaleString(BP.LOCALE());
