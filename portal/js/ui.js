@@ -652,5 +652,98 @@
   BP.SITIO = (function(){ try { return location.origin + location.pathname.replace(/[^/]*$/, ''); } catch (e) { return '/'; } })();
   BP.OS_URL = 'https://os.bairengroup.com';
 
+  /* ══ 8/10/2026 · Movimiento y navegación ═══════════════════════════════════
+     Lo que hace que pasar de una página a otra se sienta rápido. El CSS está en css/transiciones.css. */
+  const QUIETO = (() => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } })();
+  /* El id de la ficha a la que lleva un enlace del portal (propiedad.html?id=… o propiedad-…), o null */
+  const idDeFicha = href => {
+    try {
+      const u = new URL(href, location.href); if (u.origin !== location.origin) return null;
+      const m = u.pathname.match(/\/propiedad-([^/]+)$/); if (m) return decodeURIComponent(m[1]);
+      if (/\/propiedad(\.html)?$/.test(u.pathname)) return u.searchParams.get('id') || u.searchParams.get('slug');
+    } catch (e) { /* dirección rara */ }
+    return null;
+  };
+
+  /* ── 1 · La foto viaja de la tarjeta a la ficha ─────────────────────────────
+     Ida: al tocar una tarjeta, su foto se llama "foto" (view-transition-name) justo antes de navegar y se
+     anota cuál era. En la ficha, un script del <head> (propiedad.html) pone esa misma foto, con el mismo
+     nombre, donde va a quedar la foto principal: el navegador la hace crecer de la tarjeta hasta ahí. Esa
+     copia queda encima hasta que la foto propia de la ficha está bajada, y ahí se funde (abajo, "relevo").
+     No se nombra el esqueleto de la ficha: la página lo reemplaza mientras llegan los datos y Chrome corta
+     la transición si desaparece un elemento con nombre.
+     Vuelta: al irse de la ficha hacia atrás, su foto principal se llama "foto"; la lista vuelve de la caché
+     del navegador con la tarjeta todavía nombrada, y la foto se achica hasta ella.
+     Nunca dos elementos con el mismo nombre: eso cancela la transición entera. */
+  const VT_CLAVE = 'bp_vt_foto', VT_HEROE = 'bp_vt_heroe';
+  const sinNombres = () => document.querySelectorAll('[data-bp-vt]').forEach(el => { el.style.viewTransitionName = ''; el.removeAttribute('data-bp-vt'); });
+  const nombrar = el => { el.style.viewTransitionName = 'foto'; el.setAttribute('data-bp-vt', ''); };
+  const leer = k => { try { return JSON.parse(sessionStorage.getItem(k) || 'null'); } catch (e) { return null; } };
+  document.addEventListener('click', e => {
+    if (QUIETO || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    const a = e.target.closest && e.target.closest('a[href]'); if (!a || (a.target && a.target !== '_self') || a.hasAttribute('download')) return;
+    const id = idDeFicha(a.href); if (!id) return;
+    const caja = a.querySelector('img') ? a : (a.closest('.prop-card, .p-card-h, .h-edif') || a);
+    const img = caja.querySelector('.tj-foto img, .p-card-photo img, img');
+    sinNombres(); document.querySelectorAll('.bp-vt-destino').forEach(x => x.remove());
+    if (!img || !img.complete || !img.naturalWidth) return;
+    const r = img.getBoundingClientRect(); if (r.bottom <= 0 || r.top >= innerHeight || !r.width) return;
+    nombrar(img);
+    /* Dónde quedó la foto principal la última vez que se vio una ficha en esta pantalla (si no, la ficha lo estima) */
+    const h = leer(VT_HEROE), heroe = h && h.w === innerWidth && h.h === innerHeight ? h.r : null;
+    try { sessionStorage.setItem(VT_CLAVE, JSON.stringify({ id: String(id), src: img.currentSrc || img.src, t: Date.now(), heroe })); } catch (err) { /* sin sessionStorage */ }
+  });
+  /* Al irse de la ficha sin haber tocado una tarjeta (volver, el logo, la barra): la foto principal se nombra */
+  addEventListener('pageswap', e => {
+    if (QUIETO || !e.viewTransition || !document.body.classList.contains('p-ficha-page')) return;
+    document.querySelectorAll('.bp-vt-destino').forEach(x => x.remove());
+    if (document.querySelector('[data-bp-vt]')) return;   /* ya hay una tarjeta nombrada (similares) */
+    const s0 = document.querySelector('#gal .p-fhero-slide[data-i="0"]'), hs = document.getElementById('heroSlides');
+    const g = s0 && hs && hs.scrollLeft < 4 ? s0 : document.getElementById('gal');
+    if (g && g.getBoundingClientRect().bottom > 0) nombrar(g);
+  });
+  /* Terminada una transición (o vuelta la página desde la caché del navegador), los nombres se sueltan */
+  addEventListener('pagereveal', e => { if (e.viewTransition) e.viewTransition.finished.then(sinNombres, sinNombres); else sinNombres(); });
+  addEventListener('pageshow', e => { if (e.persisted && !('onpagereveal' in window)) sinNombres(); });
+  /* En la ficha: relevo de la copia que llegó volando. Se acomoda sobre la foto principal cuando aparece y se
+     funde en 200 ms apenas la foto propia bajó (o si la persona desliza las fotos). Se anota dónde quedó la foto
+     principal, para que la próxima vez la copia aterrice ya en su lugar. */
+  (function(){
+    if (!document.body || !document.body.classList.contains('p-ficha-page')) return;
+    const heroe = () => document.querySelector('#gal .p-fhero-slide[data-i="0"]');
+    const anotar = s0 => { const b = s0.getBoundingClientRect(); if (!b.width) return; try { sessionStorage.setItem(VT_HEROE, JSON.stringify({ w: innerWidth, h: innerHeight, r: [Math.round(b.left), Math.round(b.top + scrollY), Math.round(b.width), Math.round(b.height)] })); } catch (e) { /* nada */ } };
+    let hecho = false;
+    /* Se retira recién cuando terminó el viaje: Chrome corta la transición si desaparece un elemento con nombre */
+    const irse = (ov, rapido) => {
+      if (!ov.isConnected) return;
+      if (ov._vt && !ov._vtListo) { ov._vt.finished.then(() => { ov._vtListo = true; irse(ov, rapido); }, () => { ov._vtListo = true; irse(ov, rapido); }); return; }
+      ov.style.viewTransitionName = 'none';
+      if (rapido || !ov.animate) { ov.remove(); return; }
+      ov.animate({ opacity: [1, 0] }, { duration: 200, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'forwards' }).finished.then(() => ov.remove(), () => ov.remove());
+    };
+    const relevo = () => {
+      const s0 = heroe(); if (s0 && !hecho) { hecho = true; anotar(s0); }
+      const ov = document.querySelector('.bp-vt-destino'); if (!ov) return !!s0;
+      if (!s0) { if (document.getElementById('ficha') && !document.getElementById('ficha').hasAttribute('aria-busy') && !document.querySelector('.p-fhero-skel, .p-skel-ficha')) irse(ov); return false; }
+      if (ov._relevo) return true; ov._relevo = true;
+      /* Si la copia aterrizó en otro lugar (primera ficha de la visita), se corre hasta la foto principal */
+      const a = ov.getBoundingClientRect(), b = s0.getBoundingClientRect();
+      if (Math.abs(a.left - b.left) + Math.abs(a.top - b.top) + Math.abs(a.width - b.width) + Math.abs(a.height - b.height) > 4) {
+        ov.style.left = Math.round(b.left + scrollX) + 'px'; ov.style.top = Math.round(b.top + scrollY) + 'px'; ov.style.width = Math.round(b.width) + 'px'; ov.style.height = Math.round(b.height) + 'px';
+        if (ov.animate && !QUIETO) ov.animate({ transform: [`translate(${a.left - b.left}px,${a.top - b.top}px) scale(${a.width / b.width},${a.height / b.height})`, 'none'] }, { duration: 220, easing: 'cubic-bezier(.22,1,.36,1)' });
+      }
+      const m = /url\(['"]?([^'")]+)['"]?\)/.exec(s0.style.backgroundImage || '');
+      const fin = () => setTimeout(() => irse(ov), 60);
+      if (m) { const im = new Image(); im.onload = im.onerror = fin; im.src = m[1]; if (im.complete) fin(); } else fin();
+      const hs = document.getElementById('heroSlides'); if (hs) hs.addEventListener('scroll', () => irse(ov, true), { once: true, passive: true });
+      return true;
+    };
+    document.addEventListener('bp:vt-destino', relevo);
+    if (relevo()) return;
+    const mo = new MutationObserver(() => { if (relevo()) mo.disconnect(); });
+    mo.observe(document.getElementById('ficha') || document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['aria-busy'] });
+    setTimeout(() => { mo.disconnect(); document.querySelectorAll('.bp-vt-destino').forEach(x => irse(x)); }, 8000);
+  })();
+
   window.BP = BP;
 })();
