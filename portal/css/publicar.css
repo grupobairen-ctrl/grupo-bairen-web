@@ -320,3 +320,7 @@ body.p-flujo-pub .pf-foto .mas{border-radius:var(--r-ctl) 0 0 0!important}
 body.p-flujo-pub .pf-hoja-caja{border-radius:var(--r-box) var(--r-box) 0 0!important;box-shadow:0 -8px 32px rgba(10,20,40,.12)}
 body.p-flujo-pub .pf-hoja-caja::before{border-radius:var(--r-pill)!important}
 @media(min-width:760px){body.p-flujo-pub .pf-unidades{border-radius:var(--r-box)!important;overflow:hidden}body.p-flujo-pub .pf-u{border-radius:0!important}}
+
+/* ── 8/10/2026 · Pasada premium: la barra de Continuar, translúcida con desenfoque y con su respaldo opaco ── */
+.pf-pie{border-top:1px solid var(--pf-linea);background:#F4F0E6}
+@supports ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.pf-pie{background:rgba(244,240,230,.82);-webkit-backdrop-filter:blur(16px) saturate(140%);backdrop-filter:blur(16px) saturate(140%)}}

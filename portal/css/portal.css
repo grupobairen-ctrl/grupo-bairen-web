@@ -4671,6 +4671,24 @@ body.p-panel-page .p-mas-menu a,body.p-panel-page .p-mas-menu button{border-radi
 body.p-flujo-pub{--p-focus-b:#131D2D}
 .pf-top,.p-catband,.p-mcta,.p-tabbar,.h-hoja,.h-hero,body.p-ficha-page .p-ficha2 .p-cta-price,.p-page.dark{--p-focus-b:#DECDA0}
 
+/* ── 4 · Barras fijas: translúcidas, con línea fina arriba ───────────────────────────────────────────────── */
+@media(max-width:859px){
+  .p-tabbar{background:#131D2D;border-top:1px solid rgba(251,250,246,.10);box-shadow:none}
+  .p-tabbar a{font:400 .75rem/1 var(--font-body)!important;letter-spacing:.01em!important;color:rgba(251,250,246,.66)}
+  .p-tabbar a.on{color:var(--gold-light,#DECDA0);font-weight:500!important}
+}
+@media(max-width:900px){
+  .p-mcta{background:#131D2D;border-top:1px solid rgba(251,250,246,.10);gap:10px;padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
+  .p-mcta-price{font:500 1.0625rem/1.15 var(--font-body)!important;color:#FBFAF6}
+  .p-mcta-price small{font:400 .8125rem/1.2 var(--font-body)!important;color:rgba(251,250,246,.66)}
+  .p-mcta .p-btn{min-height:46px;padding:0 16px!important;letter-spacing:.005em!important}
+  .p-mcta .p-mcta-sec{border-color:rgba(251,250,246,.32)!important}
+}
+@supports ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  @media(max-width:859px){.p-tabbar{background:var(--p-barra);-webkit-backdrop-filter:blur(16px) saturate(140%);backdrop-filter:blur(16px) saturate(140%)}}
+  @media(max-width:900px){.p-mcta{background:var(--p-barra);-webkit-backdrop-filter:blur(16px) saturate(140%);backdrop-filter:blur(16px) saturate(140%)}}
+}
+
 /* ── 6 · Portada: el video con su luz real ────────────────────────────────────────────────────────────────
    Tomás (8/10): en el celular la caja tapaba un tercio del video y un velo parejo lo apagaba entero. Fuera el velo
    parejo y la opacidad del video: solo un degradé abajo, detrás del título y la barra, y uno chico arriba, detrás
