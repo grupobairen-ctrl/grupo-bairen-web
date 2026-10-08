@@ -94,7 +94,10 @@ document.addEventListener('DOMContentLoaded', function(){
   if (!BPStore.requireSession('publicar')) return;
   document.getElementById('modeNote').textContent = mode === 'local' ? 'Modo local: el aviso y las fotos quedan en este navegador.' : '';
   const qs = BP.qs(); const editId = qs.get('id'); let perfil = qs.get('perfil') || '';
-  const ZONAS = BP.ZONAS; const BARRIOS = { 'Palermo':['Palermo','Palermo Soho','Palermo Hollywood','Palermo Chico','Las Cañitas','Botánico'], 'Recoleta':['Recoleta','Barrio Norte','Barrio Parque'], 'Belgrano':['Belgrano','Belgrano R','Belgrano C','Bajo Belgrano'], 'Núñez':['Núñez'], 'Colegiales':['Colegiales'], 'Puerto Madero':['Puerto Madero'], 'Saavedra':['Saavedra'], 'GBA Norte':['Vicente López','Olivos','La Lucila','Martínez','San Isidro','Acassuso','Beccar','Tigre','Nordelta','Pilar'] };
+  const ZONAS = BP.ZONAS; const BARRIOS = { 'Palermo':['Palermo','Palermo Soho','Palermo Hollywood','Palermo Chico','Las Cañitas','Botánico'], 'Recoleta':['Recoleta','Barrio Norte','Barrio Parque'], 'Retiro':['Retiro'], 'Belgrano':['Belgrano','Belgrano R','Belgrano C','Bajo Belgrano'], 'Núñez':['Núñez'], 'Colegiales':['Colegiales'], 'Villa Crespo':['Villa Crespo'], 'Puerto Madero':['Puerto Madero'], 'Saavedra':['Saavedra'], 'GBA Norte':['Vicente López','Olivos','La Lucila','Martínez','San Isidro','Acassuso','Beccar','Tigre','Nordelta','Pilar'] };
+  /* 8/10/2026 · Una zona de BP.ZONAS sin lista acá trababa el formulario (Retiro y Villa Crespo). Si mañana se suma
+     otra, ofrece la zona misma como barrio; y el barrio que ya tiene el aviso (un importado) no se pierde al editar. */
+  const barriosDe = (z, actual) => { const l = (BARRIOS[z] || [z]).slice(); if (actual && l.indexOf(actual) === -1) l.unshift(actual); return l; };
   const AMEN = ['Pileta','Gimnasio','SUM','Parrilla','Seguridad 24hs','Conserje 24hs','Cochera','Terraza o jardín','Balcón','Ascensor','Laundry','Baulera','Bicicletero','Spa / Sauna','Aire acondicionado','Calefacción central','Pet friendly','Amoblado'];
   const CARACT = ['Apto crédito','Apto profesional','Ofrece financiación','Permite mascotas','Luminoso','Acepta seguro de caución','Contrato digital'];
   let pub = await BPStore.getMyPublicador();
@@ -195,7 +198,7 @@ document.addEventListener('DOMContentLoaded', function(){
       </div>
       ${navBtns()}`;
     const zs = document.getElementById('f-zona'), bs = document.getElementById('f-barrio');
-    const fillBarrios = () => { const z = zs.value; bs.innerHTML = z ? BARRIOS[z].map(b => `<option value="${b}" ${b===a.barrio?'selected':''}>${b}</option>`).join('') : '<option value="">Elegí primero la zona</option>'; };
+    const fillBarrios = () => { const z = zs.value; bs.innerHTML = z ? barriosDe(z, z === a.zona ? a.barrio : '').map(b => `<option value="${BP.esc(b)}" ${b===a.barrio?'selected':''}>${BP.esc(b)}</option>`).join('') : '<option value="">Elegí primero la zona</option>'; };
     fillBarrios(); zs.addEventListener('change', fillBarrios);
     const bt = document.getElementById('btnTraducir'); if (bt) bt.addEventListener('click', async () => {
       collect(); const desc = (a.descripcion || '').trim(); if (desc.length < 40) { BP.toast('Escribí primero la descripción en castellano.', 'error'); return; }
