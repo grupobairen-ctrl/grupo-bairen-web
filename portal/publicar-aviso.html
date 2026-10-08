@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <script>/* El velo de carga: navy desde el primer byte, se retira cuando la página está lista de verdad:
      load + ningún esqueleto a la vista + las fotos del primer pantallazo cargadas. Si eso pasa en menos de
      500 ms nadie lo ve; si se vio, se queda hasta los 800 ms para no titilar; a los 8 s se va pase lo que
@@ -22,398 +22,736 @@
   setTimeout(V.soltar,8000)})(document.documentElement);</script>
   <title>Publicar una propiedad · BAIREN</title>
   <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#131D2D">
-  <script>
-/* 6.5 · Cuatro páginas bajaban todo para terminar redirigiendo a Ingresar.
-   La comprobación de sesión ocurre acá, antes de los datos y de los assets pesados.
-   Solo decide en modo local; con base conectada decide el store, que ya tiene la sesión. */
-(function(){try{
-  var u=localStorage.getItem('bp_user');
-  var sb=Object.keys(localStorage).some(function(k){return k.indexOf('sb-')===0&&k.indexOf('auth-token')>-1});
-  var demo=/[?&]demo=1(&|$)/.test(location.search)||sessionStorage.getItem('bp_demo')==='1';
-  if((!u||u==='null')&&!sb&&!demo){location.replace('ingresar.html?volver='+encodeURIComponent('publicar'));}
-}catch(e){}})();
-</script>
+  <!-- 8/10/2026 · Tanda 2: la pantalla 1 (¿Qué publicás?) se ve sin sesión; el ingreso se pide al continuar (pantalla 2).
+       Por eso ya no hay redirección a Ingresar en el head: la decide el script de abajo. -->
   <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20261008a"><link rel="stylesheet" href="css/catalogo.css?v=20261008a"><link rel="stylesheet" href="css/portal.css?v=20261008a">
-  <style>
-    .p-stepper{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0 26px}
-    .p-stepper button{display:flex;align-items:center;gap:8px;border:1px solid var(--p-line);background:var(--p-card);border-radius:999px;padding:8px 14px;font:500 .78rem var(--font-body);color:var(--text-mid);cursor:pointer;letter-spacing:.06em}
-    .p-stepper button i{font-style:normal;width:22px;height:22px;border-radius:50%;background:var(--p-tray);color:var(--navy-deeper);display:inline-flex;align-items:center;justify-content:center;font-size:.72rem}
-    .p-stepper button.on{border-color:var(--gold);color:var(--navy-deeper)} .p-stepper button.on i{background:var(--gold)} .p-stepper button.done i{background:var(--navy-deeper);color:#fff}
-    .p-formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px} .p-formgrid .full{grid-column:1/-1}
-    /* 8/10/2026 · El rótulo y la caja de texto son de los campos, no de las casillas: antes les caían a los checkbox de Extras
-       (casillas de 46 px de alto y textos en mayúscula). Los grupos de casillas van en fieldset con su legend. */
-    .p-fld > label,.p-grupo > legend{display:block;font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-dark);margin:0 0 6px;padding:0}
-    .p-fld input:not([type=checkbox]):not([type=radio]),.p-fld select,.p-fld textarea{width:100%;height:46px;border:1px solid var(--p-line);border-radius:8px;padding:0 12px;font:400 .95rem var(--font-body);color:var(--navy-deeper);background:var(--p-card)}
-    .p-fld textarea{height:auto;min-height:150px;padding:12px;resize:vertical} .p-fld input:focus,.p-fld select:focus,.p-fld textarea:focus{border-color:var(--gold)}
-    .p-fld .hint{font-size:.76rem;color:var(--text-mid);margin-top:4px}
-    .p-precio{display:flex;gap:8px} .p-fld .p-precio select{flex:0 0 104px;width:104px} .p-fld .p-precio input{flex:1 1 auto;min-width:0}
-    .p-fld.err input,.p-fld.err select,.p-fld.err textarea{border-color:#B3423C}
-    .p-err-campo[hidden]{display:none}   /* portal.css le da display:block y el mensaje quedaba a la vista después de corregir */
-    .p-grupo{border:0;padding:0;margin:18px 0 0;min-width:0} .p-grupo:first-of-type{margin-top:0} .p-grupo > .p-note{margin:0 0 8px}
-    .p-checks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 20px;max-width:640px}
-    .p-checks label{display:flex;align-items:center;gap:10px;min-height:44px;padding:2px 0;font:400 .92rem/1.3 var(--font-body);letter-spacing:normal;text-transform:none;color:var(--navy-deeper);cursor:pointer}
-    .p-checks input{flex:0 0 auto;width:18px;height:18px;margin:0;accent-color:var(--navy-deeper);cursor:pointer}
-    @media(max-width:340px){.p-checks{grid-template-columns:1fr}}
-    .p-card-panel{background:var(--p-card);border:1px solid var(--p-line);border-radius:var(--p-radius);padding:26px}
-    .p-seg{display:flex;gap:8px;flex-wrap:wrap} .p-seg label{border:1px solid var(--p-line);border-radius:999px;padding:9px 14px;font:500 .84rem var(--font-body);cursor:pointer;color:var(--navy-deeper);background:var(--p-card);display:inline-flex;gap:8px;align-items:center} .p-seg input{accent-color:var(--navy-deeper)} .p-seg label:has(input:checked){background:var(--navy-deeper);color:#fff;border-color:var(--navy-deeper)}
-    /* 8/10/2026 · Fotos: los botones van debajo de la foto, no encima, y miden 44 px o más (antes 34, y en celular
-       se pisaban sobre fotos de 144 px). En celular, una fila por foto: miniatura a la izquierda, botones a la derecha. */
-    .p-fotos{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;margin-top:12px}
-    .p-fotos .p-foto{position:relative;display:flex;flex-direction:column;gap:8px;aspect-ratio:auto;overflow:visible;background:none;border-radius:0}
-    .p-fotos .p-foto .ph{position:relative;aspect-ratio:4/3;overflow:hidden;background:var(--p-tray)}
-    .p-fotos .p-foto .ph img{display:block;width:100%;height:100%;object-fit:cover}
-    .p-fotos .p-foto .ctl{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
-    .p-fotos .p-foto .ctl button{position:static;display:inline-flex;align-items:center;justify-content:center;width:auto;min-width:44px;height:44px;padding:0 14px;border:1px solid rgba(19,29,45,.18);border-radius:0;background:#FFFDF8;color:var(--navy-deeper);font:500 .72rem/1 var(--font-body);letter-spacing:.1em;text-transform:uppercase;cursor:pointer;opacity:1}
-    .p-fotos .p-foto .ctl .mv,.p-fotos .p-foto .ctl .quitar{width:44px;padding:0;font-size:1.25rem;letter-spacing:0}
-    .p-fotos .p-foto .ctl .quitar{margin-left:auto}
-    .p-fotos .p-foto .ctl button:hover:not(:disabled){border-color:var(--navy-deeper)}
-    .p-fotos .p-foto .ctl button:disabled{opacity:.35;cursor:default}
-    .p-fotos .p-nota-fotos{grid-column:1/-1;margin:0}
-    @media(max-width:560px){
-      .p-fotos{grid-template-columns:1fr;gap:12px}
-      .p-fotos .p-foto{flex-direction:row;align-items:flex-start;gap:12px}
-      .p-fotos .p-foto .ph{flex:0 0 132px}
-      .p-fotos .p-foto .ctl{flex:1 1 auto;min-width:0}
-    }
-    .p-drop{border:1px dashed var(--gold);border-radius:16px;padding:26px;text-align:center;color:var(--text-mid);cursor:pointer;background:var(--p-card)} .p-drop b{display:block;color:var(--navy-deeper);font-weight:500;margin-bottom:4px}
-    .p-nav-steps{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:22px;flex-wrap:wrap}
-    .p-nav-steps > div{display:flex;gap:8px;flex-wrap:wrap;min-width:0}
-    .p-nav-steps > div:empty{display:none}
-    .p-nav-steps .p-btn{white-space:nowrap}
-    /* Celular: las dos acciones principales a lo ancho, en dos columnas; Volver debajo, a lo ancho. Nunca se desbordan. */
-    @media (max-width:767px){
-      .p-nav-steps{flex-direction:column-reverse;align-items:stretch;gap:8px}
-      .p-nav-steps > div{display:grid;grid-template-columns:1fr;gap:8px}
-      .p-nav-steps > .p-nav-main{grid-template-columns:1fr 1fr}
-      .p-nav-steps .p-btn{width:100%;min-height:48px;padding:0 10px;font-size:.68rem;letter-spacing:.1em;white-space:normal;line-height:1.25;text-align:center}
-      .p-nav-steps .p-btn .ic{display:none}
-    }
-    .p-resumen dt{font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-dark);margin-top:12px} .p-resumen dd{margin:2px 0 0;color:var(--navy-deeper)}
-    @media(max-width:700px){.p-formgrid{grid-template-columns:1fr}}
-  </style>
+  <link rel="stylesheet" href="css/base.css?v=20261008a"><link rel="stylesheet" href="css/catalogo.css?v=20261008a"><link rel="stylesheet" href="css/portal.css?v=20261008a"><link rel="stylesheet" href="css/publicar.css?v=20261008b">
 </head>
-<body class="p-herramienta">
+<!-- data-flujo: ui.js no dibuja el pie ni la barra inferior de la app. Esta página tampoco llama a BP.header ni a BP.footer:
+     arriba va su propia barra (Atrás, avance, Salir) y abajo el botón Continuar fijo. -->
+<body class="p-flujo-pub" data-flujo>
 <div class="p-velo" aria-hidden="true"><span class="w">BAIREN</span></div>
-<div id="pHeader"></div>
-<div class="p-band"><div class="p-container" style="max-width:920px">
-  <span class="p-eyebrow">Publicar</span>
-  <h1 class="p-h2" id="ttl" style="font-size:clamp(1.7rem,3vw,2.3rem)">Publicá tu propiedad</h1>
-  <p class="p-sub" id="sub">Cinco pasos. Podés guardar y seguir después desde tu panel.</p>
-  <div class="p-stepper" id="stepper" style="margin-bottom:0"></div>
-</div></div>
-<section class="p-page after-band" role="main"><div class="p-container" style="max-width:920px">
-  <div class="p-card-panel" id="panel"><div class="p-skel-form" aria-hidden="true"><div class="p-skel-line t"></div><div class="p-skel-line l"></div><div class="p-skel-line m"></div><div class="p-skel-line l"></div><div class="p-skel-line s"></div></div></div>
-  <p class="p-note" id="modeNote" style="margin-top:12px"></p>
-</div></section>
-<div id="pFooter"></div>
+<header class="pf-top">
+  <div class="pf-top-in">
+    <button type="button" class="pf-atras" id="pfAtras"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg><span id="pfAtrasTx">Atrás</span></button>
+    <span class="pf-marca" aria-hidden="true">BAIREN</span>
+    <button type="button" class="pf-salir" id="pfSalir">Salir</button>
+  </div>
+  <div class="pf-prog" id="pfProg" role="progressbar" aria-valuemin="1" aria-valuemax="8" aria-valuenow="1"><i></i></div>
+</header>
+<main class="pf-main" id="pfMain">
+  <section class="pf-pantalla" id="pfPantalla" aria-labelledby="pfT"><div class="p-skel-form" aria-hidden="true"><div class="p-skel-line t"></div><div class="p-skel-line l"></div><div class="p-skel-line m"></div><div class="p-skel-line l"></div></div></section>
+  <p class="pf-modo" id="modeNote"></p>
+</main>
+<div class="pf-pie" id="pfPie"><div class="pf-pie-in" id="pfPieIn"><button type="button" class="pf-seguir" id="pfSeguir" disabled>Continuar</button></div></div>
 <script src="supabase-portal.js?v=20261008a" defer></script><script src="js/errores.js?v=20261008a" defer></script><script src="js/motion.js?v=20261008a" defer></script><script src="js/bairen-motion.js?v=20261008a" defer></script><script src="js/i18n-portal.js?v=20261008a" defer></script><script src="js/ui.js?v=20261008a" defer></script><script src="js/store.js?v=20261008a" defer></script><script src="js/data.js?v=20261008a" defer></script>
 <script>
-/* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
+/* Publicar · el recorrido en ocho pantallas cortas (8/10/2026, tanda 2 del lanzamiento).
+   1 ¿Qué publicás?  2 Ingreso (si no hay sesión, a ingresar.html y vuelta acá)  3 Tu empresa (una vez por cuenta)
+   4 La propiedad  5 Precio (según la operación; emprendimiento: unidades)  6 Fotos  7 Descripción y lo que tiene
+   8 Revisar y enviar. Después, Recibido. Cada Continuar valida su pantalla y guarda el borrador (si ya tiene calle y altura).
+   Editar un aviso abre directo la pantalla que le falta, o Revisar si está completo; desde Revisar, "Cambiar" lleva a
+   una pantalla y Continuar vuelve a Revisar. Los textos van por BP.t con claves pub2_*; el castellano es el de respaldo. */
 document.addEventListener('DOMContentLoaded', function(){
 (async function(){
-  BP.header(); BP.footer();
+  const T = (k, es) => BP.t(k, es), TF = (k, es, vars) => BP.tf(k, es, vars), esc = BP.esc;
+  const el = document.getElementById('pfPantalla'), main = document.getElementById('pfMain'), pieIn = document.getElementById('pfPieIn');
+  const bAtras = document.getElementById('pfAtras'), bSalir = document.getElementById('pfSalir'), prog = document.getElementById('pfProg');
+  document.getElementById('pfAtrasTx').textContent = T('pub2_atras', 'Atrás');
+  bAtras.setAttribute('aria-label', T('pub2_atras', 'Atrás'));
+  prog.setAttribute('aria-label', T('pub2_avance', 'Avance'));
   const mode = await BPStore.init();
-  if (!BPStore.requireSession('publicar')) return;
-  document.getElementById('modeNote').textContent = mode === 'local' ? 'Modo local: el aviso y las fotos quedan en este navegador.' : '';
-  const qs = BP.qs(); const editId = qs.get('id'); let perfil = qs.get('perfil') || '';
+  const haySesion = () => !!BPStore.session;
+  const qs = BP.qs(); const editId = qs.get('id'), copiaId = qs.get('copia'), pasoQs = qs.get('paso'), perfilQs = qs.get('perfil') || '';
+
+  /* ── Pantalla 2: ingreso. ingresar.html vuelve a publicar-aviso.html (volver=publicar) sin más parámetros, así que la
+     vuelta (lo elegido en la pantalla 1, o el ?id= / ?copia= que se estaba abriendo) queda en sessionStorage. ── */
+  const VUELTA = 'bp_pub_vuelta';
+  function irAIngresar(que){
+    try { sessionStorage.setItem(VUELTA, JSON.stringify({ s: location.search, q: que || null, t: Date.now() })); } catch (e) { /* sin almacenamiento: vuelve a la pantalla 1 */ }
+    const perfil = perfilQs || (que === 'emprendimiento' ? 'desarrolladora' : '');
+    location.href = 'ingresar.html?volver=publicar' + (perfil ? '&perfil=' + encodeURIComponent(perfil) : '');
+  }
+  if ((editId || copiaId || pasoQs === 'perfil') && !haySesion()) { irAIngresar(null); return; }
+  let vuelta = null;
+  if (haySesion()) { try { vuelta = JSON.parse(sessionStorage.getItem(VUELTA) || 'null'); sessionStorage.removeItem(VUELTA); } catch (e) { vuelta = null; } }
+  if (vuelta && !(Date.now() - (vuelta.t || 0) < 2 * 3600e3)) vuelta = null;   /* una vuelta vieja no decide nada */
+  if (vuelta && /[?&](id|copia|paso)=/.test(vuelta.s || '') && !/[?&](id|copia|paso)=/.test(location.search)) { location.replace('publicar-aviso.html' + vuelta.s); return; }
+  document.getElementById('modeNote').textContent = mode === 'local' ? T('pub2_modo_local', 'Modo local: el aviso y las fotos quedan en este navegador.') : '';
+
+  /* ── Datos ── */
   const ZONAS = BP.ZONAS; const BARRIOS = { 'Palermo':['Palermo','Palermo Soho','Palermo Hollywood','Palermo Chico','Las Cañitas','Botánico'], 'Recoleta':['Recoleta','Barrio Norte','Barrio Parque'], 'Retiro':['Retiro'], 'Belgrano':['Belgrano','Belgrano R','Belgrano C','Bajo Belgrano'], 'Núñez':['Núñez'], 'Colegiales':['Colegiales'], 'Villa Crespo':['Villa Crespo'], 'Puerto Madero':['Puerto Madero'], 'Saavedra':['Saavedra'], 'GBA Norte':['Vicente López','Olivos','La Lucila','Martínez','San Isidro','Acassuso','Beccar','Tigre','Nordelta','Pilar'] };
-  /* 8/10/2026 · Una zona de BP.ZONAS sin lista acá trababa el formulario (Retiro y Villa Crespo). Si mañana se suma
-     otra, ofrece la zona misma como barrio; y el barrio que ya tiene el aviso (un importado) no se pierde al editar. */
+  /* Una zona sin lista ofrece la zona misma como barrio; el barrio que ya tiene el aviso (un importado) no se pierde */
   const barriosDe = (z, actual) => { const l = (BARRIOS[z] || [z]).slice(); if (actual && l.indexOf(actual) === -1) l.unshift(actual); return l; };
-  const AMEN = ['Pileta','Gimnasio','SUM','Parrilla','Seguridad 24hs','Conserje 24hs','Cochera','Terraza o jardín','Balcón','Ascensor','Laundry','Baulera','Bicicletero','Spa / Sauna','Aire acondicionado','Calefacción central','Pet friendly','Amoblado'];
   /* Contrato de operación (8/10/2026): los valores de la base no cambian; estas son las etiquetas */
-  const OP_TXT = { venta: 'Venta', alquiler: 'Alquiler tradicional', mediano: 'Mediano plazo (3 a 12 meses)' };
-  /* Moneda (contrato 8/10/2026): solo el alquiler tradicional puede ir en pesos; venta y mediano plazo, siempre USD */
-  const conMoneda = op => op === 'alquiler';
-  const PRECIO_LBL = { venta: 'Precio en USD', alquiler: 'Precio por mes', mediano: 'Precio por mes, en USD' };
-  /* Mediano plazo (contrato 8/10/2026): la estadía mínima va en plazo ("3 meses") y lo que incluye el precio, en
-     caracteristicas con estos cinco textos exactos. Se piden en Lo principal, al lado del precio, solo para 'mediano'. */
+  const OP_TXT = { venta: T('pub2_op_venta', 'Venta'), alquiler: T('pub2_op_alquiler', 'Alquiler tradicional'), mediano: T('pub2_op_mediano', 'Mediano plazo (3 a 12 meses)') };
+  /* Lo que incluye el mediano plazo y las garantías del tradicional van en caracteristicas, con estos textos exactos */
   const INCLUYE = ['Expensas incluidas', 'Servicios incluidos', 'Internet incluido', 'Limpieza incluida', 'Ropa blanca incluida'];
+  const GARANTIAS = ['Acepta seguro de caución', 'Acepta garantía propietaria'];
   const ESTADIAS = [3,4,5,6,7,8,9,10,11,12].map(n => n + ' meses');
-  const estadiaOpts = actual => [['', 'Elegí la estadía mínima']].concat(actual && ESTADIAS.indexOf(actual) === -1 ? [[actual, actual]] : []).concat(ESTADIAS.map(x => [x, x]));
-  const precioTxt = (precio, moneda) => precio == null || precio === '' ? 'Sin precio' : moneda === 'ARS' ? '$ ' + BP.fmtN(Math.round(Number(precio))) : BP.fmtUSD(Number(precio));
-  const CARACT = ['Apto crédito','Apto profesional','Ofrece financiación','Permite mascotas','Luminoso','Acepta seguro de caución','Contrato digital'];
-  let pub = await BPStore.getMyPublicador();
-  /* El DNI vive en la persona (migración 01): se trae para que al editar el perfil no aparezca vacío */
-  if (pub && !pub.dni && BPStore.getMyPersona) { try { const per = await BPStore.getMyPersona(); if (per && per.dni) pub = Object.assign({}, pub, { dni: per.dni }); } catch (e) {} }
-  let aviso = editId ? (await BPStore.getAviso(editId)) : null;
-  /* 8/10/2026 · "Publicar otra parecida" (?copia=<id>): un aviso nuevo con los datos de uno propio, para cargar varias
-     unidades parecidas sin rehacer todo. Dirección, unidad y fotos quedan vacías; tampoco se copia lo que es de cada
-     unidad (título, piso, orientación, cualidades, video, mail del propietario, código interno). */
-  const COPIA = ['operacion','tipo','zona','barrio','precio','moneda','ambientes','dormitorios','banos','cocheras','antiguedad','m2_total','m2_cubierto','expensas','mostrar_direccion','amenities','caracteristicas','descripcion','plazo'];
+  const PLAZOS = ['12 meses', '24 meses', '36 meses'];
+  const TIPOS = ['Departamento', 'Piso', 'PH', 'Casa'];
+  const ETAPAS = [['pozo', T('pub2_etapa_pozo', 'En pozo')], ['construccion', T('pub2_etapa_obra', 'En construcción')], ['terminado', T('pub2_etapa_terminado', 'Terminado')]];
+  /* "Lo que tiene": una sola lista, cada opción con el texto exacto y la columna que ya usan filtros y fichas */
+  const etiquetaDe = x => { const l = LO_QUE_TIENE.find(y => y[0] === x); return (l && l[2]) || (BP.etiqueta ? BP.etiqueta(x) : x); };
+  const LO_QUE_TIENE = [['Amoblado','amenities'], ['Balcón','amenities'], ['Terraza o jardín','amenities'], ['Cochera','amenities'], ['Pileta','amenities'], ['Gimnasio','amenities'], ['Seguridad 24hs','amenities', T('pub2_lqt_seguridad', 'Seguridad 24 h')], ['Ascensor','amenities'], ['Laundry','amenities'], ['Aire acondicionado','amenities'], ['Pet friendly','amenities'], ['Apto profesional','caracteristicas']];
+  const ICO = {
+    mediano: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 11V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v3"/><path d="M3 13a2 2 0 0 1 4 0v2h10v-2a2 2 0 0 1 4 0v5H3z"/><path d="M6 18v2M18 18v2"/></svg>',
+    tradicional: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 11 9-7 9 7v10h-6v-6H9v6H3z"/></svg>',
+    emprendimiento: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3h16v18H4z"/><path d="M8 7h2M14 7h2M8 11h2M14 11h2M8 15h2M14 15h2M10 21v-3h4v3"/></svg>',
+    camara: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h4l2-3h6l2 3h4v12H3z"/><circle cx="12" cy="13.5" r="3.5"/></svg>',
+    mas: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="19" cy="12" r="1.6" fill="currentColor"/></svg>',
+    check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>'
+  };
+  const precioTxt = (precio, moneda) => precio == null || precio === '' ? T('pub2_sin_precio', 'Sin precio') : moneda === 'ARS' ? '$ ' + BP.fmtN(Math.round(Number(precio))) : BP.fmtUSD(Number(precio));
+  /* Números como los escribe la gente: "1.400", "1400", "45,5". Vacío = null. */
+  const num = s => { const t = String(s == null ? '' : s).trim(); if (!t) return null; const d = t.replace(/\.(?=\d{3}(\D|$))/g, '').replace(',', '.').replace(/[^\d.]/g, ''); return d === '' || isNaN(Number(d)) ? null : Number(d); };
+  const entero = s => { const n = num(s); return n == null ? null : Math.round(n); };
+  const miles = n => n == null || n === '' ? '' : BP.fmtN(Math.round(Number(n)));
+  const fechaTxt = s => { const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(s || '')); return m ? Number(m[3]) + '/' + Number(m[2]) + '/' + m[1] : ''; };
+  /* WhatsApp: se acepta como lo escribe la gente (11 2345-6789, 011 15 2345 6789) y se guarda con 54 9 */
+  const waNorm = s => { let d = String(s || '').replace(/\D/g, ''); if (d.indexOf('00') === 0) d = d.slice(2); if (d.indexOf('54') === 0) return d.length === 12 && d[2] !== '9' ? '549' + d.slice(2) : d; if (d[0] === '0') d = d.slice(1); if (d.length === 12 && d.indexOf('1115') === 0) d = '11' + d.slice(4); return d.length === 10 ? '549' + d : d; };
+
+  let pub = haySesion() ? await BPStore.getMyPublicador() : null;
+  /* El DNI vive en la persona (migración 01): se trae para que el perfil no aparezca vacío */
+  if (pub && !pub.dni && BPStore.getMyPersona) { try { const per = await BPStore.getMyPersona(); if (per && per.dni) pub = Object.assign({}, pub, { dni: per.dni }); } catch (e) { /* sin persona */ } }
+  let aviso = editId ? await BPStore.getAviso(editId) : null;
+  if (editId && !aviso) BP.toast(T('pub2_no_encontrado', 'No encontramos ese aviso. Podés cargar uno nuevo.'), 'error');
+  /* "Publicar otra parecida" (?copia=<id>): un aviso nuevo con los datos de uno propio. Dirección, unidad y fotos
+     quedan vacías, y tampoco se copia lo que es de cada unidad (título, piso, cualidades, video, mail del propietario).
+     En un emprendimiento la dirección es la del edificio: esa sí se copia. */
+  const COPIA = ['operacion','tipo','zona','barrio','precio','moneda','ambientes','dormitorios','banos','cocheras','antiguedad','m2_total','m2_cubierto','expensas','mostrar_direccion','amenities','caracteristicas','descripcion','plazo','emprendimiento','etapa','entrega'];
   let copiaDe = null;
-  if (!aviso && qs.get('copia') && pub) { const o = await BPStore.getAviso(qs.get('copia')); if (o && o.publicador_id === pub.id) { copiaDe = o; aviso = { amenities: [], caracteristicas: [], cualidades: [], fotos: [], estado_curacion: 'borrador' }; COPIA.forEach(k => { if (o[k] != null) aviso[k] = Array.isArray(o[k]) ? o[k].slice() : o[k]; }); } }
-  if (!aviso) aviso = { operacion: 'venta', tipo: 'Departamento', zona: '', barrio: '', amenities: [], caracteristicas: [], cualidades: [], fotos: [], mostrar_direccion: 'aproximada', estado_curacion: 'borrador' };
-  if (!perfil && pub) perfil = pub.tipo;
-  let step = pub ? 1 : 0;
-  if (qs.get('paso') === 'perfil') step = 0;   /* "Editar mi perfil de publicador" desde el panel */
-  const STEPS = ['Tu perfil', 'Lo principal', 'Fotos y video', 'Extras', 'Revisar y enviar'];
-  const el = document.getElementById('panel');
-  /* Al corregir un campo marcado, deja de verse en rojo */
-  const desmarcar = e => { const f = e.target.closest && e.target.closest('.p-fld.err'); if (f) f.classList.remove('err'); };
-  el.addEventListener('input', desmarcar); el.addEventListener('change', desmarcar);
-  const v = (o, k) => o && o[k] != null ? o[k] : '';
-  /* Teclado correcto en el celular y autocompletado según el tipo de dato; la pista queda ligada al campo */
-  const modoTeclado = (name, type) => type === 'number' ? ' inputmode="numeric"' : type === 'tel' ? ' inputmode="tel" autocomplete="tel"' : type === 'email' ? ' inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false"' : type === 'url' ? ' inputmode="url" autocapitalize="off" spellcheck="false"' : (name === 'dni' || name === 'cuit') ? ' inputmode="numeric" autocomplete="off"' : name === 'responsable' ? ' autocomplete="name"' : '';
-  const fld = (name, label, type, val, extra, hint) => `<div class="p-fld ${extra && extra.full ? 'full' : ''}" data-fld="${name}"><label for="f-${name}">${label}</label>${type === 'textarea' ? `<textarea id="f-${name}" name="${name}" ${extra && extra.attrs || ''}${hint ? ` aria-describedby="h-${name}"` : ''}>${BP.esc(val)}</textarea>` : type === 'select' ? `<select id="f-${name}" name="${name}" ${extra && extra.attrs || ''}${hint ? ` aria-describedby="h-${name}"` : ''}>${(extra.opts||[]).map(o => `<option value="${o[0]}" ${String(o[0])===String(val)?'selected':''}>${o[1]}</option>`).join('')}</select>` : `<input id="f-${name}" name="${name}" type="${type}" value="${BP.esc(val)}" ${extra && extra.attrs || ''}${modoTeclado(name, type)}${hint ? ` aria-describedby="h-${name}"` : ''}>`}${hint ? `<div class="hint" id="h-${name}">${hint}</div>` : ''}</div>`;
+  if (!aviso && copiaId && pub) { const o = await BPStore.getAviso(copiaId); if (o && o.publicador_id === pub.id) { copiaDe = o; aviso = { amenities: [], caracteristicas: [], cualidades: [], fotos: [], estado_curacion: 'borrador' }; COPIA.forEach(k => { if (o[k] != null) aviso[k] = Array.isArray(o[k]) ? o[k].slice() : o[k]; }); if (o.emprendimiento) aviso.direccion = o.direccion; } }
+  if (!aviso) aviso = { tipo: 'Departamento', zona: '', barrio: '', amenities: [], caracteristicas: [], cualidades: [], fotos: [], mostrar_direccion: 'aproximada', estado_curacion: 'borrador' };
+  ['amenities', 'caracteristicas', 'cualidades'].forEach(k => { if (!Array.isArray(aviso[k])) aviso[k] = []; });
+  aviso.fotos = (Array.isArray(aviso.fotos) ? aviso.fotos : []).slice().sort((x, y) => (x.orden || 0) - (y.orden || 0)).map(f => ({ url: f.url }));
 
-  function renderStepper(){ document.getElementById('stepper').innerHTML = `<p class="p-paso-txt" aria-hidden="true">Paso ${step+1} de ${STEPS.length} · ${STEPS[step]}</p>` + STEPS.map((s, i) => `<button type="button" class="${i===step?'on':i<step?'done':''}" data-s="${i}"${i===step?' aria-current="step"':''} aria-label="Paso ${i+1} de ${STEPS.length}: ${s}"><i aria-hidden="true">${i<step?'✓':i+1}</i>${s}</button>`).join(''); document.querySelectorAll('#stepper button').forEach(b => b.addEventListener('click', () => { const i = Number(b.dataset.s); if (i <= step || pub) { if (step > 0) collect(); step = i; render(); } })); }
-
-  function render(){ renderStepper(); if (step === 0) renderPerfil(); else if (step === 1) renderPrincipales(); else if (step === 2) renderFotos(); else if (step === 3) renderExtras(); else renderRevision(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-  /* 8/10/2026 · Editar no cambia el estado de un aviso en revisión ni de uno publicado: guardar lo deja como estaba.
-     Antes, Continuar o Guardar borrador lo devolvían a borrador sin avisar (y lo sacaban de la cola de curación). */
+  /* Qué se publica: mediano, tradicional (venta o alquiler) o emprendimiento (una desarrolladora que vende por unidades) */
+  const claseDe = a => (a.emprendimiento || a.etapa) ? 'emprendimiento' : a.operacion === 'mediano' ? 'mediano' : (a.operacion === 'venta' || a.operacion === 'alquiler') ? 'tradicional' : null;
+  const SUGERIDA = { gestor: 'mediano', desarrolladora: 'emprendimiento', profesional: 'tradicional', inmobiliaria: 'tradicional', corredor: 'tradicional', dueno: 'tradicional' };
+  let clase = claseDe(aviso) || (vuelta && vuelta.q) || null;
+  const modoPerfil = pasoQs === 'perfil' && !!pub;   /* "Editar perfil de publicador" desde el panel */
+  /* Editar o no cambia el estado: un aviso en revisión o publicado sigue igual al guardar */
   const enCurso = () => aviso.estado_curacion === 'en_revision' || aviso.estado_curacion === 'publicado';
   const estadoAlGuardar = () => enCurso() ? aviso.estado_curacion : 'borrador';
-  const rotuloGuardar = () => enCurso() ? 'Guardar cambios' : 'Guardar borrador';
-  const navBtns = (backLabel, nextLabel) => `<div class="p-nav-steps"><div>${step > 0 ? `<button type="button" class="p-btn p-btn-dark" data-back>${backLabel||'Volver'}</button>` : ''}</div><div class="p-nav-main"><button type="button" class="p-btn" data-save>${rotuloGuardar()}</button><button type="button" class="p-btn p-btn-fill" data-next>${nextLabel||'Continuar'} <span class="ic">${BP.ico.arrow}</span></button></div></div>`;
+  const tieneDireccion = () => !!String(aviso.direccion || '').trim();
 
-  /* ── Paso 0: perfil del publicador ── */
-  function renderPerfil(){
-    /* 11/9 noche · Sin perfil en la URL y sin publicador, las tres opciones se muestran sin marca previa (antes caía en
-       "Dueño directo" y una inmobiliaria podía guardarse como dueño sin darse cuenta); continuar exige elegir. */
-    const p = pub || { tipo: ({ inmobiliaria: 'profesional', corredor: 'profesional' })[perfil] || perfil || '' }; const tipo = ['dueno', 'profesional', 'gestor', 'desarrolladora'].indexOf(p.tipo) > -1 ? p.tipo : '';
-    el.innerHTML = `<h2 class="p-sec-t">Quién publica</h2><p class="p-kicker" style="margin-bottom:16px">Aparece en cada ficha como "Publica: …". BAIREN verifica en menos de 48 horas.</p>
-      <div class="p-seg" id="tipoSeg" style="margin-bottom:18px"><label><input type="radio" name="tipo" value="dueno" ${tipo==='dueno'?'checked':''}> Dueño directo</label><label><input type="radio" name="tipo" value="profesional" ${tipo==='profesional'?'checked':''}> Inmobiliaria o corredor</label><label><input type="radio" name="tipo" value="gestor" ${tipo==='gestor'?'checked':''}> Gestor de alquileres</label><label><input type="radio" name="tipo" value="desarrolladora" ${tipo==='desarrolladora'?'checked':''}> Desarrolladora</label></div>
-      <div class="p-formgrid" id="perfilForm"></div>${p.verificado ? `<p class="p-note" style="margin-top:12px">${BP.ico.check} Publicador verificado.</p>` : ''}
-      ${navBtns('', 'Guardar y continuar')}`;
-    const form = document.getElementById('perfilForm');
-    const draw = t => { if (!t) { form.innerHTML = '<p class="p-note full" style="margin:0">Elegí quién publica para completar tus datos.</p>'; return; } form.innerHTML = (t === 'dueno' ? fld('nombre','Nombre y apellido','text',v(p,'nombre'),{attrs:'required'}) + fld('dni','DNI','text',v(p,'dni'),{attrs:'inputmode="numeric"'}) : t === 'gestor' ? fld('nombre','Empresa o nombre del gestor','text',v(p,'nombre'),{attrs:'required'}) + fld('responsable','Responsable, nombre y apellido','text',v(p,'responsable'),{attrs:'required'}) + fld('dni','DNI o CUIT','text',v(p,'dni'),{attrs:'required'}) : t === 'profesional' ? fld('nombre','Inmobiliaria o corredor','text',v(p,'nombre'),{attrs:'required'}) + fld('responsable','Corredor responsable, nombre y apellido','text',v(p,'responsable'),{attrs:'required'}) + fld('matricula','Matrícula','text',v(p,'matricula'),{attrs:'required placeholder="CUCICBA 0000"'},'Se valida contra el registro público del colegio.') + fld('colegio','Colegio','select',v(p,'colegio')||'CUCICBA',{opts:[['CUCICBA','CUCICBA, Ciudad de Buenos Aires'],['CMCPSI','San Isidro, Provincia de Buenos Aires'],['CMCPLZ','Lomas de Zamora, Provincia de Buenos Aires'],['Otro','Otro colegio de Provincia']]}) + fld('cuit','CUIT','text',v(p,'cuit')) : fld('nombre','Razón social','text',v(p,'nombre'),{attrs:'required'}) + fld('cuit','CUIT','text',v(p,'cuit'),{attrs:'required'}) + fld('responsable','Responsable comercial','text',v(p,'responsable')))
-      + fld('telefono','Teléfono','tel',v(p,'telefono'),{attrs:'required'}) + fld('whatsapp','WhatsApp, solo números, con 54 9 11','tel',v(p,'whatsapp'),{attrs:'required placeholder="5491123456789"'}) + fld('email','Mail de contacto','email',v(p,'email')||BPStore.session.email,{attrs:'required'}) + fld('descripcion','Presentación corta','textarea',v(p,'descripcion'),{full:true,attrs:'maxlength="400" style="min-height:90px"'},'Dos líneas. Aparece en tu perfil.')
-      + `<div class="p-fld full"><label for="docs">Verificación</label><div class="p-note" style="margin-bottom:8px">${t === 'dueno' ? 'Subí tu DNI y un comprobante de titularidad: escritura, ABL o expensas a tu nombre. Lo revisamos y lo borramos.' : t === 'gestor' ? 'Subí tu DNI o constancia de CUIT y el mandato de administración firmado por al menos un propietario. Lo revisamos y lo borramos.' : t === 'profesional' ? 'Con la matrícula alcanza: la validamos contra el registro público. Si querés, sumá el certificado.' : 'Subí constancia de CUIT y un documento de la sociedad.'}</div><div class="p-carga" id="docsZona" tabindex="0" role="button" aria-controls="docs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8.5L19 7.5V21H6z"/><path d="M14.2 3v4.6H19"/><path d="M9 13h6M9 16.4h6"/></svg><div class="p-carga-txt"><b>Elegí los documentos</b><span>JPG, PNG o PDF, hasta 10 MB cada uno. Se borran después de revisarlos.</span></div><span class="p-btn p-btn-sm p-carga-btn" aria-hidden="true">Elegir archivos</span></div><input type="file" id="docs" multiple accept="image/*,.pdf" hidden aria-label="Documentos de verificación"><ul class="p-carga-lista" id="docsLista" aria-live="polite"></ul></div>`; };
-    /* La zona de documentos: elegir, arrastrar, y una lista con nombre, peso y quitar. La lista real vive en el input (DataTransfer). */
+  /* ── Emprendimiento: las unidades. La primera es el aviso base (el borrador que se guarda al pasar de pantalla);
+     al enviar, cada una es un aviso de venta con las mismas fotos, descripción y nombre. La lista del borrador se
+     recuerda en este navegador hasta que se envía. Al editar una unidad ya enviada, se edita solo esa. ── */
+  const UKEY = id => 'bp_pub_unidades_' + id;
+  const unaUnidad = !!(editId && aviso.id && aviso.estado_curacion !== 'borrador');
+  const unidadDe = a => ({ id: a.id || null, unidad: a.unidad || '', ambientes: a.ambientes || null, m2_total: a.m2_total || null, precio: a.precio != null && a.precio !== '' ? Number(a.precio) : null, estado: a.estado === 'reservado' ? 'reservado' : 'disponible' });
+  let unidades = [];
+  function iniciarUnidades(){
+    let guardadas = null; if (aviso.id && !unaUnidad) { try { guardadas = JSON.parse(localStorage.getItem(UKEY(aviso.id)) || 'null'); } catch (e) { guardadas = null; } }
+    unidades = Array.isArray(guardadas) && guardadas.length ? guardadas : [unidadDe(aviso)];
+    if (copiaDe) unidades = [Object.assign(unidadDe(aviso), { id: null, unidad: '' })];
+    unidades[0].id = aviso.id || null;
+  }
+  const aBase = () => { const u = unidades[0]; if (!u) return; aviso.unidad = u.unidad; aviso.ambientes = u.ambientes; aviso.m2_total = u.m2_total; aviso.precio = u.precio; aviso.estado = u.estado; aviso.moneda = 'USD'; aviso.operacion = 'venta'; aviso.plazo = null; };
+  /* El título de una unidad es "Emprendimiento · unidad" (así el panel y la curación muestran el nombre), salvo que el aviso traiga uno propio */
+  const tituloAuto = !aviso.titulo || (!!aviso.emprendimiento && aviso.titulo === [aviso.emprendimiento, aviso.unidad].filter(Boolean).join(' · '));
+  const tituloUnidad = (emp, unidad) => [emp, unidad].filter(Boolean).join(' · ') || null;
+  if (clase === 'emprendimiento') iniciarUnidades();
+
+  /* La elección de la pantalla 1 define la operación por defecto y limpia lo que deja de aplicar */
+  function limpiarSegunOperacion(){
+    const a = aviso;
+    if (a.operacion !== 'mediano') { a.caracteristicas = a.caracteristicas.filter(x => INCLUYE.indexOf(x) === -1); if ('disponible_desde' in a) a.disponible_desde = null; }
+    if (a.operacion !== 'alquiler') a.caracteristicas = a.caracteristicas.filter(x => GARANTIAS.indexOf(x) === -1);
+    if (a.operacion === 'venta') a.plazo = null;
+    a.moneda = a.operacion === 'alquiler' && a.moneda === 'ARS' ? 'ARS' : 'USD';
+    a.amoblado = a.operacion === 'mediano' || a.amenities.indexOf('Amoblado') > -1;
+  }
+  function cambiarOperacion(op){ if (aviso.operacion !== op) { aviso.plazo = null; aviso.operacion = op; } limpiarSegunOperacion(); }
+  function aplicarClase(c){
+    const antes = clase; clase = c;
+    if (c === 'mediano') cambiarOperacion('mediano');
+    else if (c === 'emprendimiento') cambiarOperacion('venta');
+    else cambiarOperacion(aviso.operacion === 'venta' || aviso.operacion === 'alquiler' ? aviso.operacion : (pub && pub.tipo === 'gestor' ? 'alquiler' : 'venta'));
+    if (c !== 'emprendimiento' && antes === 'emprendimiento') { aviso.emprendimiento = null; aviso.etapa = null; aviso.entrega = null; }
+    if (c === 'emprendimiento' && !unidades.length) iniciarUnidades();
+  }
+  if (clase && !aviso.operacion) aplicarClase(clase);
+
+  /* ── Qué falta en cada pantalla (lo usa la entrada al editar y el envío) ── */
+  const empresaCompleta = p => !!(p && p.nombre && (p.whatsapp || p.telefono) && (p.tipo !== 'profesional' || p.matricula) && ((p.tipo !== 'gestor' && p.tipo !== 'desarrolladora') || p.cuit || p.dni));
+  const unidadIncompleta = u => !String(u.unidad || '').trim() || !(u.ambientes >= 1) || !(u.m2_total > 0) || !(u.precio > 0);
+  function incompletas(){
+    const a = aviso, emp = clase === 'emprendimiento', l = [];
+    if (!empresaCompleta(pub)) l.push('empresa');
+    if (!a.zona || !a.barrio || !tieneDireccion() || (!emp && (!(a.m2_total > 0) || !(a.ambientes >= 1)))) l.push('propiedad');
+    if (emp ? (!a.emprendimiento || !a.etapa || !unidades.length || unidades.some(unidadIncompleta)) : (!(Number(a.precio) > 0) || (a.operacion === 'mediano' && !a.plazo))) l.push('precio');
+    if (a.fotos.length < 8 && !a.quiero_produccion) l.push('fotos');
+    if (String(a.descripcion || '').trim().length < 150) l.push('descripcion');
+    return l;
+  }
+
+  /* ── Piezas de formulario ── */
+  const campo = (name, label, control, cls, ayuda) => `<div class="pf-campo p-fld ${cls || ''}" data-fld="${name}"><label for="f-${name}">${label}</label>${control}${ayuda ? `<p class="pf-ayuda" id="h-${name}">${ayuda}</p>` : ''}</div>`;
+  const texto = (name, val, attrs) => `<input id="f-${name}" name="${name}" type="text" value="${esc(val == null ? '' : val)}" ${attrs || ''}>`;
+  const cifra = (name, val, attrs) => `<input id="f-${name}" name="${name}" type="text" inputmode="numeric" autocomplete="off" data-miles value="${esc(miles(val))}" ${attrs || ''}>`;
+  const conPrefijo = (pre, control, id) => `<div class="pf-precio"><span class="pre" ${id ? `id="${id}"` : ''} aria-hidden="true">${pre}</span>${control}</div>`;
+  const elegir = (name, val, opts, attrs) => `<select id="f-${name}" name="${name}" ${attrs || ''}>${opts.map(o => `<option value="${esc(o[0])}" ${String(o[0]) === String(val == null ? '' : val) ? 'selected' : ''}>${esc(o[1])}</option>`).join('')}</select>`;
+  const chip = (name, val, label, on) => `<label class="pf-chip${on ? ' on' : ''}"><input type="radio" name="${name}" value="${esc(val)}" ${on ? 'checked' : ''}><span>${label}</span></label>`;
+  const marca = (name, val, label, on) => `<label class="pf-toggle${on ? ' on' : ''}"><input type="checkbox" name="${name}" value="${esc(val)}" ${on ? 'checked' : ''}><span class="bx" aria-hidden="true"></span><span>${label}</span></label>`;
+  const grupo = (id, legend, inner, cls) => `<fieldset class="pf-grupo pf-campo p-fld ${cls || ''}" id="${id}"><legend class="pf-rot">${legend}</legend>${inner}</fieldset>`;
+  const pasos = (name, label, val, max) => { const n = Number(val) || 0; return `<div class="pf-campo p-fld" data-fld="${name}"><span class="pf-rot" id="l-${name}">${label}</span><div class="pf-stepper" data-max="${max}"><button type="button" data-d="-1" ${n ? '' : 'disabled'} aria-label="${esc(TF('pub2_menos', 'Uno menos: {x}', { x: label }))}">&minus;</button><output id="f-${name}" tabindex="-1" aria-labelledby="l-${name}" aria-live="polite" class="${n ? '' : 'vacio'}">${n}</output><button type="button" data-d="1" ${n >= max ? 'disabled' : ''} aria-label="${esc(TF('pub2_mas', 'Uno más: {x}', { x: label }))}">+</button><input type="hidden" name="${name}" value="${n || ''}"></div></div>`; };
+  const cab = (t, sub) => `<div class="pf-cab"><h1 class="pf-t" id="pfT" tabindex="-1">${t}</h1>${sub ? `<p class="pf-sub">${sub}</p>` : ''}</div>`;
+  const valor = name => { const i = el.querySelector(`[name="${name}"]`); return i ? String(i.value || '').trim() : ''; };
+  const elegido = name => { const i = el.querySelector(`[name="${name}"]:checked`); return i ? i.value : ''; };
+  const marcados = name => Array.from(el.querySelectorAll(`[name="${name}"]:checked`)).map(x => x.value);
+  /* caracteristicas y amenities guardan cosas de varias pantallas: cada una reemplaza solo lo suyo */
+  const reemplazar = (lista, propias, nuevas) => (lista || []).filter(x => propias.indexOf(x) === -1).concat(nuevas);
+  /* El error va al lado del campo. En un grupo de chips, al grupo entero (no adentro de un chip) y el foco a su primera opción. */
+  const marcarError = (name, msg) => {
+    const f = el.querySelector(`[data-fld="${name}"]`) || document.getElementById(name);
+    if (f && f.tagName === 'FIELDSET') { BP.errorCampo(f, msg); const i = f.querySelector('input'); if (i) { try { i.focus(); } catch (e) { /* nada */ } } return false; }
+    const c = (f && (f.querySelector('#f-' + name) || f.querySelector('input:not([type=hidden]),select,textarea,output'))) || f;
+    BP.errorCampo(c, msg); return false;
+  };
+
+  /* Chips y casillas: la clase .on acompaña a :checked (no depende solo de :has). Menos y más. Números con puntos de miles. */
+  el.addEventListener('change', e => { const i = e.target; if (!i.closest) return; if (i.matches('.pf-chip input')) el.querySelectorAll(`input[name="${i.name}"]`).forEach(x => x.closest('label').classList.toggle('on', x.checked)); else if (i.matches('.pf-toggle input')) i.closest('label').classList.toggle('on', i.checked); const f = i.closest('.p-fld'); if (f) { const er = f.querySelector('.p-err-campo'); if (er && i.type !== 'text') er.hidden = true; } });
+  el.addEventListener('click', e => {
+    const b = e.target.closest && e.target.closest('.pf-stepper button'); if (!b) return;
+    const s = b.closest('.pf-stepper'), inp = s.querySelector('input'), out = s.querySelector('output'), max = Number(s.dataset.max);
+    const n = Math.max(0, Math.min(max, (Number(inp.value) || 0) + Number(b.dataset.d)));
+    inp.value = n || ''; out.textContent = n; out.classList.toggle('vacio', !n);
+    s.querySelector('[data-d="-1"]').disabled = !n; s.querySelector('[data-d="1"]').disabled = n >= max;
+    out.classList.remove('p-invalido'); out.removeAttribute('aria-invalid'); const er = s.closest('.p-fld').querySelector('.p-err-campo'); if (er) er.hidden = true;
+  });
+  el.addEventListener('focusout', e => { const i = e.target; if (i.matches && i.matches('[data-miles]')) { const n = num(i.value); i.value = n == null ? '' : miles(n); } });
+  /* Enter en un campo de una línea es Continuar, como en el celular */
+  el.addEventListener('keydown', e => { if (e.key !== 'Enter' || e.isComposing) return; const t = e.target; if (t.matches && t.matches('input[type=text],input[type=tel],input[type=email],input[type=date],input:not([type])') && !t.closest('.pf-unidades')) { e.preventDefault(); continuar(); } });
+
+  /* ── Las pantallas ── */
+  const ORDEN = ['que', 'ingreso', 'empresa', 'propiedad', 'precio', 'fotos', 'descripcion', 'revisar'];
+  let actual = null, pant = {}, desdeRevisar = false, mostroEmpresa = false, ocupado = false, claseCambio = false;
+  const PANT = {};
+
+  /* 1 · ¿Qué publicás? */
+  PANT.que = function(){
+    let sel = clase || SUGERIDA[pub ? pub.tipo : perfilQs] || '';
+    const op = (k, t, d) => `<button type="button" class="pf-opcion${sel === k ? ' on' : ''}" data-que="${k}" aria-pressed="${sel === k}">${ICO[k]}<span class="tx"><b>${t}</b><span>${d}</span></span><i class="ck" aria-hidden="true"></i></button>`;
+    el.innerHTML = cab(T('pub2_que_t', '¿Qué publicás?')) + `<div class="pf-opciones" role="group" aria-labelledby="pfT">
+      ${op('mediano', T('pub2_que_mediano', 'Mediano plazo (3 a 12 meses)'), T('pub2_que_mediano_d', 'Amoblado, con precio por mes en dólares.'))}
+      ${op('tradicional', T('pub2_que_trad', 'Venta o alquiler tradicional'), T('pub2_que_trad_d', 'Una unidad en venta o con contrato.'))}
+      ${op('emprendimiento', T('pub2_que_emp', 'Emprendimiento'), T('pub2_que_emp_d', 'Varias unidades de un mismo desarrollo.'))}</div>`;
+    el.querySelectorAll('[data-que]').forEach(b => b.addEventListener('click', () => { sel = b.dataset.que; el.querySelectorAll('[data-que]').forEach(x => { const on = x === b; x.classList.toggle('on', on); x.setAttribute('aria-pressed', String(on)); }); }));
+    return { validar: () => { if (!sel) { BP.toast(T('pub2_que_err', 'Elegí una de las tres opciones.'), 'error'); return false; } claseCambio = sel !== clase; aplicarClase(sel); return true; } };
+  };
+
+  /* 3 · Tu empresa: una sola vez por cuenta. Desde el panel (?paso=perfil) suma los datos de contacto y los documentos. */
+  PANT.empresa = function(){
+    const p = pub || {};
+    const TP = [['profesional', T('pub2_tipo_prof', 'Inmobiliaria o corredor')], ['gestor', T('pub2_tipo_gestor', 'Gestor de alquileres')], ['desarrolladora', T('pub2_tipo_desa', 'Desarrolladora')], ['dueno', T('pub2_tipo_dueno', 'Dueño directo')]];
+    const desdeQs = ({ inmobiliaria: 'profesional', corredor: 'profesional' })[perfilQs] || perfilQs;
+    let tipo = TP.some(x => x[0] === p.tipo) ? p.tipo : TP.some(x => x[0] === desdeQs) ? desdeQs : ({ mediano: 'gestor', emprendimiento: 'desarrolladora', tradicional: 'profesional' })[clase] || '';
+    const fijo = !!(p.verificado && p.tipo);   /* verificado: el tipo ya no cambia */
+    const titulo = t => t === 'dueno' ? T('pub2_emp_t_dueno', 'Tus datos') : T('pub2_emp_t', 'Tu empresa');
+    el.innerHTML = cab(titulo(tipo), modoPerfil ? '' : T('pub2_emp_sub', 'Se carga una sola vez.'))
+      + (fijo ? '' : grupo('tipoPub', T('pub2_emp_como', 'Publicás como'), `<div class="pf-chips cols-2">${TP.map(([k, l]) => chip('tipo_pub', k, l, k === tipo)).join('')}</div>`))
+      + `<div class="pf-campos" id="empCampos" style="margin-top:20px"></div>`
+      + (modoPerfil ? '' : `<p class="pf-nota">${T('pub2_emp_docs', 'Los documentos los subís después, desde tu panel.')}</p>`);
+    const caja = document.getElementById('empCampos');
+    const dibujar = t => {
+      if (!t) { caja.innerHTML = ''; return; }
+      const nom = { profesional: T('pub2_nombre_prof', 'Nombre de la inmobiliaria o del corredor'), gestor: T('pub2_nombre_gestor', 'Nombre de la empresa'), desarrolladora: T('pub2_nombre_desa', 'Nombre de la desarrolladora'), dueno: T('pub2_nombre_dueno', 'Nombre y apellido') }[t];
+      let h = campo('nombre', nom, texto('nombre', p.nombre, `autocomplete="${t === 'dueno' ? 'name' : 'organization'}"`), 'full')
+        + campo('whatsapp', T('pub2_whatsapp', 'WhatsApp'), `<input id="f-whatsapp" name="whatsapp" type="tel" inputmode="tel" autocomplete="tel" value="${esc(p.whatsapp || '')}" aria-describedby="h-whatsapp" placeholder="11 2345 6789">`, 'full', T('pub2_whatsapp_h', 'Con código de área.'))
+        + (t === 'profesional' ? campo('matricula', T('pub2_matricula', 'Matrícula'), texto('matricula', p.matricula, 'placeholder="CUCICBA 0000" autocomplete="off"'), 'full') : '')
+        + (t === 'gestor' || t === 'desarrolladora' ? campo('cuit', T('pub2_cuit', 'CUIT'), texto('cuit', p.cuit, 'inputmode="numeric" autocomplete="off" placeholder="30-12345678-9"'), 'full') : '');
+      if (modoPerfil) h += `<p class="pf-divisor pf-rot">${T('pub2_mas_datos', 'Más datos')}</p>`
+        + campo('telefono', T('pub2_telefono', 'Teléfono'), `<input id="f-telefono" name="telefono" type="tel" inputmode="tel" autocomplete="tel" value="${esc(p.telefono || '')}">`, 'full')
+        + campo('email', T('pub2_mail', 'Mail de contacto'), `<input id="f-email" name="email" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" value="${esc(p.email || BPStore.session.email || '')}">`, 'full')
+        + (t === 'dueno' ? '' : campo('responsable', t === 'profesional' ? T('pub2_responsable_prof', 'Corredor responsable') : T('pub2_responsable', 'Responsable'), texto('responsable', p.responsable, 'autocomplete="name"'), 'full'))
+        + (t === 'profesional' ? campo('colegio', T('pub2_colegio', 'Colegio'), elegir('colegio', p.colegio || 'CUCICBA', [['CUCICBA', 'CUCICBA, Ciudad de Buenos Aires'], ['CMCPSI', 'San Isidro, Provincia de Buenos Aires'], ['CMCPLZ', 'Lomas de Zamora, Provincia de Buenos Aires'], ['Otro', 'Otro colegio de Provincia']]), 'full') : '')
+        + campo('descripcion', T('pub2_presentacion', 'Presentación corta'), `<textarea id="f-descripcion" name="descripcion" maxlength="400" style="min-height:110px">${esc(p.descripcion || '')}</textarea>`, 'full')
+        + `<div class="pf-campo full pf-docs"><span class="pf-rot">${T('pub2_documentos', 'Documentos de verificación')}</span><p class="pf-ayuda" style="margin:0 0 10px">${t === 'dueno' ? T('pub2_docs_dueno', 'DNI y un comprobante de titularidad. Los revisamos y los borramos.') : t === 'gestor' ? T('pub2_docs_gestor', 'Constancia de CUIT y el mandato de un propietario. Los revisamos y los borramos.') : t === 'profesional' ? T('pub2_docs_prof', 'Con la matrícula alcanza. Si querés, sumá el certificado.') : T('pub2_docs_desa', 'Constancia de CUIT y un documento de la sociedad.')}</p><button type="button" class="p-carga" id="docsZona"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8.5L19 7.5V21H6z"/><path d="M14.2 3v4.6H19"/><path d="M9 13h6M9 16.4h6"/></svg><span class="p-carga-txt"><b>${T('pub2_docs_elegir', 'Elegí los documentos')}</b><span>${T('pub2_docs_formatos', 'JPG, PNG o PDF, hasta 10 MB.')}</span></span></button><input type="file" id="docs" multiple accept="image/*,.pdf" hidden aria-label="${esc(T('pub2_documentos', 'Documentos de verificación'))}"><ul class="pf-docs-lista" id="docsLista" aria-live="polite"></ul></div>`;
+      caja.innerHTML = h;
+      if (modoPerfil) engancharDocs();
+      const tt = document.getElementById('pfT'); if (tt) tt.textContent = titulo(t);
+    };
     const engancharDocs = () => {
       const zona = document.getElementById('docsZona'), inp = document.getElementById('docs'), lista = document.getElementById('docsLista'); if (!zona || !inp) return;
-      const kb = n => n < 1024 * 1024 ? Math.round(n / 1024) + ' KB' : (n / 1048576).toFixed(1) + ' MB';
-      const pintar = () => { const fs = Array.from(inp.files || []); lista.innerHTML = fs.map((f, i) => `<li><span class="nom">${BP.esc(f.name)}</span><span class="peso">${kb(f.size)}</span><button type="button" class="quitar" data-i="${i}" aria-label="Quitar ${BP.esc(f.name)}">×</button></li>`).join(''); zona.classList.toggle('con', fs.length > 0); };
+      const kb = n => n < 1048576 ? Math.round(n / 1024) + ' KB' : (n / 1048576).toFixed(1) + ' MB';
+      const pintar = () => { lista.innerHTML = Array.from(inp.files || []).map((f, i) => `<li><span class="nom">${esc(f.name)}</span><span class="peso">${kb(f.size)}</span><button type="button" data-i="${i}" aria-label="${esc(TF('pub2_quitar_x', 'Quitar {x}', { x: f.name }))}">&times;</button></li>`).join(''); };
       const poner = files => { const dt = new DataTransfer(); Array.from(inp.files || []).forEach(f => dt.items.add(f)); Array.from(files || []).forEach(f => { if (!Array.from(dt.files).some(x => x.name === f.name && x.size === f.size)) dt.items.add(f); }); inp.files = dt.files; pintar(); };
-      zona.addEventListener('click', () => inp.click()); zona.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); inp.click(); } });
-      inp.addEventListener('change', () => { poner(inp.files); });
-      zona.addEventListener('dragover', e => { e.preventDefault(); zona.classList.add('sobre'); }); zona.addEventListener('dragleave', () => zona.classList.remove('sobre')); zona.addEventListener('drop', e => { e.preventDefault(); zona.classList.remove('sobre'); poner(e.dataTransfer.files); });
-      lista.addEventListener('click', e => { const b = e.target.closest('.quitar'); if (!b) return; const dt = new DataTransfer(); Array.from(inp.files).forEach((f, i) => { if (i !== Number(b.dataset.i)) dt.items.add(f); }); inp.files = dt.files; pintar(); });
-      pintar();
+      let previos = [];
+      zona.addEventListener('click', () => { previos = Array.from(inp.files || []); inp.click(); });
+      inp.addEventListener('change', () => { const nuevos = Array.from(inp.files || []); const dt = new DataTransfer(); previos.forEach(f => dt.items.add(f)); inp.files = dt.files; poner(nuevos); });
+      zona.addEventListener('dragover', e => { e.preventDefault(); }); zona.addEventListener('drop', e => { e.preventDefault(); poner(e.dataTransfer.files); });
+      lista.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; const dt = new DataTransfer(); Array.from(inp.files).forEach((f, i) => { if (i !== Number(b.dataset.i)) dt.items.add(f); }); inp.files = dt.files; pintar(); });
     };
-    draw(tipo); engancharDocs();
-    /* Sin tipo elegido no hay nada que guardar ni adónde continuar: los dos botones esperan la elección */
-    const botonesPaso = () => { const hay = !!document.querySelector('[name=tipo]:checked'); el.querySelectorAll('[data-next],[data-save]').forEach(b => { b.disabled = !hay; }); };
-    botonesPaso();
-    document.querySelectorAll('[name=tipo]').forEach(r => r.addEventListener('change', () => { draw(r.value); engancharDocs(); botonesPaso(); }));
-    bindNav(async () => {
-      const rt = document.querySelector('[name=tipo]:checked'); if (!rt) { BP.errorCampo(document.getElementById('tipoSeg'), 'Elegí quién publica.'); return false; }
-      const t = rt.value; const data = { tipo: t }; form.querySelectorAll('input:not([type=file]),select,textarea').forEach(i => data[i.name] = i.value.trim());
-      if (!data.nombre || !data.telefono || !data.whatsapp || (t === 'profesional' && !data.matricula) || (t === 'desarrolladora' && !data.cuit)) {
-        const falta = !data.nombre ? 'nombre' : !data.telefono ? 'telefono' : !data.whatsapp ? 'whatsapp' : (t === 'profesional' ? 'matricula' : 'cuit');
-        const el = form.querySelector('[name=' + falta + ']');
-        BP.errorCampo(el, 'Este dato es obligatorio.');
-        return false; }
-      data.zonas = data.zonas || []; data.badge = t === 'dueno' ? 'Dueño verificado' : t === 'desarrolladora' ? 'Venta directa' : t === 'gestor' ? 'Gestor de alquileres' : 'Corredor inmobiliario matriculado';
-      try { pub = await BPStore.savePublicador(data);
-        /* 11/9 · El perfil de la cuenta sale de acá cuando se vino a publicar: dueño directo o profesional (inmobiliaria, desarrolladora). Si falla no frena la carga: el panel lo deduce del publicador igual.
-           11/9 noche · Solo si todavía no eligió, o si había dicho "busco": una elección hecha en Mi cuenta no se pisa cada vez que edita el publicador. */
-        try { const pa = BPStore.getPerfil(); if (!pa || pa === 'busca') await BPStore.setPerfil(t === 'dueno' ? 'dueno' : 'profesional'); } catch (e) { /* el publicador ya quedó; el panel deduce el perfil de ahí */ }
-        const files = Array.from(document.getElementById('docs').files || []); for (const f of files) { const path = await BPStore.uploadDoc(f, pub.id, t === 'dueno' ? 'titularidad' : t === 'profesional' ? 'matricula' : t === 'gestor' ? 'mandato' : 'cuit'); await BPStore.requestVerificacion(pub.id, t === 'dueno' ? 'titularidad' : t === 'profesional' ? 'matricula' : 'cuit', path); } if (!files.length && !pub.verificado) await BPStore.requestVerificacion(pub.id, t === 'profesional' ? 'matricula' : t === 'desarrolladora' ? 'cuit' : 'dni', null); BP.toast('Perfil guardado.'); return true; } catch (e) { BP.toast(BPStore.errorAlGuardar(e, 'No se pudo guardar el perfil.'), 'error'); return false; }
-    });
-  }
-
-  /* ── Paso 1: principales ── */
-  function renderPrincipales(){
-    const a = aviso;
-    el.innerHTML = `<h2 class="p-sec-t">Lo principal</h2><p class="p-kicker" style="margin-bottom:16px">Operación, ubicación y los datos que salen en la tarjeta.</p><div class="p-formgrid">
-      ${fld('operacion','Operación','select',a.operacion,{opts:[['venta',OP_TXT.venta],['alquiler',OP_TXT.alquiler],['mediano',OP_TXT.mediano]]})}
-      ${fld('tipo','Tipo de propiedad','select',a.tipo,{opts:[['Departamento','Departamento'],['Piso','Piso'],['PH','PH'],['Casa','Casa']]})}
-      ${fld('zona','Zona','select',a.zona,{opts:[['','Elegí la zona']].concat(ZONAS.map(z=>[z,BP.zonaLabel(z)]))},'Solo las zonas de BAIREN.')}
-      ${fld('barrio','Barrio o subzona','select',a.barrio,{opts:[['','Elegí primero la zona']]})}
-      ${fld('direccion','Calle y altura','text',a.direccion,{attrs:'required placeholder="Ortega y Gasset 1500"'})}
-      ${fld('unidad','Piso y unidad','text',a.unidad,{attrs:'placeholder="4° B"'})}
-      ${fld('mostrar_direccion','Dirección en la ficha','select',a.mostrar_direccion,{opts:[['aproximada','Aproximada, solo la cuadra'],['exacta','Exacta']]})}
-      <div class="p-fld" data-fld="precio"><label for="f-precio" id="l-precio">${PRECIO_LBL[a.operacion] || PRECIO_LBL.venta}</label><div class="p-precio"><select id="f-moneda" name="moneda" aria-label="Moneda" ${conMoneda(a.operacion) ? '' : 'hidden disabled'}><option value="USD" ${a.moneda !== 'ARS' ? 'selected' : ''}>USD</option><option value="ARS" ${a.moneda === 'ARS' ? 'selected' : ''}>ARS</option></select><input id="f-precio" name="precio" type="number" value="${BP.esc(v(a,'precio'))}" required min="0" step="1" inputmode="numeric" aria-describedby="h-precio"></div><div class="hint" id="h-precio">Sin puntos.</div></div>
-      <div class="full" id="bloqueMediano" ${a.operacion === 'mediano' ? '' : 'hidden'}>
-        <div class="p-formgrid">${fld('plazo','Estadía mínima','select',a.plazo||'',{opts:estadiaOpts(a.plazo),attrs:a.operacion === 'mediano' ? '' : 'disabled'})}</div>
-        <fieldset class="p-grupo" style="margin-top:14px"><legend>Qué incluye</legend><div class="p-checks">${INCLUYE.map(x => `<label><input type="checkbox" name="incl" value="${x}" ${(a.caracteristicas||[]).indexOf(x)>-1?'checked':''} ${a.operacion === 'mediano' ? '' : 'disabled'}> ${x}</label>`).join('')}</div></fieldset>
-      </div>
-      ${fld('expensas','Expensas por mes, en pesos','number',a.expensas,{attrs:'min="0" step="1"'})}
-      ${fld('m2_total','Superficie total, m²','number',a.m2_total,{attrs:'required min="10"'})}
-      ${fld('m2_cubierto','Superficie cubierta, m²','number',a.m2_cubierto,{attrs:'min="10"'})}
-      ${fld('ambientes','Ambientes','number',a.ambientes,{attrs:'required min="1" max="12"'})}
-      ${fld('dormitorios','Dormitorios','number',a.dormitorios,{attrs:'min="0" max="10"'})}
-      ${fld('banos','Baños','number',a.banos,{attrs:'min="1" max="8"'})}
-      ${fld('cocheras','Cocheras','number',a.cocheras,{attrs:'min="0" max="6"'})}
-      ${fld('antiguedad','Antigüedad en años. A estrenar: 0','number',a.antiguedad,{attrs:'min="0" max="150"'})}
-      ${fld('titulo','Título del aviso','text',a.titulo,{full:true,attrs:'maxlength="80" placeholder="Piso alto con vista al río y terraza propia"'},'Hasta 80 caracteres. Sin mayúsculas sostenidas ni signos de exclamación.')}
-      ${fld('descripcion','Descripción','textarea',a.descripcion,{full:true,attrs:'required minlength="150" maxlength="4000"'},'Mínimo 150 caracteres. Luz, distribución, edificio, cuadra: contala como a alguien que la va a vivir.')}
-    </div>
-      <div class="p-fld full p-trad" style="margin-top:6px">
-        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button type="button" class="p-btn p-btn-sm" id="btnTraducir">Traducir a inglés y portugués</button><span class="p-note" style="margin:0">Gratis. Revisá el resultado antes de publicar.</span></div>
-        <details id="tradBox" ${(a.descripcion_en || a.descripcion_pt) ? 'open' : ''} style="margin-top:10px"><summary class="p-note" style="cursor:pointer">Versiones en inglés y portugués</summary>
-          <div class="p-formgrid" style="margin-top:8px">${fld('descripcion_en','Descripción en inglés','textarea',a.descripcion_en,{full:true,attrs:'rows="5"'})}${fld('descripcion_pt','Descripción en portugués','textarea',a.descripcion_pt,{full:true,attrs:'rows="5"'})}</div>
-        </details>
-      </div>
-      ${navBtns()}`;
-    const zs = document.getElementById('f-zona'), bs = document.getElementById('f-barrio');
-    const fillBarrios = () => { const z = zs.value; bs.innerHTML = z ? barriosDe(z, z === a.zona ? a.barrio : '').map(b => `<option value="${BP.esc(b)}" ${b===a.barrio?'selected':''}>${BP.esc(b)}</option>`).join('') : '<option value="">Elegí primero la zona</option>'; };
-    fillBarrios(); zs.addEventListener('change', fillBarrios);
-    /* La operación decide el rótulo del precio y si se elige la moneda. Lo que no aplica queda oculto y deshabilitado: collect() no lo lee. */
-    const os = document.getElementById('f-operacion');
-    const segunOperacion = () => { const op = os.value; document.getElementById('l-precio').textContent = PRECIO_LBL[op] || PRECIO_LBL.venta; const m = document.getElementById('f-moneda'); m.hidden = m.disabled = !conMoneda(op);
-      const bm = document.getElementById('bloqueMediano'); bm.hidden = op !== 'mediano'; bm.querySelectorAll('select,input').forEach(i => { i.disabled = op !== 'mediano'; }); };
-    os.addEventListener('change', segunOperacion);
-    const bt = document.getElementById('btnTraducir'); if (bt) bt.addEventListener('click', async () => {
-      collect(); const desc = (a.descripcion || '').trim(); if (desc.length < 40) { BP.toast('Escribí primero la descripción en castellano.', 'error'); return; }
-      bt.disabled = true; const txt = bt.textContent; bt.textContent = 'Traduciendo…';
-      try { const r = await BPStore.traducir(a.titulo || a.direccion || '', desc); a.descripcion_en = r.en.descripcion; a.descripcion_pt = r.pt.descripcion; const en = el.querySelector('[name=descripcion_en]'), pt = el.querySelector('[name=descripcion_pt]'); if (en) en.value = a.descripcion_en; if (pt) pt.value = a.descripcion_pt; document.getElementById('tradBox').open = true; BP.toast('Traducido con ' + (r.motor === 'deepl' ? 'DeepL' : 'MyMemory') + '. Revisá y corregí lo que haga falta.'); }
-      catch (e) { BP.toast(BPStore.errorAlGuardar(e, 'No se pudo traducir.'), 'error'); }
-      finally { bt.disabled = false; bt.textContent = txt; }
-    });
-    bindNav(async () => { collect(); const req = reqDe(aviso); let ok = true; req.forEach(k => { const f = document.querySelector(`[data-fld=${k}]`); const bad = !aviso[k] || (k === 'descripcion' && String(aviso[k]).length < 150); f.classList.toggle('err', bad); if (bad) ok = false; }); if (!ok) {
-        const k = req.find(x => !aviso[x] || (x === 'descripcion' && String(aviso[x]).length < 150));
-        const el = document.querySelector(`[data-fld=${k}]`);
-        BP.errorCampo(el && (el.querySelector('#f-' + k) || el.querySelector('input,select,textarea') || el), k === 'descripcion' ? 'La descripción necesita al menos 150 caracteres.' : k === 'plazo' ? 'Elegí la estadía mínima.' : 'Falta este dato.');
-        return false; } return true; });
-  }
-
-  /* ── Paso 2: fotos y video ── */
-  function renderFotos(){
-    const a = aviso;
-    el.innerHTML = `<h2 class="p-sec-t">Fotos y video</h2><p class="p-kicker" style="margin-bottom:16px">Mínimo ocho fotos horizontales. La primera es la portada. Si no tenés fotos producidas, marcá la casilla y seguí: las hace BAIREN.</p>
-      <button type="button" class="p-carga" id="drop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14"/><path d="m3 16 5-5 4 4 3-3 6 6"/><circle cx="15.5" cy="9.5" r="1.5"/></svg><span class="p-carga-txt"><b>Elegí las fotos, o arrastralas acá</b><span>JPG o PNG, hasta 10 MB cada una. Horizontales; la primera es la portada.</span></span><span class="p-btn p-btn-sm p-carga-btn" aria-hidden="true">Elegir fotos</span></button><input type="file" id="fotosIn" multiple accept="image/*" hidden aria-label="Fotos de la propiedad">
-      <div class="p-fotos" id="fotosGrid"></div>
-      <div class="p-formgrid" style="margin-top:18px">${fld('video_url','Video, link de YouTube o Bunny','url',a.video_url,{full:true,attrs:'placeholder="https://"'})}<label class="full" style="display:flex;gap:10px;align-items:center;color:var(--navy-deeper)"><input type="checkbox" id="quieroProd" ${a.quiero_produccion?'checked':''}> Quiero que BAIREN produzca las fotos y el video de la unidad, sin costo.</label></div>
-      ${navBtns()}`;
-    const inp = document.getElementById('fotosIn'), drop = document.getElementById('drop'), grid = document.getElementById('fotosGrid');
-    /* 6.2 · Arrastrar y soltar no existe con el dedo. Cada foto trae botones para moverse,
-       ponerse de portada y salir, que funcionan igual con mouse, teclado y pantalla táctil. */
-    const draw = async () => {
-      const items = [];
-      for (let i = 0; i < a.fotos.length; i++) {
-        const u = await BPStore.resolveFoto(a.fotos[i].url);
-        items.push(`<div class="p-foto" draggable="true" data-i="${i}">
-          <div class="ph"><img src="${u}" alt="Foto ${i+1} de ${a.fotos.length}">${i===0?'<span class="es-portada">Portada</span>':''}</div>
-          <div class="ctl">
-            <button type="button" class="mv" data-mov="-1" data-i="${i}" ${i===0?'disabled':''} aria-label="Mover la foto ${i+1} hacia atrás">‹</button>
-            <button type="button" class="mv" data-mov="1" data-i="${i}" ${i===a.fotos.length-1?'disabled':''} aria-label="Mover la foto ${i+1} hacia adelante">›</button>
-            ${i===0?'':`<button type="button" class="portada" data-portada="${i}" aria-label="Usar la foto ${i+1} como portada">Portada</button>`}
-            <button type="button" class="quitar" data-del="${i}" aria-label="Quitar la foto ${i+1}">×</button>
-            ${/^https?:/.test(a.fotos[i].url) ? `<button type="button" class="mejorar" data-ia="${i}" aria-label="Mejorar la foto ${i+1} con IA">Mejorar con IA</button>` : ''}
-          </div>
-        </div>`);
-      }
-      grid.innerHTML = items.join('') + (a.fotos.length ? `<p class="p-note p-nota-fotos">${a.fotos.length} ${a.fotos.length === 1 ? 'foto' : 'fotos'} · mínimo 8. Ordenalas con las flechas. La primera es la portada.</p>` : '');
-      const mover = (de, aI) => { if (aI < 0 || aI >= a.fotos.length) return; const m = a.fotos.splice(de, 1)[0]; a.fotos.splice(aI, 0, m); BP.anunciar('Foto movida al lugar ' + (aI + 1) + ' de ' + a.fotos.length); draw().then(() => { const b = grid.querySelector(`.p-foto[data-i="${aI}"] [data-mov="${aI > de ? 1 : -1}"]`); if (b && !b.disabled) b.focus(); }); };
-      grid.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => { a.fotos.splice(Number(b.dataset.del), 1); BP.anunciar('Foto quitada, quedan ' + a.fotos.length); draw(); }));
-      grid.querySelectorAll('[data-mov]').forEach(b => b.addEventListener('click', () => { const i = Number(b.dataset.i); mover(i, i + Number(b.dataset.mov)); }));
-      grid.querySelectorAll('[data-portada]').forEach(b => b.addEventListener('click', () => { mover(Number(b.dataset.portada), 0); }));
-      /* Producción con IA: la foto vuelta a sacar (GPT, prompt maestro). Se compara con la original y el que publica decide. */
-      grid.querySelectorAll('[data-ia]').forEach(b => b.addEventListener('click', async () => {
-        const i = Number(b.dataset.ia); const card = b.closest('.p-foto'); b.disabled = true; b.textContent = 'Produciendo la foto'; if (window.BPM && BPM.produciendo) BPM.produciendo(b, true);
+    dibujar(tipo);
+    el.querySelectorAll('[name=tipo_pub]').forEach(r => r.addEventListener('change', () => { tipo = r.value; dibujar(tipo); }));
+    return {
+      boton: modoPerfil ? T('pub2_guardar', 'Guardar') : null,
+      validar: async () => {
+        const t = fijo ? p.tipo : elegido('tipo_pub');
+        if (!t) return marcarError('tipoPub', T('pub2_err_tipo', 'Elegí cómo publicás.'));
+        const data = { tipo: t };
+        caja.querySelectorAll('input:not([type=file]),select,textarea').forEach(i => { if (i.name) data[i.name] = String(i.value || '').trim(); });
+        const req = ['nombre', 'whatsapp'].concat(t === 'profesional' ? ['matricula'] : (t === 'gestor' || t === 'desarrolladora') ? ['cuit'] : []);
+        const falta = req.find(k => !data[k]); if (falta) return marcarError(falta, T('pub2_err_dato', 'Falta este dato.'));
+        const wa = waNorm(data.whatsapp); if (wa.length < 11 || wa.length > 13) return marcarError('whatsapp', T('pub2_err_wa', 'Revisá el WhatsApp: con código de área y sin el 15.'));
+        data.whatsapp = wa;
+        if (data.cuit && (t === 'gestor' || t === 'desarrolladora') && data.cuit.replace(/\D/g, '').length !== 11) return marcarError('cuit', T('pub2_err_cuit', 'El CUIT tiene 11 números.'));
+        if (!data.telefono) data.telefono = p.telefono || wa;
+        if (!data.email) data.email = p.email || BPStore.session.email;
+        if (p.slug) data.slug = p.slug;   /* el enlace público del publicador no cambia si cambia el nombre */
+        data.zonas = p.zonas || [];
+        if (t === 'profesional' && !data.colegio) data.colegio = p.colegio || 'CUCICBA';
+        data.badge = t === 'dueno' ? 'Dueño verificado' : t === 'desarrolladora' ? 'Venta directa' : t === 'gestor' ? 'Gestor de alquileres' : 'Corredor inmobiliario matriculado';
+        const antes = pub;
         try {
-          const r = await BPStore.producirFoto(a.fotos[i].url, { formato: 'apaisado' });
-          const cmp = document.createElement('div'); cmp.className = 'p-iacmp';
-          cmp.innerHTML = `<div class="dos"><figure><img src="${a.fotos[i].url}" alt="Original"><figcaption>Original</figcaption></figure><figure><img src="${r.image}" alt="Nueva, con IA"><figcaption>Nueva, con IA</figcaption></figure></div><p class="p-note">Es la misma propiedad, vuelta a fotografiar. Compará ventanas, muebles y textos antes de aceptar.</p><div class="acts"><button type="button" class="p-btn p-btn-sm p-btn-fill" data-usar>Usar la nueva</button><button type="button" class="p-btn p-btn-sm" data-cerrar>Descartar</button></div>`;
-          cmp.setAttribute('role', 'dialog'); cmp.setAttribute('aria-modal', 'true'); cmp.setAttribute('aria-label', 'Comparar foto original y nueva'); cmp.tabIndex = -1;
-          document.body.appendChild(cmp);
-          const focoPrevio = document.activeElement; const escCmp = e => { if (e.key === 'Escape') cerrarCmp(); }; const cerrarCmp = () => { cmp.remove(); document.removeEventListener('keydown', escCmp); if (focoPrevio && focoPrevio.focus) focoPrevio.focus(); };
-          document.addEventListener('keydown', escCmp); (cmp.querySelector('[data-usar]') || cmp).focus();
-          cmp.querySelector('[data-cerrar]').addEventListener('click', cerrarCmp);
-          cmp.querySelector('[data-usar]').addEventListener('click', async () => { const u = cmp.querySelector('[data-usar]'); u.disabled = true; u.textContent = 'Guardando…'; try { const key = aviso.id || aviso.slug || ('nuevo-' + BPStore.session.id.slice(-4)); const url = await BPStore.subirDataUrl(r.image, key, Date.now() % 100000); a.fotos.splice(i + 1, 0, { url, ia: true }); cmp.remove(); BP.toast('Foto nueva agregada al lado de la original. Quitá la que no quieras.'); draw(); } catch (e) { u.disabled = false; u.textContent = 'Usar la nueva'; BP.toast(BPStore.errorAlGuardar(e, 'No se pudo guardar la foto.'), 'error'); } });
-        } catch (e) { BP.toast(BPStore.errorAlGuardar(e, 'No se pudo producir la foto.'), 'error'); }
-        finally { if (window.BPM && BPM.produciendo) BPM.produciendo(b, false); b.disabled = false; b.textContent = 'Mejorar con IA'; }
-      }));
-      let from = null;
-      grid.querySelectorAll('.p-foto').forEach(f => {
-        f.addEventListener('dragstart', () => from = Number(f.dataset.i));
-        f.addEventListener('dragover', e => e.preventDefault());
-        f.addEventListener('drop', () => { const to = Number(f.dataset.i); if (from == null || from === to) return; mover(from, to); });
-      });
-      document.body.dataset.fotos = a.fotos.length;
+          pub = await BPStore.savePublicador(data);
+          /* El perfil de la cuenta sale de acá si todavía no eligió (o si había dicho "busco"); si falla, el panel lo deduce del publicador */
+          try { const pa = BPStore.getPerfil(); if (!pa || pa === 'busca') await BPStore.setPerfil(t === 'dueno' ? 'dueno' : 'profesional'); } catch (e) { /* sigue */ }
+          const clave = t === 'dueno' ? 'titularidad' : t === 'profesional' ? 'matricula' : t === 'gestor' ? 'mandato' : 'cuit';
+          const files = Array.from((document.getElementById('docs') || {}).files || []);
+          for (const f of files) { const path = await BPStore.uploadDoc(f, pub.id, clave); await BPStore.requestVerificacion(pub.id, clave === 'mandato' ? 'cuit' : clave, path); }
+          if (!files.length && !antes && !pub.verificado) await BPStore.requestVerificacion(pub.id, t === 'profesional' ? 'matricula' : (t === 'desarrolladora' || t === 'gestor') ? 'cuit' : 'dni', null);
+        } catch (e) { BP.toast(BPStore.errorAlGuardar(e, T('pub2_err_perfil', 'No se pudo guardar el perfil.')), 'error'); return false; }
+        return true;
+      },
+      alContinuar: modoPerfil ? async () => { BP.toast(T('pub2_perfil_ok', 'Perfil guardado.')); setTimeout(() => { location.href = 'panel.html#cuenta'; }, 700); return true; } : null
     };
-    const add = async files => { const key = aviso.id || aviso.slug || ('nuevo-' + BPStore.session.id.slice(-4)); let i = a.fotos.length; for (const f of Array.from(files)) { if (!/^image\//.test(f.type)) continue; try { BP.toast('Subiendo foto ' + (i + 1) + '…'); const url = await BPStore.uploadFoto(f, key, i++); a.fotos.push({ url }); } catch (e) { BP.toast(BPStore.errorAlGuardar(e, 'No se pudo subir una foto.'), 'error'); } } draw(); };
-    drop.addEventListener('click', () => inp.click()); inp.addEventListener('change', () => add(inp.files)); drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('sobre'); }); drop.addEventListener('dragleave', () => drop.classList.remove('sobre')); drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('sobre'); add(e.dataTransfer.files); });
-    draw();
-    bindNav(async () => { collect(); a.quiero_produccion = document.getElementById('quieroProd').checked; if (a.fotos.length < 8 && !a.quiero_produccion) { BP.toast('Hacen falta ocho fotos y hay ' + a.fotos.length + '. O pedí la producción de BAIREN.', 'error'); return false; } return true; });
-  }
+  };
 
-  /* ── Paso 3: extras ── */
-  function renderExtras(){
+  /* 4 · La propiedad. En un emprendimiento, solo lo común: unidad, ambientes y m² van en la tabla de unidades. */
+  PANT.propiedad = function(){
+    const a = aviso, emp = clase === 'emprendimiento';
+    const nota = copiaDe ? TF('pub2_copia_de', 'Copia de {x}.', { x: esc([copiaDe.direccion, copiaDe.unidad].filter(Boolean).join(', ')) }) : '';
+    el.innerHTML = cab(emp ? T('pub2_prop_t_emp', 'El emprendimiento') : T('pub2_prop_t', 'La propiedad'), nota) + `<div class="pf-campos">
+      ${campo('zona', T('pub2_zona', 'Zona'), elegir('zona', a.zona, [['', T('pub2_elegi', 'Elegí')]].concat(ZONAS.map(z => [z, BP.zonaLabel(z)]))))}
+      ${campo('barrio', T('pub2_barrio', 'Barrio'), elegir('barrio', a.barrio, [['', T('pub2_elegi', 'Elegí')]]))}
+      ${campo('direccion', T('pub2_direccion', 'Calle y altura'), texto('direccion', a.direccion, 'placeholder="Ortega y Gasset 1500" autocomplete="off"'), 'full')}
+      ${emp ? '' : campo('unidad', T('pub2_unidad', 'Piso y unidad'), texto('unidad', a.unidad, 'placeholder="4° B" autocomplete="off"'))}
+      ${emp ? '' : campo('m2_total', T('pub2_m2', 'm² totales'), `<input id="f-m2_total" name="m2_total" type="text" inputmode="decimal" autocomplete="off" value="${esc(a.m2_total == null ? '' : a.m2_total)}">`)}
+      ${grupo('g-tipo', T('pub2_tipo', 'Tipo'), `<div class="pf-chips cols-2 pf-cuatro">${TIPOS.concat(TIPOS.indexOf(a.tipo) === -1 && a.tipo ? [a.tipo] : []).map(x => chip('tipo', x, esc(BP.etiqueta ? BP.etiqueta(x) : x), (a.tipo || 'Departamento') === x)).join('')}</div>`, 'full')}
+      ${emp ? '' : pasos('ambientes', T('pub2_ambientes', 'Ambientes'), a.ambientes, 12) + pasos('banos', T('pub2_banos', 'Baños'), a.banos, 8)}
+    </div>`;
+    const zs = document.getElementById('f-zona'), bs = document.getElementById('f-barrio');
+    const llenar = () => { const z = zs.value; const l = z ? barriosDe(z, z === a.zona ? a.barrio : '') : []; bs.innerHTML = (l.length === 1 ? '' : `<option value="">${esc(T('pub2_elegi', 'Elegí'))}</option>`) + l.map(b => `<option value="${esc(b)}" ${b === a.barrio ? 'selected' : ''}>${esc(b)}</option>`).join(''); bs.disabled = !z; };
+    llenar(); zs.addEventListener('change', llenar);
+    const dir = document.getElementById('f-direccion'); dir.addEventListener('input', actualizarSalir);
+    const leer = () => {
+      a.zona = valor('zona'); a.barrio = valor('barrio'); a.direccion = valor('direccion'); a.tipo = elegido('tipo') || a.tipo || 'Departamento';
+      a.ciudad = a.zona === 'GBA Norte' ? 'Zona Norte' : 'Capital Federal';
+      if (!emp) { a.unidad = valor('unidad'); a.m2_total = entero(valor('m2_total')); a.ambientes = entero(valor('ambientes')); a.banos = entero(valor('banos')); }
+    };
+    return { leer, validar: () => {
+      if (!a.zona) return marcarError('zona', T('pub2_err_zona', 'Elegí la zona.'));
+      if (!a.barrio) return marcarError('barrio', T('pub2_err_barrio', 'Elegí el barrio.'));
+      if (!tieneDireccion()) return marcarError('direccion', T('pub2_err_direccion', 'Escribí la calle y la altura.'));
+      if (!emp && !(a.m2_total > 0)) return marcarError('m2_total', T('pub2_err_m2', 'Escribí los m² totales.'));
+      if (!emp && !(a.ambientes >= 1)) return marcarError('ambientes', T('pub2_err_ambientes', 'Marcá cuántos ambientes tiene.'));
+      return true;
+    } };
+  };
+
+  /* 5 · Precio, según la operación. Emprendimiento: datos comunes y la tabla de unidades. */
+  PANT.precio = function(){
+    if (clase === 'emprendimiento') return precioEmprendimiento();
+    const a = aviso, trad = clase === 'tradicional';
+    el.innerHTML = cab(a.operacion === 'mediano' ? T('pub2_precio_t_mediano', 'Precio y estadía') : T('pub2_precio_t', 'Precio'))
+      + (trad ? grupo('g-operacion', T('pub2_operacion', 'Operación'), `<div class="pf-chips cols-2">${chip('operacion', 'venta', T('pub2_op_venta', 'Venta'), a.operacion === 'venta')}${chip('operacion', 'alquiler', T('pub2_op_alquiler_corto', 'Alquiler'), a.operacion === 'alquiler')}</div>`) : '')
+      + `<div class="pf-campos" id="bloqueOp" ${trad ? 'style="margin-top:20px"' : ''}></div>`;
+    const caja = document.getElementById('bloqueOp');
+    const dibujar = () => {
+      const op = a.operacion, inc = a.caracteristicas.filter(x => INCLUYE.indexOf(x) > -1), expIncl = op === 'mediano' && inc.indexOf('Expensas incluidas') > -1;
+      const pre = op === 'alquiler' && a.moneda === 'ARS' ? '$' : 'USD';
+      let h = '';
+      if (op === 'alquiler') h += grupo('g-moneda', T('pub2_moneda', 'Moneda'), `<div class="pf-chips cols-2">${chip('moneda', 'USD', T('pub2_dolares', 'Dólares'), a.moneda !== 'ARS')}${chip('moneda', 'ARS', T('pub2_pesos', 'Pesos'), a.moneda === 'ARS')}</div>`, 'full');
+      h += campo('precio', op === 'venta' ? T('pub2_precio_venta', 'Precio') : T('pub2_precio_mes', 'Precio por mes'), conPrefijo(pre, cifra('precio', a.precio), 'prePrecio'), 'full');
+      if (op === 'mediano') {
+        h += grupo('g-plazo', T('pub2_estadia', 'Estadía mínima, en meses'), `<div class="pf-chips cols-5">${ESTADIAS.concat(a.plazo && ESTADIAS.indexOf(a.plazo) === -1 ? [a.plazo] : []).map(x => chip('plazo', x, ESTADIAS.indexOf(x) > -1 ? String(parseInt(x, 10)) : esc(x), a.plazo === x)).join('')}</div>`, 'full');
+        h += campo('disponible_desde', T('pub2_disponible', 'Disponible desde'), `<input id="f-disponible_desde" name="disponible_desde" type="date" value="${esc(String(a.disponible_desde || '').slice(0, 10))}">`, 'full');
+        h += grupo('g-incluye', T('pub2_incluye', 'Qué incluye el precio'), `<div class="pf-toggles">${INCLUYE.map(x => marca('incl', x, esc(BP.etiqueta ? BP.etiqueta(x) : x), inc.indexOf(x) > -1)).join('')}</div>`, 'full');
+      }
+      h += `<div class="pf-campo p-fld full" data-fld="expensas" ${expIncl ? 'hidden' : ''}><label for="f-expensas">${T('pub2_expensas', 'Expensas por mes, en pesos')}</label>${conPrefijo('$', cifra('expensas', a.expensas))}</div>`;
+      if (op === 'alquiler') {
+        h += grupo('g-plazo', T('pub2_plazo_contrato', 'Plazo del contrato'), `<div class="pf-chips cols-3">${PLAZOS.concat(a.plazo && PLAZOS.indexOf(a.plazo) === -1 ? [a.plazo] : []).map(x => chip('plazo', x, esc(x), a.plazo === x)).join('')}</div>`, 'full');
+        h += grupo('g-garantias', T('pub2_garantias', 'Garantías que aceptás'), `<div class="pf-toggles">${marca('gar', GARANTIAS[0], T('pub2_gar_caucion', 'Seguro de caución'), a.caracteristicas.indexOf(GARANTIAS[0]) > -1)}${marca('gar', GARANTIAS[1], T('pub2_gar_propietaria', 'Garantía propietaria'), a.caracteristicas.indexOf(GARANTIAS[1]) > -1)}</div>`, 'full');
+      }
+      caja.innerHTML = h;
+      const dd = document.getElementById('f-disponible_desde'); if (dd) dd.addEventListener('change', () => { dd.dataset.tocado = '1'; });
+      el.querySelectorAll('[name=incl][value="Expensas incluidas"]').forEach(x => x.addEventListener('change', () => { const f = el.querySelector('[data-fld=expensas]'); if (f) f.hidden = x.checked; }));
+      el.querySelectorAll('[name=moneda]').forEach(x => x.addEventListener('change', () => { const p = document.getElementById('prePrecio'); if (p) p.textContent = x.value === 'ARS' ? '$' : 'USD'; }));
+    };
+    const leer = () => {
+      const op = a.operacion; if (!document.getElementById('f-precio')) return;
+      a.precio = num(valor('precio'));
+      if (op === 'alquiler') a.moneda = elegido('moneda') === 'ARS' ? 'ARS' : 'USD';
+      if (op === 'mediano') {
+        a.plazo = elegido('plazo') || null;
+        const inc = marcados('incl'); a.caracteristicas = reemplazar(a.caracteristicas, INCLUYE, inc);
+        /* disponible_desde solo viaja si se cargó o si el aviso ya lo traía: sin la migración 23 la columna no existe */
+        const dd = document.getElementById('f-disponible_desde'); if (dd && (dd.value || dd.dataset.tocado || 'disponible_desde' in a)) a.disponible_desde = dd.value || null;
+        a.expensas = inc.indexOf('Expensas incluidas') > -1 ? null : num(valor('expensas'));
+      } else a.expensas = num(valor('expensas'));
+      if (op === 'alquiler') { a.plazo = elegido('plazo') || null; a.caracteristicas = reemplazar(a.caracteristicas, GARANTIAS, marcados('gar')); }
+      limpiarSegunOperacion();
+    };
+    el.querySelectorAll('[name=operacion]').forEach(r => r.addEventListener('change', () => { leer(); cambiarOperacion(r.value); dibujar(); }));
+    dibujar();
+    return { leer, validar: () => {
+      if (!(Number(a.precio) > 0)) return marcarError('precio', T('pub2_err_precio', 'Escribí el precio, sin puntos ni letras.'));
+      if (a.operacion === 'mediano' && !a.plazo) return marcarError('g-plazo', T('pub2_err_estadia', 'Elegí la estadía mínima.'));
+      return true;
+    } };
+  };
+
+  function precioEmprendimiento(){
     const a = aviso;
-    el.innerHTML = `<h2 class="p-sec-t">Extras</h2><p class="p-kicker" style="margin-bottom:16px">Lo que completa la ficha.</p>
-      <fieldset class="p-grupo"><legend>Amenities</legend><div class="p-checks">${AMEN.map(x => `<label><input type="checkbox" name="amen" value="${x}" ${a.amenities.indexOf(x)>-1?'checked':''}> ${x}</label>`).join('')}</div></fieldset>
-      <fieldset class="p-grupo"><legend>Características</legend><div class="p-checks">${CARACT.map(x => `<label><input type="checkbox" name="car" value="${x}" ${a.caracteristicas.indexOf(x)>-1?'checked':''}> ${x}</label>`).join('')}</div></fieldset>
-      <fieldset class="p-grupo"><legend>Cualidades de la unidad</legend><p class="p-note">Marcá solo las ciertas. La curación las verifica; solo las verificadas aparecen en la ficha y en la búsqueda.</p><div class="p-checks">${BP.CUALIDADES.map(x => `<label><input type="checkbox" name="cual" value="${x}" ${(a.cualidades||[]).indexOf(x)>-1?'checked':''}> ${x}</label>`).join('')}</div></fieldset>
-      ${pub && pub.tipo === 'desarrolladora' ? `<div class="p-fld" style="margin-top:18px"><label>Desarrollo</label></div><div class="p-formgrid">${fld('emprendimiento','Nombre del desarrollo','text',a.emprendimiento||'',{attrs:'placeholder="Torre Libertador 5600"'},'Las unidades con el mismo nombre se agrupan en su página.')}${fld('etapa','Etapa de obra','select',a.etapa||'construccion',{opts:[['pozo','En pozo'],['construccion','En construcción'],['terminado','Terminado']]})}${fld('entrega','Entrega','text',a.entrega||'',{attrs:'placeholder="Diciembre 2027"'})}</div>` : ''}
-      ${pub && pub.tipo !== 'dueno' ? `<div class="p-formgrid" style="margin-top:18px">${fld('propietario_email','Mail del propietario (opcional)','email',a.propietario_email||'',{full:true,attrs:'placeholder="propietario@mail.com"'},'Con ese mail, el dueño entra a BAIREN y ve las visitas y reservas que registrás. No ve las consultas.')}</div>` : ''}
-      <div class="p-formgrid" style="margin-top:18px">${fld('orientacion','Orientación','select',a.orientacion||'',{opts:[['','No informada'],['Norte','Norte'],['Sur','Sur'],['Este','Este'],['Oeste','Oeste'],['Noreste','Noreste'],['Noroeste','Noroeste']]})}${fld('disposicion','Disposición','select',a.disposicion||'',{opts:[['','No informada'],['Frente','Frente'],['Contrafrente','Contrafrente'],['Lateral','Lateral'],['Interior','Interior']]})}${fld('piso','Piso','text',a.piso||'',{attrs:'placeholder="4"'})}${a.operacion === 'alquiler' ? fld('plazo','Plazo','text',a.plazo||'',{attrs:'placeholder="24 meses"'}) : ''}</div>
-      ${navBtns()}`;
-    bindNav(async () => { collect(); return true; });
+    document.body.classList.add('pf-ancho');
+    const COLS = [T('pub2_u_unidad', 'Piso y unidad'), T('pub2_u_amb', 'Ambientes'), T('pub2_u_m2', 'm²'), T('pub2_u_precio', 'Precio USD'), T('pub2_u_estado', 'Estado')];
+    el.innerHTML = cab(T('pub2_emp_unidades_t', 'Unidades y precios')) + `<div class="pf-campos">
+      ${campo('emprendimiento', T('pub2_emp_nombre', 'Nombre del emprendimiento'), texto('emprendimiento', a.emprendimiento, 'placeholder="Torre Libertador 5600" autocomplete="off"'), 'full')}
+      ${grupo('g-etapa', T('pub2_etapa', 'Etapa'), `<div class="pf-chips cols-3">${ETAPAS.map(([k, l]) => chip('etapa', k, l, a.etapa === k)).join('')}</div>`, 'full')}
+      ${campo('entrega', T('pub2_entrega', 'Entrega'), texto('entrega', a.entrega, 'placeholder="Diciembre 2027" autocomplete="off"'), 'full')}
+    </div>
+    <h2 class="pf-h2">${T('pub2_unidades', 'Unidades')} <small id="uCuenta"></small></h2>
+    <div class="pf-unidades" id="uLista"></div>
+    ${unaUnidad ? '' : `<button type="button" class="pf-mas" id="uMas">${T('pub2_u_agregar', 'Agregar unidad')}</button>`}`;
+    const lista = document.getElementById('uLista');
+    const fila = (u, i) => { const n = TF('pub2_u_n', 'Unidad {n}', { n: i + 1 }); const lbl = k => esc(COLS[k] + ', ' + n.toLowerCase()); return `<div class="pf-u" data-i="${i}">
+      <p class="pf-u-n"><span class="tx">${n}</span><span class="num" aria-hidden="true">${i + 1}</span></p>
+      <label class="pf-u-c c-unidad p-fld"><span>${COLS[0]}</span><input name="u_unidad" type="text" value="${esc(u.unidad || '')}" placeholder="4° B" autocomplete="off" aria-label="${lbl(0)}"></label>
+      <label class="pf-u-c c-amb p-fld"><span>${COLS[1]}</span><input name="u_ambientes" type="text" inputmode="numeric" value="${esc(u.ambientes || '')}" autocomplete="off" aria-label="${lbl(1)}"></label>
+      <label class="pf-u-c c-m2 p-fld"><span>${COLS[2]}</span><input name="u_m2" type="text" inputmode="decimal" value="${esc(u.m2_total || '')}" autocomplete="off" aria-label="${lbl(2)}"></label>
+      <label class="pf-u-c c-precio p-fld"><span>${COLS[3]}</span><input name="u_precio" type="text" inputmode="numeric" data-miles value="${esc(miles(u.precio))}" autocomplete="off" aria-label="${lbl(3)}"></label>
+      <label class="pf-u-c c-estado p-fld"><span>${COLS[4]}</span><select name="u_estado" aria-label="${lbl(4)}"><option value="disponible" ${u.estado !== 'reservado' ? 'selected' : ''}>${T('pub2_u_disponible', 'Disponible')}</option><option value="reservado" ${u.estado === 'reservado' ? 'selected' : ''}>${T('pub2_u_reservada', 'Reservada')}</option></select></label>
+      <div class="pf-u-acc">${unaUnidad ? '' : `<button type="button" data-dup aria-label="${esc(TF('pub2_u_dup_aria', 'Duplicar la unidad {n}', { n: i + 1 }))}">${T('pub2_u_duplicar', 'Duplicar')}</button><button type="button" data-quitar ${unidades.length < 2 ? 'disabled' : ''} aria-label="${esc(TF('pub2_u_quitar_aria', 'Quitar la unidad {n}', { n: i + 1 }))}">${T('pub2_u_quitar', 'Quitar')}</button>`}</div>
+    </div>`; };
+    const leerUnidades = () => { lista.querySelectorAll('.pf-u').forEach(f => { const u = unidades[Number(f.dataset.i)]; if (!u) return; const q = n => f.querySelector(`[name=${n}]`).value; u.unidad = q('u_unidad').trim(); u.ambientes = entero(q('u_ambientes')); u.m2_total = entero(q('u_m2')); u.precio = num(q('u_precio')); u.estado = q('u_estado') === 'reservado' ? 'reservado' : 'disponible'; }); };
+    const dibujar = foco => {
+      lista.innerHTML = `<div class="pf-u-cab" aria-hidden="true"><span></span>${COLS.map(c => `<span>${c}</span>`).join('')}<span></span></div>` + unidades.map(fila).join('');
+      document.getElementById('uCuenta').textContent = unidades.length === 1 ? T('pub2_u_una', '1 unidad') : TF('pub2_u_varias', '{n} unidades', { n: unidades.length });
+      if (foco != null) { const i = lista.querySelector(`.pf-u[data-i="${foco}"] [name=u_unidad]`); if (i) i.focus(); }
+    };
+    lista.addEventListener('click', e => {
+      const b = e.target.closest('button'); if (!b) return; const i = Number(b.closest('.pf-u').dataset.i); leerUnidades();
+      if (b.hasAttribute('data-dup')) { const c = Object.assign({}, unidades[i], { id: null, slug: null, codigo: null, unidad: '' }); unidades.splice(i + 1, 0, c); dibujar(i + 1); BP.anunciar(TF('pub2_u_duplicada', 'Unidad {n} duplicada. Completá el piso y la unidad.', { n: i + 1 })); }
+      else if (b.hasAttribute('data-quitar') && unidades.length > 1) { const sale = unidades.splice(i, 1)[0]; if (i === 0) unidades[0].id = sale.id; dibujar(Math.min(i, unidades.length - 1)); BP.anunciar(T('pub2_u_quitada', 'Unidad quitada.')); }
+    });
+    const mas = document.getElementById('uMas'); if (mas) mas.addEventListener('click', () => { leerUnidades(); unidades.push({ id: null, unidad: '', ambientes: null, m2_total: null, precio: null, estado: 'disponible' }); dibujar(unidades.length - 1); });
+    lista.addEventListener('input', e => { const f = e.target.closest('.p-fld'); if (f) { const er = f.querySelector('.p-err-campo'); if (er) er.hidden = true; } });
+    dibujar();
+    const leer = () => { a.emprendimiento = valor('emprendimiento') || null; a.etapa = elegido('etapa') || null; a.entrega = valor('entrega') || null; leerUnidades(); aBase(); };
+    return { leer, validar: () => {
+      if (!a.emprendimiento) return marcarError('emprendimiento', T('pub2_err_emp', 'Escribí el nombre del emprendimiento.'));
+      if (!a.etapa) return marcarError('g-etapa', T('pub2_err_etapa', 'Elegí la etapa de obra.'));
+      for (let i = 0; i < unidades.length; i++) {
+        const u = unidades[i], f = lista.querySelector(`.pf-u[data-i="${i}"]`), campoU = n => f.querySelector(`[name=${n}]`);
+        if (!u.unidad) { BP.errorCampo(campoU('u_unidad'), TF('pub2_err_u_unidad', 'Unidad {n}: falta el piso y la unidad.', { n: i + 1 })); return false; }
+        if (unidades.findIndex(x => x.unidad.toLowerCase() === u.unidad.toLowerCase()) !== i) { BP.errorCampo(campoU('u_unidad'), TF('pub2_err_u_repetida', 'Unidad {n}: ese piso y unidad ya está en la lista.', { n: i + 1 })); return false; }
+        if (!(u.ambientes >= 1)) { BP.errorCampo(campoU('u_ambientes'), TF('pub2_err_u_amb', 'Unidad {n}: faltan los ambientes.', { n: i + 1 })); return false; }
+        if (!(u.m2_total > 0)) { BP.errorCampo(campoU('u_m2'), TF('pub2_err_u_m2', 'Unidad {n}: faltan los m².', { n: i + 1 })); return false; }
+        if (!(u.precio > 0)) { BP.errorCampo(campoU('u_precio'), TF('pub2_err_u_precio', 'Unidad {n}: falta el precio.', { n: i + 1 })); return false; }
+      }
+      return true;
+    } };
   }
 
-  /* ── Paso 4: revisión ── */
-  function renderRevision(){
-    const a = aviso; const pubName = pub ? pub.nombre : '';
-    el.innerHTML = `<h2 class="p-sec-t">Revisar y enviar</h2><p class="p-kicker" style="margin-bottom:10px">Así se va a ver. BAIREN lo revisa en menos de 48 horas y te avisa por mail.</p>
-      <div class="p-grid" style="max-width:320px;margin:14px 0 18px" id="prev"></div>
-      <dl class="p-resumen" style="margin:0"><dt>Publica</dt><dd>${BP.esc(pubName)} ${pub && pub.matricula ? '· ' + BP.esc(pub.matricula) : ''} ${pub && !pub.verificado ? '<span class="p-badge dueno">Verificación pendiente</span>' : ''}</dd><dt>Operación</dt><dd>${OP_TXT[a.operacion] || OP_TXT.alquiler} · ${BP.esc(a.tipo)}</dd><dt>Ubicación</dt><dd>${BP.esc(a.direccion)} ${BP.esc(a.unidad||'')}, ${BP.esc(a.barrio)} (${BP.zonaLabel(a.zona)}) · dirección ${a.mostrar_direccion}</dd><dt>Precio</dt><dd>${precioTxt(a.precio, a.moneda)}${a.operacion !== 'venta' ? ' por mes' : ''}${a.operacion === 'mediano' && a.plazo ? ' · estadía mínima ' + BP.esc(a.plazo) : ''}${a.expensas ? ' · expensas $ ' + BP.fmtN(a.expensas) : ''}</dd><dt>Datos</dt><dd>${[a.m2_total ? a.m2_total + ' m²' : null, a.ambientes ? a.ambientes + ' amb.' : null, a.dormitorios ? a.dormitorios + ' dorm.' : null, a.banos ? a.banos + ' baños' : null, a.cocheras ? a.cocheras + ' coch.' : null, a.antiguedad != null && a.antiguedad !== '' ? a.antiguedad + ' años' : null].filter(Boolean).join(' · ')}</dd>${a.operacion === 'mediano' ? `<dt>Qué incluye</dt><dd>${(a.caracteristicas || []).filter(x => INCLUYE.indexOf(x) > -1).join(', ') || 'Sin informar'}</dd>` : ''}<dt>Fotos</dt><dd>${a.fotos.length}${a.quiero_produccion ? ' · producción de BAIREN solicitada' : ''}</dd><dt>Amenities</dt><dd>${a.amenities.join(', ') || 'Sin informar'}</dd></dl>
-      <div class="p-prose" style="margin-top:18px"><div class="box"><b>Condiciones.</b> Al enviar confirmás que la propiedad está en una zona de BAIREN, que tenés derecho a publicarla (titularidad, mandato o matrícula) y que los datos son ciertos. Si no cumple el estándar, te decimos por qué.</div></div>
-      <label style="display:flex;gap:10px;align-items:flex-start;margin-top:14px;color:var(--navy-deeper)"><input type="checkbox" id="acepto"><span>Acepto los <a href="legales.html#terminos" style="text-decoration:underline">Términos y condiciones</a> y los <a href="legales.html#criterios" style="text-decoration:underline">criterios de selección</a>.</span></label>
-      <div class="p-nav-steps"><button type="button" class="p-btn p-btn-dark" data-back>Volver</button><div class="p-nav-main"><button type="button" class="p-btn" data-save>${rotuloGuardar()}</button><button type="button" class="p-btn p-btn-fill" id="enviar">Enviar a revisión ${BP.ico.arrow}</button></div></div>`;
-    (async () => { const m = await BPData.fromStore(Object.assign({}, a, { publicador: pub, id: a.id || 'prev', fotos: a.fotos.map((f, i) => ({ url: f.url, orden: i })) })); document.getElementById('prev').innerHTML = BPData.cardV(m).replace(/href="[^"]*"/, 'href="#"'); })();
-    el.querySelector('[data-back]').addEventListener('click', () => { step = 3; render(); });
-    el.querySelector('[data-save]').addEventListener('click', async e => { const b = e.currentTarget; if (b.disabled) return; if (!tieneDireccion()) { pedirDireccion(); return; } const cambios = enCurso(); ocupar(b, true, 'Guardando…'); try { await save(estadoAlGuardar()); BP.toast(cambios ? 'Cambios guardados.' : 'Borrador guardado en tu panel.'); } catch (x) { BP.toast(BPStore.errorAlGuardar(x), 'error'); } ocupar(b, false); });
-    document.getElementById('enviar').addEventListener('click', async () => {
-      const btn = document.getElementById('enviar');
-      /* Antes de enviar se vuelve a mirar lo obligatorio de Principales: con el stepper se puede haber saltado el paso */
-      const falta = reqDe(a).find(k => !a[k] || (k === 'descripcion' && String(a[k]).length < 150));
-      if (falta) { step = 1; render(); setTimeout(() => { const f = document.querySelector(`[data-fld=${falta}]`); if (f) { f.classList.add('err'); BP.errorCampo(f.querySelector('#f-' + falta) || f.querySelector('input,select,textarea') || f, falta === 'descripcion' ? 'La descripción tiene que tener al menos 150 caracteres.' : falta === 'plazo' ? 'Elegí la estadía mínima.' : 'Falta este dato.'); } }, 350); return; }
-      if (a.fotos.length < 8 && !a.quiero_produccion) { step = 2; render(); BP.toast('Hacen falta ocho fotos y hay ' + a.fotos.length + '. O pedí la producción de BAIREN.', 'error'); return; }
-      if (!document.getElementById('acepto').checked) { BP.errorCampo('acepto', 'Aceptá los términos para enviar.'); return; }
-      ocupar(btn, true, 'Enviando…');
-      try { await save('en_revision'); if (BPStore.notify && aviso.id) Promise.resolve(BPStore.notify('revision', { aviso_id: aviso.id })).catch(() => {}); terminado(); } catch (e) { ocupar(btn, false); BP.toast(BPStore.errorAlGuardar(e, 'No se pudo enviar.'), 'error'); }
+  /* 6 · Fotos: se suben y se guardan de a una, con su avance. La primera es la portada; Mover y Quitar en una hoja desde abajo. */
+  let cola = [], subiendo = false;
+  PANT.fotos = function(){
+    const a = aviso;
+    el.innerHTML = cab(T('pub2_fotos_t', 'Fotos'), T('pub2_fotos_sub', 'Mínimo ocho, horizontales. La primera es la portada.'))
+      + `<button type="button" class="pf-agregar" id="fAgregar">${ICO.camara}<span>${T('pub2_fotos_agregar', 'Agregar fotos')}</span><small>${T('pub2_fotos_agregar_d', 'Desde la cámara o la galería')}</small></button>
+      <input type="file" id="fotosIn" accept="image/*" multiple hidden aria-label="${esc(T('pub2_fotos_agregar', 'Agregar fotos'))}">
+      <p class="pf-fotos-cuenta" id="fCuenta" aria-live="polite"></p>
+      <div class="pf-fotos" id="fGrid"></div>
+      <label class="pf-toggle pf-toggle-sola${a.quiero_produccion ? ' on' : ''}"><input type="checkbox" id="quieroProd" name="quiero_produccion" ${a.quiero_produccion ? 'checked' : ''}><span class="bx" aria-hidden="true"></span><span>${T('pub2_fotos_bairen', 'Que las haga BAIREN, sin costo')}</span></label>`;
+    const inp = document.getElementById('fotosIn'), add = document.getElementById('fAgregar');
+    add.addEventListener('click', () => inp.click());
+    inp.addEventListener('change', () => { agregarFotos(inp.files); inp.value = ''; });
+    add.addEventListener('dragover', e => { e.preventDefault(); add.classList.add('sobre'); }); add.addEventListener('dragleave', () => add.classList.remove('sobre'));
+    add.addEventListener('drop', e => { e.preventDefault(); add.classList.remove('sobre'); agregarFotos(e.dataTransfer.files); });
+    document.getElementById('fGrid').addEventListener('click', e => { const b = e.target.closest('[data-menu]'); if (b) menuFoto(Number(b.dataset.menu)); });
+    dibujarFotos();
+    return { leer: () => { const q = document.getElementById('quieroProd'); if (q) a.quiero_produccion = q.checked; },
+      validar: () => {
+        if (subiendo) { BP.toast(T('pub2_espera_fotos', 'Esperá a que terminen de subir las fotos.')); return false; }
+        if (a.fotos.length < 8 && !a.quiero_produccion) { BP.toast(TF('pub2_err_fotos', 'Hacen falta ocho fotos y hay {n}. O marcá que las haga BAIREN.', { n: a.fotos.length }), 'error'); return false; }
+        return true;
+      } };
+  };
+  async function dibujarFotos(){
+    const g = document.getElementById('fGrid'); if (!g) return; const a = aviso, n = a.fotos.length;
+    const urls = []; for (const f of a.fotos) urls.push(await BPStore.resolveFoto(f.url));
+    if (!document.getElementById('fGrid')) return;
+    g.innerHTML = urls.map((u, i) => `<div class="pf-foto" data-i="${i}"><img src="${esc(u)}" alt="${esc(TF('pub2_foto_n', 'Foto {n} de {t}', { n: i + 1, t: n }))}" loading="lazy">${i === 0 ? `<span class="portada">${T('pub2_portada', 'Portada')}</span>` : `<span class="num" aria-hidden="true">${i + 1}</span>`}<button type="button" class="mas" data-menu="${i}" aria-label="${esc(TF('pub2_foto_opciones', 'Mover o quitar la foto {n}', { n: i + 1 }))}">${ICO.mas}</button></div>`).join('')
+      + cola.map(p => `<div class="pf-foto sube${p.estado === 'subiendo' ? ' activa' : ''}"><img src="${p.vista}" alt=""><span class="est">${p.estado === 'subiendo' ? T('pub2_subiendo', 'Subiendo') : T('pub2_en_espera', 'En espera')}</span><span class="barra" aria-hidden="true"><i></i></span></div>`).join('');
+    const c = document.getElementById('fCuenta');
+    if (c) c.innerHTML = subiendo ? `<b>${esc(TF('pub2_fotos_subiendo', 'Subiendo {n} de {t}', { n: lote.hechas + 1, t: lote.total }))}</b>` : n ? `<b>${n < 8 ? esc(TF('pub2_fotos_de8', '{n} de 8', { n })) : esc(TF('pub2_fotos_n', '{n} fotos', { n }))}</b><span>${n > 1 ? T('pub2_fotos_orden', 'Tocá ··· para moverlas') : ''}</span>` : '';
+    const add = document.getElementById('fAgregar'); if (add) add.classList.toggle('chico', n + cola.length > 0);
+    document.body.dataset.fotos = n;
+  }
+  let lote = { hechas: 0, total: 0 };
+  function agregarFotos(files){
+    const nuevas = Array.from(files || []).filter(f => /^image\//.test(f.type) || /\.(jpe?g|png|webp|heic|heif)$/i.test(f.name || ''));
+    if (!nuevas.length) return;
+    nuevas.forEach(f => cola.push({ file: f, estado: 'espera', vista: URL.createObjectURL(f) }));
+    lote.total += nuevas.length;
+    procesarCola();
+  }
+  async function procesarCola(){
+    if (subiendo) { dibujarFotos(); return; }
+    subiendo = true; botonOcupado(true, TF('pub2_fotos_subiendo', 'Subiendo {n} de {t}', { n: lote.hechas + 1, t: lote.total }));
+    const key = aviso.id || aviso.slug || ('nuevo-' + String(BPStore.session.id).slice(-4));
+    while (cola.length) {
+      const p = cola[0]; p.estado = 'subiendo'; botonOcupado(true, TF('pub2_fotos_subiendo', 'Subiendo {n} de {t}', { n: lote.hechas + 1, t: lote.total })); dibujarFotos();
+      try {
+        const url = await BPStore.uploadFoto(p.file, key, aviso.fotos.length);
+        aviso.fotos.push({ url });
+        /* Cada foto queda guardada en el aviso apenas sube */
+        try { await autoguardar(incompletas().filter(x => x !== 'fotos').length === 0); } catch (e) { BP.toast(BPStore.errorAlGuardar(e), 'error'); }
+      } catch (e) { BP.toast(BPStore.errorAlGuardar(e, T('pub2_err_foto', 'No se pudo subir una foto.')), 'error'); }
+      cola.shift(); lote.hechas++; try { URL.revokeObjectURL(p.vista); } catch (e) { /* nada */ }
+    }
+    subiendo = false; lote = { hechas: 0, total: 0 }; botonOcupado(false); dibujarFotos();
+    if (aviso.fotos.length) BP.anunciar(TF('pub2_fotos_listas', '{n} fotos cargadas.', { n: aviso.fotos.length }));
+  }
+  function moverFoto(de, a){ const l = aviso.fotos; if (a < 0 || a >= l.length || de === a) return; const m = l.splice(de, 1)[0]; l.splice(a, 0, m); BP.anunciar(TF('pub2_foto_movida', 'Foto movida al lugar {n} de {t}.', { n: a + 1, t: l.length })); }
+  function menuFoto(i){
+    const n = aviso.fotos.length, f = aviso.fotos[i]; if (!f) return;
+    const hoja = document.createElement('div'); hoja.className = 'pf-hoja';
+    hoja.innerHTML = `<div class="pf-hoja-fondo" data-cerrar></div><div class="pf-hoja-caja" role="dialog" aria-modal="true" aria-labelledby="hojaT"><p class="pf-hoja-t" id="hojaT">${esc(TF('pub2_foto_n', 'Foto {n} de {t}', { n: i + 1, t: n }))}</p>
+      ${n > 1 ? `<p class="pf-rot">${T('pub2_mover_a', 'Mover al lugar')}</p><div class="pf-pos">${Array.from({ length: n }, (_, j) => `<button type="button" data-pos="${j}" ${j === i ? 'aria-current="true"' : ''} aria-label="${esc(TF('pub2_mover_lugar', 'Lugar {n}', { n: j + 1 }))}">${j + 1}</button>`).join('')}</div>` : ''}
+      <div class="pf-hoja-acc">${i > 0 ? `<button type="button" data-portada>${T('pub2_usar_portada', 'Usar de portada')}</button>` : ''}${/^https?:/.test(f.url) && BPStore.producirFoto ? `<button type="button" data-ia>${T('pub2_mejorar_ia', 'Mejorar con IA')}</button>` : ''}<button type="button" class="peligro" data-quitar>${T('pub2_quitar_foto', 'Quitar la foto')}</button><button type="button" class="suave" data-cerrar>${T('pub2_cancelar', 'Cancelar')}</button></div></div>`;
+    document.body.appendChild(hoja);
+    let destinoFoco = i;
+    const salirHoja = BP.focoAtrapado(hoja.querySelector('.pf-hoja-caja'), { alCerrar: () => { hoja.remove(); }, devolverA: null });
+    const cerrar = async cambio => { salirHoja(); if (cambio) { await dibujarFotos(); try { await autoguardar(incompletas().filter(x => x !== 'fotos').length === 0); } catch (e) { BP.toast(BPStore.errorAlGuardar(e), 'error'); } } const b = document.querySelector(`[data-menu="${Math.min(destinoFoco, aviso.fotos.length - 1)}"]`) || document.getElementById('fAgregar'); if (b) b.focus(); };
+    hoja.addEventListener('click', e => {
+      const b = e.target.closest('button,[data-cerrar]'); if (!b) return;
+      if (b.hasAttribute('data-cerrar')) return cerrar(false);
+      if (b.dataset.pos != null) { destinoFoco = Number(b.dataset.pos); moverFoto(i, destinoFoco); return cerrar(true); }
+      if (b.hasAttribute('data-portada')) { destinoFoco = 0; moverFoto(i, 0); return cerrar(true); }
+      if (b.hasAttribute('data-quitar')) { aviso.fotos.splice(i, 1); destinoFoco = i; BP.anunciar(TF('pub2_foto_quitada', 'Foto quitada. Quedan {n}.', { n: aviso.fotos.length })); return cerrar(true); }
+      if (b.hasAttribute('data-ia')) { salirHoja(); mejorarConIA(i); }
     });
   }
-
-  function collect(){ el.querySelectorAll('input[name]:not([type=checkbox]):not([type=radio]):not([type=file]):not(:disabled),select[name]:not(:disabled),textarea[name]:not(:disabled)').forEach(i => { const k = i.name; let val = i.value; if (i.type === 'number') val = val === '' ? null : Number(val); if (typeof val === 'string') val = val.trim(); aviso[k] = val; }); const am = el.querySelectorAll('[name=amen]:checked'); if (el.querySelector('[name=amen]')) aviso.amenities = Array.from(am).map(x => x.value); const ca = el.querySelectorAll('[name=car]:checked'); if (el.querySelector('[name=car]')) aviso.caracteristicas = (aviso.caracteristicas || []).filter(x => CARACT.indexOf(x) === -1).concat(Array.from(ca).map(x => x.value));
-    /* caracteristicas guarda dos cosas: las de Extras y lo que incluye el mediano plazo. Cada paso reemplaza solo lo suyo. */
-    if (el.querySelector('[name=incl]:not(:disabled)')) aviso.caracteristicas = (aviso.caracteristicas || []).filter(x => INCLUYE.indexOf(x) === -1).concat(Array.from(el.querySelectorAll('[name=incl]:checked')).map(x => x.value));
-    if (aviso.operacion !== 'mediano') aviso.caracteristicas = (aviso.caracteristicas || []).filter(x => INCLUYE.indexOf(x) === -1);
-    if (aviso.operacion === 'venta') aviso.plazo = null; const cu = el.querySelectorAll('[name=cual]:checked'); if (el.querySelector('[name=cual]')) aviso.cualidades = Array.from(cu).map(x => x.value); if (aviso.operacion === 'mediano') aviso.amoblado = true; else aviso.amoblado = aviso.amenities.indexOf('Amoblado') > -1; if (aviso.video_url) aviso.video_tipo = /youtu/.test(aviso.video_url) ? 'youtube' : /bunny|mediadelivery/.test(aviso.video_url) ? 'bunny' : 'mp4';
-    aviso.moneda = conMoneda(aviso.operacion) && aviso.moneda === 'ARS' ? 'ARS' : 'USD'; }
-  /* 8/10/2026 · En el paso 0 los campos son del perfil (nombre, DNI, presentación): no se leen al aviso */
-  async function save(estado){ if (step > 0) collect(); const rec = Object.assign({}, aviso); rec.estado_curacion = estado; delete rec.publicador; if (estado === 'en_revision') rec.motivo_rechazo = null; const saved = await BPStore.saveAviso(rec); aviso.id = saved.id; aviso.codigo = saved.codigo; aviso.slug = saved.slug; aviso.estado_curacion = estado; return saved; }
-  /* Lo obligatorio del paso Principales; se revisa al avanzar y otra vez antes de enviar */
-  const REQ = ['zona','barrio','direccion','precio','m2_total','ambientes','descripcion'];
-  const reqDe = a => a.operacion === 'mediano' ? REQ.concat('plazo') : REQ;   /* el mediano plazo pide además la estadía mínima */
-  const tieneDireccion = () => !!String(aviso.direccion || '').trim();
-  function pedirDireccion(){
-    const marcar = () => { const f = document.querySelector('[data-fld=direccion]'); if (f) { f.classList.add('err'); BP.errorCampo(document.getElementById('f-direccion') || f, 'Para guardar el borrador, escribí la calle y la altura.'); } };
-    if (step === 1) { marcar(); return; }
-    step = 1; render(); setTimeout(marcar, 350);
-  }
-  /* Un botón ocupado no se vuelve a apretar: queda deshabilitado y dice qué está haciendo */
-  function ocupar(btn, on, label){ if (!btn) return; if (on) { btn.dataset.label = btn.innerHTML; btn.disabled = true; btn.setAttribute('aria-busy', 'true'); btn.textContent = label || 'Guardando…'; } else { btn.disabled = false; btn.removeAttribute('aria-busy'); if (btn.dataset.label) btn.innerHTML = btn.dataset.label; } }
-  function bindNav(validate){
-    const b = el.querySelector('[data-back]'); if (b) b.addEventListener('click', () => { if (step > 0) collect(); step = Math.max(0, step - 1); render(); });
-    const bs = el.querySelector('[data-save]'), bn = el.querySelector('[data-next]');
-    bs.addEventListener('click', async () => { if (bs.disabled) return;
-      /* Sin calle y altura no se crea un aviso vacío: en el paso 0 se guarda solo el perfil; en los otros, se pide la dirección */
-      if (step === 0) { const ok = await validate(); if (!ok) return; if (!tieneDireccion()) { BP.toast('Perfil guardado. El borrador del aviso se guarda cuando tenga calle y altura: la cargás en el paso siguiente.'); return; } }
-      else { collect(); if (!tieneDireccion()) { pedirDireccion(); return; } }
-      ocupar(bs, true, 'Guardando…'); try { const cambios = enCurso(); await save(estadoAlGuardar()); BP.toast(cambios ? 'Cambios guardados.' : 'Borrador guardado.'); } catch (e) { BP.toast(BPStore.errorAlGuardar(e), 'error'); } ocupar(bs, false); });
-    bn.addEventListener('click', async () => { if (bn.disabled) return; ocupar(bn, true, step === 0 ? 'Guardando…' : 'Guardando…'); const ok = await validate(); if (!ok) { ocupar(bn, false); return; } if (step > 0 && tieneDireccion()) { try { await save(estadoAlGuardar()); } catch (e) { ocupar(bn, false); BP.toast(BPStore.errorAlGuardar(e), 'error'); return; } } step++; render(); });
+  /* Producción con IA (la foto vuelta a sacar, prompt maestro de Bairen): se compara con la original y decide quien publica */
+  async function mejorarConIA(i){
+    const f = aviso.fotos[i]; if (!f) return; BP.toast(T('pub2_ia_produciendo', 'Produciendo la foto con IA…'));
+    try {
+      const r = await BPStore.producirFoto(f.url, { formato: 'apaisado' });
+      const cmp = document.createElement('div'); cmp.className = 'p-iacmp'; cmp.setAttribute('role', 'dialog'); cmp.setAttribute('aria-modal', 'true'); cmp.setAttribute('aria-label', T('pub2_ia_comparar', 'Comparar la foto original y la nueva')); cmp.tabIndex = -1;
+      cmp.innerHTML = `<div class="dos"><figure><img src="${esc(f.url)}" alt="${esc(T('pub2_ia_original', 'Original'))}"><figcaption>${T('pub2_ia_original', 'Original')}</figcaption></figure><figure><img src="${esc(r.image)}" alt="${esc(T('pub2_ia_nueva', 'Nueva, con IA'))}"><figcaption>${T('pub2_ia_nueva', 'Nueva, con IA')}</figcaption></figure></div><p class="p-note">${T('pub2_ia_nota', 'Es la misma propiedad, vuelta a fotografiar. Compará ventanas, muebles y textos antes de aceptar.')}</p><div class="acts"><button type="button" class="p-btn p-btn-sm p-btn-fill" data-usar>${T('pub2_ia_usar', 'Usar la nueva')}</button><button type="button" class="p-btn p-btn-sm" data-cerrar>${T('pub2_ia_descartar', 'Descartar')}</button></div>`;
+      document.body.appendChild(cmp);
+      const salirCmp = BP.focoAtrapado(cmp, { alCerrar: () => cmp.remove() });
+      cmp.querySelector('[data-cerrar]').addEventListener('click', () => salirCmp());
+      cmp.querySelector('[data-usar]').addEventListener('click', async () => { const u = cmp.querySelector('[data-usar]'); u.disabled = true; u.textContent = T('pub2_guardando', 'Guardando…'); try { const key = aviso.id || aviso.slug || ('nuevo-' + String(BPStore.session.id).slice(-4)); const url = await BPStore.subirDataUrl(r.image, key, Date.now() % 100000); aviso.fotos.splice(i + 1, 0, { url, ia: true }); salirCmp(); BP.toast(T('pub2_ia_agregada', 'La foto nueva quedó al lado de la original. Quitá la que no quieras.')); await dibujarFotos(); await autoguardar(incompletas().filter(x => x !== 'fotos').length === 0); } catch (e) { u.disabled = false; u.textContent = T('pub2_ia_usar', 'Usar la nueva'); BP.toast(BPStore.errorAlGuardar(e, T('pub2_err_foto_guardar', 'No se pudo guardar la foto.')), 'error'); } });
+    } catch (e) { BP.toast(BPStore.errorAlGuardar(e, T('pub2_err_ia', 'No se pudo producir la foto.')), 'error'); }
   }
 
-  if (editId && aviso) document.getElementById('ttl').textContent = 'Editar aviso';
-  if (copiaDe) { document.getElementById('ttl').textContent = 'Publicar otra parecida'; document.getElementById('sub').textContent = 'Es una copia de ' + [copiaDe.direccion, copiaDe.unidad].filter(Boolean).join(', ') + '. Revisá los datos y completá la dirección, la unidad y las fotos.'; }
-  /* Al enviar: en vez de volver solo al panel, se ofrece cargar otra unidad parecida a esta */
-  function terminado(){
-    document.getElementById('stepper').innerHTML = '';
-    el.innerHTML = `<h2 class="p-sec-t" tabindex="-1" id="listoT">Enviado a revisión</h2><p class="p-kicker">BAIREN lo revisa en menos de 48 horas. Te avisamos por mail cuando esté publicado.</p>
-      <div class="p-nav-steps"><div></div><div class="p-nav-main"><a class="p-btn" href="panel.html#avisos">Ir a mi panel</a><a class="p-btn p-btn-fill" href="publicar-aviso.html?copia=${encodeURIComponent(aviso.id)}">Publicar otra parecida</a></div></div>`;
-    window.scrollTo({ top: 0, behavior: 'smooth' }); const h = document.getElementById('listoT'); if (h) h.focus({ preventScroll: true });
+  /* 7 · Descripción y una sola lista de lo que tiene */
+  PANT.descripcion = function(){
+    const a = aviso;
+    const tiene = x => x === 'Cochera' ? (a.amenities.indexOf('Cochera') > -1 || Number(a.cocheras) > 0) : x === 'Amoblado' ? (a.amenities.indexOf('Amoblado') > -1 || (!!a.amoblado && a.operacion !== 'mediano')) : (a.amenities.indexOf(x) > -1 || a.caracteristicas.indexOf(x) > -1);
+    el.innerHTML = cab(T('pub2_desc_t', 'Descripción')) + `<div class="pf-campo p-fld" data-fld="descripcion"><label for="f-descripcion" class="pf-sr">${T('pub2_desc_t', 'Descripción')}</label><textarea id="f-descripcion" name="descripcion" maxlength="4000" aria-describedby="dCuenta" placeholder="${esc(T('pub2_desc_ph', 'Luz, distribución, edificio y cuadra, como para alguien que la va a vivir.'))}">${esc(a.descripcion || '')}</textarea><p class="pf-contador" id="dCuenta" aria-live="polite"></p></div>
+      ${grupo('g-tiene', T('pub2_lo_que_tiene', 'Lo que tiene'), `<div class="pf-toggles">${LO_QUE_TIENE.map(([x, col, lbl]) => marca('lqt', x, lbl || esc(BP.etiqueta ? BP.etiqueta(x) : x), tiene(x))).join('')}</div>`)}`;
+    el.querySelector('#g-tiene').style.marginTop = '26px';
+    const ta = document.getElementById('f-descripcion'), cu = document.getElementById('dCuenta');
+    const contar = () => { const n = ta.value.trim().length; cu.classList.toggle('ok', n >= 150); cu.textContent = n >= 150 ? TF('pub2_desc_ok', '{n} caracteres', { n }) : TF('pub2_desc_faltan', 'Faltan {n} caracteres para el mínimo de 150', { n: 150 - n }); };
+    ta.addEventListener('input', contar); contar();
+    const leer = () => {
+      a.descripcion = ta.value.trim();
+      const m = marcados('lqt'), am = LO_QUE_TIENE.filter(x => x[1] === 'amenities').map(x => x[0]), ca = LO_QUE_TIENE.filter(x => x[1] === 'caracteristicas').map(x => x[0]);
+      a.amenities = reemplazar(a.amenities, am, m.filter(x => am.indexOf(x) > -1));
+      a.caracteristicas = reemplazar(a.caracteristicas, ca, m.filter(x => ca.indexOf(x) > -1));
+      /* Cochera y Amoblado tienen además su columna: se mantienen de acuerdo con la casilla */
+      if (m.indexOf('Cochera') > -1) a.cocheras = Math.max(1, Number(a.cocheras) || 0); else a.cocheras = 0;
+      a.amoblado = a.operacion === 'mediano' || m.indexOf('Amoblado') > -1;
+    };
+    return { leer, validar: () => (a.descripcion.length >= 150) || marcarError('descripcion', T('pub2_err_desc', 'La descripción necesita al menos 150 caracteres.')) };
+  };
+
+  /* 8 · Revisar: la tarjeta como se va a ver, un resumen corto con "Cambiar", los términos y Enviar */
+  PANT.revisar = function(){
+    const a = aviso, emp = clase === 'emprendimiento'; if (emp) aBase();
+    const cambios = enCurso(); document.body.classList.add('pf-ancho');
+    const op = OP_TXT[a.operacion] || OP_TXT.venta;
+    const precioResumen = () => {
+      if (emp) { const ps = unidades.map(u => u.precio).filter(x => x > 0); return (unidades.length === 1 ? T('pub2_u_una', '1 unidad') : TF('pub2_u_varias', '{n} unidades', { n: unidades.length })) + (ps.length ? ' · ' + TF('pub2_rev_desde_precio', 'desde {p}', { p: precioTxt(Math.min.apply(null, ps), 'USD') }) : '') + ' · ' + esc(unidades.map(u => u.unidad).filter(Boolean).join(', ')); }
+      const l = [precioTxt(a.precio, a.moneda) + (a.operacion !== 'venta' ? ' ' + T('pub2_por_mes', 'por mes') : '')];
+      if (a.operacion === 'mediano' && a.plazo) l.push(TF('pub2_rev_estadia', 'mínimo {p}', { p: esc(a.plazo) }));
+      if (a.operacion === 'mediano' && a.disponible_desde) l.push(TF('pub2_rev_disponible', 'libre desde el {f}', { f: fechaTxt(a.disponible_desde) }));
+      if (a.operacion === 'alquiler' && a.plazo) l.push(TF('pub2_rev_contrato', 'contrato de {p}', { p: esc(a.plazo) }));
+      const inc = a.caracteristicas.filter(x => INCLUYE.indexOf(x) > -1); if (a.operacion === 'mediano' && inc.length) l.push(esc(inc.join(', ')));
+      if (a.expensas) l.push(TF('pub2_rev_expensas', 'expensas $ {e}', { e: BP.fmtN(a.expensas) }));
+      return l.join(' · ');
+    };
+    const filas = [
+      ['que', T('pub2_rev_que', 'Qué'), esc([op, BP.etiqueta ? BP.etiqueta(a.tipo || 'Departamento') : a.tipo].concat(emp && a.emprendimiento ? [a.emprendimiento] : []).join(' · '))],
+      ['propiedad', T('pub2_rev_donde', 'Dónde'), esc([[a.direccion, emp ? '' : a.unidad].filter(Boolean).join(', '), a.barrio].filter(Boolean).join(' · '))],
+      ['precio', emp ? T('pub2_unidades', 'Unidades') : T('pub2_precio_t', 'Precio'), precioResumen()],
+      ['fotos', T('pub2_fotos_t', 'Fotos'), a.fotos.length ? TF('pub2_fotos_n', '{n} fotos', { n: a.fotos.length }) + (a.quiero_produccion ? ' · ' + T('pub2_rev_bairen', 'las hace BAIREN') : '') : (a.quiero_produccion ? T('pub2_rev_bairen_todas', 'Las hace BAIREN') : '0')],
+      ['descripcion', T('pub2_desc_t', 'Descripción'), esc(TF('pub2_rev_desc', '{n} caracteres', { n: String(a.descripcion || '').length })) + (a.amenities.length ? ' · ' + esc(a.amenities.slice(0, 4).map(etiquetaDe).join(', ')) + (a.amenities.length > 4 ? '…' : '') : '')]
+    ];
+    el.innerHTML = cab(cambios ? T('pub2_rev_t_cambios', 'Revisá los cambios') : T('pub2_rev_t', 'Revisá y enviá'))
+      + `<div class="pf-rev"><div class="pf-prev" id="prev" aria-hidden="true"></div>
+      <div><dl class="pf-resumen">${filas.map(([p, t, val]) => `<div class="fila"><div><dt>${t}</dt><dd>${val}</dd></div><button type="button" class="pf-cambiar" data-ir="${p}" aria-label="${esc(TF('pub2_cambiar_x', 'Cambiar {x}', { x: t.toLowerCase() }))}">${T('pub2_cambiar', 'Cambiar')}</button></div>`).join('')}</dl>
+      ${cambios ? '' : `<label class="pf-acepto p-fld" for="acepto"><input type="checkbox" id="acepto"><span>${T('pub2_acepto', 'Confirmo que los datos son ciertos y acepto los <a href="legales.html#terminos" target="_blank" rel="noopener">términos</a> y los <a href="legales.html#criterios" target="_blank" rel="noopener">criterios de selección</a>.')}</span></label>`}</div></div>`;
+    (async () => { try { const m = await BPData.fromStore(Object.assign({}, a, { publicador: pub, id: a.id || 'prev', fotos: a.fotos.map((f, i) => ({ url: f.url, orden: i })) })); const p = document.getElementById('prev'); if (p) p.innerHTML = BPData.cardV(m).replace(/<a class="prop-card"([^>]*?) href="[^"]*"/, '<div class="prop-card"$1').replace(/<\/a>\s*$/, '</div>').replace(/<button[^>]*data-fav[\s\S]*?<\/button>/, ''); } catch (e) { /* sin vista previa: el resumen alcanza */ } })();
+    el.querySelectorAll('[data-ir]').forEach(b => b.addEventListener('click', () => { desdeRevisar = true; ir(b.dataset.ir, -1); }));
+    return { boton: cambios ? T('pub2_guardar_cambios', 'Guardar cambios') : T('pub2_enviar', 'Enviar a revisión'), botonClase: cambios ? '' : 'oro', alContinuar: enviar };
+  };
+
+  /* ── Navegación ── */
+  function siguiente(p){
+    if (p === 'que') return !haySesion() ? 'ingreso' : empresaCompleta(pub) ? 'propiedad' : 'empresa';
+    if (p === 'empresa') return 'propiedad';
+    return ORDEN[ORDEN.indexOf(p) + 1] || 'revisar';
   }
-  render();
+  function anterior(p){
+    if (modoPerfil) return null;
+    if (p === 'propiedad') return mostroEmpresa ? 'empresa' : 'que';
+    if (p === 'empresa') return 'que';
+    if (p === 'que') return null;
+    return ORDEN[ORDEN.indexOf(p) - 1];
+  }
+  function ocupar(btn, on, label){ if (!btn) return; if (on) { if (!btn.dataset.label) btn.dataset.label = btn.innerHTML; btn.disabled = true; btn.setAttribute('aria-busy', 'true'); btn.textContent = label || T('pub2_guardando', 'Guardando…'); } else { btn.disabled = false; btn.removeAttribute('aria-busy'); if (btn.dataset.label) { btn.innerHTML = btn.dataset.label; delete btn.dataset.label; } } }
+  function botonOcupado(on, label){ const b = document.getElementById('pfSeguir'); if (!b) return; if (on) { if (!b.dataset.label) b.dataset.label = b.innerHTML; b.disabled = true; b.setAttribute('aria-busy', 'true'); b.textContent = label; } else ocupar(b, false); }
+  function pie(txt, cls){ pieIn.className = 'pf-pie-in'; pieIn.innerHTML = `<button type="button" class="pf-seguir ${cls || ''}" id="pfSeguir">${txt}</button>`; document.getElementById('pfSeguir').addEventListener('click', continuar); }
+  function actualizarSalir(){
+    const conAviso = haySesion() && !!pub && !modoPerfil && ['propiedad', 'precio', 'fotos', 'descripcion', 'revisar'].indexOf(actual) > -1;
+    const dir = actual === 'propiedad' ? valor('direccion') : aviso.direccion;
+    bSalir.textContent = conAviso && String(dir || '').trim() ? T('pub2_salir_guardado', 'Salir, queda guardado') : T('pub2_salir', 'Salir');
+  }
+  /* Un error de la pantalla anterior no se queda flotando en la siguiente */
+  const apagarError = () => { const t = document.getElementById('bpToast'); if (t && t.classList.contains('err')) t.classList.remove('on'); };
+  function ir(nombre, dir){
+    actual = nombre; if (nombre === 'empresa') mostroEmpresa = true;
+    apagarError(); document.body.classList.remove('pf-doble');
+    const i = ORDEN.indexOf(nombre);
+    prog.querySelector('i').style.width = ((i + 1) / ORDEN.length * 100) + '%'; prog.setAttribute('aria-valuenow', String(i + 1)); prog.setAttribute('aria-valuetext', TF('pub2_paso_de', 'Paso {n} de {t}', { n: i + 1, t: ORDEN.length }));
+    document.body.classList.remove('pf-ancho'); bAtras.hidden = false;
+    pant = PANT[nombre]() || {};
+    pie(pant.boton || (desdeRevisar ? T('pub2_listo', 'Listo') : T('pub2_continuar', 'Continuar')), pant.botonClase);
+    actualizarSalir();
+    document.body.dataset.pantalla = nombre;
+    el.classList.remove('entra-d', 'entra-i'); void el.offsetWidth; el.classList.add(dir === -1 ? 'entra-i' : 'entra-d');
+    window.scrollTo(0, 0);
+    const h = document.getElementById('pfT'); if (h) { try { h.focus({ preventScroll: true }); } catch (e) { /* nada */ } }
+  }
+  async function continuar(){
+    if (ocupado) return; const b = document.getElementById('pfSeguir'); if (!b || b.disabled) return;
+    ocupado = true; ocupar(b, true, actual === 'revisar' ? (enCurso() ? T('pub2_guardando', 'Guardando…') : T('pub2_enviando', 'Enviando…')) : T('pub2_guardando', 'Guardando…'));
+    let sigue = false;
+    try {
+      if (pant.leer) pant.leer();
+      const ok = pant.validar ? await pant.validar() : true;
+      if (!ok) return;
+      if (pant.alContinuar) { await pant.alContinuar(); return; }
+      await autoguardar(true);
+      /* Desde Revisar, Continuar vuelve a Revisar; si en la pantalla 1 cambió lo que se publica, sigue en orden (el precio cambia) */
+      if (desdeRevisar && actual === 'que' && claseCambio) desdeRevisar = false;
+      const dest = desdeRevisar ? 'revisar' : siguiente(actual);
+      if (dest === 'ingreso') { sigue = true; irAIngresar(clase); return; }
+      if (dest === 'revisar') desdeRevisar = false;
+      sigue = true; ocupado = false; ir(dest, 1);
+    } catch (e) { BP.toast(BPStore.errorAlGuardar(e), 'error'); }
+    finally { if (!sigue) { ocupado = false; if (document.getElementById('pfSeguir') === b) ocupar(b, false); } }
+  }
+  async function atras(){
+    if (ocupado) return;
+    if (subiendo) { BP.toast(T('pub2_espera_fotos', 'Esperá a que terminen de subir las fotos.')); return; }
+    if (actual === 'recibido') { location.href = 'panel.html#avisos'; return; }
+    if (pant && pant.leer) pant.leer();
+    const prev = desdeRevisar ? 'revisar' : anterior(actual);
+    if (!prev) { salir(); return; }
+    if (desdeRevisar) desdeRevisar = false;
+    try { await autoguardar(false); } catch (e) { /* queda en memoria; se guarda al seguir */ }
+    ir(prev, -1);
+  }
+  async function salir(){
+    if (subiendo) { BP.toast(T('pub2_espera_fotos', 'Esperá a que terminen de subir las fotos.')); return; }
+    if (actual !== 'recibido' && pant && pant.leer) pant.leer();
+    if (['propiedad', 'precio', 'fotos', 'descripcion', 'revisar'].indexOf(actual) > -1) { try { await autoguardar(false); } catch (e) { BP.toast(BPStore.errorAlGuardar(e), 'error'); return; } }
+    location.href = !haySesion() ? 'publicar.html' : modoPerfil ? 'panel.html#cuenta' : 'panel.html#avisos';
+  }
+  bAtras.addEventListener('click', atras); bSalir.addEventListener('click', salir);
+
+  /* ── Guardar ── */
+  async function save(estado){
+    const rec = Object.assign({}, aviso); rec.estado_curacion = estado; delete rec.publicador; if (estado === 'en_revision') rec.motivo_rechazo = null;
+    if (clase === 'emprendimiento' && tituloAuto) rec.titulo = tituloUnidad(rec.emprendimiento, rec.unidad);
+    /* El código lleva la operación (BA-…V-, L-, M-). En "Venta o alquiler" el borrador se guarda antes de elegir entre las
+       dos: mientras nunca se envió, si la operación cambió, el código se rehace (saveAviso lo genera de nuevo). */
+    const letra = { venta: 'V', alquiler: 'L', mediano: 'M' }[rec.operacion];
+    if (rec.codigo && aviso.estado_curacion === 'borrador' && letra && !new RegExp(letra + '-[A-Z0-9]{3}$').test(rec.codigo)) delete rec.codigo;
+    const saved = await BPStore.saveAviso(rec);
+    aviso.id = saved.id; aviso.codigo = saved.codigo; aviso.slug = saved.slug; aviso.estado_curacion = estado;
+    return saved;
+  }
+  /* El borrador se guarda al pasar de pantalla: con calle y altura (la base la exige; sin ella no se crea un aviso vacío).
+     Un aviso en revisión o publicado se guarda solo con la pantalla validada, y conserva su estado. */
+  async function autoguardar(validado){
+    if (!haySesion() || !pub || modoPerfil) return false;
+    if (clase === 'emprendimiento') aBase();
+    if (!tieneDireccion()) return false;
+    if (enCurso() && !validado) return false;
+    await save(estadoAlGuardar());
+    if (clase === 'emprendimiento' && aviso.id && !unaUnidad) { unidades[0].id = aviso.id; try { localStorage.setItem(UKEY(aviso.id), JSON.stringify(unidades)); } catch (e) { /* sin lugar: la lista vive en esta pestaña */ } }
+    return true;
+  }
+  /* Enviar: se revisa todo otra vez (con "Cambiar" se pudo saltear algo), y un emprendimiento crea un aviso por unidad */
+  async function enviar(){
+    const falta = incompletas()[0];
+    if (falta) { desdeRevisar = false; ir(falta, -1); if (falta !== 'empresa') setTimeout(() => { if (pant.leer) pant.leer(); if (pant.validar) pant.validar(); }, 380); return; }
+    const eraEnCurso = enCurso();
+    if (!eraEnCurso) { const c = document.getElementById('acepto'); if (!c || !c.checked) { BP.errorCampo('acepto', T('pub2_err_acepto', 'Marcá la casilla para enviar.')); return; } }
+    const estado = eraEnCurso ? aviso.estado_curacion : 'en_revision';
+    let n = 1;
+    if (clase === 'emprendimiento') {
+      aBase(); await save(estado); unidades[0].id = aviso.id;
+      const base = Object.assign({}, aviso);
+      for (let i = 1; i < unidades.length; i++) {
+        const u = unidades[i];
+        const rec = Object.assign({}, base, { unidad: u.unidad, ambientes: u.ambientes, m2_total: u.m2_total, precio: u.precio, estado: u.estado, estado_curacion: estado, motivo_rechazo: null, titulo: tituloAuto ? tituloUnidad(base.emprendimiento, u.unidad) : base.titulo, fotos: base.fotos.map(f => ({ url: f.url })) });
+        delete rec.publicador; delete rec.id; delete rec.codigo; rec.slug = null;
+        if (u.id) { rec.id = u.id; rec.slug = u.slug || null; if (u.codigo) rec.codigo = u.codigo; }
+        const s = await BPStore.saveAviso(rec); u.id = s.id; u.slug = s.slug; u.codigo = s.codigo;
+        botonOcupado(true, TF('pub2_enviando_n', 'Enviando {n} de {t}…', { n: i + 1, t: unidades.length }));
+      }
+      n = unidades.length;
+      try { localStorage.removeItem(UKEY(aviso.id)); } catch (e) { /* nada */ }
+    } else await save(estado);
+    /* Aviso al equipo: uno por envío (en un emprendimiento, el de la primera unidad; la cola de curación muestra todas) */
+    if (!eraEnCurso && BPStore.notify && aviso.id) Promise.resolve(BPStore.notify('revision', { aviso_id: aviso.id })).catch(() => {});
+    recibido(eraEnCurso, n);
+  }
+  function recibido(cambios, n){
+    actual = 'recibido'; document.body.dataset.pantalla = 'recibido'; desdeRevisar = false;
+    prog.querySelector('i').style.width = '100%'; prog.setAttribute('aria-valuenow', '8'); bAtras.hidden = true; bSalir.textContent = T('pub2_salir', 'Salir');
+    const sub = cambios ? (aviso.estado_curacion === 'publicado' ? T('pub2_rec_publicado', 'Ya se ven en la ficha.') : T('pub2_rec_en_revision', 'Sigue en revisión. Te avisamos por mail cuando esté publicado.'))
+      : n > 1 ? TF('pub2_rec_emp', 'Recibimos {n} unidades. Las revisamos en menos de 48 horas y te avisamos por mail.', { n }) : T('pub2_rec_sub', 'Lo revisamos en menos de 48 horas y te avisamos por mail.');
+    el.innerHTML = `<div class="pf-recibido"><span class="sello" aria-hidden="true">${ICO.check}</span>${cab(cambios ? T('pub2_rec_cambios_t', 'Cambios guardados') : T('pub2_rec_t', 'Recibido'), sub)}</div>`;
+    apagarError(); document.body.classList.remove('pf-ancho'); document.body.classList.add('pf-doble'); pieIn.className = 'pf-pie-in doble';
+    pieIn.innerHTML = `<a class="pf-seguir" id="pfOtra" href="publicar-aviso.html?copia=${encodeURIComponent(aviso.id)}">${T('pub2_otra_parecida', 'Publicar otra parecida')}</a><a class="pf-seg2" href="panel.html#avisos">${T('pub2_ir_panel', 'Ir a mi panel')}</a>`;
+    el.classList.remove('entra-d', 'entra-i'); void el.offsetWidth; el.classList.add('entra-d');
+    window.scrollTo(0, 0); const h = document.getElementById('pfT'); if (h) { try { h.focus({ preventScroll: true }); } catch (e) { /* nada */ } }
+  }
+
+  /* ── Por dónde se entra ── */
+  let inicio = 'que';
+  if (modoPerfil) inicio = 'empresa';
+  else if (!haySesion()) inicio = 'que';
+  else if (aviso.id || copiaDe) inicio = clase ? (incompletas()[0] || 'revisar') : 'que';   /* editar o copia: directo a lo que falta */
+  else if (clase && vuelta) inicio = siguiente('que');                                      /* volvió de Ingresar con la elección hecha */
+  ir(inicio, 1);
 })();
 });
 </script>
