@@ -360,6 +360,9 @@
   };
   S.saveAviso = async function(a){
     const pub = await S.getMyPublicador(); if (!pub) throw new Error('Completá tu perfil de publicador primero.');
+    /* 8/10/2026 · La base exige la dirección (direccion not null): sin ella no se manda nada, con un mensaje en castellano,
+       y en modo local tampoco se crea un aviso vacío. */
+    if (!String(a.direccion || '').trim()) throw new Error(T('err_sin_direccion', 'Falta la calle y la altura del aviso.'));
     const rec = Object.assign({ estado: 'disponible', estado_curacion: 'borrador', moneda: 'USD', ciudad: a.zona === 'GBA Norte' ? 'Zona Norte' : 'Capital Federal', tipo: 'Departamento', mostrar_direccion: 'aproximada' }, a, { publicador_id: pub.id, updated_at: now() });
     /* 25/9/2026 · codigo_interno es único por publicador (índice de migracion-21): sin espacios, y vacío = null, porque
        dos filas importadas sin código ('') chocarían. Un alta con un código que el publicador ya tiene actualiza ese
