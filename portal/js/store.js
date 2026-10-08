@@ -471,7 +471,12 @@
       if (c.visita_deseada) fila.visita_deseada = c.visita_deseada;
       let { error } = await S.sb.schema('portal').from('consultas').insert(fila);
       if (error && (fila.visita_deseada || fila.canal === 'visita')) { /* sin migración 02: se guarda como consulta común y la fecha va en el mensaje */ fila.mensaje = ((fila.mensaje || '') + ' [Pide visita: ' + new Date(c.visita_deseada).toLocaleString('es-AR') + ']').trim(); delete fila.visita_deseada; fila.canal = 'formulario'; ({ error } = await S.sb.schema('portal').from('consultas').insert(fila)); }
-      if (error) console.warn('consulta no guardada', error);
+      if (error) {
+        console.warn('consulta no guardada', error);
+        /* 8/10/2026 · Sin el mailto de antes, una consulta que no se guarda se perdía mientras la persona veía "Listo".
+           Ahora el formulario se entera y lo dice; el clic en WhatsApp (canal 'whatsapp') solo registra y sigue. */
+        if (rec.canal !== 'whatsapp') throw new Error(T('err_consulta', 'No pudimos enviar la consulta. Probá de nuevo o escribile por WhatsApp.'));
+      }
       if (esUUID(c.aviso_id)) S.notify('consulta', { aviso_id: c.aviso_id, datos: { nombre: c.nombre, email: c.email, telefono: c.telefono, mensaje: c.mensaje } });
     }
     const all = L.consultas.get([]); rec.id = uid(); all.push(rec); L.consultas.set(all);
