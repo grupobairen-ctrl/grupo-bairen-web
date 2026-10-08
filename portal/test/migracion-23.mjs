@@ -238,12 +238,23 @@ control(13, 'anon ya no evalúa las políticas de cuenta (solo "publicados visib
 console.log('\n14 · disponible_desde');
 control(14, 'P1 la carga en su aviso y anon la lee', [await como('P1', `update portal.avisos set disponible_desde = '2026-11-01' where codigo = 'BA-P1-2' returning disponible_desde::text`), await como('anon', `select disponible_desde::text from portal.avisos where codigo = 'BA-P1-2'`)], [[{ disponible_desde: '2026-11-01' }], [{ disponible_desde: '2026-11-01' }]]);
 
+console.log('\n15 · unidades_borrador (la lista de unidades de un emprendimiento en borrador)');
+const LISTA = JSON.stringify([{ id: null, unidad: '2° A', ambientes: 2, m2_total: 52, precio: 165000, estado: 'disponible' }, { id: null, unidad: '5° B', ambientes: 3, m2_total: 80, precio: 249000, estado: 'reservado' }]);
+control(15, 'P1 guarda la lista en su borrador', await como('P1', `update portal.avisos set unidades_borrador = '${LISTA}'::jsonb where codigo = 'BA-P1-3' returning jsonb_array_length(unidades_borrador) n`), [{ n: 2 }]);
+control(15, 'P1 la lee desde otro dispositivo (S.COLS.AVISO + unidades_borrador)', await como('P1', `select unidades_borrador->1->>'unidad' u from (select ${COLS_AVISO},unidades_borrador from portal.avisos where codigo = 'BA-P1-3') a`), [{ u: '5° B' }]);
+control(15, 'P2 no ve el borrador de P1', await como('P2', `select unidades_borrador from portal.avisos where codigo = 'BA-P1-3'`), []);
+control(15, 'anon no ve el borrador', await como('anon', `select unidades_borrador from portal.avisos where codigo = 'BA-P1-3'`), []);
+control(15, 'algo que no es una lista → rechazado', await como('P1', `update portal.avisos set unidades_borrador = '{"unidad":"x"}'::jsonb where codigo = 'BA-P1-3'`), r => err(r) && /avisos_unidades_borrador_check/.test(r));
+control(15, 'una lista de 100 KB → rechazada', await como('P1', `update portal.avisos set unidades_borrador = jsonb_build_array(repeat('u', 100000)) where codigo = 'BA-P1-3'`), r => err(r) && /avisos_unidades_borrador_check/.test(r));
+control(15, 'al enviar vuelve a null', await como('P1', `update portal.avisos set unidades_borrador = null where codigo = 'BA-P1-3' returning unidades_borrador`), [{ unidades_borrador: null }]);
+await como('P1', `update portal.avisos set unidades_borrador = '${LISTA}'::jsonb where codigo = 'BA-P1-3'`);
+
 console.log('\nSegunda corrida (repetible):');
 const r2 = await run('migracion-23-lanzamiento.sql (2da)', mig);
 control('rep', 'tablero todo en verde', r2 && r2.at(-1).rows.every(x => x.ok), true);
 control('rep', 'el respaldo no se pisó', (await db.query(`select clave from portal.respaldo_migracion_23 order by clave`)).rows.map(x => x.clave), respaldo1);
 control('rep', 'la definición respaldada del OS es la de antes (sin el filtro de bairen)', (await db.query(`select valor #>> '{}' like '%p.slug = ''bairen''%' as tiene from portal.respaldo_migracion_23 where clave = 'trg_aviso_sincroniza_os'`)).rows, [{ tiene: false }]);
-control('rep', 'los datos siguen (avisos, consultas, disponible_desde)', (await db.query(`select (select count(*)::int from portal.avisos) a, (select count(*)::int from portal.consultas) c, (select disponible_desde::text from portal.avisos where codigo = 'BA-P1-2') d`)).rows, [{ a: 6, c: 2, d: '2026-11-01' }]);
+control('rep', 'los datos siguen (avisos, consultas, disponible_desde, unidades_borrador)', (await db.query(`select (select count(*)::int from portal.avisos) a, (select count(*)::int from portal.consultas) c, (select disponible_desde::text from portal.avisos where codigo = 'BA-P1-2') d, (select jsonb_array_length(unidades_borrador) from portal.avisos where codigo = 'BA-P1-3') u`)).rows, [{ a: 6, c: 2, d: '2026-11-01', u: 2 }]);
 
 console.log('\nRollback:');
 const rb = readFileSync(W + 'migracion-23-lanzamiento-rollback.sql', 'utf8');
@@ -251,6 +262,7 @@ const r3 = await run('migracion-23-lanzamiento-rollback.sql', rb);
 if (r3) console.table(r3.at(-1).rows);
 control('rb', 'tablero del rollback en verde', r3 && r3.at(-1).rows.every(x => x.ok), true);
 control('rb', 'disponible_desde tenía datos: quedó', (await db.query(`select count(*)::int n from information_schema.columns where table_schema = 'portal' and table_name = 'avisos' and column_name = 'disponible_desde'`)).rows, [{ n: 1 }]);
+control('rb', 'unidades_borrador tenía datos: quedó, con la lista', (await db.query(`select jsonb_array_length(unidades_borrador) n from portal.avisos where codigo = 'BA-P1-3'`)).rows, [{ n: 2 }]);
 control('rb', 'vuelve lo de antes: anon lee propietario_email', await como('anon', `select count(propietario_email)::int n from portal.avisos where id = '${AB}'`), [{ n: 1 }]);
 control('rb', 'vuelve lo de antes: P1 publica sin curación', await como('P1', `update portal.avisos set estado_curacion = 'publicado' where codigo = 'BA-P1-3' returning estado_curacion`), [{ estado_curacion: 'publicado' }]);
 control('rb', 'políticas de avisos como antes (roles public)', (await db.query(`select count(*)::int n from pg_policies where schemaname = 'portal' and tablename = 'avisos' and roles = '{public}'::name[]`)).rows, [{ n: 8 }]);

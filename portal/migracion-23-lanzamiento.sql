@@ -15,6 +15,8 @@
 --
 -- Qué hace (el número es el de la sección de abajo):
 --   1. disponible_desde (date) en portal.avisos, para el mediano plazo.
+--      unidades_borrador (jsonb): la lista de unidades de un emprendimiento
+--      mientras es borrador, para seguir la carga desde otro dispositivo.
 --      Más dos columnas internas: portada_curada y pausado_por.
 --   3. Disparador en portal.avisos: lo que es de la curación lo cambia solo
 --      un curador o el servidor (service key / SQL Editor).
@@ -141,6 +143,18 @@ on conflict (clave) do nothing;
 -- disponible_desde: desde cuándo se puede entrar (mediano plazo). La usa el front en la tanda siguiente.
 alter table portal.avisos add column if not exists disponible_desde date;
 comment on column portal.avisos.disponible_desde is 'Mediano plazo: desde qué fecha la unidad está libre para entrar. Opcional (migración 23).';
+-- unidades_borrador: la lista de unidades de un emprendimiento en borrador (publicar-aviso.html, paso Unidades), guardada
+-- en el aviso base. Al enviar se crea un aviso por unidad y la lista vuelve a null. Hasta la 23 vivía solo en el navegador:
+-- en otro dispositivo se perdía sin aviso (simulación de venta, 8/10/2026). Un arreglo, con tope de 64 KB (unas 300 unidades).
+alter table portal.avisos add column if not exists unidades_borrador jsonb;
+do $$
+begin
+  if not exists (select 1 from pg_constraint where conrelid = 'portal.avisos'::regclass and conname = 'avisos_unidades_borrador_check') then
+    alter table portal.avisos add constraint avisos_unidades_borrador_check
+      check (unidades_borrador is null or (jsonb_typeof(unidades_borrador) = 'array' and octet_length(unidades_borrador::text) <= 65536));
+  end if;
+end $$;
+comment on column portal.avisos.unidades_borrador is 'Emprendimiento en borrador: la lista de unidades (piso y unidad, ambientes, m², precio, estado) que carga la desarrolladora. Al enviar se crea un aviso por unidad y vuelve a null. Opcional (migración 23).';
 -- Internas del disparador de curación (sección 3): la portada que vio el curador y quién pausó.
 alter table portal.avisos add column if not exists portada_curada text;
 alter table portal.avisos add column if not exists pausado_por text;
@@ -472,7 +486,8 @@ create policy "docs borra los suyos" on storage.objects for delete to authentica
 -- ── 8 · propietario_email, cerrado de verdad ───────────────────────
 -- schema-portal.sql:409 hacía revoke select (propietario_email) from anon, pero el grant de tabla de la línea
 -- 241 lo anulaba: con permiso sobre la tabla, el revoke de una columna no cambia nada. Ahora anon y authenticated
--- tienen select columna por columna, todas menos propietario_email (las de hoy, incluida disponible_desde).
+-- tienen select columna por columna, todas menos propietario_email (las de hoy, incluidas disponible_desde y
+-- unidades_borrador; esta última solo tiene datos en borradores, que la clave pública no ve).
 -- Revocar el select de tabla también revoca los de columna, así que esto es repetible.
 -- Efecto en el front: nadie con la clave pública puede pedir `*` de avisos (falla entero). store.js ya no lo
 -- pide (S.COLS); saveAviso tiene que pedir .select(S.COLS.AVISO).
@@ -592,6 +607,9 @@ commit;
 select n, control, ok from (values
   (1, 'columna avisos.disponible_desde',
       exists (select 1 from information_schema.columns where table_schema = 'portal' and table_name = 'avisos' and column_name = 'disponible_desde')),
+  (1, 'columna avisos.unidades_borrador (jsonb, con tope)',
+      exists (select 1 from information_schema.columns where table_schema = 'portal' and table_name = 'avisos' and column_name = 'unidades_borrador' and data_type = 'jsonb')
+      and exists (select 1 from pg_constraint where conrelid = 'portal.avisos'::regclass and conname = 'avisos_unidades_borrador_check')),
   (2, 'disparador trg_av_curacion (avisos)',
       exists (select 1 from pg_trigger where tgrelid = 'portal.avisos'::regclass and tgname = 'trg_av_curacion' and tgenabled = 'O')),
   (3, 'disparador trg_fotos_portada (fotos)',
