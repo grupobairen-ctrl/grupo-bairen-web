@@ -363,8 +363,9 @@
   };
 
   /* 8/10/2026 · Tanda 2 · La tarjeta, más corta (como pidió Tomás: "demasiados textos y muchas cosas").
-     Sobre la foto, la operación corta (o "Reservada") y, si viene, "Disponible desde 14 nov". Abajo: la calle chica
-     en versalitas (sin altura si la dirección es aproximada), el título humano, el precio con su moneda y /mes,
+     Sobre la foto, la operación corta (o "Reservada") y, si viene, "Disponible desde 14 nov". Abajo: el título humano,
+     la calle en gris debajo (sin altura si la dirección es aproximada; 8/10/2026, pasada premium: antes iba arriba en
+     versalitas doradas), el precio con su moneda y /mes,
      los datos en una línea y quién publica en una línea de texto. Sin botón "Ver ficha": toda la tarjeta es un
      solo enlace. El corazón queda afuera del enlace (un botón no puede ir adentro de un <a>), encima de la foto.
      La clase prop-card queda en la raíz: la usan el catálogo (foco al cambiar de página) y otras grillas. */
@@ -386,8 +387,8 @@
   <a class="tj-link" href="${href}">
     <span class="tj-foto">${foto}${tag}${desde ? `<span class="tj-desde">${BP.esc(desde)}</span>` : ''}</span>
     <span class="tj-cuerpo">
-      ${calle ? `<span class="tj-calle">${BP.esc(calle)}</span>` : ''}
       <span class="tj-titulo">${BP.esc(tit)}</span>
+      ${calle ? `<span class="tj-calle">${BP.esc(calle)}</span>` : ''}
       <span class="tj-fila"><span class="tj-precio">${D.precioCorto(a)}</span>${meta ? `<span class="tj-meta">${meta}</span>` : ''}</span>
       ${linea ? `<span class="tj-pub">${linea}</span>` : ''}
     </span>
@@ -409,8 +410,8 @@
   <div class="tj-link">
     <span class="tj-foto">${foto}<span class="tj-tag tj-venta">${BP.t('card_venta', 'Venta')}</span>${etapa ? `<span class="tj-desde">${BP.esc(etapa)}</span>` : ''}</span>
     <span class="tj-cuerpo">
-      ${calle ? `<span class="tj-calle">${BP.esc(calle)}</span>` : ''}
       <span class="tj-titulo">${BP.esc(e.nombre)}</span>
+      ${calle ? `<span class="tj-calle">${BP.esc(calle)}</span>` : ''}
       <span class="tj-fila"><span class="tj-precio">${e.desde ? BP.tf('emp_desde', 'Desde {p}', { p: BP.fmtUSD(e.desde) }) : BP.t('card_consultar_precio', 'Consultar precio')}</span><span class="tj-meta">${BP.esc(meta)}</span></span>
       ${linea ? `<span class="tj-pub">${linea}</span>` : ''}
     </span>

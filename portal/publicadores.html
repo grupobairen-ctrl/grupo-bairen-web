@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20261008k"><link rel="stylesheet" href="css/catalogo.css?v=20261008k"><link rel="stylesheet" href="css/portal.css?v=20261008k"><link rel="stylesheet" href="css/transiciones.css?v=20261008k">
+  <link rel="stylesheet" href="css/base.css?v=20261008l"><link rel="stylesheet" href="css/catalogo.css?v=20261008l"><link rel="stylesheet" href="css/portal.css?v=20261008l"><link rel="stylesheet" href="css/transiciones.css?v=20261008l">
 </head>
 <body class="p-publicadores">
 <div class="p-velo" aria-hidden="true"><span class="w">BAIREN</span></div>
@@ -21,8 +21,8 @@
 </div></section>
 <div id="pFooter"></div>
 <!-- lanz3-visitante · Sin este archivo no se sabe la zona de cada aviso: el conteo sumaba los de fuera de zona, que el catálogo no muestra -->
-<script src="../mapa-barrios.js?v=20261008k" defer></script>
-<script src="supabase-portal.js?v=20261008k" defer></script><script src="js/errores.js?v=20261008k" defer></script><script src="js/bairen-motion.js?v=20261008k" defer></script><script src="js/i18n-portal.js?v=20261008k" defer></script><script src="js/ui.js?v=20261008k" defer></script><script src="js/store.js?v=20261008k" defer></script><script src="js/data.js?v=20261008k" defer></script>
+<script src="../mapa-barrios.js?v=20261008l" defer></script>
+<script src="supabase-portal.js?v=20261008l" defer></script><script src="js/errores.js?v=20261008l" defer></script><script src="js/bairen-motion.js?v=20261008l" defer></script><script src="js/i18n-portal.js?v=20261008l" defer></script><script src="js/ui.js?v=20261008l" defer></script><script src="js/store.js?v=20261008l" defer></script><script src="js/data.js?v=20261008l" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -36,7 +36,7 @@ BPData.load().then(function(d){
   (function(){
     var todos = Object.values(d.publicadores), reales = todos.filter(function(p){ return !p.demo; });
     var lista = reales.length >= 3 ? reales : todos;
-    var tile = function(p){ var nom = BPData.pubNombre(p); return '<a class="tile" href="#' + p.id + '" title="' + BP.esc(nom) + '"><span class="mono">' + p.inicial + '</span><span class="nom">' + BP.esc(nom) + '</span><span class="tip">' + (p.tipo === 'dueno' ? (p.verificado ? BP.t('ui_dato_dueno_verificado', 'Dueño verificado') : BP.t('ui_dato_dueno_directo', 'Dueño directo')) : p.tipo === 'desarrolladora' ? BP.t('pubs_desarrolladora', 'Desarrolladora') : BP.esc(p.matricula || (p.verificado ? BP.etiqueta(p.badge) : '') || '')) + (p.demo ? ' · ' + BP.t('pubs_ejemplo_min', 'ejemplo') : '') + '</span></a>'; };
+    var tile = function(p){ var nom = BPData.nombreVisible(BPData.pubNombre(p)); return '<a class="tile" href="#' + p.id + '" title="' + BP.esc(nom) + '"><span class="mono">' + p.inicial + '</span><span class="nom">' + BP.esc(nom) + '</span><span class="tip">' + (p.tipo === 'dueno' ? (p.verificado ? BP.t('ui_dato_dueno_verificado', 'Dueño verificado') : BP.t('ui_dato_dueno_directo', 'Dueño directo')) : p.tipo === 'desarrolladora' ? BP.t('pubs_desarrolladora', 'Desarrolladora') : BP.esc(p.matricula || (p.verificado ? BP.etiqueta(p.badge) : '') || '')) + (p.demo ? ' · ' + BP.t('pubs_ejemplo_min', 'ejemplo') : '') + '</span></a>'; };
     var tandas = []; for (var k = 0; k < lista.length; k += 4) tandas.push(lista.slice(k, k + 4));
     var ultima = tandas[tandas.length - 1]; if (ultima && ultima.length < 4) ultima.push(null);
     var hueco = '<a class="tile vacio" href="publicar.html#inmobiliaria"><span class="mono">+</span><span class="nom">' + BP.t('pubs_tu_inmo', 'Tu inmobiliaria') + '</span><span class="tip">' + BP.t('pubs_publicar_en', 'Publicar en BAIREN') + '</span></a>';
@@ -52,7 +52,7 @@ BPData.load().then(function(d){
     var mine = av.filter(function(a){ return a.publicadorId === p.id && !a.reservado; });
     var venta = mine.filter(function(a){ return a.op === 'venta'; }).length, alq = mine.length - venta;
     return '<article class="p-pub-block" id="' + p.id + '">' +
-      '<div class="row"><div class="p-pub-logo">' + p.inicial + '</div><div><b>' + BP.esc(BPData.pubNombre(p)) + '</b><div class="p-kicker">' + (p.tipo === 'dueno' ? (p.verificado ? BP.t('pubs_dueno_directo_verif', 'Dueño directo verificado') : BP.t('ui_dato_dueno_directo', 'Dueño directo')) : [p.demo ? BP.etiqueta(p.responsable) : p.responsable, p.verificado && p.badge ? BP.etiqueta(p.badge) : null].filter(Boolean).map(BP.esc).join(' · ')) + '</div></div></div>' +
+      '<div class="row"><div class="p-pub-logo">' + p.inicial + '</div><div><b>' + BP.esc(BPData.nombreVisible(BPData.pubNombre(p))) + '</b><div class="p-kicker">' + (p.tipo === 'dueno' ? (p.verificado ? BP.t('pubs_dueno_directo_verif', 'Dueño directo verificado') : BP.t('ui_dato_dueno_directo', 'Dueño directo')) : [p.demo ? BP.etiqueta(p.responsable) : p.responsable, p.verificado && p.badge ? BP.etiqueta(p.badge) : null].filter(Boolean).map(BP.esc).join(' · ')) + '</div></div></div>' +
       '<div class="badges">' + BPData.badgeHTML(p) + (p.demo ? '<span class="p-badge demo">' + BP.t('card_ejemplo', 'Ejemplo') + '</span>' : '') + '</div>' +
       '<p class="p-text" style="margin:12px 0;font-size:.92rem">' + BP.esc(BPData.pubDesc(p)) + '</p>' +
       '<p class="p-codes">' + BP.tf('pubs_publica_desde', 'Publica desde {y}', { y: p.desde }) + ' · ' + BP.tf('pubs_en_venta', '{n} en venta', { n: venta }) + ' · ' + BP.tf('pubs_en_alquiler', '{n} en alquiler', { n: alq }) + ' · ' + BP.t('pubs_zonas', 'Zonas: ') + p.zonas.map(BP.zonaLabel).join(', ') + '</p>' +

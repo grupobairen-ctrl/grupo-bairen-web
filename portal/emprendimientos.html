@@ -10,11 +10,11 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20261008k"><link rel="stylesheet" href="css/catalogo.css?v=20261008k"><link rel="stylesheet" href="css/portal.css?v=20261008k"><link rel="stylesheet" href="css/transiciones.css?v=20261008k">
+  <link rel="stylesheet" href="css/base.css?v=20261008l"><link rel="stylesheet" href="css/catalogo.css?v=20261008l"><link rel="stylesheet" href="css/portal.css?v=20261008l"><link rel="stylesheet" href="css/transiciones.css?v=20261008l">
   <style>
     .p-emp{display:grid;grid-template-columns:minmax(260px,42%) 1fr;background:var(--p-card);border:1px solid var(--p-line);border-radius:var(--p-radius);overflow:hidden;margin-bottom:18px}
     .p-emp .ph{position:relative;min-height:260px;background:var(--p-tray)} .p-emp .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-    .p-emp .ph .tag{position:absolute;left:12px;top:12px;background:var(--navy-deeper);color:#fff;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;padding:5px 9px;border-radius:8px}
+    .p-emp .ph .tag{position:absolute;left:12px;top:12px;background:var(--navy-deeper);color:#fff;font-size:.8125rem;letter-spacing:.01em;text-transform:none;padding:5px 9px;border-radius:8px}
     .p-emp .body{padding:22px 24px} .p-emp h2{font-family:var(--font-display);font-weight:500;font-size:1.35rem;margin:0 0 4px;color:var(--navy-deeper)}
     .p-emp .desde{font-family:var(--font-display);font-size:1.4rem;color:var(--navy-deeper);margin:8px 0 2px} .p-emp .desde small{font-family:var(--font-body);font-size:.8rem;color:var(--text-mid)}
     .p-emp .facts{display:flex;gap:14px;flex-wrap:wrap;font-size:.86rem;color:var(--navy-deeper);margin:8px 0}
@@ -29,7 +29,7 @@
     .p-emp-us a:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
     .p-emp-us .u{font-weight:500}
     .p-emp-us .pr{text-align:right;font-family:var(--font-display);font-size:1rem}
-    .p-emp-us .res{font:500 .66rem/1 var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:var(--text-mid)}
+    .p-emp-us .res{font:500 .8125rem/1 var(--font-body);letter-spacing:.01em;text-transform:none;color:var(--text-mid)}
     .p-emp-todos{display:inline-block;margin:0 0 16px}
     .p-emp-us a > span{white-space:nowrap}
     @media(max-width:760px){.p-emp{grid-template-columns:1fr}.p-emp > .units{padding:0 16px 4px}.p-emp-us a{grid-template-columns:minmax(0,1fr) auto auto minmax(96px,auto);font-size:.86rem;gap:12px}.p-emp-us .pr{font-size:.95rem}}
@@ -45,7 +45,7 @@
   <div id="lista"><div class="p-skel" style="height:260px;border-radius:var(--p-radius);background:#EEE9DD"></div></div>
 </div></section>
 <div id="pFooter"></div>
-<script src="supabase-portal.js?v=20261008k" defer></script><script src="js/errores.js?v=20261008k" defer></script><script src="../mapa-barrios.js?v=20261008k" defer></script><script src="js/bairen-motion.js?v=20261008k" defer></script><script src="js/i18n-portal.js?v=20261008k" defer></script><script src="js/ui.js?v=20261008k" defer></script><script src="js/store.js?v=20261008k" defer></script><script src="js/data.js?v=20261008k" defer></script>
+<script src="supabase-portal.js?v=20261008l" defer></script><script src="js/errores.js?v=20261008l" defer></script><script src="../mapa-barrios.js?v=20261008l" defer></script><script src="js/bairen-motion.js?v=20261008l" defer></script><script src="js/i18n-portal.js?v=20261008l" defer></script><script src="js/ui.js?v=20261008l" defer></script><script src="js/store.js?v=20261008l" defer></script><script src="js/data.js?v=20261008l" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function(){
     <div class="body"><h2>${BP.esc(e.nombre)}</h2><div class="p-barrio">${BP.esc(e.dir)}, ${BP.esc(e.barrio)}</div>
       <div class="desde">${e.desde ? BP.tf('emp_desde', 'Desde {p}', { p: BP.fmtUSD(e.desde) }) : BP.t('ui_consultar', 'Consultar')}</div>
       <div class="facts"><span>${e.unidades.length === 1 ? BP.t('emp_unidad_1', '1 unidad') : BP.tf('emp_unidades', '{n} unidades', { n: e.unidades.length })}</span>${e.ambmin ? `<span>${e.ambmin === e.ambmax ? (e.ambmin === 1 ? BP.t('emp_amb_1', '1 amb.') : BP.tf('emp_amb', '{n} amb.', { n: e.ambmin })) : BP.tf('emp_amb_rango', '{a} a {b} amb.', { a: e.ambmin, b: e.ambmax })}</span>` : ''}${e.m2min ? `<span>${e.m2min === e.m2max ? e.m2min + ' m²' : BP.tf('emp_m2_rango', '{a} a {b} m²', { a: e.m2min, b: e.m2max })}</span>` : ''}</div>
-      <div class="p-publine">${BP.t('card_publica', 'Publica')} <b>${BP.esc(BPData.pubNombre(pub))}</b> ${BPData.badgeHTML(pub)}${pub.demo ? '<span class="p-badge demo">' + BP.t('card_ejemplo', 'Ejemplo') + '</span>' : ''}</div>
+      <div class="p-publine">${BP.t('card_publica', 'Publica')} <b>${BP.esc(BPData.nombreVisible(BPData.pubNombre(pub)))}</b> ${BPData.badgeHTML(pub)}${pub.demo ? '<span class="p-badge demo">' + BP.t('card_ejemplo', 'Ejemplo') + '</span>' : ''}</div>
       <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">${pub.whatsapp ? `<a class="p-btn p-btn-sm p-btn-dark" href="https://wa.me/${encodeURIComponent(pub.whatsapp)}?text=${encodeURIComponent(BP.tf('emp_wa_msg', 'Hola, vi {t} en BAIREN y quiero más información.', { t: e.nombre }))}" target="_blank" rel="noopener" aria-label="${BP.esc(BP.tf('card_wa_aria', 'Escribir por WhatsApp a {p}', { p: BPData.pubNombre(pub) }))}" data-wa data-aviso="${BP.esc(e.key)}" data-pub="${BP.esc(pub.storeId || pub.id)}">${BP.ico.wa} WhatsApp</a>` : ''}${pub.email ? `<a class="p-btn p-btn-sm p-btn-navy" href="mailto:${encodeURIComponent(pub.email)}?subject=${encodeURIComponent(BP.tf('emp_mail_subject', 'Consulta por {t} desde BAIREN', { t: e.nombre }))}">${BP.ico.mail} ${BP.t('card_contactar', 'Contactar')}</a>` : '<span class="p-sincontacto">' + BP.t('card_contacto_pendiente', 'Contacto pendiente') + '</span>'}</div>
     </div>
     <details class="units"${solo ? ' open' : ''}><summary>${e.unidades.length === 1 ? BP.t('emp_ver_unidad_1', 'Ver la unidad') : BP.tf('emp_ver_unidades', 'Ver las {n} unidades', { n: e.unidades.length })}</summary><ul class="p-emp-us">${e.unidades.map(fila).join('')}</ul></details></article>`; }).join('');
