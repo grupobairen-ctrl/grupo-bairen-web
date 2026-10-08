@@ -55,7 +55,11 @@
         if (window.bairenReady) {
           const sb = await Promise.race([window.bairenReady, new Promise((_, r) => setTimeout(() => r(new Error('sdk')), 15000))]);
           const probe = await sb.schema('portal').from('publicadores').select('id').limit(1);
-          if (!probe.error) { S.mode = 'supabase'; S.sb = sb; const { data } = await sb.auth.getUser(); S.session = data && data.user ? sesionDe(data.user) : null; sb.auth.onAuthStateChange((_, sess) => { if (DEMO) return; S.session = sess && sess.user ? sesionDe(sess.user) : null; if (window.BP && BP.applySession) BP.applySession(S.session, S.mode); }); }
+          if (!probe.error) { S.mode = 'supabase'; S.sb = sb; const { data } = await sb.auth.getUser(); S.session = data && data.user ? sesionDe(data.user) : null; sb.auth.onAuthStateChange((_, sess) => { if (DEMO) return; S.session = sess && sess.user ? sesionDe(sess.user) : null;
+            /* 8/10/2026 · Fuera del aviso de Auth (setTimeout): Supabase avisa con el candado de la sesión tomado, y
+               applySession pregunta a la base si la cuenta es curadora. Esa consulta esperaba el mismo candado y todo lo
+               que venía después (el panel entero) quedaba colgado cuando la sesión se renovaba al abrir la página. */
+            setTimeout(() => { if (window.BP && BP.applySession) BP.applySession(S.session, S.mode); }, 0); }); }
         }
       } catch (e) { /* modo local */ }
       if (DEMO) {
