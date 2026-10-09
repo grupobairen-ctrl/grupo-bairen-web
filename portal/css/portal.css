@@ -4931,3 +4931,21 @@ html:not(.teclado) .mobile-menu a:focus-visible,html:not(.teclado) .mobile-menu 
 @media (max-width:1023px){
   .p-fgal-ver,.p-fdatos{display:none}
 }
+
+/* ── 8/10/2026 (noche) · Tomás: portada del celular con filtro azul y el título con la barra al centro ─────────────
+   Un velo navy parejo y suave sobre todo el video (como el de la compu), un poco más denso arriba detrás del encabezado,
+   y el bloque del título y la barra de búsqueda centrado en la pantalla, alineado al medio. */
+@media(max-width:899px){
+  body.p-home .h-hero{align-items:center;padding:56px 0 56px}
+  body.p-home .h-hero-velo{background:
+    linear-gradient(to bottom,rgba(19,29,45,.50) 0,rgba(19,29,45,0) 150px),
+    radial-gradient(ellipse 95% 38% at 50% 50%,rgba(19,29,45,.24) 0%,rgba(19,29,45,.10) 60%,rgba(19,29,45,0) 100%),
+    linear-gradient(rgba(19,29,45,.34),rgba(19,29,45,.34))}
+  body.p-home .h-hero-in{text-align:center}
+  body.p-home .h-hero h1{text-shadow:0 2px 24px rgba(10,14,22,.45),0 1px 3px rgba(10,14,22,.30)}
+}
+
+/* ── 8/10/2026 (noche) · Tomás: al estirar hacia abajo, debajo del pie, navy en todo el sitio ────────────────────
+   El pie pinta navy por debajo de sí con una sombra sin difuminar (no agrega scroll): tapa el relleno de papel que deja
+   el cuerpo abajo (en la ficha, los 76 px de la barra de contacto) y empalma con el fondo navy del documento. */
+.footer.p-pie2{box-shadow:0 100vh 0 100vh var(--navy-deeper,#131D2D)}
