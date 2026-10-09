@@ -4897,6 +4897,35 @@ html:not(.teclado) .mobile-menu a:focus-visible,html:not(.teclado) .mobile-menu 
   /* Tres similares, con aire arriba */
   body.p-ficha-page .p-fsim{padding-top:40px}
   body.p-ficha-page .p-fsim .p-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:28px}
+
+  /* ── Portada ───────────────────────────────────────────────────────────────────────────────────────────── */
+  /* El video, su recorte, su encuadre, su arranque, el velo y el título no se tocan acá */
+  /* Lo último que entró: seis, de a tres */
+  :root body.p-home .h-ultimos{padding:72px 0 64px}
+  :root body.p-home .h-ultimos-riel{grid-template-columns:repeat(3,minmax(0,1fr));gap:40px 28px;padding-top:28px}
+  body.p-home .h-ultimos-riel > :nth-child(n+7){display:none}
+  /* Seguimos un estándar: una sola línea, con los cuatro criterios y el enlace */
+  :root body.p-home .h-estandar{padding:34px 0}
+  :root body.p-home .h-estandar .h-in{display:flex;align-items:center;flex-wrap:wrap;gap:14px 40px}
+  :root body.p-home .h-estandar .h-eyebrow{display:none!important}
+  :root body.p-home .h-estandar .h-h2{margin:0;font-size:1.5rem;line-height:1.2;white-space:nowrap}
+  :root body.p-home .h-camino{flex:0 1 auto;margin:0;padding:0}
+  body.p-home .h-camino-linea{display:none}
+  :root body.p-home .h-hitos{display:flex;flex-wrap:wrap;align-items:center;gap:10px 0}
+  :root body.p-home .h-hito{flex-direction:row;align-items:center;gap:8px;margin:0!important;opacity:1;transform:none;text-align:left}
+  :root body.p-home .h-hito + .h-hito::before{content:"";width:4px;height:4px;margin:0 16px;border-radius:50%;background:rgba(194,169,104,.7)}
+  :root body.p-home .h-hito .pt{width:auto;height:auto;border:0;background:none;box-shadow:none!important;color:var(--gold-light,#DECDA0)}
+  :root body.p-home .h-hito .pt svg:not(.anillo){width:19px;height:19px}
+  body.p-home .h-hito .pt .anillo{display:none}
+  :root body.p-home .h-hito b{font:400 1rem/1.3 var(--font-body)!important;color:#FBFAF6;white-space:nowrap}
+  :root body.p-home .h-criterios{margin:0 0 0 auto;font:500 .9375rem/1 var(--font-body)!important;color:var(--gold-light,#DECDA0);white-space:nowrap}
+  :root body.p-home .h-criterios span,:root body.p-home .h-criterios em{font-size:inherit!important}
+  /* Edificios: el título solo, sin la línea de abajo; los rótulos de cada fachada, a 14 px */
+  :root body.p-home .h-sec#edificios{padding-top:72px;padding-bottom:64px}
+  body.p-home #edificiosCopy{display:none}
+  :root body.p-home .h-edif-txt em,:root body.p-home .h-edif-txt em span{font-size:.875rem!important}
+  /* El cierre, más corto */
+  :root body.p-home .h-encaja{padding:48px 0}
 }
 /* escritorio simple · Lo que es solo de la compu no aparece en el celular (el celular queda como estaba) */
 @media (max-width:1023px){
