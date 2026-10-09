@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Verificá tu identidad · BAIREN</title>
+  <meta name="description" content="Verificá tu identidad una vez en BAIREN: te abre la reserva y la firma.">
+  <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#131D2D">
+  <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
+  <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css?v=20261009c"><link rel="stylesheet" href="css/catalogo.css?v=20261009c"><link rel="stylesheet" href="css/portal.css?v=20261009c"><link rel="stylesheet" href="css/transiciones.css?v=20261009c"><style>@view-transition{navigation:auto}</style><style>html.arrancando body{opacity:0}body{transition:opacity .18s cubic-bezier(.22,1,.36,1)}@media(prefers-reduced-motion:reduce){body{transition:none}}</style><script>/* 8/10/2026 · Arranque sin pantallazo (ver BP.listo en ui.js): siempre, salvo al entrar a una ficha desde el portal (ahí la foto de la tarjeta crece hasta la ficha); en Safari del iPhone la transición entre páginas no tapaba el video al tocar el logo. Tope: 800 ms. */(function(){try{var h=document.documentElement,n=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{},r=document.referrer||'';if(r.indexOf(location.origin)===0&&n.type!=='reload'&&/propiedad/.test(location.pathname))return;h.classList.add('arrancando');setTimeout(function(){h.classList.remove('arrancando')},800)}catch(e){}})()</script>
+  <link rel="stylesheet" href="css/identidad.css?v=20261009c">
+</head>
+<!-- 9/10/2026 · Riel de identidad (migración 29). Verificar la identidad una vez: tres fotos (frente y dorso del documento y
+     una selfie), un paso por pantalla con su progreso, y una última pantalla para revisar los datos y dar el consentimiento
+     (Ley 25.326). Nada sale del navegador hasta "Mandar para verificar". Después, el estado: en revisión, verificada (con
+     la fecha) o rechazada (con el motivo y "Volver a intentar"). ?volver=<página> lleva de vuelta (por ejemplo, a la
+     conversación desde la que se llegó). Apagada para el público con BPDigital.activo(). Lógica de datos: js/dg-identidad.js. -->
+<!-- data-flujo: sin el pie ni la barra de abajo de la app (es un trámite corto, como Publicar) -->
+<body class="p-product p-identidad" data-flujo>
+<div class="p-velo" aria-hidden="true"><span class="w">BAIREN</span></div>
+<div id="pHeader"></div>
+<main class="idn-main" id="contenido" aria-busy="true">
+  <div class="idn-caja" id="idnCaja">
+    <div class="idn-esq" aria-hidden="true"><i></i><i class="t"></i><i></i><i class="b"></i></div>
+  </div>
+</main>
+<div id="pFooter"></div>
+
+<script src="supabase-portal.js?v=20261009c" defer></script><script src="js/errores.js?v=20261009c" defer></script>
+<script src="js/bairen-motion.js?v=20261009c" defer></script><script src="js/i18n-portal.js?v=20261009c" defer></script><script src="js/ui.js?v=20261009c" defer></script><script src="js/store.js?v=20261009c" defer></script>
+<script src="js/digital.js?v=20261009c" defer></script><script src="js/dg-identidad.js?v=20261009c" defer></script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+(async function(){
+  'use strict';
+  BP.header(); BP.footer(); if (window.BPStore) BPStore.init();
+  const t = (k, d) => BP.t('dg_identidad_' + k, d);
+  const tf = (k, d, v) => BP.tf('dg_identidad_' + k, d, v);
+  const esc = BP.esc, $ = id => document.getElementById(id);
+  const main = $('contenido'), caja = $('idnCaja');
+  const svg = d => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${d}</svg>`;
+  const ICO = {
+    doc: svg('<rect x="3" y="5.5" width="18" height="13" rx="2"/><circle cx="8.5" cy="11" r="2"/><path d="M5.8 15.6c.6-1.3 1.6-2 2.7-2s2.1.7 2.7 2"/><path d="M14 10h4.5M14 13h3"/>'),
+    dorso: svg('<rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="M6 9.5h12M6 12.5h12M6 15.5h7"/>'),
+    cara: svg('<circle cx="12" cy="9" r="3.6"/><path d="M5 20c1.2-3.6 3.9-5.4 7-5.4s5.8 1.8 7 5.4"/>'),
+    camara: svg('<path d="M4 8h3l1.6-2.4h6.8L17 8h3v11H4z"/><circle cx="12" cy="13.2" r="3.4"/>'),
+    ok: svg('<path d="M12 3 4.5 6v5.5c0 4.6 3.2 8 7.5 9.5 4.3-1.5 7.5-4.9 7.5-9.5V6z"/><path d="m9 12 2 2 4-4"/>'),
+    reloj: svg('<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>'),
+    atras: svg('<path d="M15 18l-6-6 6-6"/>'),
+    candado: svg('<rect x="5" y="10.5" width="14" height="9.5" rx="2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/>')
+  };
+  const quieto = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const fecha = v => { const d = new Date(v); if (isNaN(d)) return ''; try { return d.toLocaleDateString(BP.LOCALE(), { day: 'numeric', month: 'numeric', year: 'numeric' }); } catch (e) { return d.toISOString().slice(0, 10); } };
+
+  document.title = t('titulo_pag', 'Verificá tu identidad') + ' · BAIREN';
+  if (window.BPStore && BPStore.ready) await BPStore.ready;
+  const D = window.BPDigital, I = window.BPIdentidad;
+  const listo = () => main.removeAttribute('aria-busy');
+  if (!D || !D.activo() || !I) {
+    listo();
+    caja.innerHTML = `<div class="p-empty p-ensena idn-pronto"><b>${esc(t('pronto_t', 'Muy pronto'))}</b><p>${esc(t('pronto_p', 'Verificá tu identidad una vez para reservar y firmar.'))}</p><a class="p-btn" href="index.html">${esc(t('pronto_btn', 'Volver al inicio'))}</a></div>`;
+    return;
+  }
+  if (!window.BPStore || !BPStore.requireSession()) return;
+  try { await BP.probePretty(); } catch (e) { /* enlaces con .html */ }
+
+  /* Adónde vuelve: solo una página del portal (nunca otra web) */
+  const volver = (() => { const v = BP.qs().get('volver') || ''; return /^[a-z0-9-]+\.html(\?[^\s<>"'#\\]*)?$/i.test(v) ? v : ''; })();
+  const volverTxt = t('volver', 'Volver');
+
+  /* Los tres pasos: una foto por pantalla */
+  const PASOS = [
+    { k: 'frente', ico: ICO.doc, tit: t('p1_t', 'Frente del documento'), tip: t('p1_tip', 'Con buena luz y sin reflejos: que se lean todos los datos.'), cam: 'environment', alt: t('p1_alt', 'Frente de tu documento') },
+    { k: 'dorso', ico: ICO.dorso, tit: t('p2_t', 'Dorso del documento'), tip: t('p2_tip', 'Del otro lado, entero dentro de la foto.'), cam: 'environment', alt: t('p2_alt', 'Dorso de tu documento') },
+    { k: 'selfie', ico: ICO.cara, tit: t('p3_t', 'Una selfie'), tip: t('p3_tip', 'Tu cara de frente, con luz, sin anteojos de sol ni gorra.'), cam: 'user', alt: t('p3_alt', 'Tu selfie') }
+  ];
+  const st = { estado: null, paso: -1, blobs: {}, urls: {}, enviando: false, datos: {} };
+  const confianza = () => `<p class="idn-conf">${ICO.candado}<span>${esc(t('confianza', 'Solo las ve BAIREN y se borran apenas las revisamos.'))}</span></p>`;
+
+  /* ── pantalla: arriba el estado en una línea, el título y, abajo, un solo botón principal ── */
+  function pantalla(o){
+    caja.innerHTML = `${o.atras ? `<button type="button" class="idn-atras" data-atras>${ICO.atras}<span>${esc(t('atras', 'Atrás'))}</span></button>` : ''}
+      ${o.estado ? `<p class="idn-estado idn-e-${esc(o.clase || 'sin')}" role="status">${o.estado}</p>` : ''}
+      ${o.prog != null ? progreso(o.prog) : ''}
+      <h1 class="idn-tit" id="idnTit" tabindex="-1">${esc(o.titulo)}</h1>
+      ${o.bajada ? `<p class="idn-bajada">${esc(o.bajada)}</p>` : ''}
+      <div class="idn-cuerpo">${o.cuerpo || ''}</div>
+      <div class="idn-acc"><p class="idn-err" role="alert" hidden></p>${o.acc || ''}</div>`;
+    listo();
+    const h = $('idnTit'); if (h && o.foco !== false) { try { h.focus({ preventScroll: true }); } catch (e) {} }
+    if (!quieto()) window.scrollTo(0, 0);
+    const at = caja.querySelector('[data-atras]'); if (at && o.atras) at.addEventListener('click', o.atras);
+  }
+  function progreso(i){
+    const items = PASOS.map((p, n) => `<li class="${n < i ? 'hecho' : n === i ? 'actual' : ''}"${n === i ? ' aria-current="step"' : ''}><span class="idn-barra" aria-hidden="true"></span><span class="idn-prog-t">${esc(p.k === 'frente' ? t('prog_frente', 'Frente') : p.k === 'dorso' ? t('prog_dorso', 'Dorso') : t('prog_selfie', 'Selfie'))}</span></li>`).join('');
+    const txt = i >= PASOS.length ? t('prog_listo', 'Listo para mandar') : tf('prog_n', 'Paso {i} de {n}', { i: i + 1, n: PASOS.length });
+    return `<div class="idn-prog"><p class="idn-prog-n">${esc(txt)}</p><ol aria-label="${esc(t('prog_aria', 'Progreso'))}">${items}</ol></div>`;
+  }
+  /* Atrás del celular: cada paso es una entrada del historial (como la hoja del buscador de la portada). "Atrás" vuelve un
+     paso; desde el primero, a la portada del trámite. Al mandar, el historial vuelve al principio. */
+  st.prof = 0;
+  const editable = () => !st.estado || st.estado.estado === 'sin' || st.estado.estado === 'rechazada';
+  function mostrar(i){ if (i == null || i < 0 || !editable()) return pintarEstado(); if (i >= PASOS.length) return pintarRevisar(); pintarPaso(i); }
+  function ir(i){ guardarDatos(); st.prof++; try { history.pushState({ idn: i, prof: st.prof }, ''); } catch (e) {} mostrar(i); }
+  function atras(){ if (st.prof > 0) history.back(); else pintarEstado(); }
+  window.addEventListener('popstate', e => {
+    if (st.saltando) { st.saltando = false; st.prof = 0; return; }
+    guardarDatos();
+    const x = e.state || {}; st.prof = x.prof || 0;
+    mostrar(x.idn);
+  });
+  const errorEn = msg => { const p = caja.querySelector('.idn-err'); if (!p) { BP.toast(msg, 'error'); return; } p.textContent = msg; p.hidden = false; };
+  const irVolver = () => { location.href = volver || 'mensajes.html'; };
+  const botonVolver = () => `<button type="button" class="p-btn p-btn-fill idn-prim" data-volver>${esc(volver ? volverTxt : t('ir_mensajes', 'Mis mensajes'))}</button>`;
+  const enlazarVolver = () => { const b = caja.querySelector('[data-volver]'); if (b) b.addEventListener('click', irVolver); };
+
+  /* ── estados ───────────────────────────────────────────── */
+  function pintarEstado(){
+    const e = st.estado || { estado: 'sin' };
+    if (e.verificada || e.estado === 'verificada') {
+      const nom = [e.nombre, e.apellido].filter(Boolean).join(' ');
+      pantalla({ clase: 'ok', estado: `<span class="idn-pill ok">${esc(t('e_verificada', 'Verificada'))}</span><span>${esc(e.verificada_en ? tf('e_desde', 'desde el {f}', { f: fecha(e.verificada_en) }) : t('e_lista', 'lista para reservar y firmar'))}</span>`,
+        titulo: t('ok_t', 'Tu identidad está verificada'), bajada: t('ok_p', 'Ya podés reservar y firmar.'),
+        cuerpo: nom ? `<div class="idn-sello">${ICO.ok}<span>${esc(nom)}</span></div>` : '', acc: botonVolver() });
+      enlazarVolver(); return;
+    }
+    if (e.estado === 'pendiente') {
+      pantalla({ clase: 'rev', estado: `<span class="idn-pill rev">${esc(t('e_revision', 'En revisión'))}</span><span>${esc(e.pendiente_desde ? tf('e_mandaste', 'mandaste las fotos el {f}', { f: fecha(e.pendiente_desde) }) : t('e_mandadas', 'ya mandaste las fotos'))}</span>`,
+        titulo: t('rev_t', 'La estamos revisando'), bajada: t('rev_p', 'Suele estar en menos de un día hábil.'),
+        cuerpo: `<div class="idn-sello rev">${ICO.reloj}<span>${esc(t('rev_sello', 'Tus fotos se borran apenas terminamos.'))}</span></div>`, acc: botonVolver() });
+      enlazarVolver(); return;
+    }
+    const rechazada = e.estado === 'rechazada';
+    pantalla({ clase: rechazada ? 'no' : 'sin',
+      estado: rechazada ? `<span class="idn-pill no">${esc(t('e_rechazada', 'No se pudo verificar'))}</span><span>${esc(e.motivo || t('e_rech_sin', 'Volvé a sacar las fotos.'))}</span>`
+        : `<span class="idn-pill">${esc(t('e_sin', 'Sin verificar'))}</span><span>${esc(t('e_sin_p', 'tres fotos, un minuto'))}</span>`,
+      titulo: rechazada ? t('rech_t', 'Probemos de nuevo') : t('ini_t', 'Verificá tu identidad'),
+      bajada: t('ini_p', 'Verificá tu identidad una vez. Te abre la reserva y la firma.'),
+      cuerpo: `<ol class="idn-tres">${PASOS.map((p, n) => `<li><span class="idn-tres-ico">${p.ico}</span><span class="idn-tres-t"><b>${n + 1}</b> ${esc(p.tit)}</span></li>`).join('')}</ol>`,
+      acc: `<button type="button" class="p-btn p-btn-fill idn-prim" data-empezar>${esc(rechazada ? t('reintentar', 'Reintentar') : t('empezar', 'Empezar'))}</button>${confianza()}` });
+    caja.querySelector('[data-empezar]').addEventListener('click', () => ir(0));
+  }
+
+  /* ── un paso: una foto ─────────────────────────────────── */
+  function pintarPaso(i){
+    st.paso = i;
+    const p = PASOS[i], url = st.urls[p.k];
+    pantalla({ prog: i, atras,
+      titulo: p.tit, bajada: p.tip,
+      cuerpo: `<label class="idn-toma${url ? ' con-foto' : ''}${p.k === 'selfie' ? ' selfie' : ''}" for="idnArchivo">
+          ${url ? `<img src="${esc(url)}" alt="${esc(p.alt)}">` : `<span class="idn-toma-ico">${p.ico}</span><span class="idn-toma-t">${esc(t('toma_t', 'Tocá para sacar la foto'))}</span>`}
+        </label>
+        <input type="file" id="idnArchivo" class="idn-archivo" accept="image/*" capture="${p.cam}" aria-label="${esc(p.tit)}">`,
+      acc: url
+        ? `<button type="button" class="p-btn p-btn-fill idn-prim" data-seguir>${esc(i === PASOS.length - 1 ? t('revisar', 'Revisar') : t('seguir', 'Seguir'))}</button><button type="button" class="idn-link" data-otra>${esc(t('otra', 'Sacar otra'))}</button>`
+        : `<button type="button" class="p-btn p-btn-fill idn-prim" data-sacar>${ICO.camara}${esc(t('sacar', 'Sacar foto'))}</button>${confianza()}` });
+    const inp = $('idnArchivo');
+    inp.addEventListener('change', async () => {
+      const f = inp.files && inp.files[0]; if (!f) return;
+      const tile = caja.querySelector('.idn-toma'); if (tile) tile.classList.add('cargando');
+      try {
+        const b = await I.achicar(f);
+        if (st.urls[p.k]) URL.revokeObjectURL(st.urls[p.k]);
+        st.blobs[p.k] = b; st.urls[p.k] = URL.createObjectURL(b);
+        pintarPaso(i);
+        BP.anunciar(t('foto_lista', 'Foto lista.'));
+      } catch (e) { if (tile) tile.classList.remove('cargando'); errorEn(e.message || String(e)); }
+      finally { inp.value = ''; }
+    });
+    const abrir = () => inp.click();
+    const bs = caja.querySelector('[data-sacar]'); if (bs) bs.addEventListener('click', abrir);
+    const bo = caja.querySelector('[data-otra]'); if (bo) bo.addEventListener('click', abrir);
+    const bg = caja.querySelector('[data-seguir]'); if (bg) bg.addEventListener('click', () => ir(i + 1));
+  }
+
+  /* ── revisar y mandar: los datos del documento y el consentimiento ── */
+  function pintarRevisar(){
+    const e = st.estado || {}, d = st.datos;
+    const v = k => d[k] != null ? d[k] : (e[k] || '');
+    const campo = (n, label, extra) => `<div class="idn-campo"><label for="idn-${n}">${esc(label)}</label><input type="text" id="idn-${n}" name="${n}" value="${esc(v(n))}" ${extra || ''}></div>`;
+    pantalla({ prog: PASOS.length, atras,
+      titulo: t('rev2_t', 'Revisá y mandá'), bajada: t('rev2_p', 'Tus datos, como figuran en el documento.'),
+      cuerpo: `<ul class="idn-miniaturas">${PASOS.map((p, n) => `<li><button type="button" class="idn-mini" data-ir="${n}" aria-label="${esc(tf('cambiar_de', 'Cambiar: {p}', { p: p.tit }))}"><img src="${esc(st.urls[p.k])}" alt=""><span>${esc(p.k === 'frente' ? t('prog_frente', 'Frente') : p.k === 'dorso' ? t('prog_dorso', 'Dorso') : t('prog_selfie', 'Selfie'))}</span></button></li>`).join('')}</ul>
+        <form class="idn-form" id="idnForm" novalidate>
+          <div class="idn-fila">${campo('nombre', t('c_nombre', 'Nombre'), 'autocomplete="given-name" autocapitalize="words" maxlength="80" required')}${campo('apellido', t('c_apellido', 'Apellido'), 'autocomplete="family-name" autocapitalize="words" maxlength="80" required')}</div>
+          ${campo('dni', t('c_dni', 'Número de documento'), 'inputmode="numeric" autocomplete="off" maxlength="16" required')}
+          <label class="idn-acepto"><input type="checkbox" name="acepto" id="idn-acepto" required><span>${esc(t('acepto', 'Acepto que BAIREN use estas fotos solo para verificarme y las borre al terminar (Ley 25.326).'))}</span></label>
+          <details class="idn-como"><summary>${esc(t('como_t', '¿Cómo cuidamos tus fotos?'))}</summary><p>${esc(t('como_p', 'Se guardan en un lugar privado. Solo las ve el equipo de BAIREN y se borran apenas terminamos la revisión. Para pedir que borremos tus datos, escribinos a portal@bairengroup.com.'))}</p></details>
+        </form>`,
+      acc: `<button type="submit" form="idnForm" class="p-btn p-btn-fill idn-prim" data-mandar>${esc(t('mandar', 'Mandar'))}</button>${confianza()}` });
+    caja.querySelectorAll('[data-ir]').forEach(b => b.addEventListener('click', () => ir(Number(b.dataset.ir))));
+    $('idnForm').addEventListener('submit', ev => { ev.preventDefault(); mandar(); });
+  }
+  function guardarDatos(){ const f = $('idnForm'); if (!f) return; ['nombre', 'apellido', 'dni'].forEach(k => { st.datos[k] = f.elements[k].value; }); }
+  async function mandar(){
+    if (st.enviando) return;
+    const f = $('idnForm'); guardarDatos();
+    const nombre = f.elements.nombre.value.trim(), apellido = f.elements.apellido.value.trim(), dni = f.elements.dni.value.replace(/[^0-9a-z]/gi, '');
+    if (!nombre) return BP.errorCampo('idn-nombre', t('err_nombre_f', 'Escribí tu nombre como figura en el documento.'));
+    if (!apellido) return BP.errorCampo('idn-apellido', t('err_apellido_f', 'Escribí tu apellido como figura en el documento.'));
+    if (!/^[0-9a-z]{6,12}$/i.test(dni)) return BP.errorCampo('idn-dni', t('err_dni', 'Revisá el número de documento.'));
+    if (!f.elements.acepto.checked) return BP.errorCampo('idn-acepto', t('err_consent', 'Para mandar las fotos, marcá que estás de acuerdo.'));
+    const btn = caja.querySelector('[data-mandar]'), txt = btn.textContent;
+    st.enviando = true; btn.disabled = true; btn.setAttribute('aria-busy', 'true'); caja.querySelector('.idn-err').hidden = true;
+    try {
+      await I.solicitar({ frente: st.blobs.frente, dorso: st.blobs.dorso, selfie: st.blobs.selfie, nombre, apellido, dni, consentimiento: true,
+        progreso: (i, n) => { btn.textContent = tf('subiendo', 'Subiendo {i} de {n}…', { i, n }); } });
+      Object.values(st.urls).forEach(u => { try { URL.revokeObjectURL(u); } catch (e) {} });
+      st.blobs = {}; st.urls = {}; st.datos = {};
+      st.estado = await I.estado({ fresco: true });
+      pintarEstado();
+      if (st.prof > 0) { const n = st.prof; st.saltando = true; st.prof = 0; history.go(-n); }
+      BP.toast(t('mandadas', 'Listo.'));
+    } catch (e) {
+      btn.disabled = false; btn.removeAttribute('aria-busy'); btn.textContent = txt;
+      errorEn((e && e.message) || t('err_mandar', 'No pudimos mandar las fotos. Probá de nuevo.'));
+    } finally { st.enviando = false; }
+  }
+
+  /* ── arranque ──────────────────────────────────────────── */
+  try { history.replaceState({ idn: null, prof: 0 }, ''); } catch (e) {}
+  try { st.estado = await I.estado({ fresco: true }); }
+  catch (e) { listo(); BP.estadoError(caja, (e && e.message) || t('err_cargar', 'No pudimos ver el estado de tu identidad.')); return; }
+  pintarEstado();
+})();
+});
+</script>
+</body>
+</html>
