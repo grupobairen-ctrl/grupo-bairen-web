@@ -21,7 +21,7 @@
   BP.probePretty = async function(){ try { const k = sessionStorage.getItem('bp_pretty'); if (k !== null) { BP.pretty = k === '1'; return BP.pretty; } const r = await fetch(new URL('_rewrite-probe', document.baseURI).href, { method: 'HEAD', cache: 'no-store' }); BP.pretty = r.ok && (r.headers.get('x-bp-rewrite') === '1'); sessionStorage.setItem('bp_pretty', BP.pretty ? '1' : '0'); if (BP.pretty && document.getElementById('pHeader') && document.querySelector('.navbar')) { BP.header(BP._active); if (window.BPStore && window.BPStore.ready) window.BPStore.ready.then(() => BP.applySession(window.BPStore.session, window.BPStore.mode)); } } catch (e) { BP.pretty = false; } return BP.pretty; };
   const TIPO_PLURAL = { departamento:'departamentos', piso:'pisos', ph:'ph', casa:'casas', todos:'propiedades' };
   const OP_SLUG = { venta:'venta', alquiler:'alquiler', mediano:'alquiler-mediano-plazo', largo:'alquiler-largo-plazo' };
-  BP.urlBuscar = function(f){ f = f || {}; const p = new URLSearchParams(); if (f.op) p.set('op', f.op); if (f.tipo && f.tipo !== 'departamento') p.set('tipo', f.tipo); (f.zonas || (f.zona ? [f.zona] : [])).forEach(z => p.append('zona', z)); Object.keys(f).forEach(k => { if (['op','tipo','zona','zonas'].indexOf(k) === -1 && f[k] != null && f[k] !== '' && f[k] !== false) p.set(k, f[k] === true ? '1' : f[k]); });
+  BP.urlBuscar = function(f){ f = f || {}; const p = new URLSearchParams(); if (f.op) p.set('op', f.op); if (f.tipo && f.tipo !== 'todos') p.set('tipo', f.tipo); (f.zonas || (f.zona ? [f.zona] : [])).forEach(z => p.append('zona', z)); Object.keys(f).forEach(k => { if (['op','tipo','zona','zonas'].indexOf(k) === -1 && f[k] != null && f[k] !== '' && f[k] !== false) p.set(k, f[k] === true ? '1' : f[k]); });
     if (BP.pretty && f.op && (!f.zonas || f.zonas.length <= 1) && !f.q && !f.pub) { const zona = f.zona || (f.zonas && f.zonas[0]); const rest = new URLSearchParams(p); rest.delete('op'); rest.delete('tipo'); rest.delete('zona'); const path = TIPO_PLURAL[f.tipo || 'departamento'] + '-' + OP_SLUG[f.op] + (zona ? '-' + BP.zonaSlug(zona) : '-buenos-aires'); return path + (rest.toString() ? '?' + rest.toString() : ''); }
     return 'buscar.html' + (p.toString() ? '?' + p.toString() : ''); };
   BP.parsePretty = function(){ const m = location.pathname.match(/\/(departamentos|pisos|ph|casas|propiedades)-(venta|alquiler-mediano-plazo|alquiler-largo-plazo|alquiler)-([a-z0-9-]+)$/); if (!m) return null; const tipo = { departamentos:'departamento', pisos:'piso', ph:'ph', casas:'casa', propiedades:'todos' }[m[1]]; const op = m[2] === 'alquiler-mediano-plazo' ? 'mediano' : m[2] === 'alquiler-largo-plazo' ? 'largo' : m[2]; const zona = m[3] === 'buenos-aires' ? null : BP.zonaFromSlug(m[3]); return { tipo, op, zona }; };
@@ -374,7 +374,11 @@
     || null;
 
   /* ── Header ─────────────────────────────────────────────── */
-  BP.header = function(active){ BP._active = active;
+  /* 8/10/2026 · Arranque sin pantallazo: cada página arranca en navy (html.arrancando, en línea en el <head>) y se
+     muestra entera cuando ya están el encabezado y la barra de abajo, que los dibuja este archivo. Antes se veía un
+     instante el video de la portada a pantalla completa, sin barras ni título. */
+  BP.listo = () => { requestAnimationFrame(() => requestAnimationFrame(() => document.documentElement.classList.remove('arrancando'))); };
+  BP.header = function(active){ BP._active = active; setTimeout(BP.listo, 150);
     const dd = (ttl, items, ancha) => `<div class="col${ancha ? ' ancha' : ''}"><div class="p-dd-ttl">${ttl}</div>` + items.map(i=>`<a href="${i[1]}"${i[2]?` data-op="${i[2]}" data-zona="${BP.esc(i[3])}"`:''}>${i[0]}<span class="p-dd-n" hidden></span></a>`).join('') + `</div>`;
     const zonasLinks = op => BP.ZONAS.map(z=>[BP.zonaLabel(z), BP.urlBuscar({ op, zona: z }), op, z]);
     const html = `
@@ -510,6 +514,7 @@
 </footer>`;
     const host = document.getElementById('pFooter'); if (host) host.innerHTML = html;
     BP.tabbar();
+    BP.listo();
   };
 
   /* ── 8/10/2026 · Tanda 2 · La barra de abajo, como una app (sólo en el celular, por CSS: menos de 860 px) ──
