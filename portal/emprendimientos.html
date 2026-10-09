@@ -32,6 +32,16 @@
     .p-emp-us .res{font:500 .8125rem/1 var(--font-body);letter-spacing:.01em;text-transform:none;color:var(--text-mid)}
     .p-emp-todos{display:inline-block;margin:0 0 16px}
     .p-emp-us a > span{white-space:nowrap}
+    /* 9/10/2026 · Lista de espera (migración 34): un botón discreto que pasa a "Te avisamos"; la desarrolladora ve cuántos esperan */
+    .p-emp-aviso{min-height:44px;margin-top:6px}
+    .p-emp-avisame{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0;background:none;border:0;font:400 .9rem/1.2 var(--font-body);color:var(--navy-deeper);cursor:pointer;text-decoration:underline;text-decoration-color:rgba(194,169,104,.8);text-underline-offset:4px;-webkit-tap-highlight-color:transparent}
+    .p-emp-avisame svg{flex:0 0 auto;width:17px;height:17px;color:#75623C}
+    .p-emp-avisame:hover{text-decoration-color:currentColor}
+    .p-emp-avisame[aria-pressed="true"]{text-decoration:none;color:#75623C;font-weight:500}
+    .p-emp-avisame[aria-busy="true"]{opacity:.55;cursor:progress}
+    .p-emp-avisame:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+    .p-emp-espera{display:flex;align-items:center;gap:8px;min-height:44px;margin:0;font:400 .875rem/1.35 var(--font-body);color:var(--text-mid)}
+    .p-emp-espera svg{flex:0 0 auto;width:16px;height:16px;color:#75623C}
     @media(max-width:760px){.p-emp{grid-template-columns:1fr}.p-emp > .units{padding:0 16px 4px}.p-emp-us a{grid-template-columns:minmax(0,1fr) auto auto minmax(96px,auto);font-size:.86rem;gap:12px}.p-emp-us .pr{font-size:.95rem}}
   </style>
 </head>
@@ -45,7 +55,7 @@
   <div id="lista"><div class="p-skel" style="height:260px;border-radius:var(--p-radius);background:#EEE9DD"></div></div>
 </div></section>
 <div id="pFooter"></div>
-<script src="supabase-portal.js?v=20261009d" defer></script><script src="js/errores.js?v=20261009d" defer></script><script src="../mapa-barrios.js?v=20261009d" defer></script><script src="js/bairen-motion.js?v=20261009d" defer></script><script src="js/i18n-portal.js?v=20261009d" defer></script><script src="js/ui.js?v=20261009d" defer></script><script src="js/store.js?v=20261009d" defer></script><script src="js/data.js?v=20261009d" defer></script>
+<script src="supabase-portal.js?v=20261009c" defer></script><script src="js/errores.js?v=20261009c" defer></script><script src="../mapa-barrios.js?v=20261009c" defer></script><script src="js/bairen-motion.js?v=20261009c" defer></script><script src="js/i18n-portal.js?v=20261009c" defer></script><script src="js/ui.js?v=20261009c" defer></script><script src="js/store.js?v=20261009c" defer></script><script src="js/data.js?v=20261009c" defer></script><script src="js/digital.js?v=20261009c" defer></script><script src="js/dg-inversores.js?v=20261009c" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -64,6 +74,8 @@ document.addEventListener('DOMContentLoaded', function(){
   const ETAPA = { pozo: BP.t('emp_pozo', 'En pozo'), construccion: BP.t('emp_construccion', 'En construcción'), terminado: BP.t('emp_terminado', 'Terminado') };
   const el = document.getElementById('lista');
   if (!emps.length) { el.innerHTML = `<div class="p-empty">${BP.tf('emp_vacio', 'Todavía no hay desarrollos publicados{donde}. Si sos desarrolladora, <a href="publicar.html#desarrolladora" style="text-decoration:underline">publicá el tuyo</a>.', { donde: zona ? BP.tf('emp_vacio_en', ' en {z}', { z: BP.esc(BP.zonaLabel(zona)) }) : '' })}</div>`; return; }
+  /* 9/10/2026 · "Avisame cuando haya novedades" (lista de espera, js/dg-inversores.js). Solo con BAIREN digital prendido. */
+  const avisar = !!(window.BPDigital && BPDigital.activo() && BPDigital.sumarmeLista);
   const fila = u => `<li><a href="${BP.urlFicha(u)}"><span class="u">${BP.esc(u.unidad || BPData.titulo(u))}</span><span>${u.amb ? (u.amb === 1 ? BP.t('emp_amb_1', '1 amb.') : BP.tf('emp_amb', '{n} amb.', { n: u.amb })) : ''}</span><span>${u.m2 ? u.m2 + ' m²' : ''}</span><span class="pr">${u.reservado ? `<span class="res">${BP.t('card_reservada', 'Reservada')}</span>` : u.precio ? BP.fmtUSD(u.precio) : BP.t('ui_consultar', 'Consultar')}</span></a></li>`;
   el.innerHTML = (solo ? `<a class="p-link p-emp-todos" href="emprendimientos.html">${BP.t('emp_ver_todos', 'Ver todos los desarrollos')}</a>` : '') + emps.map(e => { const pub = BPData.pub(e.publicadorId); return `<article class="p-emp" data-emp="${BP.esc(e.nombre)}">
     <div class="ph">${e.foto ? `<img src="${BP.sbImg(e.foto, 900)}" alt="${BP.esc(e.nombre)}">` : ''}<span class="tag">${ETAPA[e.etapa] || ETAPA.construccion}${e.entrega ? BP.tf('emp_entrega', ' · entrega {d}', { d: BP.esc(BPData.mesTr(e.entrega)) }) : ''}</span></div>
@@ -72,8 +84,50 @@ document.addEventListener('DOMContentLoaded', function(){
       <div class="facts"><span>${e.unidades.length === 1 ? BP.t('emp_unidad_1', '1 unidad') : BP.tf('emp_unidades', '{n} unidades', { n: e.unidades.length })}</span>${e.ambmin ? `<span>${e.ambmin === e.ambmax ? (e.ambmin === 1 ? BP.t('emp_amb_1', '1 amb.') : BP.tf('emp_amb', '{n} amb.', { n: e.ambmin })) : BP.tf('emp_amb_rango', '{a} a {b} amb.', { a: e.ambmin, b: e.ambmax })}</span>` : ''}${e.m2min ? `<span>${e.m2min === e.m2max ? e.m2min + ' m²' : BP.tf('emp_m2_rango', '{a} a {b} m²', { a: e.m2min, b: e.m2max })}</span>` : ''}</div>
       <div class="p-publine">${BP.t('card_publica', 'Publica')} <b>${BP.esc(BPData.nombreVisible(BPData.pubNombre(pub)))}</b> ${BPData.badgeHTML(pub)}${pub.demo ? '<span class="p-badge demo">' + BP.t('card_ejemplo', 'Ejemplo') + '</span>' : ''}</div>
       <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">${pub.whatsapp ? `<a class="p-btn p-btn-sm p-btn-dark" href="https://wa.me/${encodeURIComponent(pub.whatsapp)}?text=${encodeURIComponent(BP.tf('emp_wa_msg', 'Hola, vi {t} en BAIREN y quiero más información.', { t: e.nombre }))}" target="_blank" rel="noopener" aria-label="${BP.esc(BP.tf('card_wa_aria', 'Escribir por WhatsApp a {p}', { p: BPData.pubNombre(pub) }))}" data-wa data-aviso="${BP.esc(e.key)}" data-pub="${BP.esc(pub.storeId || pub.id)}">${BP.ico.wa} WhatsApp</a>` : ''}${pub.email ? `<a class="p-btn p-btn-sm p-btn-navy" href="mailto:${encodeURIComponent(pub.email)}?subject=${encodeURIComponent(BP.tf('emp_mail_subject', 'Consulta por {t} desde BAIREN', { t: e.nombre }))}">${BP.ico.mail} ${BP.t('card_contactar', 'Contactar')}</a>` : '<span class="p-sincontacto">' + BP.t('card_contacto_pendiente', 'Contacto pendiente') + '</span>'}</div>
+      ${avisar ? `<div class="p-emp-aviso" data-aviso-emp="${BP.esc(e.nombre)}" data-aviso-pub="${BP.esc(pub.storeId || e.publicadorId || '')}"></div>` : ''}
     </div>
     <details class="units"${solo ? ' open' : ''}><summary>${e.unidades.length === 1 ? BP.t('emp_ver_unidad_1', 'Ver la unidad') : BP.tf('emp_ver_unidades', 'Ver las {n} unidades', { n: e.unidades.length })}</summary><ul class="p-emp-us">${e.unidades.map(fila).join('')}</ul></details></article>`; }).join('');
+  if (avisar) await montarAvisos();
+
+  /* Sin sesión, "Avisame" lleva a ingresar y vuelve acá con ?avisame=<desarrollo>: ahí se suma sola a la lista */
+  async function montarAvisos(){
+    const D = BPDigital, ses = BPStore.session, q = BP.qs();
+    const tx = { si: BP.t('dg_desarrollos_avisame', 'Avisame'), ya: BP.t('dg_desarrollos_te_avisamos', 'Te avisamos'), enviando: BP.t('dg_desarrollos_enviando', 'Enviando…') };
+    const pintar = (b, en) => { b.setAttribute('aria-pressed', en ? 'true' : 'false'); b.innerHTML = en ? `<span>${BP.esc(tx.ya)}</span>${BP.ico.check}` : `${BP.ico.bell}<span>${BP.esc(tx.si)}</span>`; };
+    const rotulo = emp => BP.tf('dg_desarrollos_avisame_aria', 'Avisame cuando haya novedades de {e}', { e: emp });
+    if (ses && q.get('avisame')) {
+      const emp = q.get('avisame'), pub = q.get('avisame_pub') || null;
+      try { await D.sumarmeLista(emp, pub); BP.toast(BP.t('dg_desarrollos_ok', 'Listo, te avisamos.')); }
+      catch (err) { BP.toast(err.message || String(err), 'error'); }
+      try { const u = new URL(location.href); u.searchParams.delete('avisame'); u.searchParams.delete('avisame_pub'); history.replaceState(history.state, '', u.pathname + u.search + u.hash); } catch (e2) { /* nada */ }
+    }
+    const [mias, mio, cuentas] = await Promise.all([D.misListas().catch(() => []), ses ? BPStore.getMyPublicador().catch(() => null) : null, ses ? D.listasEspera().catch(() => []) : []]);
+    const en = new Set(mias.map(x => x.publicador_id + '|' + x.emprendimiento));
+    document.querySelectorAll('[data-aviso-emp]').forEach(box => {
+      const emp = box.dataset.avisoEmp, pubId = box.dataset.avisoPub;
+      if (mio && pubId && (mio.id === pubId || mio.slug === pubId)) {
+        const c = cuentas.find(x => x.emprendimiento === emp && x.publicador_id === pubId), n = c ? c.total : 0;
+        box.innerHTML = `<p class="p-emp-espera">${BP.ico.bell}<span>${BP.esc(n === 1 ? BP.t('dg_desarrollos_espera_1', '1 persona espera novedades') : BP.tf('dg_desarrollos_espera_n', '{n} personas esperan novedades', { n }))}</span></p>`;
+        return;
+      }
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'p-emp-avisame';
+      b.setAttribute('aria-label', rotulo(emp)); b.title = rotulo(emp);
+      pintar(b, en.has(pubId + '|' + emp)); box.appendChild(b);
+      b.addEventListener('click', async () => {
+        if (!BPStore.session) {
+          const u = new URL(location.href); u.searchParams.set('avisame', emp); if (pubId) u.searchParams.set('avisame_pub', pubId);
+          location.href = 'ingresar.html?volver=' + encodeURIComponent('emprendimientos.html' + u.search); return;
+        }
+        if (b.getAttribute('aria-busy') === 'true') return;
+        const ya = b.getAttribute('aria-pressed') === 'true'; b.setAttribute('aria-busy', 'true'); b.disabled = true; b.innerHTML = `<span>${BP.esc(tx.enviando)}</span>`;
+        try {
+          if (ya) { await D.salirLista(emp, pubId || null); pintar(b, false); BP.toast(BP.t('dg_desarrollos_baja', 'Listo, no te avisamos más.')); }
+          else { await D.sumarmeLista(emp, pubId || null); pintar(b, true); BP.toast(BP.t('dg_desarrollos_ok', 'Listo, te avisamos.')); }
+        } catch (err) { pintar(b, ya); BP.toast(err.message || String(err), 'error'); }
+        b.removeAttribute('aria-busy'); b.disabled = false;
+      });
+    });
+  }
 })();
 });
 </script>

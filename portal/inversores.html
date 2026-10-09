@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Membresía Inversor · BAIREN</title>
+  <meta name="description" content="Lanzamientos antes que nadie, unidades fuera de portal e informes de rentabilidad por zona.">
+  <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#131D2D">
+  <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
+  <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css?v=20261009c"><link rel="stylesheet" href="css/catalogo.css?v=20261009c"><link rel="stylesheet" href="css/portal.css?v=20261009c"><link rel="stylesheet" href="css/transiciones.css?v=20261009c"><style>@view-transition{navigation:auto}</style><style>html.arrancando body{opacity:0}body{transition:opacity .18s cubic-bezier(.22,1,.36,1)}@media(prefers-reduced-motion:reduce){body{transition:none}}</style><script>/* 8/10/2026 · Arranque sin pantallazo (ver BP.listo en ui.js): siempre, salvo al entrar a una ficha desde el portal (ahí la foto de la tarjeta crece hasta la ficha); en Safari del iPhone la transición entre páginas no tapaba el video al tocar el logo. Tope: 800 ms. */(function(){try{var h=document.documentElement,n=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{},r=document.referrer||'';if(r.indexOf(location.origin)===0&&n.type!=='reload'&&/propiedad/.test(location.pathname))return;h.classList.add('arrancando');setTimeout(function(){h.classList.remove('arrancando')},800)}catch(e){}})()</script>
+  <link rel="stylesheet" href="css/inversores.css?v=20261009c">
+</head>
+<!-- 9/10/2026 · Membresía Inversor (migración 34). Una página corta: título, tres beneficios, precio y un solo botón; la
+     letra chica, plegada. El estado de la membresía va en una línea arriba del botón. Con ?admin, la plataforma ve las
+     solicitudes y los miembros (activar, extender, pausar) y las listas de espera de los desarrollos.
+     Apagada para el público: sin BPDigital.activo() muestra "Muy pronto". Los datos, en js/dg-inversores.js. -->
+<body class="p-product p-inversores">
+<div class="p-velo" aria-hidden="true"><span class="w">BAIREN</span></div>
+<div id="pHeader"></div>
+<main class="inv" id="contenido" aria-busy="true">
+  <div class="inv-in" aria-hidden="true"><span class="inv-sk inv-sk-sobre"></span><span class="inv-sk inv-sk-h1"></span><span class="inv-sk inv-sk-txt"></span><span class="inv-sk inv-sk-txt"></span></div>
+</main>
+<div id="pFooter"></div>
+
+<script src="supabase-portal.js?v=20261009c" defer></script><script src="js/errores.js?v=20261009c" defer></script>
+<script src="../mapa-barrios.js?v=20261009c" defer></script>
+<script src="js/bairen-motion.js?v=20261009c" defer></script><script src="js/i18n-portal.js?v=20261009c" defer></script><script src="js/ui.js?v=20261009c" defer></script><script src="js/store.js?v=20261009c" defer></script>
+<script src="js/digital.js?v=20261009c" defer></script><script src="js/dg-inversores.js?v=20261009c" defer></script>
+<script src="js/data.js?v=20261009c" defer></script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+(async function(){
+  'use strict';
+  const t = (k, d) => BP.t('dg_desarrollos_' + k, d), tf = (k, d, v) => BP.tf('dg_desarrollos_' + k, d, v), esc = BP.esc;
+  const $ = id => document.getElementById(id);
+  const QUIETO = (() => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } })();
+  const main = $('contenido');
+  const fin = () => main.removeAttribute('aria-busy');
+  const dia = s => { const f = s ? new Date(s) : null; return f && !isNaN(f) ? f.toLocaleDateString('es-AR', { day: 'numeric', month: 'numeric', year: 'numeric' }) : ''; };
+  const precioTxt = p => p ? BP.fmtPrecio(+p.precio, p.moneda) : '';
+  const periodoTxt = p => p && p.periodo === 'anio' ? t('por_anio', 'por año') : t('por_mes', 'por mes');
+  const msj = e => String((e && e.message) || e || '') || t('err', 'No pudimos hacerlo. Probá de nuevo.');
+
+  BP.header(); BP.footer(); if (window.BPStore) BPStore.init(); await BPStore.ready;
+  document.title = t('doc', 'Membresía Inversor') + ' · BAIREN';
+  const D = window.BPDigital;
+  const vacio = (titulo, texto, btn) => { main.innerHTML = `<div class="inv-in"><div class="p-empty inv-vacio"><b>${esc(titulo)}</b><p>${esc(texto)}</p>${btn || ''}</div></div>`; fin(); };
+  if (!D || !D.activo() || !D.membresia) return vacio(t('pronto_t', 'Muy pronto'), t('pronto_p', 'Estamos preparando algo nuevo para BAIREN.'), `<a class="p-btn" href="index.html">${esc(t('volver', 'Volver al inicio'))}</a>`);
+
+  /* Hoja de abajo en el celular, panel centrado en la compu: foco atrapado, Escape, el botón Atrás del celular la
+     cierra (history.pushState, como la hoja del buscador de la portada) y el foco vuelve al que la abrió. Con
+     o.enviar, la hoja espera la respuesta: el botón pasa a "Enviando…" y, si falla, queda abierta con el aviso. */
+  const hoja = o => new Promise(res => {
+    const id = 'invH' + Math.random().toString(36).slice(2, 8); let valor = null, ida = false, conHistoria = false;
+    const w = document.createElement('div'); w.className = 'inv-velo';
+    w.innerHTML = `<div class="inv-hoja" role="dialog" aria-modal="true" aria-labelledby="${id}">
+      <div class="inv-hoja-cab"><h2 class="inv-hoja-t" id="${id}">${esc(o.titulo)}</h2><button type="button" class="inv-x" data-cerrar aria-label="${esc(t('cerrar', 'Cerrar'))}">${BP.ico.x}</button></div>
+      <form class="inv-form" novalidate>${o.cuerpo || ''}<div class="inv-acts"><button type="button" class="p-btn" data-cerrar>${esc(t('cancelar', 'Cancelar'))}</button><button type="submit" class="p-btn p-btn-fill${o.peligro ? ' inv-peligro' : ''}">${esc(o.ok)}</button></div></form></div>`;
+    document.body.appendChild(w); document.documentElement.classList.add('inv-quieta');
+    requestAnimationFrame(() => requestAnimationFrame(() => w.classList.add('on')));
+    try { history.pushState({ invHoja: 1 }, '', location.href); conHistoria = true; } catch (e) { conHistoria = false; }
+    const caja = w.querySelector('.inv-hoja'), form = w.querySelector('form'), ok = form.querySelector('[type=submit]');
+    const alVolver = () => { conHistoria = false; cerrar(); };
+    addEventListener('popstate', alVolver);
+    const quitar = () => {
+      if (ida) return; ida = true; removeEventListener('popstate', alVolver);
+      w.classList.remove('on'); document.documentElement.classList.remove('inv-quieta'); setTimeout(() => w.remove(), QUIETO ? 0 : 240);
+      if (conHistoria) { conHistoria = false; try { history.back(); } catch (e) { /* nada */ } }
+      res(valor);
+    };
+    let soltar = BP.focoAtrapado(caja, { primero: caja.querySelector('input') || ok, alCerrar: quitar });
+    function cerrar(){ if (soltar) { const f = soltar; soltar = null; f(); } else quitar(); }
+    w.addEventListener('mousedown', e => { if (e.target === w) cerrar(); });
+    caja.querySelectorAll('[data-cerrar]').forEach(b => b.addEventListener('click', cerrar));
+    form.addEventListener('submit', async e => {
+      e.preventDefault(); if (ok.disabled) return;
+      const v = {}; form.querySelectorAll('input').forEach(i => { v[i.name] = i.value.trim(); });
+      if (o.validar && o.validar(v, form)) return;
+      if (o.enviar) {
+        const txt = ok.textContent; ok.disabled = true; ok.textContent = t('enviando', 'Enviando…');
+        try { await o.enviar(v); } catch (err) { ok.disabled = false; ok.textContent = txt; BP.toast(msj(err), 'error'); return; }
+      }
+      valor = v; cerrar();
+    });
+  });
+
+  if (BP.qs().has('admin')) return admin();
+  return publico();
+
+  /* ── La página de la membresía ───────────────────────────────────────────────────────────────────────── */
+  async function publico(){
+    const ses = BPStore.session; let r;
+    try {
+      if (ses && BP.qs().get('quiero') === '1') {
+        try { const u = new URL(location.href); u.searchParams.delete('quiero'); history.replaceState(history.state, '', u.pathname + u.search + u.hash); } catch (e) { /* nada */ }
+        r = await D.solicitarMembresia(); BP.toast(t('ok_pedida', 'Listo, recibimos tu pedido.'));
+      } else r = await D.membresia();
+    } catch (e) { fin(); return BP.estadoError(main, t('err_cargar', 'No pudimos cargar la membresía.'), () => location.reload()); }
+    pintar(r);
+  }
+
+  function pintar(r){
+    const ses = BPStore.session, p = r.plan || {}, m = r.membresia, est = m ? m.estado : null;
+    const urlIngresar = 'ingresar.html?volver=' + encodeURIComponent('inversores.html?quiero=1');
+    /* El estado en una línea; un solo botón, fijo abajo en el celular (con el precio, como un total) */
+    const ESTADO = {
+      solicitada: [t('e_solicitada', 'Pedido recibido · te escribimos para activarla'), 'e-solicitada'],
+      activa: [tf('e_activa', 'Sos miembro · hasta el {f}', { f: dia(m && m.hasta) }), 'e-activa'],
+      pausada: [t('e_pausada', 'Tu membresía está en pausa'), 'e-pausada'],
+      vencida: [tf('e_vencida', 'Tu membresía venció el {f}', { f: dia(m && m.hasta) }), 'e-vencida']
+    };
+    const accion = !ses ? { txt: t('cta', 'Ser miembro'), href: urlIngresar }
+      : !est ? { txt: t('cta', 'Ser miembro'), pedir: true }
+      : est === 'activa' ? { txt: t('cta_explorar', 'Ver lanzamientos'), href: 'explorar.html' }
+      : est === 'pausada' ? { txt: t('cta_reactivar', 'Reactivar'), pedir: true }
+      : est === 'vencida' ? { txt: t('cta_renovar', 'Renovar'), pedir: true } : null;
+    const confianza = est === 'activa' ? '' : est === 'solicitada' ? tf('conf_solicitada', 'Te escribimos a {m} para coordinar el pago.', { m: ses.email || t('tu_mail', 'tu mail') }) : t('conf', 'Hoy no se cobra nada: te escribimos para activarla.');
+    const BEN = [t('b1', 'Los lanzamientos, 48 horas antes que nadie.'), t('b2', 'Unidades que no salen al portal.'), t('b3', 'Informes de rentabilidad por zona.')];
+    const precio = p.precio != null ? `<p class="inv-precio"><b>${esc(precioTxt(p))}</b><span>${esc(periodoTxt(p))}</span></p>` : '';
+    const boton = accion ? (accion.href ? `<a class="p-btn p-btn-fill inv-cta" href="${esc(accion.href)}">${esc(accion.txt)}</a>` : `<button type="button" class="p-btn p-btn-fill inv-cta" id="invPedir">${esc(accion.txt)}</button>`) : '';
+    const conf = confianza ? `<p class="inv-conf">${esc(confianza)}</p>` : '';
+    main.classList.toggle('con-barra', !!accion);
+    main.innerHTML = `<div class="inv-in">
+      <header class="inv-cab">
+        <p class="inv-sobre">${esc(t('sobre', 'Membresía Inversor'))}</p>
+        <h1 class="inv-h1">${t('h1', 'Llegá <em>antes</em> a cada lanzamiento.')}</h1>
+      </header>
+      <ul class="inv-ben">${BEN.map((b, i) => `<li style="--i:${i}">${esc(b)}</li>`).join('')}</ul>
+      <div class="inv-pie">
+        ${est ? `<p class="inv-estado ${ESTADO[est][1]}" role="status">${esc(ESTADO[est][0])}</p>` : ''}
+        ${accion ? `<div class="inv-barra p-barra-fija">${precio}${boton}${conf}</div>` : precio + conf}
+      </div>
+      <details class="inv-letra">
+        <summary>${esc(t('letra', '¿Cómo funciona?'))}</summary>
+        <ul>
+          <li>${esc(t('l1', 'Se paga por mes. Por ahora la activamos a mano.'))}</li>
+          <li>${esc(t('l2', 'Cada lanzamiento se abre al público 48 horas después.'))}</li>
+          <li>${esc(t('l3', 'Tus búsquedas salen destacadas y verificadas.'))}</li>
+          <li>${esc(t('l4', 'Si consultás en pozo, quien vende sabe que sos miembro.'))}</li>
+          <li>${esc(t('l5', 'La das de baja cuando quieras: portal@bairengroup.com.'))}</li>
+        </ul>
+      </details>
+    </div>`;
+    fin();
+    const b = $('invPedir');
+    if (b) b.addEventListener('click', async () => {
+      const txt = b.textContent; b.disabled = true; b.textContent = t('enviando', 'Enviando…');
+      try { const r2 = await D.solicitarMembresia(); BP.toast(t('ok_pedida', 'Listo, recibimos tu pedido.')); pintar(r2); const e = main.querySelector('.inv-estado'); if (e) { e.tabIndex = -1; e.focus({ preventScroll: true }); } }
+      catch (e) { b.disabled = false; b.textContent = txt; BP.toast(msj(e), 'error'); }
+    });
+  }
+
+  /* ── La plataforma: solicitudes, miembros y listas de espera ─────────────────────────────────────────── */
+  async function admin(){
+    if (!BPStore.requireSession()) return;
+    let lista, listas, plan;
+    const cargar = async () => { [lista, listas, plan] = await Promise.all([D.membresiasAdmin(), D.listasEspera().catch(() => []), D.membresia().then(r => r.plan).catch(() => null)]); };
+    try { await cargar(); }
+    catch (e) { return vacio(t('solo_equipo_t', 'Solo para el equipo de BAIREN'), t('solo_equipo_p', 'Esta pantalla la usan curación y soporte.'), `<a class="p-btn" href="inversores.html">${esc(t('ver_membresia', 'Ver la membresía'))}</a>`); }
+    const abiertos = {};
+    const pill = m => {
+      const txt = { solicitada: t('p_solicitada', 'Por activar'), activa: tf('p_activa', 'Activa · hasta el {f}', { f: dia(m.hasta) }), pausada: t('p_pausada', 'En pausa'), vencida: tf('p_vencida', 'Venció el {f}', { f: dia(m.hasta) }) }[m.estado] || m.estado;
+      return `<span class="inv-pill e-${esc(m.estado)}">${esc(txt)}</span>`;
+    };
+    const fila = m => `<li class="inv-fila">
+      <div class="inv-fila-txt"><b>${esc(m.nombre || m.email || '')}</b><span>${esc(m.email || '')}</span>${pill(m)}</div>
+      <div class="inv-fila-acc">${m.estado === 'activa'
+        ? `<button type="button" class="inv-link" data-activar="${esc(m.id)}">${esc(t('extender', 'Extender'))}</button><button type="button" class="inv-link" data-pausar="${esc(m.id)}">${esc(t('pausar', 'Pausar'))}</button>`
+        : `<button type="button" class="p-btn p-btn-sm" data-activar="${esc(m.id)}">${esc(t('activar', 'Activar'))}</button>`}</div></li>`;
+    const grupo = (k, titulo, filas, vacioTxt) => {
+      const ver = abiertos[k] ? filas : filas.slice(0, 3);
+      return `<section class="inv-sec" aria-labelledby="sec-${k}"><h2 class="inv-h2" id="sec-${k}">${esc(titulo)}<span class="inv-n">${filas.length}</span></h2>
+        ${filas.length ? `<ul class="inv-filas">${ver.map(fila).join('')}</ul>${filas.length > 3 && !abiertos[k] ? `<button type="button" class="inv-link inv-mas" data-mas="${k}">${esc(tf('ver_todos', 'Ver los {n}', { n: filas.length }))}</button>` : ''}`
+          : `<p class="inv-nota">${esc(vacioTxt)}</p>`}</section>`;
+    };
+    const esperaHTML = () => listas.length ? `<ul class="inv-filas">${listas.map(l => `<li class="inv-fila inv-espera" data-emp="${esc(l.emprendimiento)}" data-pub="${esc(l.publicador_id || '')}">
+        <div class="inv-fila-txt"><b>${esc(l.emprendimiento)}</b><span>${esc([l.publicador_nombre, l.total === 1 ? t('espera_1', '1 espera') : tf('espera_n', '{n} esperan', { n: l.total })].filter(Boolean).join(' · '))}</span>${l.sin_avisar ? `<span class="inv-pill e-solicitada">${esc(l.sin_avisar === 1 ? t('sin_avisar_1', '1 sin avisar') : tf('sin_avisar_n', '{n} sin avisar', { n: l.sin_avisar }))}</span>` : ''}</div>
+        <div class="inv-fila-acc"><button type="button" class="inv-link" data-quienes>${esc(t('quienes', 'Ver quiénes'))}</button>${l.sin_avisar ? `<button type="button" class="inv-link" data-avisados>${esc(t('avisados', 'Marcar avisados'))}</button>` : ''}</div>
+        <ul class="inv-quienes" hidden></ul></li>`).join('')}</ul>`
+      : `<p class="inv-nota">${esc(t('espera_vacio', 'Sin pedidos de aviso por ahora.'))}</p>`;
+    function pintarAdmin(){
+      const sol = lista.filter(m => m.estado === 'solicitada'), act = lista.filter(m => m.estado === 'activa'), resto = lista.filter(m => m.estado === 'pausada' || m.estado === 'vencida');
+      const linea = [sol.length === 1 ? t('r_sol_1', '1 pedido por activar') : tf('r_sol_n', '{n} pedidos por activar', { n: sol.length }), act.length === 1 ? t('r_act_1', '1 miembro') : tf('r_act_n', '{n} miembros', { n: act.length }), plan ? precioTxt(plan) + ' ' + periodoTxt(plan) : ''].filter(Boolean).join(' · ');
+      main.innerHTML = `<div class="inv-in inv-admin">
+        <header class="inv-cab"><p class="inv-sobre">${esc(t('plataforma', 'Plataforma'))}</p><h1 class="inv-h1">${t('admin_h1', 'Membresías <em>Inversor</em>')}</h1>
+          <p class="inv-estado" role="status">${esc(linea)}</p></header>
+        ${grupo('sol', t('g_sol', 'Pedidos'), sol, t('sol_vacio', 'Sin pedidos. Los nuevos aparecen acá.'))}
+        ${grupo('act', t('g_act', 'Miembros'), act, t('act_vacio', 'Todavía no hay miembros.'))}
+        ${resto.length ? grupo('resto', t('g_resto', 'En pausa o vencidas'), resto, '') : ''}
+        <details class="inv-letra inv-sec-espera"><summary>${esc(t('g_espera', 'Listas de espera'))}<span class="inv-n">${listas.length}</span></summary>${esperaHTML()}</details>
+        <p class="inv-nota">${esc(t('admin_nota', 'Sin cobro automático todavía: activá al confirmar el pago.'))}</p>
+      </div>`;
+      fin();
+    }
+    pintarAdmin();
+    main.addEventListener('click', async e => {
+      const mas = e.target.closest('[data-mas]'); if (mas) { abiertos[mas.dataset.mas] = true; pintarAdmin(); return; }
+      const ac = e.target.closest('[data-activar]'), pa = e.target.closest('[data-pausar]'), qu = e.target.closest('[data-quienes]'), av = e.target.closest('[data-avisados]');
+      if (ac) {
+        const m = lista.find(x => x.id === ac.dataset.activar); if (!m) return;
+        const base = m.estado === 'activa' && m.hasta && new Date(m.hasta) > new Date() ? new Date(m.hasta) : new Date();
+        const def = new Date(base); def.setMonth(def.getMonth() + 1);
+        const iso = f => f.getFullYear() + '-' + String(f.getMonth() + 1).padStart(2, '0') + '-' + String(f.getDate()).padStart(2, '0');
+        const manana = new Date(Date.now() + 864e5);
+        const v = await hoja({ titulo: m.estado === 'activa' ? tf('h_extender', 'Extender a {n}', { n: m.nombre || m.email }) : tf('h_activar', 'Activar a {n}', { n: m.nombre || m.email }), ok: m.estado === 'activa' ? t('extender', 'Extender') : t('activar', 'Activar'),
+          cuerpo: `<label class="inv-campo"><span>${esc(t('f_hasta', 'Activa hasta'))}</span><input name="hasta" type="date" required value="${iso(def)}" min="${iso(manana)}"></label>
+            <label class="inv-campo"><span>${esc(t('f_ref', 'Referencia del pago'))} <small>${esc(t('opcional', '(opcional)'))}</small></span><input name="referencia" type="text" maxlength="200" autocomplete="off" placeholder="${esc(t('f_ref_ph', 'Ej.: transferencia del 9/10'))}"></label>
+            <p class="inv-nota">${esc(t('h_nota', 'Activala cuando confirmes el pago.'))}</p>`,
+          validar: (val, form) => { if (!val.hasta) { BP.errorCampo(form.querySelector('[name=hasta]'), t('err_hasta', 'Elegí hasta cuándo.')); return true; } return false; },
+          enviar: val => D.activarMembresia(m.id, val.hasta, val.referencia || null) });
+        if (!v) return;
+        BP.toast(t('ok_activa', 'Listo, membresía activa.')); await cargar().catch(() => {}); pintarAdmin();
+        return;
+      }
+      if (pa) {
+        const m = lista.find(x => x.id === pa.dataset.pausar); if (!m) return;
+        const v = await hoja({ titulo: tf('h_pausar', '¿Pausar a {n}?', { n: m.nombre || m.email }), ok: t('pausar', 'Pausar'), peligro: true,
+          cuerpo: `<p class="inv-txt">${esc(t('h_pausar_p', 'Deja de ver los lanzamientos antes. Se puede reactivar.'))}</p>`,
+          enviar: () => D.pausarMembresia(m.id) });
+        if (!v) return;
+        BP.toast(t('ok_pausa', 'Listo, en pausa.')); await cargar().catch(() => {}); pintarAdmin();
+        return;
+      }
+      const li = e.target.closest('.inv-espera');
+      if (qu && li) {
+        const ul = li.querySelector('.inv-quienes');
+        if (!ul.hidden) { ul.hidden = true; qu.textContent = t('quienes', 'Ver quiénes'); return; }
+        qu.disabled = true;
+        try {
+          const ps = await D.listaPersonas(li.dataset.emp, li.dataset.pub || null);
+          ul.innerHTML = ps.map(p => `<li><b>${esc(p.nombre || '')}</b> <span>${esc(p.email || '')}</span>${p.avisado_en ? ` <em>${esc(tf('avisado', 'avisado el {f}', { f: dia(p.avisado_en) }))}</em>` : ''}</li>`).join('');
+          ul.hidden = false; qu.textContent = t('ocultar', 'Ocultar');
+        } catch (err) { BP.toast(msj(err), 'error'); }
+        qu.disabled = false;
+        return;
+      }
+      if (av && li) {
+        av.disabled = true; av.textContent = t('enviando', 'Enviando…');
+        try { const n = await D.marcarAvisados(li.dataset.emp, li.dataset.pub || null); BP.toast(n === 1 ? t('ok_avisado_1', '1 persona marcada como avisada.') : tf('ok_avisados_n', '{n} personas marcadas como avisadas.', { n })); await cargar(); pintarAdmin(); const d = main.querySelector('.inv-sec-espera'); if (d) d.open = true; }
+        catch (err) { av.disabled = false; av.textContent = t('avisados', 'Marcar avisados'); BP.toast(msj(err), 'error'); }
+      }
+    });
+  }
+})();
+});
+</script>
+</body>
+</html>
