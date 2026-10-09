@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20261009c"><link rel="stylesheet" href="css/catalogo.css?v=20261009c"><link rel="stylesheet" href="css/portal.css?v=20261009c"><link rel="stylesheet" href="css/publicar.css?v=20261009c"><link rel="stylesheet" href="css/transiciones.css?v=20261009c"><style>@view-transition{navigation:auto}</style><style>html.arrancando body{opacity:0}body{transition:opacity .18s cubic-bezier(.22,1,.36,1)}@media(prefers-reduced-motion:reduce){body{transition:none}}</style><script>/* 8/10/2026 · Arranque sin pantallazo (ver BP.listo en ui.js): siempre, salvo al entrar a una ficha desde el portal (ahí la foto de la tarjeta crece hasta la ficha); en Safari del iPhone la transición entre páginas no tapaba el video al tocar el logo. Tope: 800 ms. */(function(){try{var h=document.documentElement,n=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{},r=document.referrer||'';if(r.indexOf(location.origin)===0&&n.type!=='reload'&&/propiedad/.test(location.pathname))return;h.classList.add('arrancando');setTimeout(function(){h.classList.remove('arrancando')},800)}catch(e){}})()</script><script>/* El asistente no dibuja el encabezado del portal: se muestra apenas está el DOM */document.addEventListener('DOMContentLoaded',function(){requestAnimationFrame(function(){document.documentElement.classList.remove('arrancando')})});</script>
+  <link rel="stylesheet" href="css/base.css?v=20261009c"><link rel="stylesheet" href="css/catalogo.css?v=20261009c"><link rel="stylesheet" href="css/portal.css?v=20261009c"><link rel="stylesheet" href="css/publicar.css?v=20261009c"><link rel="stylesheet" href="css/tarifas.css?v=20261009c"><link rel="stylesheet" href="css/transiciones.css?v=20261009c"><style>@view-transition{navigation:auto}</style><style>html.arrancando body{opacity:0}body{transition:opacity .18s cubic-bezier(.22,1,.36,1)}@media(prefers-reduced-motion:reduce){body{transition:none}}</style><script>/* 8/10/2026 · Arranque sin pantallazo (ver BP.listo en ui.js): siempre, salvo al entrar a una ficha desde el portal (ahí la foto de la tarjeta crece hasta la ficha); en Safari del iPhone la transición entre páginas no tapaba el video al tocar el logo. Tope: 800 ms. */(function(){try{var h=document.documentElement,n=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{},r=document.referrer||'';if(r.indexOf(location.origin)===0&&n.type!=='reload'&&/propiedad/.test(location.pathname))return;h.classList.add('arrancando');setTimeout(function(){h.classList.remove('arrancando')},800)}catch(e){}})()</script><script>/* El asistente no dibuja el encabezado del portal: se muestra apenas está el DOM */document.addEventListener('DOMContentLoaded',function(){requestAnimationFrame(function(){document.documentElement.classList.remove('arrancando')})});</script>
 </head>
 <!-- data-flujo: ui.js no dibuja el pie ni la barra inferior de la app. Esta página tampoco llama a BP.header ni a BP.footer:
      arriba va su propia barra (Atrás, avance, Salir) y abajo el botón Continuar fijo. -->
@@ -31,6 +31,8 @@
 </main>
 <div class="pf-pie" id="pfPie"><div class="pf-pie-in" id="pfPieIn"><button type="button" class="pf-seguir" id="pfSeguir" disabled>Continuar</button></div></div>
 <script src="supabase-portal.js?v=20261009c" defer></script><script src="js/errores.js?v=20261009c" defer></script><script src="js/bairen-motion.js?v=20261009c" defer></script><script src="js/i18n-portal.js?v=20261009c" defer></script><script src="js/ui.js?v=20261009c" defer></script><script src="js/store.js?v=20261009c" defer></script><script src="js/data.js?v=20261009c" defer></script>
+<!-- 9/10/2026 · Rieles: el estimado de los servicios de BAIREN arriba de Continuar (migración 35) -->
+<script src="js/digital.js?v=20261009c" defer></script><script src="js/dg-tarifas.js?v=20261009c" defer></script>
 <script>
 /* Publicar · el recorrido en ocho pantallas cortas (8/10/2026, tanda 2 del lanzamiento).
    1 ¿Qué publicás?  2 Ingreso (si no hay sesión, a ingresar.html y vuelta acá)  3 Tu empresa (una vez por cuenta)
@@ -741,6 +743,36 @@ document.addEventListener('DOMContentLoaded', function(){
     return { boton: cambios ? T('pub2_guardar_cambios', 'Guardar cambios') : T('pub2_enviar', 'Enviar a revisión'), botonClase: cambios ? '' : 'oro', alContinuar: enviar };
   };
 
+  /* ── 9/10/2026 · Rieles · El estimado de los servicios de BAIREN (js/dg-tarifas.js, migración 35), como en Pedidos Ya:
+     arriba de Continuar, "Publicar: sin costo" y "Si cerrás por BAIREN ≈ USD X", con el detalle en una hoja. Aparece cuando
+     ya se sabe la operación y el precio (de Propiedad a Revisar) y se actualiza mientras se escribe el precio, la
+     operación, la moneda o el plazo. Solo con BAIREN digital prendido; nunca en modo curador, perfil o documentos. ── */
+  const estimado = (window.BPDigital && BPDigital.activo() && BPDigital.estimadoUI) ? BPDigital.estimadoUI(document.getElementById('pfPie'), { antesDe: pieIn }) : null;
+  const PANT_ESTIMADO = ['propiedad', 'precio', 'fotos', 'descripcion', 'revisar'];
+  function datosEstimado(){
+    if (!clase || modoCurador || modoPerfil || modoDocs || PANT_ESTIMADO.indexOf(actual) < 0) return null;
+    const perfil = (pub && pub.tipo) || perfilQs || null, enPrecio = actual === 'precio' && !!el.querySelector('[name=precio],[name=u_precio]');
+    if (clase === 'emprendimiento') {
+      const etapa = (enPrecio && elegido('etapa')) || aviso.etapa; if (!etapa) return null;
+      const ps = (enPrecio ? Array.from(el.querySelectorAll('[name=u_precio]')).map(i => num(i.value)) : unidades.map(u => u.precio)).filter(x => x > 0);
+      const linea = BPDigital.lineaDe('venta', etapa);
+      if (linea !== 'pozo' && !ps.length) return null;
+      return { linea, precio: ps.length ? Math.min.apply(null, ps) : null, moneda: 'USD', perfil, porUnidad: true };
+    }
+    const op = (enPrecio && elegido('operacion')) || aviso.operacion;
+    const precio = enPrecio ? num(valor('precio')) : Number(aviso.precio);
+    const moneda = op === 'alquiler' ? ((enPrecio && elegido('moneda')) || aviso.moneda) : 'USD';
+    const plazo = parseInt((enPrecio ? elegido('plazo') : aviso.plazo) || '', 10) || null;
+    const linea = BPDigital.lineaDe(op, null, op === 'mediano' ? plazo : null);
+    if (!linea || !(precio > 0)) return null;
+    /* Supuestos: largo plazo, el plazo del contrato (24 meses si no lo eligió); mediano, 6 meses o la estadía mínima si es mayor */
+    const meses = linea === 'tradicional' ? plazo : linea === 'mediano' ? Math.max(6, plazo || 0) : linea === 'temporario' ? Math.max(1, plazo || 0) : null;
+    return { linea, precio, moneda, meses, perfil };
+  }
+  let tEstimado = null;
+  const pintarEstimado = () => { if (estimado) estimado.pintar(datosEstimado()); };
+  if (estimado) { const alCambiar = () => { if (actual !== 'precio') return; clearTimeout(tEstimado); tEstimado = setTimeout(pintarEstimado, 180); }; el.addEventListener('input', alCambiar); el.addEventListener('change', alCambiar); }
+
   /* ── Navegación ── */
   /* El dueño directo que todavía no mandó el DNI y la titularidad pasa por Tus documentos (salvo que en esta visita
      haya dicho "Los subo después") */
@@ -797,6 +829,7 @@ document.addEventListener('DOMContentLoaded', function(){
     pant = PANT[nombre]() || {};
     avisoArriba(nombre);
     pie(pant.boton || (desdeRevisar ? T('pub2_listo', 'Listo') : T('pub2_continuar', 'Continuar')), pant.botonClase, pant.secundario);
+    pintarEstimado();
     actualizarSalir();
     document.body.dataset.pantalla = nombre;
     el.classList.remove('entra-d', 'entra-i'); void el.offsetWidth; el.classList.add(dir === -1 ? 'entra-i' : 'entra-d');
@@ -906,7 +939,7 @@ document.addEventListener('DOMContentLoaded', function(){
       try { sessionStorage.setItem('bp_cur_msg', msg); } catch (e) { /* sin almacenamiento: el aviso se ve igual acá */ }
       BP.toast(msg); setTimeout(() => { location.href = 'curacion.html#cola'; }, 700); return;
     }
-    actual = 'recibido'; document.body.dataset.pantalla = 'recibido'; desdeRevisar = false;
+    actual = 'recibido'; document.body.dataset.pantalla = 'recibido'; desdeRevisar = false; if (estimado) estimado.esconder();
     prog.querySelector('i').style.width = '100%'; prog.setAttribute('aria-valuenow', prog.getAttribute('aria-valuemax') || '8'); bAtras.hidden = true; bSalir.textContent = T('pub2_salir', 'Salir');
     const sub = cambios ? (aviso.estado_curacion === 'publicado' ? T('pub2_rec_publicado', 'Ya se ven en la ficha.') : aviso.estado_curacion === 'pausado' ? T('pub2_rec_pausado', 'Sigue pausado. Lo reactivás desde tu panel.') : T('pub2_rec_en_revision', 'Sigue en revisión. Te avisamos por mail cuando esté publicado.'))
       : n > 1 ? TF('pub2_rec_emp', 'Recibimos {n} unidades. Las revisamos en menos de 48 horas y te avisamos por mail.', { n }) : T('pub2_rec_sub', 'Lo revisamos en menos de 48 horas y te avisamos por mail.');

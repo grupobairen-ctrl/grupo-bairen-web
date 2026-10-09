@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Precios · BAIREN</title>
+  <meta name="description" content="Publicar en BAIREN es sin costo. Si cerrás por BAIREN, pagás solo los servicios que usás, cuando los usás.">
+  <meta name="theme-color" content="#131D2D">
+  <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
+  <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css?v=20261009c"><link rel="stylesheet" href="css/catalogo.css?v=20261009c"><link rel="stylesheet" href="css/portal.css?v=20261009c"><link rel="stylesheet" href="css/transiciones.css?v=20261009c"><link rel="stylesheet" href="css/tarifas.css?v=20261009c"><style>@view-transition{navigation:auto}</style><style>html.arrancando body{opacity:0}body{transition:opacity .18s cubic-bezier(.22,1,.36,1)}@media(prefers-reduced-motion:reduce){body{transition:none}}</style><script>/* 8/10/2026 · Arranque sin pantallazo (ver BP.listo en ui.js): siempre, salvo al entrar a una ficha desde el portal (ahí la foto de la tarjeta crece hasta la ficha); en Safari del iPhone la transición entre páginas no tapaba el video al tocar el logo. Tope: 800 ms. */(function(){try{var h=document.documentElement,n=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{},r=document.referrer||'';if(r.indexOf(location.origin)===0&&n.type!=='reload'&&/propiedad/.test(location.pathname))return;h.classList.add('arrancando');setTimeout(function(){h.classList.remove('arrancando')},800)}catch(e){}})()</script>
+</head>
+<!-- 9/10/2026 · Rieles · Precios (migración 35). Página pública con los servicios de BAIREN por tipo de publicación: una
+     tarjeta por tipo, con el total típico grande y la lista corta debajo. Los precios salen del escenario público del
+     motor de cobro (BPDigital.tarifas, js/dg-tarifas.js); los ejemplos, de BPDigital.calcularEstimado con los mismos
+     supuestos del estimado al publicar. Encuadre: publicar es sin costo y BAIREN no cobra comisión por la operación, sino
+     servicios que se pagan cuando se usan. Apagada para el público hasta abrir BAIREN digital (BPDigital.activo()). -->
+<body class="p-product p-precios">
+<div class="p-velo" aria-hidden="true"><span class="w">BAIREN</span></div>
+<div id="pHeader"></div>
+<main class="tp-in" id="contenido" aria-busy="true">
+  <div id="tpCuerpo"><div class="p-skel-form" aria-hidden="true"><div class="p-skel-line s"></div><div class="p-skel-line t"></div><div class="p-skel-line m"></div><div class="p-skel-line l"></div><div class="p-skel-line m"></div></div></div>
+</main>
+<div id="pFooter"></div>
+
+<script src="supabase-portal.js?v=20261009c" defer></script><script src="js/errores.js?v=20261009c" defer></script>
+<script src="../mapa-barrios.js?v=20261009c" defer></script>
+<script src="js/bairen-motion.js?v=20261009c" defer></script><script src="js/i18n-portal.js?v=20261009c" defer></script><script src="js/ui.js?v=20261009c" defer></script><script src="js/store.js?v=20261009c" defer></script>
+<script src="js/data.js?v=20261009c" defer></script><script src="js/digital.js?v=20261009c" defer></script><script src="js/dg-tarifas.js?v=20261009c" defer></script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+(async function(){
+  'use strict';
+  BP.header(); BP.footer(); if (window.BPStore) BPStore.init();
+  await BPStore.ready;
+  const D = window.BPDigital, esc = BP.esc, main = document.getElementById('contenido'), cuerpo = document.getElementById('tpCuerpo');
+  const t = (k, d) => BP.t('dg_tarifas_p_' + k, d), tf = (k, d, v) => BP.tf('dg_tarifas_p_' + k, d, v);
+  const fin = () => main.removeAttribute('aria-busy');
+  const vacio = (titulo, texto) => { cuerpo.innerHTML = `<div class="p-empty tp-vacio"><b>${esc(titulo)}</b><p>${esc(texto)}</p><a class="p-btn" href="index.html">${esc(t('volver', 'Ir al inicio'))}</a></div>`; fin(); };
+  if (!D || !D.activo() || !D.tarifas) return vacio(t('pronto', 'Muy pronto'), t('pronto_d', 'Los precios de los servicios de BAIREN todavía no están publicados.'));
+
+  let reglas = [];
+  try { reglas = await D.tarifas(); } catch (e) { return vacio(t('error', 'No pudimos cargar los precios'), t('error_d', 'Probá de nuevo en un rato.')); }
+
+  /* Un ejemplo típico por tipo de publicación, con los mismos supuestos que el estimado al publicar */
+  const TIPOS = [
+    { linea: 'mediano', d: t('d_mediano', 'Alquiler amoblado de más de 3 meses.'), ej: { precio: 1000, moneda: 'USD' } },
+    { linea: 'tradicional', d: t('d_tradicional', 'Con contrato, en pesos o en dólares.'), ej: { precio: 700, moneda: 'USD' } },
+    { linea: 'temporario', d: t('d_temporario', 'Turismo, de una noche a 3 meses.'), ej: { precio: 1200, moneda: 'USD' } },
+    { linea: 'venta', d: t('d_venta', 'Una unidad terminada.'), ej: { precio: 180000, moneda: 'USD' } },
+    { linea: 'pozo', d: t('d_pozo', 'Unidades en pozo o en construcción.'), ej: {} }
+  ];
+  const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';
+  /* La nota pública del servicio de pozo (o el supuesto del estimado) */
+  const T_NOTA = (rs, l) => { const x = rs.find(r => r.linea === l && r.evento === 'lead_inversor'); return (x && x.nota_publica) || ''; };
+  const fila = (r, linea, corredor) => `<li class="${corredor ? 'corredor' : ''}"><span class="n"${corredor ? ` data-tag="${esc(t('corredores', 'Corredores'))}"` : ''}>${esc(corredor ? r.concepto.replace(/\s*\(corredor aliado\)/i, '') : r.concepto)}</span><span class="m">${esc(D.sinCorte(D.precioTarifa(r, linea)))}</span><small>${esc(D.cuandoTarifa(r, linea))}</small></li>`;
+  const tarjeta = tipo => {
+    const propias = reglas.filter(r => r.linea === tipo.linea);
+    const e = D.calcularEstimado(reglas, Object.assign({ linea: tipo.linea, perfil: 'dueno' }, tipo.ej));
+    const r = D.resumenEstimado(e);
+    const sumados = e.items.filter(i => i.tipo === 'suma');
+    const ej = s => tf('ejemplo', 'Ejemplo: {s}', { s: s.charAt(0).toLowerCase() + s.slice(1) });
+    /* Sin servicios que se sumen y con uno por inversor: el total es "USD 30 por inversor verificado" */
+    const porInversor = !sumados.length && e.items.some(i => i.tipo === 'unitario' && i.evento === 'lead_inversor');
+    const total = sumados.length || porInversor ? r.val.replace(/^≈ /, '') : t('sin_costo', 'Sin costo');
+    const sub = porInversor ? (T_NOTA(reglas, tipo.linea) || e.supuesto) : !sumados.length ? t('sin_costo_linea', 'Sin servicios con costo.')
+      : sumados.every(i => i.modo === 'fijo') ? t('fijo', 'Precio fijo, cualquiera sea el precio.') : ej(e.supuesto);
+    /* Si el total es el precio por inversor, no se repite en la lista */
+    const orden = D.ordenarTarifas(propias.filter(x => !(porInversor && x.evento === 'lead_inversor')));
+    const lista = orden.filter(x => !D.soloCorredor(x)).concat(orden.filter(D.soloCorredor));
+    return `<article class="tp-t" aria-labelledby="tp-${tipo.linea}">
+      <h2 id="tp-${tipo.linea}">${esc(D.LINEAS[tipo.linea])}</h2><p class="tp-t-d">${esc(tipo.d)}</p>
+      <p class="tp-total">${esc(total)}${porInversor ? ` <small>${esc(t('por_inversor', 'por inversor verificado'))}</small>` : ''}</p>
+      ${sub ? `<p class="tp-sup">${esc(D.sinCorte(sub))}</p>` : ''}
+      ${lista.length ? `<ul class="tp-lista">${lista.map(x => fila(x, tipo.linea, D.soloCorredor(x))).join('')}</ul>` : ''}
+    </article>`;
+  };
+  const enTodas = reglas.filter(r => r.linea === 'todas');
+  const simulado = !reglas.some(r => r.cobra);
+  cuerpo.innerHTML = `<header class="tp-cab">
+      <p class="tp-pre">${esc(t('pre', 'Precios'))}</p>
+      <h1>${t('t', 'Publicar es <em>sin costo</em>.')}</h1>
+      <p class="tp-sub">${esc(t('sub', 'Pagás solo los servicios que usás, cuando los usás.'))}</p>
+      <ul class="tp-confia">
+        <li>${CHECK}<span>${esc(t('nunca_porcentaje', 'Nunca un porcentaje de la venta ni del alquiler.'))}</span></li>
+        <li>${CHECK}<span>${esc(t('nunca_inquilino', 'Al inquilino que alquila para vivir no le cobramos nada.'))}</span></li>
+        <li>${CHECK}<span>${esc(t('nunca_plata', 'La plata de tus operaciones va directo a tu cuenta.'))}</span></li>
+      </ul>
+      ${simulado ? `<p class="tp-lanz">${esc(t('lanzamiento', 'Precios de lanzamiento: hoy no se cobran.'))}</p>` : ''}
+    </header>
+    <section class="tp-tarjetas" aria-label="${esc(t('aria_tipos', 'Precios por tipo de publicación'))}">${TIPOS.map(tarjeta).join('')}</section>
+    ${enTodas.length ? `<p class="tp-todas">${enTodas.map(r => `<b>${esc(r.concepto)}</b>: ${esc(D.sinCorte(D.precioTarifa(r, null)))}, ${esc(t('solo_si', 'solo si la usás.'))}`).join(' ')}</p>` : ''}
+    <div class="tp-cta">
+      <a class="p-btn p-btn-fill" href="publicar.html">${esc(t('cta', 'Publicar'))}</a>
+      <p class="tp-pie">${esc(t('pie', 'Precios en dólares. Cada servicio se paga cuando se usa.'))}</p>
+    </div>`;
+  fin();
+})();
+});
+</script>
+</body>
+</html>
