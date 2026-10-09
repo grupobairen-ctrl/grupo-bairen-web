@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20261008p"><link rel="stylesheet" href="css/catalogo.css?v=20261008p"><link rel="stylesheet" href="css/portal.css?v=20261008p"><link rel="stylesheet" href="css/transiciones.css?v=20261008p"><style>@view-transition{navigation:auto}</style>
+  <link rel="stylesheet" href="css/base.css?v=20261008t"><link rel="stylesheet" href="css/catalogo.css?v=20261008t"><link rel="stylesheet" href="css/portal.css?v=20261008t"><link rel="stylesheet" href="css/transiciones.css?v=20261008t"><style>@view-transition{navigation:auto}</style>
   <style>body{padding-top:0}#ficha>.p-ficha-top,#ficha>.p-ficha,#ficha>section{max-width:var(--p-max);margin:0 auto;padding-left:24px;padding-right:24px}#ficha>.p-ficha-top{padding-top:88px}@media(max-width:900px){#ficha>.p-ficha-top{padding-top:76px}}.p-video{aspect-ratio:16/9;background:#0b1220;border-radius:16px;overflow:hidden}.p-video iframe,.p-video video{width:100%;height:100%;border:0;display:block}
   /* Fachada del video (25/9/2026): portada y botón de reproducir; el reproductor se pide al tocar */
   .p-video-play{position:relative;display:block;width:100%;height:100%;padding:0;border:0;background:#0b1220;cursor:pointer}
@@ -28,11 +28,11 @@
 <div class="p-lb" id="lb" aria-hidden="true"><div class="velo" data-lb-close></div><button type="button" class="x" data-lb-close aria-label="Cerrar las fotos" data-i18n-aria="ficha_lb_cerrar" data-i18n="ficha_lb_cerrar_txt">Cerrar</button><div class="marco" id="lbMarco"><img id="lbImg" alt="" draggable="false"></div><button type="button" class="nav prev" data-lb-prev aria-label="Foto anterior" data-i18n-aria="ficha_lb_prev"></button><button type="button" class="nav next" data-lb-next aria-label="Foto siguiente" data-i18n-aria="ficha_lb_next"></button><div class="pie"><span class="cuenta" id="lbCount"></span><div class="tiras" id="lbTiras"></div></div></div>
 <div id="pFooter"></div>
 
-<script src="supabase-portal.js?v=20261008p" defer></script><script src="js/errores.js?v=20261008p" defer></script>
+<script src="supabase-portal.js?v=20261008t" defer></script><script src="js/errores.js?v=20261008t" defer></script>
 <!-- 8/10/2026 · Sin este archivo la ficha no sabía que Palermo Hollywood es Palermo: "Ver más en Palermo Hollywood" daba 0 resultados -->
-<script src="../mapa-barrios.js?v=20261008p" defer></script>
-<script src="js/iconos-amenities.js?v=20261008p" defer></script><script src="js/bairen-motion.js?v=20261008p" defer></script><script src="js/i18n-portal.js?v=20261008p" defer></script><script src="js/ui.js?v=20261008p" defer></script><script src="js/store.js?v=20261008p" defer></script>
-<script src="js/data.js?v=20261008p" defer></script>
+<script src="../mapa-barrios.js?v=20261008t" defer></script>
+<script src="js/iconos-amenities.js?v=20261008t" defer></script><script src="js/bairen-motion.js?v=20261008t" defer></script><script src="js/i18n-portal.js?v=20261008t" defer></script><script src="js/ui.js?v=20261008t" defer></script><script src="js/store.js?v=20261008t" defer></script>
+<script src="js/data.js?v=20261008t" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -270,10 +270,25 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip" role="group" aria-label="$
   const showLb = (i, dir) => {
     if (!fotos.length) return;
     const abriendo = !lb.classList.contains('open');
-    cur = (i + fotos.length) % fotos.length;
+    /* 8/10/2026 · Las fotos que no cargan se saltean, en la dirección en que se va */
+    const paso = dir < 0 ? -1 : 1; let j = (i + fotos.length) % fotos.length, vueltas = 0;
+    while (fotoRota.has(j) && vueltas < fotos.length) { j = (j + paso + fotos.length) % fotos.length; vueltas++; }
+    if (vueltas >= fotos.length) return;
+    cur = j;
     const chica = BP.sbImg(fotos[cur], ANCHO_FOTO), grande = BP.sbImg(fotos[cur], ANCHO_VISOR);
+    /* 8/10/2026 · Al pasar de foto, la anterior se va enseguida: mientras baja la nueva, el visor muestra que está cargando.
+       Antes quedaba la anterior, y si la nueva tardaba o no cargaba parecía la misma foto subida dos veces. Si no carga, se
+       marca como rota (se apaga en la tira) y se pasa a la siguiente. El deslizamiento corre cuando la foto ya llegó. */
+    const pedida = cur, pasando = !abriendo && dir;
+    lbImg.classList.add('p-lb-cargando'); lbImg._yaPaso = false;
+    lbImg.onload = () => { if (pedida !== cur) return; lbImg.classList.remove('p-lb-cargando'); if (pasando && !lbImg._yaPaso && window.BPM && BPM.pasarFoto) { lbImg._yaPaso = true; BPM.pasarFoto(lbImg, dir); } };
+    lbImg.onerror = () => {
+      if (pedida !== cur) return;
+      fotoRota.add(cur); const bt = lbTiras && lbTiras.querySelector(`[data-lbt="${cur}"]`); if (bt) bt.hidden = true;
+      if (fotos.some((f, k) => !fotoRota.has(k))) showLb(cur + paso, paso); else { lbImg.classList.remove('p-lb-cargando'); closeLb(); }
+    };
     lbImg.src = chica; lbImg.alt = TF('ficha_foto_alt', '{t}, foto {i}', { t: tit, i: cur+1 });
-    if (grande !== chica) { const alta = new Image(); alta.onload = () => { if (lbImg.src === chica) lbImg.src = grande; }; alta.src = grande; }
+    if (grande !== chica) { const alta = new Image(); alta.onload = () => { if (pedida === cur && lbImg.src === chica) lbImg.src = grande; }; alta.src = grande; }
     lbCount.textContent = TF('ficha_lb_de', '{i} de {n}', { i: cur+1, n: fotos.length });
     lb.classList.add('open'); lb.setAttribute('aria-hidden','false'); lb.setAttribute('role','dialog'); lb.setAttribute('aria-modal','true');
     lb.setAttribute('aria-label', TF('ficha_lb_fotos_de', 'Fotos de {t}', { t: tit })); document.body.style.overflow = 'hidden';
@@ -291,7 +306,7 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip" role="group" aria-label="$
       /* 25/9/2026 · El primer [data-lb-close] es el velo (un div), que no toma foco: al abrir con Enter
          desde la tira el foco se quedaba detrás del visor. Va al botón Cerrar. */
       soltarLb = BP.focoAtrapado(lb, { devolverA: abridorLb, primero: lb.querySelector('button[data-lb-close]'), alCerrar: () => cerrarLbSolo() });
-    } else if (dir && window.BPM && BPM.pasarFoto) BPM.pasarFoto(lbImg, dir);
+    }
     BP.anunciar(TF('ficha_foto_n', 'Foto {i} de {n}', { i: cur+1, n: fotos.length }));
   };
   const cerrarLbSolo = () => {

@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20261008p"><link rel="stylesheet" href="css/catalogo.css?v=20261008p"><link rel="stylesheet" href="css/portal.css?v=20261008p"><link rel="stylesheet" href="css/transiciones.css?v=20261008p"><style>@view-transition{navigation:auto}</style>
+  <link rel="stylesheet" href="css/base.css?v=20261008t"><link rel="stylesheet" href="css/catalogo.css?v=20261008t"><link rel="stylesheet" href="css/portal.css?v=20261008t"><link rel="stylesheet" href="css/transiciones.css?v=20261008t"><style>@view-transition{navigation:auto}</style>
 </head>
 <body class="p-publicar-landing p-membership">
 <div class="p-velo" aria-hidden="true"><span class="w">BAIREN</span></div>
@@ -38,7 +38,7 @@
 </div></section>
 <div id="pFooter"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin defer></script>
-<script src="supabase-portal.js?v=20261008p" defer></script><script src="js/errores.js?v=20261008p" defer></script><script src="js/bairen-motion.js?v=20261008p" defer></script><script src="js/i18n-portal.js?v=20261008p" defer></script><script src="js/ui.js?v=20261008p" defer></script><script src="js/store.js?v=20261008p" defer></script><script src="js/data.js?v=20261008p" defer></script>
+<script src="supabase-portal.js?v=20261008t" defer></script><script src="js/errores.js?v=20261008t" defer></script><script src="js/bairen-motion.js?v=20261008t" defer></script><script src="js/i18n-portal.js?v=20261008t" defer></script><script src="js/ui.js?v=20261008t" defer></script><script src="js/store.js?v=20261008t" defer></script><script src="js/data.js?v=20261008t" defer></script>
 <script>document.addEventListener('DOMContentLoaded', function(){BP.header("membership"); BP.footer(); BP.reveal(); document.title = BP.t('mb_title', document.title);
   /* lanz3-visitante · En inglés y portugués "$149.000" se leía como dólares (y en inglés, como 149): los valores van en pesos con la sigla */
   if (BP.lang !== 'es') document.querySelectorAll('[data-mensual][data-anual]').forEach(function(el){ ['mensual', 'anual'].forEach(function(k){ var n = Number(String(el.dataset[k]).replace(/\D/g, '')); if (n) el.dataset[k] = 'ARS ' + n.toLocaleString(BP.LOCALE()); }); el.textContent = el.dataset.mensual; });

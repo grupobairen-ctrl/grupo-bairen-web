@@ -570,3 +570,10 @@ body.sheet-open{overflow:hidden;}
     font-size: 11px;
   }
 }
+
+/* 8/10/2026 · Visor de fotos: mientras baja la foto nueva no se ve la anterior; un aro chico indica que está cargando */
+#lbImg.p-lb-cargando{opacity:0!important;transition:none!important}
+#lbMarco{position:relative}
+#lbMarco:has(#lbImg.p-lb-cargando)::after{content:"";position:absolute;left:50%;top:50%;width:28px;height:28px;margin:-14px 0 0 -14px;border:2px solid rgba(251,250,246,.22);border-top-color:#C2A968;border-radius:50%;animation:p-lb-gira .8s linear infinite}
+@keyframes p-lb-gira{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){#lbMarco:has(#lbImg.p-lb-cargando)::after{animation-duration:2.4s}}
