@@ -577,3 +577,20 @@ body.sheet-open{overflow:hidden;}
 #lbMarco:has(#lbImg.p-lb-cargando)::after{content:"";position:absolute;left:50%;top:50%;width:28px;height:28px;margin:-14px 0 0 -14px;border:2px solid rgba(251,250,246,.22);border-top-color:#C2A968;border-radius:50%;animation:p-lb-gira .8s linear infinite}
 @keyframes p-lb-gira{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){#lbMarco:has(#lbImg.p-lb-cargando)::after{animation-duration:2.4s}}
+
+/* 8/10/2026 · Encabezado de escritorio más simple: los tres idiomas pasan a ser un solo botón con el idioma actual ("ES" y
+   una flechita); al pasar el mouse o al llegar con el teclado se despliegan los otros dos debajo. Solo CSS, sobre los
+   botones que ya arma ui.js. El celular (menú y barra) no cambia. */
+@media(min-width:1024px){
+  .p-navbar .p-nav-right .p-lang{position:relative;display:inline-flex;align-items:center;gap:0;width:52px;height:36px;margin-right:4px}
+  .p-navbar .p-nav-right .p-lang button{display:none;min-width:52px;height:36px;padding:0 10px;justify-content:center;align-items:center;font:500 .8125rem/1 var(--font-body)!important;letter-spacing:.02em;border:0!important;border-radius:10px;color:rgba(251,250,246,.78)}
+  .p-navbar .p-nav-right .p-lang button.on{display:inline-flex;gap:7px;color:#FBFAF6}
+  .p-navbar .p-nav-right .p-lang button.on::after{content:"";width:5px;height:5px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:translateY(-2px) rotate(45deg);opacity:.7;transition:transform .2s cubic-bezier(.22,1,.36,1)}
+  .p-navbar .p-nav-right .p-lang:is(:hover,:focus-within) button.on::after{transform:translateY(1px) rotate(225deg)}
+  .p-navbar .p-nav-right .p-lang:is(:hover,:focus-within)::before{content:"";position:absolute;left:-4px;right:-4px;top:-4px;height:116px;background:#1A2538;border:1px solid rgba(251,250,246,.10);border-radius:12px;box-shadow:0 12px 32px rgba(10,14,22,.28);z-index:0}
+  .p-navbar .p-nav-right .p-lang:is(:hover,:focus-within) button{position:relative;z-index:1}
+  .p-navbar .p-nav-right .p-lang:is(:hover,:focus-within) button:not(.on){display:inline-flex;position:absolute;left:0;top:38px;z-index:1}
+  .p-navbar .p-nav-right .p-lang:is(:hover,:focus-within) button:not(.on) ~ button:not(.on){top:74px}
+  .p-navbar .p-nav-right .p-lang button:not(.on):hover{background:rgba(251,250,246,.07);color:#FBFAF6}
+}
+@media(min-width:1024px) and (prefers-reduced-motion:reduce){.p-navbar .p-nav-right .p-lang button.on::after{transition:none}}
