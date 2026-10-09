@@ -22,7 +22,7 @@
   const QUIETO = () => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } };
 
   /* Los estilos (en mensajes.html se suman solos; pagos.html los trae en el head) */
-  (function(){ try { if (document.querySelector('link[href*="css/pagos.css"]')) return; const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'css/pagos.css?v=20261009g'; document.head.appendChild(l); } catch (e) {} })();
+  (function(){ try { if (document.querySelector('link[href*="css/pagos.css"]')) return; const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'css/pagos.css?v=20261009h'; document.head.appendChild(l); } catch (e) {} })();
 
   /* ── formatos ──────────────────────────────────────────── */
   const LOC = () => (window.BP && BP.LOCALE) ? BP.LOCALE() : 'es-AR';
@@ -270,6 +270,20 @@
         operacion_id: o.id, publicador_id: o.publicador_id, etapa: o.etapa, linea: o.linea, aviso_titulo: o.aviso && o.aviso.titulo,
         aviso_direccion: o.aviso && [o.aviso.direccion, o.aviso.barrio].filter(Boolean).join(' · '), interesado: nombre(o.interesado_email), reservas: reservasDe(o.id), pagos: pagosDe(o.id, true) }))
     };
+  };
+  /* 9/10 · "Todos", para el equipo de BAIREN (migración 37): las señas y cuotas de todas las operaciones, solo lectura.
+     Mismo formato que la cobranza, más el nombre de quien publica. En modo local, cualquiera con sesión es del equipo. */
+  P.deTodos = async function(){
+    sesion();
+    if (conBase()) return rpc('pagos_de_todos');
+    vencerLocal();
+    const conAlgo = id => K.reservas.get([]).some(r => r.operacion_id === id) || K.pagos.get([]).some(p => p.operacion_id === id);
+    const nombre = e => { const s = String(e || '').split('@')[0].split('.')[0]; return s ? s.charAt(0).toUpperCase() + s.slice(1) : T('interesado', 'Interesado'); };
+    const pubs = L.LS('bp_publicadores').get([]);
+    const pubNombre = o => o.publicador_nombre || ((pubs.find(x => x.id === o.publicador_id) || {}).nombre) || '';
+    return { operaciones: L.ops().filter(o => conAlgo(o.id)).sort((a, b) => String(b.actualizada_en).localeCompare(String(a.actualizada_en))).map(o => ({
+      operacion_id: o.id, publicador_id: o.publicador_id, publicador: pubNombre(o), etapa: o.etapa, linea: o.linea, aviso_titulo: o.aviso && o.aviso.titulo,
+      aviso_direccion: o.aviso && [o.aviso.direccion, o.aviso.barrio].filter(Boolean).join(' · '), interesado: nombre(o.interesado_email), reservas: reservasDe(o.id), pagos: pagosDe(o.id, true) })) };
   };
   /* El recibo de una cuota pagada */
   P.recibo = async function(id){

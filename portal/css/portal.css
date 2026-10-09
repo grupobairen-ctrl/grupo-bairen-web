@@ -2862,8 +2862,9 @@ body.p-home .h-criterios em{font-style:normal}
 .mobile-menu .m-secundario{display:flex;flex-wrap:wrap;gap:6px 26px;padding:14px 0 2px;border-top:1px solid rgba(255,255,255,.07)}
 .mobile-menu .m-secundario a{display:inline-flex;align-items:center;min-height:40px;font:400 .82rem/1.3 var(--font-body);letter-spacing:.02em;color:rgba(251,250,246,.62);border:0;padding:0;text-decoration:none}
 .mobile-menu .m-secundario a.on{color:var(--gold-light,#DECDA0)}
-.mobile-menu .m-cuenta{display:flex;gap:26px;padding:6px 0 2px}
-.mobile-menu .m-cuenta a{display:inline-flex;align-items:center;gap:8px;min-height:40px;font:400 .82rem/1.3 var(--font-body);color:rgba(251,250,246,.78);border:0;padding:0;text-decoration:none}
+.mobile-menu .m-cuenta{display:flex;flex-wrap:wrap;gap:0 26px;padding:6px 0 2px}
+.mobile-menu .m-cuenta a[hidden]{display:none}
+.mobile-menu .m-cuenta a{display:inline-flex;align-items:center;gap:8px;min-height:44px;font:400 .82rem/1.3 var(--font-body);color:rgba(251,250,246,.78);border:0;padding:0;text-decoration:none}
 .mobile-menu .m-cuenta a svg{width:16px;height:16px}
 .mobile-menu .m-cuenta[hidden]{display:none}
 .mobile-menu .m-cta{margin-top:16px}
@@ -2968,6 +2969,17 @@ body.p-panel-page .p-empty.p-ensena b{font:500 1rem/1.3 var(--font-body);color:v
 body.p-panel-page .p-empty.p-ensena p{margin:0;max-width:56ch;font:400 .9rem/1.55 var(--font-body);color:var(--text-mid)}
 body.p-panel-page .p-empty.p-ensena .p-btn{margin-top:6px}
 /* Mi cuenta como ficha */
+/* 9/10 · Mi cuenta: los accesos de BAIREN digital (Pagos, identidad, avisos, membresía; y lo del equipo). Lista de app:
+   renglones de 56 px con el nombre, una línea de ayuda y la flecha */
+body.p-panel-page .p-atajos{margin:14px 0 18px;border:1px solid rgba(19,29,45,.1);border-radius:12px!important;background:#FFFDF8;overflow:hidden}
+body.p-panel-page .p-atajo{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:56px;padding:10px 16px;color:var(--navy-deeper,#131D2D);text-decoration:none;border-top:1px solid rgba(19,29,45,.08)}
+body.p-panel-page .p-atajos > .p-atajo:first-child{border-top:0}
+body.p-panel-page .p-atajo .t{display:flex;flex-direction:column;gap:2px;font:500 .95rem/1.25 var(--font-body)}
+body.p-panel-page .p-atajo small{font:400 .78rem/1.3 var(--font-body);color:#59647A}
+body.p-panel-page .p-atajo .ch{width:18px;height:18px;flex:0 0 auto;color:#75623C}
+body.p-panel-page .p-atajo:hover,body.p-panel-page .p-atajo:focus-visible{background:rgba(19,29,45,.03)}
+body.p-panel-page .p-atajos-eq[hidden]{display:none}
+body.p-panel-page .p-atajos-l{margin:0;padding:14px 16px 6px;border-top:1px solid rgba(19,29,45,.08);font:500 .78rem/1.2 var(--font-body);letter-spacing:.02em;color:#75623C}
 body.p-panel-page .p-ficha-cuenta{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:0;margin:14px 0 18px;padding:0;border:1px solid rgba(19,29,45,.1);border-radius:12px;background:#FFFDF8;overflow:hidden}
 body.p-panel-page .p-ficha-cuenta > div{padding:14px 18px;border-bottom:1px solid rgba(19,29,45,.08);border-right:1px solid rgba(19,29,45,.08)}
 body.p-panel-page .p-ficha-cuenta dt{font:400 .8125rem/1.3 var(--font-body);letter-spacing:.01em;text-transform:none;color:var(--text-mid)}
