@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Avisos · BAIREN</title>
+  <meta name="description" content="Tus avisos en BAIREN: mensajes, visitas, propuestas y búsquedas que encajan con tus unidades.">
+  <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#131D2D">
+  <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
+  <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css?v=20261009c"><link rel="stylesheet" href="css/catalogo.css?v=20261009c"><link rel="stylesheet" href="css/portal.css?v=20261009c"><link rel="stylesheet" href="css/transiciones.css?v=20261009c"><style>@view-transition{navigation:auto}</style><style>html.arrancando body{opacity:0}body{transition:opacity .18s cubic-bezier(.22,1,.36,1)}@media(prefers-reduced-motion:reduce){body{transition:none}}</style><script>/* 8/10/2026 · Arranque sin pantallazo (ver BP.listo en ui.js). Tope: 800 ms. */(function(){try{var h=document.documentElement;h.classList.add('arrancando');setTimeout(function(){h.classList.remove('arrancando')},800)}catch(e){}})()</script>
+  <link rel="stylesheet" href="css/explorar.css?v=20261009c"><link rel="stylesheet" href="css/avisos.css?v=20261009c" data-dg-avisos-css data-ok="1">
+</head>
+<!-- 9/10/2026 · BAIREN digital · Avisos (migración 32).
+     Todo lo que le pasó a la cuenta, en una lista: mensajes (sumados por conversación), pasos de sus operaciones,
+     propuestas y unidades que encajan con sus búsquedas. Un toque lleva directo al lugar y deja el aviso leído.
+     Para quien publica, la pestaña Coincidencias: cada unidad con cuántas personas buscan algo así y un solo botón,
+     "Ver y proponer" (la hoja de abajo de Explorar, con las búsquedas, sin quién busca). Abajo, un interruptor: los avisos
+     también por mail. Reúsa las piezas de Explorar (body.p-explorar: la cabecera, las pestañas, la hoja, los vacíos).
+     Requiere sesión. Sin BPDigital.activo() (?digital=1) muestra "Muy pronto". -->
+<body class="p-product p-explorar p-avisos">
+<div class="p-velo" aria-hidden="true"><span class="w">BAIREN</span></div>
+<div id="pHeader"></div>
+<main class="p-ex p-av" id="contenido" aria-busy="true">
+  <div class="p-ex-cab" aria-hidden="true"><span class="p-dg-sk p-dg-sk-h1"></span><span class="p-dg-sk p-dg-sk-txt"></span></div>
+</main>
+<div id="pFooter"></div>
+
+<script src="supabase-portal.js?v=20261009c" defer></script><script src="js/errores.js?v=20261009c" defer></script>
+<script src="../mapa-barrios.js?v=20261009c" defer></script>
+<script src="js/bairen-motion.js?v=20261009c" defer></script><script src="js/i18n-portal.js?v=20261009c" defer></script><script src="js/ui.js?v=20261009c" defer></script><script src="js/store.js?v=20261009c" defer></script>
+<script src="js/digital.js?v=20261009c" defer></script>
+<script src="js/dg-avisos.js?v=20261009c" defer></script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+(async function(){
+  'use strict';
+  const t = (k, d) => BP.t('dg_avisos_' + k, d), tf = (k, d, v) => BP.tf('dg_avisos_' + k, d, v), esc = BP.esc, $ = id => document.getElementById(id);
+  const QUIETO = (() => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } })();
+  /* La hoja de abajo (la misma de Explorar y Se busca) */
+  const hoja = o => {
+    const id = 'avH' + Math.random().toString(36).slice(2, 8);
+    const w = document.createElement('div'); w.className = 'p-dg-velo';
+    w.innerHTML = `<div class="p-dg-hoja ${o.clase || ''}" role="dialog" aria-modal="true" aria-labelledby="${id}">
+      <div class="p-dg-hoja-cab"><h2 class="p-dg-hoja-t" id="${id}">${esc(o.titulo)}</h2><button type="button" class="p-dg-x" data-cerrar aria-label="${esc(t('cerrar', 'Cerrar'))}">${BP.ico.x}</button></div>
+      <div class="p-dg-hoja-cuerpo">${o.cuerpo}</div></div>`;
+    document.body.appendChild(w); document.documentElement.classList.add('p-dg-quieta');
+    requestAnimationFrame(() => requestAnimationFrame(() => w.classList.add('on')));
+    const caja = w.querySelector('.p-dg-hoja'); let soltar = null, ida = false;
+    let quitar = () => { if (ida) return; ida = true; w.classList.remove('on'); if (!document.querySelectorAll('.p-dg-velo.on').length) document.documentElement.classList.remove('p-dg-quieta'); setTimeout(() => w.remove(), QUIETO ? 0 : 240); if (o.alCerrar) o.alCerrar(); };
+    const cerrar = () => { if (soltar) { const f = soltar; soltar = null; f(); } else quitar(); };
+    /* Atrás (el del celular) cierra la hoja, como la del buscador de la portada */
+    let empujada = false;
+    try { history.pushState({ avHoja: id }, ''); empujada = true; } catch (e) { /* nada */ }
+    const alVolver = () => { if (!empujada) return; empujada = false; cerrar(); };
+    addEventListener('popstate', alVolver);
+    const quitar0 = quitar;
+    quitar = () => { removeEventListener('popstate', alVolver); if (empujada) { empujada = false; try { history.back(); } catch (e) { /* nada */ } } quitar0(); };
+    soltar = BP.focoAtrapado(caja, { devolverA: o.devolverA || document.activeElement, primero: o.primero ? caja.querySelector(o.primero) : null, alCerrar: quitar });
+    w.addEventListener('mousedown', e => { if (e.target === w) cerrar(); });
+    caja.querySelectorAll('[data-cerrar]').forEach(b => b.addEventListener('click', cerrar));
+    return { w, caja, cerrar };
+  };
+  const pronto = main => {
+    main.removeAttribute('aria-busy'); main.classList.add('p-dg-pronto-main');
+    main.innerHTML = `<div class="p-dg-pronto"><span class="p-dg-pronto-ic" aria-hidden="true">${BP.ico.bell}</span>
+      <h1 class="p-dg-pronto-t">${t('pronto_t', 'Muy <em>pronto</em>')}</h1>
+      <p>${esc(t('pronto_p', 'Estamos preparando algo nuevo para BAIREN.'))}</p>
+      <a class="p-btn p-btn-fill" href="index.html">${esc(t('pronto_btn', 'Volver al inicio'))}</a></div>`;
+  };
+  const msjError = (e, d) => String((e && e.message) || e || '') || d;
+  const foto = (u, w) => u && !/^idb:/.test(u) ? `<img src="${esc(BP.sbImg ? BP.sbImg(u, w) : u)}" alt="" loading="lazy" decoding="async" onerror="this.remove()">` : '';
+
+  BP.header(); BP.footer(); if (window.BPStore) BPStore.init(); await BPStore.ready;
+  document.title = t('doc', 'Avisos') + ' · BAIREN';
+  const main = $('contenido');
+  if (!window.BPDigital || !BPDigital.activo() || !BPDigital.avisos) { pronto(main); return; }
+  if (!BPStore.requireSession()) return;
+  const D = BPDigital;
+  let pub = null; try { pub = await BPStore.getMyPublicador(); } catch (e) { pub = null; }
+  const E = { avisos: [], coin: [], verLeidos: 8 };
+
+  main.innerHTML = `
+  <header class="p-ex-cab">
+    <h1 class="p-ex-h1">${t('h1', 'Tus <em>avisos</em>')}</h1>
+    <p class="p-ex-bajada">${esc(t('bajada', 'Mensajes, visitas y propuestas, en un solo lugar.'))}</p>
+  </header>
+  ${pub ? `<div class="p-ex-tabs" role="tablist" aria-label="${esc(t('tabs_aria', 'Secciones de avisos'))}">
+    <button type="button" role="tab" id="tabA" aria-controls="panA" aria-selected="true">${esc(t('tab_avisos', 'Avisos'))}<span class="p-ex-n" id="nA" hidden></span></button>
+    <button type="button" role="tab" id="tabC" aria-controls="panC" aria-selected="false" tabindex="-1">${esc(t('tab_coin', 'Coincidencias'))}<span class="p-ex-n" id="nC" hidden></span></button>
+  </div>` : ''}
+  <section class="p-ex-panel" id="panA"${pub ? ' role="tabpanel" aria-labelledby="tabA" tabindex="-1"' : ''}>
+    <div id="lista" aria-busy="true"><div class="p-av-sk" aria-hidden="true">${'<span><i></i><i></i></span>'.repeat(4)}</div></div>
+    <div class="p-av-pref" id="preferencias">
+      <div class="p-av-pref-txt"><b id="prefT">${esc(t('pref_t', 'Avisos por mail'))}</b><span id="prefD">${esc(t('pref_d', 'Un solo mail con lo que no leíste.'))}</span></div>
+      <button type="button" class="p-av-switch" role="switch" id="prefMail" aria-checked="true" aria-labelledby="prefT" aria-describedby="prefD" disabled><span aria-hidden="true"></span></button>
+    </div>
+  </section>
+  ${pub ? `<section class="p-ex-panel" id="panC" role="tabpanel" aria-labelledby="tabC" tabindex="-1" hidden>
+    <p class="p-av-coin-bajada">${esc(t('coin_bajada', 'Búsquedas que encajan con tus unidades. Anónimas hasta que aceptan.'))}</p>
+    <div id="coin" aria-busy="true">${'<div class="p-ex-sk-item" aria-hidden="true"><span class="p-dg-sk p-ex-sk-foto"></span><span class="p-ex-sk-l"><span class="p-dg-sk"></span><span class="p-dg-sk"></span><span class="p-dg-sk"></span></span></div>'.repeat(2)}</div>
+  </section>` : ''}`;
+  main.removeAttribute('aria-busy');
+
+  /* ── Pestañas (como Explorar): #coincidencias abre la segunda ── */
+  const tabs = pub ? [$('tabA'), $('tabC')] : [], panes = pub ? [$('panA'), $('panC')] : [];
+  const abrirTab = (i, foco) => {
+    if (!tabs.length) return;
+    tabs.forEach((b, j) => { const on = i === j; b.setAttribute('aria-selected', on ? 'true' : 'false'); b.tabIndex = on ? 0 : -1; panes[j].hidden = !on; if (on && !QUIETO) { panes[j].classList.remove('entra'); void panes[j].offsetWidth; panes[j].classList.add('entra'); } });
+    if (foco) tabs[i].focus();
+    try { history.replaceState(history.state, '', location.pathname + location.search + (i ? '#coincidencias' : '')); } catch (e) { /* nada */ }
+  };
+  tabs.forEach((b, i) => {
+    b.addEventListener('click', () => abrirTab(i));
+    b.addEventListener('keydown', e => { const k = ['ArrowRight', 'ArrowLeft'].indexOf(e.key) > -1 ? (i + 1) % 2 : e.key === 'Home' ? 0 : e.key === 'End' ? 1 : -1; if (k > -1) { e.preventDefault(); abrirTab(k, true); } });
+  });
+
+  /* ── Avisos: primero lo sin leer; lo leído, de a poco ── */
+  const item = n => {
+    const nuevo = !n.leida_en;
+    return `<li><a class="p-av-item${nuevo ? ' nuevo' : ''}" href="${esc(D.urlAviso(n.url))}" data-id="${esc(n.id)}">
+      <span class="p-av-punto" aria-hidden="true"></span>
+      <span class="p-av-l1"><b>${esc(n.titulo)}</b><time datetime="${esc(n.actualizada_en || '')}">${esc(D.horaAviso(n.actualizada_en))}</time></span>
+      ${n.contexto ? `<span class="p-av-ctx">${esc(n.contexto)}</span>` : ''}
+      ${n.texto ? `<span class="p-av-txt">${esc(n.texto)}</span>` : ''}${nuevo ? `<span class="p-sr">${esc(t('sin_leer', 'sin leer'))}</span>` : ''}</a></li>`;
+  };
+  function pintarLista(){
+    const host = $('lista'); host.removeAttribute('aria-busy');
+    const nuevos = E.avisos.filter(n => !n.leida_en), leidos = E.avisos.filter(n => n.leida_en);
+    if ($('nA')) { $('nA').textContent = nuevos.length || ''; $('nA').hidden = !nuevos.length; }
+    if (!E.avisos.length) {
+      host.innerHTML = `<div class="p-dg-vacio"><p class="p-dg-vacio-t">${esc(t('vacio_t', 'Todavía no hay avisos'))}</p>
+        <p>${esc(t('vacio_p', 'Acá vas a ver mensajes, visitas y propuestas.'))}</p>
+        <a class="p-btn p-btn-fill" href="explorar.html">${esc(t('vacio_btn', 'Explorar'))}</a></div>`;
+      return;
+    }
+    const vis = leidos.slice(0, E.verLeidos);
+    host.innerHTML = `
+      ${nuevos.length ? `<div class="p-av-grupo"><div class="p-av-grupo-cab"><h2 class="p-av-grupo-t">${esc(nuevos.length === 1 ? t('uno_sin_leer', '1 sin leer') : tf('n_sin_leer', '{n} sin leer', { n: nuevos.length }))}</h2>
+        <button type="button" class="p-av-link" id="btnTodo">${esc(t('marcar_leidos', 'Marcar leídos'))}</button></div>
+        <ul class="p-av-lista">${nuevos.map(item).join('')}</ul></div>` : `<p class="p-av-aldia">${BP.ico.check}<span>${esc(t('al_dia', 'Estás al día.'))}</span></p>`}
+      ${vis.length ? `<div class="p-av-grupo"><div class="p-av-grupo-cab"><h2 class="p-av-grupo-t">${esc(t('anteriores', 'Anteriores'))}</h2></div>
+        <ul class="p-av-lista">${vis.map(item).join('')}</ul>
+        ${leidos.length > vis.length ? `<button type="button" class="p-btn p-av-mas" id="btnMas">${esc(tf('ver_mas', 'Ver {n} más', { n: Math.min(20, leidos.length - vis.length) }))}</button>` : ''}</div>` : ''}`;
+  }
+  async function cargarLista(){
+    try { E.avisos = await D.avisos({ limite: 100 }); pintarLista(); }
+    catch (err) { console.error(err); $('lista').removeAttribute('aria-busy'); BP.estadoError($('lista'), t('err_cargar', 'No pudimos cargar tus avisos.'), cargarLista); }
+  }
+  $('lista').addEventListener('click', async e => {
+    if (e.target.closest('#btnTodo')) {
+      const b = e.target.closest('#btnTodo'); b.disabled = true;
+      try { E.propio = true; await D.marcarLeido(null); E.avisos.forEach(n => { if (!n.leida_en) n.leida_en = new Date().toISOString(); }); pintarLista(); BP.anunciar && BP.anunciar(t('ok_todo', 'Todo leído.')); const p = $('lista').querySelector('a'); if (p) p.focus(); }
+      catch (err) { b.disabled = false; BP.toast(msjError(err, t('err_marcar', 'No pudimos marcar los avisos.')), 'error'); }
+      return;
+    }
+    if (e.target.closest('#btnMas')) { E.verLeidos += 20; pintarLista(); return; }
+    const a = e.target.closest('a[data-id]');
+    if (a && a.classList.contains('nuevo')) {
+      e.preventDefault(); const href = a.href; a.setAttribute('aria-busy', 'true');
+      try { E.propio = true; await Promise.race([D.marcarLeido(+a.dataset.id), new Promise(r => setTimeout(r, 700))]); } catch (err) { /* igual sigue */ }
+      if (new URL(href).pathname === location.pathname) { await cargarLista(); await cargarCoin(); abrirDesdeUrl(new URL(href)); try { history.pushState(null, '', href); } catch (x) { /* nada */ } }
+      else location.href = href;
+    }
+  });
+
+  /* ── Preferencias: un interruptor ── */
+  const sw = $('prefMail');
+  (async () => { try { const p = await D.preferenciasAviso(); sw.setAttribute('aria-checked', p.email ? 'true' : 'false'); } catch (e) { /* queda prendido */ } sw.disabled = false; })();
+  sw.addEventListener('click', async () => {
+    const quiere = sw.getAttribute('aria-checked') !== 'true';
+    sw.setAttribute('aria-checked', quiere ? 'true' : 'false'); sw.disabled = true;
+    try { await D.guardarPreferenciasAviso({ email: quiere }); BP.toast(quiere ? t('ok_mail_si', 'Listo. También por mail.') : t('ok_mail_no', 'Listo. Sin mails.')); }
+    catch (err) { sw.setAttribute('aria-checked', quiere ? 'false' : 'true'); BP.toast(msjError(err, t('err_pref', 'No pudimos guardar el cambio.')), 'error'); }
+    finally { sw.disabled = false; }
+  });
+
+  /* ── Coincidencias (publicador): una tarjeta por unidad, un solo botón ── */
+  const porUnidad = () => {
+    const m = new Map();
+    E.coin.forEach(c => { const k = String(c.aviso_id); if (!m.has(k)) m.set(k, { aviso: c, busquedas: [] }); m.get(k).busquedas.push(c); });
+    return Array.from(m.values()).sort((x, y) => (y.busquedas.filter(b => !b.propuesta).length - x.busquedas.filter(b => !b.propuesta).length) || (y.busquedas.length - x.busquedas.length));
+  };
+  const nombreUnidad = a => a.aviso_direccion || a.aviso_titulo || t('tu_unidad', 'tu unidad');
+  const precioUnidad = a => a.aviso_precio != null ? BP.fmtPrecio(+a.aviso_precio, a.aviso_moneda) + (a.aviso_operacion !== 'venta' ? ' ' + t('por_mes', 'por mes') : '') : '';
+  function tarjetaUnidad(u){
+    const a = u.aviso, n = u.busquedas.length, propuestas = u.busquedas.filter(b => b.propuesta).length;
+    const titulo = n === 1 ? tf('una_persona', '1 persona busca algo como {u}', { u: nombreUnidad(a) }) : tf('n_personas', '{n} personas buscan algo como {u}', { n, u: nombreUnidad(a) });
+    return `<li><article class="p-av-uni" id="u-${esc(a.aviso_id)}" aria-labelledby="ut-${esc(a.aviso_id)}" tabindex="-1">
+      <span class="p-av-uni-foto" aria-hidden="true">${foto(a.foto, 240)}</span>
+      <div class="p-av-uni-txt">
+        <h3 class="p-av-uni-t" id="ut-${esc(a.aviso_id)}">${esc(titulo)}</h3>
+        <p class="p-av-uni-ctx">${esc([a.aviso_barrio, precioUnidad(a)].filter(Boolean).join(' · '))}</p>
+        ${propuestas ? `<p class="p-av-uni-estado">${esc(propuestas === n ? t('ya_todas', 'Ya les propusiste esta unidad') : tf('propuestas_de', 'Propusiste a {p} de {n}', { p: propuestas, n }))}</p>` : ''}
+      </div>
+      <button type="button" class="p-btn p-btn-sm${propuestas < n ? ' p-btn-fill' : ''}" data-proponer="${esc(a.aviso_id)}">${esc(propuestas < n ? t('ver_proponer', 'Ver y proponer') : t('ver', 'Ver'))}</button>
+    </article></li>`;
+  }
+  function pintarCoin(){
+    const host = $('coin'); if (!host) return; host.removeAttribute('aria-busy');
+    const us = porUnidad(), pend = us.filter(u => u.busquedas.some(b => !b.propuesta)).length;
+    if ($('nC')) { $('nC').textContent = pend || ''; $('nC').hidden = !pend; }
+    host.innerHTML = us.length ? `<ul class="p-av-unis">${us.map(tarjetaUnidad).join('')}</ul>`
+      : `<div class="p-dg-vacio"><p class="p-dg-vacio-t">${esc(t('coin_vacio_t', 'Sin coincidencias todavía'))}</p>
+        <p>${esc(t('coin_vacio_p', 'Te avisamos cuando alguien busque algo como tus unidades.'))}</p>
+        <a class="p-btn p-btn-fill" href="explorar.html#se-busca">${esc(t('coin_vacio_btn', 'Ver búsquedas'))}</a></div>`;
+  }
+  async function cargarCoin(){
+    if (!pub) return;
+    try { E.coin = (await D.coincidencias()) || []; pintarCoin(); }
+    catch (err) { console.error(err); $('coin').removeAttribute('aria-busy'); BP.estadoError($('coin'), t('err_coin', 'No pudimos cargar las coincidencias.'), cargarCoin); }
+  }
+  const PERFIL = p => (D.PERFILES && D.PERFILES[p]) || '';
+  function proponer(avisoId, boton){
+    const u = porUnidad().find(x => String(x.aviso.aviso_id) === String(avisoId)); if (!u) return;
+    const a = u.aviso, libres = u.busquedas.filter(b => !b.propuesta);
+    const opcion = b => { const bb = b.busqueda || {}, usada = !!b.propuesta;
+      return `<label class="p-dg-unidad p-av-bus${usada ? ' usada' : ''}">
+        <input type="radio" name="b" value="${esc(b.busqueda_id)}"${usada ? ' disabled' : ''}${!usada && libres.length === 1 ? ' checked' : ''}>
+        <span class="p-dg-unidad-txt"><b>${esc(D.resumenBusqueda(bb) || t('una_busqueda', 'Una búsqueda'))}</b>
+          <span>${esc([PERFIL(bb.perfil), bb.verificada ? t('verificada', 'Verificada') : '', bb.detalle ? '“' + bb.detalle + '”' : ''].filter(Boolean).join(' · '))}</span>
+          ${usada ? `<em>${esc(b.propuesta === 'aceptada' ? t('aceptada', 'Aceptó tu propuesta') : b.propuesta === 'rechazada' ? t('rechazada', 'No la aceptó') : t('ya_propuesta', 'Ya se la propusiste'))}</em>` : ''}</span>
+      </label>`; };
+    const cuerpo = `<p class="p-dg-resumen">${esc(nombreUnidad(a))}${precioUnidad(a) ? ' · ' + esc(precioUnidad(a)) : ''}</p>
+      <form class="p-dg-form" id="fProp" novalidate>
+        <fieldset class="p-dg-grupo" id="gBus"><legend>${esc(libres.length ? t('elegi_busqueda', 'Elegí la búsqueda') : t('todas_propuestas', 'Ya se la propusiste a todos'))}</legend>
+          <div class="p-dg-unidades">${u.busquedas.map(opcion).join('')}</div></fieldset>
+        ${libres.length ? `<label class="p-dg-campo"><span>${esc(t('msj', 'Mensaje'))} <small>${esc(t('opcional', '(opcional)'))}</small></span>
+          <textarea id="propMsj" maxlength="1000" rows="3" placeholder="${esc(t('msj_ph', 'Por qué esta unidad encaja con lo que busca.'))}"></textarea></label>
+        <div class="p-av-fijo"><button type="submit" class="p-btn p-btn-fill" id="propEnviar">${esc(t('enviar', 'Proponer'))}</button>
+          <p class="p-dg-nota">${BP.ico.shield}<span>${esc(t('nota', 'Sus datos te llegan si acepta.'))}</span></p></div>` : ''}
+      </form>`;
+    const h = hoja({ titulo: t('proponer_t', 'Proponer tu unidad'), cuerpo, devolverA: boton, primero: libres.length ? 'input[type=radio]:not([disabled])' : '[data-cerrar]' });
+    const f = h.caja.querySelector('#fProp'); if (!f || !libres.length) return;
+    f.addEventListener('change', () => { const er = h.caja.querySelector('#gBus-err'); if (er) er.hidden = true; });
+    f.addEventListener('submit', async e => {
+      e.preventDefault();
+      const sel = f.querySelector('[name=b]:checked');
+      if (!sel) { let p = h.caja.querySelector('#gBus-err'); if (!p) { p = document.createElement('p'); p.id = 'gBus-err'; p.className = 'p-err-campo'; f.querySelector('#gBus').insertAdjacentElement('afterend', p); } p.textContent = t('err_elegi', 'Elegí una búsqueda.'); p.hidden = false; f.querySelector('#gBus').setAttribute('aria-describedby', 'gBus-err'); const r = f.querySelector('input:not([disabled])'); if (r) r.focus(); return; }
+      const btn = f.querySelector('#propEnviar'); btn.disabled = true; btn.textContent = t('enviando', 'Enviando…');
+      try {
+        await D.proponer(sel.value, { id: a.aviso_id, codigo: a.aviso_codigo, titulo: a.aviso_titulo, barrio: a.aviso_barrio, precio: a.aviso_precio, moneda: a.aviso_moneda, operacion: a.aviso_operacion, etapa: a.aviso_etapa, fotos: a.foto ? [a.foto] : [] }, f.querySelector('#propMsj').value.trim());
+        h.cerrar(); BP.toast(t('ok_prop', 'Listo. Te avisamos cuando responda.'));
+        await cargarCoin(); const c = document.getElementById('u-' + a.aviso_id); if (c) c.focus();
+      } catch (err) { btn.disabled = false; btn.textContent = t('enviar', 'Proponer'); BP.toast(msjError(err, t('err_prop', 'No pudimos enviar la propuesta.')), 'error'); }
+    });
+  }
+  if ($('coin')) $('coin').addEventListener('click', e => { const b = e.target.closest('[data-proponer]'); if (b) proponer(b.dataset.proponer, b); });
+
+  /* Entrar desde un aviso: avisos.html?aviso=<id>#coincidencias abre la hoja de esa unidad; #preferencias, el interruptor */
+  function abrirDesdeUrl(u){
+    const url = u || location;
+    if (url.hash === '#preferencias') { const p = $('preferencias'); p.scrollIntoView({ block: 'center' }); setTimeout(() => sw.focus({ preventScroll: true }), 50); return; }
+    if (url.hash !== '#coincidencias' || !pub) return;
+    abrirTab(1);
+    const id = new URLSearchParams(url.search).get('aviso');
+    const card = id && document.getElementById('u-' + id);
+    if (card) { card.scrollIntoView({ block: 'center' }); const b = card.querySelector('[data-proponer]'); if (b) proponer(id, b); }
+  }
+  await Promise.all([cargarLista(), cargarCoin()]);
+  abrirDesdeUrl();
+  addEventListener('hashchange', () => abrirDesdeUrl());
+  /* Si se marca algo desde la campana estando acá, la lista se pone al día (lo que marca la página ya lo pinta ella) */
+  document.addEventListener('bp:avisos', () => { if (E.propio) { E.propio = false; return; } if (!document.hidden) cargarLista(); });
+})();
+});
+</script>
+</body>
+</html>
