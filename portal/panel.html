@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20261009g"><link rel="stylesheet" href="css/catalogo.css?v=20261009g"><link rel="stylesheet" href="css/portal.css?v=20261009g"><link rel="stylesheet" href="css/transiciones.css?v=20261009g"><link rel="stylesheet" href="css/identidad.css?v=20261009g"><style>@view-transition{navigation:auto}</style><style>html.arrancando body{opacity:0}body{transition:opacity .18s cubic-bezier(.22,1,.36,1)}@media(prefers-reduced-motion:reduce){body{transition:none}}</style><script>/* 8/10/2026 · Arranque sin pantallazo (ver BP.listo en ui.js): siempre, salvo al entrar a una ficha desde el portal (ahí la foto de la tarjeta crece hasta la ficha); en Safari del iPhone la transición entre páginas no tapaba el video al tocar el logo. Tope: 800 ms. */(function(){try{var h=document.documentElement,n=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{},r=document.referrer||'';if(r.indexOf(location.origin)===0&&n.type!=='reload'&&/propiedad/.test(location.pathname))return;h.classList.add('arrancando');setTimeout(function(){h.classList.remove('arrancando')},800)}catch(e){}})()</script>
+  <link rel="stylesheet" href="css/base.css?v=20261009h"><link rel="stylesheet" href="css/catalogo.css?v=20261009h"><link rel="stylesheet" href="css/portal.css?v=20261009h"><link rel="stylesheet" href="css/transiciones.css?v=20261009h"><link rel="stylesheet" href="css/identidad.css?v=20261009h"><style>@view-transition{navigation:auto}</style><style>html.arrancando body{opacity:0}body{transition:opacity .18s cubic-bezier(.22,1,.36,1)}@media(prefers-reduced-motion:reduce){body{transition:none}}</style><script>/* 8/10/2026 · Arranque sin pantallazo (ver BP.listo en ui.js): siempre, salvo al entrar a una ficha desde el portal (ahí la foto de la tarjeta crece hasta la ficha); en Safari del iPhone la transición entre páginas no tapaba el video al tocar el logo. Tope: 800 ms. */(function(){try{var h=document.documentElement,n=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{},r=document.referrer||'';if(r.indexOf(location.origin)===0&&n.type!=='reload'&&/propiedad/.test(location.pathname))return;h.classList.add('arrancando');setTimeout(function(){h.classList.remove('arrancando')},800)}catch(e){}})()</script>
   <style>
     .p-panel{display:grid;grid-template-columns:240px 1fr;gap:28px;align-items:start}
     .p-side-nav{background:var(--p-card);border:1px solid var(--p-line);border-radius:var(--p-radius);padding:10px;position:sticky;top:84px}
@@ -47,7 +47,7 @@
   <div id="content" aria-busy="true"><div class="p-skel-panel" aria-hidden="true"><div class="p-skel-line t"></div><div class="p-skel-line s"></div><div class="p-skel-line row"></div><div class="p-skel-line row"></div><div class="p-skel-line row"></div></div></div>
 </div></section>
 <div id="pFooter"></div>
-<script src="supabase-portal.js?v=20261009g" defer></script><script src="js/errores.js?v=20261009g" defer></script><script src="js/bairen-motion.js?v=20261009g" defer></script><script src="js/i18n-portal.js?v=20261009g" defer></script><script src="js/ui.js?v=20261009g" defer></script><script src="js/store.js?v=20261009g" defer></script><script src="js/data.js?v=20261009g" defer></script><script src="js/dg-identidad.js?v=20261009g" defer></script>
+<script src="supabase-portal.js?v=20261009h" defer></script><script src="js/errores.js?v=20261009h" defer></script><script src="js/bairen-motion.js?v=20261009h" defer></script><script src="js/i18n-portal.js?v=20261009h" defer></script><script src="js/ui.js?v=20261009h" defer></script><script src="js/store.js?v=20261009h" defer></script><script src="js/data.js?v=20261009h" defer></script><script src="js/dg-identidad.js?v=20261009h" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -422,7 +422,24 @@ document.addEventListener('DOMContentLoaded', function(){
             <div class="acts"><button type="button" class="p-btn p-btn-sm" data-avatar-subir>${BP.t('img_subir', 'Subir una foto')}</button><input type="file" accept="image/*" hidden data-avatar-file aria-label="${BP.esc(BP.t('img_subir', 'Subir una foto'))}"><button type="button" class="p-btn p-btn-sm p-btn-quiet" data-avatar-quitar${av0.tipo === 'foto' ? '' : ' hidden'}>${BP.t('img_quitar', 'Quitar')}</button></div>
             <p class="p-note">${BP.t('img_nota', 'Un ícono o una foto tuya. La foto se recorta sola, cuadrada y al centro.')}</p>
           </fieldset></dd></div>`;
+    /* 9/10 · Con BAIREN digital, lo primero de Mi cuenta son los accesos (un div con rol de navegación: base.css fija todo <nav> como header): Pagos, identidad, avisos y membresía (y, para el
+       equipo, lo de todos). En el celular la pestaña Cuenta abre el panel y no había otro camino a Pagos. */
+    const CHEV = '<svg class="ch" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
+    const atajo = a => `<a class="p-atajo" href="${BP.esc(a[0])}"><span class="t">${BP.esc(a[1])}<small>${BP.esc(a[2])}</small></span>${CHEV}</a>`;
+    const atajos = BP.digital() ? `<div class="p-atajos" role="navigation" aria-label="${BP.esc(BP.t('pan_atajos', 'Tu cuenta en BAIREN'))}">
+        ${[['pagos.html', BP.t('dg_pagos', 'Pagos'), BP.t('pan_at_pagos', 'Señas, cuotas y recibos')],
+           ['cuenta-verificacion.html', BP.t('dg_identidad_menu', 'Tu identidad'), BP.t('pan_at_identidad', 'Verificala una vez y listo')],
+           ['avisos.html', BP.t('dg_avisos_t', 'Avisos'), BP.t('pan_at_avisos', 'Lo nuevo de tus operaciones')],
+           ['inversores.html', BP.t('dg_membresia', 'Membresía Inversor'), BP.t('pan_at_inversor', 'Lanzamientos antes que nadie')]].map(atajo).join('')}
+        <div class="p-atajos-eq" data-atajos-equipo hidden><p class="p-atajos-l">${BP.t('pan_at_equipo', 'Equipo BAIREN')}</p>
+        ${[['pagos.html?vista=todos', BP.t('pan_at_pagos_todos', 'Pagos de todos'), BP.t('pan_at_pagos_todos_s', 'Señas y cuotas de cada operación')],
+           ['cobros.html', BP.t('dg_cobros', 'Cobros'), BP.t('pan_at_cobros', 'Tarifas de BAIREN y escenarios')],
+           ['garantias.html', BP.t('dg_garantias', 'Garantías'), BP.t('pan_at_garantias', 'Pedidos y empresas')],
+           ['inversores.html?admin', BP.t('dg_inversores_admin', 'Miembros'), BP.t('pan_at_miembros', 'Membresía Inversor')],
+           ['curacion.html', BP.t('curacion', 'Curación'), BP.t('pan_at_curacion', 'Avisos por revisar')]].map(atajo).join('')}</div>
+      </div>` : '';
     content.innerHTML = `<h1 class="p-h2">${BP.t('mi_cuenta', 'Mi cuenta')}</h1>
+      ${atajos}
       <dl class="p-ficha-cuenta">
         ${filaImagen}
         <div><dt>${BP.t('pan_mail', 'Mail')}</dt><dd>${BP.esc(BPStore.session.email)}</dd></div>
@@ -433,6 +450,7 @@ document.addEventListener('DOMContentLoaded', function(){
       <div class="p-head-acts p-cuenta-acts">${pub ? `<a class="p-btn" href="publicar-aviso.html?paso=perfil">${BP.t('pan_editar_publicador', 'Editar perfil de publicador')}</a>` : `<a class="p-btn p-btn-fill" href="publicar-aviso.html">${BP.t('pan_publicar_prop', 'Publicar una propiedad')}</a>`}<button type="button" class="p-btn p-btn-quiet" data-logout>${BP.t('cerrar_sesion', 'Cerrar sesión')}</button></div>
       <p class="p-note p-cuenta-priv">${BP.t('pan_privacidad', '<b>Privacidad.</b> Podés pedir acceso, corrección o borrado de tus datos escribiendo a <a href="mailto:portal@bairengroup.com">portal@bairengroup.com</a>. Los documentos de verificación se eliminan después de revisarlos.')}</p>`;
     content.querySelector('[data-logout]').addEventListener('click', async () => { await BPStore.signOut(); location.href = 'index.html'; });
+    const eq = content.querySelector('[data-atajos-equipo]'); if (eq) BPStore.isCurador().then(ok => { eq.hidden = !ok; }).catch(() => {});
     /* 9/10/2026 · Domicilio legal (migración 29, Res. SIC 446/2025): se guarda solo ese dato del publicador (BPIdentidad) */
     const fDom = content.querySelector('[data-dom]');
     if (fDom) fDom.addEventListener('submit', async e => {

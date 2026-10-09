@@ -244,6 +244,7 @@ caso('Cobros: un escenario con porcentaje de la operación se rechaza', /Ley 234
 await digital(false);
 await c.ir('precios.html', 1500);
 caso('Precios apagado: Muy pronto', /Muy pronto/.test(await c.ev('document.getElementById("contenido").innerText')), null);
+await digital(true);   /* deja el portal abierto para la prueba que sigue (la cookie bp_cerrado dura 2 minutos) */
 
 out.medidas = out.medidas.map(x => ({ n: x.nombre, scrollX: x.scrollX, continuar: x.continuarVisible, palabras: x.palabras }));
 caso('Medidas: sin scroll horizontal y Continuar a la vista en todas', out.medidas.every(x => !x.scrollX && x.continuar), out.medidas);

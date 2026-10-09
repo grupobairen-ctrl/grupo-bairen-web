@@ -28,4 +28,5 @@ corre garantias-cel   portal/test/rieles/garantias.mjs mobile
 corre garantias-compu portal/test/rieles/garantias.mjs desktop
 corre desarrollos     portal/test/rieles/desarrollos.mjs
 corre tarifas         portal/test/rieles/tarifas.mjs
+corre cuenta          portal/test/rieles/cuenta.mjs
 exit $falla

@@ -243,7 +243,7 @@
   (function estilos(){
     try {
       document.body.classList.add('dg-garantias');
-      if (!document.querySelector('link[data-dg-garantias]')) { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'css/garantias.css?v=20261009g'; l.setAttribute('data-dg-garantias', ''); document.head.appendChild(l); }
+      if (!document.querySelector('link[data-dg-garantias]')) { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'css/garantias.css?v=20261009h'; l.setAttribute('data-dg-garantias', ''); document.head.appendChild(l); }
     } catch (e) {}
   })();
 

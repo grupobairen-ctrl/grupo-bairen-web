@@ -542,6 +542,9 @@
      ni con data-flujo. Al dibujarse marca <html class="con-tabbar">: el CSS deja lugar abajo y el menú de arriba
      esconde lo que ya está en la barra. Es un div con role="navigation": el <nav> suelto lleva el estilo viejo
      del header fijo (catalogo.css). */
+  /* 9/10 · Con BAIREN digital, la pestaña Cuenta abre Mi cuenta (Pagos, identidad, avisos y membresía arriba de todo), como
+     en una app; las otras vistas del panel quedan a un toque en las pastillas de arriba */
+  BP.tabCuenta = () => BP.digital() ? 'panel.html#cuenta' : 'panel.html';
   BP.tabbar = function(){
     const b = document.body;
     if (!b || b.hasAttribute('data-flujo') || b.classList.contains('p-ficha-page') || b.classList.contains('p-herramienta') || document.getElementById('pTabbar')) return;
@@ -561,12 +564,12 @@
       ['explorar', 'explorar.html', BP.ico.search, BP.t('dg_explorar', 'Explorar')],
       ['guardados', 'guardados.html', BP.ico.heart, BP.t('tab_guardados', 'Guardados')],
       ['mensajes', 'mensajes.html', BP.ico.chat, BP.t('dg_mensajes', 'Mensajes')],
-      ['cuenta', ses ? 'panel.html' : 'ingresar.html', BP.ico.user, BP.t('tab_cuenta', 'Cuenta')]
+      ['cuenta', ses ? BP.tabCuenta() : 'ingresar.html', BP.ico.user, BP.t('tab_cuenta', 'Cuenta')]
     ] : [
       ['inicio', 'index.html', BP.ico.home, BP.t('tab_inicio', 'Inicio')],
       ['buscar', BP.ultimaBusqueda(), BP.ico.search, BP.t('tab_buscar', 'Buscar')],
       ['guardados', 'guardados.html', BP.ico.heart, BP.t('tab_guardados', 'Guardados')],
-      ['cuenta', ses ? 'panel.html' : 'ingresar.html', BP.ico.user, BP.t('tab_cuenta', 'Cuenta')]
+      ['cuenta', ses ? BP.tabCuenta() : 'ingresar.html', BP.ico.user, BP.t('tab_cuenta', 'Cuenta')]
     ];
     const bar = document.createElement('div');
     bar.id = 'pTabbar'; bar.className = 'p-tabbar'; bar.setAttribute('role', 'navigation'); bar.setAttribute('aria-label', BP.t('tab_aria', 'Accesos'));
@@ -639,14 +642,16 @@
       if (mob) {
         const cta = mob.querySelector('.m-cta'); if (cta) cta.innerHTML = `<a class="p-btn p-btn-sm" href="publicar-aviso.html">${BP.t('publicar', 'Publicar')}</a><a class="p-btn p-btn-sm p-btn-fill m-sin-tabbar" href="panel.html">${BP.t('mi_cuenta', 'Mi cuenta')}</a>`;
         /* lanz3-visitante · Guardados ya es un renglón del menú: acá quedan los contactos */
-        const cuenta = mob.querySelector('.m-cuenta'); if (cuenta) { cuenta.hidden = false; cuenta.innerHTML = BP.digital() ? `<a href="pagos.html">${BP.esc(BP.t('dg_pagos', 'Pagos'))}</a><a href="cuenta-verificacion.html">${BP.esc(BP.t('dg_identidad_menu', 'Tu identidad'))}</a><a href="inversores.html">${BP.esc(BP.t('dg_membresia', 'Membresía Inversor'))}</a>` : `<a href="panel.html#contactos">${BP.ico.chat} <span data-i18n="mis_contactos">Mis contactos</span></a>`; }
+        /* 9/10 · Con BAIREN digital, lo de la cuenta va en el menú también donde está la barra de abajo: la pestaña Cuenta abre
+           el panel, y Pagos, Tu identidad y lo del equipo no tenían otro camino en el celular */
+        const cuenta = mob.querySelector('.m-cuenta'); if (cuenta) { cuenta.hidden = false; cuenta.classList.toggle('m-sin-tabbar', !BP.digital()); cuenta.innerHTML = BP.digital() ? `<a href="pagos.html">${BP.esc(BP.t('dg_pagos', 'Pagos'))}</a><a href="cuenta-verificacion.html">${BP.esc(BP.t('dg_identidad_menu', 'Tu identidad'))}</a><a href="inversores.html">${BP.esc(BP.t('dg_membresia', 'Membresía Inversor'))}</a><a href="cobros.html" data-curador hidden>${BP.esc(BP.t('dg_cobros', 'Cobros'))}</a><a href="garantias.html" data-curador hidden>${BP.esc(BP.t('dg_garantias', 'Garantías'))}</a><a href="inversores.html?admin" data-curador hidden>${BP.esc(BP.t('dg_inversores_admin', 'Miembros'))}</a><a href="curacion.html" data-curador hidden>${BP.esc(BP.t('curacion', 'Curación'))}</a>` : `<a href="panel.html#contactos">${BP.ico.chat} <span data-i18n="mis_contactos">Mis contactos</span></a>`; }
         /* lanz3-visitante · Cerrar sesión, a un toque desde el menú (antes eran cuatro gestos dentro del panel) */
         if (!mob.querySelector('.m-salir')) { const ref = mob.querySelector('.m-cta'); if (ref) { ref.insertAdjacentHTML('afterend', `<button type="button" class="m-salir" data-logout>${BP.esc(BP.t('cerrar_sesion', 'Cerrar sesión'))}</button>`); if (!mob.classList.contains('open')) mob.querySelector('.m-salir').tabIndex = -1; } }
       }
       BP.avatarFallback(right, session.email); if (mob) BP.avatarFallback(mob, session.email);
-      document.querySelectorAll('#pTabbar [data-tab="cuenta"]').forEach(a => { a.href = 'panel.html'; });
+      document.querySelectorAll('#pTabbar [data-tab="cuenta"]').forEach(a => { a.href = BP.tabCuenta(); });
       document.querySelectorAll('.p-nav-right [data-logout], .mobile-menu [data-logout]').forEach(b => { if (b._salir) return; b._salir = true; b.addEventListener('click', async e => { e.preventDefault(); await window.BPStore.signOut(); BP.toast(BP.t('ui_sesion_cerrada', 'Sesión cerrada.')); setTimeout(() => location.href = 'index.html', 600); }); });
-      if (window.BPStore) window.BPStore.isCurador().then(ok => { right.querySelectorAll('[data-curador]').forEach(a => a.hidden = !ok); });
+      if (window.BPStore) window.BPStore.isCurador().then(ok => { [right, mob].forEach(el => { if (el) el.querySelectorAll('[data-curador]').forEach(a => a.hidden = !ok); }); });
       /* El lado derecho se dibujó de nuevo: "Publicar" (¿Quién publica?), "Mi cuenta" y el idioma se enganchan ya */
       BP.crear(right); if (BP.desplegables) BP.desplegables(right); BP.idioma(document);
     } else {
@@ -668,8 +673,8 @@
     if (burger && burger.closest('.p-navbar')) burger.insertAdjacentHTML('beforebegin', `<div class="p-campana p-campana-m" data-dg-campana hidden><button type="button" class="p-bell" aria-label="${BP.esc(BP.t('dg_avisos_campana', 'Avisos'))}">${BP.ico.bell}<span class="p-campana-n" hidden></span></button></div>`);
     const cargar = src => new Promise((ok, mal) => { const sc = document.createElement('script'); sc.src = src; sc.onload = ok; sc.onerror = mal; document.head.appendChild(sc); });
     BP._dgAvisos = BP._dgAvisos || (async () => {
-      if (!window.BPDigital) await cargar('js/digital.js?v=20261009g');
-      if (!window.BPDigital.campana) await cargar('js/dg-avisos.js?v=20261009g');
+      if (!window.BPDigital) await cargar('js/digital.js?v=20261009h');
+      if (!window.BPDigital.campana) await cargar('js/dg-avisos.js?v=20261009h');
     })();
     BP._dgAvisos.then(() => { document.querySelectorAll('[data-dg-campana]').forEach(el => window.BPDigital.campana(el)); }).catch(() => { BP._dgAvisos = null; });
   };
