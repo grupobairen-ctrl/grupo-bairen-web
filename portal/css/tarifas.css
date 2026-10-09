@@ -1,0 +1,82 @@
+/* BAIREN · Portal · Tarifas (migración 35, 9/10/2026). Tres lugares, cada uno colgado de la clase de su body:
+   · body.p-flujo-pub: la barra del estimado arriba de Continuar y su hoja (reusa .pf-hoja del asistente para publicar);
+   · body.p-precios: la página de precios, una tarjeta por tipo de publicación;
+   · body.p-cobros: el selector "Escenario que ven los publicadores".
+   Papel, navy y oro tinta; Playfair para el número importante, Jost para el resto. Nada por debajo de 12 px. Los radios
+   van con !important porque portal.css pone en 0 el radio de los botones dentro de elementos con clase p-. */
+
+/* ── La barra del estimado (publicar-aviso.html) ───────────────────────────────────────────────────────── */
+body.p-flujo-pub .tf-barra{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:12px;max-width:var(--pf-ancho);margin:0 auto 10px}
+body.p-flujo-pub.pf-ancho .tf-barra{max-width:860px}
+body.p-flujo-pub .tf-barra[hidden]{display:none}
+body.p-flujo-pub .tf-l1{grid-column:1;grid-row:1;margin:0;font:400 .8125rem/1.3 var(--font-body);color:var(--pf-medio)}
+body.p-flujo-pub .tf-l2{grid-column:1/-1;grid-row:2;min-width:0;margin:1px 0 0;display:flex;align-items:baseline;flex-wrap:wrap;gap:0 8px;font:400 .8125rem/1.3 var(--font-body);color:var(--pf-navy)}
+body.p-flujo-pub .tf-l2 b{font:400 1.25rem/1.15 var(--font-display);color:var(--pf-navy);white-space:nowrap}
+/* 44 px de alto táctil, sin agrandar el renglón (los márgenes negativos lo superponen al monto, que no se toca) */
+body.p-flujo-pub .tf-ver{grid-column:2;grid-row:1;min-height:44px;margin:-12px 0;padding:0 2px;background:none;border:0;color:var(--pf-oro-tinta);font:500 .875rem/1 var(--font-body);
+  text-decoration:underline;text-decoration-color:rgba(117,98,60,.5);text-underline-offset:4px;cursor:pointer;white-space:nowrap}
+body.p-flujo-pub .tf-ver:hover{color:var(--pf-navy)}
+body.p-flujo-pub .tf-ver:focus-visible{outline:2px solid var(--pf-oro);outline-offset:2px;border-radius:4px!important}
+/* La barra suma su alto al pie: el contenido deja lugar y Continuar sigue a la vista */
+body.p-flujo-pub.tf-con-estimado{--pf-pie:calc(134px + env(safe-area-inset-bottom,0px))}
+body.p-flujo-pub.tf-con-estimado.pf-doble{--pf-pie:calc(200px + env(safe-area-inset-bottom,0px))}
+
+/* La hoja del detalle: cada servicio en una línea (nombre, precio) y los supuestos en letra chica */
+body.p-flujo-pub .tf-hoja .tf-intro{margin:-6px 0 10px;font:400 .875rem/1.45 var(--font-body);color:var(--pf-medio)}
+body.p-flujo-pub .tf-items{list-style:none;margin:0;padding:0}
+body.p-flujo-pub .tf-items li{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:16px;padding:11px 0;border-top:1px solid var(--pf-linea)}
+body.p-flujo-pub .tf-items .tf-n{font:400 1rem/1.3 var(--font-body);color:var(--pf-navy)}
+body.p-flujo-pub .tf-items .tf-m{font:500 1rem/1.3 var(--font-body);color:var(--pf-navy);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+body.p-flujo-pub .tf-items small{grid-column:1/-1;margin-top:2px;font:400 .8125rem/1.4 var(--font-body);color:var(--pf-medio)}
+body.p-flujo-pub .tf-total{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin:0;padding:13px 0 2px;border-top:1px solid var(--pf-navy);color:var(--pf-navy)}
+body.p-flujo-pub .tf-total span{font:500 .9375rem/1.3 var(--font-body)}
+body.p-flujo-pub .tf-total b{font:400 1.5rem/1.1 var(--font-display);white-space:nowrap}
+body.p-flujo-pub .tf-sup{margin:10px 0 0;font:400 .8125rem/1.45 var(--font-body);color:var(--pf-medio)}
+body.p-flujo-pub .tf-lanz{margin-top:6px;color:var(--pf-oro-tinta)}
+body.p-flujo-pub .tf-lanz a{color:inherit;text-underline-offset:3px;white-space:nowrap}
+body.p-flujo-pub .tf-hoja .pf-hoja-acc{margin-top:14px}
+
+/* ── Precios (precios.html) ────────────────────────────────────────────────────────────────────────────── */
+body.p-precios{--tp-papel:#F6F2E8;--tp-sup:#FFFDF8;--tp-linea:rgba(19,29,45,.10);--tp-navy:#131D2D;--tp-medio:#59647A;--tp-oro:#75623C;background:var(--tp-papel);color:var(--tp-navy)}
+body.p-precios .tp-in{max-width:1120px;margin:0 auto;padding:104px 16px 72px}
+@media(min-width:900px){body.p-precios .tp-in{padding:128px 32px 96px}}
+body.p-precios .tp-cab{max-width:680px;margin:0 0 28px}
+body.p-precios .tp-pre{margin:0 0 8px;font:500 .8125rem/1.2 var(--font-body);color:var(--tp-oro)}
+body.p-precios h1{margin:0 0 12px;font:400 clamp(2rem,6vw,3rem)/1.08 var(--font-display);color:var(--tp-navy)}
+body.p-precios h1 em{font-style:italic}
+body.p-precios .tp-sub{margin:0;font:300 1.0625rem/1.55 var(--font-body);color:var(--tp-medio)}
+body.p-precios .tp-confia{list-style:none;margin:18px 0 0;padding:0;display:grid;gap:6px}
+body.p-precios .tp-confia li{display:flex;align-items:flex-start;gap:10px;font:400 .9375rem/1.45 var(--font-body);color:var(--tp-navy)}
+body.p-precios .tp-confia svg{flex:0 0 18px;width:18px;height:18px;margin-top:2px;color:var(--tp-oro)}
+body.p-precios .tp-lanz{display:inline-flex;margin:18px 0 0;padding:6px 12px;border:1px solid rgba(117,98,60,.35);border-radius:var(--r-pill,999px)!important;font:500 .8125rem/1.2 var(--font-body);color:var(--tp-oro);background:rgba(117,98,60,.06)}
+body.p-precios .tp-tarjetas{display:grid;gap:14px;margin:8px 0 0}
+@media(min-width:700px){body.p-precios .tp-tarjetas{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(min-width:1080px){body.p-precios .tp-tarjetas{grid-template-columns:repeat(3,minmax(0,1fr))}}
+body.p-precios .tp-t{display:flex;flex-direction:column;background:var(--tp-sup);border:1px solid var(--tp-linea);border-radius:var(--r-box,14px)!important;padding:20px 20px 16px}
+body.p-precios .tp-t h2{margin:0;font:500 1rem/1.3 var(--font-body);color:var(--tp-navy)}
+body.p-precios .tp-t-d{margin:2px 0 0;font:400 .8125rem/1.4 var(--font-body);color:var(--tp-medio)}
+body.p-precios .tp-total{margin:14px 0 0;font:400 2.25rem/1.05 var(--font-display);color:var(--tp-navy);font-variant-numeric:lining-nums}
+body.p-precios .tp-total small{font:400 .9375rem/1.2 var(--font-body);color:var(--tp-medio);margin-left:4px}
+body.p-precios .tp-sup{margin:6px 0 0;font:400 .8125rem/1.45 var(--font-body);color:var(--tp-medio)}
+body.p-precios .tp-lista{list-style:none;margin:14px 0 0;padding:0}
+body.p-precios .tp-lista li{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:14px;padding:10px 0;border-top:1px solid var(--tp-linea)}
+body.p-precios .tp-lista .n{font:400 .9375rem/1.35 var(--font-body);color:var(--tp-navy)}
+body.p-precios .tp-lista .m{font:500 .9375rem/1.35 var(--font-body);color:var(--tp-navy);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+body.p-precios .tp-lista small{grid-column:1/-1;margin-top:2px;font:400 .8125rem/1.4 var(--font-body);color:var(--tp-medio)}
+body.p-precios .tp-lista .corredor .n::after{content:attr(data-tag);display:inline-block;margin-left:8px;padding:2px 8px;border-radius:var(--r-pill,999px);background:rgba(19,29,45,.06);font:500 .75rem/1.4 var(--font-body);color:var(--tp-medio);vertical-align:1px}
+body.p-precios .tp-todas{margin:18px 0 0;font:400 .875rem/1.5 var(--font-body);color:var(--tp-medio)}
+body.p-precios .tp-todas b{font-weight:500;color:var(--tp-navy)}
+body.p-precios .tp-cta{display:flex;flex-direction:column;align-items:flex-start;gap:10px;margin:36px 0 0}
+body.p-precios .tp-cta .p-btn{min-height:48px;padding:0 28px;border-radius:var(--r-pill,999px)!important}
+body.p-precios .tp-pie{margin:0;font:400 .8125rem/1.5 var(--font-body);color:var(--tp-medio);max-width:640px}
+body.p-precios .tp-vacio{margin:24px 0}
+
+/* ── Cobros: el escenario que ven los publicadores ─────────────────────────────────────────────────────── */
+body.p-cobros .tf-esc-pub{display:grid;gap:6px;max-width:760px;margin:-12px 0 28px;padding:14px 16px;background:#FFFDF8;border:1px solid rgba(19,29,45,.10);border-radius:var(--r-box,14px)!important}
+body.p-cobros .tf-esc-pub label{font:500 .8125rem/1.3 var(--font-body);color:#75623C}
+body.p-cobros .tf-esc-fila{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px}
+body.p-cobros .tf-esc-fila select{flex:1 1 240px;min-width:0;min-height:44px;padding:8px 12px;border:1px solid rgba(19,29,45,.18);border-radius:var(--r-ctl,10px)!important;background:#fff;font:400 1rem/1.3 var(--font-body);color:#131D2D}
+body.p-cobros .tf-esc-fila a{font:400 .875rem/1.2 var(--font-body);color:#75623C;text-underline-offset:3px}
+body.p-cobros .tf-esc-pub p{margin:0;font:300 .8125rem/1.45 var(--font-body);color:#59647A}
+
+@media(prefers-reduced-motion:reduce){body.p-flujo-pub .tf-hoja .pf-hoja-caja,body.p-flujo-pub .tf-hoja .pf-hoja-fondo{animation:none}}
