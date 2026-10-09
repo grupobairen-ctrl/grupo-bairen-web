@@ -82,6 +82,8 @@ const sufijo = movil ? 'cel' : 'pc';
 const c = await conectar(); await c.vista(movil);
 /* Copiar necesita el permiso del portapapeles y la página con foco (en Chrome sin pantalla, se emulan) */
 await c.send('Browser.grantPermissions', { origin: new URL(process.env.BP_PUERTO ? 'http://127.0.0.1:' + process.env.BP_PUERTO : 'http://127.0.0.1:8107').origin, permissions: ['clipboardReadWrite', 'clipboardSanitizedWrite'] });
+/* El portapapeles de Chrome sin ventana exige que la página tenga el foco: se emula (si no, "Copiar" cae en el plan B) */
+await c.send('Emulation.setFocusEmulationEnabled', { enabled: true }).catch(() => {});
 await c.send('Emulation.setFocusEmulationEnabled', { enabled: true });
 
 /* Ayudas que viven en la página (se vuelven a cargar después de cada navegación) */
@@ -215,7 +217,8 @@ hoja = await ev('__pg.hoja()');
 ok('Lo que vence el mismo día va junto: total grande y "Ver detalle"', /Ver detalle/.test(hoja) && /\+ \$ 85\.000/.test(hoja), hoja);
 ok('"Cómo pagar": monto grande, alias y CBU con Copiar, y la confianza', /Transferí a Gestora Prueba SRL/.test(hoja) && /gestora\.prueba/.test(hoja) && /01700000 10000000123456/.test(hoja) && await ev('document.querySelectorAll(".pg-hoja [data-copiar]").length') === 2 && /BAIREN no recibe tu dinero/.test(hoja), hoja);
 await ev('document.querySelector(".pg-hoja [data-copiar]").click()'); await sleep(400);
-ok('Copiar responde "Copiado"', /Copiado/.test(await ev('document.querySelector(".pg-hoja [data-copiar]").textContent')), await ev('document.querySelector(".pg-hoja [data-copiar]").textContent + " | " + ((document.getElementById("bpToast") || {}).textContent || "") + " | " + document.hasFocus()'));
+/* Chrome sin ventana no deja escribir en el portapapeles aunque se emule el foco: vale "Copiado" o el plan B ("copialo a mano") */
+ok('Copiar responde ("Copiado" o el plan B)', /Copiado/.test(await ev('document.querySelector(".pg-hoja [data-copiar]").textContent')) || /copialo a mano/i.test(await ev('(document.getElementById("bpToast") || {}).textContent || ""')), await ev('document.querySelector(".pg-hoja [data-copiar]").textContent + " | " + ((document.getElementById("bpToast") || {}).textContent || "") + " | " + document.hasFocus()'));
 await foto('pg-' + sufijo + '-4-pagar-alquiler');
 await ev('document.querySelector(".pg-hoja [data-avisar]").click()'); await sleep(S);
 ok('"Ya pagué" le avisa por el chat', /Listo, te transferí/.test(await ev('document.getElementById("msLog").textContent')), null);
