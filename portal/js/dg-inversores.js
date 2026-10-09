@@ -160,13 +160,15 @@
     const filas = await novedadesBase.apply(D, arguments);
     if (base()) return filas;
     const miembro = await D.esMiembro(); const ahora = Date.now(); const pubs = K.pubs.get([]);
+    let miPubId = null; try { const mp = await BPStore.getMyPublicador(); miPubId = mp && mp.id; } catch (e) {}
     return filas.filter(r => {
       if (!r.publicacion_id) { r.visible_desde_publico = null; r.anticipado = false; return true; }
       const p = pubs.find(x => x.id === r.publicacion_id) || {};
       const pubEn = t0(r.fecha) || ahora;
       const desde = p.visible_desde_publico ? Math.max(t0(p.visible_desde_publico), pubEn) : pubEn + (r.tipo === 'lanzamiento' ? H48 : 0);
       r.visible_desde_publico = new Date(desde).toISOString(); r.anticipado = desde > ahora;
-      if (r.anticipado && !miembro) return false;
+      const propio = !!miPubId && (p.publicador_id === miPubId || r.publicador_id === miPubId);
+      if (r.anticipado && !miembro && !propio) return false;
       if (!miembro && desde > pubEn) r.fecha = r.visible_desde_publico;
       return true;
     });

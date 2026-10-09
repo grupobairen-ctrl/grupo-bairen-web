@@ -199,7 +199,7 @@ const resp = await ev(`BPDigital.avisos().then(l => l.filter(n => n.tipo === 'pr
 ok('Rechazada: le llega al publicador', Array.isArray(resp) && resp.length === 1 && resp[0] === 'Tu propuesta no fue aceptada | explorar.html#se-busca', resp);
 
 /* 5. Entrar desde el aviso abre directo la hoja de esa unidad */
-await ir('avisos.html?aviso=aviso-1#coincidencias', 2400);
+await ir('avisos.html?aviso=aviso-1#coincidencias', 4000);
 ok('avisos.html?aviso=…#coincidencias abre la hoja de esa unidad', await esperarQue(`(() => { const h = document.querySelector('.p-dg-velo.on .p-dg-resumen'); return h && /Gorriti 4800/.test(h.textContent); })()`));
 await ev('history.back(); true'); await sleep(700);
 ok('Atrás cierra la hoja y deja la página', await ev(`!document.querySelector('.p-dg-velo') && /avisos\.html$/.test(location.pathname) && document.getElementById('tabC').getAttribute('aria-selected') === 'true'`));

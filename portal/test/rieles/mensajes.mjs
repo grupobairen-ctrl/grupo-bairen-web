@@ -133,8 +133,11 @@ try {
   await accion('visita_hecha');
   await dialogo({ feedback: 'Le gustó mucho la luz.' });
   check((await texto('#msLog')).includes('Visita hecha'), '3 · visita hecha');
-  await accion('contrato_gen');
-  await dialogo({});
+  /* Desde la integración de los rieles (9/10), "Contrato preparado" y "Registrar cobro del mes" los hacen los módulos de
+     documentos y de pagos (sus pruebas propias están en test/rieles). Acá se registran por la API para seguir el recorrido. */
+  check(!(await hay('#msAcc [data-acc="contrato_gen"]')), '3 · el paso manual "Contrato preparado" lo reemplaza el riel de documentos');
+  const pasoApi = async (tipo, datos) => { await c.ev(`BPDigital.paso(new URLSearchParams(location.search).get('op'), ${JSON.stringify(tipo)}, ${JSON.stringify(datos || null)}).then(() => true)`); await c.ev('location.reload(); true'); await sleep(1500); };
+  await pasoApi('contrato_generado');
   check((await texto('#msLog')).includes('Contrato preparado'), '3 · contrato preparado');
   await accion('cerrar');
   await dialogo({ plazo_meses: '6' }, false);
@@ -144,17 +147,14 @@ try {
   await dialogo({ monto_contrato: '7200', moneda: 'USD' });
   check((await texto('#msRec')).includes('Cerrada'), '3 · etapa Cerrada', await texto('.ms-rec-txt'));
   check((await texto('#msLog')).includes('USD 7.200 · 6 meses'), '3 · hito de cierre con monto y plazo');
-  await accion('cobro');
-  const sug = await c.ev(`document.querySelector('.ms-dlg form').elements.monto.value`);
-  check(sug === '1200', '3 · cobro sugerido 1.200', sug);
-  await dialogo({});
+  check((await texto('.ms-acc-estado')).includes('cuotas'), '3 · cerrada, el riel de pagos propone armar las cuotas', await texto('.ms-acc-estado'));
+  await pasoApi('cobro_mensual', { monto: 1200, moneda: 'USD', periodo: '2026-11' });
   check((await texto('#msLog')).includes('Cobro del mes'), '3 · cobro del mes registrado');
-  check((await texto('.ms-acc-estado')).includes('Operación cerrada'), '3 · estado de cierre', await texto('.ms-acc-estado'));
   await c.ev(`document.querySelector('.ms-info-btn').click(); true`); await sleep(500);
   check(await c.ev(`document.getElementById('msOp').classList.contains('ms-panel-on')`), '3 · se abren los detalles');
   check((await texto('#msPanel')).includes('ana@prueba.local'), '3 · contacto del interesado en los detalles');
   check((await texto('#msPanel')).includes('Le gustó mucho la luz'), '3 · feedback en Visitas');
-  check((await texto('#msPanel')).includes('Muy pronto'), '3 · documentos vacíos con "Muy pronto"');
+  check((await texto('#msPanel')).includes('Acá van a estar la reserva y el contrato'), '3 · documentos vacíos con su explicación');
   await c.foto('08-detalles-pablo-movil');
   await c.ev(`document.querySelector('[data-cerrar-panel]').click(); true`); await sleep(400);
   check(!(await c.ev(`document.getElementById('msOp').classList.contains('ms-panel-on')`)), '3 · se cierran los detalles');

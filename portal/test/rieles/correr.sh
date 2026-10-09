@@ -9,8 +9,11 @@
 cd "$(dirname "$0")/../../.."
 export BP_PUERTO=${BP_PUERTO:-8107} BP_CHROME=${BP_CHROME:-9307} BP_CAPTURAS=${BP_CAPTURAS:-/tmp/bp-rieles}
 mkdir -p "$BP_CAPTURAS"; falla=0
-corre() { local n="$1"; shift; node "$@" > "$BP_CAPTURAS/$n.out" 2>&1; local r=$?
-  local malos; malos=$(grep -ciE '^(FALLA|XX|✗|NO OK)|[0-9]+ FALLAS?' "$BP_CAPTURAS/$n.out")
+# Antes de cada prueba se cierran las pestañas que dejó la anterior: con muchas abiertas, Chrome frena los relojes de las
+# de atrás y el sondeo del chat (cada 8 s) llega tarde.
+limpiar_chrome() { curl -s "http://127.0.0.1:$BP_CHROME/json/list" | python3 -I -c 'import json,sys; [print(t["id"]) for t in json.load(sys.stdin) if t.get("type") == "page"]' 2>/dev/null | tail -n +2 | while read -r id; do curl -s "http://127.0.0.1:$BP_CHROME/json/close/$id" > /dev/null; done; }
+corre() { limpiar_chrome; local n="$1"; shift; node "$@" > "$BP_CAPTURAS/$n.out" 2>&1; local r=$?
+  local malos; malos=$(grep -ciE '^(FALLA|XX|✗|NO OK)|[1-9][0-9]* FALLAS?' "$BP_CAPTURAS/$n.out")
   if [ $r -ne 0 ] || [ "$malos" != "0" ]; then echo "FALLA  $n (salida $r, $malos líneas con falla) → $BP_CAPTURAS/$n.out"; falla=1; else echo "OK     $n"; fi; }
 corre explorar        portal/test/rieles/explorar.mjs
 corre mensajes        portal/test/rieles/mensajes.mjs

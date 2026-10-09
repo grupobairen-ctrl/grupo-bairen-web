@@ -109,7 +109,7 @@ const sinScroll = async donde => { const s = await ev('__pg.scroll()'); ok('Sin 
 
 /* 0. Datos: el publicador (Pablo), la sesión de quien busca (Ana) y la operación */
 await c.ir('index.html', 300);
-await c.ev(`localStorage.clear(); sessionStorage.clear(); localStorage.setItem('bp_digital', '1');
+await c.ev(`localStorage.clear(); sessionStorage.clear(); localStorage.setItem('bp_digital', '1'); localStorage.setItem('bp_dg_identidad', JSON.stringify({ 'local-ana': { estado: 'verificada', verificada_en: new Date().toISOString() } }));
   localStorage.setItem('bp_publicadores', JSON.stringify([{ id: 'pub-gestora', slug: 'gestora-prueba', nombre: 'Gestora Prueba', razon_social: 'Gestora Prueba SRL', cuit: '30-11122233-4', tipo: 'gestor', auth_user_id: 'local-pablo', email: 'pablo@prueba.local', verificado: true, whatsapp: '5491100000000' }])); true`);
 await c.ir('pagos.html', 900);
 ok('Pagos sin sesión pide ingresar', /ingresar\.html/.test(await c.ev('location.href')), await c.ev('location.href'));
