@@ -1,19 +1,27 @@
 /**
  * Vercel Function — "Embellecer con IA" del admin
  *
- * Recibe UNA foto recién subida en admin.html y la devuelve "vuelta a sacar"
- * como lo haría un fotógrafo de arquitectura, sin cambiar la propiedad, con el
- * prompt de BAIREN. Si la foto trae marca de agua o logo encima, la saca (5/10/2026).
+ * Recibe UNA foto del admin.html y la devuelve retocada como lo haría un
+ * retocador profesional: misma toma, mismo encuadre, mismos muebles; cambian
+ * solo la luz, el color, la nitidez y las líneas torcidas. Si la foto trae marca
+ * de agua o logo encima, la saca (5/10/2026).
  * Corre por la API de OpenAI (se paga por foto, sin ChatGPT Plus).
+ *
+ * 9/10/2026: el prompt anterior pedía "volver a sacar" la foto desde otro ángulo
+ * y la salida era siempre 4:5. Para recomponer la toma, la IA redibujaba el
+ * ambiente entero y cambiaba la perspectiva, los muebles y las medidas. Ahora se
+ * pide un retoque de la misma toma, y la salida tiene la proporción de la original.
  *
  * Variables en Vercel (proyecto grupo-bairen-web, entorno Production):
  *   OPENAI_API_KEY        clave de platform.openai.com. Sin ella responde 501.
  *   ADMIN_EMAILS          mails que pueden usar el botón, separados por coma.
  *                         Sin ella responde 501: tener sesión no alcanza para gastar la
  *                         clave (el registro de Supabase estuvo abierto hasta el 1/10/2026).
- *   OPENAI_IMAGE_MODEL    opcional, por defecto 'gpt-image-2.5-sunburst'.
- *   OPENAI_IMAGE_QUALITY  opcional, por defecto 'high' (≈ USD 0,06 por foto; 'medium' ≈ 0,026 empasta textos chicos).
- *   OPENAI_IMAGE_SIZE     opcional, por defecto '1024x1280' (4:5, como las fotos de la web).
+ *   OPENAI_IMAGE_MODEL    opcional, por defecto 'gpt-image-2.5-sunburst' (el más fiel al editar).
+ *   OPENAI_IMAGE_QUALITY  opcional, por defecto 'high' (≈ USD 0,06 por foto; 'medium' ≈ 0,026 empasta
+ *                         textos chicos; 'xhigh' y 'max' existen y cuestan más).
+ *   OPENAI_IMAGE_SIZE     opcional. Sin ella, la proporción de la foto original con los
+ *                         mismos píxeles que el 1024x1280 de antes (mismo costo por foto).
  *
  * Uso (desde admin.html, con sesión):
  *   POST /api/embellecer   Authorization: Bearer <access_token de Supabase>
@@ -28,35 +36,70 @@ const SUPABASE_URL = 'https://nmrjyyrhwjroonrppnka.supabase.co';
 // Anon key pública por diseño (los datos los protege RLS) — ver supabase-config.js
 const SUPABASE_ANON_KEY = 'sb_publishable_D0YwiSL5Hm3GyOSx2r1lug_ZV7v46_n';
 
-const PROMPT = `Re-shoot this exact photograph as if a world-class architectural photographer had come to the property and taken it again for an editorial magazine feature (ArchDaily / Dezeen / Divisare standard). Two goals, in this order:
+const PROMPT = `Edit this real estate photo the way a professional photo retoucher would. This is a retouch of the SAME photograph: not a new photo, not a re-shoot, not a redesign. A person who knows the place must recognize it instantly and find nothing changed except the photo quality.
 
-1. PERFECT COMPOSITION (required): do NOT keep the original framing. Treat the original framing as a rough draft to correct, not as a reference. Recompose the shot from the ideal camera position and angle for this space: centered, balanced composition; a clean frontal one-point perspective, or a corner two-point perspective if it shows the space better; perfectly vertical lines, as if shot on a 17mm tilt-shift lens on a tripod at chest height, camera perfectly level; straight horizon; comfortable margins, nothing important cut off at the edges.
+KEEP EXACTLY AS IN THE ORIGINAL:
 
-2. THE PROPERTY IS LOCKED: it must remain exactly the same real place, only photographed better.
+- Camera: same position, height, angle, lens and field of view. Same framing and crop, same perspective and vanishing points. Every wall, door, window, piece of furniture and object stays in the same place in the frame and at the same size. Do not zoom, rotate, widen or recompose.
 
-- Same architecture: layout, walls, ceiling height, real dimensions and proportions, doors, windows, moldings, columns, stairs, floors.
+- Architecture: layout, walls, ceiling height, real dimensions and proportions, doors, windows, moldings, columns, stairs, floors.
 
-- Same furniture and objects: identical pieces, same positions, same sizes, same colors, same materials. Do not add, remove, replace or upgrade anything. No new plants, lamps, artwork or decor.
+- Furniture and objects: the same pieces, in the same positions, with the same sizes, shapes, colors and materials. Do not add, remove, move, replace, upgrade or restyle anything. No new plants, lamps, artwork, cushions or decor. Do not tidy up or declutter.
 
-- Same wall colors, same floor, same textures and materials, true to the original.
+- Wall colors, floor, textures and materials, true to the original.
 
-- Same view through the windows.
+- The view through the windows.
 
-- Every text that physically exists in the place must remain identical, sharp and legible: signs, building name, unit numbers, posters, brand names.
+- Every text that physically exists in the place stays identical, sharp and legible: signs, building name, unit numbers, posters, brand names.
+
+IMPROVE ONLY THIS:
+
+- Exposure: lift dark shadows and bring down blown highlights, so the interior is evenly and naturally exposed and the view through the windows is still visible, as a professional exposure blend would. Keep the real light of the photo: same light sources, same direction, same time of day. Do not add sunlight, sun rays, lamps or light effects.
+
+- Color: neutral white balance (remove yellow, green or blue casts), true-to-material colors, clean whites, natural contrast. Restrained and realistic, not saturated.
+
+- Lines: if the camera was slightly tilted, straighten the vertical lines and the horizon. Only a subtle correction; never change the viewpoint.
+
+- Clarity: remove noise and blur, crisp natural detail.
 
 - Watermarks are NOT part of the place: if the photo has a watermark, logo, text, timestamp or stamp overlaid on top of the image (for example a real estate agency or listing portal logo, semi-transparent lettering, lines or a corner stamp), remove it completely and reconstruct what is behind it, so the result looks as if it was never there. This applies only to graphics added on top of the photo, never to real signs or objects in the scene.
 
-- If the new angle reveals areas not visible in the original photo, extend the existing architecture and surfaces logically and consistently; never invent new windows, doors, furniture or decor.
+The result must look like the original photo after a professional edit: a real photograph, indistinguishable from one taken with a good camera. Not a 3D render, not an illustration, not an AI image. Keep real textures and natural imperfections: no plastic, waxy or over-smoothed surfaces, no over-sharpening, no HDR look, no halos, no glow.`;
 
-Photography quality:
+// Medidas de la foto que llega (el admin siempre manda JPG; PNG por las dudas).
+// Sin medidas legibles devuelve null y se usa size 'auto'.
+function medidas(buf) {
+  if (buf.length > 24 && buf[0] === 0x89 && buf[1] === 0x50) {
+    return { w: buf.readUInt32BE(16), h: buf.readUInt32BE(20) };
+  }
+  if (buf[0] !== 0xff || buf[1] !== 0xd8) return null;
+  let i = 2;
+  while (i + 9 < buf.length) {
+    if (buf[i] !== 0xff) { i++; continue; }
+    const marker = buf[i + 1];
+    // SOF0 a SOF15 traen alto y ancho (C4, C8 y CC son otra cosa)
+    if (marker >= 0xc0 && marker <= 0xcf && marker !== 0xc4 && marker !== 0xc8 && marker !== 0xcc) {
+      return { w: buf.readUInt16BE(i + 7), h: buf.readUInt16BE(i + 5) };
+    }
+    i += 2 + buf.readUInt16BE(i + 2);
+  }
+  return null;
+}
 
-- Light: relight the scene as a master architectural photographer would, with natural daylight only, coming exclusively through the real windows and openings of the space. Soft diffused mid-morning light: even and realistic, gentle falloff, shadows with natural detail. All artificial and ceiling lights off. Balanced exposure: interior perfectly exposed and the view through the windows still visible. No blown-out windows, no fake HDR look, no halos.
-
-- Color: neutral professional white balance (clean daylight, no yellow or warm cast), true-to-material colors, restrained editorial color grade, clean whites, shadows with natural detail.
-
-- Technique: everything in focus (f/8, ISO 100), zero noise, no lens distortion, crisp high-resolution detail.
-
-The result must be a photorealistic photograph, indistinguishable from a real photo. Not a 3D render, not an illustration, no painterly or over-sharpened textures. Format: 4:5`;
+// Misma proporción que la original, para que la IA no tenga que recortar ni
+// inventar bordes, con los mismos píxeles que el 1024x1280 de antes (mismo
+// costo). OpenAI pide lados múltiplos de 16 y proporción entre 1:3 y 3:1.
+function tamanoPara(buf) {
+  const m = medidas(buf);
+  if (!m || !m.w || !m.h) return 'auto';
+  const r = Math.min(3, Math.max(1 / 3, m.w / m.h));
+  let w = Math.round(Math.sqrt(1024 * 1280 * r) / 16) * 16;
+  let h = Math.round(w / r / 16) * 16;
+  // El redondeo a 16 puede pasar apenas de 3:1 en las panorámicas
+  if (w > 3 * h) h += 16;
+  if (h > 3 * w) w += 16;
+  return w + 'x' + h;
+}
 
 async function usuarioDe(req) {
   const auth = req.headers.authorization || '';
@@ -93,7 +136,7 @@ module.exports = async (req, res) => {
 
   const model   = process.env.OPENAI_IMAGE_MODEL   || 'gpt-image-2.5-sunburst';
   const quality = process.env.OPENAI_IMAGE_QUALITY || 'high';
-  const size    = process.env.OPENAI_IMAGE_SIZE    || '1024x1280';
+  const size    = process.env.OPENAI_IMAGE_SIZE    || tamanoPara(bytes);
 
   const fd = new FormData();
   fd.append('model', model);

@@ -1059,7 +1059,8 @@ async function handleNewFiles(fileList) {
     try {
       const blob = await compressImage(f);
       const previewUrl = URL.createObjectURL(blob);
-      state.photos.push({ _new: true, file: blob, url: previewUrl });
+      // orig: el archivo sin comprimir, solo en memoria, para darle a la IA una copia limpia
+      state.photos.push({ _new: true, file: blob, url: previewUrl, orig: f });
       renderPhotoGrid();
       updateSidebar();
       saveDraftDebounced();
@@ -1083,13 +1084,17 @@ function puedeEmbellecer(ph) {
   return !!(ph && (ph.file || ph.url) && !ph._ia && !ph._iaWorking);
 }
 
-// Una foto ya guardada no tiene archivo local: se baja del storage (público) y se
-// pasa a JPG con el mismo compresor de la subida, que es lo que acepta la IA.
+// La IA recibe un JPG al 92 %: con el 72 % de la subida, los bloques de la
+// compresión la llevan a redibujar texturas y bordes. Una foto recién elegida sale
+// de su archivo original; una guardada se baja del storage (público). La que vuelve
+// de un borrador ya no tiene original y va como está.
+const IA_CALIDAD = 0.92;
 async function archivoParaIA(ph) {
+  if (ph.orig) return compressImage(ph.orig, 1600, IA_CALIDAD);
   if (ph.file) return ph.file;
   const r = await fetch(ph.url);
   if (!r.ok) throw new Error('No se pudo leer la foto guardada.');
-  return compressImage(await r.blob());
+  return compressImage(await r.blob(), 1600, IA_CALIDAD);
 }
 
 // Mientras haya fotos en la IA no se guarda: se subiría la foto sin embellecer.
@@ -1179,6 +1184,7 @@ async function procesarIA(ph) {
     ph.file = blob;
     ph.url = URL.createObjectURL(blob);
     ph._ia = true;
+    delete ph.orig;
     // Una guardada pasa a ser nueva: al guardar se sube la embellecida y
     // deleteRemovedPhotos borra la original (ya no queda su id en la grilla).
     if (!ph._new) {
