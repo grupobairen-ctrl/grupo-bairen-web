@@ -377,7 +377,8 @@
      Explorar, Mensajes, Se busca y Cobros están apagados para el público. ?digital=1 los prende en este navegador y
      ?digital=0 los apaga (la misma clave que BPDigital.activo() en js/digital.js). */
   /* Con BP.DIGITAL_PUBLICO en true, BAIREN digital está prendido para todos (el interruptor deja de hacer falta). */
-  BP.DIGITAL_PUBLICO = false;
+  /* 9/10/2026 · Abierto para todos: Tomás lo probó con dos cuentas reales ("funciona perfecto, pusheemos") */
+  BP.DIGITAL_PUBLICO = true;
   BP.digital = function(){
     if (BP.DIGITAL_PUBLICO) return true;
     try {
@@ -667,8 +668,8 @@
     if (burger && burger.closest('.p-navbar')) burger.insertAdjacentHTML('beforebegin', `<div class="p-campana p-campana-m" data-dg-campana hidden><button type="button" class="p-bell" aria-label="${BP.esc(BP.t('dg_avisos_campana', 'Avisos'))}">${BP.ico.bell}<span class="p-campana-n" hidden></span></button></div>`);
     const cargar = src => new Promise((ok, mal) => { const sc = document.createElement('script'); sc.src = src; sc.onload = ok; sc.onerror = mal; document.head.appendChild(sc); });
     BP._dgAvisos = BP._dgAvisos || (async () => {
-      if (!window.BPDigital) await cargar('js/digital.js?v=20261009e');
-      if (!window.BPDigital.campana) await cargar('js/dg-avisos.js?v=20261009e');
+      if (!window.BPDigital) await cargar('js/digital.js?v=20261009f');
+      if (!window.BPDigital.campana) await cargar('js/dg-avisos.js?v=20261009f');
     })();
     BP._dgAvisos.then(() => { document.querySelectorAll('[data-dg-campana]').forEach(el => window.BPDigital.campana(el)); }).catch(() => { BP._dgAvisos = null; });
   };

@@ -22,7 +22,7 @@
   const QUIETO = () => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } };
 
   /* Los estilos (en mensajes.html se suman solos; pagos.html los trae en el head) */
-  (function(){ try { if (document.querySelector('link[href*="css/pagos.css"]')) return; const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'css/pagos.css?v=20261009e'; document.head.appendChild(l); } catch (e) {} })();
+  (function(){ try { if (document.querySelector('link[href*="css/pagos.css"]')) return; const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'css/pagos.css?v=20261009f'; document.head.appendChild(l); } catch (e) {} })();
 
   /* ── formatos ──────────────────────────────────────────── */
   const LOC = () => (window.BP && BP.LOCALE) ? BP.LOCALE() : 'es-AR';
