@@ -9,7 +9,18 @@ node portal/test/dev-server.mjs
 ```
 Abrir http://localhost:8080/portal/. El dev server reproduce las reescrituras de `vercel.json` (rutas limpias como `/portal/departamentos-venta-palermo` y `/portal/propiedad-<id>`). Con `python3 -m http.server 8080` también funciona, sin rutas limpias.
 
-## Prueba de punta a punta
+## Pruebas de recorrido (8/10/2026, las vigentes)
+En `portal/test/flujos/`, en modo local (sin la base real ni mails). Recorren la carga completa (mediano plazo en celular y compu, alquiler tradicional, emprendimiento con unidades, importar un CSV, editar un aviso viejo), la curación y la capa de datos simulando Supabase, más una pasada por las 15 páginas.
+```
+PORT=8107 node portal/test/dev-server.mjs &
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --remote-debugging-port=9307 --user-data-dir=/tmp/bp-chrome about:blank &
+bash portal/test/flujos/correr.sh
+```
+Puertos y carpetas con `BP_PUERTO`, `BP_CHROME` y `BP_CAPTURAS` (capturas en `/tmp/bp-flujos/`). Sale con 1 si algo falla. Al cerrar, apagar solo los propios procesos por puerto (`lsof -tiTCP:8107 -sTCP:LISTEN | xargs kill`), nunca `pkill -f`.
+Ojo: corren contra el modo local. Lo que depende de la base real (permisos, disparadores, migraciones) no lo ven: eso se ensaya aparte en una transacción deshecha (ver migraciones 23 a 26) o con `test/migracion-23.mjs` en PGlite.
+
+## Prueba de punta a punta (vieja)
+`test/e2e.mjs` es del recorrido de cinco pasos y falla en "formulario de perfil" desde el recorrido de 8 pantallas (tanda 2). Reemplazada por `test/flujos/`.
 ```
 "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --remote-debugging-port=9222 --user-data-dir=/tmp/chrome-bp-cdp about:blank &
 node portal/test/e2e.mjs
