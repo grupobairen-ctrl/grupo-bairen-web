@@ -227,6 +227,10 @@
     {
       "path": "/api/portal-avisos",
       "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/portal-pago",
+      "schedule": "0,30 * * * *"
     }
   ]
 }

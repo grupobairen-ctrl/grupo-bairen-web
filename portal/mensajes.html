@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20261009d"><link rel="stylesheet" href="css/catalogo.css?v=20261009d"><link rel="stylesheet" href="css/portal.css?v=20261009d"><link rel="stylesheet" href="css/transiciones.css?v=20261009d"><style>@view-transition{navigation:auto}</style><style>html.arrancando body{opacity:0}body{transition:opacity .18s cubic-bezier(.22,1,.36,1)}@media(prefers-reduced-motion:reduce){body{transition:none}}</style><script>/* 8/10/2026 · Arranque sin pantallazo (ver BP.listo en ui.js): siempre, salvo al entrar a una ficha desde el portal (ahí la foto de la tarjeta crece hasta la ficha); en Safari del iPhone la transición entre páginas no tapaba el video al tocar el logo. Tope: 800 ms. */(function(){try{var h=document.documentElement,n=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{},r=document.referrer||'';if(r.indexOf(location.origin)===0&&n.type!=='reload'&&/propiedad/.test(location.pathname))return;h.classList.add('arrancando');setTimeout(function(){h.classList.remove('arrancando')},800)}catch(e){}})()</script>
-  <link rel="stylesheet" href="css/mensajes.css?v=20261009d">
+  <link rel="stylesheet" href="css/base.css?v=20261009e"><link rel="stylesheet" href="css/catalogo.css?v=20261009e"><link rel="stylesheet" href="css/portal.css?v=20261009e"><link rel="stylesheet" href="css/transiciones.css?v=20261009e"><style>@view-transition{navigation:auto}</style><style>html.arrancando body{opacity:0}body{transition:opacity .18s cubic-bezier(.22,1,.36,1)}@media(prefers-reduced-motion:reduce){body{transition:none}}</style><script>/* 8/10/2026 · Arranque sin pantallazo (ver BP.listo en ui.js): siempre, salvo al entrar a una ficha desde el portal (ahí la foto de la tarjeta crece hasta la ficha); en Safari del iPhone la transición entre páginas no tapaba el video al tocar el logo. Tope: 800 ms. */(function(){try{var h=document.documentElement,n=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{},r=document.referrer||'';if(r.indexOf(location.origin)===0&&n.type!=='reload'&&/propiedad/.test(location.pathname))return;h.classList.add('arrancando');setTimeout(function(){h.classList.remove('arrancando')},800)}catch(e){}})()</script>
+  <link rel="stylesheet" href="css/mensajes.css?v=20261009e">
 </head>
 <!-- 8/10/2026 · La operación digital · Mensajes. Dos vistas en la misma página:
      · Bandeja (mensajes.html): mis operaciones (BPDigital.bandeja), con filtros y, para la curación, "Ver todas".
@@ -39,12 +39,12 @@
 </main>
 <div id="pFooter"></div>
 
-<script src="supabase-portal.js?v=20261009c" defer></script><script src="js/errores.js?v=20261009c" defer></script>
-<script src="../mapa-barrios.js?v=20261009c" defer></script>
-<script src="js/bairen-motion.js?v=20261009c" defer></script><script src="js/i18n-portal.js?v=20261009c" defer></script><script src="js/ui.js?v=20261009c" defer></script><script src="js/store.js?v=20261009c" defer></script>
-<script src="js/digital.js?v=20261009c" defer></script><script src="js/dg-identidad.js?v=20261009c" defer></script><script src="js/dg-avisos.js?v=20261009c" defer></script><script src="js/dg-inversores.js?v=20261009c" defer></script><script src="js/dg-documentos.js?v=20261009c" defer></script><script src="js/dg-garantias.js?v=20261009c" defer></script>
-<script src="js/dg-pagos.js?v=20261009c" defer></script>
-<script src="js/data.js?v=20261009c" defer></script>
+<script src="supabase-portal.js?v=20261009e" defer></script><script src="js/errores.js?v=20261009e" defer></script>
+<script src="../mapa-barrios.js?v=20261009e" defer></script>
+<script src="js/bairen-motion.js?v=20261009e" defer></script><script src="js/i18n-portal.js?v=20261009e" defer></script><script src="js/ui.js?v=20261009e" defer></script><script src="js/store.js?v=20261009e" defer></script>
+<script src="js/digital.js?v=20261009e" defer></script><script src="js/dg-identidad.js?v=20261009e" defer></script><script src="js/dg-avisos.js?v=20261009e" defer></script><script src="js/dg-inversores.js?v=20261009e" defer></script><script src="js/dg-documentos.js?v=20261009e" defer></script><script src="js/dg-garantias.js?v=20261009e" defer></script>
+<script src="js/dg-pagos.js?v=20261009e" defer></script>
+<script src="js/data.js?v=20261009e" defer></script>
 <script>
 document.addEventListener('DOMContentLoaded', function(){
 (async function(){
@@ -266,6 +266,8 @@ document.addEventListener('DOMContentLoaded', function(){
     else if ((h.tipo === 'caida' || h.tipo === 'visita_cancelada' || h.tipo === 'solicitud_rechazada') && x.motivo) det = recorte(x.motivo, 80);
     else if (h.tipo === 'cierre') det = resumenCierre(x, st.d && st.d.operacion);
     else if (h.tipo === 'cobro_mensual' && x.monto) det = fmtMonto(x.monto, x.moneda) + (x.periodo ? ' · ' + fmtPeriodo(x.periodo) : '');
+    else if (/^(pago_recibido|reserva_pedida|reserva_pagada|reserva_devuelta)$/.test(h.tipo) && x.monto) det = fmtMonto(x.monto, x.moneda) + (x.periodo ? ' · ' + fmtPeriodo(x.periodo) : '');
+    else if (/^(garantia_elegida|garantia_emitida|seguro_emitido)$/.test(h.tipo)) det = x.tipo === 'propia' ? t('garantia_propia', 'garantía propia') : [x.proveedor, x.monto ? fmtMonto(x.monto, x.moneda) : ''].filter(Boolean).join(' · ');
     return { base: D.HITO_TXT[h.tipo] || h.tipo, det, conFecha: !!(x.fecha && (h.tipo === 'visita_pedida' || h.tipo === 'visita_confirmada')) };
   }
   const verifHTML = txt => `<span class="ms-verif">${ICO.verif}<span>${esc(txt || t('verificado', 'Verificado'))}</span></span>`;
@@ -400,7 +402,7 @@ document.addEventListener('DOMContentLoaded', function(){
       } else {
         const r = resumenCierre({ monto_contrato: op.monto_contrato, precio_cierre: op.precio_cierre, plazo_meses: op.plazo_meses, moneda: op.moneda }, op);
         out.estado = t('e_cerrada', 'Operación cerrada') + (r ? ' · ' + r : '') + '.';
-        if (!esVenta(op)) a(out.prim, 'cobro', t('a_cobro', 'Registrar cobro del mes'), 'cobro_mensual');
+        if (!esVenta(op) && !(d.ext && d.ext.pagos)) a(out.prim, 'cobro', t('a_cobro', 'Registrar cobro del mes'), 'cobro_mensual');
       }
     } else {
       out.estado = t('e_plataforma', 'Ves esta operación como equipo BAIREN. Lo que escribas acá lo leen las dos partes.');

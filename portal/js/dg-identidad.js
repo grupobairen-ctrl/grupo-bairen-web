@@ -237,6 +237,9 @@
     D._identidad = true;
     D.identidad = async function(){ const e = await I.estado(); return { estado: e.estado, verificada: !!e.verificada }; };
     D.identidadVerificada = () => I.verificada();
+    /* Alias que usan otros rieles (pagos): el estado como texto y el atajo a verificar, volviendo a esta misma página */
+    D.identidadEstado = async () => (await D.identidad()).estado;
+    D.verificarIdentidad = () => { location.href = 'cuenta-verificacion.html?volver=' + encodeURIComponent((location.pathname.split('/').pop() || 'mensajes.html') + location.search); };
     if (D.enriquecerDetalle) D.enriquecerDetalle(async d => {
       if (d.lado === 'interesado') { try { d.ext.identidad = await D.identidad(); } catch (e) { d.ext.identidad = null; } }
       /* Modo local: el "Verificado" del interesado que ve quien publica (con base lo da portal.contacto_interesado) */

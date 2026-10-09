@@ -524,6 +524,7 @@
     <li><a href="criterios.html" data-i18n="criterios">Cómo seleccionamos</a></li>
     <li><a href="publicadores.html" data-i18n="publicadores">Publicadores</a></li>
     <li><a href="membership.html">Membership</a></li>
+    ${BP.digital() ? `<li><a href="precios.html">${BP.t('dg_precios', 'Precios')}</a></li>` : ''}
     <li><a href="legales.html" data-i18n="ft_terminos">Términos y privacidad</a></li>
     <li><a href="mailto:portal@bairengroup.com">portal@bairengroup.com</a></li>
   </ul>
@@ -633,11 +634,11 @@
         <a class="p-ghost" href="guardados.html" aria-label="${BP.esc(BP.t('tab_guardados', 'Guardados'))}">${BP.ico.heart}<span data-fav-count hidden></span></a>
         <div class="p-crear"><a class="p-btn p-btn-sm" href="publicar-aviso.html" data-crear>${BP.t('publicar', 'Publicar')}</a><div class="p-crear-pop" hidden><p class="t">${BP.t('quien_publica', '¿Quién publica?')}</p><a href="publicar-aviso.html?perfil=dueno">${BP.t('soy_dueno_directo', 'Soy dueño directo')}</a><a href="publicar-aviso.html?paso=perfil">${BP.t('soy_profesional', 'Inmobiliaria, corredor o desarrolladora')}</a></div></div>
         <div class="p-nav-menu" style="display:flex"><div><button type="button" class="p-btn p-btn-sm p-btn-fill" aria-haspopup="true" style="padding:0 14px">${avH} ${BP.t('mi_cuenta', 'Mi cuenta')} <span class="car" style="border-color:var(--navy-deeper)"></span></button>
-          <div class="p-dd p-dd-cuenta" style="left:auto;right:0"><div class="p-dd-ttl">${BP.esc(session.email)}${modeTag}</div>${vistas}${BP.digital() ? `<a href="se-busca.html">${BP.t('dg_se_busca', 'Búsquedas')}</a><a href="cobros.html" data-curador hidden>${BP.t('dg_cobros', 'Cobros')}</a>` : ''}<a href="curacion.html" data-curador hidden>${BP.t('curacion', 'Curación')}</a><a href="#" data-logout>${BP.t('cerrar_sesion', 'Cerrar sesión')}</a></div></div></div>`;
+          <div class="p-dd p-dd-cuenta" style="left:auto;right:0"><div class="p-dd-ttl">${BP.esc(session.email)}${modeTag}</div>${vistas}${BP.digital() ? `<a href="se-busca.html">${BP.t('dg_se_busca', 'Búsquedas')}</a><a href="pagos.html">${BP.t('dg_pagos', 'Pagos')}</a><a href="cuenta-verificacion.html">${BP.t('dg_identidad_menu', 'Tu identidad')}</a><a href="inversores.html">${BP.t('dg_membresia', 'Membresía Inversor')}</a><a href="cobros.html" data-curador hidden>${BP.t('dg_cobros', 'Cobros')}</a><a href="garantias.html" data-curador hidden>${BP.t('dg_garantias', 'Garantías')}</a><a href="inversores.html?admin" data-curador hidden>${BP.t('dg_inversores_admin', 'Miembros')}</a>` : ''}<a href="curacion.html" data-curador hidden>${BP.t('curacion', 'Curación')}</a><a href="#" data-logout>${BP.t('cerrar_sesion', 'Cerrar sesión')}</a></div></div></div>`;
       if (mob) {
         const cta = mob.querySelector('.m-cta'); if (cta) cta.innerHTML = `<a class="p-btn p-btn-sm" href="publicar-aviso.html">${BP.t('publicar', 'Publicar')}</a><a class="p-btn p-btn-sm p-btn-fill m-sin-tabbar" href="panel.html">${BP.t('mi_cuenta', 'Mi cuenta')}</a>`;
         /* lanz3-visitante · Guardados ya es un renglón del menú: acá quedan los contactos */
-        const cuenta = mob.querySelector('.m-cuenta'); if (cuenta) { cuenta.hidden = false; cuenta.innerHTML = `<a href="panel.html#contactos">${BP.ico.chat} <span data-i18n="mis_contactos">Mis contactos</span></a>`; }
+        const cuenta = mob.querySelector('.m-cuenta'); if (cuenta) { cuenta.hidden = false; cuenta.innerHTML = BP.digital() ? `<a href="pagos.html">${BP.esc(BP.t('dg_pagos', 'Pagos'))}</a><a href="cuenta-verificacion.html">${BP.esc(BP.t('dg_identidad_menu', 'Tu identidad'))}</a><a href="inversores.html">${BP.esc(BP.t('dg_membresia', 'Membresía Inversor'))}</a>` : `<a href="panel.html#contactos">${BP.ico.chat} <span data-i18n="mis_contactos">Mis contactos</span></a>`; }
         /* lanz3-visitante · Cerrar sesión, a un toque desde el menú (antes eran cuatro gestos dentro del panel) */
         if (!mob.querySelector('.m-salir')) { const ref = mob.querySelector('.m-cta'); if (ref) { ref.insertAdjacentHTML('afterend', `<button type="button" class="m-salir" data-logout>${BP.esc(BP.t('cerrar_sesion', 'Cerrar sesión'))}</button>`); if (!mob.classList.contains('open')) mob.querySelector('.m-salir').tabIndex = -1; } }
       }
@@ -666,8 +667,8 @@
     if (burger && burger.closest('.p-navbar')) burger.insertAdjacentHTML('beforebegin', `<div class="p-campana p-campana-m" data-dg-campana hidden><button type="button" class="p-bell" aria-label="${BP.esc(BP.t('dg_avisos_campana', 'Avisos'))}">${BP.ico.bell}<span class="p-campana-n" hidden></span></button></div>`);
     const cargar = src => new Promise((ok, mal) => { const sc = document.createElement('script'); sc.src = src; sc.onload = ok; sc.onerror = mal; document.head.appendChild(sc); });
     BP._dgAvisos = BP._dgAvisos || (async () => {
-      if (!window.BPDigital) await cargar('js/digital.js?v=20261009c');
-      if (!window.BPDigital.campana) await cargar('js/dg-avisos.js?v=20261009c');
+      if (!window.BPDigital) await cargar('js/digital.js?v=20261009e');
+      if (!window.BPDigital.campana) await cargar('js/dg-avisos.js?v=20261009e');
     })();
     BP._dgAvisos.then(() => { document.querySelectorAll('[data-dg-campana]').forEach(el => window.BPDigital.campana(el)); }).catch(() => { BP._dgAvisos = null; });
   };
