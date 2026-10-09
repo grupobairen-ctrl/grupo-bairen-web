@@ -4931,3 +4931,11 @@ html:not(.teclado) .mobile-menu a:focus-visible,html:not(.teclado) .mobile-menu 
 @media (max-width:1023px){
   .p-fgal-ver,.p-fdatos{display:none}
 }
+
+/* 9/10/2026 · BAIREN digital: la barra de abajo con cinco pestañas y el número de mensajes sin leer */
+@media(max-width:859px){
+  .p-tabbar.cinco{grid-template-columns:repeat(5,1fr)}
+  .p-tabbar.cinco a span{font-size:.66rem}
+  .p-tabbar a{position:relative}
+  .p-tabbar .p-tab-n{position:absolute;top:6px;left:calc(50% + 6px);min-width:16px;height:16px;padding:0 4px;border-radius:999px;background:#DECDA0;color:#131D2D;font:600 .62rem/16px var(--font-body);text-align:center}
+}
