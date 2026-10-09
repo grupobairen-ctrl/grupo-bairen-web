@@ -4851,4 +4851,51 @@ html:not(.teclado) .mobile-menu a:focus-visible,html:not(.teclado) .mobile-menu 
   .p-tj .tj-titulo{font-size:1.25rem}
   .p-tj .tj-precio{font-size:1.125rem}
   .p-tj .tj-meta{font-size:.875rem}
+
+  /* ── Ficha ──────────────────────────────────────────────────────────────────────────────────────────────── */
+  /* La galería en mosaico: la foto grande y cuatro chicas, sin la tira de miniaturas ni el contador */
+  :root body.p-ficha-page .p-fhero.p-fhero-solo{height:min(58vh,540px);min-height:420px;background:transparent;border-radius:var(--r-box)!important;overflow:hidden}
+  body.p-ficha-page #heroSlides{position:absolute;inset:0;display:grid;gap:8px;overflow:hidden;scroll-snap-type:none;scroll-behavior:auto;
+    grid-template-columns:2fr 1fr 1fr;grid-template-rows:repeat(2,minmax(0,1fr))}
+  body.p-ficha-page #heroSlides .p-fhero-slide{height:auto;min-width:0;min-height:0;scroll-snap-align:none;background-color:#1A2538;transition:filter .3s cubic-bezier(.22,1,.36,1)}
+  body.p-ficha-page #heroSlides .p-fhero-slide:first-child{grid-row:1/3}
+  body.p-ficha-page #heroSlides .p-fhero-slide:nth-child(n+6){display:none}
+  body.p-ficha-page #gal[data-n="0"] #heroSlides,body.p-ficha-page #gal[data-n="1"] #heroSlides,body.p-ficha-page #heroSlides > .p-fhero-rota:only-child{grid-template-columns:1fr}
+  body.p-ficha-page #heroSlides > .p-fhero-rota:only-child{grid-column:1/-1}
+  body.p-ficha-page #gal[data-n="2"] #heroSlides{grid-template-columns:2fr 1fr}
+  body.p-ficha-page #gal[data-n="2"] #heroSlides .p-fhero-slide:nth-child(2){grid-row:1/3}
+  body.p-ficha-page #gal[data-n="3"] #heroSlides{grid-template-columns:2fr 1fr}
+  body.p-ficha-page #gal[data-n="4"] #heroSlides .p-fhero-slide:nth-child(2){grid-row:1/3}
+  @media (hover:hover) and (pointer:fine){body.p-ficha-page #heroSlides .p-fhero-slide[role="img"]:hover{filter:brightness(.9)}}
+  body.p-ficha-page .p-strip,body.p-ficha-page #gal .p-fcont{display:none}
+  :root body.p-ficha-page .p-fgal-ver{position:absolute;right:16px;bottom:16px;z-index:3;display:inline-flex;align-items:center;gap:8px;height:42px;padding:0 16px;
+    border:1px solid rgba(19,29,45,.16);border-radius:var(--r-ctl)!important;background:rgba(251,250,246,.94);color:#131D2D;font:500 .9375rem/1 var(--font-body);cursor:pointer;box-shadow:0 4px 18px rgba(10,20,40,.12)}
+  body.p-ficha-page .p-fgal-ver svg{width:17px;height:17px}
+  body.p-ficha-page .p-fgal-ver:hover{background:#FBFAF6;border-color:rgba(19,29,45,.36)}
+  /* Los datos, en una sola línea (los cuatro números grandes y el renglón de extras quedan para el celular) */
+  body.p-ficha-page .p-ficha2 .p-fnums,body.p-ficha-page .p-ficha2 .p-fextra{display:none}
+  body.p-ficha-page .p-ficha2 .p-fdatos{display:block;margin:20px 0 0;padding:0 0 22px;border-bottom:1px solid var(--p-hair);font:400 1.0625rem/1.5 var(--font-body);color:#131D2D;font-variant-numeric:tabular-nums lining-nums}
+  body.p-ficha-page .p-ficha2 .p-fdatos span{color:var(--p-tinta-2)}
+  /* La descripción, plegada a cuatro líneas */
+  :root body.p-ficha-page .p-ficha2 #desc.clamp{-webkit-line-clamp:4}
+  /* Condiciones y Lo que tiene: un solo bloque compacto, en dos columnas */
+  body.p-ficha-page .p-ficha2 .p-ficha-main{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-content:start}
+  body.p-ficha-page .p-ficha2 .p-ficha-main > *{grid-column:1/-1}
+  body.p-ficha-page .p-ficha2 .p-ficha-main > .p-fb-cond,body.p-ficha-page .p-ficha2 .p-ficha-main > .p-fb-tiene{background:#F4F0E6;border:1px solid var(--p-hair);padding:22px 24px;margin-top:32px}
+  :root body.p-ficha-page .p-ficha2 .p-ficha-main > .p-fb-cond{grid-column:1;border-right:0;border-radius:var(--r-box) 0 0 var(--r-box)!important}
+  :root body.p-ficha-page .p-ficha2 .p-ficha-main > .p-fb-tiene{grid-column:2;border-left:1px solid var(--p-hair);border-radius:0 var(--r-box) var(--r-box) 0!important}
+  :root body.p-ficha-page .p-ficha2 .p-ficha-main > .p-fb-cond:not(:has(~ .p-fb-tiene)){grid-column:1/-1;border-right:1px solid var(--p-hair);border-radius:var(--r-box)!important}
+  :root body.p-ficha-page .p-ficha2 .p-ficha-main > .p-fb-tiene:not(.p-fb-cond ~ .p-fb-tiene){grid-column:1/-1;border-radius:var(--r-box)!important}
+  body.p-ficha-page .p-ficha2 .p-fb-cond .p-fcond{gap:6px}
+  body.p-ficha-page .p-ficha2 .p-fb-cond .p-fcond li,body.p-ficha-page .p-ficha2 .p-fb-tiene .p-ftiene{font:400 .9375rem/1.55 var(--font-body)}
+  /* El mapa, más chico */
+  body.p-ficha-page .p-ficha2 .p-ficha-main > .p-fb-ubic{margin-top:28px}
+  :root body.p-ficha-page .p-ficha2 .p-map-wrap iframe{height:220px}
+  /* Tres similares, con aire arriba */
+  body.p-ficha-page .p-fsim{padding-top:40px}
+  body.p-ficha-page .p-fsim .p-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:28px}
+}
+/* escritorio simple · Lo que es solo de la compu no aparece en el celular (el celular queda como estaba) */
+@media (max-width:1023px){
+  .p-fgal-ver,.p-fdatos{display:none}
 }
