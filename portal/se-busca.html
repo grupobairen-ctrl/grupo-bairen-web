@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Se busca · BAIREN</title>
+  <meta name="description" content="Publicá lo que buscás sin decir quién sos y recibí propuestas de quienes publican en BAIREN.">
+  <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#131D2D">
+  <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
+  <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css?v=20261009a"><link rel="stylesheet" href="css/catalogo.css?v=20261009a"><link rel="stylesheet" href="css/portal.css?v=20261009a"><link rel="stylesheet" href="css/transiciones.css?v=20261009a"><style>@view-transition{navigation:auto}</style><style>html.arrancando body{opacity:0}body{transition:opacity .18s cubic-bezier(.22,1,.36,1)}@media(prefers-reduced-motion:reduce){body{transition:none}}</style><script>/* 8/10/2026 · Arranque sin pantallazo (ver BP.listo en ui.js): siempre, salvo al entrar a una ficha desde el portal (ahí la foto de la tarjeta crece hasta la ficha); en Safari del iPhone la transición entre páginas no tapaba el video al tocar el logo. Tope: 800 ms. */(function(){try{var h=document.documentElement,n=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{},r=document.referrer||'';if(r.indexOf(location.origin)===0&&n.type!=='reload'&&/propiedad/.test(location.pathname))return;h.classList.add('arrancando');setTimeout(function(){h.classList.remove('arrancando')},800)}catch(e){}})()</script>
+  <link rel="stylesheet" href="css/explorar.css?v=20261009a">
+</head>
+<!-- 8/10/2026 · BAIREN, la digitalización del real estate · Se busca (mis búsquedas).
+     Quien busca publica lo que necesita sin nombre ni contacto; quienes publican le proponen una unidad desde Explorar.
+     Acá crea y edita sus búsquedas (hasta 5 activas, vencen a los 60 días), las pausa, cierra o borra, y responde las
+     propuestas: al aceptar se abre la operación y pasan a hablar en mensajes.html. Requiere sesión. Todo por BPDigital.
+     Apagado para el público: sin BPDigital.activo() (se prende con ?digital=1) muestra "Muy pronto". -->
+<body class="p-product p-sebusca">
+<div class="p-velo" aria-hidden="true"><span class="w">BAIREN</span></div>
+<div id="pHeader"></div>
+<main class="p-ex p-sb" id="contenido" aria-busy="true">
+  <div class="p-ex-cab" aria-hidden="true"><span class="p-dg-sk p-dg-sk-sobre"></span><span class="p-dg-sk p-dg-sk-h1"></span><span class="p-dg-sk p-dg-sk-txt"></span></div>
+</main>
+<div id="pFooter"></div>
+
+<script src="supabase-portal.js?v=20261009a" defer></script><script src="js/errores.js?v=20261009a" defer></script>
+<script src="../mapa-barrios.js?v=20261009a" defer></script>
+<script src="js/bairen-motion.js?v=20261009a" defer></script><script src="js/i18n-portal.js?v=20261009a" defer></script><script src="js/ui.js?v=20261009a" defer></script><script src="js/store.js?v=20261009a" defer></script>
+<script src="js/digital.js?v=20261009a" defer></script>
+<script src="js/data.js?v=20261009a" defer></script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+(async function(){
+  'use strict';
+  /* ── Ayudas compartidas con explorar.html (el mismo bloque en las dos páginas) ─────────────────────────── */
+  const t = (k, d) => BP.t(k, d), tf = (k, d, v) => BP.tf(k, d, v), esc = BP.esc, $ = id => document.getElementById(id);
+  const QUIETO = (() => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } })();
+  const fechaDia = s => { const m = String(s || '').match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null; };
+  const corta = f => { if (!f || isNaN(f)) return ''; const o = { day: 'numeric', month: 'short' }; if (f.getFullYear() !== new Date().getFullYear()) o.year = 'numeric'; return f.toLocaleDateString(BP.LOCALE(), o).replace(/\./g, ''); };
+  const fechaCorta = s => corta(fechaDia(s));
+  const mesAnio = s => { const f = fechaDia(s); return f ? f.toLocaleDateString(BP.LOCALE(), { month: 'long', year: 'numeric' }) : ''; };
+  const hace = iso => {
+    if (!iso) return ''; const ms = Date.now() - new Date(iso).getTime(); if (!(ms >= 0)) return t('dg_ex_recien', 'recién');
+    const min = Math.floor(ms / 6e4), h = Math.floor(ms / 36e5), d = Math.floor(ms / 864e5);
+    if (min < 2) return t('dg_ex_recien', 'recién'); if (min < 60) return tf('dg_ex_hace_min', 'hace {n} min', { n: min });
+    if (h < 24) return tf('dg_ex_hace_h', 'hace {n} h', { n: h }); if (d === 1) return t('dg_ex_ayer', 'ayer');
+    if (d < 30) return tf('dg_ex_hace_d', 'hace {n} días', { n: d }); const m = Math.floor(d / 30);
+    return m === 1 ? t('dg_ex_hace_1m', 'hace un mes') : tf('dg_ex_hace_m', 'hace {n} meses', { n: m });
+  };
+  const queBusca = b => {
+    const n = +b.ambientes_min || 0, tp = b.tipo || '';
+    if (tp === 'PH') return n ? tf('dg_ex_q_ph_n', 'un PH de {n} ambientes', { n }) : t('dg_ex_q_ph', 'un PH');
+    if (tp === 'Casa') return n ? tf('dg_ex_q_casa_n', 'una casa de {n} ambientes', { n }) : t('dg_ex_q_casa', 'una casa');
+    if (tp === 'Piso') return n ? tf('dg_ex_q_piso_n', 'un piso de {n} ambientes', { n }) : t('dg_ex_q_piso', 'un piso');
+    if (n === 1) return t('dg_ex_q_mono', 'un monoambiente');
+    if (n) return tf('dg_ex_q_amb', '{n} ambientes', { n });
+    return tp ? t('dg_ex_q_depto', 'un departamento') : t('dg_ex_q_prop', 'una propiedad');
+  };
+  const dondeBusca = b => {
+    const z = (b.zonas || []).map(BP.zonaLabel); if (!z.length) return t('dg_ex_donde_todo', 'Buenos Aires');
+    if (z.length > 4) return tf('dg_ex_donde_mas', '{l} y {n} zonas más', { l: z.slice(0, 3).join(', '), n: z.length - 3 });
+    return z.length < 2 ? z[0] : z.slice(0, -1).join(', ') + ' ' + t('dg_ex_o', 'o') + ' ' + z[z.length - 1];
+  };
+  const lineaDe = b => b.linea || BPDigital.lineaDe(b.operacion, null, b.plazo_meses);
+  const datosBusqueda = b => {
+    const l = [], mes = b.operacion !== 'venta';
+    if (+b.precio_max) l.push(tf('dg_ex_hasta', 'Hasta {p}', { p: BP.fmtPrecio(+b.precio_max, b.moneda) }) + (mes ? ' ' + t('dg_ex_por_mes', 'por mes') : ''));
+    const dm = +b.dormitorios_min; if (dm) l.push(dm === 1 ? t('dg_ex_dorm_1', '1 dormitorio o más') : tf('dg_ex_dorm_n', '{n} dormitorios o más', { n: dm }));
+    if (+b.m2_min) l.push(tf('dg_ex_m2', '{n} m² o más', { n: BP.fmtN(+b.m2_min) }));
+    const f = fechaDia(b.desde); if (f) { const hoy = new Date(); hoy.setHours(0, 0, 0, 0); l.push(f > hoy ? tf('dg_ex_desde', 'Desde el {f}', { f: corta(f) }) : t('dg_ex_desde_ya', 'Para ahora')); }
+    const pl = +b.plazo_meses; if (pl && mes) l.push(pl === 1 ? t('dg_ex_plazo_1', 'Por 1 mes') : tf('dg_ex_plazo_n', 'Por {n} meses', { n: pl }));
+    return l;
+  };
+  const hoja = o => {
+    const id = 'dgH' + Math.random().toString(36).slice(2, 8);
+    const w = document.createElement('div'); w.className = 'p-dg-velo';
+    w.innerHTML = `<div class="p-dg-hoja ${o.clase || ''}" role="dialog" aria-modal="true" aria-labelledby="${id}">
+      <div class="p-dg-hoja-cab"><h2 class="p-dg-hoja-t" id="${id}">${esc(o.titulo)}</h2><button type="button" class="p-dg-x" data-cerrar aria-label="${esc(t('dg_ex_cerrar', 'Cerrar'))}">${BP.ico.x}</button></div>
+      <div class="p-dg-hoja-cuerpo">${o.cuerpo}</div></div>`;
+    document.body.appendChild(w); document.documentElement.classList.add('p-dg-quieta');
+    requestAnimationFrame(() => requestAnimationFrame(() => w.classList.add('on')));
+    const caja = w.querySelector('.p-dg-hoja'); let soltar = null, ida = false;
+    const quitar = () => { if (ida) return; ida = true; w.classList.remove('on'); if (!document.querySelectorAll('.p-dg-velo.on').length) document.documentElement.classList.remove('p-dg-quieta'); setTimeout(() => w.remove(), QUIETO ? 0 : 240); if (o.alCerrar) o.alCerrar(); };
+    const cerrar = () => { if (soltar) { const f = soltar; soltar = null; f(); } else quitar(); };
+    soltar = BP.focoAtrapado(caja, { devolverA: o.devolverA || document.activeElement, primero: o.primero ? caja.querySelector(o.primero) : null, alCerrar: quitar });
+    w.addEventListener('mousedown', e => { if (e.target === w) cerrar(); });
+    caja.querySelectorAll('[data-cerrar]').forEach(b => b.addEventListener('click', cerrar));
+    return { w, caja, cerrar };
+  };
+  const confirmar = (titulo, texto, si, peligro) => new Promise(res => {
+    let r = false;
+    const h = hoja({ titulo, clase: 'p-dg-hoja-chica', primero: '[data-si]', alCerrar: () => res(r),
+      cuerpo: `<p class="p-dg-txt">${esc(texto)}</p><div class="p-dg-acts"><button type="button" class="p-btn" data-cerrar>${esc(t('dg_ex_cancelar', 'Cancelar'))}</button><button type="button" class="p-btn p-btn-fill${peligro ? ' p-dg-peligro' : ''}" data-si>${esc(si)}</button></div>` });
+    h.caja.querySelector('[data-si]').addEventListener('click', () => { r = true; h.cerrar(); });
+  });
+  const pronto = main => {
+    main.removeAttribute('aria-busy'); main.classList.add('p-dg-pronto-main');
+    main.innerHTML = `<div class="p-dg-pronto"><span class="p-dg-pronto-ic" aria-hidden="true">${BP.ico.search}</span>
+      <h1 class="p-dg-pronto-t">${t('dg_ex_pronto_t', 'Muy <em>pronto</em>')}</h1>
+      <p>${esc(t('dg_ex_pronto_p', 'Estamos preparando una forma nueva de moverse en el mercado, toda dentro de BAIREN.'))}</p>
+      <a class="p-btn p-btn-fill" href="index.html">${esc(t('dg_ex_pronto_btn', 'Volver al inicio'))}</a></div>`;
+  };
+  const msjError = (e, d) => String((e && e.message) || e || '') || d;
+  /* ── fin de las ayudas compartidas ─────────────────────────────────────────────────────────────────────── */
+
+  BP.header(); BP.footer(); if (window.BPStore) BPStore.init(); await BPStore.ready;
+  document.title = t('dg_sb_doc', 'Se busca') + ' · BAIREN';
+  const main = $('contenido');
+  if (!window.BPDigital || !BPDigital.activo()) { pronto(main); return; }
+  if (!BPStore.requireSession()) return;
+  await BP.probePretty();
+
+  const E = { mias: [], props: [], editando: null };
+  const LIN = BPDigital.LINEAS;
+  const OPS = [['venta', t('dg_sb_op_venta', 'Comprar')], ['alquiler', LIN.tradicional], ['mediano', LIN.mediano]];
+  const TIPOS = [['', t('dg_sb_tipo_cualquiera', 'Cualquiera')], ['Departamento', t('dg_sb_tipo_depto', 'Departamento')], ['Piso', t('dg_sb_tipo_piso', 'Piso')], ['PH', 'PH'], ['Casa', t('dg_sb_tipo_casa', 'Casa')]];
+  const opcN = (max, ind) => `<option value="">${esc(ind)}</option>` + Array.from({ length: max }, (_, i) => `<option value="${i + 1}">${i + 1}${i + 1 === max ? '+' : ''}</option>`).join('');
+  const DETALLE_AVISO = t('dg_sb_det_aviso', 'Sin teléfonos, mails ni redes: te das a conocer cuando aceptás una propuesta');
+
+  main.innerHTML = `
+  <header class="p-ex-cab">
+    <a class="p-sb-volver" href="explorar.html#se-busca">${BP.ico.arrow}<span>${esc(t('dg_sb_volver', 'Explorar'))}</span></a>
+    <h1 class="p-ex-h1">${t('dg_sb_h1', 'Lo que <em>buscás</em>, sin decir quién sos')}</h1>
+    <p class="p-ex-bajada">${esc(t('dg_sb_bajada', 'Publicás tu búsqueda sin nombre ni contacto. Quienes publican en BAIREN te proponen unidades y vos elegís. Te das a conocer solo cuando aceptás una propuesta.'))}</p>
+  </header>
+  <div class="p-sb-cuerpo" id="cuerpo">
+    <section class="p-sb-mias" id="tus" aria-labelledby="tusT" hidden>
+      <div class="p-sb-mias-cab"><h2 class="p-sb-h2" id="tusT">${esc(t('dg_sb_tus', 'Tus búsquedas'))}</h2><button type="button" class="p-btn p-btn-sm" id="btnNueva" aria-controls="formSec">${esc(t('dg_sb_nueva', 'Nueva búsqueda'))}</button></div>
+      <div id="lista" aria-busy="true"></div>
+    </section>
+    <section class="p-sb-form-sec" id="formSec" aria-labelledby="formT">
+      <form class="p-dg-form p-sb-form" id="fBus" novalidate>
+        <h2 class="p-sb-h2" id="formT">${esc(t('dg_sb_form_nueva', 'Publicá lo que buscás'))}</h2>
+        <fieldset class="p-dg-grupo" id="gPerfil"><legend>${esc(t('dg_sb_quien', 'Quién busca'))}</legend><div class="p-dg-ops">
+          ${Object.keys(BPDigital.PERFILES).map((k, i) => `<label class="p-dg-op"><input type="radio" name="perfil" value="${k}"${i ? '' : ' checked'}><span>${esc(BPDigital.PERFILES[k])}</span></label>`).join('')}
+        </div></fieldset>
+        <fieldset class="p-dg-grupo" id="gOp"><legend>${esc(t('dg_sb_que_op', 'Qué operación'))}</legend><div class="p-dg-ops p-dg-ops-seg">
+          ${OPS.map(o => `<label class="p-dg-op"><input type="radio" name="op" value="${o[0]}"><span>${esc(o[1])}</span></label>`).join('')}
+        </div></fieldset>
+        <label class="p-dg-check" id="filaPozo" hidden><input type="checkbox" id="fPozo"><span>${esc(t('dg_sb_pozo', 'En pozo o en construcción'))}</span></label>
+        <label class="p-dg-campo"><span>${esc(t('dg_sb_tipo', 'Tipo de propiedad'))}</span><select id="fTipo">${TIPOS.map(x => `<option value="${x[0]}">${esc(x[1])}</option>`).join('')}</select></label>
+        <fieldset class="p-dg-grupo" id="gZonas"><legend>${esc(t('dg_sb_donde', 'Dónde'))} <small>${esc(t('dg_sb_donde_ayuda', 'Podés elegir varias. Sin elegir, toda la zona.'))}</small></legend><div class="p-dg-ops">
+          ${BP.ZONAS.map(z => `<label class="p-dg-op"><input type="checkbox" name="zona" value="${esc(z)}"><span>${esc(BP.zonaLabel(z))}</span></label>`).join('')}
+        </div></fieldset>
+        <fieldset class="p-dg-grupo"><legend>${esc(t('dg_sb_minimos', 'Como mínimo'))}</legend><div class="p-dg-fila3">
+          <label class="p-dg-campo"><span>${esc(t('dg_sb_amb', 'Ambientes'))}</span><select id="fAmb">${opcN(5, t('dg_sb_indistinto', 'Indistinto'))}</select></label>
+          <label class="p-dg-campo"><span>${esc(t('dg_sb_dorm', 'Dormitorios'))}</span><select id="fDorm">${opcN(4, t('dg_sb_indistinto', 'Indistinto'))}</select></label>
+          <label class="p-dg-campo"><span>${esc(t('dg_sb_m2', 'Metros²'))}</span><input id="fM2" type="number" inputmode="numeric" min="0" max="100000" step="1" placeholder="${esc(t('dg_sb_m2_ph', 'Ej.: 50'))}"></label>
+        </div></fieldset>
+        <div class="p-dg-fila2 p-sb-precio">
+          <label class="p-dg-campo"><span id="precioLbl">${esc(t('dg_sb_precio', 'Precio máximo'))}</span><input id="fPrecio" type="number" inputmode="numeric" min="0" step="1"></label>
+          <label class="p-dg-campo" id="filaMoneda" hidden><span>${esc(t('dg_sb_moneda', 'Moneda'))}</span><select id="fMoneda"><option value="USD">USD</option><option value="ARS">${esc(t('dg_sb_pesos', 'Pesos'))}</option></select></label>
+        </div>
+        <div class="p-dg-fila2">
+          <label class="p-dg-campo"><span>${esc(t('dg_sb_desde', 'Desde cuándo'))}</span><input id="fDesde" type="date"></label>
+          <label class="p-dg-campo" id="filaPlazo" hidden><span>${esc(t('dg_sb_plazo', 'Plazo, en meses'))}</span><input id="fPlazo" type="number" inputmode="numeric" min="1" max="120" step="1"></label>
+        </div>
+        <label class="p-dg-campo"><span>${esc(t('dg_sb_det', 'Algo más que quieras contar'))} <small>${esc(t('dg_ex_opcional', '(opcional)'))}</small></span>
+          <textarea id="fDetalle" maxlength="600" rows="4" aria-describedby="detAviso" placeholder="${esc(t('dg_sb_det_ph', 'Ej.: Llego con mi pareja por trabajo. Preferimos piso alto y luminoso, cerca del subte.'))}"></textarea></label>
+        <div class="p-dg-campo-pie"><p class="p-dg-nota" id="detAviso">${BP.ico.shield}<span>${esc(DETALLE_AVISO)}.</span></p><span class="p-dg-cont" id="detCont" aria-hidden="true">0 / 600</span></div>
+        <div class="p-dg-acts"><button type="button" class="p-btn" id="btnCancelar" hidden>${esc(t('dg_ex_cancelar', 'Cancelar'))}</button><button type="submit" class="p-btn p-btn-fill" id="btnGuardar">${esc(t('dg_sb_publicar', 'Publicar búsqueda'))}</button></div>
+        <p class="p-sb-form-pie">${esc(t('dg_sb_form_pie', 'Tu búsqueda queda activa 60 días. Podés tener hasta 5 activas y pausarlas o cerrarlas cuando quieras.'))}</p>
+      </form>
+    </section>
+  </div>`;
+  main.removeAttribute('aria-busy');
+
+  /* ── Formulario ── */
+  const f = $('fBus'), cuerpo = $('cuerpo'), formSec = $('formSec');
+  const opSel = () => (f.querySelector('[name=op]:checked') || {}).value || '';
+  const ajustar = () => {
+    const op = opSel();
+    $('filaPozo').hidden = op !== 'venta'; if (op !== 'venta') $('fPozo').checked = false;
+    $('filaPlazo').hidden = !(op === 'alquiler' || op === 'mediano');
+    $('filaMoneda').hidden = op !== 'alquiler'; if (op !== 'alquiler') $('fMoneda').value = 'USD';
+    $('fPlazo').placeholder = op === 'mediano' ? t('dg_sb_plazo_ph_m', 'Ej.: 6') : op === 'alquiler' ? t('dg_sb_plazo_ph_t', 'Ej.: 24') : '';
+    $('precioLbl').textContent = op === 'venta' ? t('dg_sb_precio_usd', 'Precio máximo, en USD') : op === 'mediano' ? t('dg_sb_precio_mes_usd', 'Precio máximo por mes, en USD') : op === 'alquiler' ? t('dg_sb_precio_mes', 'Precio máximo por mes') : t('dg_sb_precio', 'Precio máximo');
+    const e = $('gOp-err'); if (e && op) e.hidden = true;
+  };
+  f.addEventListener('change', e => {
+    if (e.target.name === 'op') ajustar();
+    if (e.target.name === 'zona') { const n = f.querySelectorAll('[name=zona]:checked').length; f.querySelectorAll('[name=zona]').forEach(x => { if (!x.checked) x.disabled = n >= 12; }); }
+  });
+  const det = $('fDetalle'), cont = $('detCont');
+  const contar = () => { cont.textContent = det.value.length + ' / 600'; cont.classList.toggle('cerca', det.value.length > 540); };
+  det.addEventListener('input', contar);
+  const num = (id, max) => { const v = $(id).value.trim(); if (v === '') return null; const n = Math.round(Number(v)); return isFinite(n) && n > 0 ? Math.min(n, max) : null; };
+  const leer = () => {
+    const op = opSel();
+    return {
+      id: E.editando || undefined,
+      perfil: (f.querySelector('[name=perfil]:checked') || {}).value || 'particular',
+      operacion: op,
+      linea: op === 'venta' && $('fPozo').checked ? 'pozo' : null,
+      tipo: $('fTipo').value || null,
+      zonas: Array.from(f.querySelectorAll('[name=zona]:checked')).map(x => x.value).slice(0, 12),
+      ambientes_min: num('fAmb', 20), dormitorios_min: num('fDorm', 20), m2_min: num('fM2', 100000),
+      precio_max: num('fPrecio', 1e12), moneda: op === 'alquiler' ? $('fMoneda').value : 'USD',
+      desde: $('fDesde').value || null,
+      plazo_meses: op === 'alquiler' || op === 'mediano' ? num('fPlazo', 120) : null,
+      detalle: det.value.trim() || null
+    };
+  };
+  const llenar = b => {
+    f.reset();
+    const r = f.querySelector(`[name=perfil][value="${b.perfil || 'particular'}"]`); if (r) r.checked = true;
+    const o = f.querySelector(`[name=op][value="${b.operacion}"]`); if (o) o.checked = true;
+    $('fPozo').checked = b.linea === 'pozo'; $('fTipo').value = b.tipo || '';
+    f.querySelectorAll('[name=zona]').forEach(x => { x.checked = (b.zonas || []).indexOf(x.value) > -1; x.disabled = false; });
+    $('fAmb').value = b.ambientes_min ? String(Math.min(5, b.ambientes_min)) : ''; $('fDorm').value = b.dormitorios_min ? String(Math.min(4, b.dormitorios_min)) : '';
+    $('fM2').value = b.m2_min || ''; $('fPrecio').value = b.precio_max ? Math.round(+b.precio_max) : ''; $('fMoneda').value = b.moneda === 'ARS' ? 'ARS' : 'USD';
+    $('fDesde').value = b.desde ? String(b.desde).slice(0, 10) : ''; $('fPlazo').value = b.plazo_meses || ''; det.value = b.detalle || '';
+    ajustar(); contar();
+  };
+  const limpiarErrores = () => { f.querySelectorAll('.p-err-campo').forEach(p => { p.hidden = true; }); f.querySelectorAll('.p-invalido').forEach(x => { x.classList.remove('p-invalido'); x.removeAttribute('aria-invalid'); }); };
+  const modo = editando => {
+    E.editando = editando || null;
+    $('formT').textContent = E.editando ? t('dg_sb_form_editar', 'Editar búsqueda') : t('dg_sb_form_nueva', 'Publicá lo que buscás');
+    $('btnGuardar').textContent = E.editando ? t('dg_sb_guardar', 'Guardar cambios') : t('dg_sb_publicar', 'Publicar búsqueda');
+    $('btnCancelar').hidden = !E.editando && !(E.mias.length && formSec.classList.contains('abierta'));
+  };
+  const abrirForm = (b, desde) => {
+    limpiarErrores();
+    if (b) llenar(b); else { f.reset(); f.querySelectorAll('[name=zona]').forEach(x => { x.disabled = false; }); ajustar(); contar(); }
+    formSec.classList.add('abierta'); modo(b ? b.id : null);
+    $('btnNueva').setAttribute('aria-expanded', 'true');
+    formSec.scrollIntoView({ behavior: QUIETO ? 'auto' : 'smooth', block: 'start' });
+    const primero = f.querySelector('[name=perfil]:checked'); if (primero) setTimeout(() => { try { primero.focus({ preventScroll: true }); } catch (e) { /* nada */ } }, QUIETO ? 0 : 300);
+    E.volverA = desde || null;
+  };
+  const cerrarForm = () => {
+    limpiarErrores(); f.reset(); ajustar(); contar(); formSec.classList.remove('abierta'); modo(null);
+    $('btnNueva').setAttribute('aria-expanded', 'false');
+    if (E.volverA && document.body.contains(E.volverA)) E.volverA.focus(); else $('btnNueva').focus();
+  };
+  $('btnNueva').addEventListener('click', e => abrirForm(null, e.currentTarget));
+  $('btnCancelar').addEventListener('click', cerrarForm);
+  function errorGrupo(fs, msg){
+    let p = document.getElementById(fs.id + '-err');
+    if (!p) { p = document.createElement('p'); p.id = fs.id + '-err'; p.className = 'p-err-campo'; fs.insertAdjacentElement('afterend', p); }
+    p.textContent = msg; p.hidden = false; fs.setAttribute('aria-describedby', p.id);
+    BP.toast(msg, 'error');
+    const r = fs.querySelector('input:not([disabled])'); if (r) r.focus();
+  }
+  const esContacto = m => m === t('dg_err_contacto', 'Sin datos de contacto en el texto: te das a conocer cuando aceptás una propuesta.') || /contacto/i.test(m);
+  f.addEventListener('submit', async e => {
+    e.preventDefault(); limpiarErrores();
+    const b = leer();
+    if (!b.operacion) { errorGrupo($('gOp'), t('dg_sb_err_op', 'Elegí qué operación buscás.')); return; }
+    const btn = $('btnGuardar'), txt = btn.textContent; btn.disabled = true; btn.textContent = t('dg_sb_guardando', 'Guardando…');
+    try {
+      const r = await BPDigital.guardarBusqueda(b);
+      const eraEdicion = !!E.editando;
+      BP.toast(eraEdicion ? t('dg_sb_ok_editada', 'Guardamos los cambios.') : t('dg_sb_ok_nueva', 'Tu búsqueda está publicada. Te avisamos cuando llegue una propuesta.'));
+      f.reset(); ajustar(); contar(); formSec.classList.remove('abierta'); modo(null); $('btnNueva').setAttribute('aria-expanded', 'false');
+      await cargar();
+      const card = r && r.id ? document.getElementById('b-' + r.id) : null;
+      if (card) { card.classList.add('recien'); card.scrollIntoView({ behavior: QUIETO ? 'auto' : 'smooth', block: 'start' }); try { card.focus({ preventScroll: true }); } catch (err) { /* nada */ } }
+    } catch (err) {
+      const m = msjError(err, t('dg_sb_err_guardar', 'No pudimos guardar la búsqueda.'));
+      if (esContacto(m)) BP.errorCampo(det, m); else BP.toast(m, 'error');
+    } finally { btn.disabled = false; btn.textContent = E.editando ? t('dg_sb_guardar', 'Guardar cambios') : t('dg_sb_publicar', 'Publicar búsqueda'); if (!btn.textContent) btn.textContent = txt; }
+  });
+
+  /* ── Tus búsquedas y sus propuestas ── */
+  const EST = { activa: () => t('dg_sb_e_activa', 'Activa'), pausada: () => t('dg_sb_e_pausada', 'Pausada'), cerrada: () => t('dg_sb_e_cerrada', 'Cerrada') };
+  const TIPO_PUB = { gestor: () => t('dg_sb_tp_gestor', 'Gestor de alquileres'), profesional: () => t('dg_sb_tp_prof', 'Inmobiliaria'), desarrolladora: () => t('dg_sb_tp_des', 'Desarrolladora'), dueno: () => t('dg_sb_tp_dueno', 'Dueño directo') };
+  function propuesta(p, b){
+    const href = p.aviso_id ? BP.urlFicha({ id: p.aviso_id }) : null;
+    const precio = p.aviso_precio != null ? BP.fmtPrecio(+p.aviso_precio, p.aviso_moneda) + (b.operacion !== 'venta' ? ' ' + t('dg_ex_por_mes', 'por mes') : '') : '';
+    const tp = TIPO_PUB[p.publicador_tipo] ? TIPO_PUB[p.publicador_tipo]() : '';
+    const estado = p.estado === 'aceptada' ? `<span class="p-ex-estado e-aceptada">${esc(t('dg_sb_pe_aceptada', 'Aceptada'))}</span>` : p.estado === 'rechazada' ? `<span class="p-ex-estado e-rechazada">${esc(t('dg_sb_pe_rechazada', 'Rechazada'))}</span>` : `<span class="p-ex-estado e-nueva">${esc(t('dg_sb_pe_nueva', 'Para responder'))}</span>`;
+    return `<article class="p-sb-prop e-${esc(p.estado)}" aria-labelledby="pp-${esc(p.id)}">
+      ${href ? `<a class="p-sb-prop-foto" href="${esc(href)}" tabindex="-1" aria-hidden="true">${p.foto ? `<img src="${esc(BP.sbImg(p.foto, 600))}" alt="" loading="lazy" decoding="async" onerror="this.remove()">` : ''}</a>` : `<span class="p-sb-prop-foto" aria-hidden="true"></span>`}
+      <div class="p-sb-prop-txt">
+        <p class="p-ex-marca">${estado}<time datetime="${esc(p.creado_en || '')}">${esc(hace(p.creado_en))}</time></p>
+        <h4 class="p-sb-prop-tit" id="pp-${esc(p.id)}">${href ? `<a href="${esc(href)}">${esc(p.aviso_titulo || t('dg_sb_ver_unidad', 'Ver la unidad'))}</a>` : esc(t('dg_sb_ya_no', 'Esta unidad ya no está publicada'))}</h4>
+        ${p.aviso_barrio || precio ? `<p class="p-sb-prop-lugar">${esc(p.aviso_barrio || '')}${p.aviso_barrio && precio ? ' · ' : ''}${precio ? `<b>${esc(precio)}</b>` : ''}</p>` : ''}
+        <p class="p-sb-prop-quien">${esc(t('dg_sb_propone', 'Propone'))} <b>${esc(p.publicador_nombre || t('dg_sb_un_pub', 'un publicador'))}</b>${p.publicador_verificado ? `<span class="p-verif" role="img" aria-label="${esc(t('dg_sb_verificado', 'verificado'))}">${BP.ico.check}</span>` : ''}${tp ? ` · ${esc(tp)}` : ''}</p>
+        ${p.mensaje ? `<blockquote class="p-sb-prop-msj">${esc(p.mensaje)}</blockquote>` : ''}
+        <div class="p-sb-prop-acts">
+          ${p.estado === 'enviada' ? `<button type="button" class="p-btn p-btn-sm p-btn-fill" data-aceptar="${esc(p.id)}">${esc(t('dg_sb_aceptar', 'Aceptar'))}</button><button type="button" class="p-btn p-btn-sm" data-rechazar="${esc(p.id)}">${esc(t('dg_sb_rechazar', 'Rechazar'))}</button>`
+            : p.estado === 'aceptada' && p.operacion_id ? `<a class="p-btn p-btn-sm p-btn-fill" href="mensajes.html?op=${encodeURIComponent(p.operacion_id)}">${esc(t('dg_sb_ir_conv', 'Ir a la conversación'))}</a>` : ''}
+        </div>
+      </div>
+    </article>`;
+  }
+  function tarjeta(b){
+    const id = String(b.id), props = E.props.filter(p => String(p.busqueda_id) === id);
+    const nuevas = props.filter(p => p.estado === 'enviada').length, lin = lineaDe(b), datos = datosBusqueda(b);
+    const vence = b.estado === 'activa' && b.vence_en ? tf('dg_sb_vence', 'Vence el {f}', { f: corta(new Date(b.vence_en)) }) : '';
+    return `<article class="p-sb-bus e-${esc(b.estado)}" id="b-${esc(id)}" aria-labelledby="bt-${esc(id)}" tabindex="-1">
+      <p class="p-ex-marca"><span class="p-ex-estado e-${esc(b.estado)}">${esc((EST[b.estado] || EST.activa)())}</span>${lin && LIN[lin] ? `<span class="p-ex-tipo t-linea">${esc(LIN[lin])}</span>` : ''}${b.verificada ? `<span class="p-ex-verif">${BP.ico.check}${esc(t('dg_ex_verificada', 'Verificada'))}</span>` : ''}${vence ? `<span>${esc(vence)}</span>` : ''}</p>
+      <h3 class="p-ex-bus-tit" id="bt-${esc(id)}">${esc(tf('dg_sb_frase', 'Buscás {q} en {d}', { q: queBusca(b), d: dondeBusca(b) }))}</h3>
+      ${datos.length ? `<ul class="p-ex-datos">${datos.map(d => `<li>${esc(d)}</li>`).join('')}</ul>` : ''}
+      ${b.detalle ? `<p class="p-ex-bus-det">${esc(b.detalle)}</p>` : ''}
+      <div class="p-sb-acts" role="group" aria-label="${esc(t('dg_sb_acciones', 'Acciones de la búsqueda'))}">
+        <button type="button" class="p-dg-accion" data-editar="${esc(id)}">${esc(t('dg_sb_editar', 'Editar'))}</button>
+        ${b.estado === 'activa' ? `<button type="button" class="p-dg-accion" data-estado="pausada" data-id="${esc(id)}">${esc(t('dg_sb_pausar', 'Pausar'))}</button><button type="button" class="p-dg-accion" data-estado="cerrada" data-id="${esc(id)}">${esc(t('dg_sb_cerrar', 'Cerrar'))}</button>`
+          : `<button type="button" class="p-dg-accion" data-estado="activa" data-id="${esc(id)}">${esc(t('dg_sb_reactivar', 'Reactivar'))}</button>`}
+        <button type="button" class="p-dg-accion p-dg-accion-peligro" data-borrar="${esc(id)}">${esc(t('dg_sb_borrar', 'Borrar'))}</button>
+      </div>
+      <section class="p-sb-props" aria-labelledby="pt-${esc(id)}">
+        <h4 class="p-sb-props-t" id="pt-${esc(id)}">${esc(props.length === 1 ? t('dg_ex_1_prop', '1 propuesta') : props.length ? tf('dg_ex_n_props', '{n} propuestas', { n: props.length }) : t('dg_sb_props', 'Propuestas'))}${nuevas ? `<span class="p-ex-n">${esc(nuevas === 1 ? t('dg_sb_1_nueva', '1 nueva') : tf('dg_sb_n_nuevas', '{n} nuevas', { n: nuevas }))}</span>` : ''}</h4>
+        ${props.length ? `<div class="p-sb-props-lista">${props.map(p => propuesta(p, b)).join('')}</div>`
+          : `<p class="p-sb-props-vacio">${esc(b.estado === 'activa' ? t('dg_sb_props_vacio', 'Todavía no llegaron propuestas. Te avisamos cuando llegue la primera.') : t('dg_sb_props_pausa', 'Mientras no esté activa, no llegan propuestas nuevas.'))}</p>`}
+      </section>
+    </article>`;
+  }
+  function pintar(){
+    const host = $('lista'); host.removeAttribute('aria-busy');
+    cuerpo.classList.toggle('con-mias', E.mias.length > 0);
+    $('tus').hidden = !E.mias.length;
+    const orden = { activa: 0, pausada: 1, cerrada: 2 };
+    const l = E.mias.slice().sort((x, y) => (orden[x.estado] || 0) - (orden[y.estado] || 0) || String(y.creado_en || '').localeCompare(String(x.creado_en || '')));
+    host.innerHTML = l.map(tarjeta).join('');
+    modo(E.editando);
+  }
+  async function cargar(){
+    try {
+      const [mias, props] = await Promise.all([BPDigital.misBusquedas(), BPDigital.propuestasRecibidas()]);
+      E.mias = mias || []; E.props = props || [];
+      pintar();
+    } catch (err) { console.error(err); $('tus').hidden = false; $('lista').removeAttribute('aria-busy'); BP.estadoError($('lista'), t('dg_sb_err_cargar', 'No pudimos cargar tus búsquedas.'), cargar); }
+  }
+  $('lista').addEventListener('click', async e => {
+    const ed = e.target.closest('[data-editar]');
+    if (ed) { const b = E.mias.find(x => String(x.id) === ed.dataset.editar); if (b) abrirForm(b, ed); return; }
+    const es = e.target.closest('[data-estado]');
+    if (es) {
+      es.disabled = true;
+      try {
+        await BPDigital.estadoBusqueda(es.dataset.id, es.dataset.estado);
+        BP.toast(es.dataset.estado === 'pausada' ? t('dg_sb_ok_pausada', 'Búsqueda pausada. No llegan propuestas nuevas.') : es.dataset.estado === 'cerrada' ? t('dg_sb_ok_cerrada', 'Búsqueda cerrada.') : t('dg_sb_ok_activa', 'Tu búsqueda está activa otra vez.'));
+        await cargar(); const c = document.getElementById('b-' + es.dataset.id); if (c) c.focus();
+      } catch (err) { es.disabled = false; BP.toast(msjError(err, t('dg_ex_err', 'No pudimos guardar el cambio.')), 'error'); }
+      return;
+    }
+    const bo = e.target.closest('[data-borrar]');
+    if (bo) {
+      if (!(await confirmar(t('dg_sb_borrar_t', '¿Borrar esta búsqueda?'), t('dg_sb_borrar_p', 'Se borra con las propuestas que recibió. No se puede deshacer.'), t('dg_sb_borrar', 'Borrar'), true))) return;
+      try { await BPDigital.borrarBusqueda(bo.dataset.borrar); BP.toast(t('dg_sb_ok_borrada', 'Búsqueda borrada.')); if (String(E.editando) === bo.dataset.borrar) cerrarForm(); await cargar(); if (!E.mias.length) { const p = f.querySelector('[name=perfil]:checked'); if (p) p.focus(); } else $('btnNueva').focus(); }
+      catch (err) { BP.toast(msjError(err, t('dg_sb_err_borrar', 'No pudimos borrar la búsqueda.')), 'error'); }
+      return;
+    }
+    const ac = e.target.closest('[data-aceptar]');
+    if (ac) {
+      if (!(await confirmar(t('dg_sb_ac_t', '¿Aceptar esta propuesta?'), t('dg_sb_ac_p', 'Al aceptar, quien publica sabe quién sos y pueden hablar dentro de BAIREN. Las otras propuestas siguen abiertas.'), t('dg_sb_ac_si', 'Aceptar y conversar')))) return;
+      ac.disabled = true;
+      try {
+        const opId = await BPDigital.responder(ac.dataset.aceptar, 'aceptar');
+        const url = 'mensajes.html?op=' + encodeURIComponent(opId);
+        hoja({ titulo: t('dg_sb_ac_ok_t', 'Propuesta aceptada'), clase: 'p-dg-hoja-chica', primero: 'a',
+          cuerpo: `<p class="p-dg-txt p-dg-ok" role="status">${BP.ico.check}<span>${esc(t('dg_sb_ac_ok', 'Ahora pueden hablar: quien publica ya sabe quién sos.'))}</span></p><div class="p-dg-acts"><a class="p-btn p-btn-fill" href="${esc(url)}">${esc(t('dg_sb_ir_conv', 'Ir a la conversación'))}</a></div>` });
+        setTimeout(() => { location.href = url; }, 2400);
+      } catch (err) { ac.disabled = false; BP.toast(msjError(err, t('dg_sb_err_responder', 'No pudimos responder la propuesta.')), 'error'); }
+      return;
+    }
+    const re = e.target.closest('[data-rechazar]');
+    if (re) {
+      if (!(await confirmar(t('dg_sb_re_t', '¿Rechazar esta propuesta?'), t('dg_sb_re_p', 'Quien publica sabe que no te interesó. Sigue sin saber quién sos.'), t('dg_sb_rechazar', 'Rechazar'), true))) return;
+      try { await BPDigital.responder(re.dataset.rechazar, 'rechazar'); BP.toast(t('dg_sb_ok_rechazada', 'Propuesta rechazada.')); const bid = (E.props.find(p => String(p.id) === re.dataset.rechazar) || {}).busqueda_id; await cargar(); const c = bid && document.getElementById('b-' + bid); if (c) c.focus(); }
+      catch (err) { BP.toast(msjError(err, t('dg_sb_err_responder', 'No pudimos responder la propuesta.')), 'error'); }
+    }
+  });
+
+  ajustar(); contar();
+  await cargar();
+  /* Desde Explorar: se-busca.html#b-<id> (ver las propuestas de una) o #tus */
+  const h = decodeURIComponent(location.hash.slice(1));
+  const destino = h && (document.getElementById(h) || (h === 'tus' ? $('tus') : null));
+  if (destino && !destino.hidden) { destino.scrollIntoView({ block: 'start' }); if (destino.tabIndex < 0 || destino.hasAttribute('tabindex')) { try { destino.focus({ preventScroll: true }); } catch (e) { /* nada */ } } }
+})();
+});
+</script>
+</body>
+</html>

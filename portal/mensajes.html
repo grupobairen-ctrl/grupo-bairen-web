@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mensajes · BAIREN</title>
+  <meta name="description" content="Tus conversaciones y cada paso de tus operaciones en BAIREN.">
+  <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#131D2D">
+  <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
+  <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css?v=20261009a"><link rel="stylesheet" href="css/catalogo.css?v=20261009a"><link rel="stylesheet" href="css/portal.css?v=20261009a"><link rel="stylesheet" href="css/transiciones.css?v=20261009a"><style>@view-transition{navigation:auto}</style><style>html.arrancando body{opacity:0}body{transition:opacity .18s cubic-bezier(.22,1,.36,1)}@media(prefers-reduced-motion:reduce){body{transition:none}}</style><script>/* 8/10/2026 · Arranque sin pantallazo (ver BP.listo en ui.js): siempre, salvo al entrar a una ficha desde el portal (ahí la foto de la tarjeta crece hasta la ficha); en Safari del iPhone la transición entre páginas no tapaba el video al tocar el logo. Tope: 800 ms. */(function(){try{var h=document.documentElement,n=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{},r=document.referrer||'';if(r.indexOf(location.origin)===0&&n.type!=='reload'&&/propiedad/.test(location.pathname))return;h.classList.add('arrancando');setTimeout(function(){h.classList.remove('arrancando')},800)}catch(e){}})()</script>
+  <link rel="stylesheet" href="css/mensajes.css?v=20261009a">
+</head>
+<!-- 8/10/2026 · La operación digital · Mensajes. Dos vistas en la misma página:
+     · Bandeja (mensajes.html): mis operaciones (BPDigital.bandeja), con filtros y, para la curación, "Ver todas".
+     · Operación (mensajes.html?op=<id>): el chat, el recorrido de 7 pasos con los hitos intercalados, las acciones del
+       paso siguiente según el lado (BPDigital.PUEDE) y los detalles (contacto, visitas, documentos, recorrido y, para la
+       plataforma, el cobro simulado). En el celular es una pantalla completa tipo chat; en escritorio, dos columnas.
+     Está apagada para el público: sin BPDigital.activo() muestra "Muy pronto". Toda la lógica de datos vive en js/digital.js. -->
+<body class="p-product p-mensajes">
+<div class="p-velo" aria-hidden="true"><span class="w">BAIREN</span></div>
+<div id="pHeader"></div>
+<main id="contenido" class="ms-main" aria-busy="true">
+  <div class="ms-app" id="msApp">
+    <section class="ms-bandeja" id="msBandeja" aria-labelledby="msTit">
+      <div class="ms-bhead">
+        <h1 class="ms-tit" id="msTit">Mensajes</h1>
+        <button type="button" class="ms-conm" id="msTodas" aria-pressed="false" hidden>Ver todas</button>
+      </div>
+      <div class="ms-filtros" id="msFiltros" role="group" aria-label="Filtrar conversaciones" hidden></div>
+      <div class="ms-lista" id="msLista">
+        <ul class="ms-filas ms-esq" aria-hidden="true"><li><span class="ms-fila"><span class="ms-foto"></span><span class="ms-fila-cuerpo"><i></i><i></i><i></i></span></span></li><li><span class="ms-fila"><span class="ms-foto"></span><span class="ms-fila-cuerpo"><i></i><i></i><i></i></span></span></li><li><span class="ms-fila"><span class="ms-foto"></span><span class="ms-fila-cuerpo"><i></i><i></i><i></i></span></span></li></ul>
+      </div>
+    </section>
+    <section class="ms-op" id="msOp" aria-label="Operación"></section>
+  </div>
+</main>
+<div id="pFooter"></div>
+
+<script src="supabase-portal.js?v=20261009a" defer></script><script src="js/errores.js?v=20261009a" defer></script>
+<script src="../mapa-barrios.js?v=20261009a" defer></script>
+<script src="js/bairen-motion.js?v=20261009a" defer></script><script src="js/i18n-portal.js?v=20261009a" defer></script><script src="js/ui.js?v=20261009a" defer></script><script src="js/store.js?v=20261009a" defer></script>
+<script src="js/digital.js?v=20261009a" defer></script>
+<script src="js/data.js?v=20261009a" defer></script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+(async function(){
+  'use strict';
+  BP.header(); BP.footer(); if (window.BPStore) BPStore.init();
+  /* Entrada directa a una operación (aviso, ficha): en el celular, la pantalla del chat desde el primer cuadro */
+  if (new URLSearchParams(location.search).get('op')) document.body.classList.add('ms-en-op');
+
+  /* ── textos, formato e íconos ─────────────────────────── */
+  const t = (k, d) => BP.t('dg_ms_' + k, d);
+  const tf = (k, d, v) => BP.tf('dg_ms_' + k, d, v);
+  const esc = BP.esc;
+  const $ = id => document.getElementById(id);
+  const main = $('contenido');
+  const svg = (d, extra) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"${extra || ''}>${d}</svg>`;
+  const ICO = {
+    volver: svg('<path d="M15 18l-6-6 6-6"/>', ' stroke-width="1.7"'),
+    enviar: svg('<path d="M12 19V5"/><path d="M6 11l6-6 6 6"/>', ' stroke-width="1.8"'),
+    info: svg('<circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.7v.3"/>'),
+    mas: svg('<circle cx="6" cy="12" r="1.15" fill="currentColor"/><circle cx="12" cy="12" r="1.15" fill="currentColor"/><circle cx="18" cy="12" r="1.15" fill="currentColor"/>'),
+    abajo: svg('<path d="M6 9l6 6 6-6"/>'),
+    doc: svg('<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/>'),
+    verif: svg('<path d="M12 3 4.5 6v5.5c0 4.6 3.2 8 7.5 9.5 4.3-1.5 7.5-4.9 7.5-9.5V6z"/><path d="m9 12 2 2 4-4"/>'),
+    x: BP.ico.x, chat: BP.ico.chat, wa: BP.ico.wa, mail: BP.ico.mail, phone: BP.ico.phone
+  };
+  const LOC = () => BP.LOCALE();
+  const dos = n => String(n).padStart(2, '0');
+  const fecha = v => { if (!v) return null; const d = new Date(v); return isNaN(d) ? null : d; };
+  const hhmm = d => dos(d.getHours()) + ':' + dos(d.getMinutes());
+  const mismoDia = (a, b) => a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+  const ddmm = d => d.getDate() + '/' + (d.getMonth() + 1);
+  const diaCorto = d => { try { return d.toLocaleDateString(LOC(), { weekday: 'short' }).replace(/\.$/, ''); } catch (e) { return ''; } };
+  /* "jue 20/10 15:00" */
+  const fmtVisita = v => { const d = fecha(v); return d ? (diaCorto(d) + ' ' + ddmm(d) + ' ' + hhmm(d)).trim() : ''; };
+  const fmtFechaHora = v => { const d = fecha(v); if (!d) return ''; return ddmm(d) + (d.getFullYear() !== new Date().getFullYear() ? '/' + d.getFullYear() : '') + ' ' + hhmm(d); };
+  /* La hora de la bandeja: "Ahora", "hace 5 min", "15:02", "Ayer", "lun", "6/10" */
+  const horaRel = v => {
+    const d = fecha(v); if (!d) return '';
+    const ahora = new Date(), min = (ahora - d) / 60000;
+    if (min < 1) return t('ahora', 'Ahora');
+    if (min < 60) return tf('hace_min', 'hace {n} min', { n: Math.floor(min) });
+    if (mismoDia(d, ahora)) return hhmm(d);
+    const ayer = new Date(); ayer.setDate(ayer.getDate() - 1);
+    if (mismoDia(d, ayer)) return t('ayer', 'Ayer');
+    if (ahora - d < 6 * 864e5) return diaCorto(d);
+    return ddmm(d) + (d.getFullYear() !== ahora.getFullYear() ? '/' + String(d.getFullYear()).slice(2) : '');
+  };
+  const diaLargo = d => {
+    const hoy = new Date(); if (mismoDia(d, hoy)) return t('hoy', 'Hoy');
+    const ayer = new Date(); ayer.setDate(ayer.getDate() - 1); if (mismoDia(d, ayer)) return t('ayer', 'Ayer');
+    let s = ''; try { s = d.toLocaleDateString(LOC(), d.getFullYear() !== hoy.getFullYear() ? { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' } : { weekday: 'long', day: 'numeric', month: 'long' }); } catch (e) { s = ddmm(d); }
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  };
+  const fmtPeriodo = p => { const m = /^(\d{4})-(\d{2})$/.exec(p || ''); if (!m) return p || ''; try { return new Date(+m[1], +m[2] - 1, 1).toLocaleDateString(LOC(), { month: 'long', year: 'numeric' }); } catch (e) { return p; } };
+  const fmtMonto = (n, moneda) => n == null ? '' : (moneda === 'ARS' ? '$ ' : 'USD ') + Number(n).toLocaleString(LOC(), { maximumFractionDigits: 2 });
+  const recorte = (s, n) => { const x = String(s || '').replace(/\s+/g, ' ').trim(); return x.length > n ? x.slice(0, n - 1).trimEnd() + '…' : x; };
+  const iso = v => { const d = fecha(v); return d ? d.toISOString() : null; };
+  const limpio = o => { if (!o) return null; const r = {}; Object.keys(o).forEach(k => { const v = o[k]; if (v !== undefined && v !== null && v !== '') r[k] = v; }); return Object.keys(r).length ? r : null; };
+  const movil = () => matchMedia('(max-width: 859px)').matches;
+  const panelFlotante = () => !matchMedia('(min-width: 1280px)').matches;
+  const quieto = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const TIPO_PUB = { dueno: t('tp_dueno', 'Dueño directo'), profesional: t('tp_profesional', 'Inmobiliaria'), inmobiliaria: t('tp_profesional', 'Inmobiliaria'), desarrolladora: t('tp_desarrolladora', 'Desarrolladora'), gestor: t('tp_gestor', 'Gestora') };
+  const EST_V = { pedida: t('v_pedida', 'Pedida'), confirmada: t('v_confirmada', 'Confirmada'), realizada: t('v_realizada', 'Hecha'), cancelada: t('v_cancelada', 'Cancelada'), pendiente: t('v_pendiente', 'Pendiente') };
+  const DOC_T = { reserva: t('doc_reserva', 'Reserva'), contrato: t('doc_contrato', 'Contrato'), boleto: t('doc_boleto', 'Boleto'), convenio: t('doc_convenio', 'Convenio'), inventario: t('doc_inventario', 'Inventario'), otro: t('doc_otro', 'Documento') };
+  const DOC_E = { borrador: t('doc_borrador', 'Borrador'), enviado: t('doc_enviado', 'Enviado'), firmado: t('doc_firmado_e', 'Firmado'), anulado: t('doc_anulado', 'Anulado') };
+  const EST_C = { simulado: t('c_simulado', 'Simulado'), pendiente: t('c_pendiente', 'Pendiente'), facturado: t('c_facturado', 'Facturado'), cobrado: t('c_cobrado', 'Cobrado'), anulado: t('c_anulado', 'Anulado') };
+  const PAGA = { publicador: t('paga_publicador', 'paga quien publica'), interesado: t('paga_interesado', 'paga quien busca'), propietario: t('paga_propietario', 'paga el propietario') };
+  const nom = s => { const x = String(s || '').trim(); return x ? x.charAt(0).toUpperCase() + x.slice(1) : x; };
+  const crear = html => { const tpl = document.createElement('template'); tpl.innerHTML = html.trim(); return tpl.content; };
+
+  document.title = t('titulo', 'Mensajes') + ' · BAIREN';
+  $('msTit').textContent = t('titulo', 'Mensajes');
+  $('msFiltros').setAttribute('aria-label', t('filtros_aria', 'Filtrar conversaciones'));
+  $('msOp').setAttribute('aria-label', t('op_aria', 'Operación'));
+
+  /* ── interruptor y sesión ─────────────────────────────── */
+  if (window.BPStore && BPStore.ready) await BPStore.ready;
+  const D = window.BPDigital;
+  if (!D || !D.activo()) { pronto(); return; }
+  if (!window.BPStore || !BPStore.requireSession()) return;
+  try { await BP.probePretty(); } catch (e) { /* enlaces con .html */ }
+
+  function pronto(){
+    document.body.classList.remove('ms-en-op');
+    main.removeAttribute('aria-busy');
+    main.innerHTML = `<div class="ms-pronto">
+      <span class="ms-pronto-ico">${ICO.chat}</span>
+      <h1 class="ms-pronto-t">${esc(t('pronto_t', 'Mensajes, muy pronto'))}</h1>
+      <p class="ms-pronto-p">${esc(t('pronto_p', 'Vas a poder hablar con quien publica, coordinar visitas y seguir cada paso de la operación sin salir de BAIREN.'))}</p>
+      <a class="ms-btn ms-btn-navy" href="index.html">${esc(t('pronto_btn', 'Volver al inicio'))}</a></div>`;
+  }
+
+  /* ── estado ───────────────────────────────────────────── */
+  const st = {
+    lista: [], firmaLista: '', filtro: 'todas', todas: false, cur: false,
+    opId: null, d: null, firmaD: '', msjs: [], ids: new Set(), ultimoId: 0, dibujados: new Set(), ult: {}, corte: null,
+    gen: 0, tick: 0, timer: null, ocupado: false, enviando: false, plegadas: {}, borradores: {}, soltarPanel: null, soltarMas: null, scrollBandeja: 0
+  };
+  const app = $('msApp'), opEl = $('msOp'), listaEl = $('msLista');
+  try { st.todas = sessionStorage.getItem('bp_ms_todas') === '1'; } catch (e) {}
+
+  /* ════════════════ Bandeja ════════════════ */
+  const cerrada = r => r.etapa === 'cerrada' || r.etapa === 'caida';
+  function filtradas(){
+    const l = st.lista;
+    if (st.filtro === 'interesado') return l.filter(r => r.lado === 'interesado');
+    if (st.filtro === 'publicador') return l.filter(r => r.lado === 'publicador');
+    if (st.filtro === 'cerradas') return l.filter(cerrada);
+    return l;
+  }
+  function pintarFiltros(){
+    const host = $('msFiltros');
+    const hayI = st.lista.some(r => r.lado === 'interesado'), hayP = st.lista.some(r => r.lado === 'publicador');
+    const fs = [['todas', t('f_todas', 'Todas')]];
+    if (hayI && hayP) fs.push(['interesado', t('f_interesado', 'Como interesado')], ['publicador', t('f_publicador', 'Como publicador')]);
+    fs.push(['cerradas', t('f_cerradas', 'Cerradas')]);
+    if (!fs.some(f => f[0] === st.filtro)) st.filtro = 'todas';
+    host.hidden = !st.lista.length;
+    host.innerHTML = fs.map(f => `<button type="button" class="ms-filtro" data-f="${f[0]}" aria-pressed="${f[0] === st.filtro}">${esc(f[1])}</button>`).join('');
+  }
+  $('msFiltros').addEventListener('click', e => {
+    const b = e.target.closest('[data-f]'); if (!b) return;
+    st.filtro = b.dataset.f; st.firmaLista = ''; pintarBandeja();
+    const nb = $('msFiltros').querySelector(`[data-f="${st.filtro}"]`); if (nb) nb.focus();
+  });
+  const fotoHTML = (url, titulo, cls, ancho, ya) => {
+    const ini = (String(titulo || 'B').trim().charAt(0) || 'B').toUpperCase();
+    return `<span class="ms-foto ${cls || ''}" aria-hidden="true"><span class="ms-foto-ini">${esc(ini)}</span>${url ? `<img src="${esc(BP.sbImg(url, ancho || 200))}" alt=""${ya ? '' : ' loading="lazy"'} decoding="async" onerror="this.remove()">` : ''}</span>`;
+  };
+  const etapaHTML = e => `<span class="ms-etapa ms-e-${esc(e)}">${esc(D.ETAPA_TXT[e] || e)}</span>`;
+  function contraparteFila(r){
+    if (r.lado === 'plataforma') return [nom(r.contraparte), r.publicador_nombre].filter(Boolean).join(t('con_y', ' con '));
+    return (r.lado === 'publicador' ? nom(r.contraparte) : r.contraparte) || (r.lado === 'interesado' ? t('quien_publica', 'Quien publica') : t('interesado', 'Interesado'));
+  }
+  function filaHTML(r){
+    const on = r.id === st.opId;
+    const nl = (on && !document.hidden) ? 0 : (r.no_leidos || 0);
+    const yo = r.ultimo_lado && r.ultimo_lado === r.lado;
+    const pref = !r.ultimo_texto ? '' : yo ? t('vos', 'Vos') + ': ' : r.ultimo_lado === 'plataforma' ? t('equipo_corto', 'BAIREN') + ': ' : '';
+    const ult = r.ultimo_texto ? pref + recorte(r.ultimo_texto, 120) : t('sin_mensajes', 'Sin mensajes todavía');
+    const cuando = r.ultimo_en || r.actualizada_en;
+    return `<li><a class="ms-fila${nl ? ' sin-leer' : ''}${on ? ' on' : ''}${cerrada(r) ? ' archivada' : ''}" href="mensajes.html?op=${esc(encodeURIComponent(r.id))}" data-op="${esc(r.id)}"${on ? ' aria-current="true"' : ''}>
+      ${fotoHTML(r.foto, r.aviso_titulo, 'ms-fila-foto')}
+      <span class="ms-fila-cuerpo">
+        <span class="ms-fila-l1"><span class="ms-fila-tit">${esc(r.aviso_titulo || t('una_unidad', 'Una propiedad'))}</span><time class="ms-fila-hora" datetime="${esc(cuando || '')}">${esc(horaRel(cuando))}</time></span>
+        <span class="ms-fila-l2"><span class="ms-fila-con">${esc(contraparteFila(r))}${r.aviso_lugar ? ' · ' + esc(r.aviso_lugar) : ''}</span>${etapaHTML(r.etapa)}</span>
+        <span class="ms-fila-l3"><span class="ms-fila-ult">${esc(ult)}</span>${nl ? `<span class="ms-nl"><span aria-hidden="true">${nl > 99 ? '99+' : nl}</span><span class="ms-sr">${esc(nl === 1 ? t('nl_uno', 'un mensaje sin leer') : tf('nl_varios', '{n} mensajes sin leer', { n: nl }))}</span></span>` : ''}</span>
+      </span></a></li>`;
+  }
+  function vacioBandeja(){
+    return `<div class="ms-vacio"><span class="ms-vacio-ico">${ICO.chat}</span>
+      <p class="ms-vacio-t">${esc(t('vacio_t', 'Todavía no tenés conversaciones'))}</p>
+      <p class="ms-vacio-p">${esc(t('vacio_p', 'Cuando le escribas a quien publica una propiedad, la conversación y cada paso de la operación van a quedar acá.'))}</p>
+      <a class="ms-btn ms-btn-navy" href="buscar.html">${esc(t('vacio_btn', 'Buscar propiedades'))}</a></div>`;
+  }
+  function pintarBandeja(){
+    const firma = JSON.stringify([st.filtro, st.opId, document.hidden, st.lista.map(r => [r.id, r.etapa, r.ultimo_en, r.ultimo_texto, r.no_leidos, r.actualizada_en, horaRel(r.ultimo_en || r.actualizada_en)])]);
+    if (firma === st.firmaLista) return; st.firmaLista = firma;
+    pintarFiltros();
+    const foco = document.activeElement && listaEl.contains(document.activeElement) ? (document.activeElement.dataset.op || null) : null;
+    const arriba = listaEl.scrollTop;
+    const filas = filtradas();
+    if (!st.lista.length) listaEl.innerHTML = vacioBandeja();
+    else if (!filas.length) listaEl.innerHTML = `<p class="ms-lista-vacia">${esc(t('vacio_filtro', 'No hay conversaciones con este filtro.'))}</p>`;
+    else listaEl.innerHTML = `<ul class="ms-filas">${filas.map(filaHTML).join('')}</ul>`;
+    listaEl.scrollTop = arriba;
+    if (foco) { const a = listaEl.querySelector(`[data-op="${CSS.escape(foco)}"]`); if (a) a.focus({ preventScroll: true }); }
+    const n = st.lista.reduce((s, r) => s + ((r.id === st.opId && !document.hidden) ? 0 : (r.no_leidos || 0)), 0);
+    document.title = (n ? '(' + n + ') ' : '') + t('titulo', 'Mensajes') + ' · BAIREN';
+  }
+  async function cargarBandeja(silencioso){
+    try {
+      const l = await D.bandeja({ todas: st.todas && st.cur });
+      st.lista = Array.isArray(l) ? l : [];
+      pintarBandeja();
+    } catch (e) {
+      if (silencioso) { console.warn('bandeja', e); return; }
+      st.firmaLista = '';
+      BP.estadoError(listaEl, (e && e.message) || t('err_bandeja', 'No pudimos cargar tus mensajes.'), () => cargarBandeja());
+    }
+  }
+  listaEl.addEventListener('click', e => {
+    const a = e.target.closest('a[data-op]'); if (!a) return;
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button) return;
+    e.preventDefault(); irA(a.dataset.op, true);
+  });
+  const conm = $('msTodas');
+  conm.addEventListener('click', async () => {
+    st.todas = !st.todas; conm.setAttribute('aria-pressed', String(st.todas));
+    try { sessionStorage.setItem('bp_ms_todas', st.todas ? '1' : '0'); } catch (e) {}
+    st.firmaLista = ''; await cargarBandeja();
+    BP.anunciar(st.todas ? t('todas_on', 'Ves todas las operaciones de BAIREN.') : t('todas_off', 'Ves solo tus operaciones.'));
+  });
+
+  /* ════════════════ Operación ════════════════ */
+  const ladoTxt = l => l === 'plataforma' ? t('equipo', 'Equipo BAIREN') : l === 'publicador' ? ((st.d && st.d.publicador && st.d.publicador.nombre) || t('quien_publica', 'Quien publica')) : l === 'interesado' ? (nom(st.d && st.d.interesado && st.d.interesado.nombre) || t('interesado', 'Interesado')) : 'BAIREN';
+  const esVenta = op => op.linea === 'venta' || op.linea === 'pozo' || (!op.linea && op.tipo === 'venta');
+  const hitosOrden = () => (st.d.hitos || []).slice().sort((a, b) => (+new Date(a.creado_en) - +new Date(b.creado_en)) || (a.id - b.id));
+  function ultimoDe(tipos){ const hs = hitosOrden(); for (let i = hs.length - 1; i >= 0; i--) if (tipos.indexOf(hs[i].tipo) > -1) return hs[i]; return null; }
+  function pedidaPendiente(){ const u = ultimoDe(['visita_pedida', 'visita_confirmada', 'visita_realizada', 'visita_cancelada']); return u && u.tipo === 'visita_pedida' && u.datos && u.datos.fecha ? u : null; }
+  function visitaPendiente(){
+    const vs = (st.d.visitas || []).filter(v => v.estado === 'confirmada');
+    if (vs.length) return vs[vs.length - 1];
+    const u = ultimoDe(['visita_pedida', 'visita_confirmada', 'visita_realizada', 'visita_cancelada']);
+    return u && u.tipo === 'visita_confirmada' ? { fecha: (u.datos || {}).fecha, nota: (u.datos || {}).nota, estado: 'confirmada' } : null;
+  }
+  /* Hasta dónde llegó antes de caerse (para pintar el recorrido de una operación sin acuerdo) */
+  const ETAPA_DE = { consulta: 'consulta', propuesta_aceptada: 'consulta', conversacion: 'conversacion', whatsapp: 'conversacion', visita_pedida: 'visita', visita_confirmada: 'visita', visita_realizada: 'visita', solicitud_enviada: 'solicitud', solicitud_aceptada: 'solicitud', reserva: 'reserva', contrato_firmado: 'contrato', cierre: 'cerrada' };
+  function etapaAlcanzada(){ let mx = 'consulta'; hitosOrden().forEach(h => { const e = ETAPA_DE[h.tipo]; if (e && D.ordenEtapa(e) > D.ordenEtapa(mx)) mx = e; }); return mx; }
+  function resumenCierre(x, op){
+    x = x || {}; const mon = x.moneda || (op && op.moneda);
+    if (x.monto_contrato) return fmtMonto(x.monto_contrato, mon) + (x.plazo_meses ? ' · ' + tf('meses', '{n} meses', { n: x.plazo_meses }) : '');
+    if (x.precio_cierre) return fmtMonto(x.precio_cierre, mon);
+    return '';
+  }
+  function hitoTexto(h){
+    const x = h.datos || {}; let det = '';
+    if ((h.tipo === 'visita_pedida' || h.tipo === 'visita_confirmada') && x.fecha) det = fmtVisita(x.fecha);
+    else if ((h.tipo === 'caida' || h.tipo === 'visita_cancelada' || h.tipo === 'solicitud_rechazada') && x.motivo) det = recorte(x.motivo, 80);
+    else if (h.tipo === 'cierre') det = resumenCierre(x, st.d && st.d.operacion);
+    else if (h.tipo === 'cobro_mensual' && x.monto) det = fmtMonto(x.monto, x.moneda) + (x.periodo ? ' · ' + fmtPeriodo(x.periodo) : '');
+    return { base: D.HITO_TXT[h.tipo] || h.tipo, det, conFecha: !!(x.fecha && (h.tipo === 'visita_pedida' || h.tipo === 'visita_confirmada')) };
+  }
+  const verifHTML = txt => `<span class="ms-verif">${ICO.verif}<span>${esc(txt || t('verificado', 'Verificado'))}</span></span>`;
+
+  function esqueletoOp(){
+    opEl.innerHTML = `<div class="ms-op-in">
+      <header class="ms-ohead" id="msHead"><button type="button" class="ms-ico-btn ms-volver" data-volver aria-label="${esc(t('volver', 'Volver a Mensajes'))}">${ICO.volver}</button><span class="ms-foto ms-ohead-foto ms-esq-b"></span><span class="ms-ohead-txt"><i class="ms-esq-l"></i><i class="ms-esq-l corta"></i></span></header>
+      <div class="ms-recorrido" id="msRec"></div>
+      <div class="ms-cuerpo">
+        <div class="ms-chat">
+          <div class="ms-log" id="msLog" role="log" aria-live="polite" aria-relevant="additions" aria-label="${esc(t('log_aria', 'Conversación'))}" tabindex="0"><div class="ms-log-esq" aria-hidden="true"><i></i><i class="d"></i><i></i></div></div>
+          <div class="ms-barra p-barra-fija" id="msBarra">
+            <button type="button" class="ms-nuevos" id="msNuevos" hidden>${esc(t('nuevos', 'Mensajes nuevos'))}${ICO.abajo}</button>
+            <div class="ms-acc" id="msAcc"></div>
+            <form class="ms-comp" id="msComp" novalidate>
+              <label class="ms-sr" for="msTexto">${esc(t('escribi', 'Escribí un mensaje'))}</label>
+              <textarea id="msTexto" rows="1" maxlength="4000" enterkeyhint="send" autocomplete="off" placeholder="${esc(t('ph', 'Escribí un mensaje'))}" disabled></textarea>
+              <button type="submit" class="ms-enviar" id="msEnviar" aria-label="${esc(t('enviar', 'Enviar'))}" disabled>${ICO.enviar}</button>
+            </form>
+          </div>
+        </div>
+        <div class="ms-velo-panel" id="msVeloPanel" aria-hidden="true"></div>
+        <aside class="ms-panel" id="msPanel" aria-labelledby="msPanelT"></aside>
+      </div></div>`;
+    prepararComposer();
+    ajustarVisual();
+  }
+  function opVacia(){
+    const hay = st.lista.length > 0;
+    opEl.innerHTML = `<div class="ms-op-vacia"><span class="ms-vacio-ico">${ICO.chat}</span>
+      <p class="ms-op-vacia-t">${esc(hay ? t('elegi_t', 'Elegí una conversación') : t('bienvenida_t', 'Cada operación, en un solo lugar'))}</p>
+      <p class="ms-op-vacia-p">${esc(t('elegi_p', 'El chat con quien publica, las visitas, los documentos y cada paso del recorrido, con fecha.'))}</p></div>`;
+  }
+  function errorOp(e){
+    opEl.innerHTML = `<div class="ms-op-vacia" role="alert"><p class="ms-op-vacia-t">${esc(t('err_op_t', 'No pudimos abrir esta conversación'))}</p>
+      <p class="ms-op-vacia-p">${esc((e && e.message) || t('err_op', 'Probá de nuevo en un momento.'))}</p>
+      <div class="ms-op-vacia-acc"><button type="button" class="ms-btn" data-volver>${esc(t('volver_corto', 'Volver a Mensajes'))}</button><button type="button" class="ms-btn ms-btn-navy" data-reintentar>${esc(t('reintentar', 'Reintentar'))}</button></div></div>`;
+    const r = opEl.querySelector('[data-reintentar]'); if (r) r.addEventListener('click', () => abrirOp(st.opId));
+  }
+
+  /* Encabezado: la unidad, su precio, la ficha y con quién */
+  function pintarHead(){
+    const d = st.d, a = d.aviso || {}, op = d.operacion, h = $('msHead'); if (!h) return;
+    const ficha = a.id ? BP.urlFicha({ id: a.id }) : null;
+    const per = BP.opTxt(a.operacion || op.tipo, 'per');
+    const precio = a.precio != null ? BP.fmtPrecio(a.precio, a.moneda) + (per || '') : '';
+    const linea = op.linea && D.LINEAS[op.linea] ? D.LINEAS[op.linea] : '';
+    const pub = d.publicador || {}, int = d.interesado || null;
+    let con = '', corto = '';
+    if (d.lado === 'interesado') { con = tf('con', 'Con {n}', { n: pub.nombre || t('quien_publica', 'Quien publica') }) + (TIPO_PUB[pub.tipo] ? ' · ' + TIPO_PUB[pub.tipo] : ''); corto = pub.nombre || ''; }
+    else if (d.lado === 'publicador') { con = tf('busca', '{n} · busca', { n: nom(int && int.nombre) || t('interesado', 'Interesado') }); corto = nom(int && int.nombre) || ''; }
+    else { con = tf('entre', '{a} con {b}', { a: nom(int && int.nombre) || t('interesado', 'Interesado'), b: pub.nombre || t('quien_publica', 'Quien publica') }); corto = con; }
+    const verif = d.lado === 'interesado' ? pub.verificado : (int && int.verificado);
+    const tit = a.titulo || t('una_unidad', 'Una propiedad');
+    h.innerHTML = `<button type="button" class="ms-ico-btn ms-volver" data-volver aria-label="${esc(t('volver', 'Volver a Mensajes'))}">${ICO.volver}</button>
+      ${ficha ? `<a class="ms-ohead-fotoa" href="${esc(ficha)}" aria-label="${esc(tf('ver_ficha_de', 'Ver la ficha de {t}', { t: tit }))}">${fotoHTML(a.foto, tit, 'ms-ohead-foto', 240, true)}</a>` : fotoHTML(a.foto, tit, 'ms-ohead-foto', 240, true)}
+      <div class="ms-ohead-txt">
+        <h2 class="ms-ohead-tit" id="msOpTit" tabindex="-1">${esc(tit)}</h2>
+        <p class="ms-ohead-sub">${[a.barrio || a.direccion, precio, linea].filter(Boolean).map(esc).join(' · ')}</p>
+        <p class="ms-ohead-con">${esc(con)}${verif ? verifHTML() : ''}</p>
+        <p class="ms-ohead-movil">${[corto, precio].filter(Boolean).map(esc).join(' · ')}</p>
+      </div>
+      <div class="ms-ohead-acc">
+        ${ficha ? `<a class="ms-link ms-ohead-ficha" href="${esc(ficha)}">${esc(t('ver_ficha', 'Ver ficha'))}</a>` : ''}
+        <button type="button" class="ms-ico-btn ms-info-btn" aria-controls="msPanel" aria-expanded="${opEl.classList.contains('ms-panel-on')}" aria-label="${esc(t('detalles_aria', 'Detalles de la operación'))}">${ICO.info}</button>
+      </div>`;
+  }
+
+  /* El recorrido: 7 pasos, el actual en oro. Sin acuerdo: lo que se alcanzó, apagado, y el motivo. */
+  function pintarRecorrido(){
+    const host = $('msRec'); if (!host) return;
+    const op = st.d.operacion, caida = op.etapa === 'caida';
+    const hasta = caida ? etapaAlcanzada() : op.etapa;
+    const idx = Math.max(0, D.ETAPAS.indexOf(hasta));
+    const lis = D.ETAPAS.map((e, i) => {
+      const cls = i < idx ? 'hecho' : i === idx ? (caida ? 'hecho ult' : 'actual') : '';
+      const sr = i < idx || (caida && i === idx) ? t('paso_hecho', 'hecho') : i === idx ? t('paso_actual', 'paso actual') : t('paso_falta', 'pendiente');
+      return `<li class="${cls}"${i === idx && !caida ? ' aria-current="step"' : ''}><span class="pt" aria-hidden="true"></span><span class="lb">${esc(D.ETAPA_TXT[e])}</span><span class="ms-sr">, ${esc(sr)}</span></li>`;
+    }).join('');
+    host.classList.toggle('caida', caida);
+    host.classList.toggle('fin', op.etapa === 'cerrada');
+    const txt = caida
+      ? `<b>${esc(D.ETAPA_TXT.caida)}</b>${op.motivo_caida ? ' · ' + esc(recorte(op.motivo_caida, 90)) : ''}`
+      : `<b>${esc(D.ETAPA_TXT[op.etapa] || op.etapa)}</b> · ${esc(tf('paso_n', 'paso {i} de {n}', { i: idx + 1, n: D.ETAPAS.length }))}`;
+    host.innerHTML = `<p class="ms-rec-txt">${txt}</p><ol class="ms-pasos" aria-label="${esc(t('rec_aria', 'Recorrido de la operación'))}">${lis}</ol>`;
+  }
+
+  /* ── Acciones del paso siguiente ───────────────────────── */
+  function acciones(){
+    const d = st.d, op = d.operacion, et = op.etapa, ord = D.ordenEtapa(et), lado = d.lado, P = D.PUEDE[lado] || [];
+    const abierta = et !== 'caida' && et !== 'cerrada';
+    const hay = tipo => (d.hitos || []).some(h => h.tipo === tipo);
+    const ped = pedidaPendiente(), vis = visitaPendiente();
+    const us = ultimoDe(['solicitud_enviada', 'solicitud_aceptada', 'solicitud_rechazada']);
+    const solPend = !!(us && us.tipo === 'solicitud_enviada'), solOk = !!(us && us.tipo === 'solicitud_aceptada');
+    const out = { estado: '', prim: [], mas: [] };
+    const puede = tipo => P.indexOf(tipo) > -1;
+    const a = (lista, id, txt, tipo, extra) => { if (tipo && !puede(tipo)) return; lista.push(Object.assign({ id, txt }, extra || {})); };
+    if (lado === 'interesado') {
+      const wa = d.publicador && d.publicador.whatsapp;
+      if (abierta) {
+        if (ped) out.estado = tf('e_i_pedida', 'Pediste una visita para el {f}. Falta que la confirme.', { f: fmtVisita(ped.datos.fecha) });
+        else if (vis && vis.fecha) out.estado = tf('e_visita', 'Visita confirmada: {f}.', { f: fmtVisita(vis.fecha) });
+        if (solPend) out.estado = t('e_i_sol', 'Mandaste la solicitud. Falta la respuesta.');
+        else if (solOk) out.estado = t('e_i_sol_ok', 'Aceptaron tu solicitud. Seguimos por acá con la reserva y el contrato.');
+        if (!ped && !vis && ord <= 4 && !solOk) a(out.prim, 'pedir_visita', t('a_pedir_visita', 'Pedir visita'), 'visita_pedida');
+        if (!solPend && !solOk && ord <= 4) a(out.prim, 'avanzar', t('a_avanzar', 'Quiero avanzar'), 'solicitud_enviada');
+        if (wa) a(out.prim, 'wa', t('a_wa', 'Seguir por WhatsApp'), 'whatsapp', { href: waHref(wa, tf('wa_txt', 'Hola, te escribo desde BAIREN por {t}.', { t: (d.aviso && d.aviso.titulo) || '' })), ico: ICO.wa });
+        if (vis || ped) a(out.mas, 'cancelar_visita', t('a_cancelar_visita', 'Cancelar visita'), 'visita_cancelada', { peligro: true });
+        a(out.mas, 'no_sigo', t('a_no_sigo', 'No sigo'), 'caida', { peligro: true });
+      } else if (et === 'caida') out.estado = t('e_caida', 'Quedó sin acuerdo. La conversación sigue guardada acá.');
+      else { out.estado = t('e_cerrada_i', 'Operación cerrada.'); if (wa) a(out.prim, 'wa', t('a_wa', 'Seguir por WhatsApp'), 'whatsapp', { href: waHref(wa, ''), ico: ICO.wa }); }
+    } else if (lado === 'publicador') {
+      const tel = d.interesado && d.interesado.telefono;
+      if (abierta) {
+        if (solPend) out.estado = t('e_p_sol', 'Quiere avanzar: mandó la solicitud.');
+        else if (ped) out.estado = tf('e_p_pedida', 'Pidió una visita para el {f}.', { f: fmtVisita(ped.datos.fecha) });
+        else if (vis && vis.fecha) out.estado = tf('e_visita', 'Visita confirmada: {f}.', { f: fmtVisita(vis.fecha) });
+        if (solPend) { a(out.prim, 'aceptar_sol', t('a_aceptar_sol', 'Aceptar solicitud'), 'solicitud_aceptada'); a(out.prim, 'rechazar_sol', t('a_rechazar_sol', 'Rechazar solicitud'), 'solicitud_rechazada'); }
+        if (vis) { a(out.prim, 'visita_hecha', t('a_visita_hecha', 'Visita hecha'), 'visita_realizada'); a(out.mas, 'cancelar_visita', t('a_cancelar_visita', 'Cancelar visita'), 'visita_cancelada', { peligro: true }); }
+        else if (ord <= 4 || ped) a(ped || ord <= 3 ? out.prim : out.mas, 'confirmar_visita', t('a_confirmar_visita', 'Confirmar visita'), 'visita_confirmada');
+        const genOk = hay('contrato_generado');
+        if (!genOk && ord < 6) a(ord >= 3 || solOk ? out.prim : out.mas, 'contrato_gen', t('a_contrato_gen', 'Contrato preparado'), 'contrato_generado');
+        if (genOk && ord < 6) a(out.prim, 'contrato_firm', t('a_contrato_firm', 'Contrato firmado'), 'contrato_firmado');
+        a(genOk || ord >= 5 ? out.prim : out.mas, 'cerrar', t('a_cerrar', 'Cerrar operación'), 'cierre');
+        if (ord < 5) a(solOk ? out.prim : out.mas, 'reserva', t('a_reserva', 'Reserva'), 'reserva');
+        if (tel) a(out.mas, 'wa_int', t('a_wa_int', 'Escribirle por WhatsApp'), 'whatsapp', { href: waHref(BPStore.waNorm ? BPStore.waNorm(tel) : tel, tf('wa_txt_p', 'Hola, te escribo desde BAIREN por {t}.', { t: (d.aviso && d.aviso.titulo) || '' })), ico: ICO.wa });
+        a(out.mas, 'sin_acuerdo', t('a_sin_acuerdo', 'Sin acuerdo'), 'caida', { peligro: true });
+      } else if (et === 'caida') {
+        out.estado = t('e_caida_p', 'Quedó sin acuerdo.') + (op.motivo_caida ? ' ' + tf('e_motivo', 'Motivo: {m}.', { m: recorte(op.motivo_caida, 80) }) : '');
+        a(out.prim, 'retomar', t('a_retomar', 'Retomar'), 'reabierta');
+      } else {
+        const r = resumenCierre({ monto_contrato: op.monto_contrato, precio_cierre: op.precio_cierre, plazo_meses: op.plazo_meses, moneda: op.moneda }, op);
+        out.estado = t('e_cerrada', 'Operación cerrada') + (r ? ' · ' + r : '') + '.';
+        if (!esVenta(op)) a(out.prim, 'cobro', t('a_cobro', 'Registrar cobro del mes'), 'cobro_mensual');
+      }
+    } else {
+      out.estado = t('e_plataforma', 'Ves esta operación como equipo BAIREN. Lo que escribas acá lo leen las dos partes.');
+    }
+    if (out.prim.length > 3) out.mas = out.prim.splice(3).concat(out.mas);
+    return out;
+  }
+  function waHref(num, texto){ const n = String(num || '').replace(/\D/g, ''); return n ? 'https://wa.me/' + n + (texto ? '?text=' + encodeURIComponent(texto) : '') : null; }
+  function pintarAcciones(){
+    const host = $('msAcc'); if (!host) return;
+    cerrarMas();
+    const ac = acciones();
+    const chip = (x, i) => x.href
+      ? `<a class="ms-chip ms-chip-wa" href="${esc(x.href)}" target="_blank" rel="noopener" data-acc="${x.id}">${x.ico || ''}<span>${esc(x.txt)}</span></a>`
+      : `<button type="button" class="ms-chip${i === 0 ? ' prim' : ''}" data-acc="${x.id}">${esc(x.txt)}</button>`;
+    const prim = ac.prim.filter(x => x.href || x.id);
+    const hayFila = prim.length || ac.mas.length;
+    host.innerHTML = (ac.estado ? `<p class="ms-acc-estado">${esc(ac.estado)}</p>` : '')
+      + (hayFila ? `<div class="ms-acc-fila" role="group" aria-label="${esc(t('proximo', 'Próximo paso'))}"><span class="ms-acc-t" aria-hidden="true">${esc(t('proximo', 'Próximo paso'))}</span>${prim.map(chip).join('')}${ac.mas.length ? `<button type="button" class="ms-chip ms-chip-mas" id="msMasBtn" aria-haspopup="menu" aria-expanded="false" aria-controls="msMasPop">${ICO.mas}<span>${esc(prim.length ? t('mas', 'Más') : t('pasos', 'Pasos'))}</span></button>` : ''}</div>` : '')
+      + (ac.mas.length ? `<div class="ms-mas-pop" id="msMasPop" role="menu" aria-label="${esc(t('mas_pasos', 'Más pasos'))}" hidden>${ac.mas.map(x => x.href
+          ? `<a role="menuitem" href="${esc(x.href)}" target="_blank" rel="noopener" data-acc="${x.id}" tabindex="-1">${x.ico || ''}<span>${esc(x.txt)}</span></a>`
+          : `<button type="button" role="menuitem" data-acc="${x.id}" tabindex="-1"${x.peligro ? ' class="peligro"' : ''}>${esc(x.txt)}</button>`).join('')}</div>` : '');
+    host.hidden = !host.innerHTML;
+  }
+  function cerrarMas(){ if (st.soltarMas) { const f = st.soltarMas; st.soltarMas = null; f(); } }
+  function abrirMas(btn){
+    const pop = $('msMasPop'); if (!pop) return;
+    pop.hidden = false; btn.setAttribute('aria-expanded', 'true');
+    const barra = $('msBarra'); if (barra) { const rb = btn.getBoundingClientRect(), rr = barra.getBoundingClientRect(); pop.style.right = 'auto'; pop.style.left = Math.max(12, Math.min(rb.left - rr.left, rr.width - pop.offsetWidth - 12)) + 'px'; }
+    const items = () => Array.from(pop.querySelectorAll('[role=menuitem]'));
+    items().forEach(x => x.tabIndex = -1);
+    st.soltarMas = BP.focoAtrapado(pop, { devolverA: btn, disparador: btn, cerrarAlClicFuera: true, primero: items()[0], alCerrar: () => { pop.hidden = true; btn.setAttribute('aria-expanded', 'false'); st.soltarMas = null; } });
+    pop.onkeydown = e => {
+      const it = items(), i = it.indexOf(document.activeElement);
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); const n = e.key === 'ArrowDown' ? (i + 1) % it.length : (i <= 0 ? it.length - 1 : i - 1); it[n].focus(); }
+      else if (e.key === 'Home') { e.preventDefault(); it[0].focus(); } else if (e.key === 'End') { e.preventDefault(); it[it.length - 1].focus(); }
+      else if (e.key === 'Tab') { e.preventDefault(); cerrarMas(); }
+    };
+  }
+  /* WhatsApp: el enlace se abre solo; el paso queda registrado una vez por lado */
+  function registrarWa(){
+    if (!st.d) return; const lado = st.d.lado, et = st.d.operacion.etapa;
+    if (et === 'cerrada' || et === 'caida') return;   /* cerrada: el paso ya no se registra (digital.js lo rechaza) */
+    if ((st.d.hitos || []).some(h => h.tipo === 'whatsapp' && h.lado === lado)) return;
+    const op = st.opId;
+    D.paso(op, 'whatsapp').then(() => { if (st.opId === op) recargarDetalle(true); }).catch(e => console.warn('whatsapp', e));
+  }
+  opEl.addEventListener('click', e => {
+    if (e.target.closest('[data-volver]')) { e.preventDefault(); volver(); return; }
+    if (e.target.closest('.ms-info-btn')) { if (opEl.classList.contains('ms-panel-on')) cerrarPanel(); else abrirPanel(); return; }
+    if (e.target.closest('[data-cerrar-panel]') || e.target.closest('#msVeloPanel')) { cerrarPanel(); return; }
+    if (e.target.closest('#msNuevos')) { abajoDelTodo(true); return; }
+    const mb = e.target.closest('#msMasBtn'); if (mb) { if (st.soltarMas) cerrarMas(); else abrirMas(mb); return; }
+    const b = e.target.closest('[data-acc]'); if (!b) return;
+    const id = b.dataset.acc;
+    if (id === 'wa' || id === 'wa_int') { registrarWa(); if (st.soltarMas) setTimeout(cerrarMas, 0); return; }
+    /* Quién abrió el diálogo, para devolverle el foco (en Safari tocar un botón no lo enfoca) */
+    st.abridor = b.closest('#msMasPop') ? $('msMasBtn') : b;
+    if (st.soltarMas) cerrarMas();
+    if (ACC[id]) ACC[id]();
+  });
+
+  /* ── Diálogos de los pasos ─────────────────────────────── */
+  const campoHTML = (c, id) => {
+    const lab = `<label for="${id}">${esc(c.label)}${c.req ? '' : ` <span class="ms-opc">${esc(t('opcional', '(opcional)'))}</span>`}</label>`;
+    const desc = c.ayuda ? ` aria-describedby="${id}a"` : '';
+    const v = c.valor == null ? '' : String(c.valor);
+    let ctl;
+    if (c.tipo === 'area') ctl = `<textarea id="${id}" name="${c.n}" rows="3" maxlength="${c.max || 600}"${desc}>${esc(v)}</textarea>`;
+    else if (c.tipo === 'moneda') ctl = `<select id="${id}" name="${c.n}"${desc}><option value="USD"${v !== 'ARS' ? ' selected' : ''}>USD</option><option value="ARS"${v === 'ARS' ? ' selected' : ''}>${esc(t('pesos', '$ (pesos)'))}</option></select>`;
+    else if (c.tipo === 'fecha') ctl = `<input type="datetime-local" id="${id}" name="${c.n}" value="${esc(v)}" min="${esc(BP.isoLocal(new Date()))}"${c.req ? ' required' : ''}${desc}>`;
+    else if (c.tipo === 'mes') ctl = `<input type="month" id="${id}" name="${c.n}" value="${esc(v)}"${c.req ? ' required' : ''}${desc}>`;
+    else if (c.tipo === 'numero') ctl = `<input type="number" inputmode="${c.paso === 1 ? 'numeric' : 'decimal'}" id="${id}" name="${c.n}" value="${esc(v)}" min="${c.min != null ? c.min : 0}"${c.max != null ? ` max="${c.max}"` : ''} step="${c.paso || 'any'}"${c.req ? ' required' : ''}${desc}>`;
+    else ctl = `<input type="text" id="${id}" name="${c.n}" value="${esc(v)}" maxlength="${c.max || 300}" autocomplete="off"${desc}>`;
+    return `<div class="ms-campo ms-campo-${c.tipo}">${lab}${ctl}${c.ayuda ? `<p class="ms-ayuda" id="${id}a">${esc(c.ayuda)}</p>` : ''}</div>`;
+  };
+  const todosLosCampos = campos => campos.reduce((l, c) => l.concat(c.fila || [c]), []);
+  function dialogo(o){
+    return new Promise(resolve => {
+      const id = 'msDlg' + Math.random().toString(36).slice(2, 7);
+      const velo = document.createElement('div'); velo.className = 'ms-dlg-velo';
+      let n = 0; const cid = () => id + 'c' + (n++);
+      const campos = (o.campos || []).map(c => c.fila ? `<div class="ms-campos-fila">${c.fila.map(x => campoHTML(x, cid())).join('')}</div>` : campoHTML(c, cid())).join('');
+      velo.innerHTML = `<div class="ms-dlg" role="dialog" aria-modal="true" aria-labelledby="${id}t"${o.texto ? ` aria-describedby="${id}p"` : ''}>
+        <h2 class="ms-dlg-t" id="${id}t">${esc(o.titulo)}</h2>${o.texto ? `<p class="ms-dlg-p" id="${id}p">${esc(o.texto)}</p>` : ''}
+        <form novalidate>${campos}<p class="ms-dlg-err" role="alert" hidden></p>
+          <div class="ms-dlg-acc"><button type="button" class="ms-btn" data-x>${esc(t('cancelar', 'Cancelar'))}</button><button type="submit" class="ms-btn ${o.peligro ? 'ms-btn-vino' : 'ms-btn-navy'}">${esc(o.ok)}</button></div></form></div>`;
+      document.body.appendChild(velo);
+      const dlg = velo.firstElementChild, form = dlg.querySelector('form'), err = dlg.querySelector('.ms-dlg-err'), okb = form.querySelector('[type=submit]');
+      let res = null, hecho = false;
+      const fin = () => { if (hecho) return; hecho = true; velo.classList.add('sale'); setTimeout(() => velo.remove(), quieto() ? 0 : 160); resolve(res); };
+      const abridor = st.abridor && document.contains(st.abridor) ? st.abridor : document.activeElement; st.abridor = null;
+      const soltar = BP.focoAtrapado(dlg, { devolverA: abridor, primero: form.querySelector('input,select,textarea') || okb, alCerrar: fin });
+      const cerrar = v => { res = v; soltar(); };
+      dlg.querySelector('[data-x]').addEventListener('click', () => cerrar(null));
+      velo.addEventListener('mousedown', e => { if (e.target === velo) cerrar(null); });
+      const lista = todosLosCampos(o.campos || []);
+      const mostrarErr = (msg, campo) => { err.textContent = msg; err.hidden = false; const el = campo ? form.elements[campo] : null; if (el) { el.setAttribute('aria-invalid', 'true'); el.focus(); } };
+      if (o.alCambiar) form.addEventListener('input', e => o.alCambiar(form, e));
+      form.addEventListener('input', e => { if (e.target.removeAttribute) e.target.removeAttribute('aria-invalid'); });
+      form.addEventListener('submit', async e => {
+        e.preventDefault(); err.hidden = true;
+        const v = {};
+        for (const c of lista) {
+          const el = form.elements[c.n]; let x = el ? String(el.value || '').trim() : '';
+          if (c.req && !x) return mostrarErr(tf('falta', 'Completá: {c}.', { c: c.label }), c.n);
+          if (c.tipo === 'numero' && x) {
+            const num = parseFloat(x.replace(',', '.'));
+            if (!isFinite(num)) return mostrarErr(tf('num_mal', 'Revisá el número de "{c}".', { c: c.label }), c.n);
+            if (c.pos && !(num > 0)) return mostrarErr(tf('num_pos', '"{c}" tiene que ser mayor a cero.', { c: c.label }), c.n);
+            if (c.max != null && num > c.max) return mostrarErr(tf('num_max', '"{c}" puede ser hasta {m}.', { c: c.label, m: c.max }), c.n);
+            x = num;
+          }
+          if (c.tipo === 'fecha' && x) { const f = fecha(x); if (!f) return mostrarErr(t('fecha_mal', 'Revisá la fecha.'), c.n); if (c.futuro && f.getTime() < Date.now() - 60000) return mostrarErr(t('fecha_pasada', 'Elegí un día y una hora que todavía no pasaron.'), c.n); }
+          v[c.n] = x === '' ? null : x;
+        }
+        if (!o.enviar) return cerrar(v);
+        okb.disabled = true; const txt = okb.textContent; okb.textContent = t('guardando', 'Guardando…'); form.setAttribute('aria-busy', 'true');
+        try { await o.enviar(v); cerrar(v); }
+        catch (ex) { okb.disabled = false; okb.textContent = txt; form.removeAttribute('aria-busy'); mostrarErr((ex && ex.message) || t('err_paso', 'No pudimos guardar el paso. Probá de nuevo.')); }
+      });
+    });
+  }
+  async function correr(o){
+    await dialogo(o);
+    const ae = document.activeElement;
+    if (!ae || ae === document.body || !document.contains(ae)) { const l = $('msLog'); if (l) l.focus({ preventScroll: true }); }
+  }
+  /* Un paso: se registra, se recarga el detalle y se avisa. La nota, si hay, va también al chat. */
+  async function paso(tipo, datos, nota){
+    const op = st.opId, lado = st.d.lado;
+    await D.paso(op, tipo, limpio(datos));
+    if (nota && String(nota).trim()) { try { sumar([await D.enviar(op, lado, String(nota).trim())]); } catch (e) { console.warn('nota', e); } }
+    if (st.opId !== op) return;
+    await recargarDetalle(false);
+    cargarBandeja(true);
+    BP.toast(tf('listo', 'Listo: {p}.', { p: D.HITO_TXT[tipo] || tipo }));
+  }
+  const cM = { n: 'motivo', tipo: 'texto', label: t('c_motivo', 'Motivo'), max: 300 };
+  const cN = { n: 'nota', tipo: 'texto', label: t('c_nota', 'Nota'), max: 300 };
+  const cMon = v => ({ n: 'moneda', tipo: 'moneda', label: t('c_moneda', 'Moneda'), req: true, valor: v || 'USD' });
+  const ACC = {
+    pedir_visita: () => correr({ titulo: t('d_pedir_t', 'Pedir una visita'), texto: t('d_pedir_p', 'Elegí día y hora. Quien publica la confirma por acá.'), ok: t('d_pedir_ok', 'Pedir visita'),
+      campos: [{ n: 'fecha', tipo: 'fecha', label: t('c_fecha', 'Día y hora'), req: true, futuro: true }, { n: 'nota', tipo: 'area', label: t('c_nota_visita', 'Algo para agregar') }],
+      enviar: v => paso('visita_pedida', { fecha: iso(v.fecha) }, v.nota) }),
+    avanzar: () => correr({ titulo: t('d_avanzar_t', 'Quiero avanzar'), texto: t('d_avanzar_p', 'Le avisamos a quien publica que querés seguir. Te contesta por acá con lo que hace falta para la solicitud.'), ok: t('d_avanzar_ok', 'Avisar que quiero avanzar'),
+      campos: [{ n: 'nota', tipo: 'area', label: t('c_nota_avanzar', 'Contale algo de vos') }], enviar: v => paso('solicitud_enviada', null, v.nota) }),
+    no_sigo: () => correr({ titulo: t('d_nosigo_t', 'No sigo con esta propiedad'), texto: t('d_nosigo_p', 'La conversación queda guardada. Quien publica ve que no seguís.'), ok: t('d_nosigo_ok', 'No sigo'), peligro: true,
+      campos: [cM], enviar: v => paso('caida', { motivo: v.motivo }) }),
+    cancelar_visita: () => correr({ titulo: t('d_cancv_t', 'Cancelar la visita'), texto: t('d_cancv_p', 'Le avisamos a la otra parte por acá.'), ok: t('d_cancv_ok', 'Cancelar visita'), peligro: true,
+      campos: [cM], enviar: v => paso('visita_cancelada', { motivo: v.motivo }) }),
+    confirmar_visita: () => { const p = pedidaPendiente(); return correr({ titulo: t('d_confv_t', 'Confirmar la visita'),
+      texto: p ? tf('d_confv_p', 'Pidió el {f}. Podés confirmar ese horario o elegir otro.', { f: fmtVisita(p.datos.fecha) }) : t('d_confv_p2', 'Elegí día y hora. Le llega por acá a quien busca.'), ok: t('d_confv_ok', 'Confirmar visita'),
+      campos: [{ n: 'fecha', tipo: 'fecha', label: t('c_fecha', 'Día y hora'), req: true, futuro: true, valor: p && fecha(p.datos.fecha) > new Date() ? BP.isoLocal(p.datos.fecha) : '' },
+               { n: 'nota', tipo: 'area', label: t('c_nota_conf', 'Nota para quien visita'), ayuda: t('c_nota_conf_a', 'Por ejemplo: tocar el timbre del 4B, traer DNI.') }],
+      enviar: v => paso('visita_confirmada', { fecha: iso(v.fecha), nota: v.nota }, v.nota) }); },
+    visita_hecha: () => correr({ titulo: t('d_vh_t', 'Visita hecha'), texto: t('d_vh_p', '¿Cómo fue? Queda anotado en la visita.'), ok: t('d_vh_ok', 'Marcar como hecha'),
+      campos: [{ n: 'feedback', tipo: 'area', label: t('c_feedback', 'Comentario de la visita'), max: 1000 }], enviar: v => paso('visita_realizada', { feedback: v.feedback }) }),
+    aceptar_sol: () => correr({ titulo: t('d_acs_t', 'Aceptar la solicitud'), texto: t('d_acs_p', 'Le avisamos a quien busca que su solicitud está aceptada.'), ok: t('d_acs_ok', 'Aceptar solicitud'), campos: [], enviar: () => paso('solicitud_aceptada') }),
+    rechazar_sol: () => correr({ titulo: t('d_rechs_t', 'Rechazar la solicitud'), ok: t('d_rechs_ok', 'Rechazar'), peligro: true, campos: [cM], enviar: v => paso('solicitud_rechazada', { motivo: v.motivo }) }),
+    reserva: () => correr({ titulo: t('d_reserva_t', 'Registrar la reserva'), texto: t('d_reserva_p', 'Queda en el recorrido con la fecha de hoy.'), ok: t('d_reserva_ok', 'Registrar reserva'), campos: [cN], enviar: v => paso('reserva', { nota: v.nota }) }),
+    contrato_gen: () => correr({ titulo: t('d_cg_t', 'Contrato preparado'), texto: t('d_cg_p', 'Marcá que el contrato está listo para revisar y firmar.'), ok: t('d_cg_ok', 'Marcar como preparado'), campos: [cN], enviar: v => paso('contrato_generado', { nota: v.nota }) }),
+    contrato_firm: () => correr({ titulo: t('d_cf_t', 'Contrato firmado'), texto: t('d_cf_p', 'Queda en el recorrido con la fecha de hoy.'), ok: t('d_cf_ok', 'Marcar como firmado'), campos: [cN], enviar: v => paso('contrato_firmado', { nota: v.nota }) }),
+    cerrar: () => {
+      const op = st.d.operacion;
+      if (esVenta(op)) return correr({ titulo: t('d_cierre_t', 'Cerrar la operación'), texto: t('d_cierre_venta_p', 'Anotá el precio final de la venta.'), ok: t('d_cierre_ok', 'Cerrar operación'),
+        campos: [{ fila: [{ n: 'precio_cierre', tipo: 'numero', label: t('c_precio_cierre', 'Precio de cierre'), req: true, pos: true, valor: op.precio_cierre || op.precio_publicado || '' }, cMon(op.moneda)] }],
+        enviar: v => paso('cierre', { precio_cierre: v.precio_cierre, moneda: v.moneda }) });
+      const mensual = op.precio_publicado || null;
+      return correr({ titulo: t('d_cierre_t', 'Cerrar la operación'),
+        texto: mensual ? tf('d_cierre_alq_p', 'Anotá el plazo y el total del contrato. Por ejemplo, 6 meses de {p} son {t}.', { p: fmtMonto(mensual, op.moneda), t: fmtMonto(mensual * 6, op.moneda) }) : t('d_cierre_alq_p2', 'Anotá el plazo y el total del contrato.'),
+        ok: t('d_cierre_ok', 'Cerrar operación'),
+        campos: [{ n: 'plazo_meses', tipo: 'numero', label: t('c_plazo', 'Plazo en meses'), req: true, pos: true, min: 1, max: 120, paso: 1, valor: op.plazo_meses || '' },
+                 { fila: [{ n: 'monto_contrato', tipo: 'numero', label: t('c_monto_contrato', 'Total del contrato'), req: true, pos: true, valor: op.monto_contrato || '' }, cMon(op.moneda)] }],
+        alCambiar: (form, e) => {
+          if (e.target.name === 'monto_contrato') e.target.dataset.tocado = '1';
+          if (e.target.name === 'plazo_meses' && mensual) { const m = form.elements.monto_contrato; if (m && !m.dataset.tocado) { const p = parseInt(e.target.value, 10); m.value = p > 0 ? Math.round(mensual * p) : ''; } }
+        },
+        enviar: v => paso('cierre', { monto_contrato: v.monto_contrato, plazo_meses: Math.round(v.plazo_meses), moneda: v.moneda }) });
+    },
+    cobro: () => {
+      const op = st.d.operacion, ah = new Date();
+      const sug = op.monto_contrato && op.plazo_meses ? Math.round(op.monto_contrato / op.plazo_meses) : (op.precio_publicado || '');
+      return correr({ titulo: t('d_cobro_t', 'Registrar el cobro del mes'), texto: t('d_cobro_p', 'El alquiler que se cobró este mes. Queda en el recorrido de la operación.'), ok: t('d_cobro_ok', 'Registrar cobro'),
+        campos: [{ fila: [{ n: 'monto', tipo: 'numero', label: t('c_monto', 'Monto'), req: true, pos: true, valor: sug }, cMon(op.moneda)] }, { n: 'periodo', tipo: 'mes', label: t('c_periodo', 'Período'), req: true, valor: ah.getFullYear() + '-' + dos(ah.getMonth() + 1) }],
+        enviar: v => paso('cobro_mensual', { monto: v.monto, moneda: v.moneda, periodo: v.periodo }) });
+    },
+    sin_acuerdo: () => correr({ titulo: t('d_sa_t', 'Sin acuerdo'), texto: t('d_sa_p', 'La operación queda cerrada sin acuerdo. Podés retomarla después.'), ok: t('d_sa_ok', 'Marcar sin acuerdo'), peligro: true, campos: [cM], enviar: v => paso('caida', { motivo: v.motivo }) }),
+    retomar: () => correr({ titulo: t('d_ret_t', 'Retomar la operación'), texto: t('d_ret_p', 'Vuelve a la conversación, con todo lo anterior guardado.'), ok: t('d_ret_ok', 'Retomar'), campos: [], enviar: () => paso('reabierta') })
+  };
+
+  /* ── Detalles: la unidad, el contacto, visitas, documentos, recorrido y cobro ── */
+  const det = (k, tit, cuerpo, n) => `<details class="ms-sec" data-sec="${k}"${st.plegadas[k] ? '' : ' open'}><summary><span class="ms-sec-t">${esc(tit)}</span>${n ? `<span class="ms-sec-n">${n}</span>` : ''}</summary><div class="ms-sec-in">${cuerpo}</div></details>`;
+  function contactoHTML(i){
+    const tel = i.telefono ? String(i.telefono) : '';
+    const wa = tel ? (BPStore.waNorm ? BPStore.waNorm(tel) : tel.replace(/\D/g, '')) : '';
+    const filas = [];
+    if (i.email) filas.push(`<li><a href="mailto:${esc(i.email)}">${ICO.mail}<span>${esc(i.email)}</span></a></li>`);
+    if (tel) filas.push(`<li><a href="tel:${esc(tel.replace(/[^\d+]/g, ''))}">${ICO.phone}<span>${esc(tel)}</span></a></li>`);
+    if (wa && st.d.lado === 'publicador') filas.push(`<li><a href="${esc(waHref(wa, ''))}" target="_blank" rel="noopener" data-acc="wa_int">${ICO.wa}<span>WhatsApp</span></a></li>`);
+    return `<p class="ms-persona"><span class="ms-persona-n">${esc(nom(i.nombre) || t('interesado', 'Interesado'))}</span>${i.verificado ? verifHTML() : `<span class="ms-sinverif">${esc(t('sin_verif', 'Sin verificar'))}</span>`}</p>`
+      + (filas.length ? `<ul class="ms-datos">${filas.join('')}</ul>` : `<p class="ms-nota">${esc(t('sin_contacto', 'Todavía no dejó datos de contacto.'))}</p>`);
+  }
+  function publicaHTML(p){
+    return `<p class="ms-persona"><span class="ms-persona-n">${esc(p.nombre || t('quien_publica', 'Quien publica'))}</span>${p.verificado ? verifHTML() : ''}</p>${TIPO_PUB[p.tipo] ? `<p class="ms-nota">${esc(TIPO_PUB[p.tipo])}</p>` : ''}`;
+  }
+  function visitasHTML(){
+    const vs = (st.d.visitas || []).slice().sort((a, b) => +new Date(a.fecha) - +new Date(b.fecha));
+    const ped = pedidaPendiente();
+    const li = (f, est, nota, fb) => `<li><span class="ms-v-l1"><span class="ms-v-f">${esc(fmtVisita(f))}</span><span class="ms-pill ms-pill-${est}">${esc(EST_V[est] || est)}</span></span>${nota ? `<span class="ms-v-n">${esc(nota)}</span>` : ''}${fb ? `<span class="ms-v-fb">${esc(fb)}</span>` : ''}</li>`;
+    const filas = vs.map(v => li(v.fecha, v.estado, v.nota, v.feedback));
+    if (ped) filas.push(li(ped.datos.fecha, 'pedida', ped.datos.nota));
+    return filas.length ? `<ul class="ms-visitas">${filas.join('')}</ul>` : `<p class="ms-nota">${esc(t('v_vacio', 'Todavía no hay visitas.'))}</p>`;
+  }
+  function docsHTML(){
+    const ds = st.d.documentos || [];
+    if (!ds.length) return `<div class="ms-docs-vacio">${ICO.doc}<p>${esc(t('docs_vacio', 'Acá van a estar la reserva, el contrato y el boleto, con firma digital. Muy pronto.'))}</p></div>`;
+    return `<ul class="ms-docs">${ds.map(x => `<li>${ICO.doc}<span class="ms-doc-n">${esc(x.titulo || DOC_T[x.tipo] || x.tipo)}<small>${esc(x.firmado_en ? tf('doc_firmado', 'Firmado el {f}', { f: fmtFechaHora(x.firmado_en) }) : fmtFechaHora(x.creado_en))}</small></span><span class="ms-pill ms-pill-${esc(x.estado)}">${esc(DOC_E[x.estado] || x.estado)}</span></li>`).join('')}</ul>`;
+  }
+  function recorridoHTML(){
+    const hs = hitosOrden();
+    if (!hs.length) return `<p class="ms-nota">${esc(t('rec_vacio', 'Todavía no hay pasos.'))}</p>`;
+    return `<ol class="ms-tl">${hs.map(h => { const x = hitoTexto(h); const quien = h.lado === st.d.lado ? t('vos', 'Vos') : ladoTxt(h.lado);
+      return `<li class="ms-tl-${esc(h.tipo)}"><span class="ms-tl-t">${esc(x.base)}${x.det ? ` <span class="ms-tl-d">· ${esc(x.det)}</span>` : ''}</span><span class="ms-tl-f"><time datetime="${esc(h.creado_en)}">${esc(fmtFechaHora(h.creado_en))}</time> · ${esc(quien)}</span></li>`; }).join('')}</ol>`;
+  }
+  function cobroHTML(){
+    const cs = st.d.cargos || [];
+    const nota = `<p class="ms-nota">${esc(t('cobro_nota', 'Simulado: no se le cobra a nadie. Sirve para comparar esquemas de cobro. Solo lo ve el equipo BAIREN.'))}</p>`;
+    if (!cs.length) return `<p class="ms-nota">${esc(t('cobro_vacio', 'Todavía no hay cargos para esta operación.'))}</p>` + nota;
+    const tot = {}; cs.forEach(c => { const k = c.escenario + '\u0000' + c.moneda; tot[k] = (tot[k] || 0) + (+c.monto || 0); });
+    return `<ul class="ms-cargos">${cs.map(c => `<li><span class="ms-c-con">${esc(c.concepto)}</span><span class="ms-c-m">${esc(fmtMonto(c.monto, c.moneda))}</span><span class="ms-c-esc">${esc(c.escenario)}${c.paga && PAGA[c.paga] ? ' · ' + esc(PAGA[c.paga]) : ''}</span><span class="ms-pill ms-pill-${esc(c.estado)}">${esc(EST_C[c.estado] || c.estado)}</span></li>`).join('')}</ul>`
+      + `<dl class="ms-c-tot">${Object.keys(tot).map(k => { const [e, m] = k.split('\u0000'); return `<div><dt>${esc(e)}</dt><dd>${esc(fmtMonto(tot[k], m))}</dd></div>`; }).join('')}</dl>` + nota;
+  }
+  function pintarPanel(){
+    const p = $('msPanel'); if (!p) return;
+    const d = st.d, a = d.aviso || {}, op = d.operacion;
+    const ficha = a.id ? BP.urlFicha({ id: a.id }) : null;
+    const per = BP.opTxt(a.operacion || op.tipo, 'per');
+    const tit = a.titulo || t('una_unidad', 'Una propiedad');
+    const secs = [];
+    secs.push(`<div class="ms-unidad">${fotoHTML(a.foto, tit, 'ms-unidad-foto', 600, true)}<div class="ms-unidad-txt"><p class="ms-unidad-tit">${esc(tit)}</p>
+      <p class="ms-nota">${[a.barrio || a.direccion, op.linea && D.LINEAS[op.linea]].filter(Boolean).map(esc).join(' · ')}</p>
+      ${a.precio != null ? `<p class="ms-unidad-precio">${esc(BP.fmtPrecio(a.precio, a.moneda))}${per ? `<small>${esc(per)}</small>` : ''}</p>` : ''}
+      ${ficha ? `<a class="ms-link" href="${esc(ficha)}">${esc(t('ver_ficha', 'Ver ficha'))}</a>` : ''}</div></div>`);
+    if (d.interesado) secs.push(det('contacto', t('s_interesado', 'Quien busca'), contactoHTML(d.interesado)));
+    if (d.lado !== 'publicador' && d.publicador) secs.push(det('publica', t('s_publica', 'Quien publica'), publicaHTML(d.publicador)));
+    const nv = (d.visitas || []).length + (pedidaPendiente() ? 1 : 0);
+    secs.push(det('visitas', t('s_visitas', 'Visitas'), visitasHTML(), nv));
+    secs.push(det('docs', t('s_docs', 'Documentos'), docsHTML(), (d.documentos || []).length));
+    secs.push(det('recorrido', t('s_recorrido', 'Recorrido'), recorridoHTML(), (d.hitos || []).length));
+    if (Array.isArray(d.cargos)) secs.push(det('cobro', t('s_cobro', 'Cobro (simulado)'), cobroHTML(), d.cargos.length));
+    p.innerHTML = `<div class="ms-panel-head"><h3 class="ms-panel-t" id="msPanelT">${esc(t('detalles', 'Detalles'))}</h3><button type="button" class="ms-ico-btn" data-cerrar-panel aria-label="${esc(t('cerrar_detalles', 'Cerrar los detalles'))}">${ICO.x}</button></div><div class="ms-panel-in">${secs.join('')}</div>`;
+    p.querySelectorAll('details[data-sec]').forEach(x => x.addEventListener('toggle', () => { st.plegadas[x.dataset.sec] = !x.open; }));
+  }
+  function abrirPanel(){
+    opEl.classList.add('ms-panel-on'); const btn = opEl.querySelector('.ms-info-btn'); if (btn) btn.setAttribute('aria-expanded', 'true');
+    const p = $('msPanel'); if (!p || !panelFlotante()) return;
+    st.soltarPanel = BP.focoAtrapado(p, { devolverA: btn, primero: p.querySelector('[data-cerrar-panel]'), alCerrar: () => { st.soltarPanel = null; cerrarPanel(true); } });
+  }
+  function cerrarPanel(desdeTrampa){
+    opEl.classList.remove('ms-panel-on'); const btn = opEl.querySelector('.ms-info-btn'); if (btn) btn.setAttribute('aria-expanded', 'false');
+    if (!desdeTrampa && st.soltarPanel) { const f = st.soltarPanel; st.soltarPanel = null; f(); }
+  }
+
+  /* ── El chat: mensajes y renglones de los hitos, en orden ── */
+  function itemsTodos(){
+    const ms = st.msjs.map(m => ({ k: 'm' + m.id, t: +new Date(m.creado_en), m }));
+    const hs = (st.d && st.d.hitos || []).map(h => ({ k: 'h' + h.id, t: +new Date(h.creado_en), h }));
+    return ms.concat(hs).sort((a, b) => (a.t - b.t) || (a.k < b.k ? -1 : a.k > b.k ? 1 : 0));
+  }
+  function msjHTML(m, cont, nuevo){
+    const lado = st.d.lado, equipo = m.lado === 'plataforma', mio = !equipo && m.lado === lado;
+    const cls = equipo ? 'equipo' : mio ? 'mio' : (lado === 'plataforma' && m.lado === 'publicador') ? 'otro der' : 'otro';
+    const quien = mio ? t('vos', 'Vos') : ladoTxt(m.lado);
+    const etiqueta = (equipo || lado === 'plataforma') && !cont ? `<span class="ms-quien" aria-hidden="true">${esc(quien)}</span>` : '';
+    const f = fecha(m.creado_en) || new Date();
+    return `<div class="ms-m ${cls}${cont ? ' cont' : ''}${nuevo ? ' ms-entra' : ''}" data-k="m${esc(m.id)}">${etiqueta}<div class="ms-burb"><span class="ms-sr">${esc(quien)}: </span>${esc(m.texto)}</div><span class="ms-meta"><time datetime="${esc(m.creado_en)}">${esc(hhmm(f))}</time><span class="ms-visto"></span></span></div>`;
+  }
+  function hitoHTML(h, nuevo){
+    const x = hitoTexto(h), f = fecha(h.creado_en) || new Date();
+    return `<div class="ms-hito ms-hito-${esc(h.tipo)}${nuevo ? ' ms-entra' : ''}" data-k="h${esc(h.id)}"><span class="ms-hito-t"><b>${esc(x.base)}</b>${x.det ? ' · ' + esc(x.det) : ''}${x.conFecha ? '' : `<span class="ms-hito-h"> · ${esc(hhmm(f))}</span>`}</span></div>`;
+  }
+  const cercaDelFinal = el => el.scrollHeight - el.scrollTop - el.clientHeight < 120;
+  function abajoDelTodo(suave){
+    const l = $('msLog'); if (!l) return;
+    l.scrollTo({ top: l.scrollHeight, behavior: suave && !quieto() ? 'smooth' : 'auto' });
+    const n = $('msNuevos'); if (n) n.hidden = true;
+  }
+  /* Agrega lo que falta al final del registro (sin redibujar lo anterior: el lector de pantalla lee solo lo nuevo) */
+  function agregar(nuevo){
+    const log = $('msLog'); if (!log || !st.d) return;
+    const estabaAbajo = cercaDelFinal(log);
+    const frag = document.createDocumentFragment(); let propios = false, ajenos = false;
+    itemsTodos().forEach(it => {
+      if (st.dibujados.has(it.k)) return; st.dibujados.add(it.k);
+      const d = new Date(it.t), dk = d.toDateString();
+      if (dk !== st.ult.dia) { frag.appendChild(crear(`<div class="ms-dia" role="separator"><span>${esc(diaLargo(d))}</span></div>`)); st.ult = { dia: dk }; }
+      if (it.h) { frag.appendChild(crear(hitoHTML(it.h, nuevo))); st.ult = { dia: dk }; return; }
+      const m = it.m;
+      if (st.corte != null && m.id === st.corte) { frag.appendChild(crear(`<div class="ms-corte" role="separator"><span>${esc(t('sin_leer', 'Sin leer'))}</span></div>`)); st.ult = { dia: dk }; }
+      const cont = !!st.ult.el && st.ult.lado === m.lado && (it.t - st.ult.t) < 300000;
+      if (cont) st.ult.el.classList.add('sig');
+      const el = crear(msjHTML(m, cont, nuevo)).firstElementChild; el._m = m;
+      frag.appendChild(el); st.ult = { dia: dk, lado: m.lado, t: it.t, el };
+      if (m.lado === st.d.lado) propios = true; else ajenos = true;
+    });
+    if (!frag.childNodes.length) return;
+    log.appendChild(frag);
+    marcarVisto();
+    if (!nuevo) return;
+    if (estabaAbajo || propios) abajoDelTodo(true);
+    else if (ajenos) { const n = $('msNuevos'); if (n) n.hidden = false; }
+  }
+  function pintarLog(){
+    const log = $('msLog'); if (!log) return;
+    log.setAttribute('aria-live', 'off');
+    log.innerHTML = ''; st.dibujados = new Set(); st.ult = {};
+    agregar(false);
+    if (!log.children.length) log.innerHTML = `<p class="ms-log-vacio">${esc(t('log_vacio', 'Todavía no hay mensajes. Escribí el primero.'))}</p>`;
+    const c = log.querySelector('.ms-corte');
+    if (c) log.scrollTop = Math.max(0, c.offsetTop - 24); else log.scrollTop = log.scrollHeight;
+    setTimeout(() => log.setAttribute('aria-live', 'polite'), 300);
+  }
+  /* "Visto" debajo del último mensaje propio, cuando la otra parte lo leyó */
+  function marcarVisto(){
+    const log = $('msLog'); if (!log || !st.d || st.d.lado === 'plataforma') return;
+    const mios = log.querySelectorAll('.ms-m.mio'); log.querySelectorAll('.ms-visto').forEach(s => { s.textContent = ''; });
+    const ult = mios[mios.length - 1]; if (!ult || !ult._m) return;
+    if (ult._m.leido_en) ult.querySelector('.ms-visto').textContent = ' · ' + t('visto', 'Visto');
+  }
+  function sumar(lista){
+    let n = 0;
+    (lista || []).forEach(m => { if (!m || st.ids.has(m.id)) return; st.ids.add(m.id); st.msjs.push(m); n++; if (+m.id > st.ultimoId) st.ultimoId = +m.id; });
+    if (n) { const v = $('msLog') && $('msLog').querySelector('.ms-log-vacio'); if (v) v.remove(); agregar(true); }
+    return n;
+  }
+
+  /* ── Escribir ──────────────────────────────────────────── */
+  function prepararComposer(){
+    const f = $('msComp'), ta = $('msTexto'), b = $('msEnviar');
+    const ajustar = () => { ta.style.height = 'auto'; const alto = ta.scrollHeight + 2; ta.style.height = Math.min(alto, 140) + 'px'; ta.style.overflowY = alto > 140 ? 'auto' : 'hidden'; b.disabled = !ta.value.trim() || st.enviando; if (st.opId) st.borradores[st.opId] = ta.value; };
+    ta.addEventListener('input', ajustar);
+    ta.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing && e.keyCode !== 229) { e.preventDefault(); enviar(); } });
+    f.addEventListener('submit', e => { e.preventDefault(); enviar(); });
+    ta.addEventListener('focus', () => { if (movil()) setTimeout(() => { const l = $('msLog'); if (l && cercaDelFinal(l)) abajoDelTodo(false); }, 320); });
+    ta._ajustar = ajustar;
+  }
+  function habilitarComposer(){
+    const ta = $('msTexto'); if (!ta || !st.d) return;
+    ta.disabled = false;
+    ta.placeholder = st.d.lado === 'plataforma' ? t('ph_equipo', 'Escribí como equipo BAIREN') : t('ph', 'Escribí un mensaje');
+    ta.value = st.borradores[st.opId] || ''; ta._ajustar();
+  }
+  async function enviar(){
+    const ta = $('msTexto'), b = $('msEnviar'); if (!ta || !st.d) return;
+    const texto = ta.value.trim(); if (!texto || st.enviando) return;
+    const op = st.opId, etapaAntes = st.d.operacion.etapa;
+    st.enviando = true; b.disabled = true; ta.setAttribute('aria-busy', 'true');
+    try {
+      const m = await D.enviar(op, st.d.lado, texto);
+      if (st.opId !== op) return;
+      ta.value = ''; delete st.borradores[op]; sumar([m]);
+      if (etapaAntes === 'consulta' || !(st.d.hitos || []).some(h => h.tipo === 'conversacion')) recargarDetalle(true);
+      cargarBandeja(true);
+    } catch (e) { BP.toast((e && e.message) || t('err_enviar', 'No pudimos mandar el mensaje. Probá de nuevo.'), 'error'); }
+    finally { st.enviando = false; ta.removeAttribute('aria-busy'); if (ta._ajustar) ta._ajustar(); if (!movil()) ta.focus(); }
+  }
+
+  /* ── Abrir, recargar y cerrar una operación ────────────── */
+  const firmaDetalle = d => JSON.stringify([d.operacion && [d.operacion.etapa, d.operacion.motivo_caida, d.operacion.monto_contrato, d.operacion.precio_cierre, d.operacion.plazo_meses, d.operacion.moneda, d.operacion.linea], d.lado, (d.hitos || []).map(h => h.id), (d.visitas || []).map(v => [v.id, v.estado, v.fecha]), (d.documentos || []).map(x => [x.id, x.estado]), d.cargos && d.cargos.length, d.publicador && d.publicador.whatsapp, d.interesado && [d.interesado.telefono, d.interesado.verificado]]);
+  async function recargarDetalle(silencioso){
+    const op = st.opId, g = st.gen;
+    try {
+      const d = await D.detalle(op); if (g !== st.gen) return;
+      const firma = firmaDetalle(d); st.d = d;
+      if (firma === st.firmaD) return; st.firmaD = firma;
+      pintarHead(); pintarRecorrido(); pintarAcciones(); pintarPanel(); agregar(true);
+      const btn = opEl.querySelector('.ms-info-btn'); if (btn) btn.setAttribute('aria-expanded', String(opEl.classList.contains('ms-panel-on')));
+    } catch (e) { if (!silencioso) throw e; console.warn('detalle', e); }
+  }
+  async function abrirOp(id, conFoco){
+    const g = ++st.gen;
+    if (!st.opId && movil()) st.scrollBandeja = window.scrollY;
+    cerrarMas(); if (st.soltarPanel) cerrarPanel();
+    Object.assign(st, { opId: id, d: null, firmaD: '', msjs: [], ids: new Set(), ultimoId: 0, dibujados: new Set(), ult: {}, corte: null });
+    opEl.classList.remove('ms-panel-on');
+    document.body.classList.add('ms-en-op'); app.classList.add('con-op');
+    st.firmaLista = ''; pintarBandeja();
+    esqueletoOp();
+    try {
+      const [d, ms] = await Promise.all([D.detalle(id), D.mensajes(id)]);
+      if (g !== st.gen) return;
+      st.d = d; st.firmaD = firmaDetalle(d);
+      const lado = d.lado;
+      const primero = lado !== 'plataforma' ? (ms || []).find(m => m.lado !== lado && !m.leido_en) : null;
+      if (primero && (ms || []).indexOf(primero) > 0) st.corte = primero.id;
+      (ms || []).forEach(m => { st.ids.add(m.id); st.msjs.push(m); if (+m.id > st.ultimoId) st.ultimoId = +m.id; });
+      pintarHead(); pintarRecorrido(); pintarAcciones(); pintarPanel(); pintarLog(); habilitarComposer();
+      main.removeAttribute('aria-busy');
+      document.title = recorte((d.aviso && d.aviso.titulo) || t('titulo', 'Mensajes'), 48) + ' · ' + t('titulo', 'Mensajes') + ' · BAIREN';
+      if (conFoco) { const h = $('msOpTit'); if (h) h.focus({ preventScroll: true }); }
+      const n = await D.leidos(id);
+      if (n) { const r = st.lista.find(x => x.id === id); if (r) r.no_leidos = 0; st.firmaLista = ''; pintarBandeja(); }
+    } catch (e) {
+      if (g !== st.gen) return;
+      console.warn('operación', e); main.removeAttribute('aria-busy'); errorOp(e);
+    }
+  }
+  function cerrarOp(){
+    st.gen++; cerrarMas(); if (st.soltarPanel) cerrarPanel();
+    const previa = st.opId; st.opId = null; st.d = null;
+    document.body.classList.remove('ms-en-op'); app.classList.remove('con-op'); opEl.classList.remove('ms-panel-on');
+    opVacia(); st.firmaLista = ''; pintarBandeja();
+    document.title = t('titulo', 'Mensajes') + ' · BAIREN';
+    if (movil()) window.scrollTo(0, st.scrollBandeja || 0);
+    const a = previa ? listaEl.querySelector(`[data-op="${CSS.escape(previa)}"]`) : null; if (a) a.focus({ preventScroll: !movil() });
+  }
+  function irA(id, empujar){
+    const url = id ? 'mensajes.html?op=' + encodeURIComponent(id) : 'mensajes.html';
+    if (empujar) {
+      if (id && st.opId && !movil()) history.replaceState({ op: id, empujado: !!(history.state && history.state.empujado) }, '', url);
+      else history.pushState({ op: id || null, empujado: !!id }, '', url);
+    }
+    if (id) abrirOp(id, true); else cerrarOp();
+  }
+  /* Volver: si esta misma página abrió la operación, el atrás del navegador; si se entró directo, a la bandeja */
+  function volver(){ if (history.state && history.state.op && history.state.empujado) history.back(); else irA(null, true); }
+  window.addEventListener('popstate', () => { const id = new URLSearchParams(location.search).get('op'); if (id) { if (id !== st.opId) abrirOp(id, true); } else if (st.opId) cerrarOp(); });
+
+  /* ── iPhone: el teclado no tapa el campo (la pantalla de la operación sigue al viewport visible) ── */
+  function ajustarVisual(){
+    const vv = window.visualViewport; if (!vv) return;
+    if (!document.body.classList.contains('ms-en-op') || !movil()) { opEl.style.removeProperty('--ms-alto'); opEl.style.removeProperty('--ms-arriba'); return; }
+    opEl.style.setProperty('--ms-alto', Math.round(vv.height) + 'px');
+    opEl.style.setProperty('--ms-arriba', Math.round(vv.offsetTop) + 'px');
+  }
+  if (window.visualViewport) { visualViewport.addEventListener('resize', ajustarVisual); visualViewport.addEventListener('scroll', ajustarVisual); }
+  window.addEventListener('resize', () => { ajustarVisual(); if (!panelFlotante() && st.soltarPanel) { const f = st.soltarPanel; st.soltarPanel = null; f(); opEl.classList.remove('ms-panel-on'); } });
+  /* El aviso "Mensajes nuevos" se va solo al llegar abajo (scroll no burbujea: se escucha en captura) */
+  document.addEventListener('scroll', e => { const l = $('msLog'), n = $('msNuevos'); if (l && n && e.target === l && !n.hidden && cercaDelFinal(l)) n.hidden = true; }, { capture: true, passive: true });
+
+  /* ── Lo nuevo, cada 8 s con la pestaña a la vista ───────── */
+  async function traerNuevos(completo){
+    const op = st.opId, g = st.gen; if (!op || !st.d) return;
+    const nuevos = await D.mensajes(op, st.ultimoId || undefined); if (g !== st.gen) return;
+    const ajenos = (nuevos || []).filter(m => !st.ids.has(m.id) && m.lado !== st.d.lado);
+    sumar(nuevos);
+    if (ajenos.length) { await D.leidos(op); const r = st.lista.find(x => x.id === op); if (r) r.no_leidos = 0; }
+    if (completo || ajenos.length) await recargarDetalle(true);
+    if (completo && st.d && st.d.lado !== 'plataforma') {
+      const todos = await D.mensajes(op); if (g !== st.gen) return;
+      const porId = new Map((todos || []).map(m => [m.id, m]));
+      let cambio = false;
+      st.msjs.forEach(m => { const x = porId.get(m.id); if (x && x.leido_en && !m.leido_en) { m.leido_en = x.leido_en; cambio = true; } });
+      sumar(todos);
+      if (cambio) { const log = $('msLog'); if (log) log.querySelectorAll('.ms-m').forEach(el => { if (el._m) { const x = porId.get(el._m.id); if (x && x.leido_en) el._m.leido_en = x.leido_en; } }); marcarVisto(); }
+    }
+  }
+  async function tic(){
+    if (document.hidden || st.ocupado) return;
+    st.ocupado = true; st.tick++;
+    try {
+      if (st.opId) await traerNuevos(st.tick % 3 === 0);
+      if (st.tick % (st.opId ? 3 : 2) === 0) await cargarBandeja(true);
+      else pintarBandeja();
+    } catch (e) { console.warn('actualización', e); }
+    finally { st.ocupado = false; }
+  }
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) { st.firmaLista = ''; tic(); } });
+
+  /* ── Arranque ─────────────────────────────────────────── */
+  try { st.cur = await BPStore.isCurador(); } catch (e) { st.cur = false; }
+  if (st.cur) { conm.hidden = false; conm.textContent = t('ver_todas', 'Ver todas'); conm.setAttribute('aria-pressed', String(st.todas)); } else st.todas = false;
+  await cargarBandeja();
+  main.removeAttribute('aria-busy');
+  const inicial = new URLSearchParams(location.search).get('op');
+  history.replaceState({ op: inicial || null }, '', location.href);
+  if (inicial) abrirOp(inicial, false); else opVacia();
+  st.timer = setInterval(tic, 8000);
+})();
+});
+</script>
+</body>
+</html>

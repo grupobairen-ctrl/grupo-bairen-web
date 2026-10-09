@@ -373,6 +373,18 @@
     || document.querySelector('#pHeader ~ section, #pHeader ~ div.p-page, #pHeader ~ *:not(script):not(style):not(.p-skip)')
     || null;
 
+  /* ── 9/10/2026 · BAIREN digital (migración 27): el interruptor ─────────────
+     Explorar, Mensajes, Se busca y Cobros están apagados para el público. ?digital=1 los prende en este navegador y
+     ?digital=0 los apaga (la misma clave que BPDigital.activo() en js/digital.js). */
+  BP.digital = function(){
+    try {
+      const q = new URLSearchParams(location.search).get('digital');
+      if (q === '1') localStorage.setItem('bp_digital', '1');
+      if (q === '0') localStorage.removeItem('bp_digital');
+      return localStorage.getItem('bp_digital') === '1';
+    } catch (e) { return false; }
+  };
+
   /* ── Header ─────────────────────────────────────────────── */
   /* 8/10/2026 · Arranque sin pantallazo: cada página arranca en navy (html.arrancando, en línea en el <head>) y se
      muestra entera cuando ya están el encabezado y la barra de abajo, que los dibuja este archivo. Antes se veía un
@@ -389,6 +401,7 @@
   <!-- 8/10/2026 · Arriba sólo lo que busca el visitante: Membership y Publicadores pasan al pie -->
   <div class="p-nav-principal">
     <a href="buscar.html" data-sec="propiedades" data-i18n="nav_propiedades">Propiedades</a>
+    ${BP.digital() ? `<a href="explorar.html" data-sec="explorar">${BP.t('dg_explorar', 'Explorar')}</a>` : ''}
     <a href="emprendimientos.html" data-sec="emprendimientos" data-i18n="emprendimientos">Desarrollos</a>
     <a href="criterios.html" data-sec="criterios" data-i18n="criterios">Cómo seleccionamos</a>
   </div>
@@ -412,6 +425,7 @@
   <!-- lanz3-visitante · Donde no hay barra de abajo (la ficha), Guardados va en el menú -->
   <a href="guardados.html" class="m-link m-sin-tabbar" data-i18n="tab_guardados">Guardados</a>
   <a href="emprendimientos.html" class="m-link" data-sec="emprendimientos" data-i18n="emprendimientos">Desarrollos</a>
+  ${BP.digital() ? `<a href="se-busca.html" class="m-link" data-sec="sebusca">${BP.t('dg_se_busca', 'Se busca')}</a>` : ''}
   <a href="criterios.html" class="m-link" data-sec="criterios" data-i18n="criterios">Cómo seleccionamos</a>
   <div class="m-cuenta m-sin-tabbar" hidden></div>
   <div class="m-cta"><a class="p-btn p-btn-sm" href="publicar.html" data-i18n="publicar">Publicar</a><a class="p-btn p-btn-sm p-btn-fill m-sin-tabbar" href="ingresar.html" data-i18n="ingresar">Ingresar</a></div>
@@ -470,7 +484,7 @@
       const pretty = BP.parsePretty && BP.parsePretty(); const qs = new URLSearchParams(location.search);
       let sec = null;
       if (pretty || /^buscar\.html/.test(path)) { sec = 'propiedades'; const op = pretty ? pretty.op : qs.get('op'); const _viejo = op === 'venta' ? 'venta' : (op === 'alquiler' || op === 'mediano' || op === 'largo') ? 'alquiler' : null; }
-      else if (/^emprendimientos/.test(path)) sec = 'emprendimientos'; else if (/^psi/.test(path)) sec = 'psi';
+      else if (/^emprendimientos/.test(path)) sec = 'emprendimientos'; else if (/^explorar/.test(path)) sec = 'explorar'; else if (/^se-busca/.test(path)) sec = 'sebusca'; else if (/^psi/.test(path)) sec = 'psi';
       else if (/^publicadores/.test(path)) sec = 'publicadores'; else if (/^criterios/.test(path)) sec = 'criterios';
       document.querySelectorAll('[data-sec]').forEach(a => { const on = !!sec && a.dataset.sec === sec; a.classList.toggle('on', on); if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
     };
@@ -530,9 +544,20 @@
     const act = /^(index(\.html)?)?$/.test(pag) ? 'inicio'
       : (/^buscar/.test(pag) || (BP.parsePretty && BP.parsePretty())) ? 'buscar'
       : /^guardados/.test(pag) ? 'guardados'
+      : /^(explorar|se-busca)/.test(pag) ? 'explorar'
+      : /^mensajes/.test(pag) ? 'mensajes'
       : /^(panel|ingresar)/.test(pag) ? 'cuenta' : '';
     const ses = window.BPStore && window.BPStore.session;
-    const items = [
+    /* 9/10/2026 · Con BAIREN digital prendido, cinco pestañas como una app: la lupa pasa a ser Explorar (el buscador
+       vive en Inicio) y se suma Mensajes, con el número de no leídos. */
+    const digital = BP.digital();
+    const items = digital ? [
+      ['inicio', 'index.html', BP.ico.home, BP.t('tab_inicio', 'Inicio')],
+      ['explorar', 'explorar.html', BP.ico.search, BP.t('dg_explorar', 'Explorar')],
+      ['guardados', 'guardados.html', BP.ico.heart, BP.t('tab_guardados', 'Guardados')],
+      ['mensajes', 'mensajes.html', BP.ico.chat, BP.t('dg_mensajes', 'Mensajes')],
+      ['cuenta', ses ? 'panel.html' : 'ingresar.html', BP.ico.user, BP.t('tab_cuenta', 'Cuenta')]
+    ] : [
       ['inicio', 'index.html', BP.ico.home, BP.t('tab_inicio', 'Inicio')],
       ['buscar', BP.ultimaBusqueda(), BP.ico.search, BP.t('tab_buscar', 'Buscar')],
       ['guardados', 'guardados.html', BP.ico.heart, BP.t('tab_guardados', 'Guardados')],
@@ -541,8 +566,15 @@
     const bar = document.createElement('div');
     bar.id = 'pTabbar'; bar.className = 'p-tabbar'; bar.setAttribute('role', 'navigation'); bar.setAttribute('aria-label', BP.t('tab_aria', 'Accesos'));
     bar.innerHTML = items.map(i => `<a href="${BP.esc(i[1])}" data-tab="${i[0]}"${i[0] === act ? ' class="on" aria-current="page"' : ''}>${i[2]}<span>${BP.esc(i[3])}</span></a>`).join('');
+    if (digital) bar.classList.add('cinco');
     b.appendChild(bar);
     document.documentElement.classList.add('con-tabbar');
+    /* Mensajes sin leer (solo donde está cargado js/digital.js) */
+    if (digital && window.BPStore && BPStore.ready) BPStore.ready.then(async () => {
+      if (!window.BPDigital || !BPStore.session) return;
+      const n = await BPDigital.noLeidos(); const t = bar.querySelector('[data-tab="mensajes"]');
+      if (n && t) t.insertAdjacentHTML('beforeend', `<b class="p-tab-n" aria-label="${BP.esc(BP.t('dg_no_leidos', 'sin leer'))}">${n > 9 ? '9+' : n}</b>`);
+    }).catch(() => {});
   };
   /* lanz3-visitante · La pestaña Buscar vuelve a la última búsqueda de esta visita, con sus filtros (buscar.html la
      anota en cada cambio). Sólo direcciones del catálogo dentro del portal; si no hay, el catálogo de siempre. */
@@ -591,11 +623,11 @@
       const av = (window.BPStore && BPStore.getAvatar) ? BPStore.getAvatar() : null;
       const avH = BP.ico.user;   /* 12/9: la imagen de la cuenta se ve en el panel, no en el botón del header (pedido de Tomás) */
       right.innerHTML = `<button type="button" class="p-ghost p-bell" aria-label="${BP.esc(BP.t('notificaciones', 'Notificaciones'))}" data-notif>${BP.ico.bell}<span class="dot" hidden></span></button>
-        <a class="p-ghost" href="panel.html#contactos">${BP.ico.chat} ${BP.t('mis_contactos', 'Mis contactos')}</a>
+        ${BP.digital() ? `<a class="p-ghost" href="mensajes.html">${BP.ico.chat} ${BP.t('dg_mensajes', 'Mensajes')}</a>` : `<a class="p-ghost" href="panel.html#contactos">${BP.ico.chat} ${BP.t('mis_contactos', 'Mis contactos')}</a>`}
         <a class="p-ghost" href="guardados.html" aria-label="${BP.esc(BP.t('tab_guardados', 'Guardados'))}">${BP.ico.heart}<span data-fav-count hidden></span></a>
         <div class="p-crear"><a class="p-btn p-btn-sm" href="publicar-aviso.html" data-crear>${BP.t('publicar', 'Publicar')}</a><div class="p-crear-pop" hidden><p class="t">${BP.t('quien_publica', '¿Quién publica?')}</p><a href="publicar-aviso.html?perfil=dueno">${BP.t('soy_dueno_directo', 'Soy dueño directo')}</a><a href="publicar-aviso.html?paso=perfil">${BP.t('soy_profesional', 'Inmobiliaria, corredor o desarrolladora')}</a></div></div>
         <div class="p-nav-menu" style="display:flex"><div><button type="button" class="p-btn p-btn-sm p-btn-fill" aria-haspopup="true" style="padding:0 14px">${avH} ${BP.t('mi_cuenta', 'Mi cuenta')} <span class="car" style="border-color:var(--navy-deeper)"></span></button>
-          <div class="p-dd p-dd-cuenta" style="left:auto;right:0"><div class="p-dd-ttl">${BP.esc(session.email)}${modeTag}</div>${vistas}<a href="curacion.html" data-curador hidden>${BP.t('curacion', 'Curación')}</a><a href="#" data-logout>${BP.t('cerrar_sesion', 'Cerrar sesión')}</a></div></div></div>`;
+          <div class="p-dd p-dd-cuenta" style="left:auto;right:0"><div class="p-dd-ttl">${BP.esc(session.email)}${modeTag}</div>${vistas}${BP.digital() ? `<a href="se-busca.html">${BP.t('dg_se_busca', 'Se busca')}</a><a href="cobros.html" data-curador hidden>${BP.t('dg_cobros', 'Cobros')}</a>` : ''}<a href="curacion.html" data-curador hidden>${BP.t('curacion', 'Curación')}</a><a href="#" data-logout>${BP.t('cerrar_sesion', 'Cerrar sesión')}</a></div></div></div>`;
       if (mob) {
         const cta = mob.querySelector('.m-cta'); if (cta) cta.innerHTML = `<a class="p-btn p-btn-sm" href="publicar-aviso.html">${BP.t('publicar', 'Publicar')}</a><a class="p-btn p-btn-sm p-btn-fill m-sin-tabbar" href="panel.html">${BP.t('mi_cuenta', 'Mi cuenta')}</a>`;
         /* lanz3-visitante · Guardados ya es un renglón del menú: acá quedan los contactos */

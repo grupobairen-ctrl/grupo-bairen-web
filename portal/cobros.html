@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cobros · BAIREN</title>
+  <meta name="description" content="Escenarios de cobro, reglas y simulación de BAIREN.">
+  <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#131D2D">
+  <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
+  <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css?v=20261009a"><link rel="stylesheet" href="css/catalogo.css?v=20261009a"><link rel="stylesheet" href="css/portal.css?v=20261009a"><link rel="stylesheet" href="css/transiciones.css?v=20261009a"><link rel="stylesheet" href="css/cobros.css?v=20261009a"><style>@view-transition{navigation:auto}</style><style>html.arrancando body{opacity:0}body{transition:opacity .18s cubic-bezier(.22,1,.36,1)}@media(prefers-reduced-motion:reduce){body{transition:none}}</style><script>/* 8/10/2026 · Arranque sin pantallazo (ver BP.listo en ui.js): siempre, salvo al entrar a una ficha desde el portal (ahí la foto de la tarjeta crece hasta la ficha); en Safari del iPhone la transición entre páginas no tapaba el video al tocar el logo. Tope: 800 ms. */(function(){try{var h=document.documentElement,n=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{},r=document.referrer||'';if(r.indexOf(location.origin)===0&&n.type!=='reload'&&/propiedad/.test(location.pathname))return;h.classList.add('arrancando');setTimeout(function(){h.classList.remove('arrancando')},800)}catch(e){}})()</script>
+</head>
+<!-- 8/10/2026 · Cobros: la herramienta de la plataforma para el motor de cobro de la migración 27. Escenarios (cada uno un
+     esquema posible), sus reglas (qué evento cobra, cuánto y a quién), lo que cada escenario habría facturado con las
+     operaciones registradas, el embudo de operaciones y los últimos cargos. Mientras ninguna regla tenga "Cobra", todo es
+     simulación. Solo curación y soporte; apagada para el público con BPDigital.activo(). -->
+<body class="p-product p-herramienta p-cobros">
+<div class="p-velo" aria-hidden="true"><span class="w">BAIREN</span></div>
+<div id="pHeader"></div>
+<main class="p-cobros-in" id="contenido" aria-busy="true">
+  <header class="cb-cab">
+    <p class="cb-pre">Plataforma</p>
+    <h1>Cobros, <em>en simulación</em></h1>
+    <p class="cb-sub">Cada operación deja registrados sus pasos. Las reglas dicen qué paso cobra, cuánto y a quién, según el escenario. Mientras ninguna regla tenga <b>Cobra</b> prendido, nada se le cobra a nadie: se ve lo que cada esquema habría facturado.</p>
+  </header>
+  <div id="cbCuerpo"></div>
+</main>
+<div id="pFooter"></div>
+
+<script src="supabase-portal.js?v=20261009a" defer></script><script src="js/errores.js?v=20261009a" defer></script>
+<script src="../mapa-barrios.js?v=20261009a" defer></script>
+<script src="js/bairen-motion.js?v=20261009a" defer></script><script src="js/i18n-portal.js?v=20261009a" defer></script><script src="js/ui.js?v=20261009a" defer></script><script src="js/store.js?v=20261009a" defer></script>
+<script src="js/data.js?v=20261009a" defer></script><script src="js/digital.js?v=20261009a" defer></script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+(async function(){
+  BP.header(); BP.footer(); if (window.BPStore) BPStore.init();
+  await BPStore.ready;
+  const D = window.BPDigital, main = document.getElementById('contenido'), cuerpo = document.getElementById('cbCuerpo');
+  const fin = () => main.removeAttribute('aria-busy');
+  const vacio = (t, p, btn) => { cuerpo.innerHTML = `<div class="p-empty cb-vacio"><b>${BP.esc(t)}</b><p>${BP.esc(p)}</p>${btn || ''}</div>`; fin(); };
+  if (!D || !D.activo()) return vacio('Muy pronto', 'Esta herramienta todavía no está abierta.', '<a class="p-btn" href="index.html">Volver al inicio</a>');
+  if (!BPStore.requireSession()) return;
+  if (!(await BPStore.isCurador())) return vacio('Solo para el equipo de BAIREN', 'Esta pantalla la usan curación y soporte.', '<a class="p-btn" href="index.html">Volver al inicio</a>');
+
+  const LIN = ['todas', 'temporario', 'mediano', 'tradicional', 'venta', 'pozo'];
+  const linTxt = l => l === 'todas' ? 'Todas las líneas' : (D.LINEAS[l] || l);
+  const EVT_TXT = Object.assign({}, D.HITO_TXT, { conversacion: 'Contacto respondido', whatsapp: 'Pasaron a WhatsApp' });
+  const evtTxt = e => EVT_TXT[e] || e;
+  const BASE_TXT = { precio_publicado: 'del precio publicado', precio_cierre: 'del precio de cierre', monto_contrato: 'del total del contrato', monto_hito: 'del monto cobrado' };
+  const PAGA_TXT = { publicador: 'Publicador', interesado: 'Quien busca', propietario: 'Propietario' };
+  const dinero = (n, m) => (m === 'ARS' ? '$ ' : 'USD ') + Number(n || 0).toLocaleString('es-AR', { maximumFractionDigits: 2 });
+  const valorTxt = r => r.modo === 'fijo' ? dinero(r.valor, r.moneda) + ' fijo' : Number(r.valor).toLocaleString('es-AR') + ' % ' + (BASE_TXT[r.base] || '');
+  let reglas = [], resumen = [], ops = [], cargos = [];
+
+  async function cargar(){
+    try { [reglas, resumen, ops, cargos] = await Promise.all([D.reglas(), D.resumen(), D.bandeja({ todas: true }), D.cargos({ limit: 60 })]); }
+    catch (e) { return vacio('No pudimos cargar los cobros', e.message || String(e)); }
+    pintar(); fin();
+  }
+
+  function pintar(){
+    const escenarios = [...new Set(reglas.map(r => r.escenario).concat(resumen.map(r => r.escenario)))].sort();
+    const totales = esc => { const t = {}; resumen.filter(r => r.escenario === esc && r.estado !== 'anulado').forEach(r => { t[r.moneda] = (t[r.moneda] || 0) + Number(r.total); }); return t; };
+    const reales = reglas.filter(r => r.activa && r.cobra).length;
+    cuerpo.innerHTML = `
+      ${reales ? `<p class="cb-alerta" role="status"><b>${reales} ${reales === 1 ? 'regla cobra' : 'reglas cobran'} de verdad.</b> Generan cargos pendientes para facturar.</p>` : `<p class="cb-ok" role="status">Todo en simulación: ninguna regla cobra de verdad.</p>`}
+      <section class="cb-sec" aria-labelledby="cbEscT">
+        <h2 class="cb-h2" id="cbEscT">Qué habría facturado cada escenario</h2>
+        <p class="cb-nota">Con las operaciones registradas hasta hoy. "Recalcular" vuelve a pasar todos los pasos por las reglas actuales del escenario.</p>
+        <div class="cb-escs">${escenarios.length ? escenarios.map(esc => { const t = totales(esc); const filas = resumen.filter(r => r.escenario === esc);
+          return `<article class="cb-esc"><header><h3>${BP.esc(esc)}</h3><button type="button" class="cb-link" data-recalc="${BP.esc(esc)}">Recalcular</button></header>
+            <p class="cb-total">${Object.keys(t).length ? Object.keys(t).map(m => `<span>${BP.esc(dinero(t[m], m))}</span>`).join('') : '<span class="cero">Sin cargos todavía</span>'}</p>
+            ${filas.length ? `<table class="cb-tabla"><thead><tr><th>Línea</th><th>Paga</th><th>Estado</th><th class="n">Cargos</th><th class="n">Total</th></tr></thead><tbody>${filas.map(r => `<tr><td>${BP.esc(linTxt(r.linea))}</td><td>${BP.esc(PAGA_TXT[r.paga] || r.paga)}</td><td>${BP.esc(r.estado)}</td><td class="n">${r.cantidad}</td><td class="n">${BP.esc(dinero(r.total, r.moneda))}</td></tr>`).join('')}</tbody></table>` : ''}
+          </article>`; }).join('') : '<p class="cb-nota">Todavía no hay escenarios.</p>'}</div>
+      </section>
+
+      <section class="cb-sec" aria-labelledby="cbEmbT">
+        <h2 class="cb-h2" id="cbEmbT">Operaciones</h2>
+        ${embudo()}
+      </section>
+
+      <section class="cb-sec" aria-labelledby="cbReglasT">
+        <div class="cb-sec-cab"><h2 class="cb-h2" id="cbReglasT">Reglas</h2><button type="button" class="p-btn p-btn-sm p-btn-fill" id="cbNueva">Nueva regla</button></div>
+        <p class="cb-nota">Un porcentaje sobre ventas o alquileres de más de 3 meses solo lo puede cobrar un corredor matriculado (Ley 2340). Antes de prender <b>Cobra</b> en una regla, validarla con el abogado: nota del vault, secciones 11 y 12.</p>
+        ${escenarios.map(esc => `<div class="cb-grupo"><h3>${BP.esc(esc)}</h3><div class="cb-reglas">${reglas.filter(r => r.escenario === esc).map(fila).join('') || '<p class="cb-nota">Sin reglas.</p>'}</div></div>`).join('')}
+      </section>
+
+      <section class="cb-sec" aria-labelledby="cbCargosT">
+        <h2 class="cb-h2" id="cbCargosT">Últimos cargos</h2>
+        ${cargos.length ? `<div class="cb-scroll"><table class="cb-tabla"><thead><tr><th>Fecha</th><th>Escenario</th><th>Concepto</th><th>Línea</th><th>Paga</th><th>Estado</th><th class="n">Monto</th></tr></thead><tbody>${cargos.map(c => `<tr><td>${BP.esc(new Date(c.creado_en).toLocaleDateString('es-AR'))}</td><td>${BP.esc(c.escenario)}</td><td>${BP.esc(c.concepto)}</td><td>${BP.esc(linTxt(c.linea || 'todas'))}</td><td>${BP.esc(PAGA_TXT[c.paga] || c.paga)}</td><td>${BP.esc(c.estado)}</td><td class="n">${BP.esc(dinero(c.monto, c.moneda))}</td></tr>`).join('')}</tbody></table></div>` : '<p class="cb-nota">Todavía no hay cargos: aparecen cuando una operación avanza un paso que tiene regla.</p>'}
+      </section>`;
+    cuerpo.querySelectorAll('[data-recalc]').forEach(b => b.addEventListener('click', async () => { b.disabled = true; try { const n = await D.recalcular(b.dataset.recalc); BP.toast('Recalculado: ' + n + ' cargos.'); await cargar(); } catch (e) { BP.toast(e.message); b.disabled = false; } }));
+    cuerpo.querySelectorAll('[data-editar]').forEach(b => b.addEventListener('click', () => editor(reglas.find(r => String(r.id) === b.dataset.editar))));
+    cuerpo.querySelectorAll('[data-borrar]').forEach(b => b.addEventListener('click', async () => { if (!confirm('¿Borrar esta regla? Los cargos ya generados quedan.')) return; try { await D.borrarRegla(b.dataset.borrar); await cargar(); } catch (e) { BP.toast(e.message); } }));
+    cuerpo.querySelectorAll('[data-activa]').forEach(c => c.addEventListener('change', async () => { try { await D.guardarRegla({ id: c.dataset.activa, activa: c.checked }); BP.toast(c.checked ? 'Regla activa.' : 'Regla en pausa.'); await cargar(); } catch (e) { BP.toast(e.message); c.checked = !c.checked; } }));
+    cuerpo.querySelectorAll('[data-cobra]').forEach(c => c.addEventListener('change', async () => {
+      if (c.checked && !confirm('Esta regla va a generar cargos REALES (pendientes de facturar) desde ahora. ¿Ya la validó el abogado?')) { c.checked = false; return; }
+      try { await D.guardarRegla({ id: c.dataset.cobra, cobra: c.checked }); BP.toast(c.checked ? 'La regla cobra de verdad.' : 'La regla vuelve a simulación.'); await cargar(); } catch (e) { BP.toast(e.message); c.checked = !c.checked; }
+    }));
+    document.getElementById('cbNueva').addEventListener('click', () => editor(null, escenarios));
+  }
+
+  function fila(r){
+    return `<article class="cb-regla${r.activa ? '' : ' pausada'}">
+      <div class="cb-r-txt"><b>${BP.esc(r.concepto || evtTxt(r.evento))}</b>
+        <span>${BP.esc(linTxt(r.linea))} · al registrar "${BP.esc(evtTxt(r.evento))}" · ${BP.esc(valorTxt(r))} · paga ${BP.esc((PAGA_TXT[r.paga] || r.paga).toLowerCase())}</span>
+        ${r.nota ? `<small>${BP.esc(r.nota)}</small>` : ''}</div>
+      <div class="cb-r-acc">
+        <label class="cb-sw"><input type="checkbox" data-activa="${BP.esc(r.id)}"${r.activa ? ' checked' : ''}><span>Activa</span></label>
+        <label class="cb-sw cobra"><input type="checkbox" data-cobra="${BP.esc(r.id)}"${r.cobra ? ' checked' : ''}><span>Cobra</span></label>
+        <button type="button" class="cb-link" data-editar="${BP.esc(r.id)}">Editar</button>
+        <button type="button" class="cb-link" data-borrar="${BP.esc(r.id)}">Borrar</button>
+      </div></article>`;
+  }
+
+  function embudo(){
+    if (!ops.length) return '<p class="cb-nota">Todavía no hay operaciones. Nacen cuando alguien con cuenta le escribe a quien publica desde una ficha, o cuando acepta una propuesta de Se busca.</p>';
+    const etapas = D.ETAPAS.concat(['caida']);
+    const lineas = LIN.slice(1).filter(l => ops.some(o => o.linea === l));
+    const n = (e, l) => ops.filter(o => o.etapa === e && (!l || o.linea === l)).length;
+    return `<div class="cb-scroll"><table class="cb-tabla cb-embudo"><thead><tr><th>Etapa</th>${lineas.map(l => `<th class="n">${BP.esc(linTxt(l))}</th>`).join('')}<th class="n">Total</th></tr></thead><tbody>
+      ${etapas.map(e => `<tr><td>${BP.esc(D.ETAPA_TXT[e] || e)}</td>${lineas.map(l => `<td class="n">${n(e, l) || ''}</td>`).join('')}<td class="n"><b>${n(e) || ''}</b></td></tr>`).join('')}
+    </tbody></table></div><p class="cb-nota">${ops.length} operaciones · ${ops.filter(o => o.origen === 'se_busca').length} nacieron en Se busca.</p>`;
+  }
+
+  /* El formulario de una regla, en un diálogo */
+  function editor(r, escenarios){
+    const x = r || { escenario: (escenarios && escenarios[0]) || '', linea: 'todas', evento: 'contrato_generado', paga: 'publicador', modo: 'fijo', valor: '', moneda: 'USD', base: 'monto_contrato', activa: true, cobra: false };
+    const dlg = document.createElement('div'); dlg.className = 'cb-dlg'; dlg.setAttribute('role', 'dialog'); dlg.setAttribute('aria-modal', 'true'); dlg.setAttribute('aria-labelledby', 'cbDlgT');
+    const opt = (lista, val, txt) => lista.map(v => `<option value="${BP.esc(v)}"${v === val ? ' selected' : ''}>${BP.esc(txt ? txt(v) : v)}</option>`).join('');
+    const todos = [...new Set(reglas.map(y => y.escenario))];
+    dlg.innerHTML = `<form class="cb-dlg-caja" novalidate>
+      <h2 id="cbDlgT">${r ? 'Editar regla' : 'Nueva regla'}</h2>
+      <label class="cb-f"><span>Escenario</span><input name="escenario" list="cbEscs" required maxlength="80" value="${BP.esc(x.escenario)}" placeholder="Por ejemplo: Sin matrícula · sección 12"><datalist id="cbEscs">${todos.map(e => `<option value="${BP.esc(e)}">`).join('')}</datalist></label>
+      <label class="cb-f"><span>Concepto (lo que dice el cargo)</span><input name="concepto" maxlength="80" value="${BP.esc(x.concepto || '')}" placeholder="Contrato digital"></label>
+      <div class="cb-f2">
+        <label class="cb-f"><span>Línea</span><select name="linea">${opt(LIN, x.linea, linTxt)}</select></label>
+        <label class="cb-f"><span>Cuando se registra</span><select name="evento">${opt(D.EVENTOS_COBRO, x.evento, evtTxt)}</select></label>
+      </div>
+      <div class="cb-f2">
+        <label class="cb-f"><span>Modo</span><select name="modo">${opt(['fijo', 'porcentaje'], x.modo, v => v === 'fijo' ? 'Monto fijo' : 'Porcentaje')}</select></label>
+        <label class="cb-f"><span>Valor</span><input name="valor" inputmode="decimal" required value="${BP.esc(x.valor)}"></label>
+      </div>
+      <div class="cb-f2">
+        <label class="cb-f"><span>Moneda</span><select name="moneda">${opt(['USD', 'ARS'], x.moneda)}</select></label>
+        <label class="cb-f cb-base"><span>Porcentaje sobre</span><select name="base">${opt(Object.keys(BASE_TXT), x.base || 'monto_contrato', v => BASE_TXT[v].replace(/^del /, ''))}</select></label>
+      </div>
+      <div class="cb-f2 cb-base">
+        <label class="cb-f"><span>Mínimo (opcional)</span><input name="minimo" inputmode="decimal" value="${BP.esc(x.minimo == null ? '' : x.minimo)}"></label>
+        <label class="cb-f"><span>Máximo (opcional)</span><input name="maximo" inputmode="decimal" value="${BP.esc(x.maximo == null ? '' : x.maximo)}"></label>
+      </div>
+      <label class="cb-f"><span>Paga</span><select name="paga">${opt(Object.keys(PAGA_TXT), x.paga, v => PAGA_TXT[v])}</select></label>
+      <label class="cb-f"><span>Nota</span><textarea name="nota" rows="2" maxlength="400">${BP.esc(x.nota || '')}</textarea></label>
+      <p class="cb-err" role="alert" hidden></p>
+      <div class="cb-dlg-acc"><button type="button" class="p-btn p-btn-sm" data-cerrar>Cancelar</button><button type="submit" class="p-btn p-btn-sm p-btn-fill">Guardar</button></div>
+    </form>`;
+    document.body.appendChild(dlg);
+    const f = dlg.querySelector('form'), err = dlg.querySelector('.cb-err');
+    const verBase = () => dlg.querySelectorAll('.cb-base').forEach(el => { el.hidden = f.modo.value !== 'porcentaje'; });
+    f.modo.addEventListener('change', verBase); verBase();
+    let soltar = null;
+    const cerrar = () => { if (soltar) soltar(); dlg.remove(); };
+    soltar = BP.focoAtrapado(dlg.querySelector('.cb-dlg-caja'), { alCerrar: () => dlg.remove(), cerrarAlClicFuera: true });
+    dlg.querySelector('[data-cerrar]').addEventListener('click', cerrar);
+    setTimeout(() => f.escenario.focus(), 30);
+    f.addEventListener('submit', async e => {
+      e.preventDefault(); err.hidden = true;
+      const num = v => { const s = String(v || '').replace(/\./g, '').replace(',', '.').trim(); return s === '' ? null : Number(s); };
+      const datos = { id: r ? r.id : undefined, escenario: f.escenario.value.trim(), concepto: f.concepto.value.trim() || null, linea: f.linea.value, evento: f.evento.value, paga: f.paga.value, modo: f.modo.value, valor: num(f.valor.value), moneda: f.moneda.value, base: f.modo.value === 'porcentaje' ? f.base.value : null, minimo: f.modo.value === 'porcentaje' ? num(f.minimo.value) : null, maximo: f.modo.value === 'porcentaje' ? num(f.maximo.value) : null, nota: f.nota.value.trim() || null };
+      if (!datos.escenario) { err.textContent = 'Poné el nombre del escenario.'; err.hidden = false; return; }
+      if (datos.valor == null || isNaN(datos.valor) || datos.valor < 0 || (datos.modo === 'porcentaje' && datos.valor > 100)) { err.textContent = 'Revisá el valor: un número (si es porcentaje, de 0 a 100).'; err.hidden = false; return; }
+      try { await D.guardarRegla(datos); cerrar(); BP.toast('Regla guardada. Para ver su efecto en lo ya registrado, recalculá el escenario.'); await cargar(); }
+      catch (x2) { err.textContent = x2.message || String(x2); err.hidden = false; }
+    });
+  }
+
+  await cargar();
+})();
+});
+</script>
+</body>
+</html>
