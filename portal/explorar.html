@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20261009a"><link rel="stylesheet" href="css/catalogo.css?v=20261009a"><link rel="stylesheet" href="css/portal.css?v=20261009a"><link rel="stylesheet" href="css/transiciones.css?v=20261009a"><style>@view-transition{navigation:auto}</style><style>html.arrancando body{opacity:0}body{transition:opacity .18s cubic-bezier(.22,1,.36,1)}@media(prefers-reduced-motion:reduce){body{transition:none}}</style><script>/* 8/10/2026 · Arranque sin pantallazo (ver BP.listo en ui.js): siempre, salvo al entrar a una ficha desde el portal (ahí la foto de la tarjeta crece hasta la ficha); en Safari del iPhone la transición entre páginas no tapaba el video al tocar el logo. Tope: 800 ms. */(function(){try{var h=document.documentElement,n=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{},r=document.referrer||'';if(r.indexOf(location.origin)===0&&n.type!=='reload'&&/propiedad/.test(location.pathname))return;h.classList.add('arrancando');setTimeout(function(){h.classList.remove('arrancando')},800)}catch(e){}})()</script>
-  <link rel="stylesheet" href="css/explorar.css?v=20261009a">
+  <link rel="stylesheet" href="css/base.css?v=20261009b"><link rel="stylesheet" href="css/catalogo.css?v=20261009b"><link rel="stylesheet" href="css/portal.css?v=20261009b"><link rel="stylesheet" href="css/transiciones.css?v=20261009b"><style>@view-transition{navigation:auto}</style><style>html.arrancando body{opacity:0}body{transition:opacity .18s cubic-bezier(.22,1,.36,1)}@media(prefers-reduced-motion:reduce){body{transition:none}}</style><script>/* 8/10/2026 · Arranque sin pantallazo (ver BP.listo en ui.js): siempre, salvo al entrar a una ficha desde el portal (ahí la foto de la tarjeta crece hasta la ficha); en Safari del iPhone la transición entre páginas no tapaba el video al tocar el logo. Tope: 800 ms. */(function(){try{var h=document.documentElement,n=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{},r=document.referrer||'';if(r.indexOf(location.origin)===0&&n.type!=='reload'&&/propiedad/.test(location.pathname))return;h.classList.add('arrancando');setTimeout(function(){h.classList.remove('arrancando')},800)}catch(e){}})()</script>
+  <link rel="stylesheet" href="css/explorar.css?v=20261009b">
 </head>
 <!-- 8/10/2026 · BAIREN, la digitalización del real estate · Explorar (la lupita).
      Dos pestañas: Novedades (lo nuevo, las bajas de precio y lo que cuentan quienes publican, curado) y Se busca
@@ -27,11 +27,11 @@
 </main>
 <div id="pFooter"></div>
 
-<script src="supabase-portal.js?v=20261009a" defer></script><script src="js/errores.js?v=20261009a" defer></script>
-<script src="../mapa-barrios.js?v=20261009a" defer></script>
-<script src="js/bairen-motion.js?v=20261009a" defer></script><script src="js/i18n-portal.js?v=20261009a" defer></script><script src="js/ui.js?v=20261009a" defer></script><script src="js/store.js?v=20261009a" defer></script>
-<script src="js/digital.js?v=20261009a" defer></script>
-<script src="js/data.js?v=20261009a" defer></script>
+<script src="supabase-portal.js?v=20261009b" defer></script><script src="js/errores.js?v=20261009b" defer></script>
+<script src="../mapa-barrios.js?v=20261009b" defer></script>
+<script src="js/bairen-motion.js?v=20261009b" defer></script><script src="js/i18n-portal.js?v=20261009b" defer></script><script src="js/ui.js?v=20261009b" defer></script><script src="js/store.js?v=20261009b" defer></script>
+<script src="js/digital.js?v=20261009b" defer></script>
+<script src="js/data.js?v=20261009b" defer></script>
 <script>
 document.addEventListener('DOMContentLoaded', function(){
 (async function(){
@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function(){
     inversor: () => [t('dg_ex_suj_inversor', 'Un inversor'), t('dg_ex_suj_inversor_v', 'Un inversor verificado')],
     familia: () => [t('dg_ex_suj_familia', 'Una familia'), t('dg_ex_suj_familia_v', 'Una familia verificada')],
     empresa: () => [t('dg_ex_suj_empresa', 'Una empresa'), t('dg_ex_suj_empresa_v', 'Una empresa verificada')],
-    extranjero: () => [t('dg_ex_suj_extranjero', 'Alguien desde el exterior'), t('dg_ex_suj_extranjero_v', 'Alguien verificado desde el exterior')]
+    extranjero: () => [t('dg_ex_suj_extranjero', 'Alguien del exterior'), t('dg_ex_suj_extranjero_v', 'Alguien del exterior, verificado')]
   };
   const queBusca = b => {
     const n = +b.ambientes_min || 0, tp = b.tipo || '';
@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', function(){
     main.removeAttribute('aria-busy'); main.classList.add('p-dg-pronto-main');
     main.innerHTML = `<div class="p-dg-pronto"><span class="p-dg-pronto-ic" aria-hidden="true">${BP.ico.search}</span>
       <h1 class="p-dg-pronto-t">${t('dg_ex_pronto_t', 'Muy <em>pronto</em>')}</h1>
-      <p>${esc(t('dg_ex_pronto_p', 'Estamos preparando una forma nueva de moverse en el mercado, toda dentro de BAIREN.'))}</p>
+      <p>${esc(t('dg_ex_pronto_p', 'Estamos preparando algo nuevo para BAIREN.'))}</p>
       <a class="p-btn p-btn-fill" href="index.html">${esc(t('dg_ex_pronto_btn', 'Volver al inicio'))}</a></div>`;
   };
   const msjError = (e, d) => String((e && e.message) || e || '') || d;
@@ -132,20 +132,20 @@ document.addEventListener('DOMContentLoaded', function(){
   const sk = n => Array.from({ length: n }, () => `<div class="p-ex-sk-item" aria-hidden="true"><span class="p-dg-sk p-ex-sk-foto"></span><span class="p-ex-sk-l"><span class="p-dg-sk"></span><span class="p-dg-sk"></span><span class="p-dg-sk"></span></span></div>`).join('');
   const urlIngresarSb = 'ingresar.html?volver=' + encodeURIComponent('explorar.html' + location.search + '#se-busca');
   const pasos = `<ol class="p-ex-pasos">
-      <li><b>${esc(t('dg_ex_paso1_t', 'Publicás lo que buscás'))}</b><span>${esc(t('dg_ex_paso1', 'Sin nombre, sin teléfono, sin mail.'))}</span></li>
-      <li><b>${esc(t('dg_ex_paso2_t', 'Te proponen unidades'))}</b><span>${esc(t('dg_ex_paso2', 'Quienes publican en BAIREN te mandan lo que tienen.'))}</span></li>
-      <li><b>${esc(t('dg_ex_paso3_t', 'Elegís'))}</b><span>${esc(t('dg_ex_paso3', 'Al aceptar una propuesta se conocen y empiezan a hablar.'))}</span></li></ol>`;
+      <li><b>${esc(t('dg_ex_paso1_t', 'Publicás tu búsqueda'))}</b><span>${esc(t('dg_ex_paso1', 'Tus datos quedan reservados.'))}</span></li>
+      <li><b>${esc(t('dg_ex_paso2_t', 'Recibís propuestas'))}</b><span>${esc(t('dg_ex_paso2', 'Inmobiliarias y dueños te ofrecen unidades.'))}</span></li>
+      <li><b>${esc(t('dg_ex_paso3_t', 'Elegís'))}</b><span>${esc(t('dg_ex_paso3', 'Al aceptar una, conversan en BAIREN.'))}</span></li></ol>`;
   main.innerHTML = `
   <header class="p-ex-cab">
     <p class="p-ex-sobre">${BP.ico.search}<span>${esc(t('dg_ex_sobre', 'Explorar'))}</span></p>
-    <h1 class="p-ex-h1">${t('dg_ex_h1', 'Lo que <em>se mueve</em> en el mercado')}</h1>
-    <p class="p-ex-bajada">${esc(t('dg_ex_bajada', 'Lo recién publicado, lo que bajó de precio y lo que cuentan quienes publican. Y, en Se busca, lo que la gente está buscando.'))}</p>
+    <h1 class="p-ex-h1">${t('dg_ex_h1', 'El mercado, <em>hoy</em>')}</h1>
+    <p class="p-ex-bajada">${esc(t('dg_ex_bajada', 'Unidades nuevas, bajas de precio y lanzamientos en Buenos Aires.'))}</p>
   </header>
   <div class="p-ex-cuerpo${herr ? ' con-herr' : ''}">
     <div class="p-ex-principal">
       <div class="p-ex-tabs" role="tablist" aria-label="${esc(t('dg_ex_tabs_aria', 'Secciones de Explorar'))}">
         <button type="button" role="tab" id="tabNov" aria-controls="panNov" aria-selected="true">${esc(t('dg_ex_tab_nov', 'Novedades'))}</button>
-        <button type="button" role="tab" id="tabSb" aria-controls="panSb" aria-selected="false" tabindex="-1">${esc(t('dg_ex_tab_sb', 'Se busca'))}<span class="p-ex-n" id="nSb" hidden></span></button>
+        <button type="button" role="tab" id="tabSb" aria-controls="panSb" aria-selected="false" tabindex="-1">${esc(t('dg_ex_tab_sb', 'Búsquedas'))}<span class="p-ex-n" id="nSb" hidden></span></button>
       </div>
       <section class="p-ex-panel" id="panNov" role="tabpanel" aria-labelledby="tabNov" tabindex="-1">
         <div class="p-ex-filtros" id="filtNov" role="group" aria-label="${esc(t('dg_ex_filtrar', 'Filtrar novedades'))}" hidden></div>
@@ -161,22 +161,22 @@ document.addEventListener('DOMContentLoaded', function(){
         <div id="revLista" aria-busy="true"><span class="p-dg-sk p-ex-sk-linea"></span></div>
       </section>` : ''}
       ${pub ? `<section class="p-ex-caja" aria-labelledby="pubT">
-        <h2 class="p-ex-caja-t" id="pubT">${esc(t('dg_ex_pub_t', 'Contale algo al mercado'))}</h2>
-        <p class="p-ex-caja-txt">${esc(t('dg_ex_pub_p', 'Un lanzamiento, un avance de obra o una novedad. La revisamos antes de que salga en Explorar.'))}</p>
-        <button type="button" class="p-btn p-btn-fill p-ex-ancho" id="btnNov">${esc(t('dg_ex_pub_btn', 'Publicar una novedad'))}</button>
+        <h2 class="p-ex-caja-t" id="pubT">${esc(t('dg_ex_pub_t', 'Contá un lanzamiento'))}</h2>
+        <p class="p-ex-caja-txt">${esc(t('dg_ex_pub_p', 'Una preventa, un avance de obra o una novedad. La revisamos antes de publicarla.'))}</p>
+        <button type="button" class="p-btn p-btn-fill p-ex-ancho" id="btnNov">${esc(t('dg_ex_pub_btn', 'Publicar novedad'))}</button>
         <details class="p-ex-mis" id="misDet">
           <summary>${esc(t('dg_ex_mis_t', 'Tus publicaciones y propuestas'))}<span class="p-ex-n" id="nMis" hidden></span></summary>
           <h3 class="p-ex-caja-st">${esc(t('dg_ex_mis_pubs', 'Tus publicaciones'))}</h3>
           <ul class="p-ex-milista" id="misPubs" aria-live="polite"></ul>
-          <h3 class="p-ex-caja-st" id="misPropsT" hidden>${esc(t('dg_ex_mis_props', 'Tus propuestas en Se busca'))}</h3>
+          <h3 class="p-ex-caja-st" id="misPropsT" hidden>${esc(t('dg_ex_mis_props', 'Tus propuestas'))}</h3>
           <ul class="p-ex-milista" id="misProps" hidden></ul>
         </details>
       </section>` : ''}
       <section class="p-ex-caja p-ex-caja-sb" aria-labelledby="sbT">
-        <h2 class="p-ex-caja-t" id="sbT">${esc(t('dg_ex_sb_caja_t', 'Cómo funciona Se busca'))}</h2>
+        <h2 class="p-ex-caja-t" id="sbT">${esc(t('dg_ex_sb_caja_t', 'Cómo funciona'))}</h2>
         ${pasos}
-        ${ses ? `<a class="p-btn p-btn-fill p-ex-ancho" href="se-busca.html">${esc(t('dg_ex_publicar_busco', 'Publicar lo que busco'))}</a>`
-              : `<a class="p-btn p-btn-fill p-ex-ancho" href="${esc(urlIngresarSb)}">${esc(t('dg_ex_ingresar_ver', 'Ingresar para ver las búsquedas'))}</a>`}
+        ${ses ? `<a class="p-btn p-btn-fill p-ex-ancho" href="se-busca.html">${esc(t('dg_ex_publicar_busco', 'Publicar mi búsqueda'))}</a>`
+              : `<a class="p-btn p-btn-fill p-ex-ancho" href="${esc(urlIngresarSb)}">${esc(t('dg_ex_ingresar_ver', 'Ingresá para ver las búsquedas'))}</a>`}
       </section>
     </aside>
   </div>`;
@@ -202,7 +202,7 @@ document.addEventListener('DOMContentLoaded', function(){
   addEventListener('hashchange', () => { if (location.hash === '#se-busca') abrirTab(1); });
 
   /* ── Novedades ─────────────────────────────────────────────────────────────────────────────────────────── */
-  const TIPO_TXT = { nuevo: () => t('dg_ex_t_nuevo', 'Recién publicada'), baja_precio: () => t('dg_ex_t_baja', 'Bajó de precio'), lanzamiento: () => t('dg_ex_t_lanzamiento', 'Lanzamiento'), avance_obra: () => t('dg_ex_t_avance', 'Avance de obra'), novedad: () => t('dg_ex_t_novedad', 'Novedad') };
+  const TIPO_TXT = { nuevo: () => t('dg_ex_t_nuevo', 'Nueva'), baja_precio: () => t('dg_ex_t_baja', 'Bajó de precio'), lanzamiento: () => t('dg_ex_t_lanzamiento', 'Lanzamiento'), avance_obra: () => t('dg_ex_t_avance', 'Avance de obra'), novedad: () => t('dg_ex_t_novedad', 'Novedad') };
   const CAT = r => r.tipo === 'nuevo' ? 'nuevo' : r.tipo === 'baja_precio' ? 'baja' : 'pub';
   const tipoTag = (tipo, fecha) => `<p class="p-ex-marca"><span class="p-ex-tipo t-${esc(tipo)}">${esc((TIPO_TXT[tipo] || TIPO_TXT.novedad)())}</span>${fecha ? `<time datetime="${esc(fecha)}">${esc(hace(fecha))}</time>` : ''}</p>`;
   const pubDe = (pid, a) => {
@@ -260,12 +260,12 @@ document.addEventListener('DOMContentLoaded', function(){
     const host = $('feed'), filt = $('filtNov'), todas = filasFeed();
     const n = { todo: todas.length, nuevo: 0, baja: 0, pub: 0 }; todas.forEach(x => n[CAT(x.r)]++);
     if (!n[E.filtro]) E.filtro = 'todo';
-    const cats = [['todo', t('dg_ex_f_todo', 'Todo')], ['nuevo', t('dg_ex_f_nuevo', 'Recién publicadas')], ['baja', t('dg_ex_f_baja', 'Bajaron de precio')], ['pub', t('dg_ex_f_pub', 'De quienes publican')]].filter(c => c[0] === 'todo' || n[c[0]]);
+    const cats = [['todo', t('dg_ex_f_todo', 'Todo')], ['nuevo', t('dg_ex_f_nuevo', 'Nuevas')], ['baja', t('dg_ex_f_baja', 'Bajas de precio')], ['pub', t('dg_ex_f_pub', 'Lanzamientos')]].filter(c => c[0] === 'todo' || n[c[0]]);
     filt.hidden = cats.length < 3;
     filt.innerHTML = cats.map(c => `<button type="button" class="p-dg-filtro" data-f="${c[0]}" aria-pressed="${E.filtro === c[0]}">${esc(c[1])}<span class="n">${n[c[0]]}</span></button>`).join('');
     host.removeAttribute('aria-busy');
     if (!todas.length) {
-      host.innerHTML = `<div class="p-dg-vacio"><p class="p-dg-vacio-t">${esc(t('dg_ex_feed_vacio_t', 'Por ahora, todo tranquilo'))}</p><p>${esc(t('dg_ex_feed_vacio', 'Cuando se publique algo nuevo o baje un precio, lo vas a ver acá.'))}</p><a class="p-btn" href="buscar.html">${esc(t('dg_ex_ver_todo', 'Ver todas las propiedades'))}</a></div>`;
+      host.innerHTML = `<div class="p-dg-vacio"><p class="p-dg-vacio-t">${esc(t('dg_ex_feed_vacio_t', 'Sin novedades por ahora'))}</p><p>${esc(t('dg_ex_feed_vacio', 'Acá vas a ver cada unidad nueva y cada baja de precio.'))}</p><a class="p-btn" href="buscar.html">${esc(t('dg_ex_ver_todo', 'Ver todas las propiedades'))}</a></div>`;
       return;
     }
     const lista = E.filtro === 'todo' ? todas : todas.filter(x => CAT(x.r) === E.filtro);
@@ -308,7 +308,7 @@ document.addEventListener('DOMContentLoaded', function(){
         <span class="p-ex-acts">
           ${cur ? `<button type="button" class="p-btn p-btn-sm" data-verif="${esc(id)}" data-ok="${b.verificada ? '0' : '1'}">${esc(b.verificada ? t('dg_ex_quitar_verif', 'Quitar verificación') : t('dg_ex_marcar_verif', 'Marcar verificada'))}</button>` : ''}
           ${mia ? `<a class="p-btn p-btn-sm" href="se-busca.html#b-${encodeURIComponent(id)}">${esc(t('dg_ex_ver_tus_props', 'Ver tus propuestas'))}</a>`
-                : pub ? `<button type="button" class="p-btn p-btn-sm p-btn-fill" data-proponer="${esc(id)}"${mias >= 3 ? ' disabled title="' + esc(t('dg_ex_max_props', 'Ya propusiste 3 unidades a esta búsqueda.')) + '"' : ''}>${esc(t('dg_ex_proponer', 'Proponer una propiedad'))}</button>` : ''}
+                : pub ? `<button type="button" class="p-btn p-btn-sm p-btn-fill" data-proponer="${esc(id)}"${mias >= 3 ? ' disabled title="' + esc(t('dg_ex_max_props', 'Ya propusiste 3 unidades a esta búsqueda.')) + '"' : ''}>${esc(t('dg_ex_proponer', 'Proponer una unidad'))}</button>` : ''}
         </span>
       </div>
     </article></li>`;
@@ -323,21 +323,21 @@ document.addEventListener('DOMContentLoaded', function(){
     const acept = E.misProps.filter(p => p.estado === 'aceptada').length;
     host.innerHTML = `
       <div class="p-ex-sb-cab">
-        <p>${esc(E.bus.length === 1 ? t('dg_ex_sb_1', '1 búsqueda activa.') : E.bus.length ? tf('dg_ex_sb_n', '{n} búsquedas activas.', { n: E.bus.length }) : t('dg_ex_sb_0', 'Todavía no hay búsquedas activas.'))} ${esc(t('dg_ex_sb_anon', 'Nadie sabe quién busca hasta que acepta una propuesta.'))}</p>
-        <div class="p-ex-acts"><a class="p-btn p-btn-fill" href="se-busca.html">${esc(t('dg_ex_publicar_busco', 'Publicar lo que busco'))}</a>${E.misBus.size ? `<a class="p-btn" href="se-busca.html#tus">${esc(tf('dg_ex_tus_bus', 'Tus búsquedas ({n})', { n: E.misBus.size }))}</a>` : ''}</div>
+        <p>${esc(E.bus.length === 1 ? t('dg_ex_sb_1', '1 búsqueda activa.') : E.bus.length ? tf('dg_ex_sb_n', '{n} búsquedas activas.', { n: E.bus.length }) : t('dg_ex_sb_0', 'Todavía no hay búsquedas activas.'))} ${esc(t('dg_ex_sb_anon', 'Búsquedas reales. Anónimas hasta que aceptan una propuesta.'))}</p>
+        <div class="p-ex-acts"><a class="p-btn p-btn-fill" href="se-busca.html">${esc(t('dg_ex_publicar_busco', 'Publicar mi búsqueda'))}</a>${E.misBus.size ? `<a class="p-btn" href="se-busca.html#tus">${esc(tf('dg_ex_tus_bus', 'Tus búsquedas ({n})', { n: E.misBus.size }))}</a>` : ''}</div>
       </div>
       ${pub && E.misProps.length ? `<p class="p-ex-sb-resumen">${esc(tf('dg_ex_props_resumen', 'Mandaste {n} y te aceptaron {a}.', { n: E.misProps.length === 1 ? t('dg_ex_1_prop', '1 propuesta') : tf('dg_ex_n_props', '{n} propuestas', { n: E.misProps.length }), a: acept }))}</p>` : ''}
       ${ops.length > 2 ? `<div class="p-ex-filtros" role="group" aria-label="${esc(t('dg_ex_filtrar_op', 'Filtrar por operación'))}">${ops.map(o => `<button type="button" class="p-dg-filtro" data-fo="${o[0]}" aria-pressed="${E.filtroSb === o[0]}">${esc(o[1])}<span class="n">${n[o[0]]}</span></button>`).join('')}</div>` : ''}
       ${lista.length ? `<ul class="p-ex-bus-lista">${lista.map(tarjetaBusqueda).join('')}</ul>`
-        : `<div class="p-dg-vacio"><p class="p-dg-vacio-t">${esc(t('dg_ex_sb_vacio_t', 'Sé la primera búsqueda'))}</p><p>${esc(t('dg_ex_sb_vacio', 'Contá qué estás buscando y dejá que te propongan.'))}</p></div>`}`;
+        : `<div class="p-dg-vacio"><p class="p-dg-vacio-t">${esc(t('dg_ex_sb_vacio_t', 'Todavía no hay búsquedas'))}</p><p>${esc(t('dg_ex_sb_vacio', 'Publicá la tuya y recibí propuestas.'))}</p></div>`}`;
   }
   function invitacion(){
     $('sb').removeAttribute('aria-busy');
     $('sb').innerHTML = `<div class="p-ex-invita">
-      <h2 class="p-ex-invita-t">${t('dg_ex_inv_t', 'Gente que <em>busca</em>, sin decir quién es')}</h2>
-      <p>${esc(t('dg_ex_inv_p', 'Quien busca algo concreto lo publica acá, sin nombre ni contacto. Quienes publican le proponen unidades, y se conocen recién cuando acepta una propuesta.'))}</p>
+      <h2 class="p-ex-invita-t">${t('dg_ex_inv_t', 'Lo que hoy se <em>busca</em>')}</h2>
+      <p>${esc(t('dg_ex_inv_p', 'Personas e inversores cuentan qué buscan, sin datos de contacto. Ingresá para verlo o publicar tu búsqueda.'))}</p>
       ${pasos}
-      <a class="p-btn p-btn-fill" href="${esc(urlIngresarSb)}">${esc(t('dg_ex_ingresar_ver', 'Ingresar para ver las búsquedas'))}</a>
+      <a class="p-btn p-btn-fill" href="${esc(urlIngresarSb)}">${esc(t('dg_ex_ingresar_ver', 'Ingresá para ver las búsquedas'))}</a>
     </div>`;
   }
   async function cargarSb(){
@@ -383,22 +383,22 @@ document.addEventListener('DOMContentLoaded', function(){
     const orden = unidades.slice().sort((x, y) => (coincide(y) ? 1 : 0) - (coincide(x) ? 1 : 0));
     const frase = tf('dg_ex_frase', '{s} busca {q} en {d}', { s: (SUJ[b.perfil] || SUJ.particular)()[b.verificada ? 1 : 0], q: queBusca(b), d: dondeBusca(b) });
     const cuerpo = !orden.length
-      ? `<div class="p-dg-vacio p-dg-vacio-chico"><p>${esc(t('dg_ex_sin_unidades', 'Todavía no tenés unidades publicadas para proponer.'))}</p><a class="p-btn p-btn-fill" href="panel.html">${esc(t('dg_ex_ir_panel', 'Ir a tu panel'))}</a></div>`
+      ? `<div class="p-dg-vacio p-dg-vacio-chico"><p>${esc(t('dg_ex_sin_unidades', 'Todavía no tenés unidades publicadas.'))}</p><a class="p-btn p-btn-fill" href="panel.html">${esc(t('dg_ex_ir_panel', 'Ir a tu panel'))}</a></div>`
       : `<p class="p-dg-resumen">${esc(frase)}</p>
         <form class="p-dg-form" id="fProp" novalidate>
           <fieldset class="p-dg-grupo" id="gUni"><legend>${esc(t('dg_ex_elegi_unidad', 'Elegí una de tus unidades'))}</legend><div class="p-dg-unidades">
             ${orden.map(u => { const usada = ya.has(String(u.id)); return `<label class="p-dg-unidad${usada ? ' usada' : ''}">
               <input type="radio" name="u" value="${esc(u.id)}"${usada ? ' disabled' : ''}>
               <span class="p-dg-unidad-foto">${foto(u.fotos[0], 240)}</span>
-              <span class="p-dg-unidad-txt"><b>${esc(u._tit)}</b><span>${esc([u._lugar, BP.fmtPrecio(u.precio, u.moneda)].filter(Boolean).join(' · '))}</span>${usada ? `<em>${esc(t('dg_ex_ya_propuesta', 'Ya la propusiste'))}</em>` : coincide(u) ? `<em class="ok">${esc(t('dg_ex_coincide', 'Coincide con la búsqueda'))}</em>` : ''}</span>
+              <span class="p-dg-unidad-txt"><b>${esc(u._tit)}</b><span>${esc([u._lugar, BP.fmtPrecio(u.precio, u.moneda)].filter(Boolean).join(' · '))}</span>${usada ? `<em>${esc(t('dg_ex_ya_propuesta', 'Ya la propusiste'))}</em>` : coincide(u) ? `<em class="ok">${esc(t('dg_ex_coincide', 'Coincide con lo que busca'))}</em>` : ''}</span>
             </label>`; }).join('')}
           </div></fieldset>
           <label class="p-dg-campo"><span>${esc(t('dg_ex_msj', 'Mensaje'))} <small>${esc(t('dg_ex_opcional', '(opcional)'))}</small></span>
-            <textarea id="propMsj" maxlength="1000" rows="3" placeholder="${esc(t('dg_ex_msj_ph', 'Contale por qué esta unidad le puede servir.'))}"></textarea></label>
-          <p class="p-dg-nota">${BP.ico.shield}<span>${esc(t('dg_ex_prop_nota', 'Quien busca ve la unidad y tu nombre. Vos sabés quién es cuando acepta tu propuesta.'))}</span></p>
+            <textarea id="propMsj" maxlength="1000" rows="3" placeholder="${esc(t('dg_ex_msj_ph', 'Por qué esta unidad encaja con lo que busca.'))}"></textarea></label>
+          <p class="p-dg-nota">${BP.ico.shield}<span>${esc(t('dg_ex_prop_nota', 'Ve la unidad y quién la ofrece. Sus datos te llegan si acepta.'))}</span></p>
           <div class="p-dg-acts"><button type="button" class="p-btn" data-cerrar>${esc(t('dg_ex_cancelar', 'Cancelar'))}</button><button type="submit" class="p-btn p-btn-fill" id="propEnviar">${esc(t('dg_ex_enviar_prop', 'Enviar propuesta'))}</button></div>
         </form>`;
-    const h = hoja({ titulo: t('dg_ex_proponer', 'Proponer una propiedad'), cuerpo, devolverA: boton, primero: 'input[type=radio]:not([disabled]), .p-btn' });
+    const h = hoja({ titulo: t('dg_ex_proponer', 'Proponer una unidad'), cuerpo, devolverA: boton, primero: 'input[type=radio]:not([disabled]), .p-btn' });
     const f = h.caja.querySelector('#fProp'); if (!f) return;
     f.addEventListener('change', () => { const e = h.caja.querySelector('#gUni-err'); if (e) e.hidden = true; });
     f.addEventListener('submit', async e => {
@@ -442,7 +442,7 @@ document.addEventListener('DOMContentLoaded', function(){
   function pintarMisProps(){
     const ul = $('misProps'), tt = $('misPropsT'); if (!ul) return; contarMis();
     ul.hidden = tt.hidden = !E.misProps.length; if (!E.misProps.length) return;
-    const EST = { enviada: t('dg_ex_pe_enviada', 'Enviada'), aceptada: t('dg_ex_pe_aceptada', 'Aceptada'), rechazada: t('dg_ex_pe_rechazada', 'No le interesó'), retirada: t('dg_ex_pe_retirada', 'Retirada') };
+    const EST = { enviada: t('dg_ex_pe_enviada', 'Enviada'), aceptada: t('dg_ex_pe_aceptada', 'Aceptada'), rechazada: t('dg_ex_pe_rechazada', 'No aceptada'), retirada: t('dg_ex_pe_retirada', 'Retirada') };
     ul.innerHTML = E.misProps.slice(0, 5).map(p => `<li>
       <span class="p-ex-mi-t">${esc(p.aviso_titulo || t('dg_ex_una_unidad', 'Una unidad'))}</span>
       <span class="p-ex-mi-m"><span class="p-ex-estado e-${esc(p.estado)}">${esc(EST[p.estado] || p.estado)}</span>${esc(p.busqueda ? queBusca(p.busqueda) + ' · ' + dondeBusca(p.busqueda) : '')}</span>
@@ -452,18 +452,18 @@ document.addEventListener('DOMContentLoaded', function(){
   async function publicarNovedad(boton){
     const unidades = await misUnidades();
     const TIPOS = [['lanzamiento', TIPO_TXT.lanzamiento()], ['avance_obra', TIPO_TXT.avance_obra()], ['novedad', TIPO_TXT.novedad()]];
-    const h = hoja({ titulo: t('dg_ex_pub_btn', 'Publicar una novedad'), devolverA: boton, primero: '[name=tipo]:checked',
+    const h = hoja({ titulo: t('dg_ex_pub_btn', 'Publicar novedad'), devolverA: boton, primero: '[name=tipo]:checked',
       cuerpo: `<form class="p-dg-form" id="fNov" novalidate>
-        <fieldset class="p-dg-grupo" id="gTipo"><legend>${esc(t('dg_ex_que_contas', 'Qué querés contar'))}</legend><div class="p-dg-ops p-dg-ops-seg">
+        <fieldset class="p-dg-grupo" id="gTipo"><legend>${esc(t('dg_ex_que_contas', 'Tipo'))}</legend><div class="p-dg-ops p-dg-ops-seg">
           ${TIPOS.map((x, i) => `<label class="p-dg-op"><input type="radio" name="tipo" value="${x[0]}"${i === 2 ? ' checked' : ''}><span>${esc(x[1])}</span></label>`).join('')}
         </div></fieldset>
-        <label class="p-dg-campo"><span>${esc(t('dg_ex_titulo', 'Título'))}</span><input id="novTit" type="text" maxlength="120" required autocomplete="off" placeholder="${esc(t('dg_ex_titulo_ph', 'Ej.: Abrimos la preventa de la torre de Núñez'))}"></label>
+        <label class="p-dg-campo"><span>${esc(t('dg_ex_titulo', 'Título'))}</span><input id="novTit" type="text" maxlength="120" required autocomplete="off" placeholder="${esc(t('dg_ex_titulo_ph', 'Ej.: Preventa de la torre de Núñez'))}"></label>
         <label class="p-dg-campo"><span>${esc(t('dg_ex_texto', 'Texto'))} <small>${esc(t('dg_ex_opcional', '(opcional)'))}</small></span><textarea id="novTxt" maxlength="1500" rows="5"></textarea></label>
         <div class="p-dg-fila2">
           <label class="p-dg-campo"><span>${esc(t('dg_ex_entrega_l', 'Fecha de entrega'))} <small>${esc(t('dg_ex_opcional', '(opcional)'))}</small></span><input id="novEnt" type="date"></label>
           <label class="p-dg-campo"><span>${esc(t('dg_ex_unidad_l', 'Unidad'))} <small>${esc(t('dg_ex_opcional', '(opcional)'))}</small></span><select id="novUni"><option value="">${esc(t('dg_ex_ninguna', 'Ninguna'))}</option>${unidades.map(u => `<option value="${esc(u.id)}">${esc([u._tit, u._lugar].filter(Boolean).join(' · '))}</option>`).join('')}</select></label>
         </div>
-        <p class="p-dg-nota">${BP.ico.shield}<span>${esc(t('dg_ex_nov_nota', 'Entra en revisión: la vemos antes de que salga en Explorar. Sin teléfonos ni enlaces externos.'))}</span></p>
+        <p class="p-dg-nota">${BP.ico.shield}<span>${esc(t('dg_ex_nov_nota', 'La revisamos antes de publicarla. Sin teléfonos ni enlaces.'))}</span></p>
         <div class="p-dg-acts"><button type="button" class="p-btn" data-cerrar>${esc(t('dg_ex_cancelar', 'Cancelar'))}</button><button type="submit" class="p-btn p-btn-fill" id="novEnviar">${esc(t('dg_ex_enviar_rev', 'Enviar a revisión'))}</button></div>
       </form>` });
     const f = h.caja.querySelector('#fNov');
@@ -474,7 +474,7 @@ document.addEventListener('DOMContentLoaded', function(){
       const btn = f.querySelector('#novEnviar'); btn.disabled = true; btn.textContent = t('dg_ex_enviando', 'Enviando…');
       try {
         await BPDigital.publicar({ tipo: f.querySelector('[name=tipo]:checked').value, titulo, texto: f.querySelector('#novTxt').value.trim() || null, entrega: f.querySelector('#novEnt').value || null, aviso_id: f.querySelector('#novUni').value || null });
-        h.cerrar(); BP.toast(t('dg_ex_nov_ok', 'Recibimos tu novedad. Sale en Explorar cuando la aprobemos.'));
+        h.cerrar(); BP.toast(t('dg_ex_nov_ok', 'Recibida. Se publica cuando la aprobemos.'));
         await Promise.all([cargarMisPubs(), cur ? cargarRevisar() : null]);
       } catch (err) { btn.disabled = false; btn.textContent = t('dg_ex_enviar_rev', 'Enviar a revisión'); BP.toast(msjError(err, t('dg_ex_err_nov', 'No pudimos enviar la novedad.')), 'error'); }
     });
@@ -483,7 +483,7 @@ document.addEventListener('DOMContentLoaded', function(){
     $('btnNov').addEventListener('click', e => publicarNovedad(e.currentTarget));
     $('misPubs').addEventListener('click', async e => {
       const b = e.target.closest('[data-retirar]'); if (!b) return;
-      if (!(await confirmar(t('dg_ex_retirar_t', '¿Retirar esta publicación?'), t('dg_ex_retirar_p', 'Deja de verse en Explorar. Si la querés de nuevo, publicala otra vez.'), t('dg_ex_retirar', 'Retirar'), true))) return;
+      if (!(await confirmar(t('dg_ex_retirar_t', '¿Retirar esta publicación?'), t('dg_ex_retirar_p', 'Deja de verse en Explorar.'), t('dg_ex_retirar', 'Retirar'), true))) return;
       try { await BPDigital.estadoPublicacion(b.dataset.retirar, 'retirada'); BP.toast(t('dg_ex_retirada_ok', 'Publicación retirada.')); await Promise.all([cargarMisPubs(), cargarFeed(), cur ? cargarRevisar() : null]); }
       catch (err) { BP.toast(msjError(err, t('dg_ex_err', 'No pudimos guardar el cambio.')), 'error'); }
     });
@@ -507,7 +507,7 @@ document.addEventListener('DOMContentLoaded', function(){
         ${meta ? `<p class="p-ex-rev-m">${esc(meta)}</p>` : ''}
         <div class="p-ex-acts"><button type="button" class="p-btn p-btn-sm p-btn-fill" data-aprobar="${esc(p.id)}">${esc(t('dg_ex_aprobar', 'Publicar'))}</button><button type="button" class="p-btn p-btn-sm" data-rechazar="${esc(p.id)}">${esc(t('dg_ex_rechazar', 'Rechazar'))}</button></div>
       </article>`; }).join('')
-      : `<p class="p-ex-mi-vacio">${esc(t('dg_ex_rev_vacio', 'Nada para revisar. Todo al día.'))}</p>`;
+      : `<p class="p-ex-mi-vacio">${esc(t('dg_ex_rev_vacio', 'Nada pendiente.'))}</p>`;
   }
   if (cur) $('revLista').addEventListener('click', async e => {
     const ap = e.target.closest('[data-aprobar]'), re = e.target.closest('[data-rechazar]');

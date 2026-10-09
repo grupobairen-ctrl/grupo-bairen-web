@@ -376,7 +376,10 @@
   /* ── 9/10/2026 · BAIREN digital (migración 27): el interruptor ─────────────
      Explorar, Mensajes, Se busca y Cobros están apagados para el público. ?digital=1 los prende en este navegador y
      ?digital=0 los apaga (la misma clave que BPDigital.activo() en js/digital.js). */
+  /* Con BP.DIGITAL_PUBLICO en true, BAIREN digital está prendido para todos (el interruptor deja de hacer falta). */
+  BP.DIGITAL_PUBLICO = false;
   BP.digital = function(){
+    if (BP.DIGITAL_PUBLICO) return true;
     try {
       const q = new URLSearchParams(location.search).get('digital');
       if (q === '1') localStorage.setItem('bp_digital', '1');
@@ -425,7 +428,7 @@
   <!-- lanz3-visitante · Donde no hay barra de abajo (la ficha), Guardados va en el menú -->
   <a href="guardados.html" class="m-link m-sin-tabbar" data-i18n="tab_guardados">Guardados</a>
   <a href="emprendimientos.html" class="m-link" data-sec="emprendimientos" data-i18n="emprendimientos">Desarrollos</a>
-  ${BP.digital() ? `<a href="se-busca.html" class="m-link" data-sec="sebusca">${BP.t('dg_se_busca', 'Se busca')}</a>` : ''}
+  ${BP.digital() ? `<a href="se-busca.html" class="m-link" data-sec="sebusca">${BP.t('dg_se_busca', 'Búsquedas')}</a>` : ''}
   <a href="criterios.html" class="m-link" data-sec="criterios" data-i18n="criterios">Cómo seleccionamos</a>
   <div class="m-cuenta m-sin-tabbar" hidden></div>
   <div class="m-cta"><a class="p-btn p-btn-sm" href="publicar.html" data-i18n="publicar">Publicar</a><a class="p-btn p-btn-sm p-btn-fill m-sin-tabbar" href="ingresar.html" data-i18n="ingresar">Ingresar</a></div>
@@ -627,7 +630,7 @@
         <a class="p-ghost" href="guardados.html" aria-label="${BP.esc(BP.t('tab_guardados', 'Guardados'))}">${BP.ico.heart}<span data-fav-count hidden></span></a>
         <div class="p-crear"><a class="p-btn p-btn-sm" href="publicar-aviso.html" data-crear>${BP.t('publicar', 'Publicar')}</a><div class="p-crear-pop" hidden><p class="t">${BP.t('quien_publica', '¿Quién publica?')}</p><a href="publicar-aviso.html?perfil=dueno">${BP.t('soy_dueno_directo', 'Soy dueño directo')}</a><a href="publicar-aviso.html?paso=perfil">${BP.t('soy_profesional', 'Inmobiliaria, corredor o desarrolladora')}</a></div></div>
         <div class="p-nav-menu" style="display:flex"><div><button type="button" class="p-btn p-btn-sm p-btn-fill" aria-haspopup="true" style="padding:0 14px">${avH} ${BP.t('mi_cuenta', 'Mi cuenta')} <span class="car" style="border-color:var(--navy-deeper)"></span></button>
-          <div class="p-dd p-dd-cuenta" style="left:auto;right:0"><div class="p-dd-ttl">${BP.esc(session.email)}${modeTag}</div>${vistas}${BP.digital() ? `<a href="se-busca.html">${BP.t('dg_se_busca', 'Se busca')}</a><a href="cobros.html" data-curador hidden>${BP.t('dg_cobros', 'Cobros')}</a>` : ''}<a href="curacion.html" data-curador hidden>${BP.t('curacion', 'Curación')}</a><a href="#" data-logout>${BP.t('cerrar_sesion', 'Cerrar sesión')}</a></div></div></div>`;
+          <div class="p-dd p-dd-cuenta" style="left:auto;right:0"><div class="p-dd-ttl">${BP.esc(session.email)}${modeTag}</div>${vistas}${BP.digital() ? `<a href="se-busca.html">${BP.t('dg_se_busca', 'Búsquedas')}</a><a href="cobros.html" data-curador hidden>${BP.t('dg_cobros', 'Cobros')}</a>` : ''}<a href="curacion.html" data-curador hidden>${BP.t('curacion', 'Curación')}</a><a href="#" data-logout>${BP.t('cerrar_sesion', 'Cerrar sesión')}</a></div></div></div>`;
       if (mob) {
         const cta = mob.querySelector('.m-cta'); if (cta) cta.innerHTML = `<a class="p-btn p-btn-sm" href="publicar-aviso.html">${BP.t('publicar', 'Publicar')}</a><a class="p-btn p-btn-sm p-btn-fill m-sin-tabbar" href="panel.html">${BP.t('mi_cuenta', 'Mi cuenta')}</a>`;
         /* lanz3-visitante · Guardados ya es un renglón del menú: acá quedan los contactos */

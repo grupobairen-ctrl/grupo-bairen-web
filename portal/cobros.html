@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20261009a"><link rel="stylesheet" href="css/catalogo.css?v=20261009a"><link rel="stylesheet" href="css/portal.css?v=20261009a"><link rel="stylesheet" href="css/transiciones.css?v=20261009a"><link rel="stylesheet" href="css/cobros.css?v=20261009a"><style>@view-transition{navigation:auto}</style><style>html.arrancando body{opacity:0}body{transition:opacity .18s cubic-bezier(.22,1,.36,1)}@media(prefers-reduced-motion:reduce){body{transition:none}}</style><script>/* 8/10/2026 · Arranque sin pantallazo (ver BP.listo en ui.js): siempre, salvo al entrar a una ficha desde el portal (ahí la foto de la tarjeta crece hasta la ficha); en Safari del iPhone la transición entre páginas no tapaba el video al tocar el logo. Tope: 800 ms. */(function(){try{var h=document.documentElement,n=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{},r=document.referrer||'';if(r.indexOf(location.origin)===0&&n.type!=='reload'&&/propiedad/.test(location.pathname))return;h.classList.add('arrancando');setTimeout(function(){h.classList.remove('arrancando')},800)}catch(e){}})()</script>
+  <link rel="stylesheet" href="css/base.css?v=20261009b"><link rel="stylesheet" href="css/catalogo.css?v=20261009b"><link rel="stylesheet" href="css/portal.css?v=20261009b"><link rel="stylesheet" href="css/transiciones.css?v=20261009b"><link rel="stylesheet" href="css/cobros.css?v=20261009b"><style>@view-transition{navigation:auto}</style><style>html.arrancando body{opacity:0}body{transition:opacity .18s cubic-bezier(.22,1,.36,1)}@media(prefers-reduced-motion:reduce){body{transition:none}}</style><script>/* 8/10/2026 · Arranque sin pantallazo (ver BP.listo en ui.js): siempre, salvo al entrar a una ficha desde el portal (ahí la foto de la tarjeta crece hasta la ficha); en Safari del iPhone la transición entre páginas no tapaba el video al tocar el logo. Tope: 800 ms. */(function(){try{var h=document.documentElement,n=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{},r=document.referrer||'';if(r.indexOf(location.origin)===0&&n.type!=='reload'&&/propiedad/.test(location.pathname))return;h.classList.add('arrancando');setTimeout(function(){h.classList.remove('arrancando')},800)}catch(e){}})()</script>
 </head>
 <!-- 8/10/2026 · Cobros: la herramienta de la plataforma para el motor de cobro de la migración 27. Escenarios (cada uno un
      esquema posible), sus reglas (qué evento cobra, cuánto y a quién), lo que cada escenario habría facturado con las
@@ -29,10 +29,10 @@
 </main>
 <div id="pFooter"></div>
 
-<script src="supabase-portal.js?v=20261009a" defer></script><script src="js/errores.js?v=20261009a" defer></script>
-<script src="../mapa-barrios.js?v=20261009a" defer></script>
-<script src="js/bairen-motion.js?v=20261009a" defer></script><script src="js/i18n-portal.js?v=20261009a" defer></script><script src="js/ui.js?v=20261009a" defer></script><script src="js/store.js?v=20261009a" defer></script>
-<script src="js/data.js?v=20261009a" defer></script><script src="js/digital.js?v=20261009a" defer></script>
+<script src="supabase-portal.js?v=20261009b" defer></script><script src="js/errores.js?v=20261009b" defer></script>
+<script src="../mapa-barrios.js?v=20261009b" defer></script>
+<script src="js/bairen-motion.js?v=20261009b" defer></script><script src="js/i18n-portal.js?v=20261009b" defer></script><script src="js/ui.js?v=20261009b" defer></script><script src="js/store.js?v=20261009b" defer></script>
+<script src="js/data.js?v=20261009b" defer></script><script src="js/digital.js?v=20261009b" defer></script>
 <script>
 document.addEventListener('DOMContentLoaded', function(){
 (async function(){
@@ -117,13 +117,13 @@ document.addEventListener('DOMContentLoaded', function(){
   }
 
   function embudo(){
-    if (!ops.length) return '<p class="cb-nota">Todavía no hay operaciones. Nacen cuando alguien con cuenta le escribe a quien publica desde una ficha, o cuando acepta una propuesta de Se busca.</p>';
+    if (!ops.length) return '<p class="cb-nota">Todavía no hay operaciones. Nacen cuando alguien con cuenta le escribe a quien publica desde una ficha, o cuando acepta una propuesta de Búsquedas.</p>';
     const etapas = D.ETAPAS.concat(['caida']);
     const lineas = LIN.slice(1).filter(l => ops.some(o => o.linea === l));
     const n = (e, l) => ops.filter(o => o.etapa === e && (!l || o.linea === l)).length;
     return `<div class="cb-scroll"><table class="cb-tabla cb-embudo"><thead><tr><th>Etapa</th>${lineas.map(l => `<th class="n">${BP.esc(linTxt(l))}</th>`).join('')}<th class="n">Total</th></tr></thead><tbody>
       ${etapas.map(e => `<tr><td>${BP.esc(D.ETAPA_TXT[e] || e)}</td>${lineas.map(l => `<td class="n">${n(e, l) || ''}</td>`).join('')}<td class="n"><b>${n(e) || ''}</b></td></tr>`).join('')}
-    </tbody></table></div><p class="cb-nota">${ops.length} operaciones · ${ops.filter(o => o.origen === 'se_busca').length} nacieron en Se busca.</p>`;
+    </tbody></table></div><p class="cb-nota">${ops.length} operaciones · ${ops.filter(o => o.origen === 'se_busca').length} nacieron en Búsquedas.</p>`;
   }
 
   /* El formulario de una regla, en un diálogo */
