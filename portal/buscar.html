@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20261008v"><link rel="stylesheet" href="css/catalogo.css?v=20261008v"><link rel="stylesheet" href="css/portal.css?v=20261008v"><link rel="stylesheet" href="css/transiciones.css?v=20261008v"><style>@view-transition{navigation:auto}</style>
+  <link rel="stylesheet" href="css/base.css?v=20261008w"><link rel="stylesheet" href="css/catalogo.css?v=20261008w"><link rel="stylesheet" href="css/portal.css?v=20261008w"><link rel="stylesheet" href="css/transiciones.css?v=20261008w"><style>@view-transition{navigation:auto}</style><style>html.arrancando body{opacity:0}body{transition:opacity .18s cubic-bezier(.22,1,.36,1)}@media(prefers-reduced-motion:reduce){body{transition:none}}</style><script>/* 8/10/2026 · Arranque sin pantallazo (ver BP.listo en ui.js): solo al entrar de afuera o al recargar; entre páginas del portal lo cubre la transición. Tope: 800 ms. */(function(){try{var h=document.documentElement,n=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{},r=document.referrer||'';if(r.indexOf(location.origin)===0&&n.type!=='reload')return;h.classList.add('arrancando');setTimeout(function(){h.classList.remove('arrancando')},800)}catch(e){}})()</script>
   <style>body{padding-top:64px}</style>
 </head>
 <body class="p-product p-catalogo">
@@ -102,10 +102,10 @@
 
 <div id="pFooter"></div>
 
-<script src="supabase-portal.js?v=20261008v" defer></script><script src="js/errores.js?v=20261008v" defer></script>
-<script src="../mapa-barrios.js?v=20261008v" defer></script>
-<script src="js/bairen-motion.js?v=20261008v" defer></script><script src="js/i18n-portal.js?v=20261008v" defer></script><script src="js/ui.js?v=20261008v" defer></script><script src="js/store.js?v=20261008v" defer></script>
-<script src="js/data.js?v=20261008v" defer></script>
+<script src="supabase-portal.js?v=20261008w" defer></script><script src="js/errores.js?v=20261008w" defer></script>
+<script src="../mapa-barrios.js?v=20261008w" defer></script>
+<script src="js/bairen-motion.js?v=20261008w" defer></script><script src="js/i18n-portal.js?v=20261008w" defer></script><script src="js/ui.js?v=20261008w" defer></script><script src="js/store.js?v=20261008w" defer></script>
+<script src="js/data.js?v=20261008w" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -182,7 +182,7 @@ document.addEventListener('DOMContentLoaded', function(){
     document.getElementById('zonaChips').innerHTML = F.zonas.map(z => `<span class="p-chip">${BP.zonaLabel(z)}<button type="button" data-z="${z}" aria-label="${BP.esc(BP.tf('cat_quitar', 'Quitar {z}', { z: BP.zonaLabel(z) }))}">×</button></span>`).join('');
     document.querySelectorAll('#zonaChips button').forEach(b => b.addEventListener('click', () => { F.zonas = F.zonas.filter(z => z !== b.dataset.z); apply(); }));
   }
-  function pushURL(){ const p = new URLSearchParams(); if (F.op) p.set('op', F.op); if (F.tipo !== 'departamento') p.set('tipo', F.tipo); F.zonas.forEach(z => p.append('zona', z)); if (F.q) p.set('q', F.q); if (F.mon) p.set('mon', F.mon); ['amb','dorm','banos','coch','pmin','pmax','expmax','m2min','m2max','antig','hace'].forEach(k => { if (F[k]) p.set(k, F[k]); }); F.amen.forEach(a => p.append('amen', a)); F.cual.forEach(a => p.append('cual', a)); ['amoblado','dueno','video','favs','reservadas'].forEach(k => { if (F[k]) p.set(k, '1'); }); if (F.pub) p.set('pub', F.pub); if (F.emp) p.set('emp', '1'); if (F.sort !== 'relevancia') p.set('sort', F.sort); if (F.page > 1) p.set('page', F.page); const target = BP.pretty && F.op && F.zonas.length <= 1 && !F.q && !F.pub && !F.favs ? BP.urlBuscar(Object.assign({}, Object.fromEntries(p), { op: F.op, tipo: F.tipo, zonas: F.zonas })) : 'buscar.html' + (p.toString() ? '?' + p.toString() : ''); history.replaceState(null, '', target); if (!F.favs) BP.anotarBusqueda(target); }
+  function pushURL(){ const p = new URLSearchParams(); if (F.op) p.set('op', F.op); if (F.tipo && F.tipo !== 'todos') p.set('tipo', F.tipo);   /* 8/10/2026 · el valor por defecto es 'todos' desde el 23/9: 'departamento' tiene que quedar en la dirección */ F.zonas.forEach(z => p.append('zona', z)); if (F.q) p.set('q', F.q); if (F.mon) p.set('mon', F.mon); ['amb','dorm','banos','coch','pmin','pmax','expmax','m2min','m2max','antig','hace'].forEach(k => { if (F[k]) p.set(k, F[k]); }); F.amen.forEach(a => p.append('amen', a)); F.cual.forEach(a => p.append('cual', a)); ['amoblado','dueno','video','favs','reservadas'].forEach(k => { if (F[k]) p.set(k, '1'); }); if (F.pub) p.set('pub', F.pub); if (F.emp) p.set('emp', '1'); if (F.sort !== 'relevancia') p.set('sort', F.sort); if (F.page > 1) p.set('page', F.page); const target = BP.pretty && F.op && F.zonas.length <= 1 && !F.q && !F.pub && !F.favs ? BP.urlBuscar(Object.assign({}, Object.fromEntries(p), { op: F.op, tipo: F.tipo, zonas: F.zonas })) : 'buscar.html' + (p.toString() ? '?' + p.toString() : ''); history.replaceState(null, '', target); if (!F.favs) BP.anotarBusqueda(target); }
 
   /* Título del catálogo: con un solo resultado el tipo y "guardada" van en singular ("1 Departamento en venta");
      con cualquier otra cantidad el texto es el de siempre. Por tipo: [clave singular, castellano, clave plural, castellano]. */
