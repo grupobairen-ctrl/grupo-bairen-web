@@ -506,7 +506,7 @@
     <li><a href="legales.html" data-i18n="ft_terminos">Términos y privacidad</a></li>
     <li><a href="mailto:portal@bairengroup.com">portal@bairengroup.com</a></li>
   </ul>
-  <p class="p-pie-copy">© ${new Date().getFullYear()} BAIREN</p>
+  <p class="p-pie-copy">© ${new Date().getFullYear()} DEVELOPED BY GRUPO BAIREN</p>
 </footer>`;
     const host = document.getElementById('pFooter'); if (host) host.innerHTML = html;
     BP.tabbar();

@@ -4251,7 +4251,10 @@ body.p-ficha-page .p-legal-txt p{margin:0 0 8px;text-align:left}
   .p-tabbar a svg{width:22px;height:22px;stroke-width:1.3}
   .p-tabbar a.on{color:var(--gold,#C2A968)}
   .p-tabbar a:focus-visible{outline:2px solid var(--gold,#C2A968);outline-offset:-4px}
-  html.con-tabbar body{padding-bottom:calc(56px + env(safe-area-inset-bottom))}
+  /* 8/10/2026 · El aire para la barra de abajo va como un tramo navy al final de la página, a continuación del pie, y no
+     como relleno del body (que tomaba el crema de la página: al bajar del todo en el celular se veía una franja clara) */
+  html.con-tabbar body{padding-bottom:0}
+  html.con-tabbar body::after{content:"";display:block;height:calc(56px + env(safe-area-inset-bottom));background:#131D2D}
   html.con-tabbar .p-toast{bottom:calc(68px + env(safe-area-inset-bottom))}
   html.con-tabbar .p-demo-banner{bottom:calc(68px + env(safe-area-inset-bottom))}
   /* La portada: el buscador entero arriba de la barra */
