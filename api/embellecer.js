@@ -7,10 +7,10 @@
  * de agua o logo encima, la saca (5/10/2026).
  * Corre por la API de OpenAI (se paga por foto, sin ChatGPT Plus).
  *
- * 9/10/2026: el prompt anterior pedía "volver a sacar" la foto desde otro ángulo
- * y la salida era siempre 4:5. Para recomponer la toma, la IA redibujaba el
- * ambiente entero y cambiaba la perspectiva, los muebles y las medidas. Ahora se
- * pide un retoque de la misma toma, y la salida tiene la proporción de la original.
+ * 9/10/2026: el prompt anterior pedía "volver a sacar" la foto desde otro ángulo.
+ * Para recomponer la toma, y para pasar una foto apaisada a 4:5, la IA redibujaba
+ * el ambiente entero y cambiaba la perspectiva, los muebles y las medidas. Ahora se
+ * pide un retoque de la misma toma, y el admin manda la foto ya recortada en 4:5.
  *
  * Variables en Vercel (proyecto grupo-bairen-web, entorno Production):
  *   OPENAI_API_KEY        clave de platform.openai.com. Sin ella responde 501.
@@ -20,8 +20,7 @@
  *   OPENAI_IMAGE_MODEL    opcional, por defecto 'gpt-image-2.5-sunburst' (el más fiel al editar).
  *   OPENAI_IMAGE_QUALITY  opcional, por defecto 'high' (≈ USD 0,06 por foto; 'medium' ≈ 0,026 empasta
  *                         textos chicos; 'xhigh' y 'max' existen y cuestan más).
- *   OPENAI_IMAGE_SIZE     opcional. Sin ella, la proporción de la foto original con los
- *                         mismos píxeles que el 1024x1280 de antes (mismo costo por foto).
+ *   OPENAI_IMAGE_SIZE     opcional, por defecto '1024x1280' (4:5, como las fotos de la web).
  *
  * Uso (desde admin.html, con sesión):
  *   POST /api/embellecer   Authorization: Bearer <access_token de Supabase>
@@ -66,41 +65,6 @@ IMPROVE ONLY THIS:
 
 The result must look like the original photo after a professional edit: a real photograph, indistinguishable from one taken with a good camera. Not a 3D render, not an illustration, not an AI image. Keep real textures and natural imperfections: no plastic, waxy or over-smoothed surfaces, no over-sharpening, no HDR look, no halos, no glow.`;
 
-// Medidas de la foto que llega (el admin siempre manda JPG; PNG por las dudas).
-// Sin medidas legibles devuelve null y se usa size 'auto'.
-function medidas(buf) {
-  if (buf.length > 24 && buf[0] === 0x89 && buf[1] === 0x50) {
-    return { w: buf.readUInt32BE(16), h: buf.readUInt32BE(20) };
-  }
-  if (buf[0] !== 0xff || buf[1] !== 0xd8) return null;
-  let i = 2;
-  while (i + 9 < buf.length) {
-    if (buf[i] !== 0xff) { i++; continue; }
-    const marker = buf[i + 1];
-    // SOF0 a SOF15 traen alto y ancho (C4, C8 y CC son otra cosa)
-    if (marker >= 0xc0 && marker <= 0xcf && marker !== 0xc4 && marker !== 0xc8 && marker !== 0xcc) {
-      return { w: buf.readUInt16BE(i + 7), h: buf.readUInt16BE(i + 5) };
-    }
-    i += 2 + buf.readUInt16BE(i + 2);
-  }
-  return null;
-}
-
-// Misma proporción que la original, para que la IA no tenga que recortar ni
-// inventar bordes, con los mismos píxeles que el 1024x1280 de antes (mismo
-// costo). OpenAI pide lados múltiplos de 16 y proporción entre 1:3 y 3:1.
-function tamanoPara(buf) {
-  const m = medidas(buf);
-  if (!m || !m.w || !m.h) return 'auto';
-  const r = Math.min(3, Math.max(1 / 3, m.w / m.h));
-  let w = Math.round(Math.sqrt(1024 * 1280 * r) / 16) * 16;
-  let h = Math.round(w / r / 16) * 16;
-  // El redondeo a 16 puede pasar apenas de 3:1 en las panorámicas
-  if (w > 3 * h) h += 16;
-  if (h > 3 * w) w += 16;
-  return w + 'x' + h;
-}
-
 async function usuarioDe(req) {
   const auth = req.headers.authorization || '';
   const token = auth.startsWith('Bearer ') ? auth.slice(7) : null;
@@ -136,7 +100,7 @@ module.exports = async (req, res) => {
 
   const model   = process.env.OPENAI_IMAGE_MODEL   || 'gpt-image-2.5-sunburst';
   const quality = process.env.OPENAI_IMAGE_QUALITY || 'high';
-  const size    = process.env.OPENAI_IMAGE_SIZE    || tamanoPara(bytes);
+  const size    = process.env.OPENAI_IMAGE_SIZE    || '1024x1280';
 
   const fd = new FormData();
   fd.append('model', model);
