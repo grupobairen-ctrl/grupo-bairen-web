@@ -138,7 +138,8 @@
     ['Rieles · octubre 2026', 'Tecnología por operación (corredor aliado)', 'venta', 'cierre', 'publicador', 'fijo', 150, 'USD', null],
     ['Rieles · octubre 2026', 'Tecnología por operación (corredor aliado)', 'tradicional', 'cierre', 'publicador', 'fijo', 50, 'USD', null],
     ['Rieles · octubre 2026', 'Estadía corta', 'temporario', 'cierre', 'publicador', 'porcentaje', 10, 'USD', 'monto_contrato'],
-    ['Rieles · octubre 2026', 'Inversor verificado', 'pozo', 'lead_inversor', 'publicador', 'fijo', 30, 'USD', null]
+    ['Rieles · octubre 2026', 'Inversor verificado', 'pozo', 'lead_inversor', 'publicador', 'fijo', 30, 'USD', null],
+    ['Rieles · octubre 2026', 'Firma de reserva', 'venta', 'documento_firmado', 'propietario', 'fijo', 40, 'USD', null]
   ];
   const reglasLocal = () => { let r = L.reglas.get(null); if (!r) { r = REGLAS_EJEMPLO.map(x => ({ id: uid(), escenario: x[0], concepto: x[1], linea: x[2], evento: x[3], paga: x[4], modo: x[5], valor: x[6], moneda: x[7], base: x[8], minimo: null, maximo: null, activa: true, cobra: false, nota: null })); L.reglas.set(r); } return r; };
   function aplicarLocal(h, escenario){

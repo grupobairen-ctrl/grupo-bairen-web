@@ -115,7 +115,7 @@
       "destination": "/portal/buscar.html"
     },
     {
-      "source": "/portal/:page(publicar|ingresar|panel|curacion|legales|publicadores|buscar|importar|emprendimientos|publicar-aviso|membership|guardados|explorar|mensajes|se-busca|cobros)",
+      "source": "/portal/:page(publicar|ingresar|panel|curacion|legales|publicadores|buscar|importar|emprendimientos|publicar-aviso|membership|guardados|explorar|mensajes|se-busca|cobros|cuenta-verificacion|avisos|inversores|precios|documento|pagos|garantias)",
       "destination": "/portal/:page.html"
     }
   ],
