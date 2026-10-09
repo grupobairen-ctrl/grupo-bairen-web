@@ -605,6 +605,7 @@ window.BP_I18N = {
     emp_entrega_min: 'delivery {d}', emp_ver_todos: 'See all developments',
     /* escritorio simple */
     esc_op_mediano: 'Mid-term rentals', esc_op_largo: 'Long-term rentals', esc_op_alquiler: 'Rentals', esc_op_venta: 'For sale', esc_op_todas: 'Properties', esc_guardadas: 'Saved', esc_en: '{o} in {z}',
+    esc_ver_fotos: 'See all {n} photos',
   },
   pt: {
     /* 8/10/2026 · freno de rebote da sessão */
@@ -1193,5 +1194,6 @@ window.BP_I18N = {
     emp_entrega_min: 'entrega {d}', emp_ver_todos: 'Ver todos os empreendimentos',
     /* escritorio simple */
     esc_op_mediano: 'Médio prazo', esc_op_largo: 'Aluguel tradicional', esc_op_alquiler: 'Aluguel', esc_op_venta: 'Venda', esc_op_todas: 'Imóveis', esc_guardadas: 'Salvos', esc_en: '{o} em {z}',
+    esc_ver_fotos: 'Ver as {n} fotos',
   }
 };

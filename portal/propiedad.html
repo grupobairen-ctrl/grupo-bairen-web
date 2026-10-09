@@ -118,6 +118,10 @@ document.addEventListener('DOMContentLoaded', function(){
     a.antiguedad === 0 ? T('ficha_a_estrenar', 'A estrenar') : a.antiguedad > 0 ? (a.antiguedad === 1 ? T('ficha_x_antig_1', '1 año de antigüedad') : TF('ficha_x_antig_n', '{n} años de antigüedad', { n: a.antiguedad })) : null,
     a.cocheras > 0 ? (a.cocheras === 1 ? T('ficha_x_coch_1', '1 cochera') : TF('ficha_x_coch_n', '{n} cocheras', { n: a.cocheras })) : null
   ].filter(Boolean);
+  /* escritorio simple · En la compu los números van en una sola línea, con lo de más al final:
+     "52 m² · 2 ambientes · 1 baño · 3 a 12 meses". Un número suelto lleva su rótulo en minúscula; la estadía mínima, su frase. */
+  const datosLinea = numeros.map(n => n[1] === T('ficha_estadia_min', 'Estadía mínima') ? TF('cond_estadia_min', 'Estadía mínima de {p}', { p: n[0] })
+    : (typeof n[0] === 'number' || /^\$/.test(String(n[0]))) ? n[0] + ' ' + String(n[1]).toLowerCase() : String(n[0])).concat(extras);
   /* Una unidad de un emprendimiento: el desarrollo (link a su página), el piso y unidad, la etapa y la entrega */
   const empLinea = a.emprendimiento ? `<p class="p-femp"><a href="${BPData.urlEmp(a)}">${BP.esc(a.emprendimiento)}</a>${[a.unidad, BPData.etapaTxt(a)].filter(Boolean).map(x => '&nbsp;· ' + BP.esc(x)).join('')}</p>` : '';
   /* Condiciones, en una lista corta */
@@ -144,12 +148,14 @@ document.addEventListener('DOMContentLoaded', function(){
   main.removeAttribute('aria-busy');
   main.innerHTML = `
 <div class="p-fvolver"><a href="${urlVolver}" id="volver">${BP.ico.arrow}<span>${T('ficha_volver', 'Volver')}</span></a></div>
-<div class="p-fhero p-fhero-solo" id="gal">
+<div class="p-fhero p-fhero-solo" id="gal" data-n="${Math.min(fotos.length, 5)}">
   <!-- 25/9/2026 · Chrome hace tabulable todo contenedor con desplazamiento que no tenga nada tabulable adentro:
        el carrusel del hero era una segunda parada antes de la tira. Con tira (más de una foto), la tira es la
        única parada y sus flechas mueven el hero; el carrusel sale del orden de tabulación. -->
   <div class="p-fhero-slides" id="heroSlides"${fotos.length > 1 ? ' tabindex="-1"' : ''}>${fotos.length ? fotos.map((f,i) => `<div class="p-fhero-slide" data-i="${i}" role="img" ${i === 0 ? `style="background-image:url('${BP.sbImg(f, ANCHO_FOTO)}')"` : `data-bg="${BP.esc(BP.sbImg(f, ANCHO_FOTO))}"`} aria-label="${BP.esc(TF('ficha_foto_de', '{t}, foto {i} de {n}', { t: tit, i: i+1, n: fotos.length }))}"></div>`).join('') : `<div class="p-fhero-slide p-fhero-empty">${T('ficha_fotos_prod', 'Fotos en producción')}</div>`}</div>
   ${fotos.length > 1 ? `<span class="p-fcont" id="fotoCont" aria-hidden="true">1 / ${fotos.length}</span>` : ''}
+  <!-- escritorio simple · En la compu la galería es un mosaico (la foto grande y cuatro chicas) y este botón abre el visor -->
+  ${fotos.length > 1 ? `<button type="button" class="p-fgal-ver" id="verFotos">${BP.ico.photo}<span>${TF('esc_ver_fotos', 'Ver las {n} fotos', { n: fotos.length })}</span></button>` : ''}
 </div>
 <!-- 25/9/2026 · La tira de miniaturas es un solo punto de tabulación (tabindex itinerante): las flechas pasan de foto
      y Enter abre el visor. 8/10/2026 · En el celular no se ve: ahí se desliza la foto y el contador dice dónde vas. -->
@@ -170,14 +176,15 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip" role="group" aria-label="$
     </div>
     ${numeros.length ? `<dl class="p-fnums">${numeros.map(n => `<div><dt>${n[1]}</dt><dd>${n[0]}</dd></div>`).join('')}</dl>` : ''}
     ${extras.length ? `<p class="p-fextra">${extras.map(BP.esc).join('&nbsp;· ')}</p>` : ''}
+    ${datosLinea.length ? `<p class="p-fdatos">${datosLinea.map(BP.esc).join('<span aria-hidden="true">&nbsp;· </span>')}</p>` : ''}
     <div class="p-fdesc">
       <p class="p-text clamp" id="desc">${BP.esc((BP.lang === 'en' && a.descripcion_en) || (BP.lang === 'pt' && a.descripcion_pt) || a.descripcion || T('ficha_desc_prod', 'Descripción en producción.'))}</p>
       <button type="button" class="p-more" id="descMore">${T('ficha_leer_mas', 'Leer más')}</button>
     </div>
     ${a.video ? `<div class="p-video" id="video"></div>` : ''}
-    ${condiciones.length ? `<div class="p-fbloque"><h2 class="p-sec-t">${T('ficha_condiciones', 'Condiciones')}</h2><ul class="p-fcond">${condiciones.map(c => `<li>${BP.esc(c)}</li>`).join('')}</ul></div>` : ''}
-    ${tiene.length ? `<div class="p-fbloque"><h2 class="p-sec-t">${T('ficha_tiene', 'Lo que tiene')}</h2><p class="p-ftiene">${tiene.map(x => BP.esc(BP.etiqueta(x))).join(' · ')}</p></div>` : ''}
-    ${hayMapa ? `<div class="p-fbloque"><h2 class="p-sec-t">${T('ficha_ubicacion', 'Ubicación')}</h2><div class="p-map-wrap">${BP.ico.pin}<iframe id="mapFrame" src="" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="${T('ficha_mapa_title', 'Mapa de la ubicación de la propiedad')}"></iframe></div></div>` : ''}
+    ${condiciones.length ? `<div class="p-fbloque p-fb-cond"><h2 class="p-sec-t">${T('ficha_condiciones', 'Condiciones')}</h2><ul class="p-fcond">${condiciones.map(c => `<li>${BP.esc(c)}</li>`).join('')}</ul></div>` : ''}
+    ${tiene.length ? `<div class="p-fbloque p-fb-tiene"><h2 class="p-sec-t">${T('ficha_tiene', 'Lo que tiene')}</h2><p class="p-ftiene">${tiene.map(x => BP.esc(BP.etiqueta(x))).join(' · ')}</p></div>` : ''}
+    ${hayMapa ? `<div class="p-fbloque p-fb-ubic"><h2 class="p-sec-t">${T('ficha_ubicacion', 'Ubicación')}</h2><div class="p-map-wrap">${BP.ico.pin}<iframe id="mapFrame" src="" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="${T('ficha_mapa_title', 'Mapa de la ubicación de la propiedad')}"></iframe></div></div>` : ''}
   </div>
   <aside class="p-side" id="contacto">
     <div class="p-cta" id="ctaCard">
@@ -384,6 +391,15 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip" role="group" aria-label="$
     const activar = () => { if (activa) return; activa = true; cargar(); };
     ['pointerdown', 'touchstart', 'scroll', 'wheel'].forEach(ev => heroSlides.addEventListener(ev, activar, { once: true, passive: true }));
     if (strip) ['pointerdown', 'focusin'].forEach(ev => strip.addEventListener(ev, activar, { once: true, passive: true }));
+  })();
+  /* escritorio simple · En la compu la galería es un mosaico: además de la primera, se piden de entrada las cuatro chicas.
+     "Ver las N fotos" abre el visor en la primera (cada foto del mosaico abre el visor en esa foto, como siempre). */
+  (function(){
+    const mq = matchMedia('(min-width: 1024px)');
+    const mosaico = () => { if (!mq.matches) return; document.querySelectorAll('#heroSlides .p-fhero-slide[data-bg]').forEach(el => { if (Number(el.dataset.i) > 4) return; el.style.backgroundImage = `url('${el.dataset.bg}')`; delete el.dataset.bg; }); };
+    mosaico(); try { mq.addEventListener('change', mosaico); } catch (e) {}
+    const ver = document.getElementById('verFotos');
+    if (ver) ver.addEventListener('click', () => { const i = [...Array(fotos.length).keys()].find(n => !fotoRota.has(n)); if (i == null) return; origenLb = document.querySelector(`#heroSlides .p-fhero-slide[data-i="${i}"]`) || ver; showLb(i); });
   })();
   /* El formulario de consulta (una reservada no lo tiene). "Coordinar visita" y "Visita" lo abren con la fecha de la
      visita a la vista; sin WhatsApp, "Consultar" lo abre sin la fecha. */
