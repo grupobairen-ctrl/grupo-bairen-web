@@ -4987,3 +4987,7 @@ html:not(.teclado) .mobile-menu a:focus-visible,html:not(.teclado) .mobile-menu 
   .p-tabbar a{position:relative}
   .p-tabbar .p-tab-n{position:absolute;top:6px;left:calc(50% + 6px);min-width:16px;height:16px;padding:0 4px;border-radius:999px;background:#DECDA0;color:#131D2D;font:600 .62rem/16px var(--font-body);text-align:center}
 }
+/* 9/10/2026 · BAIREN digital: en la barra de la ficha, WhatsApp como ícono al lado de "Mensaje" */
+@media(max-width:859px){.p-mcta .p-mcta-waico{width:44px;padding:0!important;justify-content:center;display:inline-flex;align-items:center}.p-mcta .p-mcta-waico svg{width:18px;height:18px}}
+/* En pantallas muy angostas (iPhone SE de 320 px) no entran precio, Visita, WhatsApp y Mensaje: la visita se pide desde el chat o la ficha */
+@media(max-width:359px){.p-mcta.con-mensaje #mctaBtn{display:none}}

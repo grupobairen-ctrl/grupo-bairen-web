@@ -15,7 +15,7 @@
 
   /* ── interruptor ───────────────────────────────────────── */
   D.activo = function(){
-    if (PUBLICO) return true;
+    if (PUBLICO || (window.BP && BP.DIGITAL_PUBLICO)) return true;
     try {
       const q = new URLSearchParams(location.search).get('digital');
       if (q === '1') localStorage.setItem('bp_digital', '1');
@@ -26,9 +26,9 @@
 
   /* ── vocabulario ───────────────────────────────────────── */
   D.LINEAS = {
-    get temporario(){ return T('dg_l_temporario', 'Temporario (hasta 3 meses)'); },
+    get temporario(){ return T('dg_l_temporario', 'Estadía corta (hasta 3 meses)'); },
     get mediano(){ return T('dg_l_mediano', 'Mediano plazo'); },
-    get tradicional(){ return T('dg_l_tradicional', 'Alquiler tradicional'); },
+    get tradicional(){ return T('dg_l_tradicional', 'Alquiler a largo plazo'); },
     get venta(){ return T('dg_l_venta', 'Venta'); },
     get pozo(){ return T('dg_l_pozo', 'Desarrollo en pozo'); }
   };
@@ -45,7 +45,7 @@
     get visita_confirmada(){ return T('dg_h_visita_confirmada', 'Visita confirmada'); }, get visita_realizada(){ return T('dg_h_visita_realizada', 'Visita hecha'); },
     get visita_cancelada(){ return T('dg_h_visita_cancelada', 'Visita cancelada'); }, get solicitud_enviada(){ return T('dg_h_solicitud_enviada', 'Mandó la solicitud'); },
     get solicitud_aceptada(){ return T('dg_h_solicitud_aceptada', 'Solicitud aceptada'); }, get solicitud_rechazada(){ return T('dg_h_solicitud_rechazada', 'Solicitud rechazada'); },
-    get propuesta_aceptada(){ return T('dg_h_propuesta_aceptada', 'Aceptó la propuesta de Se busca'); }, get reserva(){ return T('dg_h_reserva', 'Reserva'); },
+    get propuesta_aceptada(){ return T('dg_h_propuesta_aceptada', 'Aceptó una propuesta'); }, get reserva(){ return T('dg_h_reserva', 'Reserva'); },
     get contrato_generado(){ return T('dg_h_contrato_generado', 'Contrato preparado'); }, get contrato_firmado(){ return T('dg_h_contrato_firmado', 'Contrato firmado'); },
     get cierre(){ return T('dg_h_cierre', 'Operación cerrada'); }, get caida(){ return T('dg_h_caida', 'Sin acuerdo'); },
     get reabierta(){ return T('dg_h_reabierta', 'Se retomó'); }, get cobro_mensual(){ return T('dg_h_cobro_mensual', 'Cobro del mes'); }
@@ -53,7 +53,7 @@
   D.PERFILES = {
     get particular(){ return T('dg_p_particular', 'Particular'); }, get inversor(){ return T('dg_p_inversor', 'Inversor'); },
     get familia(){ return T('dg_p_familia', 'Familia'); }, get empresa(){ return T('dg_p_empresa', 'Empresa'); },
-    get extranjero(){ return T('dg_p_extranjero', 'Desde el exterior'); }
+    get extranjero(){ return T('dg_p_extranjero', 'Del exterior'); }
   };
   /* Qué pasos puede marcar cada lado (igual que portal.registrar_hito) */
   D.PUEDE = {

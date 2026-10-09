@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Se busca · BAIREN</title>
+  <title>Tu búsqueda · BAIREN</title>
   <meta name="description" content="Publicá lo que buscás sin decir quién sos y recibí propuestas de quienes publican en BAIREN.">
   <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#131D2D">
   <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20261009a"><link rel="stylesheet" href="css/catalogo.css?v=20261009a"><link rel="stylesheet" href="css/portal.css?v=20261009a"><link rel="stylesheet" href="css/transiciones.css?v=20261009a"><style>@view-transition{navigation:auto}</style><style>html.arrancando body{opacity:0}body{transition:opacity .18s cubic-bezier(.22,1,.36,1)}@media(prefers-reduced-motion:reduce){body{transition:none}}</style><script>/* 8/10/2026 · Arranque sin pantallazo (ver BP.listo en ui.js): siempre, salvo al entrar a una ficha desde el portal (ahí la foto de la tarjeta crece hasta la ficha); en Safari del iPhone la transición entre páginas no tapaba el video al tocar el logo. Tope: 800 ms. */(function(){try{var h=document.documentElement,n=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{},r=document.referrer||'';if(r.indexOf(location.origin)===0&&n.type!=='reload'&&/propiedad/.test(location.pathname))return;h.classList.add('arrancando');setTimeout(function(){h.classList.remove('arrancando')},800)}catch(e){}})()</script>
-  <link rel="stylesheet" href="css/explorar.css?v=20261009a">
+  <link rel="stylesheet" href="css/base.css?v=20261009b"><link rel="stylesheet" href="css/catalogo.css?v=20261009b"><link rel="stylesheet" href="css/portal.css?v=20261009b"><link rel="stylesheet" href="css/transiciones.css?v=20261009b"><style>@view-transition{navigation:auto}</style><style>html.arrancando body{opacity:0}body{transition:opacity .18s cubic-bezier(.22,1,.36,1)}@media(prefers-reduced-motion:reduce){body{transition:none}}</style><script>/* 8/10/2026 · Arranque sin pantallazo (ver BP.listo en ui.js): siempre, salvo al entrar a una ficha desde el portal (ahí la foto de la tarjeta crece hasta la ficha); en Safari del iPhone la transición entre páginas no tapaba el video al tocar el logo. Tope: 800 ms. */(function(){try{var h=document.documentElement,n=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{},r=document.referrer||'';if(r.indexOf(location.origin)===0&&n.type!=='reload'&&/propiedad/.test(location.pathname))return;h.classList.add('arrancando');setTimeout(function(){h.classList.remove('arrancando')},800)}catch(e){}})()</script>
+  <link rel="stylesheet" href="css/explorar.css?v=20261009b">
 </head>
 <!-- 8/10/2026 · BAIREN, la digitalización del real estate · Se busca (mis búsquedas).
      Quien busca publica lo que necesita sin nombre ni contacto; quienes publican le proponen una unidad desde Explorar.
@@ -26,11 +26,11 @@
 </main>
 <div id="pFooter"></div>
 
-<script src="supabase-portal.js?v=20261009a" defer></script><script src="js/errores.js?v=20261009a" defer></script>
-<script src="../mapa-barrios.js?v=20261009a" defer></script>
-<script src="js/bairen-motion.js?v=20261009a" defer></script><script src="js/i18n-portal.js?v=20261009a" defer></script><script src="js/ui.js?v=20261009a" defer></script><script src="js/store.js?v=20261009a" defer></script>
-<script src="js/digital.js?v=20261009a" defer></script>
-<script src="js/data.js?v=20261009a" defer></script>
+<script src="supabase-portal.js?v=20261009b" defer></script><script src="js/errores.js?v=20261009b" defer></script>
+<script src="../mapa-barrios.js?v=20261009b" defer></script>
+<script src="js/bairen-motion.js?v=20261009b" defer></script><script src="js/i18n-portal.js?v=20261009b" defer></script><script src="js/ui.js?v=20261009b" defer></script><script src="js/store.js?v=20261009b" defer></script>
+<script src="js/digital.js?v=20261009b" defer></script>
+<script src="js/data.js?v=20261009b" defer></script>
 <script>
 document.addEventListener('DOMContentLoaded', function(){
 (async function(){
@@ -100,14 +100,14 @@ document.addEventListener('DOMContentLoaded', function(){
     main.removeAttribute('aria-busy'); main.classList.add('p-dg-pronto-main');
     main.innerHTML = `<div class="p-dg-pronto"><span class="p-dg-pronto-ic" aria-hidden="true">${BP.ico.search}</span>
       <h1 class="p-dg-pronto-t">${t('dg_ex_pronto_t', 'Muy <em>pronto</em>')}</h1>
-      <p>${esc(t('dg_ex_pronto_p', 'Estamos preparando una forma nueva de moverse en el mercado, toda dentro de BAIREN.'))}</p>
+      <p>${esc(t('dg_ex_pronto_p', 'Estamos preparando algo nuevo para BAIREN.'))}</p>
       <a class="p-btn p-btn-fill" href="index.html">${esc(t('dg_ex_pronto_btn', 'Volver al inicio'))}</a></div>`;
   };
   const msjError = (e, d) => String((e && e.message) || e || '') || d;
   /* ── fin de las ayudas compartidas ─────────────────────────────────────────────────────────────────────── */
 
   BP.header(); BP.footer(); if (window.BPStore) BPStore.init(); await BPStore.ready;
-  document.title = t('dg_sb_doc', 'Se busca') + ' · BAIREN';
+  document.title = t('dg_sb_doc', 'Tu búsqueda') + ' · BAIREN';
   const main = $('contenido');
   if (!window.BPDigital || !BPDigital.activo()) { pronto(main); return; }
   if (!BPStore.requireSession()) return;
@@ -118,13 +118,13 @@ document.addEventListener('DOMContentLoaded', function(){
   const OPS = [['venta', t('dg_sb_op_venta', 'Comprar')], ['alquiler', LIN.tradicional], ['mediano', LIN.mediano]];
   const TIPOS = [['', t('dg_sb_tipo_cualquiera', 'Cualquiera')], ['Departamento', t('dg_sb_tipo_depto', 'Departamento')], ['Piso', t('dg_sb_tipo_piso', 'Piso')], ['PH', 'PH'], ['Casa', t('dg_sb_tipo_casa', 'Casa')]];
   const opcN = (max, ind) => `<option value="">${esc(ind)}</option>` + Array.from({ length: max }, (_, i) => `<option value="${i + 1}">${i + 1}${i + 1 === max ? '+' : ''}</option>`).join('');
-  const DETALLE_AVISO = t('dg_sb_det_aviso', 'Sin teléfonos, mails ni redes: te das a conocer cuando aceptás una propuesta');
+  const DETALLE_AVISO = t('dg_sb_det_aviso', 'Sin teléfonos, mails ni redes. Tus datos se comparten solo si aceptás una propuesta.');
 
   main.innerHTML = `
   <header class="p-ex-cab">
     <a class="p-sb-volver" href="explorar.html#se-busca">${BP.ico.arrow}<span>${esc(t('dg_sb_volver', 'Explorar'))}</span></a>
-    <h1 class="p-ex-h1">${t('dg_sb_h1', 'Lo que <em>buscás</em>, sin decir quién sos')}</h1>
-    <p class="p-ex-bajada">${esc(t('dg_sb_bajada', 'Publicás tu búsqueda sin nombre ni contacto. Quienes publican en BAIREN te proponen unidades y vos elegís. Te das a conocer solo cuando aceptás una propuesta.'))}</p>
+    <h1 class="p-ex-h1">${t('dg_sb_h1', 'Publicá tu <em>búsqueda</em>')}</h1>
+    <p class="p-ex-bajada">${esc(t('dg_sb_bajada', 'Recibí propuestas. Tus datos quedan reservados hasta que aceptás una.'))}</p>
   </header>
   <div class="p-sb-cuerpo" id="cuerpo">
     <section class="p-sb-mias" id="tus" aria-labelledby="tusT" hidden>
@@ -133,16 +133,16 @@ document.addEventListener('DOMContentLoaded', function(){
     </section>
     <section class="p-sb-form-sec" id="formSec" aria-labelledby="formT">
       <form class="p-dg-form p-sb-form" id="fBus" novalidate>
-        <h2 class="p-sb-h2" id="formT">${esc(t('dg_sb_form_nueva', 'Publicá lo que buscás'))}</h2>
-        <fieldset class="p-dg-grupo" id="gPerfil"><legend>${esc(t('dg_sb_quien', 'Quién busca'))}</legend><div class="p-dg-ops">
+        <h2 class="p-sb-h2" id="formT">${esc(t('dg_sb_form_nueva', 'Nueva búsqueda'))}</h2>
+        <fieldset class="p-dg-grupo" id="gPerfil"><legend>${esc(t('dg_sb_quien', 'Sos'))}</legend><div class="p-dg-ops">
           ${Object.keys(BPDigital.PERFILES).map((k, i) => `<label class="p-dg-op"><input type="radio" name="perfil" value="${k}"${i ? '' : ' checked'}><span>${esc(BPDigital.PERFILES[k])}</span></label>`).join('')}
         </div></fieldset>
-        <fieldset class="p-dg-grupo" id="gOp"><legend>${esc(t('dg_sb_que_op', 'Qué operación'))}</legend><div class="p-dg-ops p-dg-ops-seg">
+        <fieldset class="p-dg-grupo" id="gOp"><legend>${esc(t('dg_sb_que_op', 'Operación'))}</legend><div class="p-dg-ops p-dg-ops-seg">
           ${OPS.map(o => `<label class="p-dg-op"><input type="radio" name="op" value="${o[0]}"><span>${esc(o[1])}</span></label>`).join('')}
         </div></fieldset>
         <label class="p-dg-check" id="filaPozo" hidden><input type="checkbox" id="fPozo"><span>${esc(t('dg_sb_pozo', 'En pozo o en construcción'))}</span></label>
         <label class="p-dg-campo"><span>${esc(t('dg_sb_tipo', 'Tipo de propiedad'))}</span><select id="fTipo">${TIPOS.map(x => `<option value="${x[0]}">${esc(x[1])}</option>`).join('')}</select></label>
-        <fieldset class="p-dg-grupo" id="gZonas"><legend>${esc(t('dg_sb_donde', 'Dónde'))} <small>${esc(t('dg_sb_donde_ayuda', 'Podés elegir varias. Sin elegir, toda la zona.'))}</small></legend><div class="p-dg-ops">
+        <fieldset class="p-dg-grupo" id="gZonas"><legend>${esc(t('dg_sb_donde', 'Dónde'))} <small>${esc(t('dg_sb_donde_ayuda', 'Podés elegir varias.'))}</small></legend><div class="p-dg-ops">
           ${BP.ZONAS.map(z => `<label class="p-dg-op"><input type="checkbox" name="zona" value="${esc(z)}"><span>${esc(BP.zonaLabel(z))}</span></label>`).join('')}
         </div></fieldset>
         <fieldset class="p-dg-grupo"><legend>${esc(t('dg_sb_minimos', 'Como mínimo'))}</legend><div class="p-dg-fila3">
@@ -158,11 +158,11 @@ document.addEventListener('DOMContentLoaded', function(){
           <label class="p-dg-campo"><span>${esc(t('dg_sb_desde', 'Desde cuándo'))}</span><input id="fDesde" type="date"></label>
           <label class="p-dg-campo" id="filaPlazo" hidden><span>${esc(t('dg_sb_plazo', 'Plazo, en meses'))}</span><input id="fPlazo" type="number" inputmode="numeric" min="1" max="120" step="1"></label>
         </div>
-        <label class="p-dg-campo"><span>${esc(t('dg_sb_det', 'Algo más que quieras contar'))} <small>${esc(t('dg_ex_opcional', '(opcional)'))}</small></span>
-          <textarea id="fDetalle" maxlength="600" rows="4" aria-describedby="detAviso" placeholder="${esc(t('dg_sb_det_ph', 'Ej.: Llego con mi pareja por trabajo. Preferimos piso alto y luminoso, cerca del subte.'))}"></textarea></label>
+        <label class="p-dg-campo"><span>${esc(t('dg_sb_det', 'Detalles'))} <small>${esc(t('dg_ex_opcional', '(opcional)'))}</small></span>
+          <textarea id="fDetalle" maxlength="600" rows="4" aria-describedby="detAviso" placeholder="${esc(t('dg_sb_det_ph', 'Ej.: piso alto, cerca del subte, desde noviembre.'))}"></textarea></label>
         <div class="p-dg-campo-pie"><p class="p-dg-nota" id="detAviso">${BP.ico.shield}<span>${esc(DETALLE_AVISO)}.</span></p><span class="p-dg-cont" id="detCont" aria-hidden="true">0 / 600</span></div>
         <div class="p-dg-acts"><button type="button" class="p-btn" id="btnCancelar" hidden>${esc(t('dg_ex_cancelar', 'Cancelar'))}</button><button type="submit" class="p-btn p-btn-fill" id="btnGuardar">${esc(t('dg_sb_publicar', 'Publicar búsqueda'))}</button></div>
-        <p class="p-sb-form-pie">${esc(t('dg_sb_form_pie', 'Tu búsqueda queda activa 60 días. Podés tener hasta 5 activas y pausarlas o cerrarlas cuando quieras.'))}</p>
+        <p class="p-sb-form-pie">${esc(t('dg_sb_form_pie', 'Queda activa 60 días. Podés tener hasta 5.'))}</p>
       </form>
     </section>
   </div>`;
@@ -218,7 +218,7 @@ document.addEventListener('DOMContentLoaded', function(){
   const limpiarErrores = () => { f.querySelectorAll('.p-err-campo').forEach(p => { p.hidden = true; }); f.querySelectorAll('.p-invalido').forEach(x => { x.classList.remove('p-invalido'); x.removeAttribute('aria-invalid'); }); };
   const modo = editando => {
     E.editando = editando || null;
-    $('formT').textContent = E.editando ? t('dg_sb_form_editar', 'Editar búsqueda') : t('dg_sb_form_nueva', 'Publicá lo que buscás');
+    $('formT').textContent = E.editando ? t('dg_sb_form_editar', 'Editar búsqueda') : t('dg_sb_form_nueva', 'Nueva búsqueda');
     $('btnGuardar').textContent = E.editando ? t('dg_sb_guardar', 'Guardar cambios') : t('dg_sb_publicar', 'Publicar búsqueda');
     $('btnCancelar').hidden = !E.editando && !(E.mias.length && formSec.classList.contains('abierta'));
   };
@@ -254,7 +254,7 @@ document.addEventListener('DOMContentLoaded', function(){
     try {
       const r = await BPDigital.guardarBusqueda(b);
       const eraEdicion = !!E.editando;
-      BP.toast(eraEdicion ? t('dg_sb_ok_editada', 'Guardamos los cambios.') : t('dg_sb_ok_nueva', 'Tu búsqueda está publicada. Te avisamos cuando llegue una propuesta.'));
+      BP.toast(eraEdicion ? t('dg_sb_ok_editada', 'Guardamos los cambios.') : t('dg_sb_ok_nueva', 'Publicada. Te avisamos cuando llegue una propuesta.'));
       f.reset(); ajustar(); contar(); formSec.classList.remove('abierta'); modo(null); $('btnNueva').setAttribute('aria-expanded', 'false');
       await cargar();
       const card = r && r.id ? document.getElementById('b-' + r.id) : null;
@@ -272,7 +272,7 @@ document.addEventListener('DOMContentLoaded', function(){
     const href = p.aviso_id ? BP.urlFicha({ id: p.aviso_id }) : null;
     const precio = p.aviso_precio != null ? BP.fmtPrecio(+p.aviso_precio, p.aviso_moneda) + (b.operacion !== 'venta' ? ' ' + t('dg_ex_por_mes', 'por mes') : '') : '';
     const tp = TIPO_PUB[p.publicador_tipo] ? TIPO_PUB[p.publicador_tipo]() : '';
-    const estado = p.estado === 'aceptada' ? `<span class="p-ex-estado e-aceptada">${esc(t('dg_sb_pe_aceptada', 'Aceptada'))}</span>` : p.estado === 'rechazada' ? `<span class="p-ex-estado e-rechazada">${esc(t('dg_sb_pe_rechazada', 'Rechazada'))}</span>` : `<span class="p-ex-estado e-nueva">${esc(t('dg_sb_pe_nueva', 'Para responder'))}</span>`;
+    const estado = p.estado === 'aceptada' ? `<span class="p-ex-estado e-aceptada">${esc(t('dg_sb_pe_aceptada', 'Aceptada'))}</span>` : p.estado === 'rechazada' ? `<span class="p-ex-estado e-rechazada">${esc(t('dg_sb_pe_rechazada', 'Rechazada'))}</span>` : `<span class="p-ex-estado e-nueva">${esc(t('dg_sb_pe_nueva', 'Nueva'))}</span>`;
     return `<article class="p-sb-prop e-${esc(p.estado)}" aria-labelledby="pp-${esc(p.id)}">
       ${href ? `<a class="p-sb-prop-foto" href="${esc(href)}" tabindex="-1" aria-hidden="true">${p.foto ? `<img src="${esc(BP.sbImg(p.foto, 600))}" alt="" loading="lazy" decoding="async" onerror="this.remove()">` : ''}</a>` : `<span class="p-sb-prop-foto" aria-hidden="true"></span>`}
       <div class="p-sb-prop-txt">
@@ -306,7 +306,7 @@ document.addEventListener('DOMContentLoaded', function(){
       <section class="p-sb-props" aria-labelledby="pt-${esc(id)}">
         <h4 class="p-sb-props-t" id="pt-${esc(id)}">${esc(props.length === 1 ? t('dg_ex_1_prop', '1 propuesta') : props.length ? tf('dg_ex_n_props', '{n} propuestas', { n: props.length }) : t('dg_sb_props', 'Propuestas'))}${nuevas ? `<span class="p-ex-n">${esc(nuevas === 1 ? t('dg_sb_1_nueva', '1 nueva') : tf('dg_sb_n_nuevas', '{n} nuevas', { n: nuevas }))}</span>` : ''}</h4>
         ${props.length ? `<div class="p-sb-props-lista">${props.map(p => propuesta(p, b)).join('')}</div>`
-          : `<p class="p-sb-props-vacio">${esc(b.estado === 'activa' ? t('dg_sb_props_vacio', 'Todavía no llegaron propuestas. Te avisamos cuando llegue la primera.') : t('dg_sb_props_pausa', 'Mientras no esté activa, no llegan propuestas nuevas.'))}</p>`}
+          : `<p class="p-sb-props-vacio">${esc(b.estado === 'activa' ? t('dg_sb_props_vacio', 'Todavía no hay propuestas. Te avisamos cuando llegue la primera.') : t('dg_sb_props_pausa', 'Pausada: no recibe propuestas nuevas.'))}</p>`}
       </section>
     </article>`;
   }
@@ -334,34 +334,34 @@ document.addEventListener('DOMContentLoaded', function(){
       es.disabled = true;
       try {
         await BPDigital.estadoBusqueda(es.dataset.id, es.dataset.estado);
-        BP.toast(es.dataset.estado === 'pausada' ? t('dg_sb_ok_pausada', 'Búsqueda pausada. No llegan propuestas nuevas.') : es.dataset.estado === 'cerrada' ? t('dg_sb_ok_cerrada', 'Búsqueda cerrada.') : t('dg_sb_ok_activa', 'Tu búsqueda está activa otra vez.'));
+        BP.toast(es.dataset.estado === 'pausada' ? t('dg_sb_ok_pausada', 'Búsqueda pausada.') : es.dataset.estado === 'cerrada' ? t('dg_sb_ok_cerrada', 'Búsqueda cerrada.') : t('dg_sb_ok_activa', 'Tu búsqueda está activa otra vez.'));
         await cargar(); const c = document.getElementById('b-' + es.dataset.id); if (c) c.focus();
       } catch (err) { es.disabled = false; BP.toast(msjError(err, t('dg_ex_err', 'No pudimos guardar el cambio.')), 'error'); }
       return;
     }
     const bo = e.target.closest('[data-borrar]');
     if (bo) {
-      if (!(await confirmar(t('dg_sb_borrar_t', '¿Borrar esta búsqueda?'), t('dg_sb_borrar_p', 'Se borra con las propuestas que recibió. No se puede deshacer.'), t('dg_sb_borrar', 'Borrar'), true))) return;
+      if (!(await confirmar(t('dg_sb_borrar_t', '¿Borrar esta búsqueda?'), t('dg_sb_borrar_p', 'Se borra con sus propuestas.'), t('dg_sb_borrar', 'Borrar'), true))) return;
       try { await BPDigital.borrarBusqueda(bo.dataset.borrar); BP.toast(t('dg_sb_ok_borrada', 'Búsqueda borrada.')); if (String(E.editando) === bo.dataset.borrar) cerrarForm(); await cargar(); if (!E.mias.length) { const p = f.querySelector('[name=perfil]:checked'); if (p) p.focus(); } else $('btnNueva').focus(); }
       catch (err) { BP.toast(msjError(err, t('dg_sb_err_borrar', 'No pudimos borrar la búsqueda.')), 'error'); }
       return;
     }
     const ac = e.target.closest('[data-aceptar]');
     if (ac) {
-      if (!(await confirmar(t('dg_sb_ac_t', '¿Aceptar esta propuesta?'), t('dg_sb_ac_p', 'Al aceptar, quien publica sabe quién sos y pueden hablar dentro de BAIREN. Las otras propuestas siguen abiertas.'), t('dg_sb_ac_si', 'Aceptar y conversar')))) return;
+      if (!(await confirmar(t('dg_sb_ac_t', '¿Aceptar esta propuesta?'), t('dg_sb_ac_p', 'Quien publica va a ver tus datos y pueden conversar en BAIREN. Las otras propuestas siguen abiertas.'), t('dg_sb_ac_si', 'Aceptar y conversar')))) return;
       ac.disabled = true;
       try {
         const opId = await BPDigital.responder(ac.dataset.aceptar, 'aceptar');
         const url = 'mensajes.html?op=' + encodeURIComponent(opId);
         hoja({ titulo: t('dg_sb_ac_ok_t', 'Propuesta aceptada'), clase: 'p-dg-hoja-chica', primero: 'a',
-          cuerpo: `<p class="p-dg-txt p-dg-ok" role="status">${BP.ico.check}<span>${esc(t('dg_sb_ac_ok', 'Ahora pueden hablar: quien publica ya sabe quién sos.'))}</span></p><div class="p-dg-acts"><a class="p-btn p-btn-fill" href="${esc(url)}">${esc(t('dg_sb_ir_conv', 'Ir a la conversación'))}</a></div>` });
+          cuerpo: `<p class="p-dg-txt p-dg-ok" role="status">${BP.ico.check}<span>${esc(t('dg_sb_ac_ok', 'Ya pueden conversar.'))}</span></p><div class="p-dg-acts"><a class="p-btn p-btn-fill" href="${esc(url)}">${esc(t('dg_sb_ir_conv', 'Ir a la conversación'))}</a></div>` });
         setTimeout(() => { location.href = url; }, 2400);
       } catch (err) { ac.disabled = false; BP.toast(msjError(err, t('dg_sb_err_responder', 'No pudimos responder la propuesta.')), 'error'); }
       return;
     }
     const re = e.target.closest('[data-rechazar]');
     if (re) {
-      if (!(await confirmar(t('dg_sb_re_t', '¿Rechazar esta propuesta?'), t('dg_sb_re_p', 'Quien publica sabe que no te interesó. Sigue sin saber quién sos.'), t('dg_sb_rechazar', 'Rechazar'), true))) return;
+      if (!(await confirmar(t('dg_sb_re_t', '¿Rechazar esta propuesta?'), t('dg_sb_re_p', 'Tus datos siguen reservados.'), t('dg_sb_rechazar', 'Rechazar'), true))) return;
       try { await BPDigital.responder(re.dataset.rechazar, 'rechazar'); BP.toast(t('dg_sb_ok_rechazada', 'Propuesta rechazada.')); const bid = (E.props.find(p => String(p.id) === re.dataset.rechazar) || {}).busqueda_id; await cargar(); const c = bid && document.getElementById('b-' + bid); if (c) c.focus(); }
       catch (err) { BP.toast(msjError(err, t('dg_sb_err_responder', 'No pudimos responder la propuesta.')), 'error'); }
     }
