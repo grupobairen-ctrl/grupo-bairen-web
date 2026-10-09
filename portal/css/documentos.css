@@ -1,0 +1,191 @@
+/* BAIREN · Portal · Documentos y firma electrónica (riel de documentos, 9/10/2026).
+   documento.html (body.p-documento): el estado en una línea, la hoja del documento con tipografía de contrato (Playfair en
+   los títulos, Jost en el texto), el registro de firmas plegado y una barra fija abajo con un solo botón. Se imprime limpio
+   (A4) para "guardar como PDF". También, la sección "Firmas" dentro de mensajes.html (prefijo .p-mensajes .dgd-*).
+   portal.css deja en 0 el radio de toda clase p-…: los radios de acá van con !important. Celular primero: 16 px de margen,
+   44 px de alto táctil y sin scroll horizontal. */
+
+.p-documento{
+  --dgd-papel:#F6F2E8; --dgd-sup:#FFFDF8; --dgd-linea:rgba(19,29,45,.10); --dgd-linea-2:rgba(19,29,45,.18);
+  --dgd-navy:#131D2D; --dgd-tinta:#1A2538; --dgd-media:#59647A; --dgd-oro:#75623C; --dgd-oro-suave:rgba(117,98,60,.12);
+  --dgd-verde:#2E6A4E; --dgd-vino:#7E2B26; --dgd-curva:cubic-bezier(.22,1,.36,1);
+  background:var(--dgd-papel)
+}
+.p-documento [hidden]{display:none!important}
+html.dgd-quieta{overflow:hidden}
+
+/* ── Página ─────────────────────────────────────────────────────────────────────────────────────────────── */
+.p-documento .dgd-main{box-sizing:border-box;max-width:820px;min-height:70vh;margin:0 auto;padding:calc(64px + env(safe-area-inset-top) + 12px) 16px 48px;color:var(--dgd-navy)}
+.p-documento.dgd-con-barra .dgd-main{padding-bottom:150px}
+.p-documento .dgd-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 -4px}
+.p-documento :is(.dgd-volver,.dgd-link){display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 4px;border:0;background:none;color:var(--dgd-navy);
+  font:500 .875rem/1 var(--font-body);letter-spacing:0;text-transform:none;text-decoration:none;cursor:pointer;border-radius:var(--r-ctl,10px)!important}
+.p-documento :is(.dgd-volver,.dgd-link) svg{width:18px;height:18px;flex:0 0 auto}
+.p-documento :is(.dgd-volver,.dgd-link):hover span{text-decoration:underline;text-decoration-color:rgba(117,98,60,.55);text-underline-offset:4px}
+
+/* El estado, en una línea */
+.p-documento .dgd-estado{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;margin:6px 0 16px;font:400 .9375rem/1.4 var(--font-body);color:var(--dgd-media);outline:0}
+.p-documento .dgd-pill{display:inline-flex;align-items:center;min-height:28px;padding:0 12px;border-radius:var(--r-pill,999px)!important;background:var(--dgd-oro-suave);color:var(--dgd-oro);
+  font:500 .875rem/1 var(--font-body);white-space:nowrap}
+.p-documento .dgd-pill-ok{background:rgba(46,106,78,.10);color:var(--dgd-verde)}
+.p-documento .dgd-pill-mal{background:rgba(126,43,38,.08);color:var(--dgd-vino)}
+.p-documento .dgd-pill-neutro{background:rgba(19,29,45,.06);color:var(--dgd-media)}
+
+/* ── La hoja del documento ──────────────────────────────────────────────────────────────────────────────── */
+.p-documento .dgd-hoja{box-sizing:border-box;padding:28px 20px 32px;background:var(--dgd-sup);border:1px solid var(--dgd-linea);border-radius:var(--r-box,14px)!important;
+  box-shadow:0 8px 24px rgba(19,29,45,.05)}
+.p-documento .dgd-marca{margin:0 0 20px;text-align:center;font:500 .75rem/1 var(--font-display);letter-spacing:.34em;color:var(--dgd-oro)}
+.p-documento .dgd-texto{color:var(--dgd-tinta);overflow-wrap:break-word}
+.p-documento .dgd-texto h1{margin:0;text-align:center;font:400 clamp(1.55rem,6.4vw,2.2rem)/1.15 var(--font-display);letter-spacing:-.01em;color:var(--dgd-navy);text-wrap:balance}
+.p-documento .dgd-texto h1 + p{margin:8px 0 0;text-align:center;font:400 1.0625rem/1.4 var(--font-display);color:var(--dgd-oro)}
+.p-documento .dgd-texto blockquote{max-width:46ch;margin:18px auto 26px;padding:8px 14px;border:1px solid rgba(117,98,60,.26);border-radius:var(--r-ctl,10px)!important;background:rgba(117,98,60,.05)}
+.p-documento .dgd-texto blockquote p{margin:0;text-align:center;font:400 .8125rem/1.45 var(--font-body);color:var(--dgd-oro)}
+.p-documento .dgd-texto h2{margin:26px 0 8px;font:500 1.0625rem/1.3 var(--font-display);color:var(--dgd-navy);break-after:avoid}
+.p-documento .dgd-texto h3{margin:20px 0 6px;font:500 1rem/1.3 var(--font-display);color:var(--dgd-navy)}
+.p-documento .dgd-texto :is(p,li){font:400 1rem/1.7 var(--font-body);color:var(--dgd-tinta);hyphens:auto}
+.p-documento .dgd-texto p{margin:0 0 12px}
+.p-documento .dgd-texto ul{margin:0 0 14px;padding:0 0 0 1.15em}
+.p-documento .dgd-texto li{margin:4px 0;padding-left:2px}
+.p-documento .dgd-texto li::marker{color:var(--dgd-oro)}
+.p-documento .dgd-texto strong{font-weight:500;color:var(--dgd-navy)}
+.p-documento .dgd-texto em{font-style:italic}
+@media(min-width:720px){
+  .p-documento .dgd-main{padding-top:calc(64px + 28px)}
+  .p-documento .dgd-hoja{padding:56px 64px 64px}
+  .p-documento .dgd-texto p{text-align:justify}
+}
+
+/* ── Registro de firmas y huella (plegado) ──────────────────────────────────────────────────────────────── */
+.p-documento .dgd-registro{margin:14px 0 0;background:var(--dgd-sup);border:1px solid var(--dgd-linea);border-radius:var(--r-box,14px)!important}
+.p-documento .dgd-registro > summary{display:flex;align-items:center;gap:10px;min-height:54px;padding:0 18px;list-style:none;cursor:pointer;font:500 .9375rem/1.2 var(--font-body);color:var(--dgd-navy)}
+.p-documento .dgd-registro > summary::-webkit-details-marker{display:none}
+.p-documento .dgd-registro > summary::after{content:"";margin-left:auto;width:7px;height:7px;border-right:1.5px solid var(--dgd-media);border-bottom:1.5px solid var(--dgd-media);transform:translateY(-2px) rotate(45deg);transition:transform .2s var(--dgd-curva)}
+.p-documento .dgd-registro[open] > summary::after{transform:translateY(2px) rotate(225deg)}
+.p-documento .dgd-registro > summary:focus-visible{outline:2px solid var(--dgd-navy);outline-offset:-3px}
+.p-documento .dgd-cuenta{display:inline-grid;place-items:center;min-width:20px;height:22px;padding:0 8px;border-radius:var(--r-pill,999px)!important;background:rgba(19,29,45,.06);font:500 .75rem/1 var(--font-body);color:var(--dgd-media)}
+.p-documento .dgd-registro-in{padding:0 18px 18px}
+.p-documento .dgd-firmas{list-style:none;margin:0;padding:0;display:grid}
+.p-documento .dgd-f{display:grid;gap:2px;padding:12px 0;border-top:1px solid var(--dgd-linea)}
+.p-documento .dgd-f:first-child{border-top:0;padding-top:2px}
+.p-documento .dgd-f-rol{font:500 .8125rem/1.3 var(--font-body);color:var(--dgd-oro)}
+.p-documento .dgd-vos{color:var(--dgd-media);font-weight:400}
+.p-documento .dgd-f-n{font:500 .9375rem/1.35 var(--font-body);color:var(--dgd-navy)}
+.p-documento .dgd-f.falta .dgd-f-n{font-weight:400;color:var(--dgd-media)}
+.p-documento .dgd-f-m{font:400 .8125rem/1.45 var(--font-body);color:var(--dgd-media);overflow-wrap:anywhere}
+.p-documento .dgd-datos{display:grid;gap:10px;margin:14px 0 0;padding:14px 0 0;border-top:1px solid var(--dgd-linea)}
+.p-documento .dgd-datos > div{display:grid;gap:2px;min-width:0}
+.p-documento .dgd-datos dt{font:400 .8125rem/1.3 var(--font-body);color:var(--dgd-media)}
+.p-documento .dgd-datos dd{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;margin:0;font:400 .9375rem/1.4 var(--font-body);color:var(--dgd-navy);min-width:0}
+.p-documento .dgd-datos code{font:400 .8125rem/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--dgd-navy);overflow-wrap:anywhere}
+.p-documento .dgd-solo-print{display:none}
+.p-documento .dgd-verif{display:inline-flex;align-items:center;gap:4px;font:400 .8125rem/1.3 var(--font-body);color:var(--dgd-verde)}
+.p-documento .dgd-verif svg{width:15px;height:15px}
+.p-documento .dgd-verif.mal{color:var(--dgd-vino)}
+.p-documento .dgd-ley{margin:14px 0 0;font:400 .8125rem/1.45 var(--font-body);color:var(--dgd-media)}
+.p-documento .dgd-anular{display:inline-flex;align-items:center;min-height:44px;margin:6px 0 -8px;padding:0;border:0;background:none;color:var(--dgd-vino);
+  font:500 .875rem/1 var(--font-body);text-transform:none;letter-spacing:0;cursor:pointer;text-decoration:underline;text-decoration-color:rgba(126,43,38,.35);text-underline-offset:4px}
+
+/* ── La barra fija con el único botón ──────────────────────────────────────────────────────────────────── */
+.p-documento .dgd-barra{position:fixed;left:0;right:0;bottom:0;z-index:1400;padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+  background:rgba(255,253,248,.96);border-top:1px solid var(--dgd-linea);box-shadow:0 -6px 24px rgba(19,29,45,.06);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.p-documento .dgd-barra-in{display:grid;justify-items:center;gap:8px;max-width:820px;margin:0 auto}
+.p-documento .dgd-barra .dgd-btn{width:100%;max-width:440px}
+.p-documento .dgd-btn{box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:0 26px;border:1px solid var(--dgd-linea-2);
+  border-radius:var(--r-pill,999px)!important;background:transparent;color:var(--dgd-navy);font:500 1rem/1 var(--font-body);letter-spacing:0;text-transform:none;cursor:pointer;
+  transition:background-color .2s var(--dgd-curva),border-color .2s var(--dgd-curva)}
+.p-documento .dgd-btn:hover{border-color:var(--dgd-navy)}
+.p-documento .dgd-btn-navy{background:var(--dgd-navy);border-color:var(--dgd-navy);color:#FBFAF6}
+.p-documento .dgd-btn-navy:hover{background:#2A3A52;border-color:#2A3A52}
+.p-documento .dgd-btn-vino{background:var(--dgd-vino);border-color:var(--dgd-vino);color:#FBFAF6}
+.p-documento .dgd-btn:disabled{opacity:.55;cursor:default}
+.p-documento .dgd-btn:focus-visible{outline:2px solid var(--dgd-navy);outline-offset:2px}
+.p-documento .dgd-confianza{margin:0;font:400 .75rem/1.4 var(--font-body);color:var(--dgd-media);text-align:center}
+
+/* ── La hoja que sube (firmar, anular) ──────────────────────────────────────────────────────────────────── */
+.p-documento .dgd-velo{position:fixed;inset:0;z-index:1900;display:flex;align-items:flex-end;justify-content:center;background:rgba(19,29,45,0);transition:background-color .24s var(--dgd-curva)}
+.p-documento .dgd-velo.on{background:rgba(19,29,45,.42)}
+.p-documento .dgd-sheet{box-sizing:border-box;width:100%;max-height:calc(100vh - 32px);max-height:calc(100dvh - 32px);overflow:auto;overscroll-behavior:contain;
+  padding:0 16px calc(20px + env(safe-area-inset-bottom));background:var(--dgd-sup);border-radius:18px 18px 0 0!important;box-shadow:0 -8px 40px rgba(10,20,40,.16);
+  opacity:0;transform:translateY(28px);transition:transform .3s var(--dgd-curva),opacity .22s var(--dgd-curva);color:var(--dgd-navy)}
+.p-documento .dgd-velo.on .dgd-sheet{opacity:1;transform:none}
+.p-documento .dgd-sheet-cab{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 0 8px;background:var(--dgd-sup)}
+.p-documento .dgd-sheet-t{margin:0;font:400 1.375rem/1.2 var(--font-display);color:var(--dgd-navy)}
+.p-documento .dgd-x{display:inline-flex;flex:0 0 auto;align-items:center;justify-content:center;width:44px;height:44px;margin-right:-10px;padding:0;border:0;background:none;border-radius:50%!important;color:var(--dgd-navy);cursor:pointer}
+.p-documento .dgd-x:hover{background:rgba(19,29,45,.06)}
+.p-documento .dgd-x svg{width:20px;height:20px}
+.p-documento .dgd-txt{margin:0;font:300 1rem/1.55 var(--font-body);color:var(--dgd-tinta)}
+.p-documento .dgd-form{display:grid;gap:16px}
+.p-documento .dgd-campo{display:grid;gap:8px;min-width:0}
+.p-documento .dgd-campo > span{font:500 .9375rem/1.3 var(--font-body);color:var(--dgd-navy)}
+.p-documento .dgd-campo small{font:400 .8125rem/1.35 var(--font-body);color:var(--dgd-media)}
+.p-documento .dgd-campo input{box-sizing:border-box;width:100%;min-height:50px;margin:0;padding:12px 14px;border:1px solid var(--dgd-linea-2);border-radius:var(--r-ctl,10px)!important;background:#fff;
+  font:400 1rem/1.4 var(--font-body);color:var(--dgd-navy);-webkit-appearance:none;appearance:none;transition:border-color .18s var(--dgd-curva),box-shadow .18s var(--dgd-curva)}
+.p-documento .dgd-campo input:focus{outline:0;border-color:var(--dgd-navy);box-shadow:0 0 0 3px rgba(19,29,45,.10)}
+.p-documento .dgd-campo input[aria-invalid="true"]{border-color:var(--dgd-vino)}
+.p-documento .dgd-check{display:flex;align-items:flex-start;gap:12px;min-height:44px;cursor:pointer;font:400 .9375rem/1.45 var(--font-body);color:var(--dgd-tinta)}
+.p-documento .dgd-check input{flex:0 0 22px;width:22px;height:22px;margin:0;accent-color:var(--dgd-navy);cursor:pointer}
+.p-documento .dgd-check input[aria-invalid="true"]{outline:2px solid var(--dgd-vino);outline-offset:2px}
+.p-documento .dgd-err{margin:0;font:400 .875rem/1.4 var(--font-body);color:var(--dgd-vino)}
+.p-documento .dgd-form .dgd-btn-navy{width:100%}
+.p-documento .dgd-acts{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px}
+.p-documento .dgd-acts .dgd-btn{flex:1 1 140px}
+@media(min-width:700px){
+  .p-documento .dgd-velo{align-items:center;padding:24px}
+  .p-documento .dgd-sheet{width:min(460px,100%);max-height:calc(100dvh - 48px);padding:0 28px 26px;border-radius:var(--r-box,14px)!important;box-shadow:0 16px 48px rgba(10,20,40,.16);transform:translateY(10px) scale(.985)}
+  .p-documento .dgd-sheet-cab{padding-top:24px}
+}
+
+/* ── Vacíos, error y esqueleto ──────────────────────────────────────────────────────────────────────────── */
+.p-documento .dgd-vacio{display:grid;justify-items:center;gap:10px;max-width:520px;margin:24px auto 0;padding:40px 24px;border-radius:var(--r-box,14px)!important;text-align:center}
+.p-documento .dgd-vacio b{font:400 1.5rem/1.2 var(--font-display);color:var(--dgd-navy)}
+.p-documento .dgd-vacio p{margin:0 0 6px;font:300 1rem/1.55 var(--font-body);color:var(--dgd-media)}
+.p-documento .dgd-vacio .p-btn{min-height:48px;padding:0 26px;border-radius:var(--r-pill,999px)!important}
+.p-documento .dgd-vacio-ico{display:grid;place-items:center;width:56px;height:56px;border:1px solid var(--dgd-linea);border-radius:50%!important;background:var(--dgd-sup);color:var(--dgd-oro)}
+.p-documento .dgd-vacio-ico svg{width:24px;height:24px}
+.p-documento .dgd-esq{display:grid;gap:14px;padding:40px 20px;margin-top:52px;background:var(--dgd-sup);border:1px solid var(--dgd-linea);border-radius:var(--r-box,14px)!important}
+.p-documento .dgd-esq i{display:block;height:12px;border-radius:6px;background:rgba(19,29,45,.06);animation:dgd-late 1.4s ease-in-out infinite}
+.p-documento .dgd-esq i.l{width:30%;margin:0 auto}.p-documento .dgd-esq i.h{width:70%;height:26px;margin:0 auto 10px}.p-documento .dgd-esq i.c{width:55%}
+@keyframes dgd-late{50%{opacity:.5}}
+
+@media(prefers-reduced-motion:reduce){
+  .p-documento :is(.dgd-velo,.dgd-sheet,.dgd-btn,.dgd-registro > summary::after){transition:none!important}
+  .p-documento .dgd-sheet{transform:none!important}
+  .p-documento .dgd-esq i{animation:none}
+}
+
+/* ── Imprimir o guardar como PDF: solo el documento y el registro de firmas, en A4 ─────────────────────── */
+@media print{
+  @page{size:A4;margin:18mm 18mm 20mm}
+  html,body.p-documento{background:#fff!important}
+  body.p-documento{padding:0!important}
+  .p-documento :is(#pHeader,#pFooter,.navbar,.mobile-menu,.p-tabbar,.p-velo,.dgd-top,.dgd-estado,.dgd-barra,.dgd-velo,.dgd-anular,.dgd-verif,.dgd-solo-pantalla),#bpToast{display:none!important}
+  .p-documento .dgd-main{max-width:none;padding:0!important;min-height:0}
+  .p-documento .dgd-hoja{padding:0;border:0;box-shadow:none;background:#fff}
+  .p-documento .dgd-marca{margin-bottom:10mm;color:#000}
+  .p-documento .dgd-texto :is(p,li){font-size:10.5pt;line-height:1.55;color:#000;text-align:justify;orphans:3;widows:3}
+  .p-documento .dgd-texto h1{font-size:20pt;color:#000}
+  .p-documento .dgd-texto h2{font-size:12pt;color:#000;margin-top:6mm}
+  .p-documento .dgd-texto :is(strong,h1 + p){color:#000}
+  .p-documento .dgd-texto blockquote{border-color:#999;background:none}
+  .p-documento .dgd-texto blockquote p{color:#333}
+  .p-documento .dgd-registro{margin-top:10mm;border:0;border-top:1px solid #999;border-radius:0!important;background:#fff;break-inside:avoid}
+  .p-documento .dgd-registro > summary{padding:4mm 0 2mm;min-height:0;color:#000}
+  .p-documento .dgd-registro > summary::after{display:none}
+  .p-documento .dgd-registro-in{padding:0}
+  .p-documento :is(.dgd-f-n,.dgd-f-m,.dgd-f-rol,.dgd-datos dt,.dgd-datos dd,.dgd-ley,.dgd-datos code){color:#000}
+  .p-documento .dgd-solo-print{display:inline}
+}
+
+/* ════════ En la operación (mensajes.html): la sección "Firmas" ════════ */
+.p-mensajes .dgd-lista li{position:relative}
+.p-mensajes .dgd-lista .dgd-a{color:var(--ms-navy);text-decoration:underline;text-decoration-color:rgba(117,98,60,.45);text-underline-offset:3px}
+.p-mensajes .dgd-lista .dgd-a::after{content:"";position:absolute;inset:0}
+.p-mensajes .dgd-lista .dgd-a:focus-visible{outline:0}
+.p-mensajes .dgd-lista li:has(.dgd-a:focus-visible){outline:2px solid var(--ms-navy);outline-offset:2px;border-radius:var(--ms-r-ctl)}
+.p-mensajes .dgd-lista li:hover .dgd-a{text-decoration-color:var(--ms-navy)}
+.p-mensajes .dgd-lista .ms-pill-pendiente{background:var(--ms-oro-suave);color:var(--ms-oro)}
+.p-mensajes .dgd-lista .ms-pill-vencido{background:rgba(126,43,38,.07);color:var(--ms-vino)}
+.p-mensajes .dgd-lista .ms-pill-firmado{background:rgba(46,106,78,.10);color:#2E6A4E}
+.p-mensajes .dgd-confianza{margin-top:12px;font-size:.75rem}
+.p-mensajes .dgd-mas{margin-top:6px}
+.p-mensajes .dgd-mas > summary{display:inline-flex;align-items:center;min-height:44px;cursor:pointer;font:500 .8125rem/1 var(--font-body);color:var(--ms-tinta-2)}
