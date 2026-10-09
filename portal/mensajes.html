@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20261009f"><link rel="stylesheet" href="css/catalogo.css?v=20261009f"><link rel="stylesheet" href="css/portal.css?v=20261009f"><link rel="stylesheet" href="css/transiciones.css?v=20261009f"><style>@view-transition{navigation:auto}</style><style>html.arrancando body{opacity:0}body{transition:opacity .18s cubic-bezier(.22,1,.36,1)}@media(prefers-reduced-motion:reduce){body{transition:none}}</style><script>/* 8/10/2026 · Arranque sin pantallazo (ver BP.listo en ui.js): siempre, salvo al entrar a una ficha desde el portal (ahí la foto de la tarjeta crece hasta la ficha); en Safari del iPhone la transición entre páginas no tapaba el video al tocar el logo. Tope: 800 ms. */(function(){try{var h=document.documentElement,n=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{},r=document.referrer||'';if(r.indexOf(location.origin)===0&&n.type!=='reload'&&/propiedad/.test(location.pathname))return;h.classList.add('arrancando');setTimeout(function(){h.classList.remove('arrancando')},800)}catch(e){}})()</script>
-  <link rel="stylesheet" href="css/mensajes.css?v=20261009f">
+  <link rel="stylesheet" href="css/base.css?v=20261009g"><link rel="stylesheet" href="css/catalogo.css?v=20261009g"><link rel="stylesheet" href="css/portal.css?v=20261009g"><link rel="stylesheet" href="css/transiciones.css?v=20261009g"><style>@view-transition{navigation:auto}</style><style>html.arrancando body{opacity:0}body{transition:opacity .18s cubic-bezier(.22,1,.36,1)}@media(prefers-reduced-motion:reduce){body{transition:none}}</style><script>/* 8/10/2026 · Arranque sin pantallazo (ver BP.listo en ui.js): siempre, salvo al entrar a una ficha desde el portal (ahí la foto de la tarjeta crece hasta la ficha); en Safari del iPhone la transición entre páginas no tapaba el video al tocar el logo. Tope: 800 ms. */(function(){try{var h=document.documentElement,n=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{},r=document.referrer||'';if(r.indexOf(location.origin)===0&&n.type!=='reload'&&/propiedad/.test(location.pathname))return;h.classList.add('arrancando');setTimeout(function(){h.classList.remove('arrancando')},800)}catch(e){}})()</script>
+  <link rel="stylesheet" href="css/mensajes.css?v=20261009g">
 </head>
 <!-- 8/10/2026 · La operación digital · Mensajes. Dos vistas en la misma página:
      · Bandeja (mensajes.html): mis operaciones (BPDigital.bandeja), con filtros y, para la curación, "Ver todas".
@@ -39,12 +39,12 @@
 </main>
 <div id="pFooter"></div>
 
-<script src="supabase-portal.js?v=20261009f" defer></script><script src="js/errores.js?v=20261009f" defer></script>
-<script src="../mapa-barrios.js?v=20261009f" defer></script>
-<script src="js/bairen-motion.js?v=20261009f" defer></script><script src="js/i18n-portal.js?v=20261009f" defer></script><script src="js/ui.js?v=20261009f" defer></script><script src="js/store.js?v=20261009f" defer></script>
-<script src="js/digital.js?v=20261009f" defer></script><script src="js/dg-identidad.js?v=20261009f" defer></script><script src="js/dg-avisos.js?v=20261009f" defer></script><script src="js/dg-inversores.js?v=20261009f" defer></script><script src="js/dg-documentos.js?v=20261009f" defer></script><script src="js/dg-garantias.js?v=20261009f" defer></script>
-<script src="js/dg-pagos.js?v=20261009f" defer></script>
-<script src="js/data.js?v=20261009f" defer></script>
+<script src="supabase-portal.js?v=20261009g" defer></script><script src="js/errores.js?v=20261009g" defer></script>
+<script src="../mapa-barrios.js?v=20261009g" defer></script>
+<script src="js/bairen-motion.js?v=20261009g" defer></script><script src="js/i18n-portal.js?v=20261009g" defer></script><script src="js/ui.js?v=20261009g" defer></script><script src="js/store.js?v=20261009g" defer></script>
+<script src="js/digital.js?v=20261009g" defer></script><script src="js/dg-identidad.js?v=20261009g" defer></script><script src="js/dg-avisos.js?v=20261009g" defer></script><script src="js/dg-inversores.js?v=20261009g" defer></script><script src="js/dg-documentos.js?v=20261009g" defer></script><script src="js/dg-garantias.js?v=20261009g" defer></script>
+<script src="js/dg-pagos.js?v=20261009g" defer></script>
+<script src="js/data.js?v=20261009g" defer></script>
 <script>
 document.addEventListener('DOMContentLoaded', function(){
 (async function(){
@@ -287,6 +287,7 @@ document.addEventListener('DOMContentLoaded', function(){
               <textarea id="msTexto" rows="1" maxlength="4000" enterkeyhint="send" autocomplete="off" placeholder="${esc(t('ph', 'Escribí un mensaje'))}" disabled></textarea>
               <button type="submit" class="ms-enviar" id="msEnviar" aria-label="${esc(t('enviar', 'Enviar'))}" disabled>${ICO.enviar}</button>
             </form>
+            <p class="ms-pista" id="msPista" aria-live="polite" hidden>${esc(t('pista_contacto', 'Acá queda todo registrado: visitas, reserva y contrato.'))}</p>
           </div>
         </div>
         <div class="ms-velo-panel" id="msVeloPanel" aria-hidden="true"></div>
@@ -375,7 +376,7 @@ document.addEventListener('DOMContentLoaded', function(){
         else if (solOk) out.estado = t('e_i_sol_ok', 'Aceptaron tu solicitud. Seguimos por acá con la reserva y el contrato.');
         if (!ped && !vis && ord <= 4 && !solOk) a(out.prim, 'pedir_visita', t('a_pedir_visita', 'Pedir visita'), 'visita_pedida');
         if (!solPend && !solOk && ord <= 4) a(out.prim, 'avanzar', t('a_avanzar', 'Quiero avanzar'), 'solicitud_enviada');
-        if (wa) a(out.prim, 'wa', t('a_wa', 'Seguir por WhatsApp'), 'whatsapp', { href: waHref(wa, tf('wa_txt', 'Hola, te escribo desde BAIREN por {t}.', { t: (d.aviso && d.aviso.titulo) || '' })), ico: ICO.wa });
+        if (wa) a(out.prim, 'wa', t('a_wa', 'Seguir por WhatsApp'), 'whatsapp', { href: waHref(wa, tf('wa_txt', 'Hola, te escribo desde BAIREN por {t}. La reserva y el contrato los seguimos acá: {u}', { t: (d.aviso && d.aviso.titulo) || '', u: linkOp(op) })), ico: ICO.wa });
         if (vis || ped) a(out.mas, 'cancelar_visita', t('a_cancelar_visita', 'Cancelar visita'), 'visita_cancelada', { peligro: true });
         a(out.mas, 'no_sigo', t('a_no_sigo', 'No sigo'), 'caida', { peligro: true });
       } else if (et === 'caida') out.estado = t('e_caida', 'Quedó sin acuerdo. La conversación sigue guardada acá.');
@@ -394,7 +395,7 @@ document.addEventListener('DOMContentLoaded', function(){
         if (genOk && ord < 6) a(out.prim, 'contrato_firm', t('a_contrato_firm', 'Contrato firmado'), 'contrato_firmado');
         a(genOk || ord >= 5 ? out.prim : out.mas, 'cerrar', t('a_cerrar', 'Cerrar operación'), 'cierre');
         if (ord < 5) a(solOk ? out.prim : out.mas, 'reserva', t('a_reserva', 'Reserva'), 'reserva');
-        if (tel) a(out.mas, 'wa_int', t('a_wa_int', 'Escribirle por WhatsApp'), 'whatsapp', { href: waHref(BPStore.waNorm ? BPStore.waNorm(tel) : tel, tf('wa_txt_p', 'Hola, te escribo desde BAIREN por {t}.', { t: (d.aviso && d.aviso.titulo) || '' })), ico: ICO.wa });
+        if (tel) a(out.mas, 'wa_int', t('a_wa_int', 'Escribirle por WhatsApp'), 'whatsapp', { href: waHref(BPStore.waNorm ? BPStore.waNorm(tel) : tel, tf('wa_txt_p', 'Hola, te escribo desde BAIREN por {t}. La reserva y el contrato los seguimos acá: {u}', { t: (d.aviso && d.aviso.titulo) || '', u: linkOp(op) })), ico: ICO.wa });
         a(out.mas, 'sin_acuerdo', t('a_sin_acuerdo', 'Sin acuerdo'), 'caida', { peligro: true });
       } else if (et === 'caida') {
         out.estado = t('e_caida_p', 'Quedó sin acuerdo.') + (op.motivo_caida ? ' ' + tf('e_motivo', 'Motivo: {m}.', { m: recorte(op.motivo_caida, 80) }) : '');
@@ -425,6 +426,9 @@ document.addEventListener('DOMContentLoaded', function(){
     if (out.prim.length > 3) out.mas = out.prim.splice(3).concat(out.mas);
     return out;
   }
+  /* 9/10 · El WhatsApp sale con el link de vuelta a la operación: lo que se habla afuera vuelve a BAIREN para la reserva,
+     el contrato y los pagos. Absoluto sobre la página actual (sirve en portal.bairengroup.com y en local). */
+  function linkOp(op){ try { return new URL('mensajes.html?op=' + encodeURIComponent(op.id), location.href).href; } catch (e) { return ''; } }
   function waHref(num, texto){ const n = String(num || '').replace(/\D/g, ''); return n ? 'https://wa.me/' + n + (texto ? '?text=' + encodeURIComponent(texto) : '') : null; }
   function pintarAcciones(){
     const host = $('msAcc'); if (!host) return;
@@ -767,7 +771,12 @@ document.addEventListener('DOMContentLoaded', function(){
   function prepararComposer(){
     const f = $('msComp'), ta = $('msTexto'), b = $('msEnviar');
     const ajustar = () => { ta.style.height = 'auto'; const alto = ta.scrollHeight + 2; ta.style.height = Math.min(alto, 140) + 'px'; ta.style.overflowY = alto > 140 ? 'auto' : 'hidden'; b.disabled = !ta.value.trim() || st.enviando; if (st.opId) st.borradores[st.opId] = ta.value; };
+    /* 9/10 · Si escribe un teléfono, un mail o "WhatsApp", una línea chica recuerda que acá queda todo registrado. No bloquea. */
+    const pista = $('msPista'), CONTACTO = /[^\s@]+@[^\s@]+\.[a-z]{2,}|(?:\+?\d[\s().-]?){8,}|\b(?:whats?app|wsp|wpp|wapp|watsap|telegram)\b/i;
+    const mirar = () => { if (pista) pista.hidden = !CONTACTO.test(ta.value); };
     ta.addEventListener('input', ajustar);
+    ta.addEventListener('input', mirar);
+    ta._mirar = mirar;
     ta.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing && e.keyCode !== 229) { e.preventDefault(); enviar(); } });
     f.addEventListener('submit', e => { e.preventDefault(); enviar(); });
     ta.addEventListener('focus', () => { if (movil()) setTimeout(() => { const l = $('msLog'); if (l && cercaDelFinal(l)) abajoDelTodo(false); }, 320); });
@@ -777,7 +786,7 @@ document.addEventListener('DOMContentLoaded', function(){
     const ta = $('msTexto'); if (!ta || !st.d) return;
     ta.disabled = false;
     ta.placeholder = st.d.lado === 'plataforma' ? t('ph_equipo', 'Escribí como equipo BAIREN') : t('ph', 'Escribí un mensaje');
-    ta.value = st.borradores[st.opId] || ''; ta._ajustar();
+    ta.value = st.borradores[st.opId] || ''; ta._ajustar(); if (ta._mirar) ta._mirar();
   }
   async function enviar(){
     const ta = $('msTexto'), b = $('msEnviar'); if (!ta || !st.d) return;
@@ -791,7 +800,7 @@ document.addEventListener('DOMContentLoaded', function(){
       if (etapaAntes === 'consulta' || !(st.d.hitos || []).some(h => h.tipo === 'conversacion')) recargarDetalle(true);
       cargarBandeja(true);
     } catch (e) { BP.toast((e && e.message) || t('err_enviar', 'No pudimos mandar el mensaje. Probá de nuevo.'), 'error'); }
-    finally { st.enviando = false; ta.removeAttribute('aria-busy'); if (ta._ajustar) ta._ajustar(); if (!movil()) ta.focus(); }
+    finally { st.enviando = false; ta.removeAttribute('aria-busy'); if (ta._ajustar) ta._ajustar(); if (ta._mirar) ta._mirar(); if (!movil()) ta.focus(); }
   }
 
   /* ── Abrir, recargar y cerrar una operación ────────────── */

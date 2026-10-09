@@ -43,13 +43,16 @@ const escribir = async txt => {
 };
 
 try {
-  /* ── 1 · Sin ?digital=1: Muy pronto ── */
+  /* ── 1 · Cerrado (cookie bp_cerrado del servidor de prueba) y sin ?digital=1: Muy pronto. Abierto: nunca ── */
   await c.vista(true);
-  await c.ir('index.html', 300); await c.ev('localStorage.clear(); sessionStorage.clear(); true');
+  await c.ir('index.html', 300); await c.ev(`localStorage.clear(); sessionStorage.clear(); document.cookie = 'bp_cerrado=1; path=/; max-age=120'; true`);
   await c.ir('mensajes.html?digital=0', 1000);
   check(await hay('.ms-pronto'), '1 · sin ?digital=1 muestra "Muy pronto"', await texto('.ms-pronto-t'));
   check(await hay('.ms-pronto a[href="index.html"]'), '1 · botón a index.html');
   await c.foto('01-pronto-movil');
+  await c.ev(`document.cookie = 'bp_cerrado=; path=/; max-age=0'; true`);
+  await c.ir('mensajes.html?digital=0', 1000);
+  check(await c.ev('!!(window.BP && BP.DIGITAL_PUBLICO)') && !(await hay('.ms-pronto')), '1 · abierto para todos: sin "Muy pronto" aunque venga ?digital=0');
 
   /* ── 2 · Ana abre la operación y la ve en la bandeja ── */
   await c.ev(`localStorage.setItem('bp_publicadores', ${JSON.stringify(JSON.stringify(PUB))}); true`);
@@ -98,6 +101,14 @@ try {
   await c.ir('mensajes.html?op=' + op1, 1300);
   const wa = await c.ev(`(document.querySelector('#msAcc [data-acc="wa"]')||{}).href || ''`);
   check(wa.startsWith('https://wa.me/5491100000000'), '4 · WhatsApp aparece después de la respuesta', wa);
+  check(decodeURIComponent(wa).includes('mensajes.html?op=' + op1), '4 · el WhatsApp sale con el link de vuelta a la operación', decodeURIComponent(wa).slice(-90));
+  /* La pista "acá queda registrado" aparece con un teléfono, un mail o "wsp", y se va al borrar */
+  const pista = async v => c.ev(`(()=>{ const ta = document.getElementById('msTexto'); ta.value = ${JSON.stringify(v)}; ta.dispatchEvent(new Event('input', { bubbles: true })); return !document.getElementById('msPista').hidden; })()`);
+  check(!(await pista('Hola, ¿se puede visitar el jueves?')), '4 · sin pista en un mensaje común');
+  check(await pista('Mi cel es 11 5555-1234'), '4 · pista con un teléfono');
+  check(await pista('escribime a ana@mail.com'), '4 · pista con un mail');
+  check(await pista('pasame tu wsp'), '4 · pista con "wsp"');
+  check(!(await pista('')), '4 · la pista se va al borrar');
   check(await hay('#msLog .ms-corte'), '4 · separador "Sin leer" antes de la respuesta de Pablo');
   check((await texto('#msLog .ms-m.mio .ms-visto')).includes('Visto'), '4 · "Visto" debajo del mensaje que Pablo leyó');
   /* Escape cierra el diálogo y devuelve el foco */

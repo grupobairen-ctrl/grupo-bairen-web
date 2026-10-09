@@ -222,6 +222,9 @@
 .p-mensajes .ms-comp textarea:focus{border-color:var(--ms-navy);background:#fff;outline:none}
 .p-mensajes .ms-comp textarea:focus-visible{outline:1px solid var(--ms-navy);outline-offset:0}
 .p-mensajes .ms-comp textarea:disabled{opacity:.6}
+/* 9/10 · La pista de "acá queda registrado" cuando se escribe un teléfono o un mail: chica, sin alarma */
+.p-mensajes .ms-pista{margin:6px 16px 0;font:400 .75rem/1.35 'Jost',sans-serif;color:var(--ms-tinta-2);letter-spacing:.01em}
+.p-mensajes .ms-pista[hidden]{display:none}
 .p-mensajes .ms-enviar{flex:0 0 auto;display:grid;place-items:center;width:44px;height:44px;padding:0;border:0;border-radius:50%!important;background:var(--ms-navy);color:#FBFAF6;cursor:pointer;
   transition:opacity .2s var(--ms-curva),background-color .2s var(--ms-curva)}
 .p-mensajes .ms-enviar:hover:not(:disabled){background:#2A3A52}

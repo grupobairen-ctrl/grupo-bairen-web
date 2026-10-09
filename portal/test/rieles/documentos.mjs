@@ -285,9 +285,10 @@ try {
   await c.ev(`window.dispatchEvent(new Event('afterprint')); true`);
 
   /* ── 10. Sin el interruptor: "Muy pronto"; sin id: vacío que guía ── */
+  await c.ev(`document.cookie = 'bp_cerrado=1; path=/; max-age=120'; true`);
   await c.ir('documento.html?digital=0', 600);
   ok('Sin BAIREN digital: "Muy pronto"', /muy pronto/i.test(await c.ev(`document.querySelector('main').textContent`)));
-  await c.ev(`localStorage.setItem('bp_digital','1'); true`);
+  await c.ev(`document.cookie = 'bp_cerrado=; path=/; max-age=0'; localStorage.setItem('bp_digital','1'); true`);
   await c.ir('documento.html', 600);
   ok('Sin documento: vacío que lleva a Mensajes', await c.ev(`!!document.querySelector('.dgd-vacio a[href="mensajes.html"]')`));
   await abrirDoc('no-existe');

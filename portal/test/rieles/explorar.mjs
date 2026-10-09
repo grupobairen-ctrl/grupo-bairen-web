@@ -25,13 +25,15 @@ await c.vista(true);
 await c.ir('index.html', 400);
 await ev('localStorage.clear(); sessionStorage.clear(); true');
 
-/* ── 1 · sin ?digital=1: Muy pronto ── */
+/* ── 1 · cerrado (cookie bp_cerrado del servidor de prueba) y sin ?digital=1: Muy pronto ── */
+await ev(`document.cookie = 'bp_cerrado=1; path=/; max-age=120'; true`);
 await c.ir('explorar.html', 1500);
 ok('1 explorar sin interruptor: Muy pronto', await esperar('!!document.querySelector(".p-dg-pronto")'));
 await c.foto('01-pronto-m');
 await c.ir('se-busca.html', 1500);
 ok('1 se-busca sin interruptor: Muy pronto (sin pedir sesión)', (await esperar('!!document.querySelector(".p-dg-pronto")')) && /se-busca/.test(await ev('location.pathname')));
 await c.vista(false); await c.ir('explorar.html', 1200); await c.foto('01-pronto-d');
+await ev(`document.cookie = 'bp_cerrado=; path=/; max-age=0'; true`);
 
 /* ── 2 · con ?digital=1, sin sesión ── */
 await c.vista(true);
@@ -215,8 +217,10 @@ await clic('#tabSb', 300);
 await clic('.p-ex-bus [data-verif]', 900);
 ok('movimiento reducido: la página sigue andando', await esperar('!!document.querySelector(".p-ex-bus")'));
 await c.send('Emulation.setEmulatedMedia', { features: [] });
-await c.vista(true); await c.ir('explorar.html?digital=0', 1500);
+await c.vista(true); await ev(`document.cookie = 'bp_cerrado=1; path=/; max-age=120'; true`); await c.ir('explorar.html?digital=0', 1500);
 ok('?digital=0 vuelve a Muy pronto', await esperar('!!document.querySelector(".p-dg-pronto")'));
+await ev(`document.cookie = 'bp_cerrado=; path=/; max-age=0'; true`); await c.ir('explorar.html?digital=0', 1500);
+ok('Abierto para todos: ni con ?digital=0 aparece Muy pronto', await esperar('!document.querySelector(".p-dg-pronto") && !!document.querySelector(".p-ex-bus")'));
 
 console.log(R.join('\n'));
 const errs = c.errores.concat(c.consola);
