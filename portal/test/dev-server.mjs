@@ -11,11 +11,14 @@ const REWRITES = [
   [/^\/portal\/(departamentos|pisos|ph|casas|propiedades)-(venta|alquiler-mediano-plazo|alquiler-largo-plazo|alquiler)-([a-z0-9-]+)$/, () => ({ file: '/portal/buscar.html' })],
   [/^\/portal\/(publicar|ingresar|panel|curacion|legales|publicadores|buscar|importar|emprendimientos|publicar-aviso|membership|guardados|explorar|mensajes|se-busca|cobros|cuenta-verificacion|avisos|inversores|precios|documento|pagos|garantias)$/, (m) => ({ file: '/portal/' + m[1] + '.html' })],
 ];
+/* 9/10 · BAIREN digital está abierto para todos (BP.DIGITAL_PUBLICO en js/ui.js). Con la cookie bp_cerrado=1, ui.js sale con
+   el interruptor en false, como antes de abrirlo: así las pruebas siguen cubriendo la vuelta atrás ("Muy pronto"). */
+const cerrado = (req, path) => path === '/portal/js/ui.js' && /(?:^|;\s*)bp_cerrado=1(?:;|$)/.test(req.headers.cookie || '');
 createServer(async (req, res) => {
   const url = new URL(req.url, 'http://x'); let path = decodeURIComponent(url.pathname);
   for (const [re, fn] of REWRITES) { const m = path.match(re); if (m) { const r = fn(m); if (r.probe) { res.writeHead(200, { 'x-bp-rewrite': '1' }); return res.end(); } path = r.file; break; } }
   if (path.endsWith('/')) path += 'index.html';
   const file = normalize(join(ROOT, path)); if (!file.startsWith(ROOT)) { res.writeHead(403); return res.end(); }
-  try { const st = await stat(file); if (st.isDirectory()) { res.writeHead(301, { Location: url.pathname + '/' }); return res.end(); } const body = await readFile(file); res.writeHead(200, { 'Content-Type': MIME[extname(file).toLowerCase()] || 'application/octet-stream', 'Cache-Control': 'no-store' }); res.end(body); }
+  try { const st = await stat(file); if (st.isDirectory()) { res.writeHead(301, { Location: url.pathname + '/' }); return res.end(); } let body = await readFile(file); if (cerrado(req, path)) body = Buffer.from(String(body).replace('BP.DIGITAL_PUBLICO = true;', 'BP.DIGITAL_PUBLICO = false;')); res.writeHead(200, { 'Content-Type': MIME[extname(file).toLowerCase()] || 'application/octet-stream', 'Cache-Control': 'no-store' }); res.end(body); }
   catch (e) { res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' }); res.end('No encontrado: ' + path); }
 }).listen(PORT, HOST, () => console.log('BAIREN dev server: http://' + (HOST === '0.0.0.0' ? 'localhost' : HOST) + ':' + PORT + '/portal/' + (HOST === '0.0.0.0' ? '  (también desde el celular en la misma red, con la IP de la Mac)' : '')));

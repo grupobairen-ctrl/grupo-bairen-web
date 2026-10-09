@@ -11,7 +11,8 @@ import { limpiar, pantalla, seguir, set, chip, marcar, pasos, medir, fotos, avis
 const c = await conectar();
 const out = { casos: [], medidas: [] };
 const caso = (n, ok, det) => { out.casos.push({ n, ok: !!ok, det: det === undefined ? null : det }); };
-const digital = on => c.ev(on ? 'localStorage.setItem("bp_digital","1"); true' : 'localStorage.removeItem("bp_digital"); true');
+/* Apagado = portal cerrado (cookie bp_cerrado del servidor de prueba) y sin el interruptor personal */
+const digital = on => c.ev(on ? "document.cookie = 'bp_cerrado=; path=/; max-age=0'; localStorage.setItem('bp_digital','1'); true" : "document.cookie = 'bp_cerrado=1; path=/; max-age=120'; localStorage.removeItem('bp_digital'); true");
 /* La barra: visible, sus dos renglones, su alto y si Continuar queda libre y a la vista */
 const barra = () => c.ev(`(function(){
   const b = document.querySelector('.tf-barra'); const s = document.getElementById('pfSeguir');

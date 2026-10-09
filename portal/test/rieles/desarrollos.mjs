@@ -212,11 +212,12 @@ caso('Compu: "Antes que nadie" en Explorar', (await txt('.p-ex-antes')) === 'Ant
 await c.ir('mensajes.html?op=' + encodeURIComponent(op1), 2200); await c.foto('d-ms-lead'); await sinScroll('Mensajes compu');
 
 /* Página sin el interruptor: "Muy pronto" */
-await c.ev(`localStorage.removeItem('bp_digital'); true`);
+await c.ev(`document.cookie = 'bp_cerrado=1; path=/; max-age=120'; localStorage.removeItem('bp_digital'); true`);
 await c.ir('inversores.html', 1200);
 caso('Sin BAIREN digital: "Muy pronto"', (await txt('.inv-vacio b')) === 'Muy pronto', await txt('main'));
 await c.ir('emprendimientos.html', 1500);
 caso('Sin BAIREN digital, Desarrollos queda como estaba', (await c.ev(`document.querySelectorAll('.p-emp-avisame, .p-emp-aviso').length`)) === 0, null);
+await c.ev(`document.cookie = 'bp_cerrado=; path=/; max-age=0'; true`);
 
 const errores = c.errores.concat(fallas);
 console.log(JSON.stringify({ casos, errores, consola: c.consola, final: casos.filter(x => x.ok).length + '/' + casos.length }, null, 1));

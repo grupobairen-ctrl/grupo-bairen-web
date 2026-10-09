@@ -274,10 +274,10 @@ await ev('document.querySelector("[data-cuenta]").click()'); await sleep(500);
 await ev('__pg.llenar({ alias: "x" }, ".pg-hoja")'); await sleep(400);
 ok('Error: alias corto se avisa en la hoja', /Revisá el alias/.test(await ev('__pg.err(".pg-hoja")')), await ev('__pg.err(".pg-hoja")'));
 await ev('document.querySelector(".pg-hoja [data-cerrar]").click()'); await sleep(400);
-await c.ev(`localStorage.removeItem('bp_digital'); true`);
+await c.ev(`document.cookie = 'bp_cerrado=1; path=/; max-age=120'; localStorage.removeItem('bp_digital'); true`);
 await c.ir('pagos.html', 1000);
 ok('Apagado para el público: "Muy pronto"', /muy pronto/i.test(await c.ev('document.getElementById("pgCuerpo").textContent')), null);
-await c.ev(`localStorage.setItem('bp_digital', '1'); true`);
+await c.ev(`document.cookie = 'bp_cerrado=; path=/; max-age=0'; localStorage.setItem('bp_digital', '1'); true`);
 
 const errores = c.errores, consola = c.consola.filter(x => !/no-existe/.test(x));
 ok('Sin errores de consola', !errores.length && !consola.length, JSON.stringify(errores.concat(consola)).slice(0, 300));

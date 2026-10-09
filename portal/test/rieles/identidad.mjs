@@ -73,9 +73,10 @@ try {
 
   /* ── 1. Sin la llave de BAIREN digital: muy pronto ── */
   await c.vista(true);
-  await ev(`localStorage.setItem('bp_user', ${JSON.stringify(JSON.stringify(ANA))}); localStorage.removeItem('bp_digital'); true`);
+  await ev(`localStorage.setItem('bp_user', ${JSON.stringify(JSON.stringify(ANA))}); localStorage.removeItem('bp_digital'); document.cookie = 'bp_cerrado=1; path=/; max-age=120'; true`);
   await c.ir('cuenta-verificacion.html', 900);
   ok('Apagado: muy pronto', /Muy pronto/.test(await texto('#idnCaja')), await texto('#idnCaja'));
+  await ev(`document.cookie = 'bp_cerrado=; path=/; max-age=0'; true`);
 
   /* ── 2. Ana se verifica (celular) ── */
   await ses(ANA);
