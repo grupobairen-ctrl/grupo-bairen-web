@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20261009c"><link rel="stylesheet" href="css/catalogo.css?v=20261009c"><link rel="stylesheet" href="css/portal.css?v=20261009c"><link rel="stylesheet" href="css/transiciones.css?v=20261009c"><style>@view-transition{navigation:auto}</style><style>html.arrancando body{opacity:0}body{transition:opacity .18s cubic-bezier(.22,1,.36,1)}@media(prefers-reduced-motion:reduce){body{transition:none}}</style><script>/* 8/10/2026 · Arranque sin pantallazo (ver BP.listo en ui.js): siempre, salvo al entrar a una ficha desde el portal (ahí la foto de la tarjeta crece hasta la ficha); en Safari del iPhone la transición entre páginas no tapaba el video al tocar el logo. Tope: 800 ms. */(function(){try{var h=document.documentElement,n=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{},r=document.referrer||'';if(r.indexOf(location.origin)===0&&n.type!=='reload'&&/propiedad/.test(location.pathname))return;h.classList.add('arrancando');setTimeout(function(){h.classList.remove('arrancando')},800)}catch(e){}})()</script>
+  <link rel="stylesheet" href="css/base.css?v=20261009c"><link rel="stylesheet" href="css/catalogo.css?v=20261009c"><link rel="stylesheet" href="css/portal.css?v=20261009c"><link rel="stylesheet" href="css/transiciones.css?v=20261009c"><link rel="stylesheet" href="css/identidad.css?v=20261009c"><style>@view-transition{navigation:auto}</style><style>html.arrancando body{opacity:0}body{transition:opacity .18s cubic-bezier(.22,1,.36,1)}@media(prefers-reduced-motion:reduce){body{transition:none}}</style><script>/* 8/10/2026 · Arranque sin pantallazo (ver BP.listo en ui.js): siempre, salvo al entrar a una ficha desde el portal (ahí la foto de la tarjeta crece hasta la ficha); en Safari del iPhone la transición entre páginas no tapaba el video al tocar el logo. Tope: 800 ms. */(function(){try{var h=document.documentElement,n=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{},r=document.referrer||'';if(r.indexOf(location.origin)===0&&n.type!=='reload'&&/propiedad/.test(location.pathname))return;h.classList.add('arrancando');setTimeout(function(){h.classList.remove('arrancando')},800)}catch(e){}})()</script>
   <style>
     .p-cur{background:var(--p-card);border:1px solid var(--p-line);border-radius:var(--p-radius);padding:18px;margin-bottom:14px;display:grid;grid-template-columns:200px 1fr;gap:18px}
     .p-cur .ph{aspect-ratio:4/3;border-radius:8px;overflow:hidden;background:var(--p-tray)} .p-cur .ph img{width:100%;height:100%;object-fit:cover}
@@ -44,13 +44,13 @@
   <span class="p-eyebrow">Panel BAIREN</span>
   <h1 class="p-h2">Curación</h1>
   <p class="p-sub">Entra lo que pasa el estándar. Cada rechazo lleva un motivo que el publicador ve en su panel.</p>
-  <div class="p-tabs2" role="tablist" style="margin-bottom:0;border-bottom:0"><button type="button" class="on" data-t="cola" role="tab" aria-selected="true" aria-controls="out">Avisos en revisión</button><button type="button" data-t="pubs" role="tab" aria-selected="false" aria-controls="out" tabindex="-1">Publicadores por verificar</button><button type="button" data-t="sistema" role="tab" aria-selected="false" aria-controls="out" tabindex="-1">Sistema</button></div>
+  <div class="p-tabs2" role="tablist" style="margin-bottom:0;border-bottom:0"><button type="button" class="on" data-t="cola" role="tab" aria-selected="true" aria-controls="out">Avisos en revisión</button><button type="button" data-t="pubs" role="tab" aria-selected="false" aria-controls="out" tabindex="-1">Publicadores por verificar</button><button type="button" data-t="identidad" role="tab" aria-selected="false" aria-controls="out" tabindex="-1" hidden>Identidad</button><button type="button" data-t="sistema" role="tab" aria-selected="false" aria-controls="out" tabindex="-1">Sistema</button></div>
 </div></div>
 <section class="p-page after-band" role="main"><div class="p-container" style="max-width:980px">
   <div id="out" role="tabpanel" aria-busy="true"><div class="p-skel-panel" aria-hidden="true"><div class="p-skel-line row"></div><div class="p-skel-line row"></div></div></div>
 </div></section>
 <div id="pFooter"></div>
-<script src="supabase-portal.js?v=20261009c" defer></script><script src="js/errores.js?v=20261009c" defer></script><script src="js/bairen-motion.js?v=20261009c" defer></script><script src="js/i18n-portal.js?v=20261009c" defer></script><script src="js/ui.js?v=20261009c" defer></script><script src="js/store.js?v=20261009c" defer></script><script src="js/data.js?v=20261009c" defer></script>
+<script src="supabase-portal.js?v=20261009c" defer></script><script src="js/errores.js?v=20261009c" defer></script><script src="js/bairen-motion.js?v=20261009c" defer></script><script src="js/i18n-portal.js?v=20261009c" defer></script><script src="js/ui.js?v=20261009c" defer></script><script src="js/store.js?v=20261009c" defer></script><script src="js/data.js?v=20261009c" defer></script><script src="js/dg-identidad.js?v=20261009c" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -60,6 +60,9 @@ document.addEventListener('DOMContentLoaded', function(){
   if (!BPStore.requireSession('curacion')) return;
   if (!(await BPStore.isCurador())) { document.getElementById('out').innerHTML = '<div class="p-empty">Solo para el equipo de curación de BAIREN.</div>'; return; }
   const out = document.getElementById('out'); const TABS = ['cola', 'pubs', 'sistema']; let t = 'cola';
+  /* 9/10/2026 · Riel de identidad (migración 29): la pestaña Identidad, con BAIREN digital prendido (BP.digital()) */
+  const conIdentidad = !!(window.BPIdentidad && BP.digital && BP.digital());
+  if (conIdentidad) { TABS.splice(2, 0, 'identidad'); const bi = document.querySelector('.p-tabs2 [data-t=identidad]'); if (bi) bi.hidden = false; }
   /* 8/10/2026 (lanz3-publicador) · Al volver de corregir un aviso ajeno: "Guardado. El aviso sigue a nombre de X." */
   try { const m = sessionStorage.getItem('bp_cur_msg'); if (m) { sessionStorage.removeItem('bp_cur_msg'); setTimeout(() => BP.toast(m), 300); } } catch (e) { /* sin almacenamiento */ }
   /* La pestaña activa se refleja en el hash (#cola, #pubs, #sistema): sirve para volver a la misma y para los links internos */
@@ -82,7 +85,7 @@ document.addEventListener('DOMContentLoaded', function(){
   const ok = (c, txt) => `<span class="${c?'ok':'no'}">${c ? BP.ico.check : BP.ico.x} ${txt}</span>`;
   /* Una acción de curación por vez: el botón queda ocupado y, si la base la rechaza (por ejemplo en demo), se avisa */
   async function accion(btn, fn, okMsg){ if (btn.disabled) return; const card = btn.closest('.p-cur'); const btns = card.querySelectorAll('button'); btns.forEach(x => x.disabled = true); btn.setAttribute('aria-busy', 'true'); try { await fn(); BP.toast(okMsg); return true; } catch (e) { btns.forEach(x => x.disabled = false); btn.removeAttribute('aria-busy'); BP.toast(BPStore.demo ? 'En modo demo no se guarda.' : BPStore.errorAlGuardar(e), 'error'); return false; } }
-  async function render(){ out.setAttribute('aria-busy', 'true'); await (t === 'cola' ? renderCola() : t === 'pubs' ? renderPubs() : renderSistema()); out.removeAttribute('aria-busy'); }
+  async function render(){ out.setAttribute('aria-busy', 'true'); await (t === 'cola' ? renderCola() : t === 'pubs' ? renderPubs() : t === 'identidad' ? renderIdentidad() : renderSistema()); out.removeAttribute('aria-busy'); }
   async function renderCola(){
     const cola = await BPStore.colaCuracion();
     if (!cola.length) { out.innerHTML = '<div class="p-empty p-ensena"><b>No hay avisos esperando revisión.</b><p>Cuando un publicador envíe uno, aparece acá con sus fotos y datos para aprobarlo, pedir cambios o rechazarlo con un motivo.</p></div>'; return; }
@@ -125,6 +128,46 @@ document.addEventListener('DOMContentLoaded', function(){
       <textarea placeholder="Nota (opcional)" aria-label="Nota de la verificación"></textarea><div class="acts"><button type="button" class="p-btn p-btn-sm p-btn-fill" data-ok>Verificar</button><button type="button" class="p-btn p-btn-sm" data-no>Rechazar</button></div></div></div>`).join('');
     out.querySelectorAll('[data-mat]').forEach(b => b.addEventListener('click', async () => { b.disabled = true; try { await BPStore.marcarMatricula(b.dataset.mat, true); BP.toast('Matrícula verificada.'); renderPubs(); } catch (e) { b.disabled = false; BP.toast(BPStore.demo ? 'En modo demo no se guarda.' : BPStore.errorAlGuardar(e), 'error'); } }));
     out.querySelectorAll('.p-cur').forEach(card => { const id = card.dataset.id, ta = card.querySelector('textarea'); card.querySelector('[data-ok]').addEventListener('click', async e => { if (await accion(e.currentTarget, () => BPStore.verificarPublicador(id, true, ta.value.trim()), 'Publicador verificado.')) renderPubs(); }); card.querySelector('[data-no]').addEventListener('click', async e => { if (!ta.value.trim()) { BP.errorCampo(ta, 'Escribí el motivo: el publicador lo va a leer.'); return; } if (await accion(e.currentTarget, () => BPStore.verificarPublicador(id, false, ta.value.trim()), 'Rechazado.')) renderPubs(); }); });
+  }
+  /* ── 9/10/2026 · Identidad (migración 29): quien busca o publica mandó el frente y el dorso de su documento y una selfie.
+     Se aprueba o se rechaza con un motivo que la persona lee. Al resolver se borran las tres fotos del bucket (Ley 25.326);
+     si el borrado falla, la verificación queda abajo, en "Fotos por borrar", con un botón para reintentar. Las fotos se ven
+     con URL firmada de 2 minutos: si vencen, se vuelve a abrir la pestaña. Lógica de datos: js/dg-identidad.js. ── */
+  async function renderIdentidad(){
+    const I = window.BPIdentidad;
+    let cola;
+    try { cola = await I.cola(); }
+    catch (e) { BP.estadoError(out, (e && e.message) || 'No pudimos cargar las verificaciones.', () => render()); return; }
+    const pend = cola.filter(x => x.estado === 'pendiente'), sucias = cola.filter(x => x.estado !== 'pendiente');
+    if (!cola.length) { out.innerHTML = '<div class="p-empty p-ensena"><b>No hay identidades esperando revisión.</b><p>Cuando alguien mande las fotos de su documento y una selfie, aparecen acá para aprobarlas o rechazarlas con un motivo. Al resolver, las fotos se borran.</p></div>'; return; }
+    const cuando = v => { try { return new Date(v).toLocaleString('es-AR', { day: 'numeric', month: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false }); } catch (e) { return ''; } };
+    const dniTxt = d => { const x = String(d || ''); return /^\d{7,8}$/.test(x) ? Number(x).toLocaleString('es-AR') : x; };
+    const FOTOS = [['frente', 'Frente'], ['dorso', 'Dorso'], ['selfie', 'Selfie']];
+    const tarjeta = v => { const nom = [v.nombre, v.apellido].filter(Boolean).join(' ') || 'Sin nombre';
+      return `<div class="p-cur idn-cur" data-id="${BP.esc(v.id)}">
+        <div class="idn-cur-fotos">${FOTOS.map(f => `<figure><button type="button" class="idn-cur-foto" data-ampliar aria-label="${BP.esc('Ampliar: ' + f[1].toLowerCase() + ' de ' + nom)}">${v.urls && v.urls[f[0]] ? `<img src="${BP.esc(v.urls[f[0]])}" alt="${BP.esc(f[1] + ' de ' + nom)}">` : '<span class="sin">La foto no está. Volvé a abrir la pestaña.</span>'}</button><figcaption>${f[1]}</figcaption></figure>`).join('')}</div>
+        <div><b>${BP.esc(nom)}</b>${v.motivo_anterior ? ` <span class="p-badge p-cur-reenvio">Reintento</span>` : ''}
+          <div class="m idn-cur-quien">${[v.dni ? 'Documento ' + dniTxt(v.dni) : 'Sin número de documento', v.email, 'mandó el ' + cuando(v.creado_en)].filter(Boolean).map(BP.esc).join(' · ')}</div>
+          ${v.motivo_anterior ? `<p class="p-cur-anterior"><b>Motivo anterior</b> ${BP.esc(v.motivo_anterior)}</p>` : ''}
+          <p class="p-cur-revisar"><b>Qué revisar</b> Que la cara de la selfie sea la del documento, que el documento se vea entero y que el nombre y el número coincidan.</p>
+          <textarea placeholder="Motivo si rechazás (lo lee la persona)" aria-label="Motivo del rechazo" maxlength="300"></textarea>
+          <div class="acts"><button type="button" class="p-btn p-btn-sm p-btn-fill" data-ok>Aprobar</button><button type="button" class="p-btn p-btn-sm" data-no>Rechazar</button></div></div></div>`; };
+    const limpiar = v => `<div class="idn-cur-limpiar" data-id="${BP.esc(v.id)}"><span>${BP.esc([v.nombre, v.apellido].filter(Boolean).join(' ') || 'Sin nombre')} · ${v.estado === 'verificada' ? 'verificada' : 'rechazada'} el ${BP.esc(cuando(v.resuelta_en))}: las fotos siguen guardadas.</span><button type="button" class="p-btn p-btn-sm" data-borrar>Borrar fotos</button></div>`;
+    out.innerHTML = (pend.length ? pend.map(tarjeta).join('') : '<div class="p-empty p-ensena"><b>No hay identidades esperando revisión.</b></div>')
+      + (sucias.length ? `<h2 class="idn-cur-sec">Fotos por borrar</h2>${sucias.map(limpiar).join('')}` : '');
+    out.querySelectorAll('[data-ampliar]').forEach(b => b.addEventListener('click', () => { const f = b.closest('figure'); f.classList.toggle('grande'); }));
+    const resolver = async (btn, id, ok, motivo) => {
+      let r = null;
+      const hecho = await accion(btn, async () => { r = await I.resolver(id, ok, motivo); }, ok ? 'Identidad verificada.' : 'Rechazada. La persona ve el motivo.');
+      if (!hecho) return;
+      if (r && !r.borradas) setTimeout(() => BP.toast('Atención: las fotos no se pudieron borrar. Quedan en "Fotos por borrar".', 'error'), 300);
+      renderIdentidad();
+    };
+    out.querySelectorAll('.p-cur.idn-cur').forEach(card => { const id = card.dataset.id, ta = card.querySelector('textarea');
+      card.querySelector('[data-ok]').addEventListener('click', e => resolver(e.currentTarget, id, true, null));
+      card.querySelector('[data-no]').addEventListener('click', e => { if (!ta.value.trim()) { BP.errorCampo(ta, 'Escribí el motivo: la persona lo va a leer.'); return; } resolver(e.currentTarget, id, false, ta.value.trim()); }); });
+    out.querySelectorAll('.idn-cur-limpiar').forEach(fila => { const v = sucias.find(x => x.id === fila.dataset.id), b = fila.querySelector('[data-borrar]');
+      b.addEventListener('click', async () => { b.disabled = true; const ok = await I.borrarFotos(v.id, [v.frente, v.dorso, v.selfie]); if (ok) { BP.toast('Fotos borradas.'); renderIdentidad(); } else { b.disabled = false; BP.toast('No se pudieron borrar. Probá de nuevo o borralas en Supabase → Storage → portal-identidad.', 'error'); } }); });
   }
   /* ── Sistema: qué está configurado del motor, qué falta y cómo resolverlo, la última sincronización,
      los números del día y el cron. Lee GET /api/portal-salud (api/portal-salud.js): solo booleanos y
