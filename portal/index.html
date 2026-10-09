@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20261008y"><link rel="stylesheet" href="css/catalogo.css?v=20261008y"><link rel="stylesheet" href="css/portal.css?v=20261008y"><link rel="stylesheet" href="css/transiciones.css?v=20261008y"><style>@view-transition{navigation:auto}</style><style>html.arrancando body{opacity:0}body{transition:opacity .18s cubic-bezier(.22,1,.36,1)}@media(prefers-reduced-motion:reduce){body{transition:none}}</style><script>/* 8/10/2026 · Arranque sin pantallazo (ver BP.listo en ui.js): siempre, salvo al entrar a una ficha desde el portal (ahí la foto de la tarjeta crece hasta la ficha); en Safari del iPhone la transición entre páginas no tapaba el video al tocar el logo. Tope: 800 ms. */(function(){try{var h=document.documentElement,n=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{},r=document.referrer||'';if(r.indexOf(location.origin)===0&&n.type!=='reload'&&/propiedad/.test(location.pathname))return;h.classList.add('arrancando');setTimeout(function(){h.classList.remove('arrancando')},800)}catch(e){}})()</script>
+  <link rel="stylesheet" href="css/base.css?v=20261008z"><link rel="stylesheet" href="css/catalogo.css?v=20261008z"><link rel="stylesheet" href="css/portal.css?v=20261008z"><link rel="stylesheet" href="css/transiciones.css?v=20261008z"><style>@view-transition{navigation:auto}</style><style>html.arrancando body{opacity:0}body{transition:opacity .18s cubic-bezier(.22,1,.36,1)}@media(prefers-reduced-motion:reduce){body{transition:none}}</style><script>/* 8/10/2026 · Arranque sin pantallazo (ver BP.listo en ui.js): siempre, salvo al entrar a una ficha desde el portal (ahí la foto de la tarjeta crece hasta la ficha); en Safari del iPhone la transición entre páginas no tapaba el video al tocar el logo. Tope: 800 ms. */(function(){try{var h=document.documentElement,n=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{},r=document.referrer||'';if(r.indexOf(location.origin)===0&&n.type!=='reload'&&/propiedad/.test(location.pathname))return;h.classList.add('arrancando');setTimeout(function(){h.classList.remove('arrancando')},800)}catch(e){}})()</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"BAIREN","url":"https://www.bairengroup.com","logo":"https://www.bairengroup.com/bairen_logo.png","description":"El portal de propiedades seleccionadas de Buenos Aires. Alquileres a mediano plazo (3 a 12 meses), alquileres tradicionales y departamentos en venta, seleccionados uno por uno antes de entrar al portal.","areaServed":[{"@type":"City","name":"Ciudad Autónoma de Buenos Aires"},{"@type":"AdministrativeArea","name":"Zona Norte, Buenos Aires"}]}</script>
 </head>
 <body class="p-home">
@@ -25,9 +25,9 @@
 <main id="contenido">
 
 <section class="h-hero" id="inicio">
-  <video autoplay muted loop playsinline preload="metadata" poster="img/landing-m.jpg?v=1" aria-hidden="true" style="object-position:50% 50%"></video>
+  <video autoplay muted loop playsinline preload="metadata" poster="img/landing-m.jpg?v=2" aria-hidden="true" style="object-position:50% 50%"></video>
   <script>/* 8/10/2026 · El video de la portada (IMG_1829 de Tomás, a su velocidad original: 6,2 s a 30 cuadros, sin cambios de ritmo).
-     Celular: 720p vertical, 0,9 MB. Escritorio: 720p apaisado, corte 16:9 del centro del original, desde el segundo 1,6 (8/10, pedido de Tomás: solo en escritorio arranca y vuelve a empezar en la segunda toma; 138 cuadros, 4,6 s, misma velocidad), 0,7 MB; encuadre centrado (object-position 50% 50%). Se elige antes de que empiece a bajar. */(function(){var v=document.currentScript.previousElementSibling;if(v&&v.tagName==='VIDEO'){var m=window.innerWidth<900;v.poster=m?'img/landing-m.jpg?v=1':'img/landing-d.jpg?v=3';v.src=m?'video/landing-m.mp4?v=1':'video/landing-d.mp4?v=3';}})();</script>
+     8/10 (noche): IMG_1835 de Tomás reemplaza a IMG_1829, a su velocidad original (7,4 s a 30 cuadros, 223 cuadros, cuatro tomas: balcón de noche, cowork, dúplex y terraza). Celular: 720p vertical, 1,1 MB. Escritorio: 720p apaisado, corte 16:9 del centro del original, completo desde el primer cuadro, 1,0 MB; encuadre centrado (object-position 50% 50%). Se elige antes de que empiece a bajar. */(function(){var v=document.currentScript.previousElementSibling;if(v&&v.tagName==='VIDEO'){var m=window.innerWidth<900;v.poster=m?'img/landing-m.jpg?v=2':'img/landing-d.jpg?v=4';v.src=m?'video/landing-m.mp4?v=2':'video/landing-d.mp4?v=4';}})();</script>
   <div class="h-hero-velo" aria-hidden="true"></div>
   <div class="h-hero-in">
     <h1><span class="hline" data-i18n-html="hero_h1a">Propiedades <em>seleccionadas</em></span><span class="hline" data-i18n="hero_h1b">en Buenos Aires.</span></h1>
@@ -128,11 +128,11 @@
 </main>
 <div id="pFooter"></div>
 
-<script src="../mapa-barrios.js?v=20261008y" defer></script><script src="supabase-portal.js?v=20261008y" defer></script><script src="js/errores.js?v=20261008y" defer></script>
-<script src="js/bairen-motion.js?v=20261008y" defer></script>
-<script src="js/i18n-portal.js?v=20261008y" defer></script><script src="js/ui.js?v=20261008y" defer></script>
-<script src="js/store.js?v=20261008y" defer></script>
-<script src="js/data.js?v=20261008y" defer></script>
+<script src="../mapa-barrios.js?v=20261008z" defer></script><script src="supabase-portal.js?v=20261008z" defer></script><script src="js/errores.js?v=20261008z" defer></script>
+<script src="js/bairen-motion.js?v=20261008z" defer></script>
+<script src="js/i18n-portal.js?v=20261008z" defer></script><script src="js/ui.js?v=20261008z" defer></script>
+<script src="js/store.js?v=20261008z" defer></script>
+<script src="js/data.js?v=20261008z" defer></script>
 <script>
 document.addEventListener('DOMContentLoaded', function(){
 (async function(){

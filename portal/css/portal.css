@@ -4958,3 +4958,8 @@ html:not(.teclado) .mobile-menu a:focus-visible,html:not(.teclado) .mobile-menu 
     linear-gradient(rgba(19,29,45,.44),rgba(19,29,45,.44))}
   :root body.p-home .h-barra{width:min(100%,300px);height:48px;margin:0 auto;padding:0 20px 0 16px;font-size:.95rem}
 }
+
+/* 8/10/2026 (noche) · Tomás: "¿el logo está alineado con Publicar?". Las cajas sí (centro a 31,5 px), pero la tinta no:
+   "Publicar" no tiene letras que bajen y es más baja que BAIREN, así que su centro visual quedaba 1,5 px más arriba que el
+   del logo y el del menú. Se baja 1,5 px para que los tres compartan el centro óptico. */
+@media(max-width:899px){body.p-home .p-navbar > .p-pub-movil{padding-top:3px}}
