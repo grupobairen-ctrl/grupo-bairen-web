@@ -24,6 +24,22 @@
     } catch (e) { return false; }
   };
 
+  /* ── 9/10/2026 · Extensiones: los módulos de los rieles (js/dg-*.js) se enchufan acá ──
+     Cada módulo suma, sin tocar las páginas:
+     · registrarAccion({ id, lados: ['interesado'|'publicador'|'plataforma'], cuando(d), texto (o texto(d)), prim(d), peligro,
+       estado(d), ejecutar: async (d, ui) }) → un botón en el "Próximo paso" de la operación (mensajes.html). ui trae
+       dialogo(o) (el mismo diálogo de los pasos: { titulo, texto, campos: [{ n, label, tipo, req, valor, ayuda }], ok,
+       peligro } → valores o null), recargar(), toast(msg) y opId;
+     · registrarSeccion({ id, titulo (o titulo(d)), cuando(d), html(d), cuenta(d), montar(d, el, ui) }) → una sección en
+       los detalles de la operación;
+     · enriquecerDetalle(async d => …) → datos propios en d.ext.<modulo> cada vez que se carga una operación;
+     · registrarTextoHito(tipo, texto) → cómo se lee un paso nuevo en el chat y en el recorrido. */
+  D.ext = { acciones: [], secciones: [], enriquecer: [] };
+  D.registrarAccion = a => { D.ext.acciones = D.ext.acciones.filter(x => x.id !== a.id).concat([a]); };
+  D.registrarSeccion = x => { D.ext.secciones = D.ext.secciones.filter(y => y.id !== x.id).concat([x]); };
+  D.enriquecerDetalle = f => { D.ext.enriquecer.push(f); };
+  D.registrarTextoHito = (tipo, texto) => { try { Object.defineProperty(D.HITO_TXT, tipo, { get: () => T('dg_h_' + tipo, texto), enumerable: true, configurable: true }); } catch (e) {} };
+
   /* ── vocabulario ───────────────────────────────────────── */
   D.LINEAS = {
     get temporario(){ return T('dg_l_temporario', 'Estadía corta (hasta 3 meses)'); },
@@ -48,7 +64,13 @@
     get propuesta_aceptada(){ return T('dg_h_propuesta_aceptada', 'Aceptó una propuesta'); }, get reserva(){ return T('dg_h_reserva', 'Reserva'); },
     get contrato_generado(){ return T('dg_h_contrato_generado', 'Contrato preparado'); }, get contrato_firmado(){ return T('dg_h_contrato_firmado', 'Contrato firmado'); },
     get cierre(){ return T('dg_h_cierre', 'Operación cerrada'); }, get caida(){ return T('dg_h_caida', 'Sin acuerdo'); },
-    get reabierta(){ return T('dg_h_reabierta', 'Se retomó'); }, get cobro_mensual(){ return T('dg_h_cobro_mensual', 'Cobro del mes'); }
+    get reabierta(){ return T('dg_h_reabierta', 'Se retomó'); }, get cobro_mensual(){ return T('dg_h_cobro_mensual', 'Cobro del mes'); },
+    get reserva_pedida(){ return T('dg_h_reserva_pedida', 'Pidió la reserva'); }, get reserva_pagada(){ return T('dg_h_reserva_pagada', 'Reserva pagada'); },
+    get reserva_vencida(){ return T('dg_h_reserva_vencida', 'La reserva venció'); }, get reserva_devuelta(){ return T('dg_h_reserva_devuelta', 'Reserva devuelta'); },
+    get documento_generado(){ return T('dg_h_documento_generado', 'Documento listo para firmar'); }, get documento_firmado(){ return T('dg_h_documento_firmado', 'Documento firmado'); },
+    get pago_recibido(){ return T('dg_h_pago_recibido', 'Pago recibido'); }, get garantia_elegida(){ return T('dg_h_garantia_elegida', 'Eligió la garantía'); },
+    get garantia_emitida(){ return T('dg_h_garantia_emitida', 'Garantía aprobada'); }, get seguro_emitido(){ return T('dg_h_seguro_emitido', 'Seguro emitido'); },
+    get lead_inversor(){ return T('dg_h_lead_inversor', 'Consulta de inversor verificado'); }
   };
   D.PERFILES = {
     get particular(){ return T('dg_p_particular', 'Particular'); }, get inversor(){ return T('dg_p_inversor', 'Inversor'); },
@@ -103,7 +125,20 @@
     ['Sin matrícula · sección 12', 'Contrato digital', 'tradicional', 'contrato_generado', 'publicador', 'fijo', 40, 'USD', null],
     ['Sin matrícula · sección 12', 'Visita coordinada', 'venta', 'visita_confirmada', 'publicador', 'fijo', 20, 'USD', null],
     ['Sin matrícula · sección 12', 'Visita coordinada', 'pozo', 'visita_confirmada', 'publicador', 'fijo', 20, 'USD', null],
-    ['Sin matrícula · sección 12', 'Propuesta aceptada en Se busca', 'todas', 'propuesta_aceptada', 'publicador', 'fijo', 25, 'USD', null]
+    ['Sin matrícula · sección 12', 'Propuesta aceptada en Se busca', 'todas', 'propuesta_aceptada', 'publicador', 'fijo', 25, 'USD', null],
+    ['Rieles · octubre 2026', 'Contrato digital con firma', 'mediano', 'documento_firmado', 'propietario', 'fijo', 40, 'USD', null],
+    ['Rieles · octubre 2026', 'Contrato digital con firma', 'tradicional', 'documento_firmado', 'propietario', 'fijo', 40, 'USD', null],
+    ['Rieles · octubre 2026', 'Contrato digital con firma', 'temporario', 'documento_firmado', 'propietario', 'fijo', 40, 'USD', null],
+    ['Rieles · octubre 2026', 'Cobranza digital', 'mediano', 'pago_recibido', 'propietario', 'porcentaje', 2, 'USD', 'monto_hito'],
+    ['Rieles · octubre 2026', 'Cobranza digital', 'tradicional', 'pago_recibido', 'propietario', 'porcentaje', 2, 'USD', 'monto_hito'],
+    ['Rieles · octubre 2026', 'Reserva online', 'mediano', 'reserva_pagada', 'publicador', 'fijo', 80, 'USD', null],
+    ['Rieles · octubre 2026', 'Propuesta aceptada en Búsquedas', 'todas', 'propuesta_aceptada', 'publicador', 'fijo', 20, 'USD', null],
+    ['Rieles · octubre 2026', 'Garantía de alquiler', 'todas', 'garantia_emitida', 'tercero', 'porcentaje', 20, 'USD', 'monto_hito'],
+    ['Rieles · octubre 2026', 'Seguro (caución u hogar)', 'todas', 'seguro_emitido', 'tercero', 'porcentaje', 20, 'USD', 'monto_hito'],
+    ['Rieles · octubre 2026', 'Tecnología por operación (corredor aliado)', 'venta', 'cierre', 'publicador', 'fijo', 150, 'USD', null],
+    ['Rieles · octubre 2026', 'Tecnología por operación (corredor aliado)', 'tradicional', 'cierre', 'publicador', 'fijo', 50, 'USD', null],
+    ['Rieles · octubre 2026', 'Estadía corta', 'temporario', 'cierre', 'publicador', 'porcentaje', 10, 'USD', 'monto_contrato'],
+    ['Rieles · octubre 2026', 'Inversor verificado', 'pozo', 'lead_inversor', 'publicador', 'fijo', 30, 'USD', null]
   ];
   const reglasLocal = () => { let r = L.reglas.get(null); if (!r) { r = REGLAS_EJEMPLO.map(x => ({ id: uid(), escenario: x[0], concepto: x[1], linea: x[2], evento: x[3], paga: x[4], modo: x[5], valor: x[6], moneda: x[7], base: x[8], minimo: null, maximo: null, activa: true, cobra: false, nota: null })); L.reglas.set(r); } return r; };
   function aplicarLocal(h, escenario){
@@ -127,7 +162,7 @@
   }
   function hitoLocal(opId, tipo, lado, datos){
     const ops = L.ops.get([]); const op = ops.find(o => o.id === opId); if (!op) throw new Error('La operación no existe.');
-    const nueva = { consulta: 'consulta', propuesta_aceptada: 'consulta', conversacion: 'conversacion', whatsapp: 'conversacion', visita_pedida: 'visita', visita_confirmada: 'visita', visita_realizada: 'visita', solicitud_enviada: 'solicitud', solicitud_aceptada: 'solicitud', reserva: 'reserva', contrato_firmado: 'contrato', cierre: 'cerrada' }[tipo];
+    const nueva = { consulta: 'consulta', propuesta_aceptada: 'consulta', conversacion: 'conversacion', whatsapp: 'conversacion', visita_pedida: 'visita', visita_confirmada: 'visita', visita_realizada: 'visita', solicitud_enviada: 'solicitud', solicitud_aceptada: 'solicitud', reserva: 'reserva', reserva_pagada: 'reserva', contrato_firmado: 'contrato', cierre: 'cerrada' }[tipo];
     if (tipo === 'caida') { op.etapa = 'caida'; op.motivo_caida = (datos && datos.motivo) || null; }
     else if (tipo === 'reabierta') { op.etapa = 'conversacion'; op.motivo_caida = null; }
     else if (nueva && op.etapa !== 'caida' && D.ordenEtapa(nueva) > D.ordenEtapa(op.etapa)) op.etapa = nueva;
@@ -137,6 +172,13 @@
     try { aplicarLocal(h); } catch (e) { console.warn('motor de cobro local', e); }
     return h.id;
   }
+
+  /* Para los módulos en modo local: registrar un paso propio (con base, lo hacen sus funciones SQL con portal._hito) */
+  D._hitoLocal = (opId, tipo, lado, datos) => hitoLocal(opId, tipo, lado, datos);
+  D._local = { LS, uid, now, nid, miPub, ladosLocal, ops: () => L.ops.get([]), guardarOps: v => L.ops.set(v) };
+  D.conBase = conBase;
+  D.db = () => db();
+  D.rpc = (fn, args) => rpc(fn, args);
 
   /* ── operaciones ───────────────────────────────────────── */
   /* aviso: el objeto de la ficha (id, publicador_id, operacion, etapa, precio, moneda, titulo…) */
@@ -173,6 +215,12 @@
   D.noLeidos = async function(){ try { return (await D.bandeja()).reduce((n, r) => n + (r.no_leidos || 0), 0); } catch (e) { return 0; } };
 
   D.detalle = async function(opId){
+    const d = await detalleBase(opId);
+    d.ext = d.ext || {};
+    for (const f of D.ext.enriquecer) { try { await f(d); } catch (e) { console.warn('enriquecer detalle', e); } }
+    return d;
+  };
+  async function detalleBase(opId){
     requiereSesion();
     if (conBase()) return rpc('operacion_detalle', { p_op: opId });
     const op = L.ops.get([]).find(o => o.id === opId); if (!op) throw new Error(T('dg_err_no_parte', 'No sos parte de esta operación.'));

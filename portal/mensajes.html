@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20261009b"><link rel="stylesheet" href="css/catalogo.css?v=20261009b"><link rel="stylesheet" href="css/portal.css?v=20261009b"><link rel="stylesheet" href="css/transiciones.css?v=20261009b"><style>@view-transition{navigation:auto}</style><style>html.arrancando body{opacity:0}body{transition:opacity .18s cubic-bezier(.22,1,.36,1)}@media(prefers-reduced-motion:reduce){body{transition:none}}</style><script>/* 8/10/2026 · Arranque sin pantallazo (ver BP.listo en ui.js): siempre, salvo al entrar a una ficha desde el portal (ahí la foto de la tarjeta crece hasta la ficha); en Safari del iPhone la transición entre páginas no tapaba el video al tocar el logo. Tope: 800 ms. */(function(){try{var h=document.documentElement,n=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{},r=document.referrer||'';if(r.indexOf(location.origin)===0&&n.type!=='reload'&&/propiedad/.test(location.pathname))return;h.classList.add('arrancando');setTimeout(function(){h.classList.remove('arrancando')},800)}catch(e){}})()</script>
-  <link rel="stylesheet" href="css/mensajes.css?v=20261009b">
+  <link rel="stylesheet" href="css/base.css?v=20261009c"><link rel="stylesheet" href="css/catalogo.css?v=20261009c"><link rel="stylesheet" href="css/portal.css?v=20261009c"><link rel="stylesheet" href="css/transiciones.css?v=20261009c"><style>@view-transition{navigation:auto}</style><style>html.arrancando body{opacity:0}body{transition:opacity .18s cubic-bezier(.22,1,.36,1)}@media(prefers-reduced-motion:reduce){body{transition:none}}</style><script>/* 8/10/2026 · Arranque sin pantallazo (ver BP.listo en ui.js): siempre, salvo al entrar a una ficha desde el portal (ahí la foto de la tarjeta crece hasta la ficha); en Safari del iPhone la transición entre páginas no tapaba el video al tocar el logo. Tope: 800 ms. */(function(){try{var h=document.documentElement,n=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{},r=document.referrer||'';if(r.indexOf(location.origin)===0&&n.type!=='reload'&&/propiedad/.test(location.pathname))return;h.classList.add('arrancando');setTimeout(function(){h.classList.remove('arrancando')},800)}catch(e){}})()</script>
+  <link rel="stylesheet" href="css/mensajes.css?v=20261009c">
 </head>
 <!-- 8/10/2026 · La operación digital · Mensajes. Dos vistas en la misma página:
      · Bandeja (mensajes.html): mis operaciones (BPDigital.bandeja), con filtros y, para la curación, "Ver todas".
@@ -39,11 +39,11 @@
 </main>
 <div id="pFooter"></div>
 
-<script src="supabase-portal.js?v=20261009b" defer></script><script src="js/errores.js?v=20261009b" defer></script>
-<script src="../mapa-barrios.js?v=20261009b" defer></script>
-<script src="js/bairen-motion.js?v=20261009b" defer></script><script src="js/i18n-portal.js?v=20261009b" defer></script><script src="js/ui.js?v=20261009b" defer></script><script src="js/store.js?v=20261009b" defer></script>
-<script src="js/digital.js?v=20261009b" defer></script>
-<script src="js/data.js?v=20261009b" defer></script>
+<script src="supabase-portal.js?v=20261009c" defer></script><script src="js/errores.js?v=20261009c" defer></script>
+<script src="../mapa-barrios.js?v=20261009c" defer></script>
+<script src="js/bairen-motion.js?v=20261009c" defer></script><script src="js/i18n-portal.js?v=20261009c" defer></script><script src="js/ui.js?v=20261009c" defer></script><script src="js/store.js?v=20261009c" defer></script>
+<script src="js/digital.js?v=20261009c" defer></script>
+<script src="js/data.js?v=20261009c" defer></script>
 <script>
 document.addEventListener('DOMContentLoaded', function(){
 (async function(){
@@ -404,6 +404,15 @@ document.addEventListener('DOMContentLoaded', function(){
     } else {
       out.estado = t('e_plataforma', 'Ves esta operación como equipo BAIREN. Lo que escribas acá lo leen las dos partes.');
     }
+    /* 9/10/2026 · Los pasos que suman los módulos de los rieles (reserva, contrato, pagos, garantía…): js/dg-*.js con
+       BPDigital.registrarAccion. Van después de los propios; si sobran, pasan a "Más". */
+    ((D.ext && D.ext.acciones) || []).forEach(x => {
+      try {
+        if ((x.lados || []).indexOf(lado) < 0 || (x.cuando && !x.cuando(d))) return;
+        if (x.estado) { const e = x.estado(d); if (e) out.estado = e; }
+        (x.prim && x.prim(d) ? out.prim : out.mas).push({ id: 'ext:' + x.id, txt: typeof x.texto === 'function' ? x.texto(d) : x.texto, peligro: !!x.peligro });
+      } catch (e) { console.warn('acción', x.id, e); }
+    });
     if (out.prim.length > 3) out.mas = out.prim.splice(3).concat(out.mas);
     return out;
   }
@@ -460,7 +469,11 @@ document.addEventListener('DOMContentLoaded', function(){
     st.abridor = b.closest('#msMasPop') ? $('msMasBtn') : b;
     if (st.soltarMas) cerrarMas();
     if (ACC[id]) ACC[id]();
+    else if (id.indexOf('ext:') === 0) { const x = ((D.ext && D.ext.acciones) || []).find(y => 'ext:' + y.id === id); if (x) ejecutarExt(x); }
   });
+  /* Lo que reciben los módulos para trabajar dentro de la operación */
+  const uiExt = () => ({ dialogo, recargar: () => recargarDetalle(false), toast: msg => BP.toast(msg), opId: st.opId, lado: st.d && st.d.lado });
+  async function ejecutarExt(x){ try { await x.ejecutar(st.d, uiExt()); } catch (e) { BP.toast((e && e.message) || String(e)); } }
 
   /* ── Diálogos de los pasos ─────────────────────────────── */
   const campoHTML = (c, id) => {
@@ -649,10 +662,14 @@ document.addEventListener('DOMContentLoaded', function(){
     const nv = (d.visitas || []).length + (pedidaPendiente() ? 1 : 0);
     secs.push(det('visitas', t('s_visitas', 'Visitas'), visitasHTML(), nv));
     secs.push(det('docs', t('s_docs', 'Documentos'), docsHTML(), (d.documentos || []).length));
+    /* 9/10/2026 · Secciones de los módulos de los rieles (BPDigital.registrarSeccion) */
+    const extSecs = ((D.ext && D.ext.secciones) || []).filter(x => { try { return !x.cuando || x.cuando(d); } catch (e) { return false; } });
+    extSecs.forEach(x => { try { secs.push(det('ext-' + x.id, typeof x.titulo === 'function' ? x.titulo(d) : x.titulo, x.html(d), x.cuenta ? x.cuenta(d) : 0)); } catch (e) { console.warn('sección', x.id, e); } });
     secs.push(det('recorrido', t('s_recorrido', 'Recorrido'), recorridoHTML(), (d.hitos || []).length));
     if (Array.isArray(d.cargos)) secs.push(det('cobro', t('s_cobro', 'Cobro (simulado)'), cobroHTML(), d.cargos.length));
     p.innerHTML = `<div class="ms-panel-head"><h3 class="ms-panel-t" id="msPanelT">${esc(t('detalles', 'Detalles'))}</h3><button type="button" class="ms-ico-btn" data-cerrar-panel aria-label="${esc(t('cerrar_detalles', 'Cerrar los detalles'))}">${ICO.x}</button></div><div class="ms-panel-in">${secs.join('')}</div>`;
     p.querySelectorAll('details[data-sec]').forEach(x => x.addEventListener('toggle', () => { st.plegadas[x.dataset.sec] = !x.open; }));
+    extSecs.forEach(x => { if (!x.montar) return; const el = p.querySelector('[data-sec="ext-' + x.id + '"]'); if (el) { try { x.montar(st.d, el, uiExt()); } catch (e) { console.warn('montar', x.id, e); } } });
   }
   function abrirPanel(){
     opEl.classList.add('ms-panel-on'); const btn = opEl.querySelector('.ms-info-btn'); if (btn) btn.setAttribute('aria-expanded', 'true');
@@ -769,7 +786,7 @@ document.addEventListener('DOMContentLoaded', function(){
   }
 
   /* ── Abrir, recargar y cerrar una operación ────────────── */
-  const firmaDetalle = d => JSON.stringify([d.operacion && [d.operacion.etapa, d.operacion.motivo_caida, d.operacion.monto_contrato, d.operacion.precio_cierre, d.operacion.plazo_meses, d.operacion.moneda, d.operacion.linea], d.lado, (d.hitos || []).map(h => h.id), (d.visitas || []).map(v => [v.id, v.estado, v.fecha]), (d.documentos || []).map(x => [x.id, x.estado]), d.cargos && d.cargos.length, d.publicador && d.publicador.whatsapp, d.interesado && [d.interesado.telefono, d.interesado.verificado]]);
+  const firmaDetalle = d => JSON.stringify([d.operacion && [d.operacion.etapa, d.operacion.motivo_caida, d.operacion.monto_contrato, d.operacion.precio_cierre, d.operacion.plazo_meses, d.operacion.moneda, d.operacion.linea], d.lado, (d.hitos || []).map(h => h.id), (d.visitas || []).map(v => [v.id, v.estado, v.fecha]), (d.documentos || []).map(x => [x.id, x.estado]), d.cargos && d.cargos.length, d.publicador && d.publicador.whatsapp, d.interesado && [d.interesado.telefono, d.interesado.verificado], d.ext]);
   async function recargarDetalle(silencioso){
     const op = st.opId, g = st.gen;
     try {
