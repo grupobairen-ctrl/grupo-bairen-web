@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Garantías y seguros · BAIREN</title>
+  <meta name="description" content="Proveedores de garantías y seguros de BAIREN, sus convenios y las garantías que eligen quienes alquilan.">
+  <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#131D2D">
+  <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
+  <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css?v=20261009e"><link rel="stylesheet" href="css/catalogo.css?v=20261009e"><link rel="stylesheet" href="css/portal.css?v=20261009e"><link rel="stylesheet" href="css/transiciones.css?v=20261009e"><link rel="stylesheet" href="css/garantias.css?v=20261009e" data-dg-garantias><style>@view-transition{navigation:auto}</style><style>html.arrancando body{opacity:0}body{transition:opacity .18s cubic-bezier(.22,1,.36,1)}@media(prefers-reduced-motion:reduce){body{transition:none}}</style><script>/* 8/10/2026 · Arranque sin pantallazo (ver BP.listo en ui.js): siempre, salvo al entrar a una ficha desde el portal (ahí la foto de la tarjeta crece hasta la ficha); en Safari del iPhone la transición entre páginas no tapaba el video al tocar el logo. Tope: 800 ms. */(function(){try{var h=document.documentElement,n=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{},r=document.referrer||'';if(r.indexOf(location.origin)===0&&n.type!=='reload'&&/propiedad/.test(location.pathname))return;h.classList.add('arrancando');setTimeout(function(){h.classList.remove('arrancando')},800)}catch(e){}})()</script>
+</head>
+<!-- 9/10/2026 · Garantías y seguros: la herramienta de la plataforma para el riel de garantía (migración 33).
+     Proveedores (qué es, cómo se contrata, el convenio y el productor), alta y edición en tres pasos, y las garantías
+     que eligieron quienes alquilan, con su estado y su costo. Solo curación y soporte; apagada para el público con
+     BPDigital.activo(). Los datos van por window.BPGarantias (js/dg-garantias.js). -->
+<body class="p-product p-herramienta p-garantias dg-garantias">
+<div class="p-velo" aria-hidden="true"><span class="w">BAIREN</span></div>
+<div id="pHeader"></div>
+<main class="ga-in" id="contenido" aria-busy="true">
+  <header class="ga-cab">
+    <p class="ga-pre" id="gaPre">Plataforma</p>
+    <h1 id="gaTit">Garantías <em>y seguros</em></h1>
+    <p class="ga-sub" id="gaSub">Lo que quien alquila elige desde la conversación.</p>
+    <details class="ga-ley" id="gaLey"><summary>Qué dice la ley</summary>
+      <ul>
+        <li>Las empresas de fianza no son seguros: el acuerdo de referidos con ellas es comercial.</li>
+        <li>Un seguro (caución, hogar o daños) solo paga comisión a un productor asesor o agente institorio inscripto en la SSN (Ley 22.400, art. 7). Mientras BAIREN no esté inscripta, va por un productor aliado: sin su nombre y matrícula, no se activa.</li>
+        <li>No se impone ningún proveedor y a quien alquila no se le cobra nada (Ley 5859). El pago es directo con el proveedor.</li>
+      </ul>
+    </details>
+  </header>
+  <div id="gaCuerpo"><div class="ga-esq" aria-hidden="true"><div class="ga-nums"><p class="ga-num"></p><p class="ga-num"></p><p class="ga-num ancho"></p></div><ul class="ga-lista ga-provs"><li class="ga-prov"><i></i><i class="c"></i><i></i></li><li class="ga-prov"><i></i><i class="c"></i><i></i></li><li class="ga-prov"><i></i><i class="c"></i><i></i></li></ul></div></div>
+  <div class="ga-barra p-barra-fija" id="gaBarra" hidden><button type="button" class="p-btn p-btn-fill" data-nuevo>Nuevo proveedor</button></div>
+</main>
+<div id="pFooter"></div>
+
+<script src="supabase-portal.js?v=20261009e" defer></script><script src="js/errores.js?v=20261009e" defer></script>
+<script src="../mapa-barrios.js?v=20261009e" defer></script>
+<script src="js/bairen-motion.js?v=20261009e" defer></script><script src="js/i18n-portal.js?v=20261009e" defer></script><script src="js/ui.js?v=20261009e" defer></script><script src="js/store.js?v=20261009e" defer></script>
+<script src="js/data.js?v=20261009e" defer></script><script src="js/digital.js?v=20261009e" defer></script><script src="js/dg-garantias.js?v=20261009e" defer></script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+(async function(){
+  'use strict';
+  BP.header(); BP.footer(); if (window.BPStore) BPStore.init();
+  await BPStore.ready;
+  const D = window.BPDigital, G = window.BPGarantias, esc = BP.esc;
+  const t = (k, d) => BP.t('dg_garantias_' + k, d);
+  const tf = (k, d, v) => BP.tf('dg_garantias_' + k, d, v);
+  const $ = id => document.getElementById(id);
+  const main = $('contenido'), cuerpo = $('gaCuerpo');
+  document.title = t('pag_titulo', 'Garantías y seguros') + ' · BAIREN';
+  $('gaPre').textContent = t('pag_pre', 'Plataforma');
+  $('gaSub').textContent = t('pag_sub', 'Lo que quien alquila elige desde la conversación.');
+  const fin = () => main.removeAttribute('aria-busy');
+  const vacio = (tit, p, btn) => { $('gaLey').hidden = true; $('gaSub').hidden = true; cuerpo.innerHTML = `<div class="p-empty ga-vacio"><b>${esc(tit)}</b><p>${esc(p)}</p>${btn || ''}</div>`; fin(); };
+  if (!D || !G || !D.activo()) return vacio(t('pronto_t', 'Muy pronto'), t('pronto_p', 'Esta herramienta todavía no está abierta.'), `<a class="p-btn" href="index.html">${esc(t('volver_inicio', 'Volver al inicio'))}</a>`);
+  if (!BPStore.requireSession()) return;
+  if (!(await BPStore.isCurador())) return vacio(t('solo_equipo_t', 'Solo para el equipo de BAIREN'), t('solo_equipo_p', 'Esta pantalla la usan curación y soporte.'), `<a class="p-btn" href="index.html">${esc(t('volver_inicio', 'Volver al inicio'))}</a>`);
+
+  const X = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+  const linTxt = l => (l && D.LINEAS[l]) || '';
+  const EN_CURSO = ['elegida', 'en_tramite'];
+  const nombreDe = s => s.tipo === 'propia' ? G.TIPOS.propia : (s.proveedor_nombre || G.TIPOS[s.tipo] || '');
+  const sumaPorMoneda = (lista, f) => { const t2 = {}; lista.forEach(x => { const v = f(x); if (v != null && isFinite(v)) t2[x.moneda] = (t2[x.moneda] || 0) + v; }); return Object.keys(t2).map(m => G.dinero(t2[m], m)).join(' · '); };
+  let provs = [], sols = [], filtro = null;
+
+  async function cargar(){
+    try { [provs, sols] = await Promise.all([G.proveedores(), G.lista()]); }
+    catch (e) { fin(); return BP.estadoError(cuerpo, (e && e.message) || t('err_cargar', 'No pudimos cargar las garantías.'), cargar); }
+    pintar(); fin(); barra.hidden = false;
+  }
+
+  /* ── pantalla ──────────────────────────────────────────── */
+  function pintar(){
+    const curso = sols.filter(s => EN_CURSO.indexOf(s.estado) > -1), aprob = sols.filter(s => s.estado === 'aprobada');
+    if (!filtro) filtro = curso.length ? 'curso' : 'todas';
+    const conv = sumaPorMoneda(aprob, s => s.costo_total != null && s.comision_pct != null ? s.costo_total * s.comision_pct / 100 : null);
+    const costo = sumaPorMoneda(aprob, s => s.costo_total);
+    const orden = provs.slice().sort((a, b) => (b.activo - a.activo) || (a.ejemplo - b.ejemplo) || ((+a.orden || 0) - (+b.orden || 0)));
+    const vis = orden.slice(0, 3), resto = orden.slice(3);
+    const filtradas = filtro === 'curso' ? curso : filtro === 'aprobada' ? aprob : sols;
+    const primeras = filtradas.slice(0, 10), mas = filtradas.slice(10);
+    cuerpo.innerHTML = `
+      <div class="ga-nums">
+        <p class="ga-num"><b>${curso.length}</b><span>${esc(t('n_curso', 'en curso'))}</span></p>
+        <p class="ga-num"><b>${aprob.length}</b><span>${esc(t('n_aprobadas', 'aprobadas'))}</span></p>
+        <p class="ga-num ancho"><b>${esc(conv || G.dinero(0, 'USD'))}</b><span>${esc(costo ? tf('n_convenio', 'por convenio, estimado · sobre {c} aprobados', { c: costo }) : t('n_convenio_0', 'por convenio, estimado'))}</span></p>
+      </div>
+
+      <section class="ga-sec" aria-labelledby="gaProvT">
+        <div class="ga-sec-cab"><h2 class="ga-h2" id="gaProvT">${esc(t('provs_t', 'Proveedores'))}</h2><button type="button" class="p-btn p-btn-sm p-btn-fill" id="gaNuevo">${esc(t('nuevo', 'Nuevo proveedor'))}</button></div>
+        <p class="ga-nota">${esc(t('provs_nota', 'Quien alquila ve los activos. Nunca ve el convenio.'))}</p>
+        ${orden.length ? `<ul class="ga-lista ga-provs">${vis.map(tarjeta).join('')}</ul>${resto.length ? `<details class="ga-resto"><summary>${esc(tf('ver_los', 'Ver los {n}', { n: orden.length }))}</summary><ul class="ga-lista ga-provs">${resto.map(tarjeta).join('')}</ul></details>` : ''}`
+          : `<div class="p-empty ga-vacio"><b>${esc(t('provs_vacio_t', 'Todavía no hay proveedores'))}</b><p>${esc(t('provs_vacio_p', 'Cargá el primero con su convenio.'))}</p></div>`}
+      </section>
+
+      <section class="ga-sec" aria-labelledby="gaSolT">
+        <div class="ga-sec-cab"><h2 class="ga-h2" id="gaSolT">${esc(t('sols_t', 'Garantías elegidas'))}</h2></div>
+        ${sols.length ? `<div class="ga-filtros" role="group" aria-label="${esc(t('filtrar', 'Filtrar'))}">
+            ${[['curso', t('f_curso', 'En curso'), curso.length], ['aprobada', t('f_aprobadas', 'Aprobadas'), aprob.length], ['todas', t('f_todas', 'Todas'), sols.length]].map(f => `<button type="button" class="ga-filtro" data-f="${f[0]}" aria-pressed="${f[0] === filtro}">${esc(f[1])} (${f[2]})</button>`).join('')}
+          </div>
+          ${filtradas.length ? `<ul class="ga-lista">${primeras.map(fila).join('')}</ul>${mas.length ? `<details class="ga-resto"><summary>${esc(tf('ver_las', 'Ver las {n}', { n: filtradas.length }))}</summary><ul class="ga-lista">${mas.map(fila).join('')}</ul></details>` : ''}`
+            : `<p class="ga-nota">${esc(t('sols_vacio_f', 'No hay garantías con este filtro.'))}</p>`}`
+          : `<div class="p-empty ga-vacio"><b>${esc(t('sols_vacio_t', 'Todavía nadie eligió una garantía'))}</b><p>${esc(t('sols_vacio_p', 'Aparecen cuando alguien elige su garantía en Mensajes.'))}</p><a class="p-btn" href="mensajes.html">${esc(t('ir_mensajes', 'Ver Mensajes'))}</a></div>`}
+      </section>`;
+  }
+  function tarjeta(p){
+    const linea = [p.costo_pct != null ? tf('cuesta', 'Cuesta {p} del contrato', { p: G.pct(p.costo_pct) }) : null, p.cuotas].filter(Boolean).join(' · ');
+    const estado = p.ejemplo ? ['ejemplo', t('p_ejemplo', 'Ejemplo')] : p.activo ? ['activo', t('p_activo', 'Activo')] : ['', t('p_pausado', 'Pausado')];
+    const dom = (/^https:\/\/([^/?#:]+)/i.exec(p.url || '') || [])[1];
+    const filas = [[t('d_web', 'Web'), dom], [t('d_referido', 'Referido'), p.param_referido], [t('d_productor', 'Productor'), p.requiere_productor ? (p.productor_nombre ? p.productor_nombre + (p.productor_matricula_ssn ? ' · ' + tf('d_ssn', 'Matrícula SSN {m}', { m: p.productor_matricula_ssn }) : '') : t('d_falta_productor', 'Falta cargarlo')) : null],
+      [t('d_requisitos', 'Requisitos'), p.requisitos], [t('d_orden', 'Orden'), p.orden]].filter(f => f[1] != null && f[1] !== '');
+    return `<li class="ga-prov${p.activo ? '' : ' apagado'}">
+      <div class="ga-prov-l1"><div><h3 class="ga-prov-n">${esc(p.nombre)}</h3><p class="ga-prov-t">${esc(G.TIPOS[p.tipo] || p.tipo)}</p></div><span class="ga-pill ${estado[0]}">${esc(estado[1])}</span></div>
+      ${linea ? `<p class="ga-prov-m">${esc(linea)}</p>` : ''}
+      <p class="ga-prov-m">${esc(p.comision_pct != null ? tf('convenio', 'Convenio: {p} del costo', { p: G.pct(p.comision_pct) }) : t('sin_convenio', 'Sin convenio cargado'))}</p>
+      ${filas.length ? `<details class="ga-mas"><summary>${esc(t('ver_detalle', 'Ver detalle'))}</summary><dl>${filas.map(f => `<dt>${esc(f[0])}</dt><dd>${esc(f[1])}</dd>`).join('')}</dl></details>` : ''}
+      <div class="ga-prov-acc">${p.ejemplo
+        ? `<span class="ga-sw no">${esc(t('ejemplo_no', 'Los ejemplos no se activan'))}</span><button type="button" class="ga-link" data-base="${esc(p.id)}">${esc(t('copiar', 'Copiar'))}</button>`
+        : `<label class="ga-sw"><input type="checkbox" data-activo="${esc(p.id)}"${p.activo ? ' checked' : ''}><span>${esc(t('p_activo', 'Activo'))}</span></label><button type="button" class="ga-link" data-editar="${esc(p.id)}" aria-label="${esc(tf('editar_n', 'Editar {n}', { n: p.nombre }))}">${esc(t('editar', 'Editar'))}</button>`}</div>
+    </li>`;
+  }
+  function fila(s){
+    const final = EN_CURSO.indexOf(s.estado) < 0;
+    const monto = s.tipo === 'propia' ? null : s.costo_total != null ? s.costo_total : s.costo_estimado;
+    const etiqueta = s.tipo === 'propia' ? t('sin_costo', 'sin costo') : s.costo_total != null ? t('costo_total', 'costo total') : s.costo_estimado != null ? t('costo_estimado', 'estimado') : t('sin_estimar', 'sin estimar');
+    const conv = s.estado === 'aprobada' && s.costo_total != null && s.comision_pct != null ? tf('conv_fila', '{m} por convenio', { m: G.dinero(s.costo_total * s.comision_pct / 100, s.moneda) }) : null;
+    const sub = [nombreDe(s), linTxt(s.linea), s.referencia ? tf('ref', 'N.º {r}', { r: s.referencia }) : null, G.fecha(s.creado_en)].filter(Boolean).join(' · ');
+    return `<li class="ga-sol">
+      <p class="ga-sol-t"><a href="mensajes.html?op=${esc(encodeURIComponent(s.operacion_id))}">${esc(s.aviso_titulo || t('una_unidad', 'Una propiedad'))}</a></p>
+      <div class="ga-sol-m"><b>${monto != null ? esc(G.dinero(monto, s.moneda)) : '—'}</b><small>${esc(etiqueta)}</small>${conv ? `<small>${esc(conv)}</small>` : ''}</div>
+      <p class="ga-sol-s">${esc(sub)}</p>
+      <div class="ga-sol-acc"><span class="ga-pill ${esc(s.estado)}">${esc(G.ESTADOS[s.estado] || s.estado)}</span>${final ? '' : `<button type="button" class="ga-link" data-actualizar="${esc(s.id)}">${esc(t('actualizar', 'Actualizar'))}</button>`}</div>
+    </li>`;
+  }
+
+  cuerpo.addEventListener('click', e => {
+    const f = e.target.closest('[data-f]'); if (f) { filtro = f.dataset.f; pintar(); const b = cuerpo.querySelector(`[data-f="${filtro}"]`); if (b) b.focus(); return; }
+    if (e.target.closest('#gaNuevo')) return editor(null, null);
+    const ed = e.target.closest('[data-editar]'); if (ed) return editor(provs.find(p => String(p.id) === ed.dataset.editar), null);
+    const ba = e.target.closest('[data-base]'); if (ba) { const p = provs.find(x => String(x.id) === ba.dataset.base); return editor(null, p ? Object.assign({}, p, { nombre: '', url: null }) : null); }
+    const ac = e.target.closest('[data-actualizar]'); if (ac) return actualizar(sols.find(s => String(s.id) === ac.dataset.actualizar));
+  });
+  const barra = $('gaBarra'); barra.querySelector('[data-nuevo]').textContent = t('nuevo', 'Nuevo proveedor');
+  barra.addEventListener('click', () => editor(null, null));
+  cuerpo.addEventListener('change', async e => {
+    const c = e.target.closest('[data-activo]'); if (!c) return;
+    c.disabled = true;
+    try { await G.guardarProveedor(c.dataset.activo, { activo: c.checked }); BP.toast(c.checked ? t('t_activo', 'Activo: quien alquila ya lo ve.') : t('t_pausado', 'En pausa: ya no se ofrece.')); await cargar(); }
+    catch (x) { c.checked = !c.checked; c.disabled = false; BP.toast((x && x.message) || String(x), 'error'); }
+  });
+
+  /* ── diálogo: hoja de abajo en el celular, tarjeta en la compu ── */
+  /* Cada hoja suma una entrada al historial: el Atrás del celular la cierra. adelante(volver) suma un paso: Atrás vuelve. */
+  function dialogo(titulo, html, primero){
+    const velo = document.createElement('div'); velo.className = 'ga-velo';
+    velo.innerHTML = `<div class="ga-dlg" role="dialog" aria-modal="true" aria-labelledby="gaDlgT"><div class="ga-dlg-cab"><h2 class="ga-dlg-t" id="gaDlgT">${esc(titulo)}</h2><button type="button" class="ga-x" data-x aria-label="${esc(t('cerrar', 'Cerrar'))}">${X}</button></div>${html}</div>`;
+    document.body.appendChild(velo);
+    const caja = velo.firstElementChild, pasos = []; let ido = false, porAtras = false;
+    const onPop = () => { if (ido) return; const f = pasos.pop(); if (f) f(); else { porAtras = true; suelta(); } };
+    try { history.pushState({ gaDlg: 1 }, ''); window.addEventListener('popstate', onPop); } catch (e) {}
+    const quitar = () => { if (ido) return; ido = true; window.removeEventListener('popstate', onPop); if (!porAtras) { try { history.go(-(pasos.length + 1)); } catch (e) {} } velo.remove(); };
+    const suelta = BP.focoAtrapado(caja, { primero: primero ? caja.querySelector(primero) : null, alCerrar: quitar });
+    const cerrar = () => { if (!ido) suelta(); };
+    velo.addEventListener('mousedown', e => { if (e.target === velo) cerrar(); });
+    caja.querySelectorAll('[data-x]').forEach(b => b.addEventListener('click', cerrar));
+    return { caja, cerrar, adelante: volver => { pasos.push(volver); try { history.pushState({ gaDlg: pasos.length + 1 }, ''); } catch (e) {} }, atras: () => { try { history.back(); } catch (e) {} } };
+  }
+  const campo = (n, label, ctl, ayuda) => `<label class="ga-f" data-campo="${n}"><span>${esc(label)}</span>${ctl}${ayuda ? `<small>${esc(ayuda)}</small>` : ''}</label>`;
+  const val = v => v == null ? '' : esc(v);
+
+  /* Alta y edición de un proveedor, en tres pasos cortos */
+  function editor(p, base){
+    const x = p || base || { tipo: 'fianza', orden: 100 };
+    const opt = (lista, v) => lista.map(o => `<option value="${o[0]}"${o[0] === v ? ' selected' : ''}>${esc(o[1])}</option>`).join('');
+    const TIPOS = [['fianza', G.TIPOS.fianza], ['caucion', G.TIPOS.caucion], ['hogar', G.TIPOS.hogar], ['danos', G.TIPOS.danos]];
+    const html = `<form novalidate>
+      <p class="ga-paso" aria-live="polite"></p>
+      <fieldset class="ga-grupo" data-paso="1"><legend>${esc(t('e_p1', 'Qué es'))}</legend>
+        ${campo('nombre', t('e_nombre', 'Nombre'), `<input name="nombre" maxlength="80" required value="${val(x.nombre)}" autocomplete="off">`)}
+        ${campo('tipo', t('e_tipo', 'Qué ofrece'), `<select name="tipo">${opt(TIPOS, x.tipo)}</select>`)}
+        ${campo('descripcion', t('e_desc', 'Descripción corta'), `<input name="descripcion" maxlength="240" value="${val(x.descripcion)}" autocomplete="off">`, t('e_desc_a', 'Una línea. Se ve en "Requisitos".'))}
+        ${campo('requisitos', t('e_req', 'Requisitos'), `<textarea name="requisitos" maxlength="600" rows="3">${val(x.requisitos)}</textarea>`)}
+      </fieldset>
+      <fieldset class="ga-grupo" data-paso="2" hidden><legend>${esc(t('e_p2', 'Cómo se contrata'))}</legend>
+        ${campo('url', t('e_url', 'Web para contratar'), `<input name="url" type="url" inputmode="url" maxlength="500" placeholder="https://" value="${val(x.url)}" autocomplete="off">`)}
+        ${campo('param_referido', t('e_param', 'Parámetro de referido'), `<input name="param_referido" maxlength="120" placeholder="ref=bairen" value="${val(x.param_referido)}" autocomplete="off">`, t('e_param_a', 'Se suma a la web. Con {op}, va un código de la solicitud.'))}
+        <div class="ga-f2">
+          ${campo('costo_pct', t('e_costo', 'Costo estimado (% del contrato)'), `<input name="costo_pct" inputmode="decimal" value="${val(x.costo_pct)}" autocomplete="off">`)}
+          ${campo('cuotas', t('e_cuotas', 'Cuotas'), `<input name="cuotas" maxlength="80" placeholder="Hasta 6" value="${val(x.cuotas)}" autocomplete="off">`)}
+        </div>
+      </fieldset>
+      <fieldset class="ga-grupo" data-paso="3" hidden><legend>${esc(t('e_p3', 'Convenio'))}</legend>
+        ${campo('comision_pct', t('e_comision', '% del convenio (sobre el costo)'), `<input name="comision_pct" inputmode="decimal" value="${val(x.comision_pct)}" autocomplete="off">`, t('e_comision_a', 'Solo lo ve el equipo de BAIREN.'))}
+        <p class="ga-aviso" data-seguro hidden>${esc(t('e_seguro', 'Sin productor y matrícula SSN, un seguro no se activa.'))}</p>
+        <label class="ga-check" data-req-prod><input type="checkbox" name="requiere_productor"${x.requiere_productor ? ' checked' : ''}><span>${esc(t('e_req_prod', 'Va por un productor asesor'))}</span></label>
+        ${campo('productor_nombre', t('e_prod', 'Productor asesor'), `<input name="productor_nombre" maxlength="120" value="${val(x.productor_nombre)}" autocomplete="off">`)}
+        ${campo('productor_matricula_ssn', t('e_mat', 'Matrícula SSN'), `<input name="productor_matricula_ssn" maxlength="40" inputmode="numeric" value="${val(x.productor_matricula_ssn)}" autocomplete="off">`)}
+        ${campo('orden', t('e_orden', 'Orden en la lista'), `<input name="orden" inputmode="numeric" value="${val(x.orden == null ? 100 : x.orden)}" autocomplete="off">`, t('e_orden_a', 'Los más bajos van primero.'))}
+      </fieldset>
+      <p class="ga-err" role="alert" hidden></p>
+      <div class="ga-dlg-acc"><button type="button" class="p-btn" data-atras></button><button type="submit" class="p-btn p-btn-fill" data-seguir></button></div>
+    </form>`;
+    const h = dialogo(p ? t('e_t_editar', 'Editar proveedor') : t('e_t_nuevo', 'Nuevo proveedor'), html, '[name=nombre]');
+    const f = h.caja.querySelector('form'), err = f.querySelector('.ga-err'), atras = f.querySelector('[data-atras]'), seguir = f.querySelector('[data-seguir]');
+    const PASOS = { 1: ['nombre', 'tipo', 'descripcion', 'requisitos'], 2: ['url', 'param_referido', 'costo_pct', 'cuotas'], 3: ['comision_pct', 'requiere_productor', 'productor_nombre', 'productor_matricula_ssn', 'orden'] };
+    let paso = 1;
+    const datos = hasta => { const d = {}; for (let i = 1; i <= hasta; i++) PASOS[i].forEach(n => { const el = f.elements[n]; if (el) d[n] = el.type === 'checkbox' ? el.checked : el.value; }); return d; };
+    const verProductor = () => {
+      const seguro = f.elements.tipo.value !== 'fianza', req = seguro || f.elements.requiere_productor.checked;
+      f.querySelector('[data-seguro]').hidden = !seguro; f.querySelector('[data-req-prod]').hidden = seguro;
+      ['productor_nombre', 'productor_matricula_ssn'].forEach(n => { f.querySelector(`[data-campo="${n}"]`).hidden = !req; });
+    };
+    const ir = n => {
+      paso = n; err.hidden = true;
+      f.querySelectorAll('[data-paso]').forEach(g => { g.hidden = +g.dataset.paso !== n; });
+      f.querySelector('.ga-paso').textContent = tf('e_paso', 'Paso {i} de 3', { i: n });
+      atras.textContent = n === 1 ? t('cancelar', 'Cancelar') : t('atras', 'Atrás');
+      seguir.textContent = n === 3 ? t('guardar', 'Guardar') : t('seguir', 'Seguir');
+      verProductor();
+      const primero = f.querySelector(`[data-paso="${n}"] input:not([type=checkbox]),[data-paso="${n}"] select`); if (primero) primero.focus();
+    };
+    const mostrarErr = m => { err.textContent = m; err.hidden = false; err.scrollIntoView({ block: 'nearest' }); };
+    f.elements.tipo.addEventListener('change', verProductor); f.elements.requiere_productor.addEventListener('change', verProductor);
+    atras.addEventListener('click', () => { if (paso === 1) h.cerrar(); else h.atras(); });
+    f.addEventListener('submit', async e => {
+      e.preventDefault();
+      const d = datos(paso);
+      const m = G.validarProveedor(G.mezclarProveedor(p, d)); if (m) return mostrarErr(m);
+      if (paso < 3) { const volver = paso; h.adelante(() => ir(volver)); return ir(paso + 1); }
+      seguir.disabled = true; seguir.textContent = t('guardando', 'Guardando…');
+      try {
+        const r = await G.guardarProveedor(p ? p.id : null, d);
+        h.cerrar(); BP.toast(r && r.activo ? t('t_guardado', 'Proveedor guardado.') : t('t_guardado_inactivo', 'Guardado. Para ofrecerlo, prendé Activo.')); await cargar();
+      } catch (x2) { seguir.disabled = false; seguir.textContent = t('guardar', 'Guardar'); mostrarErr((x2 && x2.message) || String(x2)); }
+    });
+    ir(1);
+  }
+
+  /* Cambiar el estado de una garantía (cuando el proveedor le avisa a la plataforma) */
+  function actualizar(s){
+    if (!s) return;
+    const opciones = [['en_tramite', G.ESTADOS.en_tramite], ['aprobada', G.ESTADOS.aprobada], ['rechazada', G.ESTADOS.rechazada], ['cancelada', G.ESTADOS.cancelada]].filter(o => !(o[0] === 'en_tramite' && s.estado === 'en_tramite'));
+    const propia = s.tipo === 'propia';
+    const html = `<form novalidate>
+      <p class="ga-nota ga-nota-0">${esc([nombreDe(s), s.aviso_titulo].filter(Boolean).join(' · '))}</p>
+      <fieldset class="ga-grupo"><legend>${esc(t('u_estado', 'Nuevo estado'))}</legend><div class="ga-estados">${opciones.map(o => `<label class="ga-estado"><input type="radio" name="estado" value="${o[0]}"><span>${esc(o[1])}</span></label>`).join('')}</div></fieldset>
+      <div data-aprobada hidden>${propia ? '' : `<div class="ga-f2">${campo('costo', t('u_costo', 'Costo total'), `<input name="costo" inputmode="decimal" value="" autocomplete="off">`, s.costo_estimado != null ? tf('u_costo_a', 'Estimado: {m}.', { m: G.dinero(s.costo_estimado, s.moneda) }) : null)}
+        ${campo('moneda', t('u_moneda', 'Moneda'), `<select name="moneda"><option value="USD"${s.moneda !== 'ARS' ? ' selected' : ''}>USD</option><option value="ARS"${s.moneda === 'ARS' ? ' selected' : ''}>$ (pesos)</option></select>`)}</div>`}
+        ${campo('referencia', t('u_ref', 'Número de solicitud o póliza'), `<input name="referencia" maxlength="80" value="${val(s.referencia)}" autocomplete="off">`)}</div>
+      <p class="ga-err" role="alert" hidden></p>
+      <div class="ga-dlg-acc"><button type="button" class="p-btn" data-x>${esc(t('cancelar', 'Cancelar'))}</button><button type="submit" class="p-btn p-btn-fill">${esc(t('guardar', 'Guardar'))}</button></div>
+    </form>`;
+    const h = dialogo(t('u_t', 'Actualizar la garantía'), html, 'input[name=estado]');
+    const f = h.caja.querySelector('form'), err = f.querySelector('.ga-err');
+    f.addEventListener('change', () => { const e = f.querySelector('input[name=estado]:checked'); f.querySelector('[data-aprobada]').hidden = !(e && e.value === 'aprobada'); });
+    f.addEventListener('submit', async e => {
+      e.preventDefault(); err.hidden = true;
+      const est = f.querySelector('input[name=estado]:checked'); if (!est) { err.textContent = t('u_elegi', 'Elegí el nuevo estado.'); err.hidden = false; return; }
+      let costo = null, moneda = null;
+      if (est.value === 'aprobada' && !propia) {
+        costo = Number(String(f.elements.costo.value || '').replace(/\./g, '').replace(',', '.'));
+        if (!(costo > 0)) { err.textContent = t('err_falta_costo', 'Falta el costo total de la garantía.'); err.hidden = false; f.elements.costo.setAttribute('aria-invalid', 'true'); f.elements.costo.focus(); return; }
+        moneda = f.elements.moneda.value;
+      }
+      const ref = est.value === 'aprobada' && f.elements.referencia ? f.elements.referencia.value : null;
+      const b = f.querySelector('[type=submit]'); b.disabled = true; b.textContent = t('guardando', 'Guardando…');
+      try { await G.actualizar(s.id, est.value, costo, moneda, ref); h.cerrar(); BP.toast(tf('t_estado', 'Listo: {e}.', { e: (G.ESTADOS[est.value] || est.value).toLowerCase() })); await cargar(); }
+      catch (x2) { b.disabled = false; b.textContent = t('guardar', 'Guardar'); err.textContent = (x2 && x2.message) || String(x2); err.hidden = false; }
+    });
+  }
+
+  await cargar();
+})();
+});
+</script>
+</body>
+</html>

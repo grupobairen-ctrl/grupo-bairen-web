@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20261009d"><link rel="stylesheet" href="css/catalogo.css?v=20261009d"><link rel="stylesheet" href="css/portal.css?v=20261009d"><link rel="stylesheet" href="css/transiciones.css?v=20261009d"><style>@view-transition{navigation:auto}</style><style>html.arrancando body{opacity:0}body{transition:opacity .18s cubic-bezier(.22,1,.36,1)}@media(prefers-reduced-motion:reduce){body{transition:none}}</style><script>/* 8/10/2026 · Arranque sin pantallazo (ver BP.listo en ui.js): siempre, salvo al entrar a una ficha desde el portal (ahí la foto de la tarjeta crece hasta la ficha); en Safari del iPhone la transición entre páginas no tapaba el video al tocar el logo. Tope: 800 ms. */(function(){try{var h=document.documentElement,n=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{},r=document.referrer||'';if(r.indexOf(location.origin)===0&&n.type!=='reload'&&/propiedad/.test(location.pathname))return;h.classList.add('arrancando');setTimeout(function(){h.classList.remove('arrancando')},800)}catch(e){}})()</script>
+  <link rel="stylesheet" href="css/base.css?v=20261009e"><link rel="stylesheet" href="css/catalogo.css?v=20261009e"><link rel="stylesheet" href="css/portal.css?v=20261009e"><link rel="stylesheet" href="css/transiciones.css?v=20261009e"><link rel="stylesheet" href="css/identidad.css?v=20261009e"><style>@view-transition{navigation:auto}</style><style>html.arrancando body{opacity:0}body{transition:opacity .18s cubic-bezier(.22,1,.36,1)}@media(prefers-reduced-motion:reduce){body{transition:none}}</style><script>/* 8/10/2026 · Arranque sin pantallazo (ver BP.listo en ui.js): siempre, salvo al entrar a una ficha desde el portal (ahí la foto de la tarjeta crece hasta la ficha); en Safari del iPhone la transición entre páginas no tapaba el video al tocar el logo. Tope: 800 ms. */(function(){try{var h=document.documentElement,n=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{},r=document.referrer||'';if(r.indexOf(location.origin)===0&&n.type!=='reload'&&/propiedad/.test(location.pathname))return;h.classList.add('arrancando');setTimeout(function(){h.classList.remove('arrancando')},800)}catch(e){}})()</script>
   <style>body{padding-top:0}#ficha>.p-ficha-top,#ficha>.p-ficha,#ficha>section{max-width:var(--p-max);margin:0 auto;padding-left:24px;padding-right:24px}#ficha>.p-ficha-top{padding-top:88px}@media(max-width:900px){#ficha>.p-ficha-top{padding-top:76px}}.p-video{aspect-ratio:16/9;background:#0b1220;border-radius:16px;overflow:hidden}.p-video iframe,.p-video video{width:100%;height:100%;border:0;display:block}
   /* Fachada del video (25/9/2026): portada y botón de reproducir; el reproductor se pide al tocar */
   .p-video-play{position:relative;display:block;width:100%;height:100%;padding:0;border:0;background:#0b1220;cursor:pointer}
@@ -28,11 +28,9 @@
 <div class="p-lb" id="lb" aria-hidden="true"><div class="velo" data-lb-close></div><button type="button" class="x" data-lb-close aria-label="Cerrar las fotos" data-i18n-aria="ficha_lb_cerrar" data-i18n="ficha_lb_cerrar_txt">Cerrar</button><div class="marco" id="lbMarco"><img id="lbImg" alt="" draggable="false"></div><button type="button" class="nav prev" data-lb-prev aria-label="Foto anterior" data-i18n-aria="ficha_lb_prev"></button><button type="button" class="nav next" data-lb-next aria-label="Foto siguiente" data-i18n-aria="ficha_lb_next"></button><div class="pie"><span class="cuenta" id="lbCount"></span><div class="tiras" id="lbTiras"></div></div></div>
 <div id="pFooter"></div>
 
-<script src="supabase-portal.js?v=20261009d" defer></script><script src="js/errores.js?v=20261009d" defer></script>
+<script src="supabase-portal.js?v=20261009e" defer></script><script src="js/errores.js?v=20261009e" defer></script>
 <!-- 8/10/2026 · Sin este archivo la ficha no sabía que Palermo Hollywood es Palermo: "Ver más en Palermo Hollywood" daba 0 resultados -->
-<script src="../mapa-barrios.js?v=20261009d" defer></script>
-<script src="js/iconos-amenities.js?v=20261009d" defer></script><script src="js/bairen-motion.js?v=20261009d" defer></script><script src="js/i18n-portal.js?v=20261009d" defer></script><script src="js/ui.js?v=20261009d" defer></script><script src="js/store.js?v=20261009d" defer></script><script src="js/digital.js?v=20261009d" defer></script>
-<script src="js/data.js?v=20261009d" defer></script>
+<script src="../mapa-barrios.js?v=20261009e" defer></script><script src="js/iconos-amenities.js?v=20261009e" defer></script><script src="js/bairen-motion.js?v=20261009e" defer></script><script src="js/i18n-portal.js?v=20261009e" defer></script><script src="js/ui.js?v=20261009e" defer></script><script src="js/store.js?v=20261009e" defer></script><script src="js/digital.js?v=20261009e" defer></script><script src="js/data.js?v=20261009e" defer></script><script src="js/dg-identidad.js?v=20261009e" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){
@@ -141,7 +139,13 @@ document.addEventListener('DOMContentLoaded', function(){
   /* Lo que acompaña al precio: todo incluido, expensas incluidas o, en mediano plazo, las expensas aparte */
   /* lanz3-visitante · En venta, el precio por m² cuando hay superficie */
   const porM2 = a.op === 'venta' && a.precio && a.m2 ? TF('ficha_por_m2', '{p} por m²', { p: BP.fmtPrecio(a.precio / a.m2, a.moneda) }) : '';
-  const precioSub = a.reservado ? '' : [porM2, a.periodo ? T('ui_por_mes', '/mes') : '', BPData.todoIncluido(a) ? T('ficha_todo_incl_corto', 'todo incluido') : BPData.expensasIncluidas(a) ? T('ficha_exp_incl', 'expensas incluidas') : (expensasAparte && a.op === 'mediano' ? TF('ficha_mas_exp', 'más $ {n} de expensas', { n: BP.fmtN(a.expensas) }) : '')].filter(Boolean).join(' · ');
+  /* 9/10/2026 · Precio final (Res. SIC 446/2025): en un alquiler con expensas aparte, el total por mes en una línea.
+     En pesos se suman ("Total por mes $ 945.000 · alquiler + expensas"); en dólares con expensas en pesos van las dos
+     partes ("Total por mes USD 1.450 + $ 95.000 de expensas"). Con expensas incluidas, el precio ya es el final. */
+  const totalMes = (a.reservado || !a.periodo || !a.precio || !expensasAparte) ? ''
+    : a.moneda === 'ARS' ? TF('idn_total_ars', 'Total por mes <b>{t}</b> · alquiler + expensas', { t: BP.esc(BP.fmtPrecio(a.precio + a.expensas, 'ARS')) })
+    : TF('idn_total_mixto', 'Total por mes <b>{p} + $ {e}</b> de expensas', { p: BP.esc(BP.fmtPrecio(a.precio, a.moneda)), e: BP.esc(BP.fmtN(a.expensas)) });
+  const precioSub = a.reservado ? '' : [porM2, a.periodo ? T('ui_por_mes', '/mes') : '', BPData.todoIncluido(a) ? T('ficha_todo_incl_corto', 'todo incluido') : BPData.expensasIncluidas(a) ? T('ficha_exp_incl', 'expensas incluidas') : (expensasAparte && a.op === 'mediano' && !totalMes ? TF('ficha_mas_exp', 'más $ {n} de expensas', { n: BP.fmtN(a.expensas) }) : '')].filter(Boolean).join(' · ');
   const urlPub = 'buscar.html?op=&pub=' + encodeURIComponent(pub.id || '');
   const urlVolver = a.zona ? BP.urlBuscar({ op: BPData.opFiltro(a), zona: a.zona }) : 'buscar.html';
 
@@ -188,13 +192,14 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip" role="group" aria-label="$
   </div>
   <aside class="p-side" id="contacto">
     <div class="p-cta" id="ctaCard">
-      <div class="p-cta-price">${a.reservado ? `<span class="p-cta-res">${T('ficha_reservada', 'Reservada')}</span>` : BP.fmtPrecio(a.precio, a.moneda)}${precioSub ? `<small>${precioSub}</small>` : ''}</div>
+      <div class="p-cta-price">${a.reservado ? `<span class="p-cta-res">${T('ficha_reservada', 'Reservada')}</span>` : BP.fmtPrecio(a.precio, a.moneda)}${precioSub ? `<small>${precioSub}</small>` : ''}${totalMes ? `<span class="idn-total">${totalMes}</span>` : ''}</div>
       ${a.reservado ? (a.zona ? `<a class="p-link" href="${BP.urlBuscar({ op: BPData.opFiltro(a), zona: a.zona })}">${TF('ficha_ver_disponibles', 'Ver las disponibles en {z}', { z: BP.zonaLabel(a.zona) })}</a>` : '')
         : BPData.sinContacto(pub) ? `<p class="p-sincontacto-box">${T('card_contacto_pendiente', 'Contacto pendiente')}</p>`
         : waPub ? `<a class="p-btn p-btn-fill p-cta-wa" id="waBtn" href="${waPub}" ${waAttrs}>${BP.ico.wa} WhatsApp</a><button type="button" class="p-btn p-cta-sec" id="abrirVisita">${T('ficha_coordinar', 'Coordinar visita')}</button>`
         : `<button type="button" class="p-btn p-btn-fill" id="abrirVisita">${T('ficha_coordinar', 'Coordinar visita')}</button><button type="button" class="p-btn p-cta-sec" id="abrirForm">${T('ficha_consultar', 'Consultar')}</button>`}
     </div>
     ${pub.nombre ? `<p class="p-fpub"><span>${T('ficha_publica', 'Publica')}</span> <a href="${urlPub}">${BPData.pubLinea(pub)}</a></p>` : ''}
+    ${pub.nombre && window.BPIdentidad ? `<p class="idn-ofe"><button type="button" class="idn-ofe-btn" aria-expanded="false" aria-controls="idnOfe" data-pliega data-ofe><span>${T('idn_quien_ofrece', 'Quién ofrece')}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6"/></svg></button></p><div class="idn-ofe-datos" id="idnOfe" hidden aria-live="polite"></div>` : ''}
     <!-- Reservada: sin formulario de consulta -->
     ${a.reservado ? '' : `<form class="p-form" id="contactForm" hidden novalidate>
       <h3>${TF('ficha_escribile', 'Escribile a {p}', { p: BP.esc(pubNombre) })}</h3>
@@ -492,6 +497,22 @@ ${fotos.length > 1 ? `<div class="p-strip" id="strip" role="group" aria-label="$
   }
   document.querySelectorAll('[data-rep]').forEach(b => b.addEventListener('click', async () => { if (b.disabled) return; document.querySelectorAll('[data-rep]').forEach(x => { x.disabled = true; }); b.textContent = T('ficha_rep_ok', 'Enviado, gracias'); const r = BP.reportes.get(); r.push({ avisoId: a.id, motivo: b.dataset.rep, fecha: new Date().toISOString() }); BP.reportes.set(r); await BPStore.addDenuncia(a.id, b.dataset.rep); BP.toast(T('ficha_rep_toast', 'Gracias. Revisamos el aviso en menos de 24 horas.')); }));
   document.getElementById('share').addEventListener('click', () => BP.compartir({ titulo: tit, texto: TF('ficha_en_bairen', '{t} en BAIREN', { t: nombre }), url: location.href }));
+  /* 9/10/2026 · Quién ofrece (Res. SIC 446/2025): nombre o razón social, CUIT y domicilio de quien publica. Se pide al
+     abrirlo (vista portal.publicador_publico, migración 29). Si falta un dato, se dice que se pide por mensaje. */
+  (function(){
+    const b = document.querySelector('[data-ofe]'), caja = document.getElementById('idnOfe'); if (!b || !caja) return;
+    let cargado = false;
+    b.addEventListener('click', async () => {
+      if (cargado) return; cargado = true;   /* el primer toque lo abre (data-pliega) y lo carga */
+      caja.innerHTML = `<p>${T('idn_ofe_cargando', 'Cargando…')}</p>`;
+      let o = null; try { o = await BPIdentidad.oferente(pub); } catch (e) { o = null; }
+      const fila = (k, v) => `<dt>${k}</dt><dd>${BP.esc(v)}</dd>`;
+      const nombreRot = o && o.dueno ? T('idn_ofe_nombre', 'Nombre') : T('idn_ofe_razon', 'Razón social');
+      caja.innerHTML = o && o.completo
+        ? `<dl>${fila(nombreRot, o.nombre)}${fila('CUIT', o.cuit)}${fila(T('idn_ofe_domicilio', 'Domicilio'), o.domicilio)}</dl>`
+        : `${o && o.nombre ? `<dl>${fila(nombreRot, o.nombre)}</dl>` : ''}<p>${T('idn_ofe_pedilos', 'Datos del oferente: pedilos por mensaje.')}</p>`;
+    });
+  })();
   /* Reportar e Información legal: plegados en el último renglón, se abren al tocar */
   document.querySelectorAll('[data-pliega]').forEach(b => b.addEventListener('click', () => { const p = document.getElementById(b.getAttribute('aria-controls')); const abre = p.hidden; p.hidden = !abre; b.setAttribute('aria-expanded', abre ? 'true' : 'false'); }));
   /* La visita a la ficha se registra (estadística de quien publica); el contador ya no se muestra */

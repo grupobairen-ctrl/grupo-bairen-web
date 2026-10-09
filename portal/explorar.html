@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20261009d"><link rel="stylesheet" href="css/catalogo.css?v=20261009d"><link rel="stylesheet" href="css/portal.css?v=20261009d"><link rel="stylesheet" href="css/transiciones.css?v=20261009d"><style>@view-transition{navigation:auto}</style><style>html.arrancando body{opacity:0}body{transition:opacity .18s cubic-bezier(.22,1,.36,1)}@media(prefers-reduced-motion:reduce){body{transition:none}}</style><script>/* 8/10/2026 · Arranque sin pantallazo (ver BP.listo en ui.js): siempre, salvo al entrar a una ficha desde el portal (ahí la foto de la tarjeta crece hasta la ficha); en Safari del iPhone la transición entre páginas no tapaba el video al tocar el logo. Tope: 800 ms. */(function(){try{var h=document.documentElement,n=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{},r=document.referrer||'';if(r.indexOf(location.origin)===0&&n.type!=='reload'&&/propiedad/.test(location.pathname))return;h.classList.add('arrancando');setTimeout(function(){h.classList.remove('arrancando')},800)}catch(e){}})()</script>
-  <link rel="stylesheet" href="css/explorar.css?v=20261009d">
+  <link rel="stylesheet" href="css/base.css?v=20261009e"><link rel="stylesheet" href="css/catalogo.css?v=20261009e"><link rel="stylesheet" href="css/portal.css?v=20261009e"><link rel="stylesheet" href="css/transiciones.css?v=20261009e"><style>@view-transition{navigation:auto}</style><style>html.arrancando body{opacity:0}body{transition:opacity .18s cubic-bezier(.22,1,.36,1)}@media(prefers-reduced-motion:reduce){body{transition:none}}</style><script>/* 8/10/2026 · Arranque sin pantallazo (ver BP.listo en ui.js): siempre, salvo al entrar a una ficha desde el portal (ahí la foto de la tarjeta crece hasta la ficha); en Safari del iPhone la transición entre páginas no tapaba el video al tocar el logo. Tope: 800 ms. */(function(){try{var h=document.documentElement,n=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{},r=document.referrer||'';if(r.indexOf(location.origin)===0&&n.type!=='reload'&&/propiedad/.test(location.pathname))return;h.classList.add('arrancando');setTimeout(function(){h.classList.remove('arrancando')},800)}catch(e){}})()</script>
+  <link rel="stylesheet" href="css/explorar.css?v=20261009e">
 </head>
 <!-- 8/10/2026 · BAIREN, la digitalización del real estate · Explorar (la lupita).
      Dos pestañas: Novedades (lo nuevo, las bajas de precio y lo que cuentan quienes publican, curado) y Se busca
@@ -27,11 +27,11 @@
 </main>
 <div id="pFooter"></div>
 
-<script src="supabase-portal.js?v=20261009d" defer></script><script src="js/errores.js?v=20261009d" defer></script>
-<script src="../mapa-barrios.js?v=20261009d" defer></script>
-<script src="js/bairen-motion.js?v=20261009d" defer></script><script src="js/i18n-portal.js?v=20261009d" defer></script><script src="js/ui.js?v=20261009d" defer></script><script src="js/store.js?v=20261009d" defer></script>
-<script src="js/digital.js?v=20261009d" defer></script>
-<script src="js/data.js?v=20261009d" defer></script>
+<script src="supabase-portal.js?v=20261009e" defer></script><script src="js/errores.js?v=20261009e" defer></script>
+<script src="../mapa-barrios.js?v=20261009e" defer></script>
+<script src="js/bairen-motion.js?v=20261009e" defer></script><script src="js/i18n-portal.js?v=20261009e" defer></script><script src="js/ui.js?v=20261009e" defer></script><script src="js/store.js?v=20261009e" defer></script>
+<script src="js/digital.js?v=20261009e" defer></script><script src="js/dg-inversores.js?v=20261009e" defer></script>
+<script src="js/data.js?v=20261009e" defer></script>
 <script>
 document.addEventListener('DOMContentLoaded', function(){
 (async function(){
@@ -204,7 +204,8 @@ document.addEventListener('DOMContentLoaded', function(){
   /* ── Novedades ─────────────────────────────────────────────────────────────────────────────────────────── */
   const TIPO_TXT = { nuevo: () => t('dg_ex_t_nuevo', 'Nueva'), baja_precio: () => t('dg_ex_t_baja', 'Bajó de precio'), lanzamiento: () => t('dg_ex_t_lanzamiento', 'Lanzamiento'), avance_obra: () => t('dg_ex_t_avance', 'Avance de obra'), novedad: () => t('dg_ex_t_novedad', 'Novedad') };
   const CAT = r => r.tipo === 'nuevo' ? 'nuevo' : r.tipo === 'baja_precio' ? 'baja' : 'pub';
-  const tipoTag = (tipo, fecha) => `<p class="p-ex-marca"><span class="p-ex-tipo t-${esc(tipo)}">${esc((TIPO_TXT[tipo] || TIPO_TXT.novedad)())}</span>${fecha ? `<time datetime="${esc(fecha)}">${esc(hace(fecha))}</time>` : ''}</p>`;
+  /* 9/10/2026 · Membresía Inversor (migración 34): lo que un miembro ve antes que el público lleva "Antes que nadie" */
+  const tipoTag = (tipo, fecha, antes) => `<p class="p-ex-marca"><span class="p-ex-tipo t-${esc(tipo)}">${esc((TIPO_TXT[tipo] || TIPO_TXT.novedad)())}</span>${fecha ? `<time datetime="${esc(fecha)}">${esc(hace(fecha))}</time>` : ''}${antes ? `<span class="p-ex-mia p-ex-antes">${esc(t('dg_desarrollos_antes', 'Antes que nadie'))}</span>` : ''}</p>`;
   const pubDe = (pid, a) => {
     if (a && a.publicadorId) return BPData.pub(a.publicadorId);
     if (!pid) return null;
@@ -238,7 +239,7 @@ document.addEventListener('DOMContentLoaded', function(){
     const p = pubDe(r.publicador_id, a), linea = p ? BPData.pubLinea(p) : '';
     const entrega = r.entrega ? mesAnio(r.entrega) : '';
     return `<article class="p-ex-item p-ex-p t-${esc(r.tipo)}" style="--i:${i}">
-      ${tipoTag(r.tipo, r.fecha)}
+      ${tipoTag(r.tipo, r.fecha, r.anticipado === true)}
       <h3 class="p-ex-p-tit">${esc(r.titulo || '')}</h3>
       ${r.texto ? `<p class="p-ex-p-txt">${esc(r.texto)}</p>` : ''}
       ${entrega || linea ? `<p class="p-ex-p-meta">${entrega ? `<span class="p-ex-p-entrega">${BP.ico.cal}${esc(tf('dg_ex_entrega', 'Entrega estimada: {f}', { f: entrega }))}</span>` : ''}${linea ? `<span class="p-ex-p-quien">${linea}</span>` : ''}</p>` : ''}

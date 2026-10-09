@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pagos · BAIREN</title>
+  <meta name="description" content="Tus señas, cuotas y recibos en BAIREN. La plata va directo a quien publica.">
+  <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#131D2D">
+  <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
+  <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css?v=20261009e"><link rel="stylesheet" href="css/catalogo.css?v=20261009e"><link rel="stylesheet" href="css/portal.css?v=20261009e"><link rel="stylesheet" href="css/transiciones.css?v=20261009e"><link rel="stylesheet" href="css/pagos.css?v=20261009e"><style>@view-transition{navigation:auto}</style><style>html.arrancando body{opacity:0}body{transition:opacity .18s cubic-bezier(.22,1,.36,1)}@media(prefers-reduced-motion:reduce){body{transition:none}}</style><script>/* 8/10/2026 · Arranque sin pantallazo (ver BP.listo en ui.js): siempre, salvo al entrar a una ficha desde el portal (ahí la foto de la tarjeta crece hasta la ficha); en Safari del iPhone la transición entre páginas no tapaba el video al tocar el logo. Tope: 800 ms. */(function(){try{var h=document.documentElement,n=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{},r=document.referrer||'';if(r.indexOf(location.origin)===0&&n.type!=='reload'&&/propiedad/.test(location.pathname))return;h.classList.add('arrancando');setTimeout(function(){h.classList.remove('arrancando')},800)}catch(e){}})()</script>
+</head>
+<!-- 9/10/2026 · Rieles: reservas y cobranza (migración 31). Tres vistas en la misma página:
+     · Mis pagos (quien busca): arriba lo próximo que vence, en una tarjeta grande con "Pagar"; después lo que sigue y el
+       historial plegado por mes, con los recibos.
+     · Cobranza (quien publica): "Cobrado este mes" y "Atrasados" en grande, la seña por confirmar, las unidades en lista
+       (sus cuotas en tarjetas), el resumen por mes plegado y la cuenta de cobro (alias, CBU y titular; Mercado Pago, muy
+       pronto).
+     · Recibo (pagos.html?recibo=<id>): la vista imprimible de una cuota pagada. Lo emite quien publica.
+     La plata nunca pasa por BAIREN: va directo a la cuenta de quien publica. Apagada para el público con
+     BPDigital.activo(). Los datos y las piezas compartidas viven en js/dg-pagos.js (window.BPPagos). -->
+<body class="p-product p-pagos">
+<div class="p-velo" aria-hidden="true"><span class="w">BAIREN</span></div>
+<div id="pHeader"></div>
+<main class="pg-main" id="contenido" aria-busy="true">
+  <div id="pgCuerpo"><div class="pg-esq" aria-hidden="true"><i></i><i class="g"></i><i></i></div></div>
+</main>
+<div id="pFooter"></div>
+
+<script src="supabase-portal.js?v=20261009e" defer></script><script src="js/errores.js?v=20261009e" defer></script>
+<script src="../mapa-barrios.js?v=20261009e" defer></script>
+<script src="js/bairen-motion.js?v=20261009e" defer></script><script src="js/i18n-portal.js?v=20261009e" defer></script><script src="js/ui.js?v=20261009e" defer></script><script src="js/store.js?v=20261009e" defer></script>
+<script src="js/data.js?v=20261009e" defer></script><script src="js/digital.js?v=20261009e" defer></script><script src="js/dg-pagos.js?v=20261009e" defer></script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+(async function(){
+  'use strict';
+  BP.header(); BP.footer(); if (window.BPStore) BPStore.init();
+  const t = (k, d) => BP.t('dg_pagos_' + k, d);
+  const tf = (k, d, v) => BP.tf('dg_pagos_' + k, d, v);
+  const esc = BP.esc;
+  const $ = id => document.getElementById(id);
+  const main = $('contenido'), cuerpo = $('pgCuerpo');
+  const fin = () => { main.removeAttribute('aria-busy'); if (BP.listo) BP.listo(); };
+  const q = new URLSearchParams(location.search);
+  document.title = t('titulo', 'Pagos') + ' · BAIREN';
+
+  if (window.BPStore && BPStore.ready) await BPStore.ready;
+  const D = window.BPDigital, P = window.BPPagos;
+  const vacio = (tit, p, btn) => { cuerpo.innerHTML = `<div class="p-empty pg-vacio"><b>${esc(tit)}</b><p>${esc(p)}</p>${btn || ''}</div>`; fin(); };
+  if (!D || !P || !D.activo()) return vacio(t('pronto_t', 'Pagos, muy pronto'), t('pronto_p', 'Vas a ver tus señas, cuotas y recibos en un solo lugar.'), `<a class="p-btn p-btn-fill" href="index.html">${esc(t('pronto_btn', 'Volver al inicio'))}</a>`);
+  if (!BPStore.requireSession()) return;
+  try { await BP.probePretty(); } catch (e) { /* enlaces con .html */ }
+
+  /* ── piezas ─────────────────────────────────────────────── */
+  const sumas = lista => { const s = {}; lista.forEach(x => { s[x.moneda] = (s[x.moneda] || 0) + Number(x.monto || 0); }); return s; };
+  const montos = (s, cls) => { const ks = Object.keys(s).sort(); return ks.length ? ks.map((m, i) => `<span class="${i ? (cls || 'pg-kpi-2') : ''}">${esc(P.fmt(s[m], m))}</span>`).join('') : ''; };
+  const MESES_ORDEN = (a, b) => b.localeCompare(a);
+  const mesDe = v => String(v || '').slice(0, 7);
+  const mesTitulo = per => { const s = P.mes(per, true); return s.charAt(0).toUpperCase() + s.slice(1); };
+  const linkOp = id => `mensajes.html?op=${encodeURIComponent(id)}`;
+  const ctx = devolverA => ({ dialogo: P.preguntar, recargar: () => cargar(true), toast: m => BP.toast(m), devolverA });
+  const venceTxt = (tipo, it) => tipo === 'reserva' ? tf('pagala_antes', 'Pagala antes del {f}', { f: P.diaHora(it.vence_en) })
+    : P.estadoCuota(it) === 'atrasada' ? tf('vencio_el', 'Venció el {f}', { f: P.dia(it.vencimiento) }) : tf('vence_el', 'Vence el {f}', { f: P.dia(it.vencimiento) });
+  const nombreDe = (tipo, it) => tipo === 'reserva' ? t('sena', 'Seña') : P.cuotaTxt(it);
+
+  let datos = { mis: [], cob: null, pub: null }, vista = 'mis';
+
+  /* ═══════════════ Recibo ═══════════════ */
+  const reciboId = q.get('recibo');
+  if (reciboId) {
+    document.body.classList.add('pg-modo-recibo');
+    try {
+      const r = await P.recibo(reciboId);
+      const u = r.unidad || {};
+      const unidad = [u.titulo, [u.direccion, u.unidad].filter(Boolean).join(' '), u.barrio].filter(Boolean).filter((v, i, a) => a.indexOf(v) === i).join(' · ');
+      const concepto = r.concepto === 'deposito' ? t('r_deposito', 'depósito en garantía') : r.concepto === 'expensas' ? tf('r_expensas', 'expensas de {m}', { m: P.mes(r.periodo, true) }) : tf('r_alquiler', 'alquiler de {m}', { m: P.mes(r.periodo, true) });
+      const pub = r.publicador || {};
+      document.title = t('recibo', 'Recibo') + ' ' + P.reciboTxt(r.recibo) + ' · BAIREN';
+      cuerpo.innerHTML = `<article class="pg-recibo" aria-labelledby="pgRecT">
+        <header class="pg-recibo-cab"><p class="pg-recibo-n" id="pgRecT">${esc(t('recibo', 'Recibo'))} ${esc(P.reciboTxt(r.recibo))}</p><p class="pg-recibo-f">${esc(tf('r_lugar', 'Buenos Aires, {f}', { f: new Date(r.pagado_en).toLocaleDateString('es-AR') }))}</p></header>
+        <h1 class="pg-recibo-de">${esc(pub.nombre || '')}</h1>${pub.cuit ? `<p class="pg-recibo-cuit">CUIT ${esc(pub.cuit)}</p>` : ''}
+        <p class="pg-recibo-txt">${tf('r_texto', 'Recibí de {p} la suma de {m} en concepto de {c}.', { p: `<b>${esc(r.pagador || t('r_quien', 'quien alquila'))}</b>`, m: `<b>${esc(P.fmt(r.monto, r.moneda))}</b>`, c: `<b>${esc(concepto)}</b>` })}</p>
+        <dl class="pg-recibo-dl">
+          ${unidad ? `<div><dt>${esc(t('r_unidad', 'Unidad'))}</dt><dd>${esc(unidad)}</dd></div>` : ''}
+          <div><dt>${esc(t('r_fecha', 'Fecha de pago'))}</dt><dd>${esc(new Date(r.pagado_en).toLocaleDateString('es-AR'))}</dd></div>
+          <div><dt>${esc(t('r_medio', 'Medio'))}</dt><dd>${esc(r.proveedor === 'mercadopago' ? 'Mercado Pago' : t('r_transferencia', 'Transferencia'))}</dd></div>
+          ${r.referencia ? `<div><dt>${esc(t('r_ref', 'Referencia'))}</dt><dd>${esc(r.referencia)}</dd></div>` : ''}
+          <div><dt>${esc(t('r_venc', 'Vencimiento'))}</dt><dd>${esc(new Date(r.vencimiento + 'T12:00:00').toLocaleDateString('es-AR'))}</dd></div>
+        </dl>
+        <p class="pg-recibo-pie">${esc(tf('r_pie', 'Emitido por {p} con BAIREN. El pago fue directo a {p}: BAIREN no recibió este dinero. Comprobante de pago; no reemplaza la factura, si corresponde.', { p: pub.marca || pub.nombre || '' }))}</p>
+      </article>
+      <div class="pg-recibo-acc"><button type="button" class="p-btn p-btn-fill" id="pgImprimir">${esc(t('imprimir', 'Imprimir'))}</button><a class="p-btn" href="${esc(linkOp(r.operacion_id))}">${esc(t('ver_chat', 'Ver chat'))}</a></div>`;
+      $('pgImprimir').addEventListener('click', () => window.print());
+      fin();
+    } catch (e) {
+      vacio(t('err_recibo_t', 'No pudimos abrir este recibo'), (e && e.message) || t('err_recibo', 'Probá de nuevo en un momento.'), `<a class="p-btn" href="pagos.html">${esc(t('volver', 'Volver a Pagos'))}</a>`);
+    }
+    return;
+  }
+
+  /* ═══════════════ Mis pagos (quien busca) ═══════════════ */
+  function itemsDe(ops){
+    const out = [];
+    ops.forEach(o => { (o.reservas || []).forEach(r => out.push({ tipo: 'reserva', it: r, op: o })); (o.pagos || []).filter(p => p.estado !== 'anulado').forEach(p => out.push({ tipo: 'cuota', it: p, op: o })); });
+    return out;
+  }
+  const pendiente = i => i.tipo === 'reserva' ? P.vigente(i.it) : (i.it.estado === 'pendiente' || i.it.estado === 'vencido');
+  const vence = i => i.tipo === 'reserva' ? String(i.it.vence_en) : String(i.it.vencimiento) + 'T23:59';
+  function filaMini(i, conAccion){
+    const est = i.tipo === 'reserva' ? P.estadoReserva(i.it) : P.estadoCuota(i.it);
+    const sub = i.it.estado === 'pagado' ? tf('pagada_el', 'Pagada el {f}', { f: P.dia(i.it.pagado_en) }) : i.tipo === 'reserva' && i.it.estado !== 'pedida' ? (i.op.aviso_titulo || '') : venceTxt(i.tipo, i.it);
+    const acc = i.tipo === 'cuota' && i.it.estado === 'pagado' ? `<a class="pg-mini" href="pagos.html?recibo=${encodeURIComponent(i.it.id)}">${esc(t('recibo', 'Recibo'))} ${esc(P.reciboTxt(i.it.recibo))}</a>`
+      : conAccion ? `<button type="button" class="pg-mini" data-pagar="${esc(i.it.id)}">${esc(t('pagar', 'Pagar'))}</button>` : '';
+    return `<li class="pg-fila"><span class="pg-fila-t">${esc(nombreDe(i.tipo, i.it))}<small>${esc(sub)}</small></span><span class="pg-fila-m">${esc(P.fmt(i.it.monto, i.it.moneda))}</span>${P.pill(est)}${acc}</li>`;
+  }
+  function pintarMis(){
+    const items = itemsDe(datos.mis);
+    if (!items.length) return `<div class="p-empty pg-vacio"><b>${esc(t('mis_vacio_t', 'Todavía no tenés pagos'))}</b><p>${esc(t('mis_vacio_p', 'Acá van a estar tus señas, cuotas y recibos.'))}</p><a class="p-btn p-btn-fill" href="mensajes.html">${esc(t('ir_mensajes', 'Ir a Mensajes'))}</a></div>`;
+    const pend = items.filter(pendiente).sort((a, b) => (a.tipo === 'reserva' ? -1 : 0) - (b.tipo === 'reserva' ? -1 : 0) || vence(a).localeCompare(vence(b)));
+    const prox = pend[0];
+    /* Lo que vence junto en esa operación se paga junto: el total grande y el desglose en la hoja */
+    const juntas = prox && prox.tipo === 'cuota' ? P.juntas(prox.op) : [];
+    const estado = !prox ? t('est_al_dia_mis', 'Estás al día.')
+      : prox.tipo === 'reserva' ? tf('est_sena', 'Seña de {m} · pagala antes del {f}', { m: P.fmt(prox.it.monto, prox.it.moneda), f: P.diaHora(prox.it.vence_en) })
+      : P.lineaJuntas(prox.op);
+    let html = `<p class="pg-estado" role="status">${esc(estado)}</p>`;
+    if (prox) {
+      const est = prox.tipo === 'reserva' ? 'pedida' : P.estadoCuota(prox.it);
+      const grupo = prox.tipo === 'reserva' ? [prox.it] : juntas;
+      const tot = sumas(grupo);
+      const montoGrande = Object.keys(tot).sort((a, b) => (a === 'USD' ? -1 : 0) - (b === 'USD' ? -1 : 0)).map((m, k) => k ? `<span class="pg-prox-m2">+ ${esc(P.fmt(tot[m], m))}</span>` : `<span>${esc(P.fmt(tot[m], m))}</span>`).join('');
+      html += `<section class="pg-prox" aria-labelledby="pgProxT">
+        <p class="pg-prox-l" id="pgProxT">${esc(grupo.length > 1 ? tf('n_pagos', '{n} pagos', { n: grupo.length }) : nombreDe(prox.tipo, prox.it))}${prox.op.aviso_titulo ? ` · ${esc(prox.op.aviso_titulo)}` : ''}</p>
+        <p class="pg-prox-m">${montoGrande}</p>
+        <p class="pg-prox-v">${esc(venceTxt(prox.tipo, prox.it))} ${P.pill(est)}</p>
+        <div class="pg-prox-acc p-barra-fija"><button type="button" class="p-btn p-btn-fill" data-pagar="${esc(prox.it.id)}">${esc(prox.tipo === 'reserva' ? t('a_pagar_sena', 'Pagar seña') : t('pagar', 'Pagar'))}</button>
+          ${P.confianza(prox.tipo === 'reserva' ? t('conf_sena', 'La seña va directo a quien publica. BAIREN no recibe tu dinero.') : t('conf_cuota', 'El pago va directo a quien publica. BAIREN no recibe tu dinero.'))}</div>
+        <a class="pg-link" href="${esc(linkOp(prox.op.operacion_id))}">${esc(t('ver_chat', 'Ver chat'))}</a>
+      </section>`;
+    }
+    const yaJuntas = new Set(juntas.map(p => p.id));
+    const despues = pend.slice(1).filter(i => !yaJuntas.has(i.it.id));
+    if (despues.length) {
+      html += `<section class="pg-bloque" aria-labelledby="pgDespT"><h2 class="pg-h2" id="pgDespT">${esc(t('despues', 'Lo que sigue'))}</h2><ul class="pg-filas">${despues.slice(0, 3).map(i => filaMini(i, false)).join('')}</ul>
+        ${despues.length > 3 ? `<details class="pg-mas"><summary>${esc(tf('ver_n', 'Ver las {n}', { n: despues.length }))}</summary><ul class="pg-filas">${despues.slice(3).map(i => filaMini(i, false)).join('')}</ul></details>` : ''}</section>`;
+    }
+    /* Historial: lo pagado y lo cerrado, plegado por mes (el más reciente abierto) */
+    const hechos = items.filter(i => !pendiente(i) && !(i.tipo === 'reserva' && (i.it.estado === 'cancelada' || P.estadoReserva(i.it) === 'vencida')));
+    if (hechos.length) {
+      const fechaH = i => i.tipo === 'cuota' ? (i.it.pagado_en || i.it.vencimiento) : (i.it.pagada_en || i.it.devuelta_en || i.it.cancelada_en || i.it.vencida_en || i.it.pedida_en);
+      const g = {}; hechos.forEach(i => { const k = mesDe(fechaH(i)); (g[k] = g[k] || []).push(i); });
+      const meses = Object.keys(g).sort(MESES_ORDEN);
+      html += `<section class="pg-bloque" aria-labelledby="pgHistT"><h2 class="pg-h2" id="pgHistT">${esc(t('historial', 'Historial y recibos'))}</h2>
+        ${meses.map((m, k) => { const pagado = g[m].filter(i => i.it.estado === 'pagado' || i.it.estado === 'pagada'); const s = sumas(pagado.map(i => i.it));
+          return `<details class="pg-mes"${k === 0 ? ' open' : ''}><summary><span class="pg-mes-t">${esc(mesTitulo(m))}</span><span class="pg-mes-m">${Object.keys(s).length ? montos(s, 'pg-mes-2') : esc(t('sin_pagos', 'Sin pagos'))}</span></summary>
+            <ul class="pg-filas">${g[m].sort((a, b) => String(fechaH(b)).localeCompare(String(fechaH(a)))).map(i => filaMini(i, false)).join('')}</ul></details>`; }).join('')}</section>`;
+    }
+    return html;
+  }
+
+  /* ═══════════════ Cobranza (quien publica) ═══════════════ */
+  function cuentaManual(){ const c = datos.cob && (datos.cob.cuentas || []).find(x => x.proveedor === 'manual' && (!datos.pub || x.publicador_id === datos.pub.id)); return c || null; }
+  function pintarCobranza(){
+    const c = datos.cob || { operaciones: [], cuentas: [] };
+    /* Las unidades con algo para cobrar o ya cobrado (una seña cancelada o vencida queda en el chat) */
+    const ops = (c.operaciones || []).filter(o => (o.pagos || []).length || (o.reservas || []).some(r => P.vigente(r) || r.estado === 'pagada' || r.estado === 'devuelta'));
+    const mes = P.hoy().slice(0, 7);
+    const enMes = v => v && mesDe(new Date(new Date(v).getTime() - 3 * 3600e3).toISOString()) === mes;
+    const cobrado = []; const atrasadas = []; const senas = [];
+    ops.forEach(o => {
+      (o.pagos || []).forEach(p => { if (p.estado === 'pagado' && enMes(p.pagado_en)) cobrado.push(p); if (P.estadoCuota(p) === 'atrasada') atrasadas.push({ p, o }); });
+      (o.reservas || []).forEach(r => { if (r.estado === 'pagada' && enMes(r.pagada_en)) cobrado.push(r); if (P.vigente(r)) senas.push({ r, o }); });
+    });
+    const cuenta = cuentaManual();
+    const estado = !cuenta ? t('est_sin_cuenta', 'Cargá tu alias o CBU para que te puedan pagar.')
+      : senas.length ? tf('est_senas', '{n} por confirmar', { n: senas.length === 1 ? t('una_sena', 'Una seña') : senas.length + ' ' + t('senas', 'señas') })
+      : atrasadas.length ? (atrasadas.length === 1 ? t('est_una_atrasada', 'Una cuota atrasada') : tf('est_atrasadas', '{n} cuotas atrasadas', { n: atrasadas.length }))
+      : ops.length ? t('est_todo_al_dia', 'Todo al día.') : t('est_nada', 'Todavía no hay cobros.');
+    let html = `<p class="pg-estado" role="status">${esc(estado)}</p>`;
+    /* El paso principal de la pantalla: cargar la cuenta, o confirmar la seña */
+    if (!cuenta) html += cuentaHTML(null, true);
+    else if (senas.length) {
+      const s = senas[0];
+      html += `<section class="pg-prox" aria-labelledby="pgSenaT"><p class="pg-prox-l" id="pgSenaT">${esc(tf('sena_de', 'Seña de {p}', { p: s.o.interesado || t('interesado', 'quien alquila') }))}${s.o.aviso_titulo ? ` · ${esc(s.o.aviso_titulo)}` : ''}</p>
+        <p class="pg-prox-m">${esc(P.fmt(s.r.monto, s.r.moneda))}</p><p class="pg-prox-v">${esc(tf('vence_sena', 'Tiene hasta el {f} para pagarla', { f: P.diaHora(s.r.vence_en) }))}</p>
+        <div class="pg-prox-acc p-barra-fija"><button type="button" class="p-btn p-btn-fill" data-confirmar="${esc(s.r.id)}">${esc(t('a_confirmar', 'Confirmar seña'))}</button>${P.confianza(t('conf_confirmar', 'Confirmala cuando el dinero esté en tu cuenta.'))}</div>
+        ${senas.length > 1 ? `<p class="pg-nota">${esc(tf('mas_senas', 'Y {n} más en Unidades.', { n: senas.length - 1 }))}</p>` : ''}</section>`;
+    }
+    if (ops.length) {
+      const sAtr = sumas(atrasadas.map(x => x.p));
+      html += `<div class="pg-kpis">
+        <section class="pg-kpi" aria-labelledby="pgK1"><p class="pg-kpi-l" id="pgK1">${esc(t('cobrado_mes', 'Cobrado este mes'))}</p><p class="pg-kpi-n">${montos(sumas(cobrado)) || `<span>${esc(P.fmt(0, (ops[0].pagos[0] || ops[0].reservas[0] || {}).moneda || 'USD'))}</span>`}</p></section>
+        <section class="pg-kpi${atrasadas.length ? ' mal' : ''}" aria-labelledby="pgK2"><p class="pg-kpi-l" id="pgK2">${esc(t('atrasados', 'Atrasados'))}</p><p class="pg-kpi-n"><span>${atrasadas.length}</span></p><p class="pg-kpi-s">${atrasadas.length ? montos(sAtr, 'pg-kpi-s2') : esc(t('al_dia', 'Al día'))}</p></section>
+      </div>`;
+      if (atrasadas.length) html += `<section class="pg-bloque" aria-labelledby="pgAtrT"><h2 class="pg-h2" id="pgAtrT">${esc(t('atrasados', 'Atrasados'))}</h2><ul class="pg-filas">${atrasadas.slice(0, 3).map(x => filaCob(x.p, x.o)).join('')}</ul>
+        ${atrasadas.length > 3 ? `<details class="pg-mas"><summary>${esc(tf('ver_n', 'Ver las {n}', { n: atrasadas.length }))}</summary><ul class="pg-filas">${atrasadas.slice(3).map(x => filaCob(x.p, x.o)).join('')}</ul></details>` : ''}</section>`;
+      html += `<section class="pg-bloque" aria-labelledby="pgUniT"><h2 class="pg-h2" id="pgUniT">${esc(t('unidades', 'Unidades'))}</h2><div class="pg-unidades">${ops.map(unidadHTML).join('')}</div></section>`;
+      html += porMesHTML(ops);
+    } else html += `<div class="p-empty pg-vacio"><b>${esc(t('cob_vacio_t', 'Todavía no tenés cobros'))}</b><p>${esc(t('cob_vacio_p', 'Acá van a estar las señas y cuotas que te paguen.'))}</p><a class="p-btn" href="mensajes.html">${esc(t('ir_mensajes', 'Ir a Mensajes'))}</a></div>`;
+    if (cuenta) html += cuentaHTML(cuenta, false);
+    return html;
+  }
+  function filaCob(p, o){
+    const est = P.estadoCuota(p);
+    const sub = est === 'pagada' ? tf('pagada_el', 'Pagada el {f}', { f: P.dia(p.pagado_en) }) : venceTxt('cuota', p);
+    const acc = est === 'pagada' ? `<a class="pg-mini" href="pagos.html?recibo=${encodeURIComponent(p.id)}">${esc(t('recibo', 'Recibo'))} ${esc(P.reciboTxt(p.recibo))}</a>`
+      : est === 'anulada' ? '' : `<button type="button" class="pg-mini" data-marcar="${esc(p.id)}">${esc(t('marcar_corto', 'Marcar pagado'))}</button>`;
+    return `<li class="pg-fila"><span class="pg-fila-t">${esc(P.cuotaTxt(p))}<small>${esc(o ? [o.aviso_titulo, sub].filter(Boolean).join(' · ') : sub)}</small></span><span class="pg-fila-m">${esc(P.fmt(p.monto, p.moneda))}</span>${P.pill(est)}${acc}</li>`;
+  }
+  /* Una unidad: el resumen en una línea y, al abrirla, sus cuotas en tarjetas */
+  function unidadHTML(o){
+    const ps = (o.pagos || []).filter(p => p.estado !== 'anulado');
+    const pagadas = ps.filter(p => p.estado === 'pagado').length;
+    const ests = ps.map(P.estadoCuota);
+    const peor = ests.indexOf('atrasada') > -1 ? 'atrasada' : ests.indexOf('por_vencer') > -1 ? 'por_vencer' : ps.length && pagadas === ps.length ? 'pagada' : ps.length ? 'pendiente' : null;
+    const r = (o.reservas || [])[0];
+    const resumen = ps.length ? tf('pagadas_de', '{a} de {b} pagadas', { a: pagadas, b: ps.length }) : r ? tf('sena_estado', 'Seña {e}', { e: (P.estadoReserva(r) === 'pedida' ? t('e_pedida_txt', 'por pagar') : P.estadoReserva(r) === 'pagada' ? t('e_pagada_txt', 'pagada') : t('e_' + P.estadoReserva(r) + '_txt', P.estadoReserva(r))) }) : '';
+    const reservas = (o.reservas || []).filter(x => P.vigente(x) || ((x.estado === 'pagada' || x.estado === 'devuelta') && !ps.length)).map(x => { const e = P.estadoReserva(x); const sub = e === 'pedida' ? venceTxt('reserva', x) : e === 'pagada' ? tf('pagada_el', 'Pagada el {f}', { f: P.dia(x.pagada_en) }) : P.dia(x.pedida_en);
+      const acc = e === 'pedida' ? `<button type="button" class="pg-mini" data-confirmar="${esc(x.id)}">${esc(t('confirmar_corto', 'Confirmar'))}</button>` : '';
+      return `<li class="pg-tarjeta"><span class="pg-tarjeta-t">${esc(t('sena', 'Seña'))}</span><span class="pg-tarjeta-m">${esc(P.fmt(x.monto, x.moneda))}</span><span class="pg-tarjeta-s">${esc(sub)}</span>${P.pill(e)}${acc}</li>`; });
+    const rango = p => p.estado === 'pagado' ? 2 : p.estado === 'anulado' ? 3 : 1;
+    const cuotas = (o.pagos || []).slice().sort((a, b) => rango(a) - rango(b) || (rango(a) === 2 ? String(b.pagado_en).localeCompare(String(a.pagado_en)) : String(a.vencimiento).localeCompare(String(b.vencimiento)))).map(p => { const e = P.estadoCuota(p); const sub = e === 'pagada' ? tf('pagada_el', 'Pagada el {f}', { f: P.dia(p.pagado_en) }) : venceTxt('cuota', p);
+      const acc = e === 'pagada' ? `<a class="pg-mini" href="pagos.html?recibo=${encodeURIComponent(p.id)}">${esc(t('recibo', 'Recibo'))} ${esc(P.reciboTxt(p.recibo))}</a>`
+        : e === 'anulada' ? '' : `<button type="button" class="pg-mini" data-marcar="${esc(p.id)}">${esc(t('marcar_corto', 'Marcar pagado'))}</button><button type="button" class="pg-mini pg-mini-quieto" data-anular="${esc(p.id)}">${esc(t('anular', 'Anular'))}</button>`;
+      return `<li class="pg-tarjeta${e === 'anulada' ? ' anulada' : ''}"><span class="pg-tarjeta-t">${esc(P.cuotaTxt(p))}</span><span class="pg-tarjeta-m">${esc(P.fmt(p.monto, p.moneda))}</span><span class="pg-tarjeta-s">${esc(sub)}</span>${P.pill(e)}<span class="pg-tarjeta-acc">${acc}</span></li>`; });
+    const todas = reservas.concat(cuotas);
+    const aLaVista = todas.slice(0, 3), resto = todas.slice(3);
+    return `<details class="pg-unidad"><summary><span class="pg-u-txt"><span class="pg-u-t">${esc(o.aviso_titulo || t('una_unidad', 'Una propiedad'))}</span><span class="pg-u-s">${esc([o.interesado, resumen].filter(Boolean).join(' · '))}</span></span>${peor ? P.pill(peor) : ''}</summary>
+      <div class="pg-u-in"><ul class="pg-tarjetas">${aLaVista.join('')}</ul>
+        ${resto.length ? `<details class="pg-mas"><summary>${esc(tf('ver_todas', 'Ver todas ({n})', { n: todas.length }))}</summary><ul class="pg-tarjetas">${resto.join('')}</ul></details>` : ''}
+        <a class="pg-link" href="${esc(linkOp(o.operacion_id))}">${esc(t('ver_chat', 'Ver chat'))}</a></div></details>`;
+  }
+  /* Por mes: lo esperado y lo cobrado de cada mes, en una lista de dos columnas */
+  function porMesHTML(ops){
+    const g = {};
+    ops.forEach(o => (o.pagos || []).filter(p => p.estado !== 'anulado').forEach(p => { (g[p.periodo] = g[p.periodo] || []).push(p); }));
+    const meses = Object.keys(g).sort(MESES_ORDEN); if (!meses.length) return '';
+    return `<details class="pg-bloque pg-pleg"><summary><h2 class="pg-h2">${esc(t('por_mes', 'Por mes'))}</h2></summary><ul class="pg-meses">${meses.map(m => {
+      const ps = g[m], cob = sumas(ps.filter(p => p.estado === 'pagado')), esp = sumas(ps);
+      const ests = ps.map(P.estadoCuota); const e = ests.indexOf('atrasada') > -1 ? 'atrasada' : ests.every(x => x === 'pagada') ? 'pagada' : ests.indexOf('por_vencer') > -1 ? 'por_vencer' : 'pendiente';
+      return `<li><span class="pg-mes-t">${esc(mesTitulo(m))}</span><span class="pg-mes-v">${Object.keys(esp).sort().map(k => esc(tf('cobrado_de', '{a} de {b}', { a: P.fmt(cob[k] || 0, k), b: P.fmt(esp[k], k) }))).join('<br>')}</span>${P.pill(e)}</li>`; }).join('')}</ul></details>`;
+  }
+  /* La cuenta de cobro. principal: sin cuenta, es el paso de la pantalla */
+  function cuentaHTML(c, principal){
+    const mp = `<div class="pg-mp"><button type="button" class="p-btn" disabled aria-describedby="pgMpN">${esc(t('conectar_mp', 'Conectar Mercado Pago'))}</button><span class="pg-pronto" id="pgMpN">${esc(t('muy_pronto', 'Muy pronto'))}</span></div>`;
+    if (!c) return `<section class="pg-prox pg-cuenta-sec" aria-labelledby="pgCtaT"><p class="pg-prox-l" id="pgCtaT">${esc(t('cuenta_t', 'Cuenta de cobro'))}</p>
+      <p class="pg-txt">${esc(t('cuenta_vacia', 'Cargá tu alias o CBU para que te paguen directo.'))}</p>
+      <div class="pg-prox-acc p-barra-fija"><button type="button" class="p-btn p-btn-fill" data-cuenta>${esc(t('cargar_cuenta', 'Cargar alias'))}</button>${P.confianza(t('conf_cuenta', 'Solo la ve quien tiene algo para pagarte.'))}</div>${mp}</section>`;
+    return `<section class="pg-bloque" aria-labelledby="pgCtaT"><div class="pg-bloque-cab"><h2 class="pg-h2" id="pgCtaT">${esc(t('cuenta_t', 'Cuenta de cobro'))}</h2><button type="button" class="pg-link" data-cuenta>${esc(t('editar', 'Editar'))}</button></div>
+      <dl class="pg-dl"><div><dt>${esc(t('c_titular', 'Titular'))}</dt><dd>${esc(c.titular)}</dd></div>${c.alias ? `<div><dt>${esc(t('alias', 'Alias'))}</dt><dd>${esc(c.alias)}</dd></div>` : ''}${c.cbu ? `<div><dt>${esc(t('cbu', 'CBU o CVU'))}</dt><dd>${esc(P.cbuTxt(c.cbu))}</dd></div>` : ''}${c.nota ? `<div><dt>${esc(t('c_nota_corta', 'Nota'))}</dt><dd>${esc(c.nota)}</dd></div>` : ''}</dl>
+      ${P.confianza(t('conf_cuenta', 'Solo la ve quien tiene algo para pagarte.'))}${mp}</section>`;
+  }
+
+  /* ═══════════════ Carga y pintura ═══════════════ */
+  function pintar(){
+    const ambos = !!datos.pub && datos.mis.length > 0;
+    const tit = vista === 'cobranza' ? t('cobranza', 'Cobranza') : t('mis_pagos', 'Mis pagos');
+    cuerpo.innerHTML = `<header class="pg-cab"><h1 class="pg-h1">${esc(tit)}</h1>
+      ${ambos ? `<div class="pg-tabs" role="tablist" aria-label="${esc(t('vistas', 'Vistas'))}"><button type="button" role="tab" id="pgTabC" aria-selected="${vista === 'cobranza'}" aria-controls="pgVista" data-vista="cobranza">${esc(t('cobranza', 'Cobranza'))}</button><button type="button" role="tab" id="pgTabM" aria-selected="${vista === 'mis'}" aria-controls="pgVista" data-vista="mis">${esc(t('mis_pagos', 'Mis pagos'))}</button></div>` : ''}</header>
+      <div id="pgVista"${ambos ? ` role="tabpanel" aria-labelledby="${vista === 'cobranza' ? 'pgTabC' : 'pgTabM'}"` : ''}>${vista === 'cobranza' ? pintarCobranza() : pintarMis()}</div>`;
+    document.title = tit + ' · BAIREN';
+    /* En el celular, el botón principal queda fijo abajo, al alcance del pulgar */
+    document.body.classList.toggle('pg-con-barra', !!cuerpo.querySelector('.pg-prox-acc'));
+  }
+  async function cargar(silencioso){
+    try {
+      const pub = await BPStore.getMyPublicador().catch(() => null);
+      const [mis, cob] = await Promise.all([P.misPagos(), pub ? P.cobranza() : Promise.resolve(null)]);
+      datos = { mis: Array.isArray(mis) ? mis : [], cob, pub };
+      if (vista === 'cobranza' && !pub) vista = 'mis';
+      pintar(); fin();
+    } catch (e) {
+      if (silencioso) { BP.toast((e && e.message) || String(e)); return; }
+      BP.estadoError(cuerpo, (e && e.message) || t('err_cargar', 'No pudimos cargar tus pagos.'), () => cargar()); fin();
+    }
+  }
+  /* Un solo escuchador para todo lo que se toca */
+  const buscarItem = id => { for (const o of (datos.mis || []).concat((datos.cob && datos.cob.operaciones) || [])) { const r = (o.reservas || []).find(x => x.id === id); if (r) return { tipo: 'reserva', it: r, op: o }; const p = (o.pagos || []).find(x => x.id === id); if (p) return { tipo: 'cuota', it: p, op: o }; } return null; };
+  cuerpo.addEventListener('click', async e => {
+    const b = e.target.closest('button, a'); if (!b || b.disabled) return;
+    try {
+      if (b.dataset.vista) { vista = b.dataset.vista; history.replaceState(null, '', 'pagos.html' + (vista === 'cobranza' ? '?vista=cobranza' : '')); pintar(); const nb = cuerpo.querySelector(`[data-vista="${vista}"]`); if (nb) nb.focus(); return; }
+      if (b.dataset.pagar) { const i = buscarItem(b.dataset.pagar); if (i) P.hojaPagar({ tipo: i.tipo, item: i.it, items: i.tipo === 'cuota' ? P.juntas(i.op) : null, cuenta: i.op.cuenta, mp: i.op.mp, opId: i.op.operacion_id, unidad: i.op.aviso_titulo, devolverA: b, alCambiar: () => cargar(true) }); return; }
+      if (b.dataset.confirmar) { const i = buscarItem(b.dataset.confirmar); if (i) await P.flujos.confirmar(ctx(b), null, i.it); return; }
+      if (b.dataset.marcar) { const i = buscarItem(b.dataset.marcar); if (i) await P.flujos.marcar(ctx(b), i.it); return; }
+      if (b.dataset.anular) {
+        const i = buscarItem(b.dataset.anular); if (!i) return;
+        const v = await P.preguntar({ titulo: t('d_anular_t', 'Anular cuota'), texto: t('d_anular_p', 'Deja de figurar para quien alquila.'), ok: t('d_anular_ok', 'Anular'), peligro: true, campos: [], devolverA: b, enviar: () => P.anularPago(i.it.id) });
+        if (v) { await cargar(true); BP.toast(t('anulada_ok', 'Cuota anulada.')); }
+        return;
+      }
+      if (b.hasAttribute('data-cuenta')) { const pubId = datos.pub && datos.pub.id; if (pubId) await P.flujos.cuenta(ctx(b), pubId, cuentaManual()); return; }
+    } catch (ex) { BP.toast((ex && ex.message) || String(ex), 'error'); }
+  });
+
+  vista = q.get('vista') === 'cobranza' ? 'cobranza' : q.get('vista') === 'mis' ? 'mis' : null;
+  if (!vista) { const pub = await BPStore.getMyPublicador().catch(() => null); vista = pub ? 'cobranza' : 'mis'; }
+  await cargar();
+})();
+});
+</script>
+</body>
+</html>

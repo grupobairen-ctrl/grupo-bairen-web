@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documento · BAIREN</title>
+  <meta name="description" content="Leé y firmá la reserva o el contrato de tu operación en BAIREN.">
+  <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#131D2D">
+  <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
+  <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css?v=20261009e"><link rel="stylesheet" href="css/catalogo.css?v=20261009e"><link rel="stylesheet" href="css/portal.css?v=20261009e"><link rel="stylesheet" href="css/transiciones.css?v=20261009e"><style>@view-transition{navigation:auto}</style><style>html.arrancando body{opacity:0}body{transition:opacity .18s cubic-bezier(.22,1,.36,1)}@media(prefers-reduced-motion:reduce){body{transition:none}}</style><script>/* 8/10/2026 · Arranque sin pantallazo (ver BP.listo en ui.js). Tope: 800 ms. */(function(){try{var h=document.documentElement;h.classList.add('arrancando');setTimeout(function(){h.classList.remove('arrancando')},800)}catch(e){}})()</script>
+  <link rel="stylesheet" href="css/documentos.css?v=20261009e">
+</head>
+<!-- 9/10/2026 · Riel de documentos · Leer y firmar (documento.html?id=<documento>).
+     Como DocuSign: arriba, el estado en una línea; después, el documento legible (apto para imprimir y guardar como PDF);
+     el registro de firmas y la huella, plegados; abajo, una barra fija con un solo botón, "Firmar", que abre una hoja corta
+     (nombre, DNI y "Leí el documento completo…"). Firma electrónica con registro de fecha, IP y huella (Ley 25.506).
+     Toda la lógica de datos vive en js/dg-documentos.js (window.BPDocumentos). Apagada para el público: sin
+     BPDigital.activo() muestra "Muy pronto". -->
+<body class="p-product p-herramienta p-documento">
+<div class="p-velo" aria-hidden="true"><span class="w">BAIREN</span></div>
+<div id="pHeader"></div>
+<main id="contenido" class="dgd-main" aria-busy="true">
+  <div class="dgd-esq" aria-hidden="true"><i class="l"></i><i class="h"></i><i></i><i></i><i class="c"></i><i></i><i></i></div>
+</main>
+<div class="dgd-barra p-barra-fija" id="dgdBarra" hidden></div>
+<div id="pFooter"></div>
+
+<script src="supabase-portal.js?v=20261009e" defer></script><script src="js/errores.js?v=20261009e" defer></script>
+<script src="js/bairen-motion.js?v=20261009e" defer></script><script src="js/i18n-portal.js?v=20261009e" defer></script><script src="js/ui.js?v=20261009e" defer></script><script src="js/store.js?v=20261009e" defer></script>
+<script src="js/digital.js?v=20261009e" defer></script>
+<script src="js/dg-documentos.js?v=20261009e" defer></script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+(async function(){
+  'use strict';
+  BP.header(); BP.footer(); if (window.BPStore) BPStore.init();
+  const t = (k, d) => BP.t('dg_documentos_' + k, d);
+  const tf = (k, d, v) => BP.tf('dg_documentos_' + k, d, v);
+  const esc = BP.esc, $ = id => document.getElementById(id);
+  const main = $('contenido'), barra = $('dgdBarra');
+  const QUIETO = (() => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } })();
+  const svg = d => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${d}</svg>`;
+  const ICO = { volver: svg('<path d="M15 18l-6-6 6-6"/>'), pdf: svg('<path d="M12 4v11"/><path d="M7 10l5 5 5-5"/><path d="M5 20h14"/>'), x: BP.ico.x,
+    ok: svg('<path d="m5 12.5 4.5 4.5L19 7.5"/>'), doc: svg('<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/>') };
+
+  if (window.BPStore && BPStore.ready) await BPStore.ready;
+  const D = window.BPDigital, X = window.BPDocumentos;
+  const vacio = (titulo, texto, href, boton) => {
+    main.removeAttribute('aria-busy'); barra.hidden = true;
+    main.innerHTML = `<div class="p-empty dgd-vacio"><span class="dgd-vacio-ico">${ICO.doc}</span><b>${esc(titulo)}</b><p>${esc(texto)}</p><a class="p-btn p-btn-fill" href="${esc(href)}">${esc(boton)}</a></div>`;
+  };
+  if (!D || !D.activo() || !X) { vacio(t('pronto_t', 'Documentos, muy pronto'), t('pronto_p', 'Vas a poder leer y firmar la reserva y el contrato sin salir de BAIREN.'), 'index.html', t('pronto_btn', 'Volver al inicio')); return; }
+  if (!window.BPStore || !BPStore.requireSession()) return;
+  const id = new URLSearchParams(location.search).get('id');
+  if (!id) { vacio(t('sin_id_t', 'No encontramos el documento'), t('sin_id_p', 'Abrilo desde la operación, en Mensajes.'), 'mensajes.html', t('ir_mensajes', 'Ir a Mensajes')); return; }
+
+  const st = { j: null, huellaOk: null, abierto: false };
+  const fechaHora = v => v ? X.fechaLarga(X.diaBA(v)) + ', ' + X.horaBA(v) + ' h' : '';
+  const corta = v => { if (!v) return ''; const s = X.diaBA(v).split('-'); return +s[2] + '/' + +s[1]; };
+  const dniFmt = s => /^[0-9]+$/.test(s || '') ? s.replace(/(\d)(?=(\d{3})+$)/g, '$1.') : (s || '');
+  const cap = s => s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+
+  async function cargar(){
+    try { st.j = await X.detalle(id); }
+    catch (e) { vacio(t('err_t', 'No pudimos abrir el documento'), (e && e.message) || t('err_p', 'Probá de nuevo en un momento.'), 'mensajes.html', t('ir_mensajes', 'Ir a Mensajes')); return false; }
+    const doc = st.j.documento;
+    try { st.huellaOk = doc.contenido ? (await X.huella(doc.contenido)) === doc.hash : null; } catch (e) { st.huellaOk = null; }
+    pintar(); return true;
+  }
+
+  /* El estado, en una línea: una pastilla y lo que falta */
+  function estado(){
+    const j = st.j, doc = j.documento, e = X.estadoDe(doc), fs = j.firmas || [];
+    const partes = doc.partes || [], firmados = fs.map(f => f.lado);
+    const otro = l => partes.filter(x => x !== l)[0];
+    if (!doc.contenido) return { cls: 'neutro', pill: t('e_externo', 'Documento'), txt: t('e_externo_t', 'Este documento no se firma en BAIREN.') };
+    if (st.huellaOk === false) return { cls: 'mal', pill: t('e_revisar', 'No firmar'), txt: t('e_huella_mal', 'El texto no coincide con su huella. Avisale al equipo BAIREN.') };
+    if (e === 'anulado') return { cls: 'mal', pill: t('e_anulado', 'Anulado'), txt: doc.motivo_anulacion ? tf('e_anulado_m', 'Motivo: {m}', { m: doc.motivo_anulacion }) : tf('e_anulado_f', 'El {f}, por quien publica.', { f: corta(doc.anulado_en) }) };
+    if (e === 'firmado') return { cls: 'ok', pill: t('e_firmado', 'Firmado por las dos partes'), txt: X.fechaLarga(X.diaBA(doc.firmado_en)) };
+    if (e === 'vencido') return { cls: 'mal', pill: t('e_vencido', 'Vencido'), txt: tf('e_vencido_t', 'Venció el {f} sin todas las firmas.', { f: corta(doc.vence_en) }) };
+    if (j.puede_firmar) {
+      const o = otro(j.lado_firma), ya = o && firmados.indexOf(o) > -1;
+      if (j.identidad_requerida && !j.identidad_ok) return { cls: 'pend', pill: t('e_falta_tuya', 'Falta tu firma'), txt: t('e_identidad', 'Antes, verificá tu identidad en BAIREN.') };
+      return { cls: 'pend', pill: t('e_falta_tuya', 'Falta tu firma'), txt: o ? (ya ? tf('e_ya_firmo', 'Ya firmó {q}.', { q: X.rol(doc, o) }) : tf('e_despues', 'Después firma {q}.', { q: X.rol(doc, o) })) : '' };
+    }
+    const mia = fs.find(f => f.mia);
+    const faltan = partes.filter(l => firmados.indexOf(l) < 0);
+    if (mia) return { cls: 'pend', pill: t('e_firmaste', 'Firmaste'), txt: tf('e_falta_de', 'Falta la firma de {q}.', { q: faltan.map(l => X.rol(doc, l)).join(' y ') }) };
+    return { cls: 'neutro', pill: t('e_por_firmar', 'Por firmar'), txt: tf('e_n_de', '{n} de {t} firmas.', { n: firmados.length, t: partes.length }) };
+  }
+
+  function registroHTML(){
+    const j = st.j, doc = j.documento, fs = j.firmas || [], partes = doc.partes || [];
+    const filas = partes.map(l => {
+      const f = fs.find(x => x.lado === l);
+      if (!f) return `<li class="dgd-f falta"><span class="dgd-f-rol">${esc(cap(X.rol(doc, l)))}</span><span class="dgd-f-n">${esc(t('falta_firmar', 'Falta firmar'))}</span></li>`;
+      const extra = [fechaHora(f.firmado_en), tf('huella_de', 'huella {h}', { h: X.huellaCorta(f.hash) })];
+      if (f.ip) extra.push('IP ' + f.ip);
+      return `<li class="dgd-f ok"><span class="dgd-f-rol">${esc(cap(X.rol(doc, l)))}${f.mia ? ` <span class="dgd-vos">· ${esc(t('vos', 'vos'))}</span>` : ''}</span>
+        <span class="dgd-f-n">${esc(f.nombre)} · DNI ${esc(dniFmt(f.dni))}</span><span class="dgd-f-m">${esc(extra.join(' · '))}</span></li>`;
+    }).join('');
+    const huellaTxt = st.huellaOk === true ? `<span class="dgd-verif">${ICO.ok}${esc(t('verificada', 'Verificada en este navegador'))}</span>` : st.huellaOk === false ? `<span class="dgd-verif mal">${esc(t('no_coincide', 'No coincide con el texto'))}</span>` : '';
+    return `<details class="dgd-registro" id="dgdRegistro"${st.abierto ? ' open' : ''}>
+      <summary><span class="dgd-reg-t">${esc(t('registro', 'Firmas y huella'))}</span><span class="dgd-cuenta">${esc(tf('n_de', '{n} de {t}', { n: fs.length, t: partes.length }))}</span></summary>
+      <div class="dgd-registro-in">
+        <ol class="dgd-firmas">${filas}</ol>
+        <dl class="dgd-datos">
+          <div><dt>${esc(t('huella_doc', 'Huella del documento (SHA-256)'))}</dt><dd><code class="dgd-solo-pantalla" title="${esc(doc.hash || '')}">${esc(X.huellaCorta(doc.hash))}</code><code class="dgd-solo-print">${esc(doc.hash || '')}</code>${huellaTxt}</dd></div>
+          <div><dt>${esc(t('modelo', 'Modelo'))}</dt><dd>${esc(doc.titulo || '')} · ${esc(tf('version', 'versión {v}', { v: doc.plantilla_version || 1 }))}</dd></div>
+          <div><dt>${esc(t('preparado', 'Preparado'))}</dt><dd>${esc(fechaHora(doc.creado_en))}</dd></div>
+          ${doc.estado === 'enviado' && doc.vence_en ? `<div><dt>${esc(t('vence', 'Vence'))}</dt><dd>${esc(fechaHora(doc.vence_en))}</dd></div>` : ''}
+        </dl>
+        <p class="dgd-ley">${esc(t('ley', 'Firma electrónica con registro de fecha, IP y huella del documento (Ley 25.506).'))}</p>
+        ${j.puede_anular ? `<button type="button" class="dgd-anular" data-anular>${esc(t('anular', 'Anular el documento'))}</button>` : ''}
+      </div></details>`;
+  }
+
+  function pintar(){
+    const j = st.j, doc = j.documento, e = estado();
+    const opUrl = 'mensajes.html?op=' + encodeURIComponent(j.operacion.id);
+    document.title = (doc.titulo || t('documento', 'Documento')) + ' · BAIREN';
+    main.removeAttribute('aria-busy');
+    main.innerHTML = `<div class="dgd-top" role="navigation" aria-label="${esc(t('nav', 'Documento'))}">
+        <a class="dgd-volver" href="${esc(opUrl)}">${ICO.volver}<span>${esc(t('volver', 'Volver'))}</span></a>
+        ${doc.contenido ? `<button type="button" class="dgd-link" data-pdf>${ICO.pdf}<span>${esc(t('pdf', 'Guardar PDF'))}</span></button>` : ''}
+      </div>
+      <p class="dgd-estado" id="dgdEstado" role="status" tabindex="-1"><span class="dgd-pill dgd-pill-${e.cls}">${esc(e.pill)}</span>${e.txt ? `<span class="dgd-estado-t">${esc(e.txt)}</span>` : ''}</p>
+      <article class="dgd-hoja" aria-labelledby="dgdTit"><p class="dgd-marca" aria-hidden="true">BAIREN</p><div class="dgd-texto">${doc.contenido ? X.md(doc.contenido) : `<h1>${esc(doc.titulo || '')}</h1>`}</div></article>
+      ${doc.contenido ? registroHTML() : ''}`;
+    const h1 = main.querySelector('.dgd-texto h1'); if (h1) h1.id = 'dgdTit';
+    const reg = $('dgdRegistro'); if (reg) reg.addEventListener('toggle', () => { st.abierto = reg.open; });
+    /* Un solo botón, fijo abajo: Firmar (solo si te toca y el texto es el de la huella) */
+    const firma = j.puede_firmar && st.huellaOk !== false && !(j.identidad_requerida && !j.identidad_ok);
+    barra.hidden = !firma;
+    document.body.classList.toggle('dgd-con-barra', firma);
+    barra.innerHTML = firma ? `<div class="dgd-barra-in"><button type="button" class="dgd-btn dgd-btn-navy" data-firmar>${esc(t('firmar', 'Firmar'))}</button>
+      <p class="dgd-confianza">${esc(t('confianza', 'Firma con registro de fecha, IP y huella del documento (Ley 25.506)'))}</p></div>` : '';
+  }
+
+  /* ── La hoja: sube desde abajo en el celular, centrada en la compu (como en Explorar) ── */
+  function hoja(o){
+    const hid = 'dgdH' + Math.random().toString(36).slice(2, 8);
+    const w = document.createElement('div'); w.className = 'dgd-velo';
+    w.innerHTML = `<div class="dgd-sheet" role="dialog" aria-modal="true" aria-labelledby="${hid}">
+      <div class="dgd-sheet-cab"><h2 class="dgd-sheet-t" id="${hid}">${esc(o.titulo)}</h2><button type="button" class="dgd-x" data-cerrar aria-label="${esc(t('cerrar', 'Cerrar'))}">${ICO.x}</button></div>
+      <div class="dgd-sheet-cuerpo">${o.cuerpo}</div></div>`;
+    document.body.appendChild(w); document.documentElement.classList.add('dgd-quieta');
+    requestAnimationFrame(() => requestAnimationFrame(() => w.classList.add('on')));
+    const caja = w.querySelector('.dgd-sheet'); let soltar = null, ida = false;
+    /* Atrás del celular: cierra la hoja (una entrada en el historial con la misma dirección) */
+    let enHistoria = false; try { history.pushState(Object.assign({}, history.state || {}, { dgdHoja: 1 }), '', location.href); enHistoria = true; } catch (e) {}
+    const alVolver = () => { if (!enHistoria) return; enHistoria = false; cerrar(); };
+    window.addEventListener('popstate', alVolver);
+    const quitar = () => { if (ida) return; ida = true; window.removeEventListener('popstate', alVolver); if (enHistoria) { enHistoria = false; try { history.back(); } catch (e) {} }
+      w.classList.remove('on'); document.documentElement.classList.remove('dgd-quieta'); setTimeout(() => w.remove(), QUIETO ? 0 : 240); if (o.alCerrar) o.alCerrar(); };
+    const cerrar = () => { if (soltar) { const f = soltar; soltar = null; f(); } else quitar(); };
+    soltar = BP.focoAtrapado(caja, { devolverA: o.devolverA || document.activeElement, primero: o.primero ? caja.querySelector(o.primero) : null, alCerrar: quitar });
+    w.addEventListener('mousedown', ev => { if (ev.target === w) cerrar(); });
+    caja.querySelectorAll('[data-cerrar]').forEach(b => b.addEventListener('click', cerrar));
+    return { caja, cerrar };
+  }
+  const errEn = (form, msg, campo) => {
+    const p = form.querySelector('.dgd-err'); p.textContent = msg; p.hidden = false;
+    form.querySelectorAll('[aria-invalid]').forEach(x => x.removeAttribute('aria-invalid'));
+    const el = campo ? form.elements[campo] : null; if (el) { el.setAttribute('aria-invalid', 'true'); el.focus(); }
+  };
+
+  function abrirFirma(boton){
+    const j = st.j, doc = j.documento;
+    const h = hoja({ titulo: doc.tipo === 'reserva' ? t('firmar_reserva', 'Firmar la reserva') : t('firmar_contrato', 'Firmar el contrato'), devolverA: boton, primero: '[name=nombre]',
+      cuerpo: `<form class="dgd-form" novalidate>
+        <p class="dgd-txt">${esc(tf('firmas_como', 'Firmás como {q}.', { q: X.rol(doc, j.lado_firma) }))}</p>
+        <label class="dgd-campo"><span>${esc(t('c_nombre', 'Nombre y apellido'))}</span><input name="nombre" type="text" autocomplete="name" maxlength="120" required></label>
+        <label class="dgd-campo"><span>${esc(t('c_dni', 'DNI'))}</span><input name="dni" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" maxlength="16" required aria-describedby="dgdDniA"><small id="dgdDniA">${esc(t('c_dni_a', 'Solo los números, sin puntos.'))}</small></label>
+        <label class="dgd-check"><input type="checkbox" name="ok"><span>${esc(t('c_ok', 'Leí el documento completo y lo firmo electrónicamente'))}</span></label>
+        <p class="dgd-err" role="alert" hidden></p>
+        <button type="submit" class="dgd-btn dgd-btn-navy">${esc(t('firmar', 'Firmar'))}</button>
+        <p class="dgd-confianza">${esc(t('confianza', 'Firma con registro de fecha, IP y huella del documento (Ley 25.506)'))}</p></form>` });
+    const form = h.caja.querySelector('form'), okb = form.querySelector('[type=submit]');
+    form.addEventListener('input', ev => { if (ev.target.removeAttribute) ev.target.removeAttribute('aria-invalid'); });
+    form.addEventListener('submit', async ev => {
+      ev.preventDefault();
+      const nombre = form.elements.nombre.value.replace(/\s+/g, ' ').trim(), dni = form.elements.dni.value.trim();
+      if (nombre.length < 5 || nombre.indexOf(' ') < 0) return errEn(form, t('err_nombre', 'Escribí tu nombre y apellido completos.'), 'nombre');
+      const dn = dni.replace(/[^0-9A-Za-z]/g, '');
+      if (!/^[0-9A-Za-z]{6,12}$/.test(dn) || !/[0-9]/.test(dn)) return errEn(form, t('err_dni', 'Revisá el DNI: solo los números, sin puntos.'), 'dni');
+      if (!form.elements.ok.checked) return errEn(form, t('err_ok', 'Marcá que leíste el documento completo.'), 'ok');
+      okb.disabled = true; const txt = okb.textContent; okb.textContent = t('firmando', 'Firmando…'); form.setAttribute('aria-busy', 'true');
+      try {
+        await X.firmar(id, nombre, dni, doc.hash);
+        h.cerrar();
+        await cargar();
+        BP.toast(doc.tipo === 'reserva' ? t('listo_reserva', 'Listo: firmaste la reserva.') : t('listo_contrato', 'Listo: firmaste el contrato.'));
+        const s = $('dgdEstado'); if (s) s.focus({ preventScroll: false });
+      } catch (e) { okb.disabled = false; okb.textContent = txt; form.removeAttribute('aria-busy'); errEn(form, (e && e.message) || t('err_firma', 'No pudimos guardar la firma. Probá de nuevo.')); }
+    });
+  }
+
+  function abrirAnular(boton){
+    const h = hoja({ titulo: t('anular_t', 'Anular el documento'), devolverA: boton, primero: '[name=motivo]',
+      cuerpo: `<form class="dgd-form" novalidate><p class="dgd-txt">${esc(t('anular_p', 'Ya no se va a poder firmar. Queda en el registro como anulado.'))}</p>
+        <label class="dgd-campo"><span>${esc(t('c_motivo', 'Motivo'))} <small>${esc(t('opcional', '(opcional)'))}</small></span><input name="motivo" type="text" maxlength="300" autocomplete="off"></label>
+        <p class="dgd-err" role="alert" hidden></p>
+        <div class="dgd-acts"><button type="button" class="dgd-btn" data-cerrar>${esc(t('cancelar', 'Cancelar'))}</button><button type="submit" class="dgd-btn dgd-btn-vino">${esc(t('anular_ok', 'Anular'))}</button></div></form>` });
+    const form = h.caja.querySelector('form'), okb = form.querySelector('[type=submit]');
+    form.querySelector('[data-cerrar]').addEventListener('click', h.cerrar);
+    form.addEventListener('submit', async ev => {
+      ev.preventDefault(); okb.disabled = true;
+      try { await X.anular(id, form.elements.motivo.value); h.cerrar(); await cargar(); BP.toast(t('anulado_ok', 'Documento anulado.')); }
+      catch (e) { okb.disabled = false; errEn(form, (e && e.message) || t('err_anular', 'No pudimos anularlo. Probá de nuevo.')); }
+    });
+  }
+
+  /* Guardar PDF: el diálogo de imprimir del navegador, con el registro de firmas desplegado */
+  let abiertoAntes = null;
+  window.addEventListener('beforeprint', () => { const r = $('dgdRegistro'); if (r) { abiertoAntes = r.open; r.open = true; } });
+  window.addEventListener('afterprint', () => { const r = $('dgdRegistro'); if (r && abiertoAntes !== null) { r.open = abiertoAntes; abiertoAntes = null; } });
+
+  document.addEventListener('click', ev => {
+    /* Volver: si se llegó desde la operación, es el Atrás del historial (como en una app) */
+    const v = ev.target.closest('.dgd-volver');
+    if (v && !ev.metaKey && !ev.ctrlKey && /mensajes(\.html)?\?op=/.test(document.referrer || '') && document.referrer.indexOf(location.origin) === 0 && history.length > 1) { ev.preventDefault(); history.back(); return; }
+    const f = ev.target.closest('[data-firmar]'); if (f) { abrirFirma(f); return; }
+    const p = ev.target.closest('[data-pdf]'); if (p) { window.print(); return; }
+    const a = ev.target.closest('[data-anular]'); if (a) { abrirAnular(a); return; }
+  });
+
+  await cargar();
+})();
+});
+</script>
+</body>
+</html>

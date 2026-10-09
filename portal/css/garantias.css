@@ -1,0 +1,234 @@
+/* BAIREN · Portal · Garantías y seguros (migración 33, 9/10/2026).
+   Dos lugares, una sola clase en el body (.dg-garantias):
+   · en Mensajes (la pone js/dg-garantias.js): la hoja "Elegí tu garantía" con tarjetas comparables y la sección
+     "Garantía" de los detalles. Reusa el diálogo, los botones y las pastillas de Mensajes (ms-dlg, ms-btn, ms-pill);
+   · en garantias.html (body.p-garantias): la herramienta de la plataforma, proveedores y solicitudes.
+   Papel, superficies cálidas, línea fina, navy para lo principal y oro tinta para el dato que importa.
+   portal.css pone radio 0 a los botones dentro de clases p-…: los radios van con !important. */
+.dg-garantias{
+  --gr-papel:#F6F2E8; --gr-sup:#FFFDF8; --gr-linea:rgba(19,29,45,.10); --gr-linea-2:rgba(19,29,45,.18);
+  --gr-navy:#131D2D; --gr-tinta:#1A2538; --gr-tinta-2:#59647A; --gr-oro:#75623C; --gr-oro-suave:rgba(117,98,60,.12); --gr-vino:#7E2B26;
+  --gr-r-box:var(--r-box,14px); --gr-r-ctl:var(--r-ctl,10px); --gr-r-pill:var(--r-pill,999px); --gr-curva:cubic-bezier(.22,1,.36,1);
+}
+
+/* ═══════════════ Mensajes: la hoja "Elegí tu garantía" ═══════════════ */
+.dg-garantias .gr-hoja{padding-top:8px}
+.dg-garantias .gr-hoja-cab{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 -10px 0 0}
+.dg-garantias .gr-hoja-cab .ms-dlg-t{margin:0}
+.dg-garantias .gr-x svg{width:20px!important;height:20px!important}
+.dg-garantias .gr-cuerpo{margin-top:16px}
+.dg-garantias .gr-ops{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.dg-garantias .gr-op{display:grid;gap:6px;padding:16px;background:#fff;border:1px solid var(--gr-linea);border-radius:var(--gr-r-box)}
+.dg-garantias .gr-op-cab{display:grid;gap:2px}
+.dg-garantias .gr-op-n{margin:0;font:500 1rem/1.3 var(--font-body);color:var(--gr-navy)}
+.dg-garantias .gr-op-tipo{font:300 .8125rem/1.3 var(--font-body);color:var(--gr-tinta-2)}
+.dg-garantias .gr-op-tag{justify-self:start;display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:var(--gr-r-pill);background:var(--gr-oro-suave);color:var(--gr-oro);font:500 .6875rem/1 var(--font-body)}
+.dg-garantias .gr-op-m{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 8px;margin:4px 0 0}
+.dg-garantias .gr-op-mv{font:400 1.625rem/1.1 var(--font-display);color:var(--gr-navy);font-variant-numeric:lining-nums tabular-nums}
+.dg-garantias .gr-op-mt{font:300 .8125rem/1.3 var(--font-body);color:var(--gr-tinta-2)}
+.dg-garantias .gr-op-c{margin:0;font:400 .875rem/1.4 var(--font-body);color:var(--gr-tinta)}
+.dg-garantias .gr-op-btn{width:100%;margin-top:6px;text-decoration:none}
+.dg-garantias .gr-op-req > summary{min-height:36px}
+.dg-garantias .gr-op-req{margin-top:2px}
+.dg-garantias .gr-op-req > summary,.dg-garantias .gr-resto > summary,.dg-garantias .gr-prev > summary{display:inline-flex;align-items:center;gap:6px;min-height:40px;list-style:none;cursor:pointer;
+  font:400 .8125rem/1.2 var(--font-body);color:var(--gr-oro);text-decoration:underline;text-decoration-color:rgba(117,98,60,.45);text-underline-offset:3px}
+.dg-garantias .gr-op-req > summary::-webkit-details-marker,.dg-garantias .gr-resto > summary::-webkit-details-marker,.dg-garantias .gr-prev > summary::-webkit-details-marker{display:none}
+.dg-garantias .gr-op-req-in{display:grid;gap:6px;padding:4px 0 2px}
+.dg-garantias .gr-op-req-in p{margin:0;font:300 .8125rem/1.5 var(--font-body);color:var(--gr-tinta-2)}
+.dg-garantias .gr-op-req-in b{font-weight:500;color:var(--gr-tinta)}
+.dg-garantias .gr-resto{margin-top:6px}
+.dg-garantias .gr-resto[open] > summary{margin-bottom:6px}
+.dg-garantias .gr-vacio{margin:0;padding:16px;border:1px dashed var(--gr-linea-2);border-radius:var(--gr-r-box);font:300 .9375rem/1.5 var(--font-body);color:var(--gr-tinta-2);text-align:center}
+/* "Usar mi garantía propietaria": una opción simple, al final */
+.dg-garantias .gr-propia{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:60px;margin-top:12px;padding:12px 14px 12px 16px;
+  background:transparent;border:1px solid var(--gr-linea-2);border-radius:var(--gr-r-box)!important;color:var(--gr-navy);text-align:left;cursor:pointer;
+  transition:border-color .2s var(--gr-curva),background-color .2s var(--gr-curva)}
+.dg-garantias .gr-propia:hover{border-color:var(--gr-navy);background:rgba(19,29,45,.02)}
+.dg-garantias .gr-propia-t{display:grid;gap:3px;font:500 .9375rem/1.25 var(--font-body)}
+.dg-garantias .gr-propia-t small{font:300 .8125rem/1.3 var(--font-body);color:var(--gr-tinta-2)}
+.dg-garantias .gr-propia svg{flex:0 0 auto;width:20px;height:20px;color:var(--gr-tinta-2)}
+/* La confianza, en una línea chica al lado de la acción */
+.dg-garantias .gr-conf{margin:10px 0 0;font:300 .78rem/1.45 var(--font-body);color:var(--gr-tinta-2)}
+.dg-garantias .gr-listo{margin:0 0 14px;font:400 1rem/1.5 var(--font-body);color:var(--gr-tinta)}
+/* Celular: tarjetas compactas (el costo y "Elegir" en la misma fila) para que entren las tres y la propia */
+@media(max-width:859px){
+  .dg-garantias .gr-ops:not(.gr-esq) .gr-op{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"cab cab" "tag tag" "m btn" "c btn" "req req";column-gap:12px;row-gap:2px;padding:14px 16px 6px}
+  .dg-garantias .gr-op-cab{grid-area:cab}
+  .dg-garantias .gr-op-tag{grid-area:tag;margin-top:4px}
+  .dg-garantias .gr-op-m{grid-area:m;margin-top:6px}
+  .dg-garantias .gr-op-c{grid-area:c}
+  .dg-garantias .gr-ops:not(.gr-esq) .gr-op-btn{grid-area:btn;align-self:center;width:auto;min-width:104px;margin-top:6px}
+  .dg-garantias .gr-op-req{grid-area:req}
+}
+/* Compu: tres columnas comparables, con "Elegir" a la misma altura */
+@media(min-width:860px){
+  .dg-garantias .ms-dlg.gr-hoja{width:min(720px,100%)}
+  .dg-garantias .gr-ops{grid-template-columns:repeat(auto-fit,minmax(190px,1fr));align-items:stretch}
+  .dg-garantias .gr-ops:not(.gr-esq) .gr-op{display:flex;flex-direction:column;gap:6px}
+  .dg-garantias .gr-op-tag{align-self:flex-start}
+  .dg-garantias .gr-ops:not(.gr-esq) .gr-op-btn{margin-top:auto}
+}
+
+/* ═══════════════ Mensajes: la sección "Garantía" ═══════════════ */
+.dg-garantias .gr-sec{display:grid;gap:4px}
+.dg-garantias .gr-est{display:grid;gap:4px}
+.dg-garantias .gr-est-l1{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0}
+.dg-garantias .gr-est-n{min-width:0;font:500 .9375rem/1.3 var(--font-body);color:var(--gr-navy);overflow-wrap:anywhere}
+.dg-garantias .gr-est-m{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 8px;margin:2px 0 0}
+.dg-garantias .gr-est-mv{font:400 1.5rem/1.15 var(--font-display);color:var(--gr-navy);font-variant-numeric:lining-nums tabular-nums}
+.dg-garantias .gr-est-mt{font:300 .8125rem/1.3 var(--font-body);color:var(--gr-tinta-2)}
+.dg-garantias .gr-est-det{margin:2px 0 0;padding-left:10px;border-left:2px solid var(--gr-oro-suave);font:300 .875rem/1.5 var(--font-body);color:var(--gr-tinta)}
+.dg-garantias .gr-sec-btn{width:100%;margin-top:10px}
+.dg-garantias .gr-link{justify-self:start;min-height:40px;padding:0;background:none;border:0;font:400 .8125rem/1.2 var(--font-body);color:var(--gr-oro);text-decoration:underline;text-decoration-color:rgba(117,98,60,.45);text-underline-offset:3px;cursor:pointer}
+.dg-garantias .gr-link:hover{color:var(--gr-navy)}
+.dg-garantias .gr-prev ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.dg-garantias .gr-prev li{display:flex;align-items:center;justify-content:space-between;gap:10px;font:300 .875rem/1.4 var(--font-body);color:var(--gr-tinta-2)}
+/* Pastillas de estado (las de Mensajes, con los estados de la garantía) */
+.dg-garantias .ms-pill.gr-pill-elegida{background:rgba(19,29,45,.06);color:var(--gr-navy)}
+.dg-garantias .ms-pill.gr-pill-en_tramite{background:rgba(176,125,36,.12);color:#7A5512}
+.dg-garantias .ms-pill.gr-pill-aprobada{background:rgba(46,107,68,.11);color:#2E6B44}
+.dg-garantias .ms-pill.gr-pill-rechazada,.dg-garantias .ms-pill.gr-pill-cancelada{background:rgba(126,43,38,.07);color:var(--gr-vino)}
+
+/* ═══════════════ La herramienta de la plataforma (garantias.html) ═══════════════ */
+body.p-garantias{background:var(--gr-papel);color:var(--gr-navy)}
+.p-garantias .ga-in{max-width:1100px;margin:0 auto;padding:104px 16px 64px}
+@media(min-width:900px){.p-garantias .ga-in{padding:120px 32px 80px}}
+.p-garantias .ga-cab{max-width:720px;margin-bottom:22px}
+.p-garantias .ga-pre{margin:0 0 6px;font:400 .8rem/1.2 var(--font-body);letter-spacing:.04em;color:var(--gr-oro)}
+.p-garantias .ga-cab h1{margin:0 0 10px;font:400 clamp(1.9rem,5vw,2.6rem)/1.1 var(--font-display);color:var(--gr-navy)}
+.p-garantias .ga-cab h1 em{font-style:italic}
+.p-garantias .ga-sub{margin:0;font:300 1rem/1.55 var(--font-body);color:var(--gr-tinta-2)}
+.p-garantias .ga-ley{margin:14px 0 0}
+.p-garantias .ga-ley > summary{display:inline-flex;align-items:center;min-height:40px;list-style:none;cursor:pointer;font:400 .875rem/1.2 var(--font-body);color:var(--gr-oro);text-decoration:underline;text-decoration-color:rgba(117,98,60,.45);text-underline-offset:3px}
+.p-garantias .ga-ley > summary::-webkit-details-marker{display:none}
+.p-garantias .ga-ley ul{margin:6px 0 0;padding:14px 16px 14px 32px;background:var(--gr-sup);border:1px solid var(--gr-linea);border-radius:var(--gr-r-box);display:grid;gap:8px}
+.p-garantias .ga-ley li{font:300 .875rem/1.55 var(--font-body);color:var(--gr-tinta)}
+/* Los números de arriba */
+.p-garantias .ga-nums{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0 0 36px}
+@media(min-width:700px){.p-garantias .ga-nums{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.p-garantias .ga-num{display:grid;gap:4px;padding:14px 16px;background:var(--gr-sup);border:1px solid var(--gr-linea);border-radius:var(--gr-r-box);min-width:0}
+.p-garantias .ga-num b{font:400 1.625rem/1.1 var(--font-display);color:var(--gr-navy);font-variant-numeric:lining-nums tabular-nums;overflow-wrap:anywhere}
+.p-garantias .ga-num span{font:300 .8125rem/1.3 var(--font-body);color:var(--gr-tinta-2)}
+.p-garantias .ga-num.ancho{grid-column:1/-1}
+@media(min-width:700px){.p-garantias .ga-num.ancho{grid-column:auto}}
+/* Secciones */
+.p-garantias .ga-sec{margin:0 0 40px}
+.p-garantias .ga-sec-cab{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.p-garantias .ga-h2{margin:0;font:400 1.45rem/1.2 var(--font-display);color:var(--gr-navy)}
+.p-garantias .ga-nota{margin:0 0 14px;font:300 .9rem/1.55 var(--font-body);color:var(--gr-tinta-2);max-width:720px}
+.p-garantias .ga-nota-0{margin:0}
+.p-garantias .ga-lista{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+@media(min-width:900px){.p-garantias .ga-provs{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.p-garantias .ga-resto{margin-top:10px}
+.p-garantias .ga-resto > summary,.p-garantias .ga-mas > summary{display:inline-flex;align-items:center;min-height:44px;list-style:none;cursor:pointer;font:400 .875rem/1.2 var(--font-body);color:var(--gr-oro);text-decoration:underline;text-decoration-color:rgba(117,98,60,.45);text-underline-offset:3px}
+.p-garantias .ga-resto > summary::-webkit-details-marker,.p-garantias .ga-mas > summary::-webkit-details-marker{display:none}
+.p-garantias .ga-resto[open] > summary{margin-bottom:10px}
+/* Tarjeta de proveedor */
+.p-garantias .ga-prov{display:grid;gap:8px;padding:16px;background:var(--gr-sup);border:1px solid var(--gr-linea);border-radius:var(--gr-r-box);min-width:0}
+.p-garantias .ga-prov.apagado{background:transparent}
+.p-garantias .ga-prov-l1{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.p-garantias .ga-prov-n{margin:0;font:500 1rem/1.3 var(--font-body);color:var(--gr-navy);overflow-wrap:anywhere}
+.p-garantias .ga-prov-t{margin:0;font:300 .8125rem/1.3 var(--font-body);color:var(--gr-tinta-2)}
+.p-garantias .ga-prov-m{margin:0;font:400 .9rem/1.45 var(--font-body);color:var(--gr-tinta)}
+.p-garantias .ga-prov-acc{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding-top:6px;border-top:1px solid var(--gr-linea)}
+.p-garantias .ga-mas{font:300 .8125rem/1.5 var(--font-body);color:var(--gr-tinta-2)}
+.p-garantias .ga-mas > summary{min-height:36px;font-size:.8125rem}
+.p-garantias .ga-mas dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;margin:4px 0 0}
+.p-garantias .ga-mas dt{color:var(--gr-tinta-2)}
+.p-garantias .ga-mas dd{margin:0;color:var(--gr-tinta);overflow-wrap:anywhere}
+.p-garantias .ga-pill{display:inline-flex;align-items:center;flex:0 0 auto;height:22px;padding:0 9px;border-radius:var(--gr-r-pill);background:rgba(19,29,45,.06);color:var(--gr-tinta-2);font:500 .6875rem/1 var(--font-body);white-space:nowrap}
+.p-garantias .ga-pill.activo,.p-garantias .ga-pill.aprobada{background:rgba(46,107,68,.11);color:#2E6B44}
+.p-garantias .ga-pill.ejemplo{background:var(--gr-oro-suave);color:var(--gr-oro)}
+.p-garantias .ga-pill.en_tramite{background:rgba(176,125,36,.12);color:#7A5512}
+.p-garantias .ga-pill.elegida{background:rgba(19,29,45,.06);color:var(--gr-navy)}
+.p-garantias .ga-pill.rechazada,.p-garantias .ga-pill.cancelada{background:rgba(126,43,38,.07);color:var(--gr-vino)}
+.p-garantias .ga-sw{display:inline-flex;align-items:center;gap:8px;min-height:44px;font:400 .875rem/1 var(--font-body);color:var(--gr-navy);cursor:pointer}
+.p-garantias .ga-sw input{width:18px;height:18px;accent-color:var(--gr-navy)}
+.p-garantias .ga-sw.no{color:var(--gr-tinta-2);cursor:default}
+.p-garantias .ga-link{min-height:44px;padding:0 4px;background:none;border:0;font:400 .875rem/1 var(--font-body);color:var(--gr-oro);text-decoration:underline;text-decoration-color:rgba(117,98,60,.45);text-underline-offset:3px;cursor:pointer}
+.p-garantias .ga-link:hover{color:var(--gr-navy)}
+/* Solicitudes: filas que en el celular son tarjetas */
+.p-garantias .ga-filtros{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
+.p-garantias .ga-filtro{min-height:40px;padding:0 14px;border:1px solid var(--gr-linea-2);border-radius:var(--gr-r-pill)!important;background:transparent;color:var(--gr-navy);font:400 .875rem/1 var(--font-body);cursor:pointer}
+.p-garantias .ga-filtro[aria-pressed="true"]{background:var(--gr-navy);border-color:var(--gr-navy);color:#FBFAF6}
+.p-garantias .ga-sol{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;padding:14px 16px;background:var(--gr-sup);border:1px solid var(--gr-linea);border-radius:var(--gr-r-box)}
+.p-garantias .ga-sol-t{margin:0;font:500 .95rem/1.3 var(--font-body);color:var(--gr-navy);overflow-wrap:anywhere}
+.p-garantias .ga-sol-t a{color:inherit;text-decoration:underline;text-decoration-color:rgba(117,98,60,.45);text-underline-offset:3px}
+.p-garantias .ga-sol-s{grid-column:1;margin:0;font:300 .8125rem/1.45 var(--font-body);color:var(--gr-tinta-2)}
+.p-garantias .ga-sol-m{grid-column:2;grid-row:1/span 2;justify-self:end;text-align:right;display:grid;gap:2px;align-content:start}
+.p-garantias .ga-sol-m b{font:400 1.25rem/1.15 var(--font-display);color:var(--gr-navy);font-variant-numeric:lining-nums tabular-nums;white-space:nowrap}
+.p-garantias .ga-sol-m small{font:300 .75rem/1.3 var(--font-body);color:var(--gr-tinta-2);white-space:nowrap}
+.p-garantias .ga-sol-acc{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.p-garantias .ga-vacio{margin:0}
+/* Diálogos: hoja de abajo en el celular, tarjeta centrada en la compu */
+.dg-garantias .ga-velo{position:fixed;inset:0;z-index:3000;display:flex;align-items:flex-end;justify-content:center;background:rgba(19,29,45,.42);animation:gaVelo .2s var(--gr-curva) both}
+.dg-garantias .ga-dlg{box-sizing:border-box;width:100%;max-height:92vh;max-height:92dvh;overflow:auto;overscroll-behavior:contain;padding:0 16px calc(18px + env(safe-area-inset-bottom));background:var(--gr-sup);color:var(--gr-navy);
+  border-radius:18px 18px 0 0!important;box-shadow:0 -8px 40px rgba(10,20,40,.16);animation:gaSube .26s var(--gr-curva) both}
+.dg-garantias .ga-dlg-cab{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 0 6px;background:var(--gr-sup)}
+.dg-garantias .ga-dlg-t{margin:0;font:400 1.375rem/1.2 var(--font-display);color:var(--gr-navy)}
+.dg-garantias .ga-x{display:inline-grid;place-items:center;width:44px;height:44px;margin-right:-10px;padding:0;background:none;border:0;border-radius:50%!important;color:var(--gr-navy);cursor:pointer}
+.dg-garantias .ga-x:hover{background:rgba(19,29,45,.06)}
+.dg-garantias .ga-x svg{width:20px;height:20px}
+.dg-garantias .ga-paso{margin:0 0 4px;font:400 .8125rem/1.3 var(--font-body);color:var(--gr-oro)}
+.dg-garantias .ga-dlg form{display:grid;gap:14px}
+.dg-garantias .ga-grupo{display:grid;gap:14px;margin:0;padding:0;border:0;min-width:0}
+.dg-garantias .ga-grupo[hidden]{display:none}
+.dg-garantias .ga-grupo legend{padding:0;margin:0 0 2px;font:500 1rem/1.3 var(--font-body);color:var(--gr-navy)}
+.dg-garantias .ga-f{display:grid;gap:6px;min-width:0;align-content:start}
+.dg-garantias .ga-f[hidden]{display:none}
+.dg-garantias .ga-f > span{font:500 .8125rem/1.3 var(--font-body);color:var(--gr-tinta)}
+.dg-garantias .ga-f input,.dg-garantias .ga-f select,.dg-garantias .ga-f textarea{box-sizing:border-box;width:100%;min-width:0;min-height:48px;margin:0;padding:0 14px;border:1px solid var(--gr-linea-2);border-radius:var(--gr-r-ctl)!important;background:#fff;color:var(--gr-tinta);font:400 1rem/1.3 var(--font-body)}
+.dg-garantias .ga-f textarea{min-height:88px;padding:12px 14px;resize:vertical}
+.dg-garantias .ga-f input:focus-visible,.dg-garantias .ga-f select:focus-visible,.dg-garantias .ga-f textarea:focus-visible{outline:1px solid var(--gr-navy);outline-offset:0;border-color:var(--gr-navy)}
+.dg-garantias .ga-f [aria-invalid="true"]{border-color:var(--gr-vino)}
+.dg-garantias .ga-f small{font:300 .8125rem/1.45 var(--font-body);color:var(--gr-tinta-2)}
+.dg-garantias .ga-f2{display:grid;grid-template-columns:minmax(0,1fr) 128px;gap:12px}
+.dg-garantias .ga-check{display:flex;align-items:center;gap:10px;min-height:44px;font:400 .9375rem/1.3 var(--font-body);color:var(--gr-tinta);cursor:pointer}
+.dg-garantias .ga-check input{width:18px;height:18px;flex:0 0 auto;accent-color:var(--gr-navy)}
+.dg-garantias .ga-aviso{margin:0;padding:10px 12px;border-radius:var(--gr-r-ctl);background:var(--gr-oro-suave);color:var(--gr-oro);font:400 .8125rem/1.45 var(--font-body)}
+.dg-garantias .ga-err{margin:0;padding:10px 12px;border-radius:var(--gr-r-ctl);background:rgba(126,43,38,.06);color:var(--gr-vino);font:400 .875rem/1.45 var(--font-body)}
+.dg-garantias .ga-dlg-acc{display:flex;gap:10px;margin-top:4px}
+.dg-garantias .ga-dlg-acc .p-btn{flex:1 1 0;height:auto;min-height:44px;font-size:.875rem}
+.dg-garantias .ga-estados{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.dg-garantias .ga-estado{display:flex;align-items:center;gap:8px;min-height:44px;padding:0 12px;border:1px solid var(--gr-linea-2);border-radius:var(--gr-r-ctl);font:400 .9rem/1.2 var(--font-body);color:var(--gr-navy);cursor:pointer}
+.dg-garantias .ga-estado:has(input:checked){border-color:var(--gr-navy);background:rgba(19,29,45,.04)}
+.dg-garantias .ga-estado input{accent-color:var(--gr-navy)}
+@media(min-width:700px){
+  .dg-garantias .ga-velo{align-items:center;padding:24px}
+  .dg-garantias .ga-dlg{width:min(520px,100%);padding:0 26px 24px;border-radius:var(--gr-r-box)!important;box-shadow:0 16px 48px rgba(10,20,40,.16);animation-name:gaAparece}
+  .dg-garantias .ga-dlg-cab{padding-top:22px}
+  .dg-garantias .ga-dlg-acc{justify-content:flex-end}
+  .dg-garantias .ga-dlg-acc .p-btn{flex:0 0 auto;padding:0 22px}
+}
+@keyframes gaVelo{from{opacity:0}to{opacity:1}}
+@keyframes gaSube{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+@keyframes gaAparece{from{transform:translateY(8px) scale(.99);opacity:0}to{transform:none;opacity:1}}
+
+/* Esqueletos mientras carga */
+.dg-garantias .gr-esq .gr-op{gap:10px;min-height:150px}
+.dg-garantias .gr-esq i,.p-garantias .ga-esq .ga-prov i,.p-garantias .ga-esq .ga-num{display:block;height:12px;width:55%;border-radius:6px;background:linear-gradient(90deg,rgba(19,29,45,.05),rgba(19,29,45,.10),rgba(19,29,45,.05));background-size:200% 100%;animation:grBrillo 1.2s linear infinite}
+.dg-garantias .gr-esq i.c,.p-garantias .ga-esq .ga-prov i.c{width:35%}
+.dg-garantias .gr-esq i.g{height:26px;width:45%}
+.dg-garantias .gr-esq i.b{height:44px;width:100%;border-radius:999px}
+.p-garantias .ga-esq .ga-num{height:76px;width:auto;border-radius:var(--gr-r-box)}
+.p-garantias .ga-esq .ga-prov{min-height:150px}
+@keyframes grBrillo{from{background-position:200% 0}to{background-position:-200% 0}}
+/* "Te llevamos a…" */
+.dg-garantias .gr-ir{margin-top:0}
+.dg-garantias .gr-hoja .gr-link{margin-top:6px}
+/* El botón principal de la pantalla, fijo abajo en el celular (al alcance del pulgar) */
+.p-garantias .ga-barra{position:fixed;left:0;right:0;bottom:0;z-index:900;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:rgba(246,242,232,.94);border-top:1px solid var(--gr-linea);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.p-garantias .ga-barra .p-btn{width:100%;height:auto;min-height:48px;font-size:.9375rem}
+.p-garantias .ga-in{padding-bottom:calc(104px + env(safe-area-inset-bottom))}
+.p-garantias #gaNuevo{height:auto;min-height:44px;padding:0 18px;font-size:.8125rem}
+@media(max-width:699px){.p-garantias #gaNuevo{display:none}}
+@media(min-width:700px){.p-garantias .ga-barra{display:none!important}.p-garantias .ga-in{padding-bottom:80px}}
+/* Las acciones de la hoja quedan pegadas abajo, al alcance del pulgar */
+.dg-garantias .ga-dlg-acc{position:sticky;bottom:calc(-18px - env(safe-area-inset-bottom));margin:4px -16px calc(-18px - env(safe-area-inset-bottom));padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:var(--gr-sup);border-top:1px solid var(--gr-linea)}
+@media(min-width:700px){.dg-garantias .ga-dlg-acc{position:static;margin:4px 0 0;padding:0;border-top:0;background:none}}
+
+/* Sin movimiento */
+@media(prefers-reduced-motion:reduce){
+  .dg-garantias .gr-propia,.dg-garantias .ga-velo,.dg-garantias .ga-dlg{transition:none;animation:none}
+  .dg-garantias .gr-esq i,.p-garantias .ga-esq .ga-prov i,.p-garantias .ga-esq .ga-num{animation:none}
+}
