@@ -406,14 +406,20 @@ document.addEventListener('DOMContentLoaded', function(){
       out.estado = t('e_plataforma', 'Ves esta operación como equipo BAIREN. Lo que escribas acá lo leen las dos partes.');
     }
     /* 9/10/2026 · Los pasos que suman los módulos de los rieles (reserva, contrato, pagos, garantía…): js/dg-*.js con
-       BPDigital.registrarAccion. Van después de los propios; si sobran, pasan a "Más". */
+       BPDigital.registrarAccion. Si sobran, pasan a "Más". */
+    /* Los chips de los rieles van primero; "reemplaza" oculta los pasos manuales que el riel hace solo (por ejemplo,
+       "Contrato preparado" y "Contrato firmado" con el riel de documentos) */
+    const extPrim = [], extMas = [], oculta = new Set();
     ((D.ext && D.ext.acciones) || []).forEach(x => {
       try {
         if ((x.lados || []).indexOf(lado) < 0 || (x.cuando && !x.cuando(d))) return;
+        (x.reemplaza || []).forEach(id => oculta.add(id));
         if (x.estado) { const e = x.estado(d); if (e) out.estado = e; }
-        (x.prim && x.prim(d) ? out.prim : out.mas).push({ id: 'ext:' + x.id, txt: typeof x.texto === 'function' ? x.texto(d) : x.texto, peligro: !!x.peligro });
+        (x.prim && x.prim(d) ? extPrim : extMas).push({ id: 'ext:' + x.id, txt: typeof x.texto === 'function' ? x.texto(d) : x.texto, peligro: !!x.peligro });
       } catch (e) { console.warn('acción', x.id, e); }
     });
+    out.prim = extPrim.concat(out.prim.filter(x => !oculta.has(x.id)));
+    out.mas = out.mas.filter(x => !oculta.has(x.id)).concat(extMas);
     if (out.prim.length > 3) out.mas = out.prim.splice(3).concat(out.mas);
     return out;
   }
@@ -630,8 +636,8 @@ document.addEventListener('DOMContentLoaded', function(){
   }
   function docsHTML(){
     const ds = st.d.documentos || [];
-    if (!ds.length) return `<div class="ms-docs-vacio">${ICO.doc}<p>${esc(t('docs_vacio', 'Acá van a estar la reserva, el contrato y el boleto, con firma digital. Muy pronto.'))}</p></div>`;
-    return `<ul class="ms-docs">${ds.map(x => `<li>${ICO.doc}<span class="ms-doc-n">${esc(x.titulo || DOC_T[x.tipo] || x.tipo)}<small>${esc(x.firmado_en ? tf('doc_firmado', 'Firmado el {f}', { f: fmtFechaHora(x.firmado_en) }) : fmtFechaHora(x.creado_en))}</small></span><span class="ms-pill ms-pill-${esc(x.estado)}">${esc(DOC_E[x.estado] || x.estado)}</span></li>`).join('')}</ul>`;
+    if (!ds.length) return `<div class="ms-docs-vacio">${ICO.doc}<p>${esc(t('docs_vacio', 'Acá van a estar la reserva y el contrato, con firma electrónica.'))}</p></div>`;
+    return `<ul class="ms-docs">${ds.map(x => `<li>${ICO.doc}<span class="ms-doc-n"><a href="documento.html?id=${esc(encodeURIComponent(x.id))}">${esc(x.titulo || DOC_T[x.tipo] || x.tipo)}</a><small>${esc(x.firmado_en ? tf('doc_firmado', 'Firmado el {f}', { f: fmtFechaHora(x.firmado_en) }) : fmtFechaHora(x.creado_en))}</small></span><span class="ms-pill ms-pill-${esc(x.estado)}">${esc(DOC_E[x.estado] || x.estado)}</span></li>`).join('')}</ul>`;
   }
   function recorridoHTML(){
     const hs = hitosOrden();
