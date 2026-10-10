@@ -5003,3 +5003,24 @@ html:not(.teclado) .mobile-menu a:focus-visible,html:not(.teclado) .mobile-menu 
 @media(max-width:859px){.p-mcta .p-mcta-waico{width:44px;padding:0!important;justify-content:center;display:inline-flex;align-items:center}.p-mcta .p-mcta-waico svg{width:18px;height:18px}}
 /* En pantallas muy angostas (iPhone SE de 320 px) no entran precio, Visita, WhatsApp y Mensaje: la visita se pide desde el chat o la ficha */
 @media(max-width:359px){.p-mcta.con-mensaje #mctaBtn{display:none}}
+
+/* ══ 10/10/2026 · El portal como app de celular ══════════════════════════════════════════════════════════════
+   Tomás: "rompe, choca las letras en el menú de abajo, está muy pegado y va lenta".
+   1 · La barra de abajo: columnas que pueden achicarse (minmax(0,1fr)) y rótulos de una línea que nunca invaden la
+       pestaña de al lado, aunque el iPhone tenga el texto agrandado o la pantalla ampliada (vista de 320 px).
+   2 · Mientras baja el JS, la barra de arriba ya está (un navy del mismo alto): sin el velo de arranque, el esqueleto
+       de cada página se ve enseguida. El velo queda solo en la portada (el video) y en el asistente de publicar.
+   3 · Con viewport-fit=cover (para la app instalada: la barra de abajo llega hasta la rayita del iPhone), en el
+       celular horizontal nada queda debajo de la muesca. */
+@media(max-width:859px){
+  .p-tabbar{grid-template-columns:repeat(4,minmax(0,1fr));padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
+  .p-tabbar.cinco{grid-template-columns:repeat(5,minmax(0,1fr))}
+  .p-tabbar a{min-width:0;padding:0 2px;gap:4px}
+  .p-tabbar a svg{flex:0 0 auto}
+  html .p-tabbar a span,html .p-tabbar.cinco a span{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:clamp(10px,2.8vw,11.5px);letter-spacing:0;line-height:1.15}
+}
+#pHeader:empty{position:fixed;inset:0 0 auto;height:calc(64px + env(safe-area-inset-top));background:#131D2D;border-bottom:1px solid rgba(251,250,246,.08);z-index:1000}
+@media(orientation:landscape) and (max-height:520px){
+  body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
+  .p-navbar,.navbar{padding-left:calc(12px + env(safe-area-inset-left));padding-right:calc(12px + env(safe-area-inset-right))}
+}

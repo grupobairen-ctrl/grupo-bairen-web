@@ -208,7 +208,8 @@ await ev('document.querySelector("[data-borrar]").focus(); document.querySelecto
 ok('a11y la hoja abre con foco adentro', await ev('!!document.activeElement.closest(".p-dg-hoja") && document.activeElement.hasAttribute("data-si")'));
 await c.foto('09-confirmar-borrar-m');
 await c.send('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27 }); await c.send('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27 }); await sleep(500);
-ok('a11y Escape cierra y devuelve el foco', await ev('!document.querySelector(".p-dg-velo") && document.activeElement.hasAttribute("data-borrar") && !document.documentElement.classList.contains("p-dg-quieta")'));
+/* Espera a que la hoja termine de cerrarse (con la máquina cargada, 500 ms a veces no alcanzaban) */
+ok('a11y Escape cierra y devuelve el foco', await esperar('!document.querySelector(".p-dg-velo") && document.activeElement.hasAttribute("data-borrar") && !document.documentElement.classList.contains("p-dg-quieta")'));
 ok('a11y Escape no borró nada', (await ev('JSON.parse(localStorage.getItem("bp_dg_bus")||"[]").length')) === 1);
 await c.send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] });
 await c.ir('explorar.html', 2200);

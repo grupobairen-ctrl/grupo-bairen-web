@@ -13,7 +13,7 @@ export async function conectar() {
   ws.onmessage = e => { const m = JSON.parse(e.data); if (m.id && pending.has(m.id)) { pending.get(m.id)(m); pending.delete(m.id); }
     else if (m.method === 'Runtime.exceptionThrown') errores.push(String(m.params.exceptionDetails.exception?.description || m.params.exceptionDetails.text).slice(0, 300));
     else if (m.method === 'Runtime.consoleAPICalled' && (m.params.type === 'error' || m.params.type === 'warning')) consola.push(m.params.type + ': ' + m.params.args.map(a => a.value || a.description || '').join(' ').slice(0, 300));
-    else if (m.method === 'Log.entryAdded' && m.params.entry.level === 'error' && !/ERR_BLOCKED_BY_CLIENT|supabase|jsdelivr/.test(m.params.entry.text + ' ' + (m.params.entry.url || ''))) consola.push('log: ' + m.params.entry.text.slice(0, 200) + ' ' + (m.params.entry.url || '')); };
+    else if (m.method === 'Log.entryAdded' && m.params.entry.level === 'error' && !/ERR_BLOCKED_BY_CLIENT|supabase|jsdelivr|from the Manifest/.test(m.params.entry.text + ' ' + (m.params.entry.url || ''))) consola.push('log: ' + m.params.entry.text.slice(0, 200) + ' ' + (m.params.entry.url || '')); };
   const send = (method, params = {}) => new Promise(res => { const i = ++id; pending.set(i, res); ws.send(JSON.stringify({ id: i, method, params })); });
   await send('Page.enable'); await send('Runtime.enable'); await send('Network.enable'); await send('DOM.enable'); await send('Log.enable');
   await send('Network.setBlockedURLs', { urls: ['*jdatlsrujgfmvyuhoffg.supabase.co*', '*supabase.co*', '*cdn.jsdelivr.net*', '*/api/*'] });

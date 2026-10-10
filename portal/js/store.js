@@ -58,8 +58,18 @@
       try {
         if (window.bairenReady) {
           const sb = await Promise.race([window.bairenReady, new Promise((_, r) => setTimeout(() => r(new Error('sdk')), 15000))]);
-          const probe = await sb.schema('portal').from('publicadores').select('id').limit(1);
-          if (!probe.error) { S.mode = 'supabase'; S.sb = sb; const { data, error: errU } = await sb.auth.getUser(); S._authErr = errU ? String(errU.message || errU).slice(0, 160) : null; S.session = data && data.user ? sesionDe(data.user) : null; sb.auth.onAuthStateChange((_, sess) => { if (DEMO) return; S.session = sess && sess.user ? sesionDe(sess.user) : null;
+          /* 10/10/2026 · Una sola espera de red al abrir cada página: la prueba de la base y la sesión van juntas, y la sesión
+             sale de la guardada en el celular (getSession, sin red salvo que haya que renovarla). Antes eran dos viajes
+             seguidos (la prueba y getUser) antes de mostrar nada. La base igual valida la sesión en cada consulta, y getUser
+             la confirma después, sin frenar la página: si la cuenta ya no vale, se cierra la sesión acá. */
+          const [probe, ses] = await Promise.all([sb.schema('portal').from('publicadores').select('id').limit(1), sb.auth.getSession().catch(e => ({ data: null, error: e }))]);
+          if (!probe.error) { S.mode = 'supabase'; S.sb = sb; const u = ses && ses.data && ses.data.session && ses.data.session.user; S._authErr = ses && ses.error ? String(ses.error.message || ses.error).slice(0, 160) : null; S.session = u ? sesionDe(u) : null;
+            if (S.session) sb.auth.getUser().then(({ data, error }) => {
+              if (error) { S._authErr = String(error.message || error).slice(0, 160); if (error.status === 401 || error.status === 403 || /not.?found|invalid|expired|missing/i.test(error.message || '')) sb.auth.signOut({ scope: 'local' }).catch(() => {}); return; }
+              const fresca = data && data.user ? sesionDe(data.user) : null;
+              if (fresca && S.session && JSON.stringify(fresca) !== JSON.stringify(S.session)) { S.session = fresca; if (window.BP && BP.applySession) BP.applySession(S.session, S.mode); }
+            }).catch(() => {});
+            sb.auth.onAuthStateChange((_, sess) => { if (DEMO) return; S.session = sess && sess.user ? sesionDe(sess.user) : null;
             /* 8/10/2026 · Fuera del aviso de Auth (setTimeout): Supabase avisa con el candado de la sesión tomado, y
                applySession pregunta a la base si la cuenta es curadora. Esa consulta esperaba el mismo candado y todo lo
                que venía después (el panel entero) quedaba colgado cuando la sesión se renovaba al abrir la página. */
