@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Curación · BAIREN</title>
-  <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#131D2D">
+  <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#131D2D"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="BAIREN"><meta name="apple-mobile-web-app-status-bar-style" content="black"><link rel="apple-touch-icon" href="img/app/icono-180.png?v=1">
   <script>
 /* 6.5 · Cuatro páginas bajaban todo para terminar redirigiendo a Ingresar.
    La comprobación de sesión ocurre acá, antes de los datos y de los assets pesados.
@@ -21,11 +21,10 @@
 }catch(e){}})();
 </script>
   <link rel="icon" href="../bairen_logo_96.png?v=3" type="image/png" sizes="96x96">
-  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://jdatlsrujgfmvyuhoffg.supabase.co" crossorigin>
   <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.js" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=20261009h"><link rel="stylesheet" href="css/catalogo.css?v=20261009h"><link rel="stylesheet" href="css/portal.css?v=20261009h"><link rel="stylesheet" href="css/transiciones.css?v=20261009h"><link rel="stylesheet" href="css/identidad.css?v=20261009h"><style>@view-transition{navigation:auto}</style><style>html.arrancando body{opacity:0}body{transition:opacity .18s cubic-bezier(.22,1,.36,1)}@media(prefers-reduced-motion:reduce){body{transition:none}}</style><script>/* 8/10/2026 · Arranque sin pantallazo (ver BP.listo en ui.js): siempre, salvo al entrar a una ficha desde el portal (ahí la foto de la tarjeta crece hasta la ficha); en Safari del iPhone la transición entre páginas no tapaba el video al tocar el logo. Tope: 800 ms. */(function(){try{var h=document.documentElement,n=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{},r=document.referrer||'';if(r.indexOf(location.origin)===0&&n.type!=='reload'&&/propiedad/.test(location.pathname))return;h.classList.add('arrancando');setTimeout(function(){h.classList.remove('arrancando')},800)}catch(e){}})()</script>
+  <link rel="preload" href="fuentes/jost-normal-latin.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="fuentes/playfair-display-normal-latin.woff2" as="font" type="font/woff2" crossorigin><link rel="stylesheet" href="fuentes/fuentes.css?v=1">
+  <link rel="stylesheet" href="css/base.css?v=20261010a"><link rel="stylesheet" href="css/catalogo.css?v=20261010a"><link rel="stylesheet" href="css/portal.css?v=20261010a"><link rel="stylesheet" href="css/transiciones.css?v=20261010a"><link rel="stylesheet" href="css/identidad.css?v=20261010a"><style>@view-transition{navigation:auto}</style><style>html.arrancando body{opacity:0}body{transition:opacity .18s cubic-bezier(.22,1,.36,1)}@media(prefers-reduced-motion:reduce){body{transition:none}}</style>
   <style>
     .p-cur{background:var(--p-card);border:1px solid var(--p-line);border-radius:var(--p-radius);padding:18px;margin-bottom:14px;display:grid;grid-template-columns:200px 1fr;gap:18px}
     .p-cur .ph{aspect-ratio:4/3;border-radius:8px;overflow:hidden;background:var(--p-tray)} .p-cur .ph img{width:100%;height:100%;object-fit:cover}
@@ -50,7 +49,7 @@
   <div id="out" role="tabpanel" aria-busy="true"><div class="p-skel-panel" aria-hidden="true"><div class="p-skel-line row"></div><div class="p-skel-line row"></div></div></div>
 </div></section>
 <div id="pFooter"></div>
-<script src="supabase-portal.js?v=20261009h" defer></script><script src="js/errores.js?v=20261009h" defer></script><script src="js/bairen-motion.js?v=20261009h" defer></script><script src="js/i18n-portal.js?v=20261009h" defer></script><script src="js/ui.js?v=20261009h" defer></script><script src="js/store.js?v=20261009h" defer></script><script src="js/data.js?v=20261009h" defer></script><script src="js/dg-identidad.js?v=20261009h" defer></script>
+<script src="supabase-portal.js?v=20261010a" defer></script><script src="js/errores.js?v=20261010a" defer></script><script src="js/bairen-motion.js?v=20261010a" defer></script><script>/* 10/10 · El diccionario (inglés y portugués) solo se baja si se eligió otro idioma: el castellano ya está en el código */try{if((localStorage.getItem('bairen_lang')||'es')!=='es')document.write('<script src="js/i18n-portal.js?v=20261010a" defer><\/script>')}catch(e){}</script><script src="js/ui.js?v=20261010a" defer></script><script src="js/store.js?v=20261010a" defer></script><script src="js/data.js?v=20261010a" defer></script><script src="js/dg-identidad.js?v=20261010a" defer></script>
 <script>
 /* 6.1 · los scripts externos bajan en paralelo y corren en orden; esto espera a que esten */
 document.addEventListener('DOMContentLoaded', function(){

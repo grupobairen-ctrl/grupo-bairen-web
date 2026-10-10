@@ -267,6 +267,8 @@ window.BP_I18N = {
     ficha_todo_incl_corto: 'all included', ficha_exp_incl: 'building fees included', ficha_mas_exp: 'plus $ {n} in building fees',
     ficha_volver: 'Back', ficha_reservada_corto: 'Reserved. Not taking inquiries for now.', ficha_condiciones: 'Terms', ficha_tiene: 'Features', ficha_reportar_corto: 'Report a problem', ficha_mcta_visita: 'Visit',
     tab_inicio: 'Home', tab_buscar: 'Search', tab_guardados: 'Saved', tab_cuenta: 'Account', tab_aria: 'Shortcuts',
+    /* 10/10/2026 · Las pestañas de BAIREN digital */
+    dg_explorar: 'Explore', dg_mensajes: 'Messages',
     guard_vacio: "You haven't saved any properties yet.", guard_err: "We couldn't load your saved properties.", alertas_t: 'Alerts', guard_todas_ops: 'All listings', guard_hasta: 'up to {p}', guard_quitar_alerta: 'Remove the alert', guard_crear_alerta: 'Create an alert',
     /* lanz3-visitante · 8/10/2026 · Arreglos de la simulación de visitantes. Claves nuevas juntas, en este bloque */
     sugerencias_aria: 'Suggestions', ver_la_unidad: 'See the unit', edif_ver_unidades: 'See units',
@@ -857,6 +859,7 @@ window.BP_I18N = {
     ficha_todo_incl_corto: 'tudo incluído', ficha_exp_incl: 'condomínio incluído', ficha_mas_exp: 'mais $ {n} de condomínio',
     ficha_volver: 'Voltar', ficha_reservada_corto: 'Reservado. Por enquanto não recebe consultas.', ficha_condiciones: 'Condições', ficha_tiene: 'O que tem', ficha_reportar_corto: 'Informar um problema', ficha_mcta_visita: 'Visita',
     tab_inicio: 'Início', tab_buscar: 'Buscar', tab_guardados: 'Salvos', tab_cuenta: 'Conta', tab_aria: 'Atalhos',
+    dg_explorar: 'Explorar', dg_mensajes: 'Mensagens',
     guard_vacio: 'Você ainda não salvou imóveis.', guard_err: 'Não conseguimos carregar seus imóveis salvos.', alertas_t: 'Alertas', guard_todas_ops: 'Todas as operações', guard_hasta: 'até {p}', guard_quitar_alerta: 'Remover o alerta', guard_crear_alerta: 'Criar um alerta',
     /* lanz3-visitante · 8/10/2026 · Arreglos de la simulación de visitantes (portugués de Brasil). Claves nuevas juntas, en este bloque */
     sugerencias_aria: 'Sugestões', ver_la_unidad: 'Ver o imóvel', edif_ver_unidades: 'Ver unidades',

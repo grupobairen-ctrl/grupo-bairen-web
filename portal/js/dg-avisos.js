@@ -287,7 +287,7 @@
   const montadas = new Set(); let reloj = null, nPanel = 0;
   function cssUnaVez(listo){
     if (document.querySelector('link[data-dg-avisos-css]') || document.body.classList.contains('p-avisos')) { const l = document.querySelector('link[data-dg-avisos-css]'); if (!l || l.dataset.ok) listo(); else l.addEventListener('load', listo, { once: true }); return; }
-    const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'css/avisos.css?v=20261009h'; l.dataset.dgAvisosCss = '1';
+    const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'css/avisos.css?v=20261010a'; l.dataset.dgAvisosCss = '1';
     l.addEventListener('load', () => { l.dataset.ok = '1'; listo(); }, { once: true }); l.addEventListener('error', listo, { once: true });
     document.head.appendChild(l);
   }
