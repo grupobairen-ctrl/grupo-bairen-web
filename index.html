@@ -868,7 +868,10 @@
   });
 
   pintarTextos(); pintar();
-  if(window.bairenReady){
+  /* supabase-config.js se carga más abajo en la página: se espera al DOM
+     completo para que window.bairenReady ya exista */
+  function cargar(){
+    if(!window.bairenReady) return;
     window.bairenReady.then(function(sb){
       return sb.from('resenas').select(COLS)
         .order('publicada_en',{ascending:false,nullsFirst:false})
@@ -878,6 +881,7 @@
       if(res.data && res.data.length){ lista=res.data; pintar(); }
     }).catch(function(e){ console.warn('[resenas] quedan las de respaldo:',e&&e.message||e); });
   }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',cargar); else cargar();
   document.addEventListener('bairen:lang',function(){ pintarTextos(); pintar(); });
   /* links viejos con ?resena van a la página para dejarla */
   if(/[?&]resena\b/.test(location.search)) location.replace('resenas.html');
