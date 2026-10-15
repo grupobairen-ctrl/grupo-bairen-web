@@ -514,62 +514,116 @@
 
   /* ─── CONTACTO ─────────────────────────────────────────── */
   /* ─── RESEÑAS (15/10/2026) ─────────────────────────────────
-     Debajo del hero: el título y las reseñas, nada más. Salen de Supabase
-     (tabla resenas: solo publicadas y columnas públicas). En la home no hay
-     botón para dejar reseña: el formulario vive en /resenas, el link que el
-     equipo manda a cada cliente, y todo pasa por admin-resenas.html. */
-  .resenas{background:var(--white);padding:clamp(56px,7vw,88px) 24px clamp(52px,6.5vw,80px);overflow:hidden;}
+     Debajo del hero: el título y un muro tipo collage con todas juntas;
+     cada una se abre entera. Salen de Supabase (tabla resenas: solo
+     publicadas y columnas públicas). En la home no hay botón para dejar
+     reseña: el formulario vive en /resenas, el link que el equipo manda a
+     cada cliente, y todo pasa por admin-resenas.html. */
+  .resenas{background:var(--white);padding:clamp(56px,7vw,88px) 24px clamp(52px,6.5vw,84px);overflow:hidden;}
   .resenas-in{max-width:1180px;margin:0 auto;}
-  .resenas-hd{display:flex;align-items:baseline;justify-content:space-between;gap:12px 24px;flex-wrap:wrap;margin-bottom:clamp(22px,3vw,30px);}
+  .resenas-hd{display:flex;align-items:baseline;justify-content:space-between;gap:10px 24px;flex-wrap:wrap;margin-bottom:clamp(20px,3vw,30px);}
   .resenas-hd h2{font-family:var(--font-display);font-weight:500;font-size:clamp(1.7rem,3.2vw,2.3rem);color:var(--navy);line-height:1.1;letter-spacing:-.01em;}
+  .resenas-hd h2 small{font-family:var(--font-body);font-size:.42em;font-weight:500;letter-spacing:.06em;color:var(--gold-dark);margin-left:10px;vertical-align:middle;}
   .rs-avg{display:flex;align-items:center;gap:10px;}
   .rs-avg[hidden]{display:none;}
   .rs-avg-n{font-family:var(--font-display);font-size:1.35rem;font-weight:500;color:var(--navy);line-height:1;font-feature-settings:"lnum" 1;}
   .rs-avg-l{font-size:.82rem;color:var(--text-mid);}
   .rs-stars{display:inline-flex;gap:2px;color:var(--gold);line-height:0;}
-  .rs-stars svg{width:16px;height:16px;fill:currentColor;}
+  .rs-stars svg{width:15px;height:15px;fill:currentColor;}
   .rs-stars svg.off{fill:none;stroke:currentColor;stroke-width:1.5;opacity:.5;}
   .rs-stars-avg{position:relative;display:inline-block;line-height:0;}
   .rs-stars-avg .rs-stars + .rs-stars{position:absolute;inset:0 auto 0 0;overflow:hidden;white-space:nowrap;}
 
-  .rs-track{display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding:4px 2px 10px;overscroll-behavior-x:contain;}
-  .rs-track::-webkit-scrollbar{display:none;}
-  .rs-track:focus-visible{outline:2px solid var(--gold);outline-offset:4px;}
-  .rs-track.abierta{align-items:flex-start;}   /* con una abierta, las demás no se estiran */
-  .rs-card{flex:0 0 calc((100% - 40px) / 3);scroll-snap-align:start;background:#fff;border:1px solid rgba(42,58,82,.1);padding:26px 26px 22px;display:flex;flex-direction:column;gap:14px;position:relative;transition:box-shadow .3s var(--ease);}
-  .rs-card::before{content:'';position:absolute;top:-1px;left:-1px;right:-1px;height:2px;background:var(--gold);transform:scaleX(0);transform-origin:left;transition:transform .45s var(--ease);}
-  @media(hover:hover){.rs-card:hover{box-shadow:0 22px 50px rgba(19,29,45,.1);}.rs-card:hover::before{transform:scaleX(1);}}
-  .rs-q{font-family:var(--font-display);font-style:italic;font-size:2.6rem;line-height:1;height:16px;color:var(--gold);overflow:visible;}
-  .rs-txt{font-size:.98rem;line-height:1.66;color:var(--text-dark);display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-line;}
-  .rs-card.open .rs-txt{display:block;-webkit-line-clamp:unset;}
-  .rs-more{align-self:flex-start;background:none;border:none;border-bottom:1px solid rgba(138,117,71,.4);padding:4px 0;margin-top:-6px;cursor:pointer;font-family:var(--font-body);font-size:.6rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-dark);}
-  .rs-more:hover{color:var(--navy);}
-  .rs-trad{font-size:.76rem;color:var(--text-mid);margin-top:-4px;}
+  /* El muro: columnas armadas por JS (cada tarjeta va a la más corta) */
+  .rs-muro{position:relative;display:flex;gap:16px;align-items:flex-start;}
+  .rs-col{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:16px;}
+  .rs-muro.cerrado{max-height:var(--rs-alto,720px);overflow:hidden;}
+  .rs-muro.cerrado::after{content:'';position:absolute;left:0;right:0;bottom:0;height:180px;background:linear-gradient(to bottom,rgba(251,250,246,0),var(--white) 88%);pointer-events:none;}
+  .rs-card{position:relative;background:#fff;border:1px solid rgba(42,58,82,.1);padding:22px 22px 18px;display:flex;flex-direction:column;gap:12px;text-align:left;transition:transform .35s var(--ease),box-shadow .35s var(--ease);}
+  .rs-card.v-navy{background:var(--navy-deeper);border-color:var(--navy-deeper);}
+  .rs-card.v-crema{background:var(--off-white);border-color:rgba(138,117,71,.18);}
+  @media(hover:hover){.rs-card:hover{transform:translateY(-3px);box-shadow:0 20px 44px rgba(19,29,45,.13);}}
+  .rs-card:active{transform:scale(.99);}
+  .rs-q{font-family:var(--font-display);font-style:italic;font-size:2.4rem;line-height:1;height:14px;color:var(--gold);overflow:visible;}
+  .rs-txt{font-size:.95rem;line-height:1.62;color:var(--text-dark);display:-webkit-box;-webkit-line-clamp:8;-webkit-box-orient:vertical;overflow:hidden;}
+  .rs-card.corta .rs-txt{font-family:var(--font-display);font-style:italic;font-size:1.22rem;line-height:1.45;color:var(--navy);}
+  .rs-card.v-navy .rs-txt{color:rgba(251,250,246,.9);}
+  .rs-card.v-navy.corta .rs-txt{color:var(--gold-light);}
+  .rs-leer{font-size:.58rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-dark);}
+  .rs-card.v-navy .rs-leer{color:var(--gold);}
+  .rs-who{display:flex;align-items:center;gap:10px;padding-top:12px;border-top:1px solid rgba(42,58,82,.08);margin-top:2px;}
+  .rs-card.v-navy .rs-who{border-top-color:rgba(255,255,255,.1);}
+  .rs-ini{width:32px;height:32px;flex:none;display:grid;place-items:center;background:var(--navy);color:var(--gold-light);font-family:var(--font-display);font-size:.95rem;}
+  .rs-card.v-navy .rs-ini{background:var(--gold);color:var(--navy-deeper);}
+  .rs-name{font-weight:500;font-size:.9rem;color:var(--navy);line-height:1.25;display:flex;align-items:center;gap:5px;}
+  .rs-card.v-navy .rs-name{color:var(--white);}
+  .rs-name svg{width:13px;height:13px;flex:none;fill:none;stroke:var(--gold-dark);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
+  .rs-card.v-navy .rs-name svg{stroke:var(--gold);}
+  .rs-meta{font-size:.76rem;color:var(--text-mid);line-height:1.35;}
+  .rs-card.v-navy .rs-meta{color:rgba(222,205,160,.65);}
+  /* toda la tarjeta abre la reseña */
+  .rs-abrir{position:absolute;inset:0;background:none;border:none;cursor:pointer;z-index:1;}
+  .rs-abrir:focus-visible{outline:2px solid var(--gold);outline-offset:3px;}
+
+  .rs-mas{display:flex;justify-content:center;margin-top:-28px;position:relative;z-index:2;}
+  .rs-mas[hidden]{display:none;}
+  .rs-mas button{display:inline-flex;align-items:center;gap:10px;background:var(--navy-deeper);color:var(--white);border:none;cursor:pointer;font-family:var(--font-body);font-size:.66rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;padding:16px 28px;min-height:48px;transition:background .25s,transform .16s cubic-bezier(.23,1,.32,1);}
+  .rs-mas button:hover{background:var(--navy);}
+  .rs-mas button:active{transform:scale(.97);}
+  .rs-mas svg{width:14px;height:14px;fill:none;stroke:var(--gold);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+  @media(max-width:640px){
+    .rs-muro,.rs-col{gap:10px;}
+    .rs-card{padding:15px 14px 13px;gap:9px;}
+    .rs-q{font-size:2rem;height:11px;}
+    .rs-txt{font-size:.86rem;line-height:1.5;-webkit-line-clamp:7;}
+    .rs-card.corta .rs-txt{font-size:1.02rem;line-height:1.4;}
+    .rs-stars svg{width:12px;height:12px;}
+    .rs-who{gap:8px;padding-top:10px;}
+    .rs-ini{width:26px;height:26px;font-size:.8rem;}
+    .rs-name{font-size:.8rem;}
+    .rs-meta{font-size:.7rem;}
+    .rs-leer{font-size:.54rem;letter-spacing:.14em;}
+  }
+
+  /* La reseña abierta */
+  html.rs-lock{overflow:hidden;}
+  .rs-dlg{border:none;padding:0;margin:auto;width:min(620px,calc(100% - 32px));max-height:calc(100dvh - 32px);background:var(--white);color:var(--text-dark);box-shadow:0 40px 100px rgba(10,16,28,.45);overflow:auto;overscroll-behavior:contain;}
+  .rs-dlg::backdrop{background:rgba(19,29,45,.78);}
+  .rs-dlg[open]{animation:rsIn .38s var(--ease);}
+  @keyframes rsIn{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:none;}}
+  .rs-dlg-in{padding:34px 36px 26px;display:flex;flex-direction:column;gap:16px;}
+  .rs-dlg-top{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:24px;}
+  .rs-dlg .rs-stars svg{width:18px;height:18px;}
+  .rs-dlg-txt{font-size:1.05rem;line-height:1.72;color:var(--text-dark);white-space:pre-line;}
+  .rs-dlg-txt.corta{font-family:var(--font-display);font-style:italic;font-size:1.45rem;line-height:1.45;color:var(--navy);}
+  .rs-trad{font-size:.78rem;color:var(--text-mid);}
   .rs-trad button{background:none;border:none;padding:0;font:inherit;color:var(--gold-dark);text-decoration:underline;text-underline-offset:3px;cursor:pointer;}
   .rs-resp{border-left:2px solid var(--gold);padding:2px 0 2px 14px;}
   .rs-resp b{display:block;font-size:.58rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-dark);margin-bottom:4px;}
-  .rs-resp p{font-size:.9rem;line-height:1.6;color:var(--text-mid);white-space:pre-line;}
-  .rs-who{margin-top:auto;display:flex;align-items:center;gap:12px;padding-top:16px;border-top:1px solid rgba(42,58,82,.08);}
-  .rs-ini{width:40px;height:40px;flex:none;display:grid;place-items:center;background:var(--navy);color:var(--gold-light);font-family:var(--font-display);font-size:1.05rem;}
-  .rs-name{font-weight:500;font-size:.96rem;color:var(--navy);line-height:1.3;}
-  .rs-meta{font-size:.8rem;color:var(--text-mid);line-height:1.4;}
+  .rs-resp p{font-size:.94rem;line-height:1.6;color:var(--text-mid);white-space:pre-line;}
+  .rs-dlg .rs-who{border-top:1px solid rgba(42,58,82,.1);padding-top:16px;}
+  .rs-dlg .rs-ini{width:44px;height:44px;font-size:1.15rem;}
+  .rs-dlg .rs-name{font-size:1rem;}
+  .rs-dlg .rs-meta{font-size:.84rem;}
   .rs-ok{display:inline-flex;align-items:center;gap:5px;margin-top:3px;font-size:.56rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-dark);}
   .rs-ok svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
-  @media(max-width:1000px){.rs-card{flex-basis:calc((100% - 20px) / 2);}}
-  @media(max-width:640px){
-    .rs-track{margin:0 -24px;padding:4px 24px 10px;scroll-padding:0 24px;gap:12px;}
-    .rs-card{flex-basis:86%;padding:24px 22px 20px;}
+  .rs-dlg-nav{display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid rgba(42,58,82,.1);padding:12px 20px;background:#fff;position:sticky;bottom:0;}
+  .rs-dlg-cuenta{font-size:.74rem;letter-spacing:.14em;color:var(--text-mid);font-feature-settings:"tnum" 1;}
+  .rs-ic{width:46px;height:46px;display:grid;place-items:center;background:transparent;border:1px solid rgba(42,58,82,.2);color:var(--navy);cursor:pointer;transition:background .2s,color .2s,border-color .2s;}
+  .rs-ic svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+  .rs-ic:hover:not(:disabled){background:var(--navy);border-color:var(--navy);color:var(--gold-light);}
+  .rs-ic:disabled{opacity:.3;cursor:default;}
+  .rs-x{border:none;margin:-10px -12px 0 0;}
+  @media(max-width:560px){
+    .rs-dlg{width:100%;max-width:100%;max-height:92dvh;margin:auto 0 0;}
+    .rs-dlg[open]{animation:rsSube .38s var(--ease);}
+    .rs-dlg-in{padding:26px 22px 20px;}
+    .rs-dlg-txt{font-size:1rem;}
+    .rs-dlg-txt.corta{font-size:1.3rem;}
   }
-
-  .rs-nav{display:flex;align-items:center;gap:16px;margin-top:20px;}
-  .rs-nav[hidden]{display:none;}
-  .rs-prog{flex:1;height:2px;background:rgba(42,58,82,.1);position:relative;overflow:hidden;}
-  .rs-prog span{position:absolute;top:0;bottom:0;left:0;width:30%;background:var(--gold);will-change:transform;}
-  .rs-arr{width:46px;height:46px;flex:none;display:grid;place-items:center;background:transparent;border:1px solid rgba(42,58,82,.2);color:var(--navy);cursor:pointer;transition:background .2s,color .2s,border-color .2s;}
-  .rs-arr svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
-  .rs-arr:hover:not(:disabled){background:var(--navy);border-color:var(--navy);color:var(--gold-light);}
-  .rs-arr:disabled{opacity:.3;cursor:default;}
-  @media(hover:none){.rs-arr{display:none;}}
+  @keyframes rsSube{from{transform:translateY(40px);opacity:0;}to{transform:none;opacity:1;}}
+  @media(prefers-reduced-motion:reduce){.rs-dlg[open]{animation:none;}.rs-card{transition:none;}}
   .contacto{padding:clamp(72px,10vw,120px) 24px;background:var(--navy-deeper);color:var(--white);position:relative;overflow:hidden;}
   .contacto::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 70% at 82% 8%,rgba(194,169,104,.09),transparent 60%);pointer-events:none;}
   .contacto-in{max-width:1080px;margin:0 auto;position:relative;display:grid;grid-template-columns:1fr;gap:48px;}
@@ -709,42 +763,47 @@
 </section>
 
 <!-- RESEÑAS (15/10/2026). Reales, nunca inventadas: cada una pasa por el
-     equipo antes de salir (admin-resenas.html). Acá solo se leen; se dejan
-     en /resenas (resenas.html), con el link que el equipo manda a cada
-     cliente. Las cinco históricas del vault van también acá como respaldo:
-     se pintan al instante y quedan si Supabase no responde. -->
+     equipo antes de salir (admin-resenas.html). Acá se leen en un muro tipo
+     collage y cada una se abre entera; se dejan en /resenas (resenas.html),
+     con el link que el equipo manda a cada cliente. Las cinco históricas
+     del vault van también acá como respaldo: se pintan al instante y quedan
+     si Supabase no responde. -->
 <section class="resenas" id="resenas" aria-labelledby="rsH">
   <div class="resenas-in">
     <div class="resenas-hd reveal">
-      <h2 id="rsH" data-rs="h">Reseñas</h2>
+      <h2 id="rsH"><span data-rs="h">Reseñas</span><small id="rsCuenta" hidden></small></h2>
       <div class="rs-avg" id="rsAvg" hidden>
         <span class="rs-stars-avg" id="rsAvgStars"></span>
         <span class="rs-avg-n" id="rsAvgN"></span>
         <span class="rs-avg-l" id="rsAvgL"></span>
       </div>
     </div>
-    <div class="rs-track" id="rsTrack" tabindex="0" role="region" aria-labelledby="rsH"></div>
-    <div class="rs-nav" id="rsNav" hidden>
-      <div class="rs-prog" aria-hidden="true"><span id="rsProg"></span></div>
-      <button class="rs-arr" id="rsPrev" type="button" data-rs-aria="prev" aria-label="Reseñas anteriores"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
-      <button class="rs-arr" id="rsNext" type="button" data-rs-aria="next" aria-label="Más reseñas"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
-    </div>
+    <div class="rs-muro reveal" id="rsMuro"></div>
+    <div class="rs-mas" id="rsMasBox" hidden><button type="button" id="rsMas"><span id="rsMasTxt"></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button></div>
   </div>
 </section>
+<dialog class="rs-dlg" id="rsDlg" aria-labelledby="rsDlgQuien">
+  <div class="rs-dlg-in" id="rsDlgIn"></div>
+  <div class="rs-dlg-nav" id="rsDlgNav">
+    <button class="rs-ic" type="button" id="rsDlgPrev" data-rs-aria="prev"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <span class="rs-dlg-cuenta" id="rsDlgCuenta"></span>
+    <button class="rs-ic" type="button" id="rsDlgNext" data-rs-aria="next"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
+  </div>
+</dialog>
 <script>
 (function(){
   var I={
-   es:{h:'Reseñas',avg_l:'{n} calificaciones',verif:'Cliente verificado',more:'Ver más',less:'Ver menos',
-    trad:'Traducido del {l}',orig:'Ver original',back:'Ver traducción',l_es:'español',l_pt:'portugués',l_en:'inglés',
-    resp:'Respuesta de BAIREN',prev:'Reseñas anteriores',next:'Más reseñas',stars:'{n} de 5 estrellas',
+   es:{h:'Reseñas',cuenta:'{n} reseñas',avg_l:'{n} calificaciones',verif:'Cliente verificado',leer:'Leer completa',abrir:'Leer la reseña de {n}',
+    mas:'Ver las {n} reseñas',todas:'Ver todas las reseñas',trad:'Traducido del {l}',orig:'Ver original',back:'Ver traducción',l_es:'español',l_pt:'portugués',l_en:'inglés',
+    resp:'Respuesta de BAIREN',prev:'Reseña anterior',next:'Reseña siguiente',close:'Cerrar',stars:'{n} de 5 estrellas',
     roles:{inquilino:'Inquilino',inquilina:'Inquilina',propietario:'Propietario',propietaria:'Propietaria'}},
-   pt:{h:'Avaliações',avg_l:'{n} avaliações',verif:'Cliente verificado',more:'Ver mais',less:'Ver menos',
-    trad:'Traduzido do {l}',orig:'Ver original',back:'Ver tradução',l_es:'espanhol',l_pt:'português',l_en:'inglês',
-    resp:'Resposta da BAIREN',prev:'Avaliações anteriores',next:'Mais avaliações',stars:'{n} de 5 estrelas',
+   pt:{h:'Avaliações',cuenta:'{n} avaliações',avg_l:'{n} avaliações',verif:'Cliente verificado',leer:'Ler completa',abrir:'Ler a avaliação de {n}',
+    mas:'Ver as {n} avaliações',todas:'Ver todas as avaliações',trad:'Traduzido do {l}',orig:'Ver original',back:'Ver tradução',l_es:'espanhol',l_pt:'português',l_en:'inglês',
+    resp:'Resposta da BAIREN',prev:'Avaliação anterior',next:'Próxima avaliação',close:'Fechar',stars:'{n} de 5 estrelas',
     roles:{inquilino:'Inquilino',inquilina:'Inquilina',propietario:'Proprietário',propietaria:'Proprietária'}},
-   en:{h:'Reviews',avg_l:'{n} ratings',verif:'Verified client',more:'Read more',less:'Read less',
-    trad:'Translated from {l}',orig:'See original',back:'See translation',l_es:'Spanish',l_pt:'Portuguese',l_en:'English',
-    resp:'Reply from BAIREN',prev:'Previous reviews',next:'More reviews',stars:'{n} out of 5 stars',
+   en:{h:'Reviews',cuenta:'{n} reviews',avg_l:'{n} ratings',verif:'Verified client',leer:'Read in full',abrir:'Read the review by {n}',
+    mas:'See all {n} reviews',todas:'See all reviews',trad:'Translated from {l}',orig:'See original',back:'See translation',l_es:'Spanish',l_pt:'Portuguese',l_en:'English',
+    resp:'Reply from BAIREN',prev:'Previous review',next:'Next review',close:'Close',stars:'{n} out of 5 stars',
     roles:{inquilino:'Tenant',inquilina:'Tenant',propietario:'Owner',propietaria:'Owner'}}
   };
   /* Respaldo: las cinco históricas (vault: Testimonios Reales), iguales a las de la base */
@@ -768,51 +827,78 @@
   var COLS='id,creada_en,nombre_publico,rol,estrellas,texto,barrio,idioma,traducciones,verificada,respuesta,publicada_en,origen';
   var STAR='<svg viewBox="0 0 24 24"%C><path d="M12 2.6l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.4l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/></svg>';
   var CHECK='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>';
-  var lista=RESPALDO;
+  var CORTA=140;            /* las cortas van grandes, en Playfair */
+  var lista=RESPALDO, abiertoMuro=false, nCols=0, actual=-1, original=false;
   var $=function(id){return document.getElementById(id);};
-  var track=$('rsTrack'), nav=$('rsNav'), prog=$('rsProg'), prev=$('rsPrev'), next=$('rsNext');
+  var muro=$('rsMuro'), dlg=$('rsDlg');
 
   function lang(){ return I[window.BAIREN_LANG] ? window.BAIREN_LANG : 'es'; }
   function t(k,n){ var v=I[lang()][k]; if(v==null) v=I.es[k]; return n!=null&&typeof v==='string' ? v.replace('{n}',n) : v; }
   function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
   function stars(n,full){ var h=''; for(var k=1;k<=5;k++) h+=STAR.replace('%C', k>n&&!full ? ' class="off"' : ''); return h; }
+  function texto(r){ var L=lang(); return (r.idioma!==L && r.traducciones && r.traducciones[L]) || r.texto; }
+  function traducida(r){ var L=lang(); return !!(r.idioma!==L && r.traducciones && r.traducciones[L]); }
   function fecha(r){
     if(r.origen==='historico') return '';
     var d=new Date(r.publicada_en||r.creada_en); if(isNaN(d)) return '';
     var loc=lang()==='pt'?'pt-BR':lang()==='en'?'en-GB':'es-AR';
     try{ return d.toLocaleDateString(loc,{month:'long',year:'numeric'}); }catch(_){ return ''; }
   }
+  function meta(r,conFecha){ return [t('roles')[r.rol]||'', r.barrio||'', conFecha?fecha(r):''].filter(Boolean).join(' · '); }
+  function arriba(r){ return r.estrellas ? '<span class="rs-stars" role="img" aria-label="'+esc(t('stars',r.estrellas))+'">'+stars(r.estrellas)+'</span>' : '<span class="rs-q" aria-hidden="true">“</span>'; }
+  function quien(r,conFecha,id){
+    return '<div class="rs-who"><span class="rs-ini" aria-hidden="true">'+esc((r.nombre_publico||'?').charAt(0).toUpperCase())+'</span>'+
+      '<div><div class="rs-name"'+(id?' id="'+id+'"':'')+'>'+esc(r.nombre_publico)+(r.verificada?CHECK:'')+'</div><div class="rs-meta">'+esc(meta(r,conFecha))+'</div>'+
+      (conFecha&&r.verificada ? '<span class="rs-ok">'+CHECK+esc(t('verif'))+'</span>' : '')+'</div></div>';
+  }
   function pintarTextos(){
     document.querySelectorAll('[data-rs]').forEach(function(el){ el.textContent=t(el.getAttribute('data-rs')); });
     document.querySelectorAll('[data-rs-aria]').forEach(function(el){ el.setAttribute('aria-label',t(el.getAttribute('data-rs-aria'))); });
   }
+
+  /* ── El muro: cada tarjeta a la columna más corta ── */
+  function columnas(){
+    var w=muro.clientWidth||window.innerWidth;
+    if(w<600) return 2;
+    return (lista.length>=12 && w>=1000) ? 4 : 3;
+  }
   function tarjeta(r,i){
-    var L=lang(), tr=(r.idioma!==L && r.traducciones && r.traducciones[L]) ? r.traducciones[L] : null;
-    var top=r.estrellas ? '<span class="rs-stars" role="img" aria-label="'+esc(t('stars',r.estrellas))+'">'+stars(r.estrellas)+'</span>' : '<span class="rs-q" aria-hidden="true">“</span>';
-    var meta=[t('roles')[r.rol]||'', r.barrio||'', fecha(r)].filter(Boolean).join(' · ');
-    return '<article class="rs-card" data-i="'+i+'">'+top+
-      '<p class="rs-txt">'+esc(tr||r.texto)+'</p>'+
-      '<button class="rs-more" type="button" hidden>'+esc(t('more'))+'</button>'+
-      (tr ? '<p class="rs-trad">'+esc(t('trad').replace('{l}',t('l_'+r.idioma)))+' · <button type="button" class="rs-orig">'+esc(t('orig'))+'</button></p>' : '')+
-      (r.respuesta ? '<div class="rs-resp"><b>'+esc(t('resp'))+'</b><p>'+esc(r.respuesta)+'</p></div>' : '')+
-      '<div class="rs-who"><span class="rs-ini" aria-hidden="true">'+esc((r.nombre_publico||'?').charAt(0).toUpperCase())+'</span>'+
-      '<div><div class="rs-name">'+esc(r.nombre_publico)+'</div><div class="rs-meta">'+esc(meta)+'</div>'+
-      (r.verificada ? '<span class="rs-ok">'+CHECK+esc(t('verif'))+'</span>' : '')+'</div></div></article>';
+    var el=document.createElement('article'), txt=texto(r);
+    el.className='rs-card'+(i%5===1?' v-navy':i%5===3?' v-crema':'')+(txt.length<=CORTA?' corta':'');
+    el.innerHTML=arriba(r)+'<p class="rs-txt">'+esc(txt)+'</p><span class="rs-leer" hidden>'+esc(t('leer'))+'</span>'+quien(r,false)+
+      '<button class="rs-abrir" type="button" data-i="'+i+'" aria-label="'+esc(t('abrir',r.nombre_publico))+'"></button>';
+    return el;
   }
   function pintar(){
-    track.innerHTML=lista.map(tarjeta).join('');
-    track.classList.remove('abierta');
-    track.scrollLeft=0;
-    medir(); pintarPromedio(); nav_();
+    nCols=columnas();
+    muro.innerHTML='';
+    var cols=[];
+    for(var c=0;c<nCols;c++){ var d=document.createElement('div'); d.className='rs-col'; muro.appendChild(d); cols.push(d); }
+    muro.classList.remove('cerrado');
+    lista.forEach(function(r,i){
+      var corta=cols[0];
+      cols.forEach(function(c){ if(c.offsetHeight<corta.offsetHeight) corta=c; });
+      corta.appendChild(tarjeta(r,i));
+    });
+    medir(); cerrar(); pintarPromedio();
+    var cu=$('rsCuenta');
+    if(lista.length>=10){ cu.textContent=t('cuenta',lista.length); cu.hidden=false; } else cu.hidden=true;
   }
   function medir(){
-    track.querySelectorAll('.rs-card').forEach(function(c){
-      if(c.classList.contains('open')) return;
-      var p=c.querySelector('.rs-txt'), b=c.querySelector('.rs-more');
-      b.hidden = p.scrollHeight <= p.clientHeight+2;
+    muro.querySelectorAll('.rs-card').forEach(function(c){
+      var p=c.querySelector('.rs-txt'); c.querySelector('.rs-leer').hidden = p.scrollHeight <= p.clientHeight+2;
     });
   }
-  /* El promedio aparece recién con 3 reseñas calificadas */
+  /* Con muchas, el muro se corta con un velo y "Ver las N reseñas" */
+  function cerrar(){
+    var tope = window.innerWidth<640 ? 640 : 760, box=$('rsMasBox');
+    if(abiertoMuro || muro.scrollHeight <= tope+120){ muro.classList.remove('cerrado'); box.hidden=true; return; }
+    muro.style.setProperty('--rs-alto', tope+'px');
+    muro.classList.add('cerrado');
+    $('rsMasTxt').textContent = lista.length>=10 ? t('mas',lista.length) : t('todas');
+    box.hidden=false;
+  }
+  $('rsMas').addEventListener('click',function(){ abiertoMuro=true; cerrar(); });
   function pintarPromedio(){
     var cal=lista.filter(function(r){return r.estrellas;}), box=$('rsAvg');
     if(cal.length<3){ box.hidden=true; return; }
@@ -825,48 +911,63 @@
     $('rsAvgL').textContent=t('avg_l',cal.length);
     box.hidden=false;
   }
-  var raf=0;
-  function nav_(){
-    cancelAnimationFrame(raf);
-    raf=requestAnimationFrame(function(){
-      var sw=track.scrollWidth, cw=track.clientWidth, max=sw-cw;
-      nav.hidden = max<=2;
-      if(max<=2) return;
-      var w=cw/sw, p=Math.min(1,Math.max(0,track.scrollLeft/max));
-      prog.style.width=(w*100)+'%';
-      prog.style.transform='translateX('+(p*(1-w)/w*100)+'%)';
-      prev.disabled = track.scrollLeft<=2;
-      next.disabled = track.scrollLeft>=max-2;
-    });
-  }
-  function paso(dir){
-    var c=track.querySelector('.rs-card'); if(!c) return;
-    var gap=parseFloat(getComputedStyle(track).columnGap)||20;
-    var porVista=Math.max(1,Math.round(track.clientWidth/(c.offsetWidth+gap)));
-    track.scrollBy({left:dir*porVista*(c.offsetWidth+gap),behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
-  }
-  track.addEventListener('scroll',nav_,{passive:true});
-  prev.addEventListener('click',function(){paso(-1);});
-  next.addEventListener('click',function(){paso(1);});
-  var rz=0; addEventListener('resize',function(){ clearTimeout(rz); rz=setTimeout(function(){ medir(); nav_(); },150); });
-  if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ medir(); nav_(); });
-  track.addEventListener('click',function(e){
-    var c=e.target.closest('.rs-card'); if(!c) return;
-    var r=lista[+c.getAttribute('data-i')];
-    if(e.target.closest('.rs-more')){
-      var o=c.classList.toggle('open');
-      track.classList.toggle('abierta', !!track.querySelector('.rs-card.open'));
-      e.target.closest('.rs-more').textContent=t(o?'less':'more');
-      nav_();
-    } else if(e.target.closest('.rs-orig')){
-      var b=e.target.closest('.rs-orig'), p=c.querySelector('.rs-txt'), orig=b.getAttribute('data-o')!=='1';
-      p.textContent = orig ? r.texto : r.traducciones[lang()];
-      b.setAttribute('data-o', orig?'1':'0');
-      b.textContent=t(orig?'back':'orig');
-      if(!c.classList.contains('open')) medir();
-    }
+  var rz=0, ancho=window.innerWidth;
+  addEventListener('resize',function(){
+    clearTimeout(rz);
+    rz=setTimeout(function(){
+      if(window.innerWidth===ancho) return;   /* la barra del navegador del celu no cuenta */
+      ancho=window.innerWidth;
+      if(columnas()!==nCols) pintar(); else { medir(); cerrar(); }
+    },150);
   });
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ pintar(); });
 
+  /* ── La reseña abierta ── */
+  function abrir(i){
+    actual=i; original=false; llenar();
+    if(!dlg.open){
+      if(typeof dlg.showModal==='function') dlg.showModal(); else dlg.setAttribute('open','');
+      document.documentElement.classList.add('rs-lock');
+    }
+  }
+  function llenar(){
+    var r=lista[actual], tr=traducida(r), txt=(tr&&!original)?texto(r):r.texto;
+    $('rsDlgIn').innerHTML=
+      '<div class="rs-dlg-top">'+arriba(r)+'<button class="rs-ic rs-x" type="button" id="rsDlgX" aria-label="'+esc(t('close'))+'"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>'+
+      '<p class="rs-dlg-txt'+(txt.length<=CORTA?' corta':'')+'">'+esc(txt)+'</p>'+
+      (tr ? '<p class="rs-trad">'+esc(t('trad').replace('{l}',t('l_'+r.idioma)))+' · <button type="button" id="rsDlgOrig">'+esc(t(original?'back':'orig'))+'</button></p>' : '')+
+      (r.respuesta ? '<div class="rs-resp"><b>'+esc(t('resp'))+'</b><p>'+esc(r.respuesta)+'</p></div>' : '')+
+      quien(r,true,'rsDlgQuien');
+    $('rsDlgNav').hidden = lista.length<2;
+    $('rsDlgCuenta').textContent=(actual+1)+' / '+lista.length;
+    $('rsDlgPrev').disabled = actual<=0;
+    $('rsDlgNext').disabled = actual>=lista.length-1;
+    dlg.scrollTop=0;
+  }
+  function mover(d){ var n=actual+d; if(n<0||n>=lista.length) return; original=false; actual=n; llenar(); }
+  function cerrarDlg(){ if(dlg.open){ if(dlg.close) dlg.close(); else { dlg.removeAttribute('open'); alCerrar(); } } }
+  function alCerrar(){
+    document.documentElement.classList.remove('rs-lock');
+    var b=muro.querySelector('.rs-abrir[data-i="'+actual+'"]'); if(b) b.focus({preventScroll:true});
+  }
+  dlg.addEventListener('close',alCerrar);
+  dlg.addEventListener('click',function(e){
+    if(e.target===dlg) return cerrarDlg();
+    if(e.target.closest('#rsDlgX')) return cerrarDlg();
+    if(e.target.closest('#rsDlgOrig')){ original=!original; llenar(); }
+  });
+  $('rsDlgPrev').addEventListener('click',function(){ mover(-1); });
+  $('rsDlgNext').addEventListener('click',function(){ mover(1); });
+  dlg.addEventListener('keydown',function(e){ if(e.key==='ArrowLeft') mover(-1); if(e.key==='ArrowRight') mover(1); });
+  var tx=0, ty=0;
+  dlg.addEventListener('touchstart',function(e){ tx=e.touches[0].clientX; ty=e.touches[0].clientY; },{passive:true});
+  dlg.addEventListener('touchend',function(e){
+    var dx=e.changedTouches[0].clientX-tx, dy=e.changedTouches[0].clientY-ty;
+    if(Math.abs(dx)>60 && Math.abs(dx)>Math.abs(dy)*1.5) mover(dx<0?1:-1);
+  },{passive:true});
+  muro.addEventListener('click',function(e){ var b=e.target.closest('.rs-abrir'); if(b) abrir(+b.getAttribute('data-i')); });
+
+  /* ── Datos ── */
   pintarTextos(); pintar();
   /* supabase-config.js se carga más abajo en la página: se espera al DOM
      completo para que window.bairenReady ya exista */
@@ -875,14 +976,14 @@
     window.bairenReady.then(function(sb){
       return sb.from('resenas').select(COLS)
         .order('publicada_en',{ascending:false,nullsFirst:false})
-        .order('creada_en',{ascending:false}).limit(60);
+        .order('creada_en',{ascending:false}).limit(120);
     }).then(function(res){
       if(res.error) throw res.error;
       if(res.data && res.data.length){ lista=res.data; pintar(); }
     }).catch(function(e){ console.warn('[resenas] quedan las de respaldo:',e&&e.message||e); });
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',cargar); else cargar();
-  document.addEventListener('bairen:lang',function(){ pintarTextos(); pintar(); });
+  document.addEventListener('bairen:lang',function(){ pintarTextos(); pintar(); if(dlg.open) llenar(); });
   /* links viejos con ?resena van a la página para dejarla */
   if(/[?&]resena\b/.test(location.search)) location.replace('resenas.html');
 })();
