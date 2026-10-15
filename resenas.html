@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<!-- Página solo para dejar una reseña (15/10/2026). Es el link que el equipo
+     manda a cada cliente: bairengroup.com/resenas (también /reseñas y /resena).
+     ?n=Catalina saluda por el nombre y lo deja cargado; ?lang=pt|en abre en
+     ese idioma. El admin arma el link y el mensaje (admin-resenas.html).
+     La reseña entra pendiente en Supabase (tabla resenas) y el equipo la
+     publica; ver migracion-web-05-resenas.sql. -->
+<meta name="robots" content="noindex, follow" />
+<meta name="description" content="Contanos cómo te fue con BAIREN. Te lleva un minuto." />
+<link rel="canonical" href="https://www.bairengroup.com/resenas" />
+<meta property="og:title" content="Dejanos tu reseña · BAIREN" />
+<meta property="og:description" content="Contanos cómo te fue con BAIREN. Te lleva un minuto." />
+<meta property="og:type" content="website" />
+<meta property="og:locale" content="es_AR" />
+<meta property="og:site_name" content="BAIREN" />
+<meta property="og:url" content="https://www.bairengroup.com/resenas" />
+<meta property="og:image" content="https://www.bairengroup.com/og-logo.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="theme-color" content="#131D2D" />
+<title>Dejanos tu reseña · BAIREN</title>
+<link rel="icon" href="/bairen_logo.png?v=3">
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --navy:#2A3A52; --navy-dark:#1E2A3F; --navy-deeper:#131D2D;
+    --gold:#C2A968; --gold-dark:#8A7547; --gold-light:#DECDA0;
+    --white:#FBFAF6; --off-white:#EEE5D0;
+    --text-dark:#1A2538; --text-mid:#6B7589;
+    --font-display:'Playfair Display',Georgia,serif;
+    --font-body:'Jost',sans-serif;
+    --ease:cubic-bezier(0.22,1,0.36,1);
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  html{background:var(--navy-deeper);}
+  body{font-family:var(--font-body);font-weight:300;color:var(--text-dark);background:var(--white);-webkit-font-smoothing:antialiased;min-height:100vh;display:flex;flex-direction:column;}
+  a{color:inherit;}
+  *:focus-visible{outline:2px solid var(--gold);outline-offset:3px;}
+
+  .top{background:var(--navy-deeper);padding:calc(14px + env(safe-area-inset-top)) 24px 0;}
+  .top-in{max-width:620px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px;}
+  .top img{height:42px;width:auto;display:block;}
+  .lang{display:flex;gap:14px;}
+  .lang button{background:none;border:none;border-bottom:1px solid transparent;cursor:pointer;font-family:var(--font-body);font-size:.62rem;font-weight:600;letter-spacing:.2em;color:rgba(255,255,255,.5);padding:4px 0;min-width:24px;}
+  .lang button:hover{color:rgba(255,255,255,.85);}
+  .lang button[aria-pressed="true"]{color:var(--gold);border-bottom-color:var(--gold);}
+
+  .intro{background:var(--navy-deeper);color:var(--white);padding:34px 24px 92px;}
+  .intro-in{max-width:620px;margin:0 auto;}
+  .eyebrow{display:block;font-size:.62rem;font-weight:600;letter-spacing:.34em;text-transform:uppercase;color:var(--gold-light);}
+  .intro h1{font-family:var(--font-display);font-weight:500;font-size:clamp(1.9rem,6vw,2.6rem);line-height:1.12;letter-spacing:-.01em;margin-top:14px;text-wrap:balance;}
+  .intro h1:focus{outline:none;}
+  .intro p{color:rgba(255,255,255,.72);font-size:1.02rem;line-height:1.55;margin-top:12px;max-width:44ch;}
+
+  main{flex:1;padding:0 16px 48px;}
+  .card{max-width:620px;margin:-60px auto 0;background:#fff;border:1px solid rgba(42,58,82,.1);box-shadow:0 30px 70px rgba(19,29,45,.12);position:relative;}
+  .rs-form{padding:30px 32px 32px;display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+  .rs-form[hidden],.rs-done[hidden]{display:none;}
+  .rs-fld{display:flex;flex-direction:column;gap:8px;min-width:0;border:none;padding:0;margin:0;}
+  .rs-fld.full{grid-column:1 / -1;}
+  .rs-lbl{font-size:.62rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--navy);padding:0;}
+  .rs-lbl small{font-size:inherit;font-weight:400;letter-spacing:.06em;text-transform:none;color:var(--text-mid);}
+  .rs-fld input,.rs-fld select,.rs-fld textarea{font-family:var(--font-body);font-size:16px;font-weight:400;padding:14px;background:#fff;border:1px solid rgba(42,58,82,.22);border-radius:0;color:var(--text-dark);width:100%;transition:border-color .2s,box-shadow .2s;}
+  .rs-fld input:focus,.rs-fld select:focus,.rs-fld textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(194,169,104,.2);}
+  .rs-fld [aria-invalid="true"]{border-color:#A33A3A;}
+  .rs-fld textarea{min-height:140px;resize:vertical;line-height:1.55;}
+  .rs-fld select{appearance:none;-webkit-appearance:none;cursor:pointer;padding-right:40px;
+    background:#fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M0 0l5 6 5-6z' fill='%232A3A52'/></svg>") no-repeat right 15px center;}
+  .rs-hint{font-size:.8rem;color:var(--text-mid);line-height:1.45;}
+  .rs-rate{display:flex;align-items:center;flex-wrap:wrap;margin-left:-5px;}
+  .rs-rate input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none;}
+  .rs-rate label{padding:5px;cursor:pointer;line-height:0;}
+  .rs-rate svg{width:40px;height:40px;fill:transparent;stroke:var(--gold);stroke-width:1.2;transition:fill .15s,transform .16s cubic-bezier(.23,1,.32,1);}
+  .rs-rate label.on svg{fill:var(--gold);}
+  .rs-rate label:active svg{transform:scale(.9);}
+  .rs-rate input:focus-visible + label{outline:2px solid var(--gold);outline-offset:1px;}
+  .rs-rate-w{margin-left:8px;font-family:var(--font-display);font-style:italic;font-size:1.1rem;color:var(--gold-dark);}
+  .rs-check{display:flex;flex-direction:row;gap:11px;align-items:flex-start;font-size:.9rem;line-height:1.5;color:var(--text-dark);cursor:pointer;}
+  .rs-check input{width:20px;height:20px;margin-top:1px;flex:none;accent-color:var(--navy);}
+  .rs-hp{position:absolute!important;left:-10000px!important;width:1px;height:1px;overflow:hidden;}
+  .rs-send{grid-column:1 / -1;background:var(--navy-deeper);color:var(--white);border:none;cursor:pointer;font-family:var(--font-body);font-size:.74rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;padding:20px;min-height:56px;text-decoration:none;text-align:center;transition:background .25s,transform .16s cubic-bezier(.23,1,.32,1);}
+  .rs-send:hover{background:var(--navy);}
+  .rs-send:active{transform:scale(.985);}
+  .rs-send:disabled{opacity:.6;cursor:wait;}
+  .rs-alert{grid-column:1 / -1;font-size:.88rem;line-height:1.45;color:#A33A3A;}
+  .rs-alert:empty{display:none;}
+  .rs-done{padding:48px 32px 44px;text-align:center;}
+  .rs-done-ic{width:60px;height:60px;margin:0 auto 20px;display:grid;place-items:center;border:1px solid var(--gold);color:var(--gold-dark);}
+  .rs-done-ic svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+  .rs-done h2{font-family:var(--font-display);font-weight:500;font-size:1.9rem;color:var(--navy);line-height:1.2;}
+  .rs-done h2:focus{outline:none;}
+  .rs-done p{color:var(--text-mid);font-size:1rem;line-height:1.6;max-width:36ch;margin:12px auto 28px;}
+  .rs-done .rs-send{display:inline-block;padding:18px 34px;}
+  .rs-done .otra{display:block;margin-top:18px;font-size:.66rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-dark);text-decoration:none;}
+
+  .nota{max-width:620px;margin:22px auto 0;display:flex;gap:10px;align-items:flex-start;font-size:.86rem;line-height:1.55;color:var(--text-mid);padding:0 4px;}
+  .nota svg{width:18px;height:18px;flex:none;margin-top:1px;fill:none;stroke:var(--gold-dark);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+  footer{background:var(--navy-deeper);color:rgba(255,255,255,.5);font-size:.78rem;text-align:center;padding:22px 24px calc(22px + env(safe-area-inset-bottom));border-top:1px solid rgba(194,169,104,.25);}
+  footer a{color:var(--gold-light);text-decoration:none;}
+
+  @media(max-width:560px){
+    .intro{padding:26px 20px 86px;}
+    main{padding:0 12px 40px;}
+    .rs-form{grid-template-columns:1fr;padding:24px 20px 28px;gap:18px;}
+    .rs-done{padding:40px 22px 36px;}
+  }
+  @media(prefers-reduced-motion:reduce){*{transition:none!important;}}
+</style>
+<script src="/meta-pixel.js"></script>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-in">
+    <a href="/" aria-label="BAIREN, ir al inicio"><img src="/bairen_logo.png?v=3" alt="BAIREN"></a>
+    <div class="lang" role="group" aria-label="Idioma">
+      <button type="button" data-lang="es" aria-pressed="true">ES</button>
+      <button type="button" data-lang="pt" aria-pressed="false">PT</button>
+      <button type="button" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+  </div>
+</header>
+
+<section class="intro">
+  <div class="intro-in">
+    <span class="eyebrow" data-rs="eyebrow">Tu reseña</span>
+    <h1 id="rsH" tabindex="-1">¿Cómo te fue con BAIREN?</h1>
+    <p data-rs="sub">Tu experiencia ayuda a quien está por decidir. Te lleva un minuto.</p>
+  </div>
+</section>
+
+<main>
+  <div class="card">
+    <form class="rs-form" id="rsForm" novalidate>
+      <fieldset class="rs-fld full">
+        <legend class="rs-lbl" data-rs="f_rate">Tu calificación</legend>
+        <div class="rs-rate" id="rsRate"></div>
+      </fieldset>
+      <div class="rs-fld full">
+        <label class="rs-lbl" for="rsTxt" data-rs="f_txt">Tu reseña</label>
+        <textarea id="rsTxt" name="texto" maxlength="2000" data-rs-ph="ph_txt"></textarea>
+      </div>
+      <div class="rs-fld">
+        <label class="rs-lbl" for="rsNom" data-rs="f_nom">Nombre</label>
+        <input id="rsNom" name="nombre" type="text" maxlength="40" autocomplete="given-name">
+      </div>
+      <div class="rs-fld">
+        <label class="rs-lbl" for="rsApe"><span data-rs="f_ape">Apellido</span> <small data-rs="hint_ape">Publicamos solo la inicial.</small></label>
+        <input id="rsApe" name="apellido" type="text" maxlength="40" autocomplete="family-name">
+      </div>
+      <div class="rs-fld">
+        <label class="rs-lbl" for="rsRol" data-rs="f_rol">Soy</label>
+        <select id="rsRol" name="rol"></select>
+      </div>
+      <div class="rs-fld">
+        <label class="rs-lbl" for="rsBarrio" data-rs="f_barrio">Barrio</label>
+        <select id="rsBarrio" name="barrio"></select>
+      </div>
+      <div class="rs-fld full">
+        <label class="rs-lbl" for="rsCont" data-rs="f_cont">Teléfono o email</label>
+        <input id="rsCont" name="contacto" type="text" maxlength="120" autocomplete="email" aria-describedby="rsContHint">
+        <span class="rs-hint" id="rsContHint" data-rs="hint_cont">No se publica. Lo usamos solo para confirmar que sos cliente.</span>
+      </div>
+      <div class="rs-hp" aria-hidden="true"><label>Web <input name="website" type="text" tabindex="-1" autocomplete="off"></label></div>
+      <label class="rs-check rs-fld full"><input type="checkbox" name="consent" id="rsConsent"><span data-rs="consent">Acepto que BAIREN publique mi reseña con mi nombre y la inicial de mi apellido.</span></label>
+      <p class="rs-alert" id="rsAlert" role="alert"></p>
+      <button class="rs-send" type="submit" id="rsSend" data-rs="send">Enviar reseña</button>
+    </form>
+    <div class="rs-done" id="rsDone" hidden>
+      <div class="rs-done-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+      <h2 id="rsDoneH" tabindex="-1"></h2>
+      <p data-rs="done_p">Recibimos tu reseña. Confirmamos que sos cliente y la publicamos en los próximos días.</p>
+      <a class="rs-send" href="/#resenas" data-rs="ver">Ver las reseñas</a>
+    </div>
+  </div>
+  <p class="nota"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg><span data-rs="nota">Publicamos solo reseñas de clientes reales y no editamos lo que escriben. Tu teléfono o email queda entre nosotros.</span></p>
+</main>
+
+<footer>© 2026 BAIREN · <a href="/">bairengroup.com</a></footer>
+
+<script src="/supabase-config.js"></script>
+<script>
+(function(){
+  var I={
+   es:{eyebrow:'Tu reseña',h:'¿Cómo te fue con BAIREN?',hN:'{n}, ¿cómo te fue con BAIREN?',sub:'Tu experiencia ayuda a quien está por decidir. Te lleva un minuto.',
+    rolOpts:[['inquilino','Inquilino'],['inquilina','Inquilina'],['propietario','Propietario'],['propietaria','Propietaria']],
+    star1:'1 estrella',starN:'{n} estrellas',f_rate:'Tu calificación',words:['','Mala','Regular','Buena','Muy buena','Excelente'],f_txt:'Tu reseña',
+    ph_txt:'Contanos con tus palabras cómo fue tu experiencia.',f_nom:'Nombre',f_ape:'Apellido',hint_ape:'Publicamos solo la inicial.',
+    f_rol:'Soy',rol_ph:'Elegí una opción',f_barrio:'Barrio',barrio_ph:'Prefiero no decir',barrio_otro:'Otro',
+    f_cont:'Teléfono o email',hint_cont:'No se publica. Lo usamos solo para confirmar que sos cliente.',
+    consent:'Acepto que BAIREN publique mi reseña con mi nombre y la inicial de mi apellido.',send:'Enviar reseña',sending:'Enviando…',
+    e_rate:'Elegí de 1 a 5 estrellas.',e_txt:'Contanos un poco más (mínimo 20 caracteres).',e_nom:'Escribí tu nombre.',
+    e_rol:'Elegí si sos inquilino o propietario.',e_cont:'Dejanos un teléfono o email para confirmar que sos cliente.',
+    e_consent:'Necesitamos tu permiso para publicarla.',e_send:'No se pudo enviar. Probá de nuevo o escribinos por WhatsApp.',
+    done_h:'¡Gracias, {n}!',done_h0:'¡Gracias!',done_p:'Recibimos tu reseña. Confirmamos que sos cliente y la publicamos en los próximos días.',ver:'Ver las reseñas',
+    nota:'Publicamos solo reseñas de clientes reales y no editamos lo que escriben. Tu teléfono o email queda entre nosotros.'},
+   pt:{eyebrow:'Sua avaliação',h:'Como foi com a BAIREN?',hN:'{n}, como foi com a BAIREN?',sub:'Sua experiência ajuda quem está decidindo. Leva um minuto.',
+    rolOpts:[['inquilino','Inquilino'],['inquilina','Inquilina'],['propietario','Proprietário'],['propietaria','Proprietária']],
+    star1:'1 estrela',starN:'{n} estrelas',f_rate:'Sua nota',words:['','Ruim','Regular','Boa','Muito boa','Excelente'],f_txt:'Sua avaliação',
+    ph_txt:'Conte com suas palavras como foi sua experiência.',f_nom:'Nome',f_ape:'Sobrenome',hint_ape:'Publicamos só a inicial.',
+    f_rol:'Sou',rol_ph:'Escolha uma opção',f_barrio:'Bairro',barrio_ph:'Prefiro não dizer',barrio_otro:'Outro',
+    f_cont:'Telefone ou e-mail',hint_cont:'Não é publicado. Usamos só para confirmar que você é cliente.',
+    consent:'Aceito que a BAIREN publique minha avaliação com meu nome e a inicial do meu sobrenome.',send:'Enviar avaliação',sending:'Enviando…',
+    e_rate:'Escolha de 1 a 5 estrelas.',e_txt:'Conte um pouco mais (mínimo 20 caracteres).',e_nom:'Escreva seu nome.',
+    e_rol:'Escolha se é inquilino ou proprietário.',e_cont:'Deixe um telefone ou e-mail para confirmarmos que você é cliente.',
+    e_consent:'Precisamos da sua permissão para publicá-la.',e_send:'Não foi possível enviar. Tente de novo ou escreva pelo WhatsApp.',
+    done_h:'Obrigado, {n}!',done_h0:'Obrigado!',done_p:'Recebemos sua avaliação. Confirmamos que você é cliente e a publicamos nos próximos dias.',ver:'Ver as avaliações',
+    nota:'Publicamos só avaliações de clientes reais e não editamos o que escrevem. Seu telefone ou e-mail fica entre nós.'},
+   en:{eyebrow:'Your review',h:'How was your experience with BAIREN?',hN:'{n}, how was your experience with BAIREN?',sub:'Your experience helps people who are about to decide. It takes a minute.',
+    rolOpts:[['inquilino','Tenant'],['propietario','Owner']],
+    star1:'1 star',starN:'{n} stars',f_rate:'Your rating',words:['','Poor','Fair','Good','Very good','Excellent'],f_txt:'Your review',
+    ph_txt:'Tell us in your own words how it went.',f_nom:'First name',f_ape:'Last name',hint_ape:'We only publish the initial.',
+    f_rol:'I am',rol_ph:'Choose an option',f_barrio:'Neighbourhood',barrio_ph:'Prefer not to say',barrio_otro:'Other',
+    f_cont:'Phone or email',hint_cont:'Not published. We only use it to confirm you are a client.',
+    consent:'I agree that BAIREN may publish my review with my first name and last initial.',send:'Send review',sending:'Sending…',
+    e_rate:'Choose 1 to 5 stars.',e_txt:'Tell us a bit more (at least 20 characters).',e_nom:'Write your name.',
+    e_rol:'Choose tenant or owner.',e_cont:'Leave a phone or email so we can confirm you are a client.',
+    e_consent:'We need your permission to publish it.',e_send:'Could not send. Try again or message us on WhatsApp.',
+    done_h:'Thank you, {n}!',done_h0:'Thank you!',done_p:'We received your review. We will confirm you are a client and publish it in the next few days.',ver:'See the reviews',
+    nota:'We only publish reviews from real clients and never edit what they write. Your phone or email stays with us.'}
+  };
+  var BARRIOS=['Belgrano','Núñez','Palermo','Recoleta','Puerto Madero','Colegiales','Villa Crespo','Retiro','GBA Norte'];
+  var STAR='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.4l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/></svg>';
+  var $=function(id){return document.getElementById(id);};
+  var form=$('rsForm'), done=$('rsDone'), alertEl=$('rsAlert'), send=$('rsSend');
+  var qs=new URLSearchParams(location.search);
+  /* ?n=Catalina: solo letras, espacios y guiones, como mucho 40 */
+  var nombreLink=(qs.get('n')||'').replace(/[^\p{L}\s'’-]/gu,'').replace(/\s+/g,' ').trim().slice(0,40);
+  var lang='es', estrellas=0, desde=Date.now();
+  try{ lang=localStorage.getItem('bairen_lang')||'es'; }catch(_){}
+  if(I[qs.get('lang')]) lang=qs.get('lang');
+  if(!I[lang]) lang='es';
+
+  function t(k,n){ var v=I[lang][k]; if(v==null) v=I.es[k]; return n!=null&&typeof v==='string' ? v.replace('{n}',n) : v; }
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+  function primerNombre(){ return ($('rsNom').value||'').trim().split(/\s+/)[0]; }
+
+  function pintar(){
+    document.documentElement.lang = lang==='pt'?'pt-BR':lang==='en'?'en':'es-AR';
+    document.querySelectorAll('.lang button').forEach(function(b){ b.setAttribute('aria-pressed', b.getAttribute('data-lang')===lang); });
+    document.querySelectorAll('[data-rs]').forEach(function(el){ el.textContent=t(el.getAttribute('data-rs')); });
+    document.querySelectorAll('[data-rs-ph]').forEach(function(el){ el.setAttribute('placeholder',t(el.getAttribute('data-rs-ph'))); });
+    $('rsH').textContent = nombreLink ? t('hN',nombreLink.split(' ')[0]) : t('h');
+    var rol=$('rsRol'), v=rol.value;
+    rol.innerHTML='<option value="">'+esc(t('rol_ph'))+'</option>'+t('rolOpts').map(function(o){return '<option value="'+o[0]+'">'+esc(o[1])+'</option>';}).join('');
+    rol.value = rol.querySelector('option[value="'+v+'"]') ? v : (v==='inquilina'?'inquilino':v==='propietaria'?'propietario':'');
+    var bar=$('rsBarrio'), bv=bar.value;
+    bar.innerHTML='<option value="">'+esc(t('barrio_ph'))+'</option>'+BARRIOS.map(function(b){return '<option>'+esc(b)+'</option>';}).join('')+'<option value="">'+esc(t('barrio_otro'))+'</option>';
+    bar.value=bv;
+    var h='';
+    for(var k=1;k<=5;k++) h+='<input type="radio" name="estrellas" id="rsS'+k+'" value="'+k+'"'+(estrellas===k?' checked':'')+'><label for="rsS'+k+'" data-n="'+k+'" aria-label="'+esc(k===1?t('star1'):t('starN',k))+'">'+STAR+'</label>';
+    $('rsRate').innerHTML=h+'<span class="rs-rate-w" id="rsRateW" aria-hidden="true"></span>';
+    marcar(estrellas);
+    if(!done.hidden){ var pn=primerNombre(); $('rsDoneH').textContent = pn ? t('done_h',pn) : t('done_h0'); }
+    if(send.disabled) send.textContent=t('sending');
+  }
+  function marcar(n){
+    document.querySelectorAll('#rsRate label').forEach(function(l){ l.classList.toggle('on', +l.getAttribute('data-n')<=n); });
+    var w=$('rsRateW'); if(w) w.textContent=n?t('words')[n]:'';
+  }
+  document.querySelector('.lang').addEventListener('click',function(e){
+    var b=e.target.closest('button'); if(!b) return;
+    lang=b.getAttribute('data-lang');
+    try{ localStorage.setItem('bairen_lang',lang); }catch(_){}
+    pintar();
+  });
+  var rate=$('rsRate');
+  rate.addEventListener('change',function(e){ if(e.target.name==='estrellas'){ estrellas=+e.target.value; marcar(estrellas); } });
+  rate.addEventListener('mouseover',function(e){ var l=e.target.closest('label'); if(l) marcar(+l.getAttribute('data-n')); });
+  rate.addEventListener('mouseleave',function(){ marcar(estrellas); });
+
+  if(nombreLink) $('rsNom').value=nombreLink.split(' ')[0];
+  pintar();
+
+  function mal(el,k){
+    alertEl.textContent=t(k);
+    if(el){ el.setAttribute('aria-invalid','true'); el.focus(); }
+    return false;
+  }
+  form.addEventListener('input',function(e){ e.target.removeAttribute('aria-invalid'); });
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    alertEl.textContent='';
+    var f=form.elements, txt=f.texto.value.trim(), nom=f.nombre.value.trim(), cont=f.contacto.value.trim();
+    if(f.website.value || Date.now()-desde<4000){ gracias(); return; }   /* robots */
+    if(!estrellas) return mal($('rsS1'),'e_rate');
+    if(txt.length<20) return mal(f.texto,'e_txt');
+    if(nom.length<2) return mal(f.nombre,'e_nom');
+    if(!f.rol.value) return mal(f.rol,'e_rol');
+    if(cont.length<6) return mal(f.contacto,'e_cont');
+    if(!f.consent.checked) return mal(f.consent,'e_consent');
+    var fila={nombre:nom, apellido:f.apellido.value.trim()||null, rol:f.rol.value, estrellas:estrellas,
+              texto:txt, barrio:f.barrio.value||null, idioma:lang, contacto:cont};
+    send.disabled=true; send.textContent=t('sending');
+    window.bairenReady.then(function(sb){ return sb.from('resenas').insert(fila); })
+      .then(function(res){ if(res.error) throw res.error; avisar(fila); gracias(); })
+      .catch(function(err){
+        console.warn('[resenas] no se guardó:',err&&err.message||err);
+        send.disabled=false; send.textContent=t('send'); alertEl.textContent=t('e_send');
+      });
+  });
+  function gracias(){
+    var pn=primerNombre();
+    $('rsDoneH').textContent = pn ? t('done_h',pn) : t('done_h0');
+    form.hidden=true; done.hidden=false;
+    window.scrollTo(0,0);
+    $('rsDoneH').focus({preventScroll:true});
+  }
+  /* Aviso al equipo por el mismo Formspree del contacto */
+  function avisar(f){
+    try{
+      var fd=new FormData();
+      fd.append('_subject','RESEÑA NUEVA ('+f.estrellas+'/5) — publicarla en bairengroup.com/admin-resenas.html');
+      fd.append('nombre',f.nombre+(f.apellido?' '+f.apellido:''));
+      fd.append('soy',f.rol); fd.append('estrellas',f.estrellas+' de 5');
+      fd.append('resena',f.texto); fd.append('contacto',f.contacto); fd.append('barrio',f.barrio||'—');
+      fetch('https://formspree.io/f/xykrypqo',{method:'POST',body:fd,headers:{'Accept':'application/json'}}).catch(function(){});
+    }catch(_){}
+  }
+})();
+</script>
+</body>
+</html>

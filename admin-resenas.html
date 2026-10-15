@@ -80,6 +80,16 @@ h1{font-family:var(--fd);font-weight:500;font-size:1.9rem;line-height:1.15;}
 .fg input{font-size:16px;padding:12px 14px;border:1px solid rgba(42,58,82,.2);background:#fff;color:var(--navy);}
 .fg input:focus{outline:none;border-color:var(--gold);}
 .login-err{color:var(--err);font-size:.85rem;margin-bottom:10px;min-height:1em;}
+.pedir{background:var(--white);border:1px solid var(--border);border-top:2px solid var(--gold);padding:22px 24px 24px;margin-bottom:28px;}
+.pedir h2{font-family:var(--fd);font-weight:500;font-size:1.35rem;margin-bottom:4px;}
+.pedir > p{color:var(--mid);font-size:.88rem;line-height:1.5;margin-bottom:16px;}
+.pedir-row{display:grid;grid-template-columns:2fr 2fr 1fr;gap:12px;}
+@media(max-width:700px){.pedir-row{grid-template-columns:1fr;}}
+.pedir select{font-size:16px;padding:12px 14px;border:1px solid rgba(42,58,82,.2);background:#fff;color:var(--navy);font-family:var(--fb);}
+.pedir textarea{width:100%;min-height:96px;resize:vertical;font-size:.95rem;line-height:1.5;padding:12px 14px;border:1px solid rgba(42,58,82,.2);background:#fff;color:var(--navy);font-family:var(--fb);margin-top:4px;}
+.pedir textarea:focus,.pedir select:focus{outline:none;border-color:var(--gold);}
+.pedir-link{font-size:.84rem;color:var(--mid);margin:10px 0 0;word-break:break-all;}
+.pedir-link a{color:var(--navy);text-decoration:underline;text-underline-offset:2px;}
 .ayuda{margin-top:28px;font-size:.86rem;color:var(--mid);line-height:1.6;background:var(--white);border:1px solid var(--border);padding:16px 18px;}
 .ayuda b{color:var(--navy);}
 .ayuda code{background:var(--off);padding:1px 6px;font-size:.84rem;}
@@ -110,10 +120,26 @@ h1{font-family:var(--fd);font-weight:500;font-size:1.9rem;line-height:1.15;}
 <main class="page" id="vMain" hidden>
   <h1>Reseñas de clientes</h1>
   <p class="sub">Las que dejan en la web llegan acá como pendientes. Confirmá que es cliente (el teléfono o email está abajo de cada una) y publicala. No se edita lo que escribió: si hace falta, sumá una respuesta de BAIREN.</p>
+  <section class="pedir" aria-labelledby="pedirH">
+    <h2 id="pedirH">Pedir una reseña</h2>
+    <p>Poné el nombre del cliente y mandale el link. La página lo saluda por su nombre y es el único lugar para dejar reseña: en la home no hay botón.</p>
+    <div class="pedir-row">
+      <div class="fg"><label for="pNom">Nombre del cliente</label><input id="pNom" type="text" maxlength="40" placeholder="Catalina" autocomplete="off"></div>
+      <div class="fg"><label for="pTel">WhatsApp (opcional)</label><input id="pTel" type="tel" maxlength="30" placeholder="11 2345 6789" autocomplete="off"></div>
+      <div class="fg"><label for="pLang">Idioma</label><select id="pLang"><option value="es">Español</option><option value="pt">Português</option><option value="en">English</option></select></div>
+    </div>
+    <div class="fg" style="margin-bottom:0"><label for="pMsg">Mensaje</label><textarea id="pMsg"></textarea></div>
+    <p class="pedir-link">Link: <a id="pLink" href="#" target="_blank" rel="noopener"></a></p>
+    <div class="r-acc">
+      <button class="b b-pri" type="button" id="pWa">Abrir en WhatsApp</button>
+      <button class="b" type="button" id="pCopy">Copiar mensaje</button>
+      <button class="b" type="button" id="pCopyLink">Copiar solo el link</button>
+    </div>
+  </section>
   <div class="tabs" id="tabs"></div>
   <div id="lista"></div>
   <div class="ayuda">
-    <b>Para pedir reseñas:</b> mandale al cliente el link <code>bairengroup.com/resena</code>, que abre el formulario directo. Por ejemplo: “Hola Catalina, ¿nos dejarías una reseña de cómo te fue con BAIREN? Te lleva un minuto: bairengroup.com/resena”.<br>
+    <b>Link general:</b> <code>bairengroup.com/resenas</code> (también anda <code>/reseñas</code>). Sin nombre, la página saluda genérico. Mejor usar el armador de arriba.<br>
     <b>Rechazar</b> es para spam o para quien no fue cliente. Una reseña con pocas estrellas de un cliente real se publica igual: es lo que hace creíble al resto.
   </div>
 </main>
@@ -184,6 +210,37 @@ h1{font-family:var(--fd);font-weight:500;font-size:1.9rem;line-height:1.15;}
     aviso(a==='publicar'?'Publicada. Ya se ve en la web.':a==='rechazar'?'Rechazada.':a==='resp'?'Respuesta guardada.':'Movida a pendientes.');
     cargar();
   });
+
+  /* ── Pedir una reseña: link con el nombre y mensaje listo ── */
+  var MSG={
+    es:function(n,l){ return 'Hola'+(n?' '+n:'')+'! Gracias por confiar en BAIREN. Nos dejarías una reseña de cómo te fue? Te lleva un minuto: '+l; },
+    pt:function(n,l){ return 'Oi'+(n?' '+n:'')+'! Obrigado por confiar na BAIREN. Você deixaria uma avaliação contando como foi? Leva um minuto: '+l; },
+    en:function(n,l){ return 'Hi'+(n?' '+n:'')+'! Thanks for trusting BAIREN. Would you leave us a review about your experience? It takes a minute: '+l; }
+  };
+  function linkPedido(){
+    var n=$('pNom').value.trim().split(/\s+/)[0]||'', lg=$('pLang').value, q=new URLSearchParams();
+    if(n) q.set('n',n); if(lg!=='es') q.set('lang',lg);
+    var qs=q.toString();
+    return {n:n, lg:lg, url:'https://www.bairengroup.com/resenas'+(qs?'?'+qs:'')};
+  }
+  function armar(){
+    var p=linkPedido();
+    $('pMsg').value=MSG[p.lg](p.n,p.url);
+    $('pLink').textContent=p.url; $('pLink').href=p.url;
+  }
+  ['pNom','pLang'].forEach(function(id){ $(id).addEventListener('input',armar); $(id).addEventListener('change',armar); });
+  function copiar(txt,ok){
+    function viejo(){ var ta=document.createElement('textarea'); ta.value=txt; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy'); aviso(ok);}catch(_){ aviso('No se pudo copiar'); } ta.remove(); }
+    if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(function(){aviso(ok);},viejo); else viejo();
+  }
+  $('pCopy').addEventListener('click',function(){ copiar($('pMsg').value,'Mensaje copiado'); });
+  $('pCopyLink').addEventListener('click',function(){ copiar(linkPedido().url,'Link copiado'); });
+  $('pWa').addEventListener('click',function(){
+    var d=$('pTel').value.replace(/\D/g,'').replace(/^0+/,'');
+    if(d && d.length<=10) d='549'+d;   /* 11 2345 6789 → 5491123456789; con código de país va tal cual */
+    window.open('https://wa.me/'+d+'?text='+encodeURIComponent($('pMsg').value),'_blank','noopener');
+  });
+  armar();
 
   $('loginForm').addEventListener('submit',async function(e){
     e.preventDefault(); $('lErr').textContent=''; $('lBtn').disabled=true;
