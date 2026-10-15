@@ -513,18 +513,150 @@
   @media(max-width:700px){.caminos-grid{grid-template-columns:1fr;gap:14px;}.camino{padding:28px 24px 26px;}.camino-name{font-size:1.35rem;}.camino-kicker{font-size:.6rem;letter-spacing:.18em;margin-bottom:14px;}.camino p{font-size:.94rem;}}
 
   /* ─── CONTACTO ─────────────────────────────────────────── */
-  /* ── Testimonio real ── */
-  .cita{background:var(--white);padding:clamp(72px,9vw,110px) 24px;text-align:center;}
-  .cita blockquote{max-width:760px;margin:0 auto;min-height:190px;display:flex;flex-direction:column;justify-content:center;transition:opacity .38s var(--ease);}
-  .cita blockquote.cita-out{opacity:0;}
-  .cita p{font-family:var(--font-display);font-style:italic;font-weight:400;font-size:clamp(1.2rem,2.4vw,1.6rem);line-height:1.5;color:var(--navy-dark);margin-bottom:18px;text-wrap:balance;}
-  .cita cite{font-style:normal;font-size:.64rem;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--gold-dark);}
-  .cita-more{background:none;border:none;cursor:pointer;font-family:var(--font-body);font-size:.62rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-dark);margin:-6px auto 16px;padding:4px 8px;border-bottom:1px solid rgba(138,117,71,.4);transition:color .2s;}
-  .cita-more:hover{color:var(--navy);}
-  .cita-dots{display:flex;gap:12px;justify-content:center;margin-top:26px;}
-  .cita-dot{width:8px;height:8px;padding:0;background:none;border:1.5px solid var(--gold-dark);transform:rotate(45deg);cursor:pointer;transition:background .25s;}
-  .cita-dot.on{background:var(--gold);border-color:var(--gold);}
-  @media(max-width:700px){.cita blockquote{min-height:260px;}}
+  /* ─── RESEÑAS (15/10/2026) ─────────────────────────────────
+     Debajo del hero. Las tarjetas salen de Supabase (tabla resenas: solo
+     publicadas y columnas públicas); el formulario deja la reseña como
+     pendiente y el equipo la publica desde admin-resenas.html. */
+  .resenas{background:var(--white);padding:clamp(72px,9vw,112px) 24px clamp(64px,8vw,96px);overflow:hidden;}
+  .resenas-in{max-width:1180px;margin:0 auto;}
+  .resenas-hd{display:grid;gap:26px;align-items:end;margin-bottom:clamp(26px,3.6vw,38px);}
+  @media(min-width:860px){.resenas-hd{grid-template-columns:1fr auto;gap:48px;}}
+  .resenas-hd h2{font-family:var(--font-display);font-weight:500;font-size:clamp(1.75rem,3.4vw,2.5rem);color:var(--navy);line-height:1.14;letter-spacing:-.01em;}
+  .resenas-sub{margin-top:12px;color:var(--text-mid);font-size:1rem;line-height:1.6;max-width:46ch;}
+  .rs-score{display:flex;align-items:center;gap:24px;flex-wrap:wrap;}
+  .rs-avg{display:flex;align-items:center;gap:14px;}
+  .rs-avg[hidden]{display:none;}
+  .rs-avg-n{font-family:var(--font-display);font-size:clamp(2.6rem,4.4vw,3.2rem);font-weight:500;color:var(--navy);line-height:1;font-feature-settings:"lnum" 1;}
+  .rs-avg-meta{display:flex;flex-direction:column;gap:7px;}
+  .rs-avg-l{font-size:.8rem;color:var(--text-mid);}
+  .rs-stars{display:inline-flex;gap:2px;color:var(--gold);line-height:0;}
+  .rs-stars svg{width:16px;height:16px;fill:currentColor;}
+  .rs-stars svg.off{fill:none;stroke:currentColor;stroke-width:1.5;opacity:.5;}
+  .rs-stars-avg{position:relative;display:inline-block;line-height:0;}
+  .rs-stars-avg .rs-stars + .rs-stars{position:absolute;inset:0 auto 0 0;overflow:hidden;white-space:nowrap;}
+  .rs-stars-avg svg{width:18px;height:18px;}
+  .rs-cta{display:inline-flex;align-items:center;gap:10px;background:var(--navy-deeper);color:var(--white);border:none;cursor:pointer;font-family:var(--font-body);font-size:.68rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;padding:17px 28px;min-height:48px;white-space:nowrap;transition:background .25s,transform .16s cubic-bezier(.23,1,.32,1);}
+  .rs-cta svg{width:15px;height:15px;stroke:var(--gold);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+  .rs-cta:hover{background:var(--navy);}
+  .rs-cta:active{transform:scale(.97);}
+
+  .rs-filtros{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px;}
+  .rs-filtros[hidden]{display:none;}
+  .rs-f{font-family:var(--font-body);font-size:.62rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;padding:0 16px;min-height:40px;border:1px solid rgba(42,58,82,.2);background:transparent;color:var(--navy);cursor:pointer;transition:background .2s,color .2s,border-color .2s;}
+  .rs-f span{opacity:.55;margin-left:5px;}
+  .rs-f[aria-pressed="true"]{background:var(--navy);color:var(--white);border-color:var(--navy);}
+  @media(hover:hover){.rs-f:hover:not([aria-pressed="true"]){border-color:var(--navy);}}
+
+  .rs-track{display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding:4px 2px 10px;overscroll-behavior-x:contain;}
+  .rs-track::-webkit-scrollbar{display:none;}
+  .rs-track:focus-visible{outline:2px solid var(--gold);outline-offset:4px;}
+  .rs-card{flex:0 0 calc((100% - 40px) / 3);scroll-snap-align:start;background:#fff;border:1px solid rgba(42,58,82,.1);padding:30px 28px 24px;display:flex;flex-direction:column;gap:16px;position:relative;transition:box-shadow .3s var(--ease),border-color .3s var(--ease);}
+  .rs-card::before{content:'';position:absolute;top:-1px;left:-1px;right:-1px;height:2px;background:var(--gold);transform:scaleX(0);transform-origin:left;transition:transform .45s var(--ease);}
+  @media(hover:hover){.rs-card:hover{box-shadow:0 22px 50px rgba(19,29,45,.1);}.rs-card:hover::before{transform:scaleX(1);}}
+  .rs-q{font-family:var(--font-display);font-style:italic;font-size:3.1rem;line-height:1;height:22px;color:var(--gold);overflow:visible;}
+  .rs-txt{font-size:.98rem;line-height:1.68;color:var(--text-dark);display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-line;}
+  .rs-track.abierta{align-items:flex-start;}   /* con una abierta, las demás no se estiran */
+  .rs-card.open .rs-txt{display:block;-webkit-line-clamp:unset;}
+  .rs-more{align-self:flex-start;background:none;border:none;border-bottom:1px solid rgba(138,117,71,.4);padding:4px 0;margin-top:-6px;cursor:pointer;font-family:var(--font-body);font-size:.6rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-dark);}
+  .rs-more:hover{color:var(--navy);}
+  .rs-trad{font-size:.76rem;color:var(--text-mid);margin-top:-4px;}
+  .rs-trad button{background:none;border:none;padding:0;font:inherit;color:var(--gold-dark);text-decoration:underline;text-underline-offset:3px;cursor:pointer;}
+  .rs-resp{border-left:2px solid var(--gold);padding:2px 0 2px 14px;}
+  .rs-resp b{display:block;font-size:.58rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-dark);margin-bottom:4px;}
+  .rs-resp p{font-size:.9rem;line-height:1.6;color:var(--text-mid);white-space:pre-line;}
+  .rs-who{margin-top:auto;display:flex;align-items:center;gap:12px;padding-top:18px;border-top:1px solid rgba(42,58,82,.08);}
+  .rs-ini{width:42px;height:42px;flex:none;display:grid;place-items:center;background:var(--navy);color:var(--gold-light);font-family:var(--font-display);font-size:1.1rem;}
+  .rs-name{font-weight:500;font-size:.96rem;color:var(--navy);line-height:1.3;}
+  .rs-meta{font-size:.8rem;color:var(--text-mid);line-height:1.4;}
+  .rs-ok{display:inline-flex;align-items:center;gap:5px;margin-top:3px;font-size:.56rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-dark);}
+  .rs-ok svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+  @media(max-width:1000px){.rs-card{flex-basis:calc((100% - 20px) / 2);}}
+  @media(max-width:640px){
+    .rs-track{margin:0 -24px;padding:4px 24px 10px;scroll-padding:0 24px;gap:12px;}
+    .rs-card{flex-basis:86%;padding:26px 22px 22px;}
+    .rs-cta{width:100%;justify-content:center;}
+    .rs-score{gap:18px;}
+    .rs-score .rs-cta{display:none;}               /* primero se leen, después se pide */
+    .rs-cta--pie{display:flex;margin-top:26px;}
+    .rs-filtros{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0 -24px 18px;padding:0 24px;}
+    .rs-filtros::-webkit-scrollbar{display:none;}
+    .rs-f{flex:none;padding:0 13px;letter-spacing:.12em;}
+  }
+  @media(min-width:641px){.rs-cta--pie{display:none;}}
+
+  .rs-nav{display:flex;align-items:center;gap:16px;margin-top:22px;}
+  .rs-nav[hidden]{display:none;}
+  .rs-prog{flex:1;height:2px;background:rgba(42,58,82,.1);position:relative;overflow:hidden;}
+  .rs-prog span{position:absolute;top:0;bottom:0;left:0;width:30%;background:var(--gold);will-change:transform;}
+  .rs-arr{width:46px;height:46px;flex:none;display:grid;place-items:center;background:transparent;border:1px solid rgba(42,58,82,.2);color:var(--navy);cursor:pointer;transition:background .2s,color .2s,border-color .2s;}
+  .rs-arr svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+  .rs-arr:hover:not(:disabled){background:var(--navy);border-color:var(--navy);color:var(--gold-light);}
+  .rs-arr:disabled{opacity:.3;cursor:default;}
+  @media(hover:none){.rs-arr{display:none;}}
+
+  .rs-nota{display:flex;gap:10px;align-items:flex-start;margin-top:26px;font-size:.86rem;line-height:1.55;color:var(--text-mid);max-width:660px;}
+  .rs-nota svg{width:18px;height:18px;flex:none;margin-top:1px;fill:none;stroke:var(--gold-dark);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+
+  /* Formulario (dialog) */
+  html.rs-lock{overflow:hidden;}
+  .rs-dlg{border:none;padding:0;margin:auto;width:min(560px,calc(100% - 32px));max-height:calc(100dvh - 32px);background:var(--white);color:var(--text-dark);box-shadow:0 40px 100px rgba(10,16,28,.45);overflow:auto;overscroll-behavior:contain;}
+  .rs-dlg::backdrop{background:rgba(19,29,45,.74);}
+  .rs-dlg[open]{animation:rsIn .4s var(--ease);}
+  @keyframes rsIn{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:none;}}
+  .rs-dlg-hd{background:var(--navy-deeper);color:var(--white);padding:28px 64px 26px 28px;position:relative;border-bottom:1px solid var(--gold);}
+  .rs-dlg-hd .sec-eyebrow{margin-bottom:0;}
+  .rs-dlg-hd h3:focus{outline:none;}
+  .rs-dlg-hd h3{font-family:var(--font-display);font-weight:500;font-size:1.7rem;line-height:1.15;margin-top:10px;}
+  .rs-dlg-hd p{color:rgba(255,255,255,.72);font-size:.94rem;line-height:1.5;margin-top:8px;}
+  .rs-x{position:absolute;top:10px;right:10px;width:46px;height:46px;display:grid;place-items:center;background:none;border:none;color:rgba(255,255,255,.75);cursor:pointer;}
+  .rs-x:hover{color:var(--gold-light);}
+  .rs-x svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;}
+  .rs-form{padding:26px 28px 30px;display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  .rs-form[hidden]{display:none;}
+  .rs-fld{display:flex;flex-direction:column;gap:7px;min-width:0;border:none;padding:0;margin:0;}
+  .rs-fld.full{grid-column:1 / -1;}
+  .rs-lbl{font-size:.6rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--navy);padding:0;}
+  .rs-lbl small{font-size:inherit;font-weight:400;letter-spacing:.08em;text-transform:none;color:var(--text-mid);}
+  .rs-fld input,.rs-fld select,.rs-fld textarea{font-family:var(--font-body);font-size:16px;font-weight:400;padding:13px 14px;background:#fff;border:1px solid rgba(42,58,82,.22);border-radius:0;color:var(--text-dark);width:100%;transition:border-color .2s,box-shadow .2s;}
+  .rs-fld input:focus,.rs-fld select:focus,.rs-fld textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(194,169,104,.2);}
+  .rs-fld [aria-invalid="true"]{border-color:#A33A3A;}
+  .rs-fld textarea{min-height:128px;resize:vertical;line-height:1.55;}
+  .rs-fld select{appearance:none;-webkit-appearance:none;cursor:pointer;padding-right:40px;
+    background:#fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M0 0l5 6 5-6z' fill='%232A3A52'/></svg>") no-repeat right 15px center;}
+  .rs-hint{font-size:.78rem;color:var(--text-mid);line-height:1.45;}
+  .rs-rate{display:flex;align-items:center;flex-wrap:wrap;margin-left:-5px;}
+  .rs-rate input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none;}
+  .rs-rate label{padding:5px;cursor:pointer;line-height:0;}
+  .rs-rate svg{width:36px;height:36px;fill:transparent;stroke:var(--gold);stroke-width:1.2;transition:fill .15s,transform .16s cubic-bezier(.23,1,.32,1);}
+  .rs-rate label.on svg{fill:var(--gold);}
+  .rs-rate label:active svg{transform:scale(.9);}
+  .rs-rate input:focus-visible + label{outline:2px solid var(--gold);outline-offset:1px;}
+  .rs-rate-w{margin-left:8px;font-family:var(--font-display);font-style:italic;font-size:1.08rem;color:var(--gold-dark);min-width:7ch;}
+  .rs-check{display:flex;flex-direction:row;gap:11px;align-items:flex-start;font-size:.88rem;line-height:1.5;color:var(--text-dark);cursor:pointer;}
+  .rs-check input{width:20px;height:20px;margin-top:1px;flex:none;accent-color:var(--navy);}
+  .rs-hp{position:absolute!important;left:-10000px!important;width:1px;height:1px;overflow:hidden;}
+  .rs-send{grid-column:1 / -1;background:var(--navy-deeper);color:var(--white);border:none;cursor:pointer;font-family:var(--font-body);font-size:.72rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;padding:19px;min-height:54px;transition:background .25s,transform .16s cubic-bezier(.23,1,.32,1);}
+  .rs-send:hover{background:var(--navy);}
+  .rs-send:active{transform:scale(.985);}
+  .rs-send:disabled{opacity:.6;cursor:wait;}
+  .rs-fine{grid-column:1 / -1;text-align:center;font-size:.78rem;color:var(--text-mid);margin-top:-6px;}
+  .rs-alert{grid-column:1 / -1;font-size:.86rem;line-height:1.45;color:#A33A3A;}
+  .rs-alert:empty{display:none;}
+  .rs-done{padding:46px 28px 42px;text-align:center;}
+  .rs-done[hidden]{display:none;}
+  .rs-done-ic{width:58px;height:58px;margin:0 auto 18px;display:grid;place-items:center;border:1px solid var(--gold);color:var(--gold-dark);}
+  .rs-done-ic svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+  .rs-done h3{font-family:var(--font-display);font-weight:500;font-size:1.7rem;color:var(--navy);line-height:1.2;}
+  .rs-done p{color:var(--text-mid);font-size:.98rem;line-height:1.6;max-width:36ch;margin:10px auto 26px;}
+  .rs-done .rs-send{display:inline-block;width:auto;padding:17px 40px;}
+  @media(max-width:560px){
+    .rs-dlg{width:100%;max-width:100%;height:100%;max-height:100%;margin:0;}
+    .rs-dlg-hd{padding:24px 60px 22px 20px;}
+    .rs-dlg-hd h3{font-size:1.5rem;}
+    .rs-form{grid-template-columns:1fr;padding:22px 20px 30px;gap:16px;}
+    .rs-rate svg{width:40px;height:40px;}
+  }
+  @media(prefers-reduced-motion:reduce){.rs-dlg[open]{animation:none;}}
   .contacto{padding:clamp(72px,10vw,120px) 24px;background:var(--navy-deeper);color:var(--white);position:relative;overflow:hidden;}
   .contacto::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 70% at 82% 8%,rgba(194,169,104,.09),transparent 60%);pointer-events:none;}
   .contacto-in{max-width:1080px;margin:0 auto;position:relative;display:grid;grid-template-columns:1fr;gap:48px;}
@@ -628,6 +760,7 @@
   </a>
   <div class="nav-links">
     <a href="catalogo.html" data-i18n="nav_alquilar">Alquilar</a>
+    <a href="#resenas" data-i18n="nav_resenas">Reseñas</a>
     <a href="#contacto" data-i18n="nav_contacto">Contacto</a>
   </div>
   <div class="lang-switch">
@@ -640,6 +773,7 @@
 
 <div class="mobile-menu" id="mobileMenu">
   <a href="catalogo.html" class="m-link" data-i18n="nav_alquilar">Alquilar</a>
+  <a href="#resenas" class="m-link" data-i18n="nav_resenas">Reseñas</a>
   <a href="#contacto" class="m-link" data-i18n="nav_contacto">Contacto</a>
 </div>
 
@@ -660,6 +794,396 @@
     </nav>
   </div>
 </section>
+
+<!-- RESEÑAS (15/10/2026). Reales, nunca inventadas: cada una pasa por el
+     equipo antes de salir (admin-resenas.html). Lee de Supabase; las cinco
+     históricas del vault van también acá como respaldo: se pintan al
+     instante y quedan si Supabase no responde. Textos en ES/PT/EN dentro
+     del script (data-rs), no en el diccionario general de la página. -->
+<section class="resenas" id="resenas" aria-labelledby="rsH">
+  <div class="resenas-in">
+    <div class="resenas-hd">
+      <div class="reveal">
+        <span class="sec-eyebrow eyebrow-gold" data-rs="eyebrow">Reseñas</span>
+        <h2 id="rsH" data-rs="h">Lo que dicen nuestros clientes.</h2>
+        <p class="resenas-sub" data-rs="sub">Inquilinos y propietarios que ya trabajaron con BAIREN, con sus palabras.</p>
+      </div>
+      <div class="rs-score reveal d1">
+        <div class="rs-avg" id="rsAvg" hidden>
+          <span class="rs-avg-n" id="rsAvgN"></span>
+          <span class="rs-avg-meta"><span class="rs-stars-avg" id="rsAvgStars"></span><span class="rs-avg-l" id="rsAvgL"></span></span>
+        </div>
+        <button class="rs-cta" type="button" data-rs-open><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4z"/></svg><span data-rs="cta">Dejar mi reseña</span></button>
+      </div>
+    </div>
+    <div class="rs-filtros" id="rsFiltros" hidden></div>
+    <div class="rs-track" id="rsTrack" tabindex="0" role="region" aria-labelledby="rsH"></div>
+    <div class="rs-nav" id="rsNav" hidden>
+      <div class="rs-prog" aria-hidden="true"><span id="rsProg"></span></div>
+      <button class="rs-arr" id="rsPrev" type="button" data-rs-aria="prev" aria-label="Reseñas anteriores"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <button class="rs-arr" id="rsNext" type="button" data-rs-aria="next" aria-label="Más reseñas"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
+    </div>
+    <button class="rs-cta rs-cta--pie" type="button" data-rs-open><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4z"/></svg><span data-rs="cta">Dejar mi reseña</span></button>
+    <p class="rs-nota"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg><span data-rs="nota">Cada reseña es de un cliente real: antes de publicarla confirmamos que alquiló o confió su propiedad a BAIREN. No editamos lo que escriben.</span></p>
+  </div>
+</section>
+
+<dialog class="rs-dlg" id="rsDlg" aria-labelledby="rsDlgH">
+  <div class="rs-dlg-hd">
+    <span class="sec-eyebrow eyebrow-goldlt" data-rs="dlg_eyebrow">Tu reseña</span>
+    <h3 id="rsDlgH" tabindex="-1" autofocus data-rs="dlg_h">Contanos cómo te fue.</h3>
+    <p data-rs="dlg_sub">Tu experiencia ayuda a quien está por decidir. Te lleva un minuto.</p>
+    <button class="rs-x" type="button" id="rsClose" data-rs-aria="close" aria-label="Cerrar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
+  <form class="rs-form" id="rsForm" novalidate>
+    <fieldset class="rs-fld full">
+      <legend class="rs-lbl" data-rs="f_rate">Tu calificación</legend>
+      <div class="rs-rate" id="rsRate"></div>
+    </fieldset>
+    <div class="rs-fld full">
+      <label class="rs-lbl" for="rsTxt" data-rs="f_txt">Tu reseña</label>
+      <textarea id="rsTxt" name="texto" maxlength="2000" data-rs-ph="ph_txt" placeholder="¿Cómo fue alquilar o trabajar con BAIREN? Contalo con tus palabras."></textarea>
+    </div>
+    <div class="rs-fld">
+      <label class="rs-lbl" for="rsNom" data-rs="f_nom">Nombre</label>
+      <input id="rsNom" name="nombre" type="text" maxlength="40" autocomplete="given-name">
+    </div>
+    <div class="rs-fld">
+      <label class="rs-lbl" for="rsApe"><span data-rs="f_ape">Apellido</span> <small data-rs="hint_ape">Publicamos solo la inicial.</small></label>
+      <input id="rsApe" name="apellido" type="text" maxlength="40" autocomplete="family-name">
+    </div>
+    <div class="rs-fld">
+      <label class="rs-lbl" for="rsRol" data-rs="f_rol">Soy</label>
+      <select id="rsRol" name="rol"></select>
+    </div>
+    <div class="rs-fld">
+      <label class="rs-lbl" for="rsBarrio" data-rs="f_barrio">Barrio</label>
+      <select id="rsBarrio" name="barrio"></select>
+    </div>
+    <div class="rs-fld full">
+      <label class="rs-lbl" for="rsCont" data-rs="f_cont">Teléfono o email</label>
+      <input id="rsCont" name="contacto" type="text" maxlength="120" autocomplete="email" aria-describedby="rsContHint">
+      <span class="rs-hint" id="rsContHint" data-rs="hint_cont">No se publica. Lo usamos solo para confirmar que sos cliente.</span>
+    </div>
+    <div class="rs-hp" aria-hidden="true"><label>Web <input name="website" type="text" tabindex="-1" autocomplete="off"></label></div>
+    <label class="rs-check rs-fld full"><input type="checkbox" name="consent" id="rsConsent"><span data-rs="consent">Acepto que BAIREN publique mi reseña con mi nombre y la inicial de mi apellido.</span></label>
+    <p class="rs-alert" id="rsAlert" role="alert"></p>
+    <button class="rs-send" type="submit" id="rsSend" data-rs="send">Enviar reseña</button>
+    <p class="rs-fine" data-rs="fine">Revisamos cada reseña antes de publicarla.</p>
+  </form>
+  <div class="rs-done" id="rsDone" hidden>
+    <div class="rs-done-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+    <h3 id="rsDoneH"></h3>
+    <p data-rs="done_p">Recibimos tu reseña. Confirmamos que sos cliente y la publicamos en los próximos días.</p>
+    <button class="rs-send" type="button" id="rsDoneClose" data-rs="close">Cerrar</button>
+  </div>
+</dialog>
+
+<script>
+(function(){
+  var I={
+   es:{eyebrow:'Reseñas',h:'Lo que dicen nuestros clientes.',sub:'Inquilinos y propietarios que ya trabajaron con BAIREN, con sus palabras.',
+    cta:'Dejar mi reseña',avg_l:'Promedio de {n} calificaciones',f_all:'Todas',f_inq:'Inquilinos',f_prop:'Propietarios',
+    nota:'Cada reseña es de un cliente real: antes de publicarla confirmamos que alquiló o confió su propiedad a BAIREN. No editamos lo que escriben.',
+    verif:'Cliente verificado',more:'Ver más',less:'Ver menos',trad:'Traducido del {l}',orig:'Ver original',back:'Ver traducción',
+    l_es:'español',l_pt:'portugués',l_en:'inglés',resp:'Respuesta de BAIREN',prev:'Reseñas anteriores',next:'Más reseñas',
+    roles:{inquilino:'Inquilino',inquilina:'Inquilina',propietario:'Propietario',propietaria:'Propietaria'},
+    rolOpts:[['inquilino','Inquilino'],['inquilina','Inquilina'],['propietario','Propietario'],['propietaria','Propietaria']],
+    stars:'{n} de 5 estrellas',star1:'1 estrella',starN:'{n} estrellas',
+    dlg_eyebrow:'Tu reseña',dlg_h:'Contanos cómo te fue.',dlg_sub:'Tu experiencia ayuda a quien está por decidir. Te lleva un minuto.',
+    f_rate:'Tu calificación',words:['','Mala','Regular','Buena','Muy buena','Excelente'],f_txt:'Tu reseña',
+    ph_txt:'¿Cómo fue alquilar o trabajar con BAIREN? Contalo con tus palabras.',f_nom:'Nombre',f_ape:'Apellido',hint_ape:'Publicamos solo la inicial.',
+    f_rol:'Soy',rol_ph:'Elegí una opción',f_barrio:'Barrio',barrio_ph:'Prefiero no decir',barrio_otro:'Otro',
+    f_cont:'Teléfono o email',hint_cont:'No se publica. Lo usamos solo para confirmar que sos cliente.',
+    consent:'Acepto que BAIREN publique mi reseña con mi nombre y la inicial de mi apellido.',send:'Enviar reseña',sending:'Enviando…',
+    fine:'Revisamos cada reseña antes de publicarla.',e_rate:'Elegí de 1 a 5 estrellas.',e_txt:'Contanos un poco más (mínimo 20 caracteres).',
+    e_nom:'Escribí tu nombre.',e_rol:'Elegí si sos inquilino o propietario.',e_cont:'Dejanos un teléfono o email para confirmar que sos cliente.',
+    e_consent:'Necesitamos tu permiso para publicarla.',e_send:'No se pudo enviar. Probá de nuevo o escribinos por WhatsApp.',
+    done_h:'¡Gracias, {n}!',done_p:'Recibimos tu reseña. Confirmamos que sos cliente y la publicamos en los próximos días.',close:'Cerrar'},
+   pt:{eyebrow:'Avaliações',h:'O que dizem nossos clientes.',sub:'Inquilinos e proprietários que já trabalharam com a BAIREN, com as próprias palavras.',
+    cta:'Deixar minha avaliação',avg_l:'Média de {n} avaliações',f_all:'Todas',f_inq:'Inquilinos',f_prop:'Proprietários',
+    nota:'Cada avaliação é de um cliente real: antes de publicá-la confirmamos que alugou ou confiou seu imóvel à BAIREN. Não editamos o que escrevem.',
+    verif:'Cliente verificado',more:'Ver mais',less:'Ver menos',trad:'Traduzido do {l}',orig:'Ver original',back:'Ver tradução',
+    l_es:'espanhol',l_pt:'português',l_en:'inglês',resp:'Resposta da BAIREN',prev:'Avaliações anteriores',next:'Mais avaliações',
+    roles:{inquilino:'Inquilino',inquilina:'Inquilina',propietario:'Proprietário',propietaria:'Proprietária'},
+    rolOpts:[['inquilino','Inquilino'],['inquilina','Inquilina'],['propietario','Proprietário'],['propietaria','Proprietária']],
+    stars:'{n} de 5 estrelas',star1:'1 estrela',starN:'{n} estrelas',
+    dlg_eyebrow:'Sua avaliação',dlg_h:'Conte como foi.',dlg_sub:'Sua experiência ajuda quem está decidindo. Leva um minuto.',
+    f_rate:'Sua nota',words:['','Ruim','Regular','Boa','Muito boa','Excelente'],f_txt:'Sua avaliação',
+    ph_txt:'Como foi alugar ou trabalhar com a BAIREN? Conte com suas palavras.',f_nom:'Nome',f_ape:'Sobrenome',hint_ape:'Publicamos só a inicial.',
+    f_rol:'Sou',rol_ph:'Escolha uma opção',f_barrio:'Bairro',barrio_ph:'Prefiro não dizer',barrio_otro:'Outro',
+    f_cont:'Telefone ou e-mail',hint_cont:'Não é publicado. Usamos só para confirmar que você é cliente.',
+    consent:'Aceito que a BAIREN publique minha avaliação com meu nome e a inicial do meu sobrenome.',send:'Enviar avaliação',sending:'Enviando…',
+    fine:'Revisamos cada avaliação antes de publicá-la.',e_rate:'Escolha de 1 a 5 estrelas.',e_txt:'Conte um pouco mais (mínimo 20 caracteres).',
+    e_nom:'Escreva seu nome.',e_rol:'Escolha se é inquilino ou proprietário.',e_cont:'Deixe um telefone ou e-mail para confirmarmos que você é cliente.',
+    e_consent:'Precisamos da sua permissão para publicá-la.',e_send:'Não foi possível enviar. Tente de novo ou escreva pelo WhatsApp.',
+    done_h:'Obrigado, {n}!',done_p:'Recebemos sua avaliação. Confirmamos que você é cliente e a publicamos nos próximos dias.',close:'Fechar'},
+   en:{eyebrow:'Reviews',h:'What our clients say.',sub:'Tenants and owners who have worked with BAIREN, in their own words.',
+    cta:'Leave a review',avg_l:'Average of {n} ratings',f_all:'All',f_inq:'Tenants',f_prop:'Owners',
+    nota:'Every review comes from a real client: before publishing it we confirm they rented or entrusted their property to BAIREN. We never edit what they write.',
+    verif:'Verified client',more:'Read more',less:'Read less',trad:'Translated from {l}',orig:'See original',back:'See translation',
+    l_es:'Spanish',l_pt:'Portuguese',l_en:'English',resp:'Reply from BAIREN',prev:'Previous reviews',next:'More reviews',
+    roles:{inquilino:'Tenant',inquilina:'Tenant',propietario:'Owner',propietaria:'Owner'},
+    rolOpts:[['inquilino','Tenant'],['propietario','Owner']],
+    stars:'{n} out of 5 stars',star1:'1 star',starN:'{n} stars',
+    dlg_eyebrow:'Your review',dlg_h:'Tell us how it went.',dlg_sub:'Your experience helps people who are about to decide. It takes a minute.',
+    f_rate:'Your rating',words:['','Poor','Fair','Good','Very good','Excellent'],f_txt:'Your review',
+    ph_txt:'How was renting or working with BAIREN? Tell us in your own words.',f_nom:'First name',f_ape:'Last name',hint_ape:'We only publish the initial.',
+    f_rol:'I am',rol_ph:'Choose an option',f_barrio:'Neighbourhood',barrio_ph:'Prefer not to say',barrio_otro:'Other',
+    f_cont:'Phone or email',hint_cont:'Not published. We only use it to confirm you are a client.',
+    consent:'I agree that BAIREN may publish my review with my first name and last initial.',send:'Send review',sending:'Sending…',
+    fine:'We review every submission before publishing it.',e_rate:'Choose 1 to 5 stars.',e_txt:'Tell us a bit more (at least 20 characters).',
+    e_nom:'Write your name.',e_rol:'Choose tenant or owner.',e_cont:'Leave a phone or email so we can confirm you are a client.',
+    e_consent:'We need your permission to publish it.',e_send:'Could not send. Try again or message us on WhatsApp.',
+    done_h:'Thank you, {n}!',done_p:'We received your review. We will confirm you are a client and publish it in the next few days.',close:'Close'}
+  };
+  var BARRIOS=['Belgrano','Núñez','Palermo','Recoleta','Puerto Madero','Colegiales','Villa Crespo','Retiro','GBA Norte'];
+  /* Respaldo: las cinco históricas (vault: Testimonios Reales), iguales a las de la base */
+  var RESPALDO=[
+   {nombre_publico:'Marcela R.',rol:'propietaria',idioma:'es',verificada:true,origen:'historico',
+    texto:'La verdad, nos solucionaron todo. Respondieron todas las dudas sin importar la hora. Nos dieron la confianza que necesitábamos. Son unos genios.',
+    traducciones:{pt:'Resolveram tudo para nós, de verdade. Responderam todas as dúvidas a qualquer hora. Nos deram a confiança que precisávamos. Vocês são geniais.',en:'They truly solved everything for us. They answered every question no matter the hour. They gave us the confidence we needed. They are brilliant.'}},
+   {nombre_publico:'Tadeo T.',rol:'inquilino',idioma:'es',verificada:true,origen:'historico',
+    texto:'Hasta la fecha son los que mejor trato me han dado. Más que sorprendido y agradecido.',
+    traducciones:{pt:'Até hoje são os que melhor atendimento me deram. Mais que surpreendido e agradecido.',en:'To this day they have given me the best treatment. More than surprised and grateful.'}},
+   {nombre_publico:'Oscar',rol:'propietario',idioma:'es',verificada:true,origen:'historico',
+    texto:'Muy satisfecho con la atención y el trabajo. Nunca tuve ningún problema, y los recomendaría sin dudar.',
+    traducciones:{pt:'Muito satisfeito com a atenção e o trabalho. Nunca tive nenhum problema, e os recomendaria sem hesitar.',en:'Very satisfied with the attention and the work. I never had a single problem, and I would recommend them without hesitation.'}},
+   {nombre_publico:'Catalina',rol:'inquilina',idioma:'es',verificada:true,origen:'historico',
+    texto:'Mi experiencia ha sido excelente. Estuvieron pendientes de todo el proceso: desde la coordinación para ver el departamento, mostrarnos varias veces, hasta el proceso de reserva, súper sencillo. Ahora que ya estamos en el departamento también han sido un apoyo cuando tuvimos dudas.',
+    traducciones:{pt:'Minha experiência foi excelente. Estiveram atentos a todo o processo: desde a coordenação para ver o apartamento, nos mostrar várias vezes, até o processo de reserva, super simples. Agora que já estamos no apartamento também têm sido um apoio quando tivemos dúvidas.',en:'My experience has been excellent. They were on top of the whole process: from coordinating the viewing, showing us the apartment several times, to the reservation process, super simple. Now that we are in the apartment they have also been a support whenever we had questions.'}},
+   {nombre_publico:'María Eugenia',rol:'inquilina',idioma:'es',verificada:true,origen:'historico',
+    texto:'Quiero compartir mi excelente experiencia con BAIREN durante el alquiler de la primera vivienda de mi hija. Desde el primer momento recibimos una atención profesional, clara y cercana. Quiero destacar especialmente el trabajo de Julián y de todo su equipo, que estuvieron siempre disponibles para responder nuevas consultas, acompañarnos en cada etapa del proceso y hacer que todo fuera ágil, simple y transparente. Una vez iniciado el contrato, el acompañamiento continuó: se preocuparon por hacer un seguimiento para saber si estaba todo bien en la vivienda y si mi hija necesitaba algo, un gesto que demuestra un verdadero compromiso con las personas y no solo con la operación. Saber que la primera experiencia de mi hija alquilando su propio hogar estuvo acompañada por un equipo tan comprometido nos dio mucha tranquilidad. Sin dudas recomiendo a BAIREN a quienes busquen una inmobiliaria seria, confiable y con una atención de excelencia.',
+    traducciones:{pt:'Quero compartilhar minha excelente experiência com o BAIREN durante o aluguel da primeira moradia da minha filha. Desde o primeiro momento recebemos um atendimento profissional, claro e próximo. Quero destacar especialmente o trabalho de Julián e de toda a sua equipe, que estiveram sempre disponíveis para responder novas consultas, nos acompanhar em cada etapa do processo e fazer com que tudo fosse ágil, simples e transparente. Uma vez iniciado o contrato, o acompanhamento continuou: se preocuparam em fazer um seguimento para saber se estava tudo bem na moradia e se minha filha precisava de algo, um gesto que demonstra um verdadeiro compromisso com as pessoas e não só com a operação. Saber que a primeira experiência da minha filha alugando o próprio lar esteve acompanhada por uma equipe tão comprometida nos deu muita tranquilidade. Sem dúvidas recomendo o BAIREN a quem busca uma imobiliária séria, confiável e com um atendimento de excelência.',en:'I want to share my excellent experience with BAIREN during the rental of my daughter\'s first home. From the very first moment we received professional, clear and warm attention. I especially want to highlight the work of Julián and his whole team, who were always available to answer new questions, walk with us through every stage of the process and make everything agile, simple and transparent. Once the contract started, the support continued: they followed up to make sure everything was fine in the home and whether my daughter needed anything, a gesture that shows a true commitment to people and not just to the deal. Knowing that my daughter\'s first experience renting her own home was accompanied by such a committed team gave us great peace of mind. I recommend BAIREN without hesitation to anyone looking for a serious, trustworthy agency with excellent service.'}}
+  ];
+  var COLS='id,creada_en,nombre_publico,rol,estrellas,texto,barrio,idioma,traducciones,verificada,respuesta,publicada_en,origen';
+  var STAR='<svg viewBox="0 0 24 24"%C><path d="M12 2.6l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.4l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/></svg>';
+  var CHECK='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>';
+
+  var lista=RESPALDO, filtro='todas', estrellas=0, abiertoEn=0;
+  var $=function(id){return document.getElementById(id);};
+  var track=$('rsTrack'), nav=$('rsNav'), prog=$('rsProg'), prev=$('rsPrev'), next=$('rsNext'),
+      filtros=$('rsFiltros'), dlg=$('rsDlg'), form=$('rsForm'), done=$('rsDone'), alertEl=$('rsAlert'), send=$('rsSend');
+
+  function lang(){ return I[window.BAIREN_LANG] ? window.BAIREN_LANG : 'es'; }
+  function t(k,n){ var v=I[lang()][k]; if(v==null) v=I.es[k]; return n!=null&&typeof v==='string' ? v.replace('{n}',n) : v; }
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+  function stars(n,cls){ var h=''; for(var k=1;k<=5;k++) h+=STAR.replace('%C', k>n&&cls!=='full' ? ' class="off"' : ''); return h; }
+  function esInq(r){ return r.rol==='inquilino'||r.rol==='inquilina'; }
+  function fecha(r){
+    if(r.origen==='historico') return '';
+    var d=new Date(r.publicada_en||r.creada_en); if(isNaN(d)) return '';
+    var loc=lang()==='pt'?'pt-BR':lang()==='en'?'en-GB':'es-AR';
+    try{ return d.toLocaleDateString(loc,{month:'long',year:'numeric'}); }catch(_){ return ''; }
+  }
+
+  /* ── Textos fijos ── */
+  function pintarTextos(){
+    document.querySelectorAll('[data-rs]').forEach(function(el){ el.textContent=t(el.getAttribute('data-rs')); });
+    document.querySelectorAll('[data-rs-ph]').forEach(function(el){ el.setAttribute('placeholder',t(el.getAttribute('data-rs-ph'))); });
+    document.querySelectorAll('[data-rs-aria]').forEach(function(el){ el.setAttribute('aria-label',t(el.getAttribute('data-rs-aria'))); });
+    var rol=$('rsRol'), v=rol.value;
+    rol.innerHTML='<option value="">'+esc(t('rol_ph'))+'</option>'+t('rolOpts').map(function(o){return '<option value="'+o[0]+'">'+esc(o[1])+'</option>';}).join('');
+    rol.value=v && rol.querySelector('option[value="'+v+'"]') ? v : (v==='inquilina'?'inquilino':v==='propietaria'?'propietario':'');
+    var bar=$('rsBarrio'), bv=bar.value;
+    bar.innerHTML='<option value="">'+esc(t('barrio_ph'))+'</option>'+BARRIOS.map(function(b){return '<option>'+esc(b)+'</option>';}).join('')+'<option value="">'+esc(t('barrio_otro'))+'</option>';
+    bar.value=bv;
+    var rate=$('rsRate'), h='';
+    for(var k=1;k<=5;k++) h+='<input type="radio" name="estrellas" id="rsS'+k+'" value="'+k+'"'+(estrellas===k?' checked':'')+'><label for="rsS'+k+'" data-n="'+k+'" aria-label="'+esc(k===1?t('star1'):t('starN',k))+'">'+STAR.replace('%C',' aria-hidden="true"')+'</label>';
+    rate.innerHTML=h+'<span class="rs-rate-w" id="rsRateW" aria-hidden="true"></span>';
+    marcar(estrellas);
+  }
+  function marcar(n){
+    document.querySelectorAll('#rsRate label').forEach(function(l){ l.classList.toggle('on', +l.getAttribute('data-n')<=n); });
+    var w=$('rsRateW'); if(w) w.textContent=n?t('words')[n]:'';
+  }
+
+  /* ── Tarjetas ── */
+  function tarjeta(r,i){
+    var L=lang(), tr=(r.idioma!==L && r.traducciones && r.traducciones[L]) ? r.traducciones[L] : null;
+    var top=r.estrellas ? '<span class="rs-stars" role="img" aria-label="'+esc(t('stars',r.estrellas))+'">'+stars(r.estrellas)+'</span>' : '<span class="rs-q" aria-hidden="true">“</span>';
+    var meta=[t('roles')[r.rol]||'', r.barrio||'', fecha(r)].filter(Boolean).join(' · ');
+    return '<article class="rs-card" data-i="'+i+'">'+top+
+      '<p class="rs-txt">'+esc(tr||r.texto)+'</p>'+
+      '<button class="rs-more" type="button" hidden>'+esc(t('more'))+'</button>'+
+      (tr ? '<p class="rs-trad">'+esc(t('trad').replace('{l}',t('l_'+r.idioma)))+' · <button type="button" class="rs-orig">'+esc(t('orig'))+'</button></p>' : '')+
+      (r.respuesta ? '<div class="rs-resp"><b>'+esc(t('resp'))+'</b><p>'+esc(r.respuesta)+'</p></div>' : '')+
+      '<div class="rs-who"><span class="rs-ini" aria-hidden="true">'+esc((r.nombre_publico||'?').charAt(0).toUpperCase())+'</span>'+
+      '<div><div class="rs-name">'+esc(r.nombre_publico)+'</div><div class="rs-meta">'+esc(meta)+'</div>'+
+      (r.verificada ? '<span class="rs-ok">'+CHECK+esc(t('verif'))+'</span>' : '')+'</div></div></article>';
+  }
+  function visibles(){ return lista.filter(function(r){ return filtro==='todas' || (filtro==='inq')===esInq(r); }); }
+  function pintar(){
+    var v=visibles();
+    track.innerHTML=v.map(function(r){ return tarjeta(r, lista.indexOf(r)); }).join('');
+    track.classList.remove('abierta');
+    track.scrollLeft=0;
+    medir(); pintarPromedio(); pintarFiltros(); nav_();
+  }
+  function medir(){
+    track.querySelectorAll('.rs-card').forEach(function(c){
+      if(c.classList.contains('open')) return;
+      var p=c.querySelector('.rs-txt'), b=c.querySelector('.rs-more');
+      b.hidden = p.scrollHeight <= p.clientHeight+2;
+    });
+  }
+  function pintarPromedio(){
+    var cal=lista.filter(function(r){return r.estrellas;}), box=$('rsAvg');
+    if(cal.length<3){ box.hidden=true; return; }
+    var avg=cal.reduce(function(s,r){return s+r.estrellas;},0)/cal.length;
+    var txt=avg.toFixed(1); if(lang()!=='en') txt=txt.replace('.',',');
+    $('rsAvgN').textContent=txt;
+    var st=$('rsAvgStars');
+    st.innerHTML='<span class="rs-stars">'+stars(0)+'</span><span class="rs-stars" style="width:'+(avg/5*100).toFixed(1)+'%">'+stars(5,'full')+'</span>';
+    st.setAttribute('role','img'); st.setAttribute('aria-label',t('stars',txt));
+    $('rsAvgL').textContent=t('avg_l',cal.length);
+    box.hidden=false;
+  }
+  function pintarFiltros(){
+    var ni=lista.filter(esInq).length, np=lista.length-ni;
+    if(lista.length<4 || !ni || !np){ filtros.hidden=true; return; }
+    var b=function(k,lbl,n){ return '<button class="rs-f" type="button" data-f="'+k+'" aria-pressed="'+(filtro===k)+'">'+esc(lbl)+'<span>'+n+'</span></button>'; };
+    filtros.innerHTML=b('todas',t('f_all'),lista.length)+b('inq',t('f_inq'),ni)+b('prop',t('f_prop'),np);
+    filtros.hidden=false;
+  }
+  var raf=0;
+  function nav_(){
+    cancelAnimationFrame(raf);
+    raf=requestAnimationFrame(function(){
+      var sw=track.scrollWidth, cw=track.clientWidth, max=sw-cw;
+      nav.hidden = max<=2;
+      if(max<=2) return;
+      var w=cw/sw, p=Math.min(1,Math.max(0,track.scrollLeft/max));
+      prog.style.width=(w*100)+'%';
+      prog.style.transform='translateX('+(p*(1-w)/w*100)+'%)';
+      prev.disabled = track.scrollLeft<=2;
+      next.disabled = track.scrollLeft>=max-2;
+    });
+  }
+  function paso(dir){
+    var c=track.querySelector('.rs-card'); if(!c) return;
+    var gap=parseFloat(getComputedStyle(track).columnGap)||20;
+    var porVista=Math.max(1,Math.round(track.clientWidth/(c.offsetWidth+gap)));
+    track.scrollBy({left:dir*porVista*(c.offsetWidth+gap),behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+  }
+  track.addEventListener('scroll',nav_,{passive:true});
+  prev.addEventListener('click',function(){paso(-1);});
+  next.addEventListener('click',function(){paso(1);});
+  var rz=0; addEventListener('resize',function(){ clearTimeout(rz); rz=setTimeout(function(){ medir(); nav_(); },150); });
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ medir(); nav_(); });
+  filtros.addEventListener('click',function(e){
+    var b=e.target.closest('.rs-f'); if(!b) return;
+    filtro=b.getAttribute('data-f'); pintar();
+  });
+  track.addEventListener('click',function(e){
+    var c=e.target.closest('.rs-card'); if(!c) return;
+    var r=lista[+c.getAttribute('data-i')];
+    if(e.target.closest('.rs-more')){
+      var o=c.classList.toggle('open');
+      track.classList.toggle('abierta', !!track.querySelector('.rs-card.open'));
+      e.target.closest('.rs-more').textContent=t(o?'less':'more');
+      nav_();
+    } else if(e.target.closest('.rs-orig')){
+      var b=e.target.closest('.rs-orig'), p=c.querySelector('.rs-txt'), orig=b.getAttribute('data-o')!=='1';
+      p.textContent = orig ? r.texto : r.traducciones[lang()];
+      b.setAttribute('data-o', orig?'1':'0');
+      b.textContent=t(orig?'back':'orig');
+      if(!c.classList.contains('open')) medir();
+    }
+  });
+
+  /* ── Datos ── */
+  pintarTextos(); pintar();
+  if(window.bairenReady){
+    window.bairenReady.then(function(sb){
+      return sb.from('resenas').select(COLS)
+        .order('publicada_en',{ascending:false,nullsFirst:false})
+        .order('creada_en',{ascending:false}).limit(60);
+    }).then(function(res){
+      if(res.error) throw res.error;
+      if(res.data && res.data.length){ lista=res.data; pintar(); }
+    }).catch(function(e){ console.warn('[resenas] quedan las de respaldo:',e&&e.message||e); });
+  }
+  document.addEventListener('bairen:lang',function(){ pintarTextos(); pintar(); if(!done.hidden) $('rsDoneH').textContent=t('done_h',primerNombre()); });
+
+  /* ── Formulario ── */
+  function abrir(){
+    if(dlg.open) return;
+    alertEl.textContent='';
+    if(typeof dlg.showModal==='function') dlg.showModal(); else dlg.setAttribute('open','');
+    document.documentElement.classList.add('rs-lock');
+    $('rsDlgH').focus();
+    abiertoEn=Date.now();
+  }
+  function cerrar(){ if(dlg.open){ if(dlg.close) dlg.close(); else { dlg.removeAttribute('open'); alCerrar(); } } }
+  function alCerrar(){
+    document.documentElement.classList.remove('rs-lock');
+    if(!done.hidden){ form.reset(); estrellas=0; marcar(0); form.hidden=false; done.hidden=true; send.disabled=false; send.textContent=t('send'); }
+  }
+  dlg.addEventListener('close',alCerrar);
+  dlg.addEventListener('click',function(e){ if(e.target===dlg) cerrar(); });
+  $('rsClose').addEventListener('click',cerrar);
+  $('rsDoneClose').addEventListener('click',cerrar);
+  document.addEventListener('click',function(e){
+    var a=e.target.closest('[data-rs-open]'); if(!a) return;
+    e.preventDefault(); abrir();
+  });
+  var rate=$('rsRate');
+  rate.addEventListener('change',function(e){ if(e.target.name==='estrellas'){ estrellas=+e.target.value; marcar(estrellas); } });
+  rate.addEventListener('mouseover',function(e){ var l=e.target.closest('label'); if(l) marcar(+l.getAttribute('data-n')); });
+  rate.addEventListener('mouseleave',function(){ marcar(estrellas); });
+
+  function primerNombre(){ return ($('rsNom').value||'').trim().split(/\s+/)[0]; }
+  function mal(el,k){
+    alertEl.textContent=t(k);
+    if(el){ el.setAttribute('aria-invalid','true'); el.focus(); }
+    return false;
+  }
+  form.addEventListener('input',function(e){ e.target.removeAttribute('aria-invalid'); });
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    alertEl.textContent='';
+    var f=form.elements, txt=f.texto.value.trim(), nom=f.nombre.value.trim(), cont=f.contacto.value.trim();
+    if(f.website.value || Date.now()-abiertoEn<4000){ mostrarGracias(); return; }   /* robots */
+    if(!estrellas) return mal($('rsS1'),'e_rate');
+    if(txt.length<20) return mal(f.texto,'e_txt');
+    if(nom.length<2) return mal(f.nombre,'e_nom');
+    if(!f.rol.value) return mal(f.rol,'e_rol');
+    if(cont.length<6) return mal(f.contacto,'e_cont');
+    if(!f.consent.checked) return mal(f.consent,'e_consent');
+    var fila={nombre:nom, apellido:f.apellido.value.trim()||null, rol:f.rol.value, estrellas:estrellas,
+              texto:txt, barrio:f.barrio.value||null, idioma:lang(), contacto:cont};
+    send.disabled=true; send.textContent=t('sending');
+    window.bairenReady.then(function(sb){ return sb.from('resenas').insert(fila); })
+      .then(function(res){ if(res.error) throw res.error; avisar(fila); mostrarGracias(); })
+      .catch(function(err){
+        console.warn('[resenas] no se guardó:',err&&err.message||err);
+        send.disabled=false; send.textContent=t('send'); alertEl.textContent=t('e_send');
+      });
+  });
+  function mostrarGracias(){
+    $('rsDoneH').textContent=t('done_h',primerNombre()||'');
+    form.hidden=true; done.hidden=false; dlg.scrollTop=0;
+    $('rsDoneClose').focus();
+  }
+  /* Aviso al equipo por el mismo Formspree del contacto: la reseña queda pendiente en el admin */
+  function avisar(f){
+    try{
+      var fd=new FormData();
+      fd.append('_subject','RESEÑA NUEVA ('+f.estrellas+'/5) — publicarla en bairengroup.com/admin-resenas.html');
+      fd.append('nombre',f.nombre+(f.apellido?' '+f.apellido:''));
+      fd.append('soy',f.rol); fd.append('estrellas',f.estrellas+' de 5');
+      fd.append('resena',f.texto); fd.append('contacto',f.contacto); fd.append('barrio',f.barrio||'—');
+      fetch('https://formspree.io/f/xykrypqo',{method:'POST',body:fd,headers:{'Accept':'application/json'}}).catch(function(){});
+    }catch(_){}
+  }
+
+  /* bairengroup.com/resena (o ?resena) abre el formulario directo: es el link que manda el equipo */
+  if(/[?&]resena\b/.test(location.search) || location.hash==='#dejar-resena'){
+    setTimeout(function(){ var s=$('resenas'); if(s) s.scrollIntoView(); abrir(); },350);
+  }
+})();
+</script>
 
 <section class="caminos" id="mediano-plazo">
   <div class="caminos-in">
@@ -693,84 +1217,6 @@
 </section>
 
 
-<!-- TESTIMONIOS REALES (del vault; nunca inventados). Carrusel: rota cada 5s,
-     pausa en hover o al expandir un "Ver más". Se muestran en su idioma original. -->
-<section class="cita" id="testimonios">
-  <blockquote class="reveal" id="citaBox">
-    <p id="citaTxt"></p>
-    <button class="cita-more" id="citaMore" type="button" hidden>Ver más</button>
-    <cite id="citaAut"></cite>
-  </blockquote>
-  <div class="cita-dots" id="citaDots" role="tablist" aria-label="Testimonios"></div>
-</section>
-<script>
-(function(){
-  /* Testimonios reales (vault: Testimonios Reales). Traducciones fieles PT/EN. */
-  var DATA={
-   es:{more:'Ver más',less:'Ver menos',q:[
-    {t:"La verdad, nos solucionaron todo. Respondieron todas las dudas sin importar la hora. Nos dieron la confianza que necesitábamos. Son unos genios.",a:"Marcela R. · Propietaria"},
-    {t:"Hasta la fecha son los que mejor trato me han dado. Más que sorprendido y agradecido.",a:"Tadeo T. · Inquilino"},
-    {t:"Muy satisfecho con la atención y el trabajo. Nunca tuve ningún problema, y los recomendaría sin dudar.",a:"Oscar · Propietario"},
-    {t:"Mi experiencia ha sido excelente. Estuvieron pendientes de todo el proceso: desde la coordinación para ver el departamento, mostrarnos varias veces, hasta el proceso de reserva, súper sencillo. Ahora que ya estamos en el departamento también han sido un apoyo cuando tuvimos dudas.",a:"Catalina · Inquilina"},
-    {t:"Quiero compartir mi excelente experiencia con BAIREN durante el alquiler de la primera vivienda de mi hija. Desde el primer momento recibimos una atención profesional, clara y cercana. Quiero destacar especialmente el trabajo de Julián y de todo su equipo, que estuvieron siempre disponibles para responder nuevas consultas, acompañarnos en cada etapa del proceso y hacer que todo fuera ágil, simple y transparente. Una vez iniciado el contrato, el acompañamiento continuó: se preocuparon por hacer un seguimiento para saber si estaba todo bien en la vivienda y si mi hija necesitaba algo, un gesto que demuestra un verdadero compromiso con las personas y no solo con la operación. Saber que la primera experiencia de mi hija alquilando su propio hogar estuvo acompañada por un equipo tan comprometido nos dio mucha tranquilidad. Sin dudas recomiendo a BAIREN a quienes busquen una inmobiliaria seria, confiable y con una atención de excelencia.",a:"María Eugenia · Inquilina"}
-   ]},
-   pt:{more:'Ver mais',less:'Ver menos',q:[
-    {t:"Resolveram tudo para nós, de verdade. Responderam todas as dúvidas a qualquer hora. Nos deram a confiança que precisávamos. Vocês são geniais.",a:"Marcela R. · Proprietária"},
-    {t:"Até hoje são os que melhor atendimento me deram. Mais que surpreendido e agradecido.",a:"Tadeo T. · Inquilino"},
-    {t:"Muito satisfeito com a atenção e o trabalho. Nunca tive nenhum problema, e os recomendaria sem hesitar.",a:"Oscar · Proprietário"},
-    {t:"Minha experiência foi excelente. Estiveram atentos a todo o processo: desde a coordenação para ver o apartamento, nos mostrar várias vezes, até o processo de reserva, super simples. Agora que já estamos no apartamento também têm sido um apoio quando tivemos dúvidas.",a:"Catalina · Inquilina"},
-    {t:"Quero compartilhar minha excelente experiência com o BAIREN durante o aluguel da primeira moradia da minha filha. Desde o primeiro momento recebemos um atendimento profissional, claro e próximo. Quero destacar especialmente o trabalho de Julián e de toda a sua equipe, que estiveram sempre disponíveis para responder novas consultas, nos acompanhar em cada etapa do processo e fazer com que tudo fosse ágil, simples e transparente. Uma vez iniciado o contrato, o acompanhamento continuou: se preocuparam em fazer um seguimento para saber se estava tudo bem na moradia e se minha filha precisava de algo, um gesto que demonstra um verdadeiro compromisso com as pessoas e não só com a operação. Saber que a primeira experiência da minha filha alugando o próprio lar esteve acompanhada por uma equipe tão comprometida nos deu muita tranquilidade. Sem dúvidas recomendo o BAIREN a quem busca uma imobiliária séria, confiável e com um atendimento de excelência.",a:"María Eugenia · Inquilina"}
-   ]},
-   en:{more:'Read more',less:'Read less',q:[
-    {t:"They truly solved everything for us. They answered every question no matter the hour. They gave us the confidence we needed. They are brilliant.",a:"Marcela R. · Owner"},
-    {t:"To this day they have given me the best treatment. More than surprised and grateful.",a:"Tadeo T. · Tenant"},
-    {t:"Very satisfied with the attention and the work. I never had a single problem, and I would recommend them without hesitation.",a:"Oscar · Owner"},
-    {t:"My experience has been excellent. They were on top of the whole process: from coordinating the viewing, showing us the apartment several times, to the reservation process, super simple. Now that we are in the apartment they have also been a support whenever we had questions.",a:"Catalina · Tenant"},
-    {t:"I want to share my excellent experience with BAIREN during the rental of my daughter's first home. From the very first moment we received professional, clear and warm attention. I especially want to highlight the work of Julián and his whole team, who were always available to answer new questions, walk with us through every stage of the process and make everything agile, simple and transparent. Once the contract started, the support continued: they followed up to make sure everything was fine in the home and whether my daughter needed anything, a gesture that shows a true commitment to people and not just to the deal. Knowing that my daughter's first experience renting her own home was accompanied by such a committed team gave us great peace of mind. I recommend BAIREN without hesitation to anyone looking for a serious, trustworthy agency with excellent service.",a:"María Eugenia · Tenant"}
-   ]}
-  };
-  var LIM=200, i=0, expanded=false, hover=false, timer=null;
-  var box=document.getElementById('citaBox'), txt=document.getElementById('citaTxt'),
-      aut=document.getElementById('citaAut'), more=document.getElementById('citaMore'),
-      dots=document.getElementById('citaDots');
-  function L(){ var l=window.BAIREN_LANG||'es'; return DATA[l]||DATA.es; }
-  DATA.es.q.forEach(function(_,k){
-    var d=document.createElement('button'); d.className='cita-dot'; d.type='button';
-    d.setAttribute('aria-label','Testimonio '+(k+1));
-    d.addEventListener('click',function(){ show(k); restart(); });
-    dots.appendChild(d);
-  });
-  function corto(s){
-    if(s.length<=LIM) return s;
-    var c=s.slice(0,LIM); return c.slice(0,c.lastIndexOf(' '))+'…';
-  }
-  function paint(){
-    var d=L(), q=d.q[i], largo=q.t.length>LIM;
-    txt.textContent='“'+((largo&&!expanded)?corto(q.t):q.t)+'”';
-    aut.textContent=q.a;
-    more.hidden=!largo; more.textContent=expanded?d.less:d.more;
-    dots.querySelectorAll('.cita-dot').forEach(function(el,n){ el.classList.toggle('on',n===i); });
-  }
-  function show(k){
-    i=k; expanded=false;
-    box.classList.add('cita-out');
-    setTimeout(function(){ paint(); box.classList.remove('cita-out'); },380);
-  }
-  more.addEventListener('click',function(){ expanded=!expanded; paint(); });
-  box.addEventListener('mouseenter',function(){hover=true;});
-  box.addEventListener('mouseleave',function(){hover=false;});
-  var tx=0;
-  box.addEventListener('touchstart',function(e){tx=e.touches[0].clientX;},{passive:true});
-  box.addEventListener('touchend',function(e){
-    var dx=e.changedTouches[0].clientX-tx;
-    if(Math.abs(dx)>45){ show(dx<0?(i+1)%5:(i+4)%5); restart(); }
-  },{passive:true});
-  document.addEventListener('bairen:lang',function(){ expanded=false; paint(); restart(); });
-  function tickr(){ if(!hover && !expanded) show((i+1)%5); }
-  function restart(){ clearInterval(timer); timer=setInterval(tickr,5000); }
-  paint(); restart();
-})();
-</script>
 
 <section class="contacto" id="contacto">
   <div class="contacto-in">
@@ -878,7 +1324,7 @@
   (function(){
     const T = {
       pt:{
-        nav_alquilar:"Alugar",nav_contacto:"Contato",
+        nav_alquilar:"Alugar",nav_resenas:"Avaliações",nav_contacto:"Contato",
         hero_t2:"no seu",hero_t3:"máximo esplendor.",
         btn_ver:"Ver apartamentos",
         mp_eyebrow:"Aluguel de médio prazo",mp_h:"Mobiliados, tudo incluído e sem garantia imobiliária.",
@@ -891,14 +1337,12 @@
         opt_alquilar:"Alugar",opt_propietario:"Sou proprietário",
         f_mensaje:"Mensagem",f_submit:"Enviar consulta",ph_nombre:"Seu nome",ph_contacto:"Como falamos com você",ph_mensaje:"Conte o que você procura",
         ft_tag:"Apartamentos mobiliados de médio prazo em Buenos Aires. Tudo incluído, sem garantia imobiliária nem seguro fiança. CABA e GBA Norte.",
-        quote_t:"“Você resolveu tudo para nós. Respondeu todas as dúvidas a qualquer hora. Nos deu a confiança que precisávamos.”",
-        quote_a:"Marcela R. · Proprietária",
         ft_ops:"Operações",ft_temporal:"Aluguel de Médio Prazo",ft_consulta:"Consultar sobre uma unidade",
         ft_empresa:"Empresa",ft_como:"Como funciona",ft_prop:"Para proprietários",
         ft_dev:"Desenvolvido por",ft_copy:"© 2026 Grupo Bairen. Todos os direitos reservados.",ft_terms:"Termos e condições",ft_privacy:"Política de privacidade"
       },
       en:{
-        nav_alquilar:"Rent",nav_contacto:"Contact",
+        nav_alquilar:"Rent",nav_resenas:"Reviews",nav_contacto:"Contact",
         hero_t2:"at its",hero_t3:"finest.",
         btn_ver:"See apartments",
         mp_eyebrow:"Medium-term rental",mp_h:"Furnished, all inclusive and no property guarantor.",
@@ -911,8 +1355,6 @@
         opt_alquilar:"Rent",opt_propietario:"I am an owner",
         f_mensaje:"Message",f_submit:"Send inquiry",ph_nombre:"Your name",ph_contacto:"How we reach you",ph_mensaje:"Tell us what you're looking for",
         ft_tag:"Furnished medium-term apartments in Buenos Aires. All inclusive, no property guarantor and no surety bond. CABA and GBA Norte.",
-        quote_t:"“You solved everything for us. You answered every question no matter the hour. You gave us the confidence we needed.”",
-        quote_a:"Marcela R. · Owner",
         ft_ops:"Services",ft_temporal:"Medium-term Rental",ft_consulta:"Ask about a unit",
         ft_empresa:"Company",ft_como:"How it works",ft_prop:"For owners",
         ft_dev:"Developed by",ft_copy:"© 2026 Grupo Bairen. All rights reserved.",ft_terms:"Terms and conditions",ft_privacy:"Privacy policy"

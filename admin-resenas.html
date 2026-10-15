@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="robots" content="noindex, nofollow">
+<title>Reseñas — Admin BAIREN</title>
+<link rel="icon" href="bairen_logo.png?v=3">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<!-- Reseñas de la portada (15/10/2026). Lo que llega desde la web entra como
+     pendiente: acá se confirma que es cliente y se publica, o se rechaza.
+     El texto del cliente no se edita; se puede sumar una respuesta de BAIREN.
+     Misma sesión que admin.html (mismo Supabase, mismo navegador). -->
+<style>
+:root{
+  --navy:#2A3A52;--navy-dark:#1E2A3F;--navy-deeper:#131D2D;
+  --gold:#C2A968;--gold-dark:#8A7547;--gold-light:#DECDA0;
+  --white:#FBFAF6;--off:#EEE5D0;--mid:#6B7589;--border:rgba(42,58,82,.12);
+  --ok:#2a7a4b;--err:#b94a4a;
+  --fd:'Playfair Display',Georgia,serif;--fb:'Jost',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--fb);background:var(--off);color:var(--navy);-webkit-font-smoothing:antialiased;min-height:100vh;}
+a{text-decoration:none;color:inherit;}
+button,input,textarea{font-family:var(--fb);}
+button{cursor:pointer;}
+nav{position:sticky;top:0;z-index:100;height:60px;background:var(--navy);border-bottom:2px solid var(--gold);display:flex;align-items:center;justify-content:space-between;padding:0 24px;gap:12px;}
+.nav-brand{font-family:var(--fd);font-size:.95rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--white);}
+.nav-brand b{color:var(--gold);}
+.nav-right{display:flex;align-items:center;gap:14px;}
+.nav-link{font-size:.58rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-light);border:1px solid rgba(194,169,104,.4);padding:7px 14px;}
+.nav-link:hover{background:var(--gold);color:var(--navy);}
+.nav-badge{font-size:.58rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;background:var(--gold);color:var(--navy);padding:5px 13px;}
+@media(max-width:560px){nav{padding:0 14px;}.nav-badge{display:none;}}
+.page{max-width:980px;margin:0 auto;padding:32px 24px 80px;}
+@media(max-width:700px){.page{padding:20px 14px 60px;}}
+h1{font-family:var(--fd);font-weight:500;font-size:1.9rem;line-height:1.15;}
+.sub{color:var(--mid);font-size:.95rem;line-height:1.55;margin:8px 0 22px;max-width:62ch;}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px;}
+.tab{font-size:.62rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;padding:0 16px;min-height:40px;border:1px solid rgba(42,58,82,.25);background:transparent;color:var(--navy);}
+.tab[aria-pressed="true"]{background:var(--navy);color:var(--white);border-color:var(--navy);}
+.tab b{display:inline-block;min-width:20px;margin-left:6px;padding:1px 6px;background:var(--gold);color:var(--navy);font-weight:700;}
+.tab[aria-pressed="true"] b{background:var(--gold-light);}
+.vacio{background:var(--white);border:1px solid var(--border);padding:40px 24px;text-align:center;color:var(--mid);}
+.r{background:var(--white);border:1px solid var(--border);padding:22px 24px;margin-bottom:12px;}
+.r-top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline;margin-bottom:10px;}
+.r-quien{font-weight:600;font-size:1rem;}
+.r-quien small{font-weight:400;color:var(--mid);font-size:.84rem;margin-left:6px;}
+.r-fecha{font-size:.78rem;color:var(--mid);}
+.r-stars{color:var(--gold);letter-spacing:2px;font-size:1.05rem;}
+.r-txt{font-size:.98rem;line-height:1.65;white-space:pre-line;margin:8px 0 14px;}
+.r-priv{display:flex;gap:18px;flex-wrap:wrap;font-size:.82rem;color:var(--mid);background:var(--off);padding:10px 12px;margin-bottom:14px;}
+.r-priv b{color:var(--navy);font-weight:600;}
+.r-priv a{color:var(--navy);text-decoration:underline;text-underline-offset:2px;}
+.r-resp label{display:block;font-size:.56rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px;}
+.r-resp textarea{width:100%;min-height:64px;resize:vertical;font-size:.92rem;padding:10px 12px;border:1px solid rgba(42,58,82,.2);background:#fff;color:var(--navy);line-height:1.5;}
+.r-resp textarea:focus{outline:none;border-color:var(--gold);}
+.r-acc{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;align-items:center;}
+.b{font-size:.6rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:0 18px;min-height:42px;border:1px solid var(--navy);background:transparent;color:var(--navy);}
+.b:hover{background:var(--navy);color:var(--white);}
+.b-pri{background:var(--navy);color:var(--white);}
+.b-pri:hover{background:var(--navy-dark);}
+.b-no{border-color:rgba(185,74,74,.5);color:var(--err);}
+.b-no:hover{background:var(--err);color:#fff;border-color:var(--err);}
+.b:disabled{opacity:.5;cursor:wait;}
+.r-estado{font-size:.6rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:4px 10px;}
+.e-publicada{background:rgba(42,122,75,.12);color:var(--ok);}
+.e-rechazada{background:rgba(185,74,74,.1);color:var(--err);}
+.e-pendiente{background:var(--gold-light);color:var(--navy);}
+.r-hist{font-size:.72rem;color:var(--mid);font-style:italic;}
+.msg{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--navy-deeper);color:var(--white);padding:12px 20px;font-size:.88rem;box-shadow:0 10px 30px rgba(0,0,0,.25);z-index:200;}
+.msg[hidden]{display:none;}
+.login{max-width:380px;margin:60px auto;background:var(--white);border:1px solid var(--border);padding:32px 28px;}
+.login h1{font-size:1.6rem;margin-bottom:6px;}
+.login p{color:var(--mid);font-size:.9rem;margin-bottom:20px;}
+.fg{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+.fg label{font-size:.56rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;}
+.fg input{font-size:16px;padding:12px 14px;border:1px solid rgba(42,58,82,.2);background:#fff;color:var(--navy);}
+.fg input:focus{outline:none;border-color:var(--gold);}
+.login-err{color:var(--err);font-size:.85rem;margin-bottom:10px;min-height:1em;}
+.ayuda{margin-top:28px;font-size:.86rem;color:var(--mid);line-height:1.6;background:var(--white);border:1px solid var(--border);padding:16px 18px;}
+.ayuda b{color:var(--navy);}
+.ayuda code{background:var(--off);padding:1px 6px;font-size:.84rem;}
+</style>
+<script src="supabase-config.js"></script>
+</head>
+<body>
+<nav>
+  <a class="nav-brand" href="admin.html">Grupo <b>BAIREN</b></a>
+  <div class="nav-right">
+    <span class="nav-badge">Reseñas</span>
+    <a class="nav-link" href="admin.html">Propiedades</a>
+    <a class="nav-link" href="index.html#resenas" target="_blank" rel="noopener">Ver en la web</a>
+  </div>
+</nav>
+
+<section class="login" id="vLogin" hidden>
+  <h1>Iniciar sesión</h1>
+  <p>Mismo usuario que el panel de propiedades.</p>
+  <form id="loginForm">
+    <div class="fg"><label for="lEmail">Email</label><input id="lEmail" type="email" autocomplete="username" required></div>
+    <div class="fg"><label for="lPass">Contraseña</label><input id="lPass" type="password" autocomplete="current-password" required></div>
+    <div class="login-err" id="lErr"></div>
+    <button class="b b-pri" type="submit" id="lBtn" style="width:100%">Entrar</button>
+  </form>
+</section>
+
+<main class="page" id="vMain" hidden>
+  <h1>Reseñas de clientes</h1>
+  <p class="sub">Las que dejan en la web llegan acá como pendientes. Confirmá que es cliente (el teléfono o email está abajo de cada una) y publicala. No se edita lo que escribió: si hace falta, sumá una respuesta de BAIREN.</p>
+  <div class="tabs" id="tabs"></div>
+  <div id="lista"></div>
+  <div class="ayuda">
+    <b>Para pedir reseñas:</b> mandale al cliente el link <code>bairengroup.com/resena</code>, que abre el formulario directo. Por ejemplo: “Hola Catalina, ¿nos dejarías una reseña de cómo te fue con BAIREN? Te lleva un minuto: bairengroup.com/resena”.<br>
+    <b>Rechazar</b> es para spam o para quien no fue cliente. Una reseña con pocas estrellas de un cliente real se publica igual: es lo que hace creíble al resto.
+  </div>
+</main>
+<div class="msg" id="msg" role="status" hidden></div>
+
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id);};
+  var sb=null, filas=[], vista='pendiente';
+  var ROL={inquilino:'Inquilino',inquilina:'Inquilina',propietario:'Propietario',propietaria:'Propietaria'};
+  var NOMBRE_TAB={pendiente:'Pendientes',publicada:'Publicadas',rechazada:'Rechazadas'};
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+  function aviso(t){ var m=$('msg'); m.textContent=t; m.hidden=false; clearTimeout(aviso.t); aviso.t=setTimeout(function(){m.hidden=true;},2600); }
+  function fecha(s){ var d=new Date(s); return isNaN(d)?'':d.toLocaleDateString('es-AR',{day:'numeric',month:'short',year:'numeric'}); }
+  function linkContacto(c){
+    if(!c) return '—';
+    if(/@/.test(c)) return '<a href="mailto:'+esc(c)+'">'+esc(c)+'</a>';
+    var n=c.replace(/\D/g,''); if(n.length>=8) return '<a href="https://wa.me/'+(n.length<=10?'549'+n:n)+'" target="_blank" rel="noopener">'+esc(c)+'</a>';
+    return esc(c);
+  }
+
+  function tabs(){
+    $('tabs').innerHTML=['pendiente','publicada','rechazada'].map(function(k){
+      var n=filas.filter(function(r){return r.estado===k;}).length;
+      return '<button class="tab" type="button" data-v="'+k+'" aria-pressed="'+(vista===k)+'">'+NOMBRE_TAB[k]+(n?'<b>'+n+'</b>':'')+'</button>';
+    }).join('');
+  }
+  function pintar(){
+    tabs();
+    var v=filas.filter(function(r){return r.estado===vista;});
+    if(!v.length){ $('lista').innerHTML='<div class="vacio">'+(vista==='pendiente'?'No hay reseñas para revisar.':'Nada por acá.')+'</div>'; return; }
+    $('lista').innerHTML=v.map(function(r){
+      var est=r.estrellas?'<span class="r-stars" aria-label="'+r.estrellas+' de 5">'+'★★★★★'.slice(0,r.estrellas)+'<span style="opacity:.25">'+'★★★★★'.slice(r.estrellas)+'</span></span>':'<span class="r-hist">Testimonio histórico, sin estrellas</span>';
+      var acc='';
+      if(r.estado!=='publicada') acc+='<button class="b b-pri" data-a="publicar">Es cliente: publicar</button>';
+      if(r.estado==='publicada') acc+='<button class="b" data-a="resp">Guardar respuesta</button><button class="b" data-a="pendiente">Despublicar</button>';
+      if(r.estado!=='rechazada') acc+='<button class="b b-no" data-a="rechazar">Rechazar</button>';
+      if(r.estado==='rechazada') acc+='<button class="b" data-a="pendiente">Volver a pendientes</button>';
+      return '<article class="r" data-id="'+r.id+'">'+
+        '<div class="r-top"><div><span class="r-quien">'+esc(r.nombre)+' '+esc(r.apellido||'')+'<small>'+esc(ROL[r.rol]||r.rol)+(r.barrio?' · '+esc(r.barrio):'')+' · se publica como “'+esc(r.nombre_publico)+'”</small></span></div>'+
+        '<span class="r-estado e-'+r.estado+'">'+r.estado+'</span></div>'+
+        est+'<p class="r-txt">'+esc(r.texto)+'</p>'+
+        '<div class="r-priv"><span><b>Contacto (privado):</b> '+linkContacto(r.contacto)+'</span><span><b>Llegó:</b> '+fecha(r.creada_en)+'</span>'+(r.idioma!=='es'?'<span><b>Idioma:</b> '+esc(r.idioma)+'</span>':'')+'</div>'+
+        '<div class="r-resp"><label for="resp-'+r.id+'">Respuesta de BAIREN (opcional, se publica)</label><textarea id="resp-'+r.id+'" maxlength="1000" placeholder="Gracias, Catalina. Fue un gusto acompañarte.">'+esc(r.respuesta||'')+'</textarea></div>'+
+        '<div class="r-acc">'+acc+'</div></article>';
+    }).join('');
+  }
+  async function cargar(){
+    var res=await sb.from('resenas').select('*').order('creada_en',{ascending:false});
+    if(res.error){ $('lista').innerHTML='<div class="vacio">No se pudieron cargar: '+esc(res.error.message)+'</div>'; return; }
+    filas=res.data||[];
+    if(vista==='pendiente' && !filas.some(function(r){return r.estado==='pendiente';})) vista='publicada';
+    pintar();
+  }
+  $('tabs').addEventListener('click',function(e){ var b=e.target.closest('.tab'); if(!b) return; vista=b.getAttribute('data-v'); pintar(); });
+  $('lista').addEventListener('click',async function(e){
+    var b=e.target.closest('button[data-a]'); if(!b) return;
+    var art=b.closest('.r'), id=art.getAttribute('data-id'), a=b.getAttribute('data-a');
+    var resp=(art.querySelector('textarea').value||'').trim()||null;
+    var cambio={respuesta:resp};
+    if(a==='publicar') cambio={estado:'publicada',verificada:true,publicada_en:new Date().toISOString(),respuesta:resp};
+    if(a==='rechazar') cambio={estado:'rechazada'};
+    if(a==='pendiente') cambio={estado:'pendiente'};
+    b.disabled=true;
+    var res=await sb.from('resenas').update(cambio).eq('id',id);
+    b.disabled=false;
+    if(res.error){ aviso('No se pudo guardar: '+res.error.message); return; }
+    aviso(a==='publicar'?'Publicada. Ya se ve en la web.':a==='rechazar'?'Rechazada.':a==='resp'?'Respuesta guardada.':'Movida a pendientes.');
+    cargar();
+  });
+
+  $('loginForm').addEventListener('submit',async function(e){
+    e.preventDefault(); $('lErr').textContent=''; $('lBtn').disabled=true;
+    var r=await sb.auth.signInWithPassword({email:$('lEmail').value,password:$('lPass').value});
+    $('lBtn').disabled=false;
+    if(r.error) $('lErr').textContent=/invalid/i.test(r.error.message)?'Email o contraseña incorrectos.':r.error.message;
+  });
+
+  window.bairenReady.then(async function(c){
+    sb=c;
+    var s=(await sb.auth.getSession()).data.session;
+    /* Supabase repite SIGNED_IN al volver a la pestaña: solo un cambio real recarga
+       (si no, se borra la respuesta que se estaba escribiendo) */
+    var dentro=null;
+    function ver(ok){ if(ok===dentro) return; dentro=ok; $('vLogin').hidden=ok; $('vMain').hidden=!ok; if(ok) cargar(); }
+    ver(!!s);
+    sb.auth.onAuthStateChange(function(ev,sess){ if(ev==='SIGNED_IN'||ev==='SIGNED_OUT') ver(!!sess); });
+  });
+})();
+</script>
+</body>
+</html>

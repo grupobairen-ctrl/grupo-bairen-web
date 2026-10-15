@@ -1,5 +1,6 @@
 {
   "redirects": [
+    { "source": "/resena", "destination": "/?resena", "permanent": false },
     { "source": "/comprar.html", "destination": "/catalogo.html", "permanent": true },
     { "source": "/comprar", "destination": "/catalogo.html", "permanent": true },
     { "source": "/psi.html", "destination": "/", "permanent": true },
