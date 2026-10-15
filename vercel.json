@@ -1,5 +1,7 @@
 {
   "redirects": [
+    { "source": "/resena", "destination": "/resenas", "permanent": false },
+    { "source": "/rese", "destination": "/resenas", "permanent": false },
     { "source": "/comprar.html", "destination": "/catalogo.html", "permanent": true },
     { "source": "/comprar", "destination": "/catalogo.html", "permanent": true },
     { "source": "/psi.html", "destination": "/", "permanent": true },
@@ -16,6 +18,9 @@
   ],
   "rewrites": [
     { "source": "/julian", "destination": "/julian.html" },
+    { "source": "/resenas", "destination": "/resenas.html" },
+    { "source": "/reseñas", "destination": "/resenas.html" },
+    { "source": "/rese%C3%B1as", "destination": "/resenas.html" },
     { "source": "/propiedades/:slug", "destination": "/api/og-propiedad?slug=:slug" },
     {
       "source": "/propiedad.html",
