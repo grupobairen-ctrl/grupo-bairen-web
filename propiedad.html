@@ -76,7 +76,7 @@ nav{position:fixed;inset:0 0 auto 0;z-index:1000;height:64px;background:var(--na
 
 /* NOT FOUND */
 .notfound{margin-top:64px;min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:40px;text-align:center;}
-.notfound h1{font-family:var(--font-display);font-size:2rem;color:var(--navy);}
+.notfound h2{font-family:var(--font-display);font-size:2rem;color:var(--navy);}
 .notfound p{color:var(--text-mid);font-size:.9rem;max-width:480px;}
 .notfound a{color:var(--gold-dark);font-weight:600;letter-spacing:.1em;text-transform:uppercase;font-size:.72rem;border:1px solid var(--gold-dark);padding:11px 22px;transition:all .25s;}
 .notfound a:hover{background:var(--gold);color:var(--navy);border-color:var(--gold);}
@@ -274,7 +274,7 @@ footer{background:var(--navy-dark);border-top:1px solid var(--gold);padding:40px
     <div class="hero-content" id="heroContent">
       <div>
         <div class="hero-tag" id="heroTag">—</div>
-        <div class="hero-address" id="heroAddress">—</div>
+        <h1 class="hero-address" id="heroAddress">—</h1>
         <div class="hero-sub" id="heroSub">—</div>
       </div>
       <div class="hero-price-box">
@@ -330,7 +330,7 @@ footer{background:var(--navy-dark);border-top:1px solid var(--gold);padding:40px
 
 <!-- NOT FOUND -->
 <div class="notfound" id="notFoundScreen" style="display:none">
-  <h1 data-i18n="prop_nf_h">Propiedad no encontrada</h1>
+  <h2 data-i18n="prop_nf_h">Propiedad no encontrada</h2>
   <p data-i18n="prop_nf_p">El link puede haber cambiado, la unidad ya fue alquilada o el slug es incorrecto.</p>
   <a href="/catalogo.html" data-i18n="prop_back_full">← Volver al catálogo</a>
 </div>
@@ -610,6 +610,13 @@ async function loadProperty() {
 }
 
 function showNotFound(customMsg) {
+  // Si el servidor ya escribió la ficha (api/og-propiedad.js), el cartel de
+  // "no encontrada" no viene: ante una falla de conexión se muestra lo escrito
+  if (!$('notFoundScreen')) {
+    $('loadingScreen').style.display = 'none';
+    $('pageContent').style.display = '';
+    return;
+  }
   $('loadingScreen').style.display = 'none';
   $('pageContent').style.display = 'none';
   if (customMsg) {
@@ -658,7 +665,7 @@ function renderProperty(p) {
 
   document.title = `${titleFull} — ${p.barrio} — BAIREN`;
   document.querySelector('meta[name="robots"]').setAttribute('content', 'index, follow');
-  document.querySelector('meta[name="description"]').setAttribute('content', descSEO);
+  document.querySelector('meta[name="description"]').setAttribute('content', (isTemp || (isAmbos && Number(p.precio_temporal) > 0)) ? metaDescSEO(p) : descSEO);
   $('metaCanonical').href = pageUrl;
   $('metaOgTitle').content  = `${titleFull} — BAIREN`;
   $('metaOgDesc').content   = descSEO;
@@ -718,6 +725,25 @@ function renderProperty(p) {
   wireGallery();
   wireLightbox();
   wireReveals();
+}
+
+// Meta description de mediano plazo: primero los datos (qué, dónde, cuánto,
+// plazo), que es lo que citan buscadores y asistentes de IA; después el
+// arranque del texto. Espejo de resumen() en api/_bairen.js y de metaDesc()
+// en api/og-propiedad.js (19/10/2026).
+function metaDescSEO(p) {
+  const usd = n => 'USD ' + Math.round(Number(n)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  const m = String(p.plazo || '').match(/(\d+)\s*(?:-|–|a)\s*(\d+)\s*mes/i);
+  const min = m ? +m[1] : 3, max = m ? +m[2] : 12;
+  const amb = p.ambientes ? `${p.ambientes} ${p.ambientes === 1 ? 'ambiente' : 'ambientes'}` : null;
+  const que = ['Departamento amoblado', amb && `de ${amb}`, p.m2 && `y ${p.m2} m²`].filter(Boolean).join(' ');
+  const precio = Number(p.precio_temporal) || 0;
+  const cuanto = precio ? `${usd(precio)} por mes${p.expensas_incluidas !== false ? ', todo incluido' : ' más expensas'}` : 'precio a consultar';
+  const base = `${que} en ${p.barrio}, Buenos Aires. ${cuanto}, de ${min} a ${max} meses y sin garantía inmobiliaria.`;
+  const resto = (p.descripcion || '').replace(/\s+/g, ' ').trim();
+  if (!resto || base.length > 140) return base;
+  const corte = resto.slice(0, 159 - base.length).replace(/\s+\S*$/, '');
+  return corte ? `${base} ${corte}…` : base;
 }
 
 function renderDynamicTexts(p) {
@@ -893,6 +919,9 @@ function renderActionCard(p, titleFull, unidadLbl, reservado, isTemp, isTrad) {
 }
 
 function injectJSONLD(p, pageUrl, ogImg) {
+  // El servidor ya escribe el aviso completo (api/og-propiedad.js, 19/10/2026):
+  // si está, queda ese, que es el que leen los robots que no corren JavaScript
+  if (document.querySelector('script[type="application/ld+json"][data-ssr]')) return;
   // Limpiar JSON-LD previo
   document.querySelectorAll('script[type="application/ld+json"][data-injected]').forEach(s => s.remove());
 
