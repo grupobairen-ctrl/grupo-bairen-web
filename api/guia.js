@@ -231,7 +231,7 @@ function pagina(L, props) {
         <span class="estado ${B.disponible(p) ? 'ok' : 'res'}">${B.disponible(p) ? L.disponible : L.reservado}</span>
         <span class="prop-txt">
           <strong>${B.esc(B.titulo(p))}</strong>
-          <span class="prop-barrio">${B.esc(p.barrio)}${p.ambientes ? ' · ' + L.amb(p.ambientes) : ''}${p.m2 ? ` · ${p.m2} m²` : ''}</span>
+          <span class="prop-barrio">${B.esc(p.barrio)}${p.ambientes ? ' · ' + L.amb(p.ambientes) : ''}${p.m2 ? ` · ${p.m2}&nbsp;m²` : ''}</span>
           <span class="prop-precio">${B.precio(p) ? B.esc(L.usd(B.precio(p))) : ''} <small>${L.porMes} · ${B.todoIncluido(p) ? L.allin : L.exp}</small></span>
           <span class="link">${L.verMas} →</span>
         </span>
@@ -340,8 +340,8 @@ footer a{color:var(--gold-light)}
   .paso{padding:14px}.paso b{font-size:1.1rem}.paso p{font-size:.9rem;line-height:1.4}
   /* en el celular, barrios y departamentos van como filas con la foto al costado */
   .zonas,.props{gap:10px;margin-top:20px}
-  .zona,.prop a{flex-direction:row}
-  .zona img,.prop img{width:116px;min-width:116px;height:auto;aspect-ratio:auto;align-self:stretch;object-fit:cover}
+  .zona,.prop a{position:relative;padding-left:116px;min-height:128px}
+  .zona img,.prop img{position:absolute;left:0;top:0;width:116px;height:100%;aspect-ratio:auto;object-fit:cover}
   .zona-txt,.prop-txt{padding:12px 14px;gap:2px}
   .zona h3{font-size:1.2rem}.zona-precio{font-size:1.1rem}.zona-desc{display:none}
   .prop strong{font-size:1.05rem}.prop-precio{font-size:1.05rem}
