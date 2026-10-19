@@ -210,8 +210,10 @@ function pagina(L, props) {
 
   const foto = (p, w) => p.portada_url || B.sbImg(p.fotos[0], w);
   const tarjetaZona = z => {
-    // la portada del catálogo es la foto elegida para vender; si no hay, la primera
-    const ej = z.props.find(p => p.portada_url) || z.props.find(p => p.fotos[0]);
+    // la portada del catálogo es la foto elegida para vender: la de la disponible
+    // más cara del barrio (suele ser la más vistosa); si no hay, la primera foto
+    const conPortada = z.props.filter(p => p.portada_url).sort((a, b) => (B.disponible(b) - B.disponible(a)) || (B.precio(b) - B.precio(a)));
+    const ej = conPortada[0] || z.props.find(p => p.fotos[0]);
     return `<article class="zona">
       ${ej ? `<img src="${B.esc(foto(ej, 640))}" alt="${B.esc(`${B.titulo(ej)}, ${ej.barrio}`)}" loading="lazy" width="640" height="400">` : ''}
       <div class="zona-txt">
@@ -331,7 +333,21 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;align-items:center;justif
 footer img{height:40px;width:auto}
 footer a{color:var(--gold-light)}
 @media(max-width:900px){.pasos{grid-template-columns:repeat(2,1fr)}.zonas,.props,.resenas{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:600px){.pasos,.zonas,.props,.resenas{grid-template-columns:1fr}.btn{width:100%}.nav-r a.hide-m{display:none}}
+@media(max-width:600px){
+  .zonas,.props,.resenas{grid-template-columns:1fr}.btn{width:100%}.nav-r a.hide-m{display:none}
+  section{padding:44px 0}
+  .pasos{grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
+  .paso{padding:14px}.paso b{font-size:1.1rem}.paso p{font-size:.9rem;line-height:1.4}
+  /* en el celular, barrios y departamentos van como filas con la foto al costado */
+  .zonas,.props{gap:10px;margin-top:20px}
+  .zona,.prop a{flex-direction:row}
+  .zona img,.prop img{width:116px;min-width:116px;height:auto;aspect-ratio:auto;align-self:stretch;object-fit:cover}
+  .zona-txt,.prop-txt{padding:12px 14px;gap:2px}
+  .zona h3{font-size:1.2rem}.zona-precio{font-size:1.1rem}.zona-desc{display:none}
+  .prop strong{font-size:1.05rem}.prop-precio{font-size:1.05rem}
+  .estado{top:8px;left:8px;font-size:.72rem;padding:3px 7px}
+  .link{font-size:.88rem}
+}
 </style>
 </head>
 <body>
