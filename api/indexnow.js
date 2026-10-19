@@ -4,7 +4,7 @@
  * ChatGPT busca en internet a través de Bing. IndexNow le avisa a Bing (y a
  * Yandex, Seznam y Naver) qué páginas cambiaron, sin esperar a que pase el
  * robot. Lo corre el cron de vercel.json una vez por día: manda las fichas
- * editadas en los últimos 3 días, la guía en los dos idiomas y el catálogo.
+ * editadas en los últimos 3 días, todas las guías (barrios y temas) en los dos idiomas y el catálogo.
  *
  * La clave es pública por diseño: es el archivo /<clave>.txt de la raíz,
  * que prueba que el sitio es nuestro. Para mandar TODAS las URLs de una vez
@@ -43,8 +43,7 @@ module.exports = async (req, res) => {
     .map(B.url);
   const urlList = [
     `${B.SITE_ROOT}/catalogo.html`,
-    `${B.SITE_ROOT}/alquiler-amoblado-buenos-aires`,
-    `${B.SITE_ROOT}/en/furnished-apartments-buenos-aires`,
+    ...B.guias(todas.filter(B.enCatalogo)).flatMap(g => [B.SITE_ROOT + g.es, B.SITE_ROOT + g.en]),
     ...cambiadas,
   ];
 

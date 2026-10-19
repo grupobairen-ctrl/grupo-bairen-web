@@ -162,6 +162,42 @@ function porZona(lista) {
   return Object.values(out).sort((a, b) => b.total - a.total);
 }
 
+/** 'Puerto Madero' → 'puerto-madero', 'Núñez' → 'nunez' (lo que va en la URL de la guía del barrio) */
+const slugZona = k => norm(k).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+/* Barrios que la gente busca y donde hoy puede no haber unidades: la guía dice
+   la verdad ("hoy no hay") y muestra las más cercanas. Si entra una unidad con
+   ese barrio, aparece primero sola. */
+const CERCA = [
+  { key: 'Colegiales', cerca: ['Palermo', 'Belgrano', 'Núñez', 'Villa Crespo'],
+    es: 'Residencial y tranquilo, con casas bajas, plazas y a pasos de Palermo y Belgrano.',
+    en: 'Quiet and residential, with low-rise houses and squares, next to Palermo and Belgrano.' },
+  { key: 'Villa Urquiza', cerca: ['Belgrano', 'Núñez', 'Palermo'],
+    es: 'Residencial, con avenidas comerciales, mucho verde y la línea B de subte.',
+    en: 'Residential, with shopping avenues, green areas and subway line B.' },
+];
+
+/* Guías por tema: las preguntas más buscadas que el modelo de BAIREN contesta */
+const TEMAS = [
+  { key: 'sin-garantia', es: '/alquilar-sin-garantia-buenos-aires', en: '/en/rent-without-guarantor-buenos-aires',
+    nombre: 'Alquilar sin garantía inmobiliaria ni seguro de caución', nombreEn: 'Renting without a guarantor or surety bond' },
+  { key: 'por-meses', es: '/alquiler-por-meses-buenos-aires', en: '/en/monthly-rentals-buenos-aires',
+    nombre: 'Alquilar por 3, 6 o 12 meses', nombreEn: 'Renting for 3, 6 or 12 months' },
+];
+
+/** Todas las guías que existen hoy: general, temas, barrios con unidades y barrios cercanos. */
+function guias(props) {
+  const out = [{ es: '/alquiler-amoblado-buenos-aires', en: '/en/furnished-apartments-buenos-aires', nombre: 'Buenos Aires', nombreEn: 'Buenos Aires', tipo: 'general' }];
+  TEMAS.forEach(t => out.push({ es: t.es, en: t.en, nombre: t.nombre, nombreEn: t.nombreEn, tipo: 'tema' }));
+  porZona(props).filter(z => z.key !== 'Otros').forEach(z => out.push({
+    es: `/alquiler-amoblado-${slugZona(z.key)}`, en: `/en/furnished-apartments-${slugZona(z.key)}`, nombre: z.key, nombreEn: z.key, tipo: 'zona', total: z.total, desde: z.desde,
+  }));
+  CERCA.forEach(c => out.push({
+    es: `/alquiler-amoblado-${slugZona(c.key)}`, en: `/en/furnished-apartments-${slugZona(c.key)}`, nombre: c.key, nombreEn: c.key, tipo: 'cerca',
+  }));
+  return out;
+}
+
 function esc(s) {
   return String(s == null ? '' : s)
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -257,7 +293,7 @@ function origen(req) {
 }
 
 module.exports = {
-  SITE_ROOT, ORG_ID, WHATSAPP_NUM, ZONAS,
+  SITE_ROOT, ORG_ID, WHATSAPP_NUM, ZONAS, CERCA, TEMAS, slugZona, guias, norm,
   publicadas, porSlug, enCatalogo, precio, todoIncluido, disponible, titulo, url,
   usd, usdEn, plazoMeses, resumen, resumenEn, zonaDe, porZona, esc, ldJson, sbImg, avisoLD, origen,
 };

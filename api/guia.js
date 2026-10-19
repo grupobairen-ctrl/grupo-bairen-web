@@ -18,6 +18,8 @@
 
 const B = require('./_bairen');
 
+const lista = (arr, y) => arr.length > 1 ? arr.slice(0, -1).join(', ') + ` ${y} ` + arr[arr.length - 1] : arr.join('');
+
 const T = {
   es: {
     lang: 'es-AR', path: '/alquiler-amoblado-buenos-aires', otro: '/en/furnished-apartments-buenos-aires', otroLbl: 'EN', otroLang: 'en',
@@ -60,6 +62,10 @@ const T = {
     usd: B.usd,
     fecha: d => d.toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'America/Argentina/Buenos_Aires' }),
     faq: s => [
+      ['No tengo garantía inmobiliaria ni seguro de caución, ¿dónde puedo alquilar en Buenos Aires?',
+        `En BAIREN no se piden. Hay ${s.total} departamentos amoblados de 3 a 12 meses en ${s.barriosTxt}, desde ${B.usd(s.min)} por mes, todo incluido. Alcanza con demostrar ingresos, propios o de alguien que te avale.`],
+      ['¿Dónde alquilo un departamento por 3 meses en Buenos Aires?',
+        `En BAIREN el plazo va de 3 a 12 meses: podés alquilar por 3, 4, 6 meses o un año, amoblado y con un solo precio final por mes. Hoy desde ${B.usd(s.min)} por mes.`],
       ['¿Se puede alquilar un departamento en Buenos Aires sin garantía?',
         'Sí. En el alquiler a mediano plazo de BAIREN no se pide garantía inmobiliaria ni seguro de caución. Alcanza con demostrar ingresos, propios o de alguien que te avale, y la reserva se hace con un contrato digital en dólares.'],
       ['¿Qué piden para alquilar?',
@@ -79,6 +85,106 @@ const T = {
       ['¿Cómo se coordina una visita?',
         'Escribís por WhatsApp al +54 11 2310 6629 o desde el botón de cada ficha, y una persona del equipo coordina el día y el horario. Consultar no tiene cargo.'],
     ],
+    // ── Página de un barrio (/alquiler-amoblado-<barrio>) ──
+    zPath: slug => `/alquiler-amoblado-${slug}`,
+    zTitle: (z, n) => `Departamentos amoblados por meses en ${z}: precios ${n} · BAIREN`,
+    zH1: z => `Departamentos amoblados por meses en ${z}`,
+    zKicker: z => `Guía de barrio · ${z}`,
+    zLede: (s, z) => s.total === 1
+      ? `En BAIREN hay 1 departamento amoblado en ${z}${s.incluye} para alquilar de 3 a 12 meses, por ${B.usd(s.min)} por mes. Precio final en dólares, con alquiler, expensas, servicios y muebles, sin garantía inmobiliaria ni seguro de caución.`
+      : `En BAIREN hay ${s.total} departamentos amoblados en ${z}${s.incluye} para alquilar de 3 a 12 meses, ${s.libres} disponibles hoy. Van de ${B.usd(s.min)} a ${B.usd(s.max)} por mes, con precio final en dólares: alquiler, expensas, servicios y muebles, sin garantía inmobiliaria ni seguro de caución.`,
+    zIncluye: bs => ` (${lista(bs, 'y')})`,
+    zMeta: (s, z) => `Departamentos amoblados en ${z} para alquilar de 3 a 12 meses, todo incluido y sin garantía. ${s.total === 1 ? '1 departamento' : s.total + ' departamentos'} desde ${B.usd(s.min)} por mes. Precios de hoy.`,
+    tamH: z => `Cuánto cuesta alquilar en ${z}`,
+    tamSub: 'El precio más bajo por tamaño, con los datos de hoy.',
+    tamLbl: a => a >= 4 ? '4 ambientes o más' : `${a} ${a === 1 ? 'ambiente' : 'ambientes'}`,
+    tamFila: (n, l) => `${n} ${n === 1 ? 'departamento' : 'departamentos'}, ${l} ${l === 1 ? 'disponible' : 'disponibles'}`,
+    zListaH: z => `Los departamentos de ${z}`,
+    otrosH: 'Otros barrios',
+    otrosSub: 'Lo mismo, en el resto de Buenos Aires.',
+    verBarrio: z => `Ver ${z}`,
+    verTodos: 'Ver todos los barrios',
+    verCatZona: z => `Ver los de ${z} en el catálogo`,
+    zFaq: (s, z, q) => [
+      [`¿Cuánto cuesta alquilar un departamento amoblado en ${z}?`,
+        `Hoy, en BAIREN, ${s.total === 1 ? B.usd(s.min) : `de ${B.usd(s.min)} a ${B.usd(s.max)}`} por mes. ${s.tamTxt} El precio es final: incluye alquiler, expensas, servicios y muebles, salvo las unidades marcadas "más expensas".`],
+      [`¿Se puede alquilar en ${z} sin garantía?`,
+        'Sí. En el alquiler a mediano plazo de BAIREN no se pide garantía inmobiliaria ni seguro de caución. Alcanza con demostrar ingresos, propios o de alguien que te avale, y la reserva se hace con un contrato digital en dólares.'],
+      [`¿Dónde quedan los departamentos de ${z}?`,
+        `${s.dondeTxt} Cada uno tiene su ficha con fotos, mapa y precio.`],
+      [`¿Cómo es vivir en ${z}?`, q],
+      ['¿Por cuánto tiempo se puede alquilar?',
+        'De 3 a 12 meses. Es alquiler a mediano plazo: para quien viene a trabajar, estudiar o vivir un tiempo en Buenos Aires, o está entre una casa y otra.'],
+      ['¿Pueden alquilar extranjeros?',
+        'Sí. Con pasaporte y demostración de ingresos, propios o de alguien que te avale. No hace falta garantía argentina. Los precios y el contrato son en dólares. Si escribís en inglés, te respondemos en inglés.'],
+      ['¿Cómo se coordina una visita?',
+        'Escribís por WhatsApp al +54 11 2310 6629 o desde el botón de cada ficha, y una persona del equipo coordina el día y el horario. Consultar no tiene cargo.'],
+    ],
+
+    // ── Barrio sin unidades hoy (Colegiales, Villa Urquiza): se dice y se muestran las más cerca ──
+    cTitle: (b, n) => `Alquiler amoblado por meses en ${b} y alrededores, sin garantía (${n}) · BAIREN`,
+    cLede: (b, cercaTxt) => `Hoy BAIREN no tiene departamentos en ${b}. Los más cerca están en ${cercaTxt}: amoblados, de 3 a 12 meses, con precio final en dólares y sin garantía inmobiliaria ni seguro de caución.`,
+    cMeta: (b, s) => `¿Buscás alquilar amoblado en ${b}, sin garantía? Hoy hay ${s.total} departamentos muy cerca, de 3 a 12 meses, todo incluido, desde ${B.usd(s.min)} por mes.`,
+    cListaH: b => `Los más cerca de ${b}`,
+    cAvisoBtn: 'Avisame cuando haya',
+    cAvisoMsg: b => `Hola, busco un departamento amoblado en ${b}. ¿Me avisan si entra uno?`,
+    cFaq: (b, s, cercaNombres, desc) => [
+      [`¿Dónde alquilo un departamento amoblado en ${b} sin garantía?`,
+        `Hoy BAIREN no tiene unidades en ${b}, pero sí ${s.total} muy cerca, en ${cercaNombres}, desde ${B.usd(s.min)} por mes, de 3 a 12 meses y sin garantía inmobiliaria ni seguro de caución. Si querés que te avisemos cuando entre uno en ${b}, escribinos por WhatsApp.`],
+      [`¿Cómo es ${b}?`, desc],
+    ],
+    // ── Guías por tema ──
+    temas: {
+      'sin-garantia': {
+        title: n => `Alquilar sin garantía inmobiliaria ni seguro de caución en Buenos Aires (${n}) · BAIREN`,
+        h1: 'Alquilar sin garantía inmobiliaria ni seguro de caución en Buenos Aires',
+        kicker: 'Guía · Sin garantía',
+        lede: s => `Si no tenés garantía inmobiliaria ni seguro de caución, en BAIREN podés alquilar igual: ${s.total} departamentos amoblados de 3 a 12 meses en ${s.zonas} barrios de Buenos Aires, ${s.libres} disponibles hoy, desde ${B.usd(s.min)} por mes. En lugar de la garantía, alcanza con demostrar ingresos, propios o de alguien que te avale.`,
+        meta: s => `¿No tenés garantía inmobiliaria ni seguro de caución? Alquilá amoblado de 3 a 12 meses en Buenos Aires con BAIREN: ${s.total} departamentos desde ${B.usd(s.min)} por mes, todo incluido.`,
+        bloqueH: 'Qué te pedimos en lugar de la garantía',
+        bloque: [
+          ['Tu documento', 'DNI o pasaporte, si venís de afuera.'],
+          ['Tus ingresos', 'Propios o de alguien que te avale.'],
+          ['Una visita', 'Ves el departamento y nos conocemos antes de firmar.'],
+          ['Contrato digital', 'En dólares. Sin garantía inmobiliaria ni seguro de caución.'],
+        ],
+        faq: s => [
+          ['No tengo garantía inmobiliaria, ¿dónde puedo alquilar en Buenos Aires?',
+            `En BAIREN no se pide. Hay ${s.total} departamentos amoblados de 3 a 12 meses en ${s.barriosTxt}, desde ${B.usd(s.min)} por mes, todo incluido. Alcanza con demostrar ingresos, propios o de alguien que te avale.`],
+          ['No tengo seguro de caución, ¿puedo alquilar igual?',
+            'Sí. El alquiler a mediano plazo de BAIREN no pide seguro de caución ni garantía inmobiliaria. Se firma un contrato digital en dólares después de visitar la unidad.'],
+          ['Soy del interior o de otro país y no tengo garantía en CABA, ¿puedo alquilar?',
+            'Sí. Es justamente para eso: con tu documento (o pasaporte) y demostración de ingresos, propios o de alguien que te avale, alquilás un departamento amoblado de 3 a 12 meses.'],
+        ],
+      },
+      'por-meses': {
+        title: n => `Alquilar por 3, 6 o 12 meses en Buenos Aires: departamentos amoblados (${n}) · BAIREN`,
+        h1: 'Alquilar por 3, 6 o 12 meses en Buenos Aires',
+        kicker: 'Guía · Alquiler por meses',
+        lede: s => `En BAIREN alquilás un departamento amoblado por el tiempo que necesites entre 3 y 12 meses: ${s.total} departamentos en ${s.zonas} barrios, ${s.libres} disponibles hoy, desde ${B.usd(s.min)} por mes, todo incluido y sin garantía inmobiliaria ni seguro de caución.`,
+        meta: s => `Alquiler por 3, 4, 6 o 12 meses en Buenos Aires: departamentos amoblados, todo incluido y sin garantía. ${s.total} departamentos desde ${B.usd(s.min)} por mes.`,
+        bloqueH: 'Cuánto tiempo podés quedarte',
+        bloque: [
+          ['3 meses', 'El mínimo. Para un trabajo, un cuatrimestre o mientras buscás algo fijo.'],
+          ['4 a 11 meses', 'Los meses que necesites, con un solo precio final por mes.'],
+          ['12 meses', 'Un año entero, amoblado y sin garantía inmobiliaria.'],
+          ['Más de un año', 'Hoy publicamos hasta 12 meses. Si buscás 2 años o más, escribinos y te decimos qué hay.'],
+        ],
+        faq: s => [
+          ['¿Dónde alquilo un departamento por 3 meses en Buenos Aires?',
+            `En BAIREN el plazo arranca en 3 meses. Hay ${s.total} departamentos amoblados en ${s.barriosTxt}, desde ${B.usd(s.min)} por mes, todo incluido y sin garantía inmobiliaria.`],
+          ['¿Se puede alquilar por 4, 5, 6 u 8 meses?',
+            'Sí. Cualquier plazo entre 3 y 12 meses, con un solo precio final por mes: alquiler, expensas, servicios y muebles.'],
+          ['¿Puedo alquilar por un año sin garantía?',
+            'Sí. Hasta 12 meses, sin garantía inmobiliaria ni seguro de caución. Alcanza con demostrar ingresos, propios o de alguien que te avale.'],
+          ['¿Y por menos de 3 meses?',
+            'BAIREN alquila desde 3 meses. Por menos tiempo es alquiler turístico, que funciona con otras reglas.'],
+          ['¿Y por 2 años o más?',
+            'Hoy publicamos alquileres de 3 a 12 meses. Si necesitás 2 años o más, escribinos por WhatsApp y te decimos si hay algo.'],
+        ],
+      },
+    },
+    masGuiasH: 'Más guías',
   },
   en: {
     lang: 'en', path: '/en/furnished-apartments-buenos-aires', otro: '/alquiler-amoblado-buenos-aires', otroLbl: 'ES', otroLang: 'es',
@@ -121,6 +227,10 @@ const T = {
     usd: B.usdEn,
     fecha: d => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'America/Argentina/Buenos_Aires' }),
     faq: s => [
+      ['I don\'t have an Argentine guarantor or surety bond. Where can I rent in Buenos Aires?',
+        `BAIREN doesn't ask for either. There are ${s.total} furnished apartments for 3 to 12 months in ${s.barriosTxtEn}, from ${B.usdEn(s.min)} per month, all inclusive. Proof of income is enough, your own or from someone who backs you.`],
+      ['Where can I rent an apartment for 3 months in Buenos Aires?',
+        `At BAIREN stays run from 3 to 12 months: you can rent for 3, 4 or 6 months or a full year, furnished and with one final monthly price. Today from ${B.usdEn(s.min)} per month.`],
       ['Can I rent an apartment in Buenos Aires without a local guarantor?',
         'Yes. BAIREN\'s medium-term rentals require no local guarantor ("garantía inmobiliaria") and no surety bond ("seguro de caución"). Proof of income, your own or from someone who backs you, is enough, and you book with a digital contract in US dollars.'],
       ['Can foreigners rent?',
@@ -138,61 +248,235 @@ const T = {
       ['How do I book a viewing?',
         'Message +54 11 2310 6629 on WhatsApp, or use the button on each listing, and someone from the team will set the day and time. Asking is free.'],
     ],
+    // ── Neighbourhood page (/en/furnished-apartments-<barrio>) ──
+    zPath: slug => `/en/furnished-apartments-${slug}`,
+    zTitle: (z, n) => `Furnished apartments for monthly rent in ${z}: ${n} prices · BAIREN`,
+    zH1: z => `Furnished apartments for monthly rent in ${z}`,
+    zKicker: z => `Neighbourhood guide · ${z}`,
+    zLede: (s, z) => s.total === 1
+      ? `BAIREN has 1 furnished apartment in ${z}${s.incluye} for stays of 3 to 12 months, at ${B.usdEn(s.min)} per month. Final price in US dollars covering rent, building fees, utilities and furniture, with no local guarantor and no surety bond.`
+      : `BAIREN has ${s.total} furnished apartments in ${z}${s.incluye} for stays of 3 to 12 months, ${s.libres} available today. They range from ${B.usdEn(s.min)} to ${B.usdEn(s.max)} per month, final price in US dollars: rent, building fees, utilities and furniture, with no local guarantor and no surety bond.`,
+    zIncluye: bs => ` (${lista(bs, 'and')})`,
+    zMeta: (s, z) => `Furnished apartments in ${z} for 3 to 12 months, all inclusive, no guarantor needed. ${s.total === 1 ? '1 apartment' : s.total + ' apartments'} from ${B.usdEn(s.min)} per month. Today's prices.`,
+    tamH: z => `How much it costs to rent in ${z}`,
+    tamSub: 'Lowest monthly price by size, with today\'s data.',
+    tamLbl: a => a >= 4 ? '4 rooms or more' : `${a} ${a === 1 ? 'room (studio)' : 'rooms'}`,
+    tamFila: (n, l) => `${n} ${n === 1 ? 'apartment' : 'apartments'}, ${l} available`,
+    zListaH: z => `Apartments in ${z}`,
+    otrosH: 'Other neighbourhoods',
+    otrosSub: 'The same, across the rest of Buenos Aires.',
+    verBarrio: z => `See ${z}`,
+    verTodos: 'See all neighbourhoods',
+    verCatZona: z => `See ${z} in the catalogue`,
+    zFaq: (s, z, q) => [
+      [`How much does a furnished apartment cost in ${z}?`,
+        `Today, at BAIREN, ${s.total === 1 ? B.usdEn(s.min) : `from ${B.usdEn(s.min)} to ${B.usdEn(s.max)}`} per month. ${s.tamTxtEn} The price is final: it includes rent, building fees, utilities and furniture, except for units marked "plus building fees".`],
+      [`Can I rent in ${z} without a local guarantor?`,
+        'Yes. BAIREN\'s medium-term rentals require no local guarantor ("garantía inmobiliaria") and no surety bond ("seguro de caución"). Proof of income, your own or from someone who backs you, is enough, and you book with a digital contract in US dollars.'],
+      [`Where are the apartments in ${z}?`,
+        `${s.dondeTxtEn} Each one has its own page with photos, map and price.`],
+      [`What is it like to live in ${z}?`, q],
+      ['How long can I stay?',
+        'From 3 to 12 months. These are medium-term rentals: for people moving to Buenos Aires to work, study or live for a while, or in between homes.'],
+      ['Can foreigners rent?',
+        'Yes. You need your passport and proof of income, your own or from someone who backs you. No Argentine guarantor is needed. Prices and contracts are in US dollars, and the team replies in English.'],
+      ['How do I book a viewing?',
+        'Message +54 11 2310 6629 on WhatsApp, or use the button on each listing, and someone from the team will set the day and time. Asking is free.'],
+    ],
+
+    // ── Neighbourhood with no units today ──
+    cTitle: (b, n) => `Furnished monthly rentals in and around ${b}, no guarantor (${n}) · BAIREN`,
+    cLede: (b, cercaTxt) => `BAIREN has no apartments in ${b} today. The closest ones are in ${cercaTxt}: furnished, for 3 to 12 months, final price in US dollars, with no local guarantor and no surety bond.`,
+    cMeta: (b, s) => `Looking for a furnished rental in ${b} with no guarantor? Today there are ${s.total} apartments nearby, for 3 to 12 months, all inclusive, from ${B.usdEn(s.min)} per month.`,
+    cListaH: b => `Closest to ${b}`,
+    cAvisoBtn: 'Let me know when there is one',
+    cAvisoMsg: b => `Hi, I am looking for a furnished apartment in ${b}. Can you let me know if one comes up?`,
+    cFaq: (b, s, cercaNombres, desc) => [
+      [`Where can I rent a furnished apartment in ${b} without a guarantor?`,
+        `BAIREN has no units in ${b} today, but there are ${s.total} close by, in ${cercaNombres}, from ${B.usdEn(s.min)} per month, for 3 to 12 months, with no local guarantor and no surety bond. Message us on WhatsApp if you want us to let you know when one comes up in ${b}.`],
+      [`What is ${b} like?`, desc],
+    ],
+    temas: {
+      'sin-garantia': {
+        title: n => `Renting in Buenos Aires without a guarantor or surety bond (${n}) · BAIREN`,
+        h1: 'Renting in Buenos Aires without a guarantor or surety bond',
+        kicker: 'Guide · No guarantor',
+        lede: s => `No Argentine guarantor ("garantía inmobiliaria") and no surety bond ("seguro de caución")? You can still rent with BAIREN: ${s.total} furnished apartments for 3 to 12 months across ${s.zonas} neighbourhoods, ${s.libres} available today, from ${B.usdEn(s.min)} per month. Instead of a guarantor, proof of income is enough, your own or from someone who backs you.`,
+        meta: s => `No guarantor or surety bond? Rent a furnished apartment in Buenos Aires for 3 to 12 months with BAIREN: ${s.total} apartments from ${B.usdEn(s.min)} per month, all inclusive.`,
+        bloqueH: 'What we ask for instead of a guarantor',
+        bloque: [
+          ['Your ID', 'Passport if you are coming from abroad.'],
+          ['Your income', 'Your own or from someone who backs you.'],
+          ['A viewing', 'You see the apartment and we meet before signing.'],
+          ['Digital contract', 'In US dollars. No guarantor and no surety bond.'],
+        ],
+        faq: s => [
+          ['I don\'t have an Argentine guarantor. Where can I rent in Buenos Aires?',
+            `BAIREN doesn't ask for one. There are ${s.total} furnished apartments for 3 to 12 months in ${s.barriosTxtEn}, from ${B.usdEn(s.min)} per month, all inclusive. Proof of income is enough, your own or from someone who backs you.`],
+          ['I don\'t have a surety bond ("seguro de caución"). Can I still rent?',
+            'Yes. BAIREN\'s medium-term rentals require no surety bond and no guarantor. You sign a digital contract in US dollars after viewing the unit.'],
+          ['I\'m a foreigner with no guarantor in Buenos Aires. Can I rent?',
+            'Yes. That is exactly who it is for: with your passport and proof of income, your own or from someone who backs you, you can rent a furnished apartment for 3 to 12 months.'],
+        ],
+      },
+      'por-meses': {
+        title: n => `Renting for 3, 6 or 12 months in Buenos Aires: furnished apartments (${n}) · BAIREN`,
+        h1: 'Renting for 3, 6 or 12 months in Buenos Aires',
+        kicker: 'Guide · Monthly rentals',
+        lede: s => `With BAIREN you rent a furnished apartment for as long as you need between 3 and 12 months: ${s.total} apartments across ${s.zonas} neighbourhoods, ${s.libres} available today, from ${B.usdEn(s.min)} per month, all inclusive and with no guarantor or surety bond.`,
+        meta: s => `Rent for 3, 4, 6 or 12 months in Buenos Aires: furnished apartments, all inclusive, no guarantor. ${s.total} apartments from ${B.usdEn(s.min)} per month.`,
+        bloqueH: 'How long you can stay',
+        bloque: [
+          ['3 months', 'The minimum. For a job, a semester or while you look for something permanent.'],
+          ['4 to 11 months', 'As many months as you need, with one final monthly price.'],
+          ['12 months', 'A full year, furnished and with no guarantor.'],
+          ['Over a year', 'Today we list stays of up to 12 months. If you need 2 years or more, message us and we will tell you what there is.'],
+        ],
+        faq: s => [
+          ['Where can I rent an apartment for 3 months in Buenos Aires?',
+            `At BAIREN stays start at 3 months. There are ${s.total} furnished apartments in ${s.barriosTxtEn}, from ${B.usdEn(s.min)} per month, all inclusive and with no guarantor.`],
+          ['Can I rent for 4, 5, 6 or 8 months?',
+            'Yes. Any length between 3 and 12 months, with one final monthly price: rent, building fees, utilities and furniture.'],
+          ['Can I rent for a year without a guarantor?',
+            'Yes. Up to 12 months, with no local guarantor and no surety bond. Proof of income is enough, your own or from someone who backs you.'],
+          ['What about less than 3 months?',
+            'BAIREN rents from 3 months. Shorter stays are tourist rentals, which follow different rules.'],
+          ['What about 2 years or more?',
+            'Today we list rentals from 3 to 12 months. If you need 2 years or more, message us on WhatsApp and we will tell you if there is something.'],
+        ],
+      },
+    },
+    masGuiasH: 'More guides',
   },
 };
 
 module.exports = async (req, res) => {
   const L = T[req.query.lang === 'en' ? 'en' : 'es'];
   const todas = await B.publicadas();
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
   if (!todas) {
     res.statusCode = 503;
     res.setHeader('Retry-After', '120');
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
     return res.end('<!doctype html><meta charset="utf-8"><title>BAIREN</title><p style="font-family:sans-serif;padding:40px">Estamos actualizando los precios. Probá de nuevo en un minuto o mirá el <a href="/catalogo.html">catálogo</a>.</p>');
   }
   const props = todas.filter(B.enCatalogo)
     .sort((a, b) => (B.disponible(b) - B.disponible(a)) || (B.precio(a) - B.precio(b)));
-  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+
+  // Qué página es: toda la ciudad, un tema, un barrio con unidades o uno cercano
+  const zonaSlug = String(req.query.zona || '');
+  const tema = String(req.query.tema || '');
+  let ctx = { tipo: 'general' };
+  if (tema && L.temas[tema]) ctx = { tipo: 'tema', tema };
+  else if (zonaSlug && zonaSlug !== 'buenos-aires') {
+    const z = B.ZONAS.find(z => B.slugZona(z.key) === zonaSlug);
+    const c = B.CERCA.find(c => B.slugZona(c.key) === zonaSlug);
+    const propias = props.filter(p => (z && B.zonaDe(p.barrio) === z.key) || (c && B.norm(p.barrio) === B.norm(c.key)));
+    if (propias.length) ctx = { tipo: 'zona', key: (z || c).key, slug: zonaSlug, propias, desc: L.zonaDesc(z || c) };
+    else if (c) ctx = { tipo: 'cerca', key: c.key, slug: zonaSlug, cerca: c.cerca, desc: L.zonaDesc(c) };
+    else {
+      res.statusCode = 404;
+      ctx = { tipo: 'general', noindex: true };
+    }
+  }
   res.setHeader('Cache-Control', 'public, s-maxage=900, stale-while-revalidate=86400');
-  res.end(pagina(L, props));
+  res.end(pagina(L, props, ctx));
 };
 
-function pagina(L, props) {
+function stats(props) {
   const zonas = B.porZona(props);
   const precios = props.map(B.precio).filter(Boolean);
   const nombres = zonas.filter(z => z.key !== 'Otros').map(z => z.key);
-  const lista = (arr, y) => arr.length > 1 ? arr.slice(0, -1).join(', ') + ` ${y} ` + arr[arr.length - 1] : arr.join('');
-  const s = {
+  // desde cuánto por tamaño (1, 2, 3 y 4 o más ambientes)
+  const tam = [1, 2, 3, 4].map(a => {
+    const ps = props.filter(p => (a === 4 ? p.ambientes >= 4 : p.ambientes === a) && B.precio(p));
+    return ps.length ? { a, n: ps.length, libres: ps.filter(B.disponible).length, desde: Math.min(...ps.map(B.precio)) } : null;
+  }).filter(Boolean);
+  const barrios = [...new Set(props.map(p => p.barrio))];
+  const calles = props.slice(0, 6).map(p => `${p.dir} (${p.barrio})`);
+  return {
     total: props.length,
     libres: props.filter(B.disponible).length,
     zonas: nombres.length,
-    min: Math.min(...precios), max: Math.max(...precios),
+    min: precios.length ? Math.min(...precios) : 0, max: precios.length ? Math.max(...precios) : 0,
     barriosTxt: lista(nombres, 'y'),
     barriosTxtEn: lista(nombres, 'and'),
     zonasTxt: zonas.filter(z => z.desde && z.key !== 'Otros').slice(0, 4).map(z => `En ${z.key}, desde ${B.usd(z.desde)}`).join('; ') + '.',
     zonasTxtEn: zonas.filter(z => z.desde && z.key !== 'Otros').slice(0, 4).map(z => `In ${z.key}, from ${B.usdEn(z.desde)}`).join('; ') + '.',
+    tam,
+    tamTxt: tam.map(t => `${t.a >= 4 ? '4 ambientes o más' : t.a === 1 ? '1 ambiente' : t.a + ' ambientes'}, desde ${B.usd(t.desde)}`).join('; ') + '.',
+    tamTxtEn: tam.map(t => `${t.a >= 4 ? '4+ rooms' : t.a === 1 ? 'studios' : t.a + ' rooms'} from ${B.usdEn(t.desde)}`).join('; ') + '.',
+    barrios,
+    dondeTxt: `En ${lista(calles, 'y')}${props.length > 6 ? `, entre otras` : ''}.`,
+    dondeTxtEn: `At ${lista(calles, 'and')}${props.length > 6 ? `, among others` : ''}.`,
   };
+}
+
+function pagina(L, props, ctx) {
+  const en = L.lang === 'en';
   const hoy = new Date();
-  const pageUrl = B.SITE_ROOT + L.path;
-  const otroUrl = B.SITE_ROOT + L.otro;
+  const anio = hoy.getFullYear();
+  const zonas = B.porZona(props);
+  const sAll = stats(props);
   const wa = msg => `https://wa.me/${B.WHATSAPP_NUM}?text=${encodeURIComponent(msg)}`;
-  const faq = L.faq(s);
+  const otroL = T[en ? 'es' : 'en'];
+
+  // ── Lo que cambia según la página ──
+  let path, otroPath, title, h1, kicker, lede, meta, faq, lst, listaH, waMsg, verHref, extra = '', bloqueH = null, bloque = null;
+  if (ctx.tipo === 'tema') {
+    const t = L.temas[ctx.tema], tm = B.TEMAS.find(x => x.key === ctx.tema);
+    path = en ? tm.en : tm.es; otroPath = en ? tm.es : tm.en;
+    title = t.title(anio); h1 = t.h1; kicker = t.kicker; lede = t.lede(sAll); meta = t.meta(sAll);
+    // de las generales salen las que el tema ya contesta (ver el orden de faq en T):
+    // sin garantía → 0 y 2 (las de garantía); por meses → 1 y 7 (las de plazo)
+    const fuera = ctx.tema === 'sin-garantia' ? [0, 2] : [1, 7];
+    faq = [...t.faq(sAll), ...L.faq(sAll).filter((_, i) => !fuera.includes(i))];
+    lst = props; listaH = `${L.listaH} (${props.length})`; waMsg = L.waMsg; verHref = '/catalogo.html';
+    bloqueH = t.bloqueH; bloque = t.bloque;
+  } else if (ctx.tipo === 'zona') {
+    const s = stats(ctx.propias);
+    const subs = s.barrios.filter(b => B.norm(b) !== B.norm(ctx.key));
+    s.incluye = subs.length ? L.zIncluye(subs) : '';
+    path = L.zPath(ctx.slug); otroPath = otroL.zPath(ctx.slug);
+    title = L.zTitle(ctx.key, anio); h1 = L.zH1(ctx.key); kicker = L.zKicker(ctx.key);
+    lede = L.zLede(s, ctx.key); meta = L.zMeta(s, ctx.key);
+    faq = L.zFaq(s, ctx.key, ctx.desc);
+    lst = ctx.propias; listaH = `${L.zListaH(ctx.key)} (${ctx.propias.length})`;
+    waMsg = L.waMsgZona(ctx.key); verHref = `/catalogo.html?barrio=${encodeURIComponent(B.zonaDe(ctx.propias[0].barrio))}`;
+    extra = seccionTam(L, s, ctx.key);
+    ctx.s = s;
+  } else if (ctx.tipo === 'cerca') {
+    const cz = ctx.cerca.map(k => zonas.find(z => z.key === k)).filter(Boolean);
+    lst = cz.flatMap(z => z.props).sort((a, b) => (B.disponible(b) - B.disponible(a)) || (B.precio(a) - B.precio(b)));
+    const s = stats(lst);
+    const cercaTxt = lista(cz.map(z => `${z.key} (${z.total}, ${L.desde} ${L.usd(z.desde)})`), en ? 'and' : 'y');
+    const cercaNombres = lista(cz.map(z => z.key), en ? 'and' : 'y');
+    path = L.zPath(ctx.slug); otroPath = otroL.zPath(ctx.slug);
+    title = L.cTitle(ctx.key, anio); h1 = L.zH1(ctx.key); kicker = L.zKicker(ctx.key);
+    lede = L.cLede(ctx.key, cercaTxt); meta = L.cMeta(ctx.key, s);
+    faq = [...L.cFaq(ctx.key, s, cercaNombres, ctx.desc), ...L.zFaq(s, ctx.key, ctx.desc).slice(4)];
+    listaH = `${L.cListaH(ctx.key)} (${lst.length})`;
+    waMsg = L.cAvisoMsg(ctx.key); verHref = '/catalogo.html';
+  } else {
+    path = L.path; otroPath = L.otro;
+    title = L.title(anio); h1 = L.h1; kicker = L.kicker; lede = L.lede(sAll); meta = L.meta(sAll);
+    faq = L.faq(sAll); lst = props; listaH = `${L.listaH} (${props.length})`; waMsg = L.waMsg; verHref = '/catalogo.html';
+  }
+  const pageUrl = B.SITE_ROOT + path;
+  const otroUrl = B.SITE_ROOT + otroPath;
 
   const ld = {
     '@context': 'https://schema.org',
     '@graph': [
       {
-        '@type': 'WebPage', '@id': pageUrl + '#page', url: pageUrl, name: L.h1, inLanguage: L.lang,
-        description: L.meta(s), dateModified: hoy.toISOString(),
+        '@type': 'WebPage', '@id': pageUrl + '#page', url: pageUrl, name: h1, inLanguage: L.lang,
+        description: meta, dateModified: hoy.toISOString(),
         isPartOf: { '@id': B.SITE_ROOT + '/#web' }, publisher: { '@id': B.ORG_ID },
-        about: { '@type': 'Place', name: 'Buenos Aires, Argentina' },
+        about: { '@type': 'Place', name: (ctx.key ? ctx.key + ', ' : '') + 'Buenos Aires, Argentina' },
         mainEntity: { '@id': pageUrl + '#lista' },
       },
       {
-        '@type': 'ItemList', '@id': pageUrl + '#lista', name: L.listaH, numberOfItems: props.length,
-        itemListElement: props.map((p, i) => ({
-          '@type': 'ListItem', position: i + 1, url: B.url(p), name: `${B.titulo(p)} — ${p.barrio}`,
-        })),
+        '@type': 'ItemList', '@id': pageUrl + '#lista', name: listaH, numberOfItems: lst.length,
+        itemListElement: lst.map((p, i) => ({ '@type': 'ListItem', position: i + 1, url: B.url(p), name: `${B.titulo(p)} — ${p.barrio}` })),
       },
       {
         '@type': 'FAQPage', '@id': pageUrl + '#faq', inLanguage: L.lang,
@@ -202,7 +486,8 @@ function pagina(L, props) {
         '@type': 'BreadcrumbList',
         itemListElement: [
           { '@type': 'ListItem', position: 1, name: 'BAIREN', item: B.SITE_ROOT + '/' },
-          { '@type': 'ListItem', position: 2, name: L.h1, item: pageUrl },
+          ...(ctx.tipo === 'general' ? [] : [{ '@type': 'ListItem', position: 2, name: L.h1, item: B.SITE_ROOT + L.path }]),
+          { '@type': 'ListItem', position: ctx.tipo === 'general' ? 2 : 3, name: h1, item: pageUrl },
         ],
       },
     ],
@@ -214,20 +499,21 @@ function pagina(L, props) {
     // más cara del barrio (suele ser la más vistosa); si no hay, la primera foto
     const conPortada = z.props.filter(p => p.portada_url).sort((a, b) => (B.disponible(b) - B.disponible(a)) || (B.precio(b) - B.precio(a)));
     const ej = conPortada[0] || z.props.find(p => p.fotos[0]);
+    const href = z.key !== 'Otros' ? L.zPath(B.slugZona(z.key)) : '/catalogo.html';
     return `<article class="zona">
       ${ej ? `<img src="${B.esc(foto(ej, 640))}" alt="${B.esc(`${B.titulo(ej)}, ${ej.barrio}`)}" loading="lazy" width="640" height="400">` : ''}
       <div class="zona-txt">
         <h3>${B.esc(z.key)}</h3>
         <p class="zona-num">${L.deptos(z.total)} · ${L.libres(z.libres)}</p>
         ${z.desde ? `<p class="zona-precio"><span>${L.desde}</span> ${B.esc(L.usd(z.desde))} <span>${L.porMes}</span></p>` : ''}
-        ${z.key !== 'Otros' ? `<p class="zona-desc">${B.esc(L.zonaDesc(B.ZONAS.find(x => x.key === z.key)))}</p>
-        <a class="link" href="/catalogo.html?barrio=${encodeURIComponent(z.key)}">${B.esc(L.verZona(z.key))} →</a>` : ''}
+        ${z.key !== 'Otros' ? `<p class="zona-desc">${B.esc(L.zonaDesc(B.ZONAS.find(x => x.key === z.key)))}</p>` : ''}
+        <a class="link" href="${href}">${B.esc(L.verBarrio(z.key))} →</a>
       </div>
     </article>`;
   };
   const tarjetaProp = p => `<li class="prop">
       <a href="${B.esc(B.url(p))}">
-        ${p.fotos[0] || p.portada_url ? `<img src="${B.esc(foto(p, 480))}" alt="${B.esc(`${L.lang === 'en' ? 'Furnished apartment at' : 'Departamento amoblado en'} ${B.titulo(p)}, ${p.barrio}`)}" loading="lazy" width="480" height="300">` : ''}
+        ${p.fotos[0] || p.portada_url ? `<img src="${B.esc(foto(p, 480))}" alt="${B.esc(`${en ? 'Furnished apartment at' : 'Departamento amoblado en'} ${B.titulo(p)}, ${p.barrio}`)}" loading="lazy" width="480" height="300">` : ''}
         <span class="estado ${B.disponible(p) ? 'ok' : 'res'}">${B.disponible(p) ? L.disponible : L.reservado}</span>
         <span class="prop-txt">
           <strong>${B.esc(B.titulo(p))}</strong>
@@ -238,22 +524,31 @@ function pagina(L, props) {
       </a>
     </li>`;
 
+  // Links a las demás guías (barrios y temas): para la gente y para los robots
+  const otras = B.guias(props).filter(g => (en ? g.en : g.es) !== path);
+  const masGuias = `<section class="alt"><div class="wrap">
+    <h2>${L.masGuiasH}</h2>
+    <div class="guias">${otras.map(g => `<a href="${en ? g.en : g.es}">${B.esc(g.tipo === 'zona' || g.tipo === 'cerca' ? g.nombre : (en ? g.nombreEn : g.nombre))}</a>`).join('')}</div>
+  </div></section>`;
+
+  const robots = ctx.noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large';
+
   return `<!DOCTYPE html>
 <html lang="${L.lang}">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>${B.esc(L.title(hoy.getFullYear()))}</title>
-<meta name="description" content="${B.esc(L.meta(s))}"/>
-<meta name="robots" content="index, follow, max-image-preview:large"/>
+<title>${B.esc(title)}</title>
+<meta name="description" content="${B.esc(meta)}"/>
+<meta name="robots" content="${robots}"/>
 <link rel="canonical" href="${pageUrl}"/>
-<link rel="alternate" hreflang="${L.lang === 'en' ? 'en' : 'es'}" href="${pageUrl}"/>
-<link rel="alternate" hreflang="${L.otroLang}" href="${otroUrl}"/>
-<link rel="alternate" hreflang="x-default" href="${B.SITE_ROOT}/alquiler-amoblado-buenos-aires"/>
+<link rel="alternate" hreflang="${en ? 'en' : 'es'}" href="${pageUrl}"/>
+<link rel="alternate" hreflang="${en ? 'es' : 'en'}" href="${otroUrl}"/>
+<link rel="alternate" hreflang="x-default" href="${en ? otroUrl : pageUrl}"/>
 <meta property="og:type" content="website"/>
 <meta property="og:site_name" content="BAIREN"/>
-<meta property="og:title" content="${B.esc(L.h1)}"/>
-<meta property="og:description" content="${B.esc(L.meta(s))}"/>
+<meta property="og:title" content="${B.esc(h1)}"/>
+<meta property="og:description" content="${B.esc(meta)}"/>
 <meta property="og:url" content="${pageUrl}"/>
 <meta property="og:image" content="${B.SITE_ROOT}/og-card.jpg"/>
 <meta name="twitter:card" content="summary_large_image"/>
@@ -332,11 +627,26 @@ footer{background:var(--navy-dark);border-top:1px solid var(--gold);color:rgba(2
 footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;align-items:center;justify-content:space-between}
 footer img{height:40px;width:auto}
 footer a{color:var(--gold-light)}
-@media(max-width:900px){.pasos{grid-template-columns:repeat(2,1fr)}.zonas,.props,.resenas{grid-template-columns:repeat(2,1fr)}}
+/* bloques de 4 (qué te pedimos, plazos) y tabla de precios por tamaño */
+.bloque{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:28px}
+.bloque div{background:#fff;border:1px solid var(--line);padding:22px}
+.bloque b{display:block;font-family:var(--display);font-weight:500;font-size:1.3rem;color:var(--navy);margin-bottom:6px}
+.bloque p{color:var(--mid);font-size:.98rem}
+.tam{margin-top:24px;border-top:1px solid var(--line);max-width:760px}
+.tam div{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:16px 0;border-bottom:1px solid var(--line)}
+.tam b{font-weight:500;color:var(--navy)}
+.tam span{color:var(--mid);font-size:.92rem}
+.tam strong{font-size:1.2rem;color:var(--navy);white-space:nowrap}
+.guias{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.guias a{border:1px solid var(--line);background:#fff;padding:10px 16px;font-size:.95rem;color:var(--navy)}
+.guias a:hover{border-color:var(--gold)}
+@media(max-width:900px){.bloque{grid-template-columns:repeat(2,1fr)}.pasos{grid-template-columns:repeat(2,1fr)}.zonas,.props,.resenas{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:600px){
   .zonas,.props,.resenas{grid-template-columns:1fr}.btn{width:100%}.nav-r a.hide-m{display:none}
   section{padding:44px 0}
-  .pasos{grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
+  .pasos,.bloque{grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
+  .bloque div{padding:14px}.bloque b{font-size:1.1rem}.bloque p{font-size:.9rem;line-height:1.4}
+  .tam div{flex-wrap:wrap}.tam span{order:3;width:100%}
   .paso{padding:14px}.paso b{font-size:1.1rem}.paso p{font-size:.9rem;line-height:1.4}
   /* en el celular, barrios y departamentos van como filas con la foto al costado */
   .zonas,.props{gap:10px;margin-top:20px}
@@ -356,44 +666,52 @@ footer a{color:var(--gold-light)}
   <div class="nav-r">
     <a href="/catalogo.html">${L.nav[0]}</a>
     <a class="hide-m" href="/#contacto">${L.nav[1]}</a>
-    <a class="lng" href="${L.otro}" hreflang="${L.otroLang}" lang="${L.otroLang}">${L.otroLbl}</a>
+    <a class="lng" href="${otroPath}" hreflang="${L.otroLang}" lang="${L.otroLang}">${L.otroLbl}</a>
   </div>
 </nav>
 
 <header class="hero">
   <div class="wrap">
-    <p class="kicker">${L.kicker}</p>
-    <h1>${L.h1}</h1>
-    <p class="lede">${B.esc(L.lede(s))}</p>
+    <p class="kicker">${B.esc(kicker)}</p>
+    <h1>${B.esc(h1)}</h1>
+    <p class="lede">${B.esc(lede)}</p>
     <p class="act">${B.esc(L.act(L.fecha(hoy)))}</p>
     <div class="ctas">
-      <a class="btn btn-gold" href="/catalogo.html">${L.ver}</a>
-      <a class="btn btn-line" href="${wa(L.waMsg)}" target="_blank" rel="noopener">${L.wa}</a>
+      ${ctx.tipo === 'cerca'
+        ? `<a class="btn btn-gold" href="${wa(waMsg)}" target="_blank" rel="noopener">${L.cAvisoBtn}</a>`
+        : `<a class="btn btn-gold" href="${verHref}">${L.ver}</a>`}
+      <a class="btn btn-line" href="${wa(waMsg)}" target="_blank" rel="noopener">${L.wa}</a>
     </div>
   </div>
 </header>
 
 <main>
-<section>
+${bloque ? `<section>
+  <div class="wrap">
+    <h2>${bloqueH}</h2>
+    <div class="bloque">${bloque.map(([t, d]) => `<div><b>${t}</b><p>${d}</p></div>`).join('')}</div>
+  </div>
+</section>` : ''}
+${ctx.tipo === 'general' ? `<section>
   <div class="wrap">
     <h2>${L.pasosH}</h2>
     <div class="pasos">${L.pasos.map(([t, d]) => `<div class="paso"><b>${t}</b><p>${d}</p></div>`).join('')}</div>
   </div>
-</section>
-
-<section class="alt">
+</section>` : ''}
+${extra}
+${ctx.tipo === 'general' || ctx.tipo === 'tema' ? `<section class="alt">
   <div class="wrap">
     <h2>${L.barriosH}</h2>
     <p class="sub">${L.barriosSub}</p>
     <div class="zonas">${zonas.map(tarjetaZona).join('')}</div>
   </div>
-</section>
+</section>` : ''}
 
 <section>
   <div class="wrap">
-    <h2>${L.listaH} (${props.length})</h2>
+    <h2>${B.esc(listaH)}</h2>
     <p class="sub">${L.listaSub}</p>
-    <ul class="props">${props.map(tarjetaProp).join('')}</ul>
+    <ul class="props">${lst.map(tarjetaProp).join('')}</ul>
   </div>
 </section>
 
@@ -404,20 +722,30 @@ footer a{color:var(--gold-light)}
   </div>
 </section>
 
+${ctx.tipo === 'zona' || ctx.tipo === 'cerca' ? `<section>
+  <div class="wrap">
+    <h2>${L.otrosH}</h2>
+    <p class="sub">${L.otrosSub}</p>
+    <div class="zonas">${zonas.filter(z => z.key !== 'Otros' && z.key !== ctx.key).map(tarjetaZona).join('')}</div>
+  </div>
+</section>` : ''}
+
 <section>
   <div class="wrap">
     <h2>${L.resenasH}</h2>
-    <div class="resenas">${RESENAS[L.lang === 'en' ? 'en' : 'es'].map(([t, q]) => `<blockquote>“${B.esc(t)}”<cite>${B.esc(q)}</cite></blockquote>`).join('')}</div>
+    <div class="resenas">${RESENAS[en ? 'en' : 'es'].map(([t, q]) => `<blockquote>“${B.esc(t)}”<cite>${B.esc(q)}</cite></blockquote>`).join('')}</div>
   </div>
 </section>
+
+${masGuias}
 
 <section class="cierre">
   <div class="wrap">
     <h2>${L.cierreH}</h2>
     <p>${L.cierreP}</p>
     <div class="ctas">
-      <a class="btn btn-gold" href="${wa(L.waMsg)}" target="_blank" rel="noopener">${L.wa}</a>
-      <a class="btn btn-line" href="/catalogo.html">${L.ver}</a>
+      <a class="btn btn-gold" href="${wa(waMsg)}" target="_blank" rel="noopener">${L.wa}</a>
+      <a class="btn btn-line" href="${verHref}">${L.ver}</a>
     </div>
   </div>
 </section>
@@ -432,6 +760,18 @@ footer a{color:var(--gold-light)}
 <script src="/meta-pixel.js"></script>
 </body>
 </html>`;
+}
+
+/** "Cuánto cuesta alquilar en Palermo": desde cuánto por tamaño */
+function seccionTam(L, s, key) {
+  if (!s.tam.length) return '';
+  return `<section>
+  <div class="wrap">
+    <h2>${B.esc(L.tamH(key))}</h2>
+    <p class="sub">${L.tamSub}</p>
+    <div class="tam">${s.tam.map(t => `<div><b>${L.tamLbl(t.a)}</b><span>${L.tamFila(t.n, t.libres)}</span><strong>${L.desde} ${B.esc(L.usd(t.desde))}</strong></div>`).join('')}</div>
+  </div>
+</section>`;
 }
 
 /* Tres de las reseñas reales de la home (vault: Testimonios Reales), con su traducción */

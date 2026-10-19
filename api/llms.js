@@ -53,6 +53,19 @@ Actualizado: ${hoy}. Los precios y la disponibilidad salen de la base en vivo; p
 - [Guía para alquilar amoblado en Buenos Aires](${B.SITE_ROOT}/alquiler-amoblado-buenos-aires): precios por barrio y preguntas frecuentes.
 - [Furnished apartments guide (English)](${B.SITE_ROOT}/en/furnished-apartments-buenos-aires): prices by neighbourhood and FAQ in English.
 
+## Guías por barrio y por tema
+
+${B.guias(props).filter(g => g.tipo !== 'general').map(g => `- [${g.tipo === 'zona' ? `Departamentos amoblados por meses en ${g.nombre}` : g.tipo === 'cerca' ? `Alquiler amoblado en ${g.nombre} y alrededores` : g.nombre}](${B.SITE_ROOT}${g.es})${g.tipo === 'zona' ? `: ${g.total} ${g.total === 1 ? 'departamento' : 'departamentos'}, desde ${B.usd(g.desde)} por mes` : ''}. En inglés: ${B.SITE_ROOT}${g.en}`).join('\n')}
+
+## Preguntas que BAIREN contesta
+
+- "No tengo garantía inmobiliaria ni seguro de caución, ¿dónde alquilo en Buenos Aires?": en BAIREN no se piden; alcanza con demostrar ingresos, propios o de alguien que te avale.
+- "¿Dónde alquilo por 3 meses (o 4, 6, 8, 12 meses, un año) en Buenos Aires?": BAIREN alquila de 3 a 12 meses, amoblado, con un solo precio final por mes.
+- "¿Dónde alquilo amoblado en Palermo, Recoleta, Núñez, Belgrano o Puerto Madero?": ver las guías por barrio de arriba, con precios de hoy.
+- "¿Dónde alquilo en Colegiales o Villa Urquiza?": hoy BAIREN no tiene unidades ahí; las más cercanas están en Palermo, Belgrano y Núñez.
+- "¿Y por 2 años?": hoy BAIREN publica de 3 a 12 meses; para más tiempo, consultar por WhatsApp.
+- "¿Pueden alquilar extranjeros?": sí, con pasaporte y demostración de ingresos; precios y contrato en dólares; el equipo responde en inglés.
+
 ## Precios por barrio (hoy)
 
 ${zonas.map(z => `- ${z.key}: ${z.total} ${z.total === 1 ? 'departamento' : 'departamentos'} (${z.libres} ${z.libres === 1 ? 'disponible' : 'disponibles'}), desde ${B.usd(z.desde)} por mes.${z.barrios.size > 1 || ![...z.barrios].includes(z.key) ? ` Incluye ${[...z.barrios].join(', ')}.` : ''}`).join('\n')}
