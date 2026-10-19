@@ -46,7 +46,7 @@ const T = {
     desde: 'desde', porMes: 'por mes',
     verZona: z => `Ver los de ${z}`,
     listaH: 'Todos los departamentos',
-    listaSub: 'Cada uno con su ficha: fotos, plano de datos y el botón para consultar.',
+    listaSub: 'Cada uno con su ficha: fotos, datos y el botón para consultar.',
     reservado: 'Reservado', disponible: 'Disponible',
     allin: 'todo incluido', exp: 'más expensas',
     amb: n => `${n} amb.`,
@@ -123,6 +123,7 @@ const T = {
 
     // ── Barrio sin unidades hoy (Colegiales, Villa Urquiza): se dice y se muestran las más cerca ──
     cTitle: (b, n) => `Alquiler amoblado por meses en ${b} y alrededores, sin garantía (${n}) · BAIREN`,
+    cH1: b => `Alquiler amoblado por meses en ${b} y alrededores`,
     cLede: (b, cercaTxt) => `Hoy BAIREN no tiene departamentos en ${b}. Los más cerca están en ${cercaTxt}: amoblados, de 3 a 12 meses, con precio final en dólares y sin garantía inmobiliaria ni seguro de caución.`,
     cMeta: (b, s) => `¿Buscás alquilar amoblado en ${b}, sin garantía? Hoy hay ${s.total} departamentos muy cerca, de 3 a 12 meses, todo incluido, desde ${B.usd(s.min)} por mes.`,
     cListaH: b => `Los más cerca de ${b}`,
@@ -286,6 +287,7 @@ const T = {
 
     // ── Neighbourhood with no units today ──
     cTitle: (b, n) => `Furnished monthly rentals in and around ${b}, no guarantor (${n}) · BAIREN`,
+    cH1: b => `Furnished monthly rentals in and around ${b}`,
     cLede: (b, cercaTxt) => `BAIREN has no apartments in ${b} today. The closest ones are in ${cercaTxt}: furnished, for 3 to 12 months, final price in US dollars, with no local guarantor and no surety bond.`,
     cMeta: (b, s) => `Looking for a furnished rental in ${b} with no guarantor? Today there are ${s.total} apartments nearby, for 3 to 12 months, all inclusive, from ${B.usdEn(s.min)} per month.`,
     cListaH: b => `Closest to ${b}`,
@@ -451,7 +453,7 @@ function pagina(L, props, ctx) {
     const cercaTxt = lista(cz.map(z => `${z.key} (${z.total}, ${L.desde} ${L.usd(z.desde)})`), en ? 'and' : 'y');
     const cercaNombres = lista(cz.map(z => z.key), en ? 'and' : 'y');
     path = L.zPath(ctx.slug); otroPath = otroL.zPath(ctx.slug);
-    title = L.cTitle(ctx.key, anio); h1 = L.zH1(ctx.key); kicker = L.zKicker(ctx.key);
+    title = L.cTitle(ctx.key, anio); h1 = L.cH1(ctx.key); kicker = L.zKicker(ctx.key);
     lede = L.cLede(ctx.key, cercaTxt); meta = L.cMeta(ctx.key, s);
     faq = [...L.cFaq(ctx.key, s, cercaNombres, ctx.desc), ...L.zFaq(s, ctx.key, ctx.desc).slice(4)];
     listaH = `${L.cListaH(ctx.key)} (${lst.length})`;
