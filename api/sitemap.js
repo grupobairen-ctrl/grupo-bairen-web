@@ -14,8 +14,6 @@ const B = require('./_bairen');
 const FIJAS = [
   { loc: '/', prio: '1.0' },
   { loc: '/catalogo.html', prio: '0.9' },
-  { loc: '/alquiler-amoblado-buenos-aires', prio: '0.9', alt: '/en/furnished-apartments-buenos-aires' },
-  { loc: '/en/furnished-apartments-buenos-aires', prio: '0.8', alt: '/alquiler-amoblado-buenos-aires' },
 ];
 
 module.exports = async (req, res) => {
@@ -27,11 +25,16 @@ module.exports = async (req, res) => {
     return res.end('Sitemap temporalmente no disponible');
   }
   const props = todas.filter(B.enCatalogo);
+  // Las guías (general, temas y barrios), cada una con su par en el otro idioma
+  const guias = B.guias(props).flatMap(g => [
+    { loc: g.es, prio: g.tipo === 'general' ? '0.9' : '0.8', alt: g.en },
+    { loc: g.en, prio: g.tipo === 'general' ? '0.8' : '0.7', alt: g.es },
+  ]);
   const ultima = props.reduce((m, p) => ((p.updated_at || p.created_at) > m ? (p.updated_at || p.created_at) : m), '2026-10-19');
   const dia = s => String(s).slice(0, 10);
 
   const urls = [
-    ...FIJAS.map(f => `  <url>
+    ...[...FIJAS, ...guias].map(f => `  <url>
     <loc>${B.SITE_ROOT}${f.loc}</loc>
     <lastmod>${dia(ultima)}</lastmod>
     <priority>${f.prio}</priority>${f.alt ? `
