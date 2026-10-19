@@ -210,7 +210,8 @@ function pagina(L, props) {
 
   const foto = (p, w) => p.portada_url || B.sbImg(p.fotos[0], w);
   const tarjetaZona = z => {
-    const ej = z.props.find(p => p.fotos[0] || p.portada_url);
+    // la portada del catálogo es la foto elegida para vender; si no hay, la primera
+    const ej = z.props.find(p => p.portada_url) || z.props.find(p => p.fotos[0]);
     return `<article class="zona">
       ${ej ? `<img src="${B.esc(foto(ej, 640))}" alt="${B.esc(`${B.titulo(ej)}, ${ej.barrio}`)}" loading="lazy" width="640" height="400">` : ''}
       <div class="zona-txt">
@@ -230,7 +231,6 @@ function pagina(L, props) {
           <strong>${B.esc(B.titulo(p))}</strong>
           <span class="prop-barrio">${B.esc(p.barrio)}${p.ambientes ? ' · ' + L.amb(p.ambientes) : ''}${p.m2 ? ` · ${p.m2} m²` : ''}</span>
           <span class="prop-precio">${B.precio(p) ? B.esc(L.usd(B.precio(p))) : ''} <small>${L.porMes} · ${B.todoIncluido(p) ? L.allin : L.exp}</small></span>
-          <span class="prop-resumen">${B.esc(L.resumen(p))}</span>
           <span class="link">${L.verMas} →</span>
         </span>
       </a>
@@ -310,7 +310,7 @@ h2{font-family:var(--display);font-weight:500;font-size:clamp(1.6rem,4vw,2.3rem)
 .prop-barrio{font-size:.92rem;color:var(--mid)}
 .prop-precio{font-size:1.2rem;font-weight:600;color:var(--navy);margin-top:4px}
 .prop-precio small{font-size:.82rem;font-weight:400;color:var(--mid)}
-.prop-resumen{font-size:.88rem;color:var(--mid);flex:1}
+.prop .link{margin-top:auto;padding-top:6px}
 .faq{margin-top:24px;border-top:1px solid var(--line)}
 details{border-bottom:1px solid var(--line)}
 summary{cursor:pointer;list-style:none;padding:18px 36px 18px 0;font-weight:500;font-size:1.05rem;color:var(--navy);position:relative}
