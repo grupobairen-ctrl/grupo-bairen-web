@@ -31,28 +31,88 @@
   <link rel="preload" as="video" href="hero.mp4?v=2" type="video/mp4" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "BAIREN",
-    "url": "https://www.bairengroup.com",
-    "logo": "https://www.bairengroup.com/bairen_logo.png",
-    "image": "https://www.bairengroup.com/og-logo.jpg",
-    "description": "Departamentos amoblados a mediano plazo en Buenos Aires. Precio final con expensas, servicios y muebles incluidos, sin garantía inmobiliaria ni seguro de caución. CABA y GBA Norte.",
-    "telephone": "+54 11 2310 6629",
-    "email": "contacto@bairengroup.com",
-    "areaServed": [
-      { "@type": "City", "name": "Ciudad Autónoma de Buenos Aires" },
-      { "@type": "AdministrativeArea", "name": "GBA Norte" }
-    ],
-    "address": {
-      "@type": "PostalAddress",
-      "addressLocality": "Buenos Aires",
-      "addressRegion": "CABA",
-      "addressCountry": "AR"
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": [
+        "Organization",
+        "RealEstateAgent"
+      ],
+      "@id": "https://www.bairengroup.com/#org",
+      "name": "BAIREN",
+      "alternateName": "Bairen",
+      "url": "https://www.bairengroup.com",
+      "logo": "https://www.bairengroup.com/bairen_logo.png",
+      "image": "https://www.bairengroup.com/og-logo.jpg",
+      "description": "Departamentos amoblados a mediano plazo (de 3 a 12 meses) en Buenos Aires. Precio final en dólares con expensas, servicios y muebles incluidos, sin garantía inmobiliaria ni seguro de caución. Recoleta, Palermo, Núñez, Belgrano, Puerto Madero y más barrios de CABA.",
+      "slogan": "Buenos Aires en su máximo esplendor.",
+      "telephone": "+54 11 2310 6629",
+      "email": "contacto@bairengroup.com",
+      "contactPoint": [
+        {
+          "@type": "ContactPoint",
+          "contactType": "customer service",
+          "telephone": "+54 11 2310 6629",
+          "url": "https://wa.me/5491123106629",
+          "email": "contacto@bairengroup.com",
+          "availableLanguage": [
+            "Spanish",
+            "English"
+          ]
+        }
+      ],
+      "areaServed": [
+        {
+          "@type": "City",
+          "name": "Ciudad Autónoma de Buenos Aires"
+        },
+        {
+          "@type": "AdministrativeArea",
+          "name": "GBA Norte"
+        }
+      ],
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Buenos Aires",
+        "addressRegion": "CABA",
+        "addressCountry": "AR"
+      },
+      "sameAs": [
+        "https://www.instagram.com/bairenrealty/"
+      ],
+      "knowsLanguage": [
+        "es-AR",
+        "es",
+        "en"
+      ],
+      "knowsAbout": [
+        "Alquiler de departamentos amoblados a mediano plazo en Buenos Aires",
+        "Alquiler temporario sin garantía en CABA",
+        "Alquiler todo incluido con expensas y servicios",
+        "Barrios de Buenos Aires para vivir por meses"
+      ],
+      "makesOffer": {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "Alquiler de departamentos amoblados a mediano plazo, de 3 a 12 meses, todo incluido y sin garantía",
+          "areaServed": "Buenos Aires, Argentina"
+        }
+      }
     },
-    "knowsLanguage": ["es-AR", "es", "en"]
-  }
+    {
+      "@type": "WebSite",
+      "@id": "https://www.bairengroup.com/#web",
+      "url": "https://www.bairengroup.com/",
+      "name": "BAIREN",
+      "inLanguage": "es-AR",
+      "publisher": {
+        "@id": "https://www.bairengroup.com/#org"
+      }
+    }
+  ]
+}
   </script>
   <style>
     :root {
@@ -778,7 +838,14 @@
         <span class="rs-avg-l" id="rsAvgL"></span>
       </div>
     </div>
-    <div class="rs-muro reveal" id="rsMuro"></div>
+    <div class="rs-muro reveal" id="rsMuro">
+      <!-- Escritas en el HTML para quien lee sin JavaScript (buscadores y asistentes de IA, 19/10/2026). El script de abajo las reemplaza al instante por el muro. -->
+      <article class="rs-card"><p class="rs-txt">“La verdad, nos solucionaron todo. Respondieron todas las dudas sin importar la hora. Nos dieron la confianza que necesitábamos. Son unos genios.”</p><div class="rs-who"><div><div class="rs-name">Marcela R.</div><div class="rs-meta">Propietaria · Cliente verificado</div></div></div></article>
+      <article class="rs-card"><p class="rs-txt">“Hasta la fecha son los que mejor trato me han dado. Más que sorprendido y agradecido.”</p><div class="rs-who"><div><div class="rs-name">Tadeo T.</div><div class="rs-meta">Inquilino · Cliente verificado</div></div></div></article>
+      <article class="rs-card"><p class="rs-txt">“Muy satisfecho con la atención y el trabajo. Nunca tuve ningún problema, y los recomendaría sin dudar.”</p><div class="rs-who"><div><div class="rs-name">Oscar</div><div class="rs-meta">Propietario · Cliente verificado</div></div></div></article>
+      <article class="rs-card"><p class="rs-txt">“Mi experiencia ha sido excelente. Estuvieron pendientes de todo el proceso: desde la coordinación para ver el departamento, mostrarnos varias veces, hasta el proceso de reserva, súper sencillo. Ahora que ya estamos en el departamento también han sido un apoyo cuando tuvimos dudas.”</p><div class="rs-who"><div><div class="rs-name">Catalina</div><div class="rs-meta">Inquilina · Cliente verificado</div></div></div></article>
+      <article class="rs-card"><p class="rs-txt">“Quiero compartir mi excelente experiencia con BAIREN durante el alquiler de la primera vivienda de mi hija. Desde el primer momento recibimos una atención profesional, clara y cercana. Quiero destacar especialmente el trabajo de Julián y de todo su equipo, que estuvieron siempre disponibles para responder nuevas consultas, acompañarnos en cada etapa del proceso y hacer que todo fuera ágil, simple y transparente. Una vez iniciado el contrato, el acompañamiento continuó: se preocuparon por hacer un seguimiento para saber si estaba todo bien en la vivienda y si mi hija necesitaba algo, un gesto que demuestra un verdadero compromiso con las personas y no solo con la operación. Saber que la primera experiencia de mi hija alquilando su propio hogar estuvo acompañada por un equipo tan comprometido nos dio mucha tranquilidad. Sin dudas recomiendo a BAIREN a quienes busquen una inmobiliaria seria, confiable y con una atención de excelencia.”</p><div class="rs-who"><div><div class="rs-name">María Eugenia</div><div class="rs-meta">Inquilina · Cliente verificado</div></div></div></article>
+    </div>
     <div class="rs-mas" id="rsMasBox" hidden><button type="button" id="rsMas"><span id="rsMasTxt"></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button></div>
   </div>
 </section>
@@ -1082,6 +1149,8 @@
       <ul>
         <li><a href="catalogo.html" data-i18n="ft_temporal">Alquiler a Mediano Plazo</a></li>
         <li><a href="#contacto" data-i18n="ft_consulta">Consultar por una unidad</a></li>
+        <li><a href="/alquiler-amoblado-buenos-aires" data-i18n="ft_guia">Guía para alquilar amoblado</a></li>
+        <li><a href="/en/furnished-apartments-buenos-aires" hreflang="en" lang="en">Furnished rentals guide (English)</a></li>
       </ul>
     </div>
     <div class="ft-col">
@@ -1141,7 +1210,7 @@
         opt_alquilar:"Alugar",opt_propietario:"Sou proprietário",
         f_mensaje:"Mensagem",f_submit:"Enviar consulta",ph_nombre:"Seu nome",ph_contacto:"Como falamos com você",ph_mensaje:"Conte o que você procura",
         ft_tag:"Apartamentos mobiliados de médio prazo em Buenos Aires. Tudo incluído, sem garantia imobiliária nem seguro fiança. CABA e GBA Norte.",
-        ft_ops:"Operações",ft_temporal:"Aluguel de Médio Prazo",ft_consulta:"Consultar sobre uma unidade",
+        ft_ops:"Operações",ft_guia:"Guia para alugar mobiliado",ft_temporal:"Aluguel de Médio Prazo",ft_consulta:"Consultar sobre uma unidade",
         ft_empresa:"Empresa",ft_como:"Como funciona",ft_prop:"Para proprietários",
         ft_dev:"Desenvolvido por",ft_copy:"© 2026 Grupo Bairen. Todos os direitos reservados.",ft_terms:"Termos e condições",ft_privacy:"Política de privacidade"
       },
@@ -1159,7 +1228,7 @@
         opt_alquilar:"Rent",opt_propietario:"I am an owner",
         f_mensaje:"Message",f_submit:"Send inquiry",ph_nombre:"Your name",ph_contacto:"How we reach you",ph_mensaje:"Tell us what you're looking for",
         ft_tag:"Furnished medium-term apartments in Buenos Aires. All inclusive, no property guarantor and no surety bond. CABA and GBA Norte.",
-        ft_ops:"Services",ft_temporal:"Medium-term Rental",ft_consulta:"Ask about a unit",
+        ft_ops:"Services",ft_guia:"Furnished rental guide",ft_temporal:"Medium-term Rental",ft_consulta:"Ask about a unit",
         ft_empresa:"Company",ft_como:"How it works",ft_prop:"For owners",
         ft_dev:"Developed by",ft_copy:"© 2026 Grupo Bairen. All rights reserved.",ft_terms:"Terms and conditions",ft_privacy:"Privacy policy"
       }

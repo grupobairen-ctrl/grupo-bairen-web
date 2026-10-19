@@ -17,6 +17,10 @@
     }
   ],
   "rewrites": [
+    { "source": "/sitemap.xml", "destination": "/api/sitemap" },
+    { "source": "/llms.txt", "destination": "/api/llms" },
+    { "source": "/alquiler-amoblado-buenos-aires", "destination": "/api/guia?lang=es" },
+    { "source": "/en/furnished-apartments-buenos-aires", "destination": "/api/guia?lang=en" },
     { "source": "/julian", "destination": "/julian.html" },
     { "source": "/resenas", "destination": "/resenas.html" },
     { "source": "/reseñas", "destination": "/resenas.html" },
