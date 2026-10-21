@@ -102,7 +102,7 @@ function usdEn(n) {
 function plazoMeses(plazo) {
   const m = String(plazo || '').match(/(\d+)\s*(?:-|–|a)\s*(\d+)\s*mes/i);
   if (m) return { min: +m[1], max: +m[2] };
-  return { min: 3, max: 12 };
+  return { min: 3, max: 24 };
 }
 
 /** La frase que contesta "qué es, dónde, cuánto y en qué condiciones" en una línea. */

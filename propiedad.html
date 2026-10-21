@@ -163,6 +163,8 @@ nav{position:fixed;inset:0 0 auto 0;z-index:1000;height:64px;background:var(--na
 .btn-primary:hover{background:var(--navy-dark);color:var(--white);}
 .btn-secondary{display:block;width:100%;background:transparent;color:var(--navy);border:1px solid rgba(42,58,82,.25);padding:11px;font-family:var(--font-body);font-size:.62rem;letter-spacing:.14em;font-weight:600;cursor:pointer;transition:all .2s;text-align:center;text-decoration:none;}
 .btn-secondary:hover{background:var(--navy);color:var(--white);border-color:var(--navy);}
+.ac-visita{padding-bottom:20px;margin-bottom:6px;border-bottom:1px solid rgba(42,58,82,.1);}
+@media(max-width:700px){.ac-body{padding:20px;}}
 .ac-footer{padding:13px 26px;background:var(--off-white);border-top:1px solid rgba(42,58,82,.07);text-align:center;}
 .ac-footer-txt{font-size:.6rem;letter-spacing:.06em;color:var(--text-mid);}
 
@@ -234,6 +236,7 @@ footer{background:var(--navy-dark);border-top:1px solid var(--gold);padding:40px
 *:focus-visible{outline:2px solid var(--gold);outline-offset:3px;}
 </style>
 <link rel="stylesheet" href="/premium.css">
+<link rel="stylesheet" href="/visita.css">
 <script src="/meta-pixel.js"></script>
 </head>
 <body>
@@ -250,11 +253,17 @@ footer{background:var(--navy-dark);border-top:1px solid var(--gold);padding:40px
     <button class="flag" data-lang="pt" aria-label="Português" title="Português">PT</button>
     <button class="flag" data-lang="en" aria-label="English" title="English">EN</button>
   </div>
+  <button class="nav-visita" type="button" data-visita data-i18n="nav_visita">Coordinar visita</button>
   <button class="burger" id="burger" aria-label="Menú"><span></span><span></span><span></span></button>
 </nav>
 <div class="mobile-menu" id="mobileMenu">
   <a href="/catalogo.html" data-i18n="nav_alquilar">Alquilar</a>
   <a href="/index.html#contacto" data-i18n="prop_nav_contact">Contacto</a>
+  <div class="lang-switch m-lang">
+    <button class="flag" data-lang="es" aria-label="Español" title="Español">ES</button>
+    <button class="flag" data-lang="pt" aria-label="Português" title="Português">PT</button>
+    <button class="flag" data-lang="en" aria-label="English" title="English">EN</button>
+  </div>
 </div>
 
 
@@ -307,14 +316,14 @@ footer{background:var(--navy-dark);border-top:1px solid var(--gold);padding:40px
         <div class="ac-price-mo" id="acPriceMo"></div>
       </div>
       <div class="ac-body" id="acBody"></div>
-      <div class="ac-footer"><div class="ac-footer-txt" data-i18n="prop_ac_footer">Sin cargo por consulta · Te responde una persona del equipo</div></div>
+      <div class="ac-footer"><div class="ac-footer-txt" data-i18n="prop_ac_footer">Seleccionada y verificada por el equipo de BAIREN</div></div>
     </div>
   </div>
 
   <!-- CONSULTA FIJA (celular) -->
   <a class="wa-bar" id="waBar" href="https://wa.me/5491123106629" target="_blank" rel="noopener noreferrer">
     <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 0C7.163 0 0 7.163 0 16c0 2.83.736 5.487 2.023 7.793L0 32l8.438-2.01A15.93 15.93 0 0016 32c8.837 0 16-7.163 16-16S24.837 0 16 0zm0 29.333a13.278 13.278 0 01-6.77-1.848l-.484-.287-5.013 1.195 1.228-4.88-.317-.502A13.278 13.278 0 012.667 16C2.667 8.636 8.636 2.667 16 2.667S29.333 8.636 29.333 16 23.364 29.333 16 29.333zm7.3-9.96c-.4-.2-2.363-1.166-2.728-1.3-.366-.133-.633-.2-.9.2-.266.4-1.033 1.3-1.266 1.566-.233.267-.466.3-.866.1-2.367-1.183-3.917-2.117-5.475-4.8-.413-.712.413-.663 1.183-2.202.133-.267.067-.5-.033-.7-.1-.2-.9-2.163-1.233-2.963-.324-.778-.653-.672-.9-.685l-.767-.013a1.47 1.47 0 00-1.067.5c-.366.4-1.4 1.367-1.4 3.33s1.434 3.863 1.634 4.13c.2.267 2.823 4.312 6.837 6.05 2.54 1.097 3.534 1.19 4.804.999.773-.115 2.363-.966 2.696-1.9.333-.933.333-1.733.233-1.9-.1-.166-.366-.266-.766-.466z"/></svg>
-    <span id="waBarTxt">Consultar por WhatsApp</span>
+    <span id="waBarTxt">Coordinar visita</span>
   </a>
 
   <!-- AVISO "SE LIBERA" (solo si el admin cargó la fecha) -->
@@ -338,7 +347,7 @@ footer{background:var(--navy-dark);border-top:1px solid var(--gold);padding:40px
 <!-- FOOTER -->
 <footer>
   <div class="ft-logo"><img src="/bairen_logo.png?v=3" alt="BAIREN"/></div>
-  <div class="ft-copy" data-i18n="cat_copy">© 2026 Grupo Bairen · Todos los derechos reservados</div>
+  <div class="ft-copy" data-i18n="cat_copy">© 2026 BAIREN · Todos los derechos reservados</div>
 </footer>
 
 <!-- WHATSAPP -->
@@ -356,7 +365,8 @@ footer{background:var(--navy-dark);border-top:1px solid var(--gold);padding:40px
 </div>
 
 <script src="/supabase-config.js"></script>
-<script src="/i18n.js?v=3"></script>
+<script src="/i18n.js?v=4"></script>
+<script src="/visita.js"></script>
 <script>
 window.sbImg = window.sbImg || function(u){return u};
 'use strict';
@@ -379,11 +389,11 @@ const PROP_T = {
     v_exp_monto:'{m} + servicios, aparte',
     v_gar_trad:'Gtía CABA / Seguro de Caución', v_gar_no:'No requerida',
     est_Disponible:'Disponible', est_Reservado:'Reservado', est_Ocupado:'Ocupado',
-    plazo_default:'3 a 12 meses',
+    plazo_default:'3 a 24 meses',
     urg_res:'Esta unidad ya está reservada. Te mostramos opciones similares.',
     urg_ok:'Seleccionada y verificada por el equipo de BAIREN.',
     btn_similares:'VER OPCIONES SIMILARES', btn_visita:'COORDINAR VISITA', btn_consultar:'CONSULTAR POR WHATSAPP',
-    bar_consultar:'Consultar por WhatsApp',
+    bar_consultar:'Consultar por WhatsApp', bar_visita:'Coordinar visita', bar_similares:'Pedir opciones similares',
     wa_similar:'Muy buenas! ¿Cuentan con propiedades similares a {p}? Me encuentro interesado/a. Gracias!',
     wa_consulta:'Hola, me interesa {p}, que vi en la web. ¿Sigue disponible?',
     wa_venta:'Hola muy buenas, me interesa la propiedad en venta en {p}. Me gustaría coordinar una visita. Gracias!',
@@ -406,11 +416,11 @@ const PROP_T = {
     v_exp_monto:'{m} + serviços, à parte',
     v_gar_trad:'Garantia CABA / Seguro fiança', v_gar_no:'Não exigida',
     est_Disponible:'Disponível', est_Reservado:'Reservado', est_Ocupado:'Ocupado',
-    plazo_default:'3 a 12 meses',
+    plazo_default:'3 a 24 meses',
     urg_res:'Esta unidade já está reservada. Mostramos opções semelhantes.',
     urg_ok:'Selecionada e verificada pela equipe BAIREN.',
     btn_similares:'VER OPÇÕES SEMELHANTES', btn_visita:'AGENDAR VISITA', btn_consultar:'CONSULTAR PELO WHATSAPP',
-    bar_consultar:'Consultar pelo WhatsApp',
+    bar_consultar:'Consultar pelo WhatsApp', bar_visita:'Agendar visita', bar_similares:'Pedir opções semelhantes',
     wa_similar:'Olá, vocês têm imóveis semelhantes a {p}? Tenho interesse. Obrigado!',
     wa_consulta:'Olá, tenho interesse em {p}, que vi no site. Ainda está disponível?',
     wa_venta:'Olá, tenho interesse no imóvel à venda em {p}. Gostaria de agendar uma visita. Obrigado!',
@@ -434,11 +444,11 @@ const PROP_T = {
     v_exp_monto:'{m} + utilities, not included',
     v_gar_trad:'CABA guarantee / Surety bond', v_gar_no:'Not required',
     est_Disponible:'Available', est_Reservado:'Reserved', est_Ocupado:'Occupied',
-    plazo_default:'3 to 12 months',
+    plazo_default:'3 to 24 months',
     urg_res:'This unit is already reserved. We can show you similar options.',
     urg_ok:'Selected and verified by the BAIREN team.',
     btn_similares:'SEE SIMILAR OPTIONS', btn_visita:'SCHEDULE A VISIT', btn_consultar:'ASK ON WHATSAPP',
-    bar_consultar:'Ask on WhatsApp',
+    bar_consultar:'Ask on WhatsApp', bar_visita:'Book a viewing', bar_similares:'Ask for similar options',
     wa_similar:'Hi! Do you have properties similar to {p}? I am interested. Thank you!',
     wa_consulta:'Hi, I am interested in {p}, which I saw on your website. Is it still available?',
     wa_venta:'Hello, I am interested in the property for sale at {p}. I would like to schedule a visit. Thank you!',
@@ -516,7 +526,7 @@ function fmtARS(n) {
 // Si el plazo tiene ambas unidades (caso "Ambos"), prioriza la parte en meses.
 function formatPlazoStat(plazo, isTemp, isTrad) {
   if (!plazo) {
-    if (isTemp) return { val: '3–12', lbl: 'Meses' };
+    if (isTemp) return { val: '3–24', lbl: 'Meses' };
     if (isTrad) return { val: '2+',   lbl: 'Años'  };
     return { val: '3–12+', lbl: 'Meses' };
   }
@@ -543,7 +553,7 @@ function formatPlazoStat(plazo, isTemp, isTrad) {
   if (hasPartir && unit === 'Años' && !val.includes('+') && !val.includes('–')) {
     val += '+';
   }
-  return { val: val || (unit === 'Años' ? '2+' : '3–12'), lbl: unit };
+  return { val: val || (unit === 'Años' ? '2+' : '3–24'), lbl: unit };
 }
 
 // ════════════════════════════════════════════════════════════════════
@@ -734,7 +744,7 @@ function renderProperty(p) {
 function metaDescSEO(p) {
   const usd = n => 'USD ' + Math.round(Number(n)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   const m = String(p.plazo || '').match(/(\d+)\s*(?:-|–|a)\s*(\d+)\s*mes/i);
-  const min = m ? +m[1] : 3, max = m ? +m[2] : 12;
+  const min = m ? +m[1] : 3, max = m ? +m[2] : 24;
   const amb = p.ambientes ? `${p.ambientes} ${p.ambientes === 1 ? 'ambiente' : 'ambientes'}` : null;
   const que = ['Departamento amoblado', amb && `de ${amb}`, p.m2 && `y ${p.m2} m²`].filter(Boolean).join(' ');
   const precio = Number(p.precio_temporal) || 0;
@@ -811,12 +821,13 @@ function renderDynamicTexts(p) {
   const plazoLblTr = plazoLbl === 'Años' ? t.stat_anios : t.stat_meses;
   const plazoStatHTML = isVenta ? '' :
     `<div class="stat"><div class="stat-val">${escapeHTML(plazoSt)}</div><div class="stat-lbl">${escapeHTML(plazoLblTr)}</div></div>`;
-  $('statsRow').innerHTML = `
-    <div class="stat"><div class="stat-val">${escapeHTML(m2Str)}</div><div class="stat-lbl">M²</div></div>
-    <div class="stat"><div class="stat-val">${escapeHTML(unidStr)}</div><div class="stat-lbl">${t.stat_unidad}</div></div>
-    <div class="stat"><div class="stat-val">${escapeHTML(ambStr)}</div><div class="stat-lbl">${t.stat_amb}</div></div>
-    ${plazoStatHTML}
-  `;
+  const stat = (v, l) => `<div class="stat"><div class="stat-val">${escapeHTML(v)}</div><div class="stat-lbl">${escapeHTML(l)}</div></div>`;
+  $('statsRow').innerHTML = [
+    p.m2 ? stat(m2Str, 'M²') : '',
+    p.unidad ? stat(unidStr, t.stat_unidad) : '',
+    p.ambientes ? stat(ambStr, t.stat_amb) : '',
+    plazoStatHTML
+  ].join('');
 
   // ─── DESCRIPCIÓN ─── (usa la traducción guardada si existe; si no, español)
   const lang = window.BAIREN_LANG || 'es';
@@ -880,9 +891,34 @@ function renderActionCard(p, titleFull, unidadLbl, reservado, isTemp, isTrad) {
               : isVenta   ? t.wa_venta.replace('{p}', propRef)
               :             t.wa_consulta.replace('{p}', unidadRef);
   const waFicha = `https://wa.me/${WHATSAPP_NUM}?text=${encodeURIComponent(waMsg)}`;
-  $('waBar').href = waFicha;
+  // Burbuja de la compu: pregunta suelta sobre la unidad, con la unidad escrita
   $('waFloat').href = waFicha;
-  $('waBarTxt').textContent = t.bar_consultar;
+
+  // Coordinar visita (21/10/2026): un solo botón con Llegada y Estadía, que abre
+  // WhatsApp con el mensaje listo. Lo arma visita.js; la tarjeta, la barra fija
+  // del celular y el botón de arriba comparten lo que la persona elige.
+  const conVisita = !reservado && !isVenta;
+  const bar = $('waBar');
+  if (conVisita) {
+    const desde = /^\d{4}-\d{2}-\d{2}/.test(p.fecha_liberacion || '') ? p.fecha_liberacion.slice(0, 10) : '';
+    const precio = isTrad ? p.precio_tradicional : p.precio_temporal;
+    const pmTxt = isTrad ? t.pm : (p.expensas_incluidas !== false ? t.pm_todo : t.pm_exp);
+    window.BairenVisita && window.BairenVisita.setUnidad({
+      ref: unidadRef,
+      titulo: titleFull,
+      sub: `${p.barrio} · ${fmtUSD(precio)}${precio ? ' ' + pmTxt : ''}`,
+      desde
+    });
+    // Sin wa.me en el link: abrir la ventana no es todavía un contacto para el píxel
+    bar.href = '#coordinar-visita';
+    bar.setAttribute('data-visita', '');
+    $('waBarTxt').textContent = t.bar_visita;
+  } else {
+    window.BairenVisita && window.BairenVisita.setUnidad(null);
+    bar.href = waFicha;
+    bar.removeAttribute('data-visita');
+    $('waBarTxt').textContent = reservado ? t.bar_similares : t.bar_consultar;
+  }
 
   if (reservado) {
     const wa = encodeURIComponent(t.wa_similar.replace('{p}', propRef));
@@ -899,23 +935,12 @@ function renderActionCard(p, titleFull, unidadLbl, reservado, isTemp, isTrad) {
     html += `
       <a class="btn-primary" href="https://wa.me/${WHATSAPP_NUM}?text=${waVenta}" target="_blank" rel="noopener noreferrer">${t.btn_visita}</a>
     `;
-  } else {
-    // Si tipo='Ambos', mandamos Temporal como default al filtro (modalidad más común)
-    const ctaTipo   = p.tipo === 'Ambos' ? 'Temporal' : p.tipo;
-    const ctaPrecio = ctaTipo === 'Tradicional' ? p.precio_tradicional
-                    : (ctaTipo === 'Venta' ? p.precio_venta : p.precio_temporal);
-    const filtro = `/filtro.html?prop=${encodeURIComponent(p.dir)}&barrio=${encodeURIComponent(p.barrio)}&tipo=${encodeURIComponent(ctaTipo)}&amb=${p.ambientes || 0}&precio=${ctaPrecio || 0}`;
-    html += `
-      <div class="urgency">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8A7547" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5"/></svg>
-        <div class="urgency-txt">${t.urg_ok}</div>
-      </div>
-      <a class="btn-primary" href="${waFicha}" target="_blank" rel="noopener noreferrer">${t.btn_consultar}</a>
-      <a class="btn-secondary" href="${filtro}">${t.btn_visita}</a>
-    `;
   }
 
-  acBody.innerHTML = html;
+  // Con visita, el formulario va arriba (lo primero que se ve debajo del precio)
+  // y los datos de la unidad debajo
+  acBody.innerHTML = conVisita ? `<div class="ac-visita" id="acVisita"></div><div class="ac-rows">${html}</div>` : html;
+  if (conVisita && window.BairenVisita) window.BairenVisita.mount($('acVisita'));
 }
 
 function injectJSONLD(p, pageUrl, ogImg) {

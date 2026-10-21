@@ -1,0 +1,90 @@
+/* ─── BAIREN · Coordinar visita (21/10/2026) ─────────────────────────
+   Un solo camino para pedir una visita en toda la web: el botón de arriba
+   a la derecha, la tarjeta de la ficha y la barra fija del celular abren
+   lo mismo. Llegada + estadía (y en el catálogo, barrio y presupuesto) y
+   un botón que abre WhatsApp con el mensaje listo. Lo arma visita.js. */
+
+:root{
+  --vis-navy:#2A3A52;--vis-navy-dark:#1E2A3F;--vis-navy-deeper:#131D2D;
+  --vis-gold:#C2A968;--vis-gold-dark:#8A7547;--vis-gold-light:#DECDA0;
+  --vis-white:#FBFAF6;--vis-off:#EEE5D0;--vis-mid:#6B7589;
+  --vis-ease:cubic-bezier(0.22,1,0.36,1);
+}
+
+/* Botón del encabezado */
+.nav-visita{
+  display:inline-flex;align-items:center;justify-content:center;
+  margin-left:auto;flex-shrink:0;white-space:nowrap;cursor:pointer;
+  font-family:'Jost',sans-serif;font-size:.64rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--vis-gold-light);background:transparent;border:1px solid rgba(194,169,104,.6);
+  padding:10px 18px;transition:background .25s,color .25s,border-color .25s;
+}
+.nav-visita:hover{background:var(--vis-gold);color:var(--vis-navy-deeper);border-color:var(--vis-gold);}
+@media(max-width:700px){
+  .nav-visita{font-size:.6rem;letter-spacing:.14em;padding:9px 12px;margin-right:4px;}
+  /* En el celular el idioma pasa adentro del menú: arriba queda logo,
+     Coordinar visita y menú, como en cualquier app */
+  nav > .lang-switch,.navbar > .lang-switch{display:none;}
+}
+.m-lang{display:none;}
+@media(max-width:700px){.m-lang{display:flex;gap:18px;margin-top:22px;}.m-lang .flag{font-size:.7rem;}}
+
+/* Ventana (abajo en el celular, al centro en la compu) */
+.vis-dlg{
+  border:none;padding:0;margin:auto;background:var(--vis-white);color:var(--vis-navy);
+  width:min(440px,calc(100vw - 32px));max-height:calc(100dvh - 48px);overflow:auto;
+  border-top:2px solid var(--vis-gold);box-shadow:0 30px 80px rgba(19,29,45,.45);
+  font-family:'Jost',sans-serif;font-weight:300;
+}
+.vis-dlg::backdrop{background:rgba(19,29,45,.62);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);}
+.vis-dlg[open]{animation:vis-in .42s var(--vis-ease);}
+@keyframes vis-in{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:none;}}
+@media(max-width:700px){
+  .vis-dlg{width:100%;max-width:100%;margin:auto 0 0;max-height:92dvh;}
+  .vis-dlg[open]{animation:vis-up .42s var(--vis-ease);}
+  @keyframes vis-up{from{transform:translateY(100%);}to{transform:none;}}
+}
+@media(prefers-reduced-motion:reduce){.vis-dlg[open]{animation:none;}}
+
+.vis-hd{position:relative;background:var(--vis-navy);padding:24px 56px 20px 24px;}
+.vis-eyebrow{font-size:.58rem;letter-spacing:.3em;text-transform:uppercase;color:var(--vis-gold-light);font-weight:500;margin-bottom:8px;}
+.vis-title{font-family:'Playfair Display',Georgia,serif;font-size:1.45rem;font-weight:400;line-height:1.2;color:var(--vis-white);}
+.vis-sub{font-size:.78rem;color:rgba(222,205,160,.85);margin-top:6px;letter-spacing:.02em;}
+.vis-x{position:absolute;top:12px;right:10px;width:40px;height:40px;background:none;border:none;color:rgba(255,255,255,.6);font-size:1.6rem;line-height:1;cursor:pointer;transition:color .2s;}
+.vis-x:hover{color:var(--vis-gold);}
+.vis-dlg .vis-form{padding:22px 24px calc(22px + env(safe-area-inset-bottom,0px));}
+
+/* Formulario (el mismo en la ventana y en la tarjeta de la ficha) */
+.vis-field{margin-bottom:18px;}
+.vis-lbl{display:block;font-size:.6rem;letter-spacing:.28em;text-transform:uppercase;color:var(--vis-gold-dark);font-weight:600;margin-bottom:9px;}
+.vis-lbl small{font-size:inherit;letter-spacing:.12em;color:var(--vis-mid);font-weight:400;text-transform:none;margin-left:4px;}
+
+.vis-date{position:relative;display:flex;align-items:center;gap:12px;min-height:50px;padding:0 14px;background:#fff;border:1px solid rgba(42,58,82,.2);transition:border-color .2s;}
+.vis-date:focus-within,.vis-date:hover{border-color:var(--vis-navy);}
+.vis-date svg{flex-shrink:0;color:var(--vis-gold-dark);}
+.vis-date-txt{font-size:.92rem;color:var(--vis-mid);}
+.vis-date.has-val .vis-date-txt{color:var(--vis-navy);font-weight:500;}
+/* El input real va encima, invisible: el toque abre el calendario del teléfono */
+.vis-date input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;border:none;-webkit-appearance:none;appearance:none;}
+
+.vis-chips{display:flex;flex-wrap:wrap;gap:8px;}
+.vis-chip{
+  flex:1 1 auto;min-height:44px;padding:0 12px;cursor:pointer;
+  font-family:'Jost',sans-serif;font-size:.84rem;font-weight:400;color:var(--vis-navy);
+  background:#fff;border:1px solid rgba(42,58,82,.2);transition:background .2s,color .2s,border-color .2s;
+}
+.vis-chip:hover{border-color:var(--vis-navy);}
+.vis-chip[aria-pressed="true"]{background:var(--vis-navy);color:var(--vis-white);border-color:var(--vis-navy);}
+.vis-chips--meses .vis-chip{flex:1 1 0;min-width:0;padding:0 6px;}
+
+.vis-btn{
+  display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:54px;margin-top:6px;
+  background:var(--vis-navy);color:var(--vis-white);border:none;cursor:pointer;text-decoration:none;
+  font-family:'Jost',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
+  transition:background .2s;
+}
+.vis-btn:hover{background:var(--vis-navy-deeper);color:var(--vis-white);}
+.vis-btn svg{width:18px;height:18px;fill:#25D366;flex-shrink:0;}
+.vis-nota{font-size:.72rem;line-height:1.5;color:var(--vis-mid);text-align:center;margin-top:10px;}
+
+.vis-dlg :focus-visible,.vis-form :focus-visible{outline:2px solid var(--vis-gold);outline-offset:2px;}

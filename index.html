@@ -47,7 +47,7 @@
       "url": "https://www.bairengroup.com",
       "logo": "https://www.bairengroup.com/bairen_logo.png",
       "image": "https://www.bairengroup.com/og-logo.jpg",
-      "description": "Departamentos amoblados a mediano plazo (de 3 a 12 meses) en Buenos Aires. Precio final en dólares con expensas, servicios y muebles incluidos, sin garantía inmobiliaria ni seguro de caución. Recoleta, Palermo, Núñez, Belgrano, Puerto Madero y más barrios de CABA.",
+      "description": "Departamentos amoblados a mediano plazo (de 3 a 24 meses) en Buenos Aires. Precio final en dólares con expensas, servicios y muebles incluidos, sin garantía inmobiliaria ni seguro de caución. Recoleta, Palermo, Núñez, Belgrano, Puerto Madero y más barrios de CABA.",
       "slogan": "Buenos Aires en su máximo esplendor.",
       "telephone": "+54 11 2310 6629",
       "email": "contacto@bairengroup.com",
@@ -98,7 +98,7 @@
         "@type": "Offer",
         "itemOffered": {
           "@type": "Service",
-          "name": "Alquiler de departamentos amoblados a mediano plazo, de 3 a 12 meses, todo incluido y sin garantía",
+          "name": "Alquiler de departamentos amoblados a mediano plazo, de 3 a 24 meses, todo incluido y sin garantía",
           "areaServed": "Buenos Aires, Argentina"
         }
       }
@@ -779,6 +779,7 @@
   *:focus-visible{outline:2px solid var(--gold);outline-offset:3px;}
 </style>
 <link rel="stylesheet" href="/premium.css">
+<link rel="stylesheet" href="/visita.css">
 <script src="/meta-pixel.js"></script>
 </head>
 <body>
@@ -797,6 +798,7 @@
     <button class="flag" data-lang="pt" aria-label="Português" title="Português">PT</button>
     <button class="flag" data-lang="en" aria-label="English" title="English">EN</button>
   </div>
+  <button class="nav-visita" type="button" data-visita data-i18n="nav_visita">Coordinar visita</button>
   <button class="burger" id="burger" type="button" aria-label="Menú" aria-expanded="false" aria-controls="mobileMenu"><span></span><span></span><span></span></button>
 </nav>
 
@@ -804,6 +806,11 @@
   <a href="catalogo.html" class="m-link" data-i18n="nav_alquilar">Alquilar</a>
   <a href="#resenas" class="m-link" data-i18n="nav_resenas">Reseñas</a>
   <a href="#contacto" class="m-link" data-i18n="nav_contacto">Contacto</a>
+  <div class="lang-switch m-lang">
+    <button class="flag" data-lang="es" aria-label="Español" title="Español">ES</button>
+    <button class="flag" data-lang="pt" aria-label="Português" title="Português">PT</button>
+    <button class="flag" data-lang="en" aria-label="English" title="English">EN</button>
+  </div>
 </div>
 
 <section class="hero" id="inicio">
@@ -1080,7 +1087,7 @@
 
       <div class="camino reveal d3">
         <div class="camino-name" data-i18n="mp3_name">Listo para vivir</div>
-        <div class="camino-kicker" data-i18n="mp3_kicker">De 3 a 12 meses</div>
+        <div class="camino-kicker" data-i18n="mp3_kicker">De 3 a 24 meses</div>
         <p data-i18n="mp3_p">Departamentos amoblados y equipados en Belgrano, Núñez, Palermo, Recoleta y Puerto Madero. Llegás con la valija.</p>
       </div>
 
@@ -1179,7 +1186,7 @@
     </div>
   </div>
   <div class="footer-bottom">
-    <span class="footer-copy" data-i18n="ft_copy">© 2026 Grupo Bairen. Todos los derechos reservados.</span>
+    <span class="footer-copy" data-i18n="ft_copy">© 2026 BAIREN. Todos los derechos reservados.</span>
     <div class="footer-legal">
       <span title="Próximamente" data-i18n="ft_terms">Términos y condiciones</span>
       <span title="Próximamente" data-i18n="ft_privacy">Política de privacidad</span>
@@ -1199,13 +1206,13 @@
   (function(){
     const T = {
       pt:{
-        nav_alquilar:"Alugar",nav_resenas:"Avaliações",nav_contacto:"Contato",
+        nav_alquilar:"Alugar",nav_resenas:"Avaliações",nav_contacto:"Contato",nav_visita:"Agendar visita",
         hero_t2:"no seu",hero_t3:"máximo esplendor.",
         btn_ver:"Ver apartamentos",
         mp_eyebrow:"Aluguel de médio prazo",mp_h:"Mobiliados, tudo incluído e sem garantia imobiliária.",
         mp1_name:"Um só preço",mp1_kicker:"Tudo incluído",mp1_p:"Aluguel, condomínio, serviços e mobília em um único número. O que está publicado é o que você paga por mês.",
         mp2_name:"Sem garantia imobiliária",mp2_kicker:"Nem seguro fiança",mp2_p:"Não é preciso fiador nem seguro fiança. Você reserva com um contrato digital em dólares.",
-        mp3_name:"Pronto para morar",mp3_kicker:"De 3 a 12 meses",mp3_p:"Apartamentos mobiliados e equipados em Belgrano, Núñez, Palermo, Recoleta e Puerto Madero. Você chega com a mala.",
+        mp3_name:"Pronto para morar",mp3_kicker:"De 3 a 24 meses",mp3_p:"Apartamentos mobiliados e equipados em Belgrano, Núñez, Palermo, Recoleta e Puerto Madero. Você chega com a mala.",
         mp_go:"Ver apartamentos",
         contacto_eyebrow:"Contato",contacto_h:"Vamos conversar.",contacto_sub:"Conte o que procura e preparamos uma proposta.",ci_wa:"WhatsApp direto",
         f_nombre:"Nome",f_contacto:"Telefone ou e-mail",f_interes:"Tenho interesse em",
@@ -1214,16 +1221,16 @@
         ft_tag:"Apartamentos mobiliados de médio prazo em Buenos Aires. Tudo incluído, sem garantia imobiliária nem seguro fiança. CABA e GBA Norte.",
         ft_ops:"Operações",ft_guia:"Guia para alugar mobiliado",ft_temporal:"Aluguel de Médio Prazo",ft_consulta:"Consultar sobre uma unidade",
         ft_empresa:"Empresa",ft_como:"Como funciona",ft_prop:"Para proprietários",
-        ft_dev:"Desenvolvido por",ft_copy:"© 2026 Grupo Bairen. Todos os direitos reservados.",ft_terms:"Termos e condições",ft_privacy:"Política de privacidade"
+        ft_dev:"Desenvolvido por",ft_copy:"© 2026 BAIREN. Todos os direitos reservados.",ft_terms:"Termos e condições",ft_privacy:"Política de privacidade"
       },
       en:{
-        nav_alquilar:"Rent",nav_resenas:"Reviews",nav_contacto:"Contact",
+        nav_alquilar:"Rent",nav_resenas:"Reviews",nav_contacto:"Contact",nav_visita:"Book a viewing",
         hero_t2:"at its",hero_t3:"finest.",
         btn_ver:"See apartments",
         mp_eyebrow:"Medium-term rental",mp_h:"Furnished, all inclusive and no property guarantor.",
         mp1_name:"One price",mp1_kicker:"All inclusive",mp1_p:"Rent, building fees, utilities and furniture in a single number. The published price is what you pay per month.",
         mp2_name:"No property guarantor",mp2_kicker:"No surety bond",mp2_p:"No property guarantor and no surety bond required. You reserve with a digital contract in US dollars.",
-        mp3_name:"Move-in ready",mp3_kicker:"3 to 12 months",mp3_p:"Furnished, fully equipped apartments in Belgrano, Núñez, Palermo, Recoleta and Puerto Madero. Arrive with your suitcase.",
+        mp3_name:"Move-in ready",mp3_kicker:"3 to 24 months",mp3_p:"Furnished, fully equipped apartments in Belgrano, Núñez, Palermo, Recoleta and Puerto Madero. Arrive with your suitcase.",
         mp_go:"See apartments",
         contacto_eyebrow:"Contact",contacto_h:"Let's talk.",contacto_sub:"Tell us what you're looking for and we'll prepare a proposal.",ci_wa:"Direct WhatsApp",
         f_nombre:"Name",f_contacto:"Phone or email",f_interes:"I'm interested in",
@@ -1232,7 +1239,7 @@
         ft_tag:"Furnished medium-term apartments in Buenos Aires. All inclusive, no property guarantor and no surety bond. CABA and GBA Norte.",
         ft_ops:"Services",ft_guia:"Furnished rental guide",ft_temporal:"Medium-term Rental",ft_consulta:"Ask about a unit",
         ft_empresa:"Company",ft_como:"How it works",ft_prop:"For owners",
-        ft_dev:"Developed by",ft_copy:"© 2026 Grupo Bairen. All rights reserved.",ft_terms:"Terms and conditions",ft_privacy:"Privacy policy"
+        ft_dev:"Developed by",ft_copy:"© 2026 BAIREN. All rights reserved.",ft_terms:"Terms and conditions",ft_privacy:"Privacy policy"
       }
     };
     const nodes = document.querySelectorAll('[data-i18n]');
@@ -1428,6 +1435,7 @@ function formatFechaLiberacion(fechaStr) {
   return d.lib_fecha.replace('{f}', formatted);
 }
 </script>
+<script src="/visita.js"></script>
 <script src="/premium.js" defer></script>
 </body>
 </html>

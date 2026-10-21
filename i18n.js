@@ -6,12 +6,12 @@
   const T = {
     pt: {
       // Nav
-      nav_alquilar: "Alugar", nav_contacto: "Contato",
+      nav_alquilar: "Alugar", nav_contacto: "Contato", nav_visita: "Agendar visita",
       // Footer
       ft_tag: "Apartamentos mobiliados de médio prazo em Buenos Aires. Tudo incluído, sem garantia imobiliária nem seguro fiança.",
       ft_ops: "Operações", ft_alquilar: "Alugar",
       ft_contacto: "Contato", ft_dev: "Desenvolvido por",
-      ft_copy: "© 2026 Grupo Bairen. Todos os direitos reservados.",
+      ft_copy: "© 2026 BAIREN. Todos os direitos reservados.",
       // Catálogo (aluguel)
       cat_back: "← Início", cat_barrios: "Bairros",
       cat_p_todos: "Preço: todos", cat_p_1: "Até USD 1.000", cat_p_2: "USD 1.000 a 1.500", cat_p_3: "USD 1.500 a 2.500", cat_p_4: "USD 2.500 ou mais",
@@ -22,7 +22,7 @@
       mapa_title: "Escolha um bairro", mapa_hint: "Escolha um bairro no mapa para ver as unidades", mapa_ver_cat: "Ver no catálogo →", mapa_todos: "Todos os bairros",
       cat_sort_default: "Ordem padrão", cat_sort_pasc: "Preço: do menor ao maior",
       cat_sort_pdesc: "Preço: do maior ao menor", cat_sort_m2: "Maior área",
-      cat_copy: "© 2026 Grupo Bairen · Todos os direitos reservados",
+      cat_copy: "© 2026 BAIREN · Todos os direitos reservados",
       // Propiedad
       prop_nav_props: "Imóveis", prop_nav_why: "Por que BAIREN", prop_nav_contact: "Contato",
       prop_back: "← Catálogo", prop_back_full: "← Voltar ao catálogo",
@@ -30,18 +30,18 @@
       prop_price_m: "Preço mensal",
       prop_price_v: "Valor",
       prop_secl_unidad: "A unidade", prop_secl_ubic: "Localização",
-      prop_ac_footer: "Consulta sem custo · Quem responde é uma pessoa da equipe",
+      prop_ac_footer: "Selecionada e verificada pela equipe BAIREN",
       prop_nf_h: "Imóvel não encontrado",
       prop_nf_p: "O link pode ter mudado, a unidade já foi alugada ou o endereço está incorreto."
     },
     en: {
       // Nav
-      nav_alquilar: "Rent", nav_contacto: "Contact",
+      nav_alquilar: "Rent", nav_contacto: "Contact", nav_visita: "Book a viewing",
       // Footer
       ft_tag: "Furnished medium-term apartments in Buenos Aires. All inclusive, no property guarantor and no surety bond.",
       ft_ops: "Services", ft_alquilar: "Rent",
       ft_contacto: "Contact", ft_dev: "Developed by",
-      ft_copy: "© 2026 Grupo Bairen. All rights reserved.",
+      ft_copy: "© 2026 BAIREN. All rights reserved.",
       // Catalogue (rentals)
       cat_back: "← Home", cat_barrios: "Neighbourhoods",
       cat_p_todos: "Price: all", cat_p_1: "Up to USD 1,000", cat_p_2: "USD 1,000 to 1,500", cat_p_3: "USD 1,500 to 2,500", cat_p_4: "USD 2,500+",
@@ -52,7 +52,7 @@
       mapa_title: "Choose a neighbourhood", mapa_hint: "Pick a neighbourhood on the map to see its units", mapa_ver_cat: "See in the catalogue →", mapa_todos: "All neighbourhoods",
       cat_sort_default: "Default order", cat_sort_pasc: "Price: low to high",
       cat_sort_pdesc: "Price: high to low", cat_sort_m2: "Largest area",
-      cat_copy: "© 2026 Grupo Bairen · All rights reserved",
+      cat_copy: "© 2026 BAIREN · All rights reserved",
       // Propiedad
       prop_nav_props: "Properties", prop_nav_why: "Why BAIREN", prop_nav_contact: "Contact",
       prop_back: "← Catalogue", prop_back_full: "← Back to catalogue",
@@ -60,7 +60,7 @@
       prop_price_m: "Monthly price",
       prop_price_v: "Price",
       prop_secl_unidad: "The unit", prop_secl_ubic: "Location",
-      prop_ac_footer: "Free inquiry · A person from our team replies",
+      prop_ac_footer: "Selected and verified by the BAIREN team",
       prop_nf_h: "Property not found",
       prop_nf_p: "The link may have changed, the unit may already be rented, or the address is incorrect."
     }

@@ -107,17 +107,18 @@ function escribirFicha(html, p) {
   else { precio = fmt(p.precio_venta); precioMo = precioAc = ''; }
 
   const { min, max } = B.plazoMeses(p.plazo);
+  // Lo que no está cargado no se muestra (antes salía "— M²")
   const stats = [
-    [p.m2 || '—', 'M²'],
-    [p.unidad || '—', 'Unidad'],
-    [p.ambientes || '—', 'Ambientes'],
+    ...(p.m2 ? [[p.m2, 'M²']] : []),
+    ...(p.unidad ? [[p.unidad, 'Unidad']] : []),
+    ...(p.ambientes ? [[p.ambientes, 'Ambientes']] : []),
     ...(isVenta ? [] : [[isTrad ? '2+' : `${min}–${max}`, isTrad ? 'Años' : 'Meses']]),
   ].map(([v, l]) => `<div class="stat"><div class="stat-val">${B.esc(v)}</div><div class="stat-lbl">${B.esc(l)}</div></div>`).join('');
 
   const rows = [['Dirección', p.dir + unidadLbl], ['Barrio', p.barrio]];
   if (p.m2) rows.push(['Superficie', `${p.m2} m²`]);
   if (p.ambientes) rows.push(['Ambientes', `${p.ambientes} ${p.ambientes !== 1 ? 'ambientes' : 'ambiente'}`]);
-  if (!isVenta) rows.push(['Plazo', p.plazo || '3 a 12 meses']);
+  if (!isVenta) rows.push(['Plazo', p.plazo || '3 a 24 meses']);
   if (isTemp || isAmbos) {
     const v = p.expensas_incluidas === false
       ? (p.expensas ? `$${Number(p.expensas).toLocaleString('es-AR')} + servicios, aparte` : 'A cargo del inquilino')
@@ -127,9 +128,10 @@ function escribirFicha(html, p) {
   if (!isVenta) rows.push(['Garantía', isTrad ? 'Gtía CABA / Seguro de Caución' : 'No requerida']);
   rows.push(['Estado', p.estado]);
   const unidadRef = `${p.dir}${p.unidad ? ' unidad ' + p.unidad : ''}${p.barrio ? ', ' + p.barrio : ''}`;
-  const wa = `https://wa.me/${B.WHATSAPP_NUM}?text=${encodeURIComponent(`Hola, me interesa ${unidadRef}, que vi en la web. ¿Sigue disponible?`)}`;
-  const acBody = rows.map(([l, v]) => `<div class="ac-row"><span class="ac-lbl">${B.esc(l)}</span><span class="ac-val">${B.esc(v)}</span></div>`).join('')
-    + (reservado ? '' : `<a class="btn-primary" href="${wa}" target="_blank" rel="noopener noreferrer">CONSULTAR POR WHATSAPP</a>`);
+  // Mismo botón que arma visita.js en el navegador (que después suma Llegada y Estadía)
+  const wa = `https://wa.me/${B.WHATSAPP_NUM}?text=${encodeURIComponent(`Hola, quiero coordinar una visita a ${unidadRef}.`)}`;
+  const acBody = (reservado ? '' : `<a class="btn-primary" href="${wa}" target="_blank" rel="noopener noreferrer">COORDINAR VISITA</a>`)
+    + rows.map(([l, v]) => `<div class="ac-row"><span class="ac-lbl">${B.esc(l)}</span><span class="ac-val">${B.esc(v)}</span></div>`).join('');
 
   const desc = p.descripcion || `${B.titulo(p)} — unidad disponible en ${p.barrio}, Buenos Aires. Listo para vivir desde el primer día.`;
   const ams = p.amenities.length
