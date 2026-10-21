@@ -6,7 +6,7 @@
   const T = {
     pt: {
       // Nav
-      nav_alquilar: "Alugar", nav_contacto: "Contato", nav_visita: "Agendar visita",
+      nav_alquilar: "Alugar", nav_contacto: "Contato", nav_busca: "O que você procura?",
       // Footer
       ft_tag: "Apartamentos mobiliados de médio prazo em Buenos Aires. Tudo incluído, sem garantia imobiliária nem seguro fiança.",
       ft_ops: "Operações", ft_alquilar: "Alugar",
@@ -36,7 +36,7 @@
     },
     en: {
       // Nav
-      nav_alquilar: "Rent", nav_contacto: "Contact", nav_visita: "Book a viewing",
+      nav_alquilar: "Rent", nav_contacto: "Contact", nav_busca: "What are you looking for?",
       // Footer
       ft_tag: "Furnished medium-term apartments in Buenos Aires. All inclusive, no property guarantor and no surety bond.",
       ft_ops: "Services", ft_alquilar: "Rent",

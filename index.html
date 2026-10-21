@@ -792,13 +792,14 @@
     <a href="catalogo.html" data-i18n="nav_alquilar">Alquilar</a>
     <a href="#resenas" data-i18n="nav_resenas">Reseñas</a>
     <a href="#contacto" data-i18n="nav_contacto">Contacto</a>
+    <a href="#buscar" data-busqueda data-i18n="nav_busca">¿Qué estás buscando?</a>
   </div>
   <div class="lang-switch">
     <button class="flag active" data-lang="es" aria-label="Español" title="Español">ES</button>
     <button class="flag" data-lang="pt" aria-label="Português" title="Português">PT</button>
     <button class="flag" data-lang="en" aria-label="English" title="English">EN</button>
   </div>
-  <button class="nav-visita" type="button" data-visita data-i18n="nav_visita">Coordinar visita</button>
+  <button class="nav-busca" type="button" data-busqueda><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><span data-i18n="nav_busca">¿Qué estás buscando?</span></button>
   <button class="burger" id="burger" type="button" aria-label="Menú" aria-expanded="false" aria-controls="mobileMenu"><span></span><span></span><span></span></button>
 </nav>
 
@@ -1206,7 +1207,7 @@
   (function(){
     const T = {
       pt:{
-        nav_alquilar:"Alugar",nav_resenas:"Avaliações",nav_contacto:"Contato",nav_visita:"Agendar visita",
+        nav_alquilar:"Alugar",nav_resenas:"Avaliações",nav_contacto:"Contato",nav_busca:"O que você procura?",
         hero_t2:"no seu",hero_t3:"máximo esplendor.",
         btn_ver:"Ver apartamentos",
         mp_eyebrow:"Aluguel de médio prazo",mp_h:"Mobiliados, tudo incluído e sem garantia imobiliária.",
@@ -1224,7 +1225,7 @@
         ft_dev:"Desenvolvido por",ft_copy:"© 2026 BAIREN. Todos os direitos reservados.",ft_terms:"Termos e condições",ft_privacy:"Política de privacidade"
       },
       en:{
-        nav_alquilar:"Rent",nav_resenas:"Reviews",nav_contacto:"Contact",nav_visita:"Book a viewing",
+        nav_alquilar:"Rent",nav_resenas:"Reviews",nav_contacto:"Contact",nav_busca:"What are you looking for?",
         hero_t2:"at its",hero_t3:"finest.",
         btn_ver:"See apartments",
         mp_eyebrow:"Medium-term rental",mp_h:"Furnished, all inclusive and no property guarantor.",

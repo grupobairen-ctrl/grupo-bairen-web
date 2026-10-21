@@ -1,69 +1,85 @@
 /* BAIREN · Coordinar visita (21/10/2026)
    Antes había dos botones que terminaban en WhatsApp ("Consultar por
    WhatsApp" y "Coordinar visita", que llevaba a un cuestionario de 5
-   preguntas) y la gente no sabía cuál tocar. Ahora hay uno solo, con la
-   misma lógica que una reserva: Llegada y Estadía, y el botón abre WhatsApp
-   con el mensaje escrito. Si no hay una unidad (inicio, catálogo) se suman
-   Barrio y Presupuesto, opcionales.
+   preguntas) y la gente no sabía cuál tocar. Ahora hay uno solo: se elige
+   la duración del contrato y el botón abre WhatsApp con el mensaje escrito.
+   12 y 24 meses van en verde y, al elegirlos, avisan que hay beneficios
+   (Tomás, 21/10/2026); el mensaje pide que se los cuenten.
 
-   - Cualquier elemento con data-visita abre la ventana.
    - La ficha avisa la unidad con BairenVisita.setUnidad({...}) y monta el
-     mismo formulario adentro de su tarjeta con BairenVisita.mount(el).
+     formulario adentro de su tarjeta con BairenVisita.mount(el).
+   - data-visita (la barra fija del celular) abre ese mismo formulario en una
+     ventana. Lo elegido se ve igual en los dos.
+   - data-busqueda ("¿Qué estás buscando?", arriba en todas las páginas) abre
+     la búsqueda: barrio, ambientes, presupuesto y duración, todo opcional,
+     para que el equipo le pase opciones por WhatsApp.
    - El botón final es un link a wa.me: meta-pixel.js lo cuenta como Contact
      igual que cualquier otro WhatsApp de la web. */
 (function () {
   'use strict';
   var WA = '5491123106629';
   var MESES = [3, 6, 12, 24];
-  var BARRIOS = ['Recoleta', 'Palermo', 'Núñez', 'Puerto Madero', 'Belgrano'];
+  var CON_BENEFICIOS = [12, 24];
+  var BARRIOS = ['Recoleta', 'Palermo', 'Núñez', 'Puerto Madero', 'Belgrano', 'Colegiales'];
+  var AMBS = ['1', '2', '3', '4'];
   var PRESUS = ['p1', 'p2', 'p3', 'p4'];
 
   var T = {
     es: {
-      eyebrow: 'Coordinar visita', gen_title: 'Contanos qué buscás',
-      gen_sub: 'Te pasamos las unidades que encajan y coordinamos la visita.',
-      llegada: 'Llegada', estadia: 'Estadía', barrio: 'Barrio', presupuesto: 'Presupuesto por mes', opcional: 'opcional',
-      fecha_ph: 'Elegí una fecha', meses: '{n} meses', cualquiera: 'Cualquiera',
-      p1: 'Hasta USD 1.000', p2: 'USD 1.000 a 1.500', p3: 'USD 1.500 a 2.500', p4: 'Más de USD 2.500',
+      eyebrow: 'Coordinar visita', duracion: 'Duración del contrato', meses: '{n} meses',
+      beneficios: '+ beneficios con el contrato de {n} meses',
       btn: 'Coordinar visita', cerrar: 'Cerrar',
       nota: 'Se abre WhatsApp con tu mensaje listo. Te responde una persona del equipo.',
-      msg_u: 'Hola, quiero coordinar una visita a {u}.', msg_g: 'Hola, quiero coordinar una visita.',
-      m_llegada: 'Llegada: {v}', m_estadia: 'Estadía: {v}', m_barrio: 'Barrio: {v}', m_presu: 'Presupuesto: {v} por mes',
-      locale: 'es-AR'
+      msg: 'Hola, quiero coordinar una visita a {u}.', m_duracion: 'Duración del contrato: {n} meses.',
+      m_beneficios: 'Quiero saber los beneficios.',
+      b_title: '¿Qué estás buscando?', b_sub: 'Contanos y te mandamos por WhatsApp las opciones que encajan.',
+      barrio: 'Barrio', amb: 'Ambientes', presu: 'Presupuesto por mes', opcional: 'opcional',
+      a1: 'Mono', a2: '2', a3: '3', a4: '4 o más',
+      p1: 'Hasta USD 1.000', p2: 'USD 1.000 a 1.500', p3: 'USD 1.500 a 2.500', p4: 'Más de USD 2.500',
+      b_btn: 'Enviar por WhatsApp',
+      b_msg: 'Hola, estoy buscando departamento.', b_cierre: 'Me pasan opciones?',
+      m_barrio: 'Barrio: {v}', m_amb: 'Ambientes: {v}', m_presu: 'Presupuesto: {v} por mes', m_y: ' o '
     },
     pt: {
-      eyebrow: 'Agendar visita', gen_title: 'Conte o que você procura',
-      gen_sub: 'Enviamos as unidades que combinam com você e agendamos a visita.',
-      llegada: 'Chegada', estadia: 'Estadia', barrio: 'Bairro', presupuesto: 'Orçamento por mês', opcional: 'opcional',
-      fecha_ph: 'Escolha uma data', meses: '{n} meses', cualquiera: 'Qualquer um',
-      p1: 'Até USD 1.000', p2: 'USD 1.000 a 1.500', p3: 'USD 1.500 a 2.500', p4: 'Mais de USD 2.500',
+      eyebrow: 'Agendar visita', duracion: 'Duração do contrato', meses: '{n} meses',
+      beneficios: '+ benefícios com o contrato de {n} meses',
       btn: 'Agendar visita', cerrar: 'Fechar',
       nota: 'O WhatsApp abre com a sua mensagem pronta. Quem responde é uma pessoa da equipe.',
-      msg_u: 'Olá, quero agendar uma visita a {u}.', msg_g: 'Olá, quero agendar uma visita.',
-      m_llegada: 'Chegada: {v}', m_estadia: 'Estadia: {v}', m_barrio: 'Bairro: {v}', m_presu: 'Orçamento: {v} por mês',
-      locale: 'pt-BR'
+      msg: 'Olá, quero agendar uma visita a {u}.', m_duracion: 'Duração do contrato: {n} meses.',
+      m_beneficios: 'Quero saber quais são os benefícios.',
+      b_title: 'O que você procura?', b_sub: 'Conte para nós e enviamos pelo WhatsApp as opções que combinam.',
+      barrio: 'Bairro', amb: 'Ambientes', presu: 'Orçamento por mês', opcional: 'opcional',
+      a1: 'Studio', a2: '2', a3: '3', a4: '4 ou mais',
+      p1: 'Até USD 1.000', p2: 'USD 1.000 a 1.500', p3: 'USD 1.500 a 2.500', p4: 'Mais de USD 2.500',
+      b_btn: 'Enviar pelo WhatsApp',
+      b_msg: 'Olá, estou procurando apartamento.', b_cierre: 'Podem me enviar opções?',
+      m_barrio: 'Bairro: {v}', m_amb: 'Ambientes: {v}', m_presu: 'Orçamento: {v} por mês', m_y: ' ou '
     },
     en: {
-      eyebrow: 'Book a viewing', gen_title: 'Tell us what you need',
-      gen_sub: 'We send you the units that fit and book the viewing.',
-      llegada: 'Move-in', estadia: 'Stay', barrio: 'Neighbourhood', presupuesto: 'Monthly budget', opcional: 'optional',
-      fecha_ph: 'Pick a date', meses: '{n} months', cualquiera: 'Any',
-      p1: 'Up to USD 1,000', p2: 'USD 1,000 to 1,500', p3: 'USD 1,500 to 2,500', p4: 'Over USD 2,500',
+      eyebrow: 'Book a viewing', duracion: 'Contract length', meses: '{n} months',
+      beneficios: '+ perks with a {n}-month contract',
       btn: 'Book a viewing', cerrar: 'Close',
       nota: 'WhatsApp opens with your message ready. A person from our team replies.',
-      msg_u: 'Hi, I would like to book a viewing at {u}.', msg_g: 'Hi, I would like to book a viewing.',
-      m_llegada: 'Move-in: {v}', m_estadia: 'Stay: {v}', m_barrio: 'Neighbourhood: {v}', m_presu: 'Budget: {v} per month',
-      locale: 'en-US'
+      msg: 'Hi, I would like to book a viewing at {u}.', m_duracion: 'Contract length: {n} months.',
+      m_beneficios: 'I would like to know the perks.',
+      b_title: 'What are you looking for?', b_sub: 'Tell us and we send you the options that fit on WhatsApp.',
+      barrio: 'Neighbourhood', amb: 'Rooms', presu: 'Monthly budget', opcional: 'optional',
+      a1: 'Studio', a2: '2', a3: '3', a4: '4+',
+      p1: 'Up to USD 1,000', p2: 'USD 1,000 to 1,500', p3: 'USD 1,500 to 2,500', p4: 'Over USD 2,500',
+      b_btn: 'Send on WhatsApp',
+      b_msg: 'Hi, I am looking for an apartment.', b_cierre: 'Could you send me some options?',
+      m_barrio: 'Neighbourhood: {v}', m_amb: 'Rooms: {v}', m_presu: 'Budget: {v} per month', m_y: ' or '
     }
   };
   function t() { return T[window.BAIREN_LANG] || T.es; }
 
-  var unidad = null;      // { ref, titulo, sub, desde:'AAAA-MM-DD' } o null
-  var estado = { llegada: '', estadia: 0, barrio: '', presu: '' };
+  var unidad = null;      // { ref, titulo, sub } o null
+  var meses = 0;          // duración elegida (0 = ninguna)
+  var busca = { barrio: [], amb: '', presu: '' };   // la búsqueda (barrio admite varios)
+  var modo = 'unidad';    // qué muestra la ventana: 'unidad' o 'busqueda'
   var forms = [];         // formularios montados (ventana + tarjeta de la ficha)
   var dlg = null;
 
-  var ICO_CAL = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="1"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>';
   var ICO_WA = '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 0C7.163 0 0 7.163 0 16c0 2.83.736 5.487 2.023 7.793L0 32l8.438-2.01A15.93 15.93 0 0016 32c8.837 0 16-7.163 16-16S24.837 0 16 0zm0 29.333a13.278 13.278 0 01-6.77-1.848l-.484-.287-5.013 1.195 1.228-4.88-.317-.502A13.278 13.278 0 012.667 16C2.667 8.636 8.636 2.667 16 2.667S29.333 8.636 29.333 16 23.364 29.333 16 29.333zm7.3-9.96c-.4-.2-2.363-1.166-2.728-1.3-.366-.133-.633-.2-.9.2-.266.4-1.033 1.3-1.266 1.566-.233.267-.466.3-.866.1-2.367-1.183-3.917-2.117-5.475-4.8-.413-.712.413-.663 1.183-2.202.133-.267.067-.5-.033-.7-.1-.2-.9-2.163-1.233-2.963-.324-.778-.653-.672-.9-.685l-.767-.013a1.47 1.47 0 00-1.067.5c-.366.4-1.4 1.367-1.4 3.33s1.434 3.863 1.634 4.13c.2.267 2.823 4.312 6.837 6.05 2.54 1.097 3.534 1.19 4.804.999.773-.115 2.363-.966 2.696-1.9.333-.933.333-1.733.233-1.9-.1-.166-.366-.266-.766-.466z"/></svg>';
 
   function esc(s) {
@@ -71,129 +87,110 @@
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
   }
-  function iso(d) {
-    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-  }
-  function deIso(v) {
-    var x = String(v || '').split('-');
-    return x.length === 3 ? new Date(+x[0], +x[1] - 1, +x[2]) : null;
-  }
-  // La primera llegada posible: hoy, o el día que se libera la unidad
-  function minLlegada() {
-    var hoy = iso(new Date());
-    return unidad && unidad.desde && unidad.desde > hoy ? unidad.desde : hoy;
-  }
-  function fechaTxt(v) {
-    var d = deIso(v);
-    if (!d) return '';
-    var o = { day: 'numeric', month: 'long' };
-    if (d.getFullYear() !== new Date().getFullYear()) o.year = 'numeric';
-    return d.toLocaleDateString(t().locale, o);
-  }
+  function conBeneficios(n) { return CON_BENEFICIOS.indexOf(n) !== -1; }
 
-  function mensaje() {
-    var L = t(), lineas = [];
-    lineas.push(unidad ? L.msg_u.replace('{u}', unidad.ref) : L.msg_g);
-    if (estado.llegada) lineas.push(L.m_llegada.replace('{v}', fechaTxt(estado.llegada)));
-    if (estado.estadia) lineas.push(L.m_estadia.replace('{v}', L.meses.replace('{n}', estado.estadia)));
-    if (!unidad && estado.barrio) lineas.push(L.m_barrio.replace('{v}', estado.barrio === '*' ? L.cualquiera : estado.barrio));
-    if (!unidad && estado.presu) lineas.push(L.m_presu.replace('{v}', L[estado.presu]));
+  function lineaDuracion(L) {
+    if (!meses) return '';
+    return L.m_duracion.replace('{n}', meses) + (conBeneficios(meses) ? ' ' + L.m_beneficios : '');
+  }
+  function mensaje(m) {
+    var L = t(), lineas;
+    if (m === 'busqueda') {
+      lineas = [L.b_msg];
+      if (busca.barrio.length) lineas.push(L.m_barrio.replace('{v}', busca.barrio.join(L.m_y)));
+      if (busca.amb) lineas.push(L.m_amb.replace('{v}', L['a' + busca.amb]));
+      if (busca.presu) lineas.push(L.m_presu.replace('{v}', L[busca.presu]));
+      if (meses) lineas.push(lineaDuracion(L));
+      lineas.push(L.b_cierre);
+    } else {
+      lineas = [L.msg.replace('{u}', unidad ? unidad.ref : 'BAIREN')];
+      if (meses) lineas.push(lineaDuracion(L));
+    }
     return lineas.join('\n');
   }
-  function waHref() { return 'https://wa.me/' + WA + '?text=' + encodeURIComponent(mensaje()); }
+  function waHref(m) { return 'https://wa.me/' + WA + '?text=' + encodeURIComponent(mensaje(m)); }
 
-  function chip(grupo, valor, txt) {
-    return '<button type="button" class="vis-chip" data-g="' + grupo + '" data-v="' + esc(valor) + '" aria-pressed="false">' + esc(txt) + '</button>';
+  function chip(g, v, txt, extra) {
+    return '<button type="button" class="vis-chip' + (extra || '') + '" data-g="' + g + '" data-v="' + esc(v) + '" aria-pressed="false">' + esc(txt) + '</button>';
+  }
+  function grupo(lbl, opc, chips, cls) {
+    return '<div class="vis-field"><span class="vis-lbl">' + esc(lbl) + (opc ? '<small>' + esc(opc) + '</small>' : '') + '</span>'
+      + '<div class="vis-chips' + (cls || '') + '" role="group" aria-label="' + esc(lbl) + '">' + chips + '</div>';
   }
 
-  function htmlForm() {
-    var L = t();
-    var h = ''
-      + '<div class="vis-field"><span class="vis-lbl">' + esc(L.llegada) + '</span>'
-      + '<label class="vis-date">' + ICO_CAL + '<span class="vis-date-txt">' + esc(L.fecha_ph) + '</span>'
-      + '<input type="date" aria-label="' + esc(L.llegada) + '"></label></div>'
-      + '<div class="vis-field"><span class="vis-lbl">' + esc(L.estadia) + '</span><div class="vis-chips vis-chips--meses" role="group" aria-label="' + esc(L.estadia) + '">'
-      + MESES.map(function (n) { return chip('estadia', n, L.meses.replace('{n}', n)); }).join('')
-      + '</div></div>';
-    if (!unidad) {
-      h += '<div class="vis-field"><span class="vis-lbl">' + esc(L.barrio) + '<small>' + esc(L.opcional) + '</small></span><div class="vis-chips" role="group" aria-label="' + esc(L.barrio) + '">'
-        + BARRIOS.map(function (b) { return chip('barrio', b, b); }).join('') + chip('barrio', '*', L.cualquiera)
-        + '</div></div>'
-        + '<div class="vis-field"><span class="vis-lbl">' + esc(L.presupuesto) + '<small>' + esc(L.opcional) + '</small></span><div class="vis-chips" role="group" aria-label="' + esc(L.presupuesto) + '">'
-        + PRESUS.map(function (k) { return chip('presu', k, L[k]); }).join('')
-        + '</div></div>';
+  function htmlForm(m) {
+    var L = t(), h = '';
+    if (m === 'busqueda') {
+      h += grupo(L.barrio, L.opcional, BARRIOS.map(function (b) { return chip('barrio', b, b); }).join('')) + '</div>'
+        + grupo(L.amb, L.opcional, AMBS.map(function (a) { return chip('amb', a, L['a' + a]); }).join(''), ' vis-chips--meses') + '</div>'
+        + grupo(L.presu, L.opcional, PRESUS.map(function (k) { return chip('presu', k, L[k]); }).join('')) + '</div>';
     }
-    h += '<a class="vis-btn" href="' + esc(waHref()) + '" target="_blank" rel="noopener noreferrer">' + ICO_WA + '<span>' + esc(L.btn) + '</span></a>'
+    h += grupo(L.duracion, m === 'busqueda' ? L.opcional : '', MESES.map(function (n) {
+        return chip('meses', n, L.meses.replace('{n}', n), conBeneficios(n) ? ' vis-chip--plus' : '');
+      }).join(''), ' vis-chips--meses')
+      + '<p class="vis-plus" aria-live="polite"></p></div>'
+      + '<a class="vis-btn" href="' + esc(waHref(m)) + '" target="_blank" rel="noopener noreferrer">' + ICO_WA
+      + '<span>' + esc(m === 'busqueda' ? L.b_btn : L.btn) + '</span></a>'
       + '<p class="vis-nota">' + esc(L.nota) + '</p>';
     return h;
   }
 
-  // Deja cada formulario montado igual que el estado (ventana y tarjeta van juntas)
+  // Deja cada formulario montado igual que lo elegido (ventana y tarjeta van juntas)
   function sync() {
+    var plus = conBeneficios(meses) ? t().beneficios.replace('{n}', meses) : '';
     forms.forEach(function (f) {
-      var inp = f.querySelector('.vis-date input');
-      if (inp) {
-        inp.min = minLlegada();
-        if (inp.value !== estado.llegada) inp.value = estado.llegada;
-        var box = inp.parentNode;
-        box.classList.toggle('has-val', !!estado.llegada);
-        box.querySelector('.vis-date-txt').textContent = estado.llegada ? fechaTxt(estado.llegada) : t().fecha_ph;
-      }
       f.querySelectorAll('.vis-chip').forEach(function (c) {
         var g = c.dataset.g, v = c.dataset.v;
-        var on = g === 'estadia' ? String(estado.estadia) === v : estado[g] === v;
+        var on = g === 'meses' ? String(meses) === v : g === 'barrio' ? busca.barrio.indexOf(v) !== -1 : busca[g] === v;
         c.setAttribute('aria-pressed', on ? 'true' : 'false');
       });
+      var p = f.querySelector('.vis-plus');
+      if (p) {
+        p.textContent = plus;
+        p.classList.toggle('on', !!plus);
+      }
       var a = f.querySelector('.vis-btn');
-      if (a) a.href = waHref();
+      if (a) a.href = waHref(f.dataset.modo);
     });
   }
 
-  // Los botoncitos se escuchan una sola vez por formulario (sobreviven al
-  // cambio de idioma, que vuelve a escribir el contenido)
-  function onChip(e) {
+  // Un solo escuchador por formulario (sobrevive al cambio de idioma, que
+  // vuelve a escribir el contenido)
+  function onClick(e) {
     var c = e.target.closest('.vis-chip');
-    if (!c) return;
-    var g = c.dataset.g, v = c.dataset.v;
-    if (g === 'estadia') estado.estadia = String(estado.estadia) === v ? 0 : +v;
-    else estado[g] = estado[g] === v ? '' : v;
-    sync();
-  }
-
-  function wire(f) {
-    var inp = f.querySelector('.vis-date input');
-    // En la compu el input invisible no abre el calendario solo: se lo pide
-    inp.addEventListener('click', function () { try { inp.showPicker(); } catch (_) {} });
-    inp.addEventListener('change', function () {
-      estado.llegada = inp.value && inp.value >= minLlegada() ? inp.value : (inp.value ? minLlegada() : '');
+    if (c) {
+      var g = c.dataset.g, v = c.dataset.v;
+      if (g === 'meses') meses = String(meses) === v ? 0 : +v;
+      else if (g === 'barrio') {
+        var i = busca.barrio.indexOf(v);
+        if (i === -1) busca.barrio.push(v); else busca.barrio.splice(i, 1);
+      } else busca[g] = busca[g] === v ? '' : v;
       sync();
-    });
-    f.querySelector('.vis-btn').addEventListener('click', function () {
-      if (dlg && dlg.open && dlg.contains(f)) setTimeout(cerrar, 300);
-    });
+      return;
+    }
+    if (e.target.closest('.vis-btn') && dlg && dlg.open && dlg.contains(e.currentTarget)) setTimeout(cerrar, 300);
   }
 
-  function render(f) {
-    f.innerHTML = htmlForm();
-    wire(f);
-  }
+  function vivos() { forms = forms.filter(function (f) { return f.isConnected; }); }
 
-  function mount(el) {
+  function mount(el, m) {
     if (!el) return;
     el.classList.add('vis-form');
+    el.dataset.modo = m || el.dataset.modo || 'unidad';
     // La ficha reescribe su tarjeta al cambiar de idioma: lo que quedó fuera de la página se suelta
-    forms = forms.filter(function (f) { return f.isConnected; });
+    vivos();
     if (forms.indexOf(el) === -1) forms.push(el);
-    if (!el._visChips) { el.addEventListener('click', onChip); el._visChips = true; }
-    render(el);
+    if (!el._vis) { el.addEventListener('click', onClick); el._vis = true; }
+    el.innerHTML = htmlForm(el.dataset.modo);
     sync();
   }
 
   function cabecera() {
     var L = t();
-    dlg.querySelector('.vis-eyebrow').textContent = L.eyebrow;
-    dlg.querySelector('.vis-title').textContent = unidad ? unidad.titulo : L.gen_title;
-    dlg.querySelector('.vis-sub').textContent = unidad ? (unidad.sub || '') : L.gen_sub;
+    var b = modo === 'busqueda';
+    dlg.querySelector('.vis-eyebrow').textContent = b ? 'BAIREN' : L.eyebrow;
+    dlg.querySelector('.vis-title').textContent = b ? L.b_title : (unidad ? unidad.titulo : 'BAIREN');
+    dlg.querySelector('.vis-sub').textContent = b ? L.b_sub : (unidad ? (unidad.sub || '') : '');
     dlg.querySelector('.vis-x').setAttribute('aria-label', L.cerrar);
   }
 
@@ -210,11 +207,11 @@
     dlg.addEventListener('close', function () { document.documentElement.style.overflow = ''; });
   }
 
-  function abrir() {
+  function abrir(m) {
+    modo = m === 'busqueda' ? 'busqueda' : 'unidad';
     if (!dlg) crear();
     cabecera();
-    var f = dlg.querySelector('.vis-form');
-    mount(f);
+    mount(dlg.querySelector('.vis-form'), modo);
     if (typeof dlg.showModal === 'function') dlg.showModal(); else dlg.setAttribute('open', '');
     document.documentElement.style.overflow = 'hidden';
   }
@@ -225,19 +222,18 @@
   }
 
   document.addEventListener('click', function (e) {
-    var b = e.target.closest && e.target.closest('[data-visita]');
+    var b = e.target.closest && e.target.closest('[data-visita],[data-busqueda]');
     if (!b) return;
     e.preventDefault();
     // Si el menú del celular estaba abierto, se cierra antes
     var mm = document.getElementById('mobileMenu'), bg = document.getElementById('burger');
     if (mm && mm.classList.contains('open') && bg) bg.click();
-    abrir();
+    abrir(b.hasAttribute('data-busqueda') ? 'busqueda' : 'unidad');
   });
 
   document.addEventListener('bairen:lang', function () {
-    forms = forms.filter(function (f) { return f.isConnected; });
-    forms.forEach(render);
-    sync();
+    vivos();
+    forms.forEach(function (f) { mount(f); });
     if (dlg) cabecera();
   });
 
@@ -247,11 +243,8 @@
     mount: mount,
     setUnidad: function (u) {
       unidad = u || null;
-      // La ventana cambia de forma (con o sin barrio y presupuesto)
-      forms = forms.filter(function (f) { return f.isConnected; });
-      forms.forEach(render);
-      sync();
       if (dlg) cabecera();
+      sync();
     }
   };
 })();

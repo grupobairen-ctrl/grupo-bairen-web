@@ -11,19 +11,18 @@
   --vis-ease:cubic-bezier(0.22,1,0.36,1);
 }
 
-/* Botón del encabezado */
-.nav-visita{
-  display:inline-flex;align-items:center;justify-content:center;
-  margin-left:auto;flex-shrink:0;white-space:nowrap;cursor:pointer;
-  font-family:'Jost',sans-serif;font-size:.64rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;
-  color:var(--vis-gold-light);background:transparent;border:1px solid rgba(194,169,104,.6);
-  padding:10px 18px;transition:background .25s,color .25s,border-color .25s;
+/* "¿Qué estás buscando?" arriba: sutil, como texto y no como botón (Tomás, 21/10).
+   En la compu va con los links del menú; en el celular, al lado del menú, y
+   el idioma pasa adentro del menú para que entre. */
+.nav-busca{
+  display:none;align-items:center;gap:7px;margin-left:auto;margin-right:6px;flex-shrink:0;white-space:nowrap;cursor:pointer;
+  font-family:'Jost',sans-serif;font-size:.76rem;font-weight:400;letter-spacing:.02em;
+  color:rgba(255,255,255,.78);background:none;border:none;padding:8px 2px;transition:color .2s;
 }
-.nav-visita:hover{background:var(--vis-gold);color:var(--vis-navy-deeper);border-color:var(--vis-gold);}
+.nav-busca svg{color:var(--vis-gold);flex-shrink:0;}
+.nav-busca:hover{color:var(--vis-gold-light);}
 @media(max-width:700px){
-  .nav-visita{font-size:.6rem;letter-spacing:.14em;padding:9px 12px;margin-right:4px;}
-  /* En el celular el idioma pasa adentro del menú: arriba queda logo,
-     Coordinar visita y menú, como en cualquier app */
+  .nav-busca{display:inline-flex;}
   nav > .lang-switch,.navbar > .lang-switch{display:none;}
 }
 .m-lang{display:none;}
@@ -59,14 +58,6 @@
 .vis-lbl{display:block;font-size:.6rem;letter-spacing:.28em;text-transform:uppercase;color:var(--vis-gold-dark);font-weight:600;margin-bottom:9px;}
 .vis-lbl small{font-size:inherit;letter-spacing:.12em;color:var(--vis-mid);font-weight:400;text-transform:none;margin-left:4px;}
 
-.vis-date{position:relative;display:flex;align-items:center;gap:12px;min-height:50px;padding:0 14px;background:#fff;border:1px solid rgba(42,58,82,.2);transition:border-color .2s;}
-.vis-date:focus-within,.vis-date:hover{border-color:var(--vis-navy);}
-.vis-date svg{flex-shrink:0;color:var(--vis-gold-dark);}
-.vis-date-txt{font-size:.92rem;color:var(--vis-mid);}
-.vis-date.has-val .vis-date-txt{color:var(--vis-navy);font-weight:500;}
-/* El input real va encima, invisible: el toque abre el calendario del teléfono */
-.vis-date input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;border:none;-webkit-appearance:none;appearance:none;}
-
 .vis-chips{display:flex;flex-wrap:wrap;gap:8px;}
 .vis-chip{
   flex:1 1 auto;min-height:44px;padding:0 12px;cursor:pointer;
@@ -76,6 +67,14 @@
 .vis-chip:hover{border-color:var(--vis-navy);}
 .vis-chip[aria-pressed="true"]{background:var(--vis-navy);color:var(--vis-white);border-color:var(--vis-navy);}
 .vis-chips--meses .vis-chip{flex:1 1 0;min-width:0;padding:0 6px;}
+/* 12 y 24 meses: recuadro verde sutil; al elegirlos aparece "+ beneficios" */
+.vis-chip--plus{border-color:rgba(42,122,75,.55);background:rgba(42,122,75,.05);color:#21603b;}
+.vis-chip--plus:hover{border-color:#2a7a4b;}
+.vis-chip--plus[aria-pressed="true"]{background:#2a7a4b;border-color:#2a7a4b;color:#fff;}
+.vis-plus{max-height:0;opacity:0;overflow:hidden;margin:0;font-size:.8rem;font-weight:500;color:#2a7a4b;letter-spacing:.01em;
+  transition:max-height .35s var(--vis-ease),opacity .3s,margin .35s var(--vis-ease);}
+.vis-plus.on{max-height:3em;opacity:1;margin-top:10px;}
+@media(prefers-reduced-motion:reduce){.vis-plus{transition:none;}}
 
 .vis-btn{
   display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:54px;margin-top:6px;
