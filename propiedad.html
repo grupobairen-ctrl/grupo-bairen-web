@@ -776,9 +776,6 @@ function renderDynamicTexts(p) {
       $('acPriceSecondary').innerHTML = `<span>${t.trad_lbl}</span>${priceTradStr}`;
     }
   } else if (isTemp) {
-    // El "all in" del precio grande solo va si el precio es de verdad un paquete.
-    // Las unidades con expensas aparte (23/9/2026) dicen "+ expensas" acá arriba,
-    // igual que en la tarjeta del catálogo y que en la fila de la ficha.
     // Todo incluido siempre (Tomás, 21/10/2026): expensas y servicios van dentro del precio
     $('heroPrice').textContent = priceTempStr;
     $('heroPriceMo').textContent = t.pm_allin;
