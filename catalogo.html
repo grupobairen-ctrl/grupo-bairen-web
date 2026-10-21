@@ -839,8 +839,8 @@ const CT = {
     title_todos:'Departamentos de 3 a 24 meses', sub_todos:'Amoblados · Todo incluido · Sin garantía inmobiliaria ni seguro de caución',
     count_one:'propiedad', count_many:'propiedades', empty_t:'Sin resultados', empty_s:'Probá con otro barrio.',
     loading:'Cargando propiedades...', err_t:'No pudimos cargar las propiedades', err_s:'Revisá la conexión a internet. Si el problema persiste, contactanos por WhatsApp.',
-    per_month:'por mes', per_month_all:'por mes · all in', per_month_exp:'por mes + expensas', consult:'Consultar precio', ver_mas:'Ver más →',
-    disponible:'Disponible', reservado:'Reservado', reservado_sem:'Reservada esta semana', serv_allin:'All in', serv_sin:'Sin incl.', serv_lbl:'Servicios',
+    per_month:'por mes', per_month_all:'por mes · todo incluido', consult:'Consultar precio', ver_mas:'Ver más →',
+    disponible:'Disponible', reservado:'Reservado', reservado_sem:'Reservada esta semana', serv_allin:'Incluye expensas y servicios', serv_lbl:'Servicios',
     amb:'Amb.', sup:'Sup.', foto_ph:'Fotografía de la unidad', tipo_temporal:'De 3 a 24 meses', tipo_tradicional:'Largo plazo',
     lib_hoy:'Se libera hoy', lib_manana:'Se libera mañana', lib_dias:'Se libera en {d} días', lib_fecha:'Se libera el {f}', lib_locale:'es-AR',
     barrios:'Barrios', borrar_filtro:'Borrar filtro', todos_barrios:'Todos los barrios', sheet_title:'Elegí un barrio', cerrar:'Cerrar', clear_aria:'Quitar filtro de barrio', u_one:'unidad', u_many:'unidades', panel_todos:'<b>{n}</b> unidades en <b>{z}</b> barrios'
@@ -849,8 +849,8 @@ const CT = {
     title_todos:'Apartamentos de 3 a 24 meses', sub_todos:'Mobiliados · Tudo incluído · Sem garantia imobiliária nem seguro fiança',
     count_one:'imóvel', count_many:'imóveis', empty_t:'Sem resultados', empty_s:'Tente outro bairro.',
     loading:'Carregando imóveis...', err_t:'Não foi possível carregar os imóveis', err_s:'Verifique sua conexão. Se o problema persistir, fale conosco pelo WhatsApp.',
-    per_month:'por mês', per_month_all:'por mês · tudo incluído', per_month_exp:'por mês + condomínio', consult:'Consultar preço', ver_mas:'Ver mais →',
-    disponible:'Disponível', reservado:'Reservado', reservado_sem:'Reservada esta semana', serv_allin:'Tudo incl.', serv_sin:'Não incl.', serv_lbl:'Serviços',
+    per_month:'por mês', per_month_all:'por mês · tudo incluído', consult:'Consultar preço', ver_mas:'Ver mais →',
+    disponible:'Disponível', reservado:'Reservado', reservado_sem:'Reservada esta semana', serv_allin:'Inclui condomínio e serviços', serv_lbl:'Serviços',
     amb:'Amb.', sup:'Sup.', foto_ph:'Foto do imóvel', tipo_temporal:'De 3 a 24 meses', tipo_tradicional:'Longo prazo',
     lib_hoy:'Disponível hoje', lib_manana:'Disponível amanhã', lib_dias:'Disponível em {d} dias', lib_fecha:'Disponível em {f}', lib_locale:'pt-BR',
     barrios:'Bairros', borrar_filtro:'Limpar filtro', todos_barrios:'Todos os bairros', sheet_title:'Escolha um bairro', cerrar:'Fechar', clear_aria:'Remover filtro de bairro', u_one:'unidade', u_many:'unidades', panel_todos:'<b>{n}</b> unidades em <b>{z}</b> bairros'
@@ -859,8 +859,8 @@ const CT = {
     title_todos:'Apartments for 3 to 24 months', sub_todos:'Furnished · All inclusive · No property guarantor and no surety bond',
     count_one:'property', count_many:'properties', empty_t:'No results', empty_s:'Try another neighbourhood.',
     loading:'Loading properties...', err_t:'We could not load the properties', err_s:'Check your internet connection. If the problem persists, contact us on WhatsApp.',
-    per_month:'per month', per_month_all:'per month · all in', per_month_exp:'per month + building fees', consult:'Ask for price', ver_mas:'See more →',
-    disponible:'Available', reservado:'Reserved', reservado_sem:'Reserved this week', serv_allin:'All in', serv_sin:'Not incl.', serv_lbl:'Services',
+    per_month:'per month', per_month_all:'per month · all inclusive', consult:'Ask for price', ver_mas:'See more →',
+    disponible:'Available', reservado:'Reserved', reservado_sem:'Reserved this week', serv_allin:'Building fees and utilities included', serv_lbl:'Services',
     amb:'Rooms', sup:'Area', foto_ph:'Unit photo', tipo_temporal:'3 to 24 months', tipo_tradicional:'Long-term',
     lib_hoy:'Available today', lib_manana:'Available tomorrow', lib_dias:'Available in {d} days', lib_fecha:'Available {f}', lib_locale:'en-US',
     barrios:'Neighbourhoods', borrar_filtro:'Clear filter', todos_barrios:'All neighbourhoods', sheet_title:'Choose a neighbourhood', cerrar:'Close', clear_aria:'Remove neighbourhood filter', u_one:'unit', u_many:'units', panel_todos:'<b>{n}</b> units across <b>{z}</b> neighbourhoods'
@@ -873,12 +873,9 @@ const tipoLabel = (t) => t === 'Temporal' ? ct('tipo_temporal') : ct('tipo_tradi
 function priceHTML(p) {
   if (p.precio > 0) {
     const fmt = p.precio.toLocaleString('es-AR').replace(/\./g,'.'); // punto como miles
-    // "all in" solo si el precio es de verdad un paquete. Las unidades con
-    // expensas aparte (23/9/2026) muestran "+ expensas" ya en la tarjeta: el
-    // catálogo no puede prometer algo que la ficha después desmiente.
-    const period = p.tipo !== 'Temporal'          ? ct('per_month')
-                 : p.expensasIncluidas === false  ? ct('per_month_exp')
-                 : ct('per_month_all');
+    // Todas las unidades son paquete completo (Tomás, 21/10/2026): el precio
+    // incluye expensas y servicios, sin excepciones
+    const period = p.tipo !== 'Temporal' ? ct('per_month') : ct('per_month_all');
     return `<div class="card-price"><span class="price-amount">USD ${fmt}</span><br><span class="price-period">${period}</span></div>`;
   }
   return `<div class="card-price"><span class="price-consult">${ct('consult')}</span></div>`;
@@ -930,7 +927,7 @@ function render() {
     const metaLine = [
       p.amb ? `${p.amb} ${ct('amb').toLowerCase()}` : null,
       p.m2 ? m2txt : null,
-      p.tipo === 'Temporal' ? (p.expensasIncluidas === false ? ct('serv_sin') : ct('serv_allin')) : null,
+      p.tipo === 'Temporal' ? ct('serv_allin') : null,
     ].filter(Boolean).join(' · ');
     const imgHTML = p.foto
       ? `<img src="${p.fotoEsPortada ? p.foto : window.sbImg(p.foto,700)}" alt="${p.dir} — foto principal" loading="lazy">`
@@ -1015,8 +1012,6 @@ async function loadFromSupabase() {
         estado: p.estado,
         reservada_at: p.reservada_at || null,
         fechaLiberacion: p.fecha_liberacion || null,
-        // expensas_incluidas = false → el precio es seco y las expensas van aparte
-        expensasIncluidas: p.expensas_incluidas !== false,
         expensas: p.expensas == null ? null : Number(p.expensas),
         amenities: amList,
         foto,

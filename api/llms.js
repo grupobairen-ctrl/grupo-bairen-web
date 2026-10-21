@@ -40,7 +40,7 @@ Actualizado: ${hoy}. Los precios y la disponibilidad salen de la base en vivo; p
 ## Cómo funciona
 
 - Plazo: de 3 a 12 meses.
-- Precio: final, en dólares, por mes. Incluye alquiler, expensas, servicios y muebles. Si una unidad tiene las expensas aparte, su ficha lo dice y muestra el monto.
+- Precio: final, en dólares, por mes. Incluye alquiler, expensas, servicios y muebles.
 - Requisitos: documento (pasaporte si sos extranjero) y demostrar ingresos, propios o de alguien que te avale. No se pide garantía inmobiliaria ni seguro de caución.
 - Reserva: con contrato digital en dólares, después de visitar la unidad.
 - Los departamentos están amoblados y equipados para vivir desde el primer día.

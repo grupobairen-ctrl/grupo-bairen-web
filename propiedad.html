@@ -103,6 +103,8 @@ nav{position:fixed;inset:0 0 auto 0;z-index:1000;height:64px;background:var(--na
 .hero-price-lbl{font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-light);margin-bottom:6px;}
 .hero-price{font-family:var(--font-display);font-size:clamp(1.6rem,4vw,3rem);font-weight:700;color:var(--gold);line-height:1.05;}
 .hero-price-mo{font-size:.7rem;color:rgba(255,255,255,.4);margin-top:4px;letter-spacing:.08em;}
+.hero-price-inc{margin-top:2px;}
+.hero-price-inc:empty{display:none;}
 @media(max-width:700px){.hero-content{padding:28px 24px;flex-direction:column;align-items:flex-start;}.hero-price-box{text-align:left;}}
 
 /* GALLERY STRIP */
@@ -281,6 +283,7 @@ footer{background:var(--navy-dark);border-top:1px solid var(--gold);padding:40px
         <div class="hero-price-lbl" data-i18n="prop_price_m">Precio mensual</div>
         <div class="hero-price" id="heroPrice">—</div>
         <div class="hero-price-mo" id="heroPriceMo"></div>
+        <div class="hero-price-mo hero-price-inc" id="heroPriceInc"></div>
       </div>
     </div>
   </div>
@@ -367,17 +370,15 @@ const PROP_T = {
   es: {
     nav_comprar:'Comprar', nav_alquilar:'Alquilar',
     tag_ambos:'Alquiler a mediano y largo plazo', tag_temporal:'Alquiler a Mediano Plazo', tag_tradicional:'Alquiler a Largo Plazo', tag_venta:'En Venta',
-    temporal_allin:'mediano plazo · all in', pm_allin:'por mes · all in', pm_todo:'por mes · todo incluido', pm:'por mes',
-    pm_exp:'por mes + expensas',
+    temporal_allin:'por mes · todo incluido', pm_allin:'por mes · todo incluido', pm_todo:'por mes · todo incluido', pm:'por mes',
+    inc_exp:'Incluye expensas y servicios',
     trad_lbl:'Largo plazo',
     stat_unidad:'Unidad', stat_amb:'Ambientes', stat_meses:'Meses', stat_anios:'Años',
     amenities:'Amenities del edificio',
     video_lbl:'Ver video de la unidad',
-    r_dir:'Dirección', r_barrio:'Barrio', r_sup:'Superficie', r_amb:'Ambientes', r_plazo:'Plazo', r_serv:'Servicios', r_serv_temp:'Expensas y serv.', r_gar:'Garantía', r_estado:'Estado',
+    r_dir:'Dirección', r_barrio:'Barrio', r_sup:'Superficie', r_amb:'Ambientes', r_plazo:'Plazo', r_serv:'Servicios', r_serv_temp:'Expensas y servicios', r_gar:'Garantía', r_estado:'Estado',
     amb_sing:'ambiente', amb_pl:'ambientes',
-    v_serv_all:'Todos incluidos', v_serv_inq:'A cargo del inquilino',
-    /* Unidades cuyo precio NO es paquete: las expensas van aparte y se dicen acá (23/9/2026) */
-    v_exp_monto:'{m} + servicios, aparte',
+    v_serv_all:'Incluidos', v_serv_inq:'A cargo del inquilino',
     v_gar_trad:'Gtía CABA / Seguro de Caución', v_gar_no:'No requerida',
     est_Disponible:'Disponible', est_Reservado:'Reservado', est_Ocupado:'Ocupado',
     plazo_default:'3 a 24 meses',
@@ -395,16 +396,15 @@ const PROP_T = {
   pt: {
     nav_comprar:'Comprar', nav_alquilar:'Alugar',
     tag_ambos:'Aluguel de médio e longo prazo', tag_temporal:'Aluguel de Médio Prazo', tag_tradicional:'Aluguel de Longo Prazo', tag_venta:'À Venda',
-    temporal_allin:'médio prazo · tudo incluído', pm_allin:'por mês · tudo incluído', pm_todo:'por mês · tudo incluído', pm:'por mês',
-    pm_exp:'por mês + condomínio',
+    temporal_allin:'por mês · tudo incluído', pm_allin:'por mês · tudo incluído', pm_todo:'por mês · tudo incluído', pm:'por mês',
+    inc_exp:'Inclui condomínio e serviços',
     trad_lbl:'Longo prazo',
     stat_unidad:'Unidade', stat_amb:'Ambientes', stat_meses:'Meses', stat_anios:'Anos',
     amenities:'Comodidades do edifício',
     video_lbl:'Ver vídeo da unidade',
-    r_dir:'Endereço', r_barrio:'Bairro', r_sup:'Área', r_amb:'Ambientes', r_plazo:'Prazo', r_serv:'Serviços', r_serv_temp:'Condomínio e serv.', r_gar:'Garantia', r_estado:'Status',
+    r_dir:'Endereço', r_barrio:'Bairro', r_sup:'Área', r_amb:'Ambientes', r_plazo:'Prazo', r_serv:'Serviços', r_serv_temp:'Condomínio e serviços', r_gar:'Garantia', r_estado:'Status',
     amb_sing:'ambiente', amb_pl:'ambientes',
     v_serv_all:'Todos incluídos', v_serv_inq:'Por conta do inquilino',
-    v_exp_monto:'{m} + serviços, à parte',
     v_gar_trad:'Garantia CABA / Seguro fiança', v_gar_no:'Não exigida',
     est_Disponible:'Disponível', est_Reservado:'Reservado', est_Ocupado:'Ocupado',
     plazo_default:'3 a 24 meses',
@@ -423,16 +423,15 @@ const PROP_T = {
   en: {
     nav_comprar:'Buy', nav_alquilar:'Rent',
     tag_ambos:'Medium & long-term rental', tag_temporal:'Medium-term Rental', tag_tradicional:'Long-term Rental', tag_venta:'For Sale',
-    temporal_allin:'medium-term · all in', pm_allin:'per month · all in', pm_todo:'per month · all inclusive', pm:'per month',
-    pm_exp:'per month + building fees',
+    temporal_allin:'per month · all inclusive', pm_allin:'per month · all inclusive', pm_todo:'per month · all inclusive', pm:'per month',
+    inc_exp:'Building fees and utilities included',
     trad_lbl:'Long-term',
     stat_unidad:'Unit', stat_amb:'Rooms', stat_meses:'Months', stat_anios:'Years',
     amenities:'Building amenities',
     video_lbl:'Watch unit video',
-    r_dir:'Address', r_barrio:'Neighbourhood', r_sup:'Area', r_amb:'Rooms', r_plazo:'Term', r_serv:'Utilities', r_serv_temp:'Fees and utilities', r_gar:'Guarantee', r_estado:'Status',
+    r_dir:'Address', r_barrio:'Neighbourhood', r_sup:'Area', r_amb:'Rooms', r_plazo:'Term', r_serv:'Utilities', r_serv_temp:'Building fees and utilities', r_gar:'Guarantee', r_estado:'Status',
     amb_sing:'room', amb_pl:'rooms',
-    v_serv_all:'All included', v_serv_inq:'Paid by tenant',
-    v_exp_monto:'{m} + utilities, not included',
+    v_serv_all:'Included', v_serv_inq:'Paid by tenant',
     v_gar_trad:'CABA guarantee / Surety bond', v_gar_no:'Not required',
     est_Disponible:'Available', est_Reservado:'Reserved', est_Ocupado:'Occupied',
     plazo_default:'3 to 24 months',
@@ -739,7 +738,7 @@ function metaDescSEO(p) {
   const amb = p.ambientes ? `${p.ambientes} ${p.ambientes === 1 ? 'ambiente' : 'ambientes'}` : null;
   const que = ['Departamento amoblado', amb && `de ${amb}`, p.m2 && `y ${p.m2} m²`].filter(Boolean).join(' ');
   const precio = Number(p.precio_temporal) || 0;
-  const cuanto = precio ? `${usd(precio)} por mes${p.expensas_incluidas !== false ? ', todo incluido' : ' más expensas'}` : 'precio a consultar';
+  const cuanto = precio ? `${usd(precio)} por mes, todo incluido` : 'precio a consultar';
   const base = `${que} en ${p.barrio}, Buenos Aires. ${cuanto}, de ${min} a ${max} meses y sin garantía inmobiliaria.`;
   const resto = (p.descripcion || '').replace(/\s+/g, ' ').trim();
   if (!resto || base.length > 140) return base;
@@ -780,11 +779,11 @@ function renderDynamicTexts(p) {
     // El "all in" del precio grande solo va si el precio es de verdad un paquete.
     // Las unidades con expensas aparte (23/9/2026) dicen "+ expensas" acá arriba,
     // igual que en la tarjeta del catálogo y que en la fila de la ficha.
-    const allIn = p.expensas_incluidas !== false;
+    // Todo incluido siempre (Tomás, 21/10/2026): expensas y servicios van dentro del precio
     $('heroPrice').textContent = priceTempStr;
-    $('heroPriceMo').textContent = allIn ? t.pm_allin : t.pm_exp;
+    $('heroPriceMo').textContent = t.pm_allin;
     $('acPrice').textContent = priceTempStr;
-    $('acPriceMo').textContent = allIn ? t.pm_todo : t.pm_exp;
+    $('acPriceMo').textContent = t.pm_todo;
   } else if (isTrad) {
     $('heroPrice').textContent = priceTradStr;
     $('heroPriceMo').textContent = t.pm;
@@ -803,6 +802,8 @@ function renderDynamicTexts(p) {
       el.textContent = (window.BAIREN_LANG === 'en') ? 'Price' : 'Valor';
     });
   }
+
+  $('heroPriceInc').textContent = (isTemp || isAmbos) ? t.inc_exp : '';
 
   // ─── STATS ───
   const ambStr   = p.ambientes ? `${p.ambientes}` : '—';
@@ -854,18 +855,9 @@ function renderActionCard(p, titleFull, unidadLbl, reservado, isTemp, isTrad) {
   if (p.m2)        rows.push({ l:t.r_sup, v: `${p.m2} m²` });
   if (p.ambientes) rows.push({ l:t.r_amb, v: `${p.ambientes} ${p.ambientes !== 1 ? t.amb_pl : t.amb_sing}` });
   if (!isVenta) rows.push({ l:t.r_plazo,  v: p.plazo || t.plazo_default });
-  /* En mediano plazo el label es "Expensas y serv." (pedido de Tomás, 19/08).
-     El valor ya no es siempre "Todos incluidos": desde el 23/9/2026 hay unidades
-     de mediano plazo cuyo precio es seco y cuyas expensas van aparte. Si la unidad
-     está marcada así, la fila dice el monto real; si no lo tenemos cargado, dice
-     que corren por cuenta del inquilino, pero nunca inventa un número ni promete
-     un paquete que no existe. */
-  if (isTemp || p.tipo === 'Ambos') {
-    const v = p.expensas_incluidas === false
-      ? (p.expensas ? t.v_exp_monto.replace('{m}', fmtARS(p.expensas)) : t.v_serv_inq)
-      : t.v_serv_all;
-    rows.push({ l:t.r_serv_temp, v });
-  }
+  /* Mediano plazo: expensas y servicios siempre incluidos. Desde el 21/10/2026
+     todas las unidades son paquete completo (Tomás); ya no hay expensas aparte. */
+  if (isTemp || p.tipo === 'Ambos') rows.push({ l:t.r_serv_temp, v: t.v_serv_all });
   else if (isTrad) rows.push({ l:t.r_serv, v: t.v_serv_inq });
   if (!isVenta) rows.push({ l:t.r_gar,    v: isTrad ? t.v_gar_trad : t.v_gar_no });
   rows.push({ l:t.r_estado, v: t['est_' + p.estado] || p.estado, color: reservado ? '#b94a4a' : '#2a7a4b' });
@@ -893,7 +885,7 @@ function renderActionCard(p, titleFull, unidadLbl, reservado, isTemp, isTrad) {
   if (conVisita) {
     const desde = /^\d{4}-\d{2}-\d{2}/.test(p.fecha_liberacion || '') ? p.fecha_liberacion.slice(0, 10) : '';
     const precio = isTrad ? p.precio_tradicional : p.precio_temporal;
-    const pmTxt = isTrad ? t.pm : (p.expensas_incluidas !== false ? t.pm_todo : t.pm_exp);
+    const pmTxt = isTrad ? t.pm : t.pm_todo;
     window.BairenVisita && window.BairenVisita.setUnidad({
       ref: unidadRef,
       titulo: titleFull,

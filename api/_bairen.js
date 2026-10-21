@@ -10,7 +10,8 @@
  *
  * Mantener las reglas espejadas con catalogo.html y propiedad.html:
  *  - solo se ofrece mediano plazo (22/9/2026): ni venta ni largo plazo;
- *  - "todo incluido" solo si expensas_incluidas no es false (23/9/2026);
+ *  - todas las unidades son "todo incluido": expensas y servicios dentro del
+ *    precio (Tomás, 21/10/2026). Ya no hay unidades con expensas aparte;
  *  - nunca la línea del corredor (11/9/2026, sin-corredor.sql).
  */
 
@@ -86,7 +87,9 @@ function enCatalogo(p) {
 }
 
 const precio = p => Number(p.precio_temporal) || 0;
-const todoIncluido = p => p.expensas_incluidas !== false;
+// Desde el 21/10/2026 todas las unidades son paquete completo (Tomás): la marca
+// expensas_incluidas de la base ya no cambia lo que se publica
+const todoIncluido = () => true;
 const disponible = p => p.estado === 'Disponible';
 const titulo = p => p.dir + (p.unidad && p.unidad !== '-' ? ' ' + p.unidad : '');
 const url = p => `${SITE_ROOT}/propiedades/${encodeURIComponent(p.slug)}`;

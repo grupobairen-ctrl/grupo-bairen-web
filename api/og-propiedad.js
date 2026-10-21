@@ -101,8 +101,8 @@ function escribirFicha(html, p) {
   const tag = isAmbos ? 'Alquiler a mediano y largo plazo' : isVenta ? 'En Venta' : isTemp ? 'Alquiler a Mediano Plazo' : 'Alquiler a Largo Plazo';
   const fmt = n => (n ? B.usd(n) : 'Consultar');
   let precio, precioMo, precioAc;
-  if (isAmbos) { precio = fmt(p.precio_temporal); precioMo = 'mediano plazo · all in'; precioAc = precioMo; }
-  else if (isTemp) { precio = fmt(p.precio_temporal); precioMo = B.todoIncluido(p) ? 'por mes · all in' : 'por mes + expensas'; precioAc = B.todoIncluido(p) ? 'por mes · todo incluido' : 'por mes + expensas'; }
+  // Todo incluido siempre (21/10/2026): expensas y servicios van dentro del precio
+  if (isAmbos || isTemp) { precio = fmt(p.precio_temporal); precioMo = precioAc = 'por mes · todo incluido'; }
   else if (isTrad) { precio = fmt(p.precio_tradicional); precioMo = precioAc = 'por mes'; }
   else { precio = fmt(p.precio_venta); precioMo = precioAc = ''; }
 
@@ -120,10 +120,7 @@ function escribirFicha(html, p) {
   if (p.ambientes) rows.push(['Ambientes', `${p.ambientes} ${p.ambientes !== 1 ? 'ambientes' : 'ambiente'}`]);
   if (!isVenta) rows.push(['Plazo', p.plazo || '3 a 24 meses']);
   if (isTemp || isAmbos) {
-    const v = p.expensas_incluidas === false
-      ? (p.expensas ? `$${Number(p.expensas).toLocaleString('es-AR')} + servicios, aparte` : 'A cargo del inquilino')
-      : 'Todos incluidos';
-    rows.push(['Expensas y serv.', v]);
+    rows.push(['Expensas y servicios', 'Incluidos']);
   } else if (isTrad) rows.push(['Servicios', 'A cargo del inquilino']);
   if (!isVenta) rows.push(['Garantía', isTrad ? 'Gtía CABA / Seguro de Caución' : 'No requerida']);
   rows.push(['Estado', p.estado]);
@@ -149,6 +146,7 @@ function escribirFicha(html, p) {
   out = fill(out, 'heroSub', `${p.barrio} · Buenos Aires`);
   out = fill(out, 'heroPrice', precio);
   out = fill(out, 'heroPriceMo', precioMo);
+  if (isAmbos || isTemp) out = fill(out, 'heroPriceInc', 'Incluye expensas y servicios');
   out = fill(out, 'acPrice', precio);
   out = fill(out, 'acPriceMo', precioAc);
   out = fillHTML(out, 'statsRow', stats);
