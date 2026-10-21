@@ -220,7 +220,18 @@
     .dest-price{font-family:var(--font-display);font-size:1.15rem;font-weight:700;color:var(--gold-dark);line-height:1;}
     .dest-cta-txt{font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;font-weight:600;color:var(--navy);}
     .destacadas-footer{text-align:center;margin-top:42px;}
-    @media(max-width:960px){.destacadas{padding:60px 24px;}.destacadas-grid{grid-template-columns:1fr;gap:18px;}}
+    .dest-price small{display:block;font-family:var(--font-body);font-size:.6rem;font-weight:400;letter-spacing:.06em;color:var(--text-mid);margin-top:7px;}
+    .dest-status.nuevo{background:var(--gold);color:var(--navy-deeper);}
+    @media(max-width:960px){
+      .destacadas{padding:72px 0 64px;}
+      .destacadas-hd{margin-bottom:36px;padding:0 24px;}
+      /* En el celular se pasan con el dedo, de a una, como un carrusel */
+      .destacadas-grid{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 24px 18px;scroll-padding:0 24px;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+      .destacadas-grid::-webkit-scrollbar{display:none;}
+      .dest-card{flex:0 0 80%;scroll-snap-align:start;}
+      .dest-card:hover{transform:none;}
+      .destacadas-footer{margin-top:22px;}
+    }
 
     @media(prefers-reduced-motion:reduce){
       html{scroll-behavior:auto;}
@@ -1055,34 +1066,18 @@
 })();
 </script>
 
-<section class="caminos" id="mediano-plazo">
-  <div class="caminos-in">
-    <div class="caminos-hd reveal">
-      <span class="sec-eyebrow eyebrow-gold" data-i18n="mp_eyebrow">Alquiler a mediano plazo</span>
-      <h2 data-i18n="mp_h">Amoblados, todo incluido y sin garantía inmobiliaria.</h2>
+<!-- ÚLTIMOS INGRESOS (21/10/2026): reemplaza al bloque de texto "Alquiler a
+     mediano plazo", que nadie leía (Tomás). Los 6 departamentos disponibles que
+     se cargaron más recientemente en el admin, leídos en vivo de la base: cada
+     unidad nueva aparece primera sola. Sin datos, la sección no se muestra. -->
+<section class="destacadas" id="destacadas" style="display:none" aria-labelledby="ultH">
+  <div class="destacadas-inner">
+    <div class="destacadas-hd reveal">
+      <span class="sec-eyebrow eyebrow-gold" data-i18n="ult_eyebrow">Recién publicados</span>
+      <h2 class="sec-title" id="ultH" data-i18n="ult_h">Últimos ingresos</h2>
     </div>
-    <div class="caminos-grid">
-
-      <div class="camino reveal d1">
-        <div class="camino-name" data-i18n="mp1_name">Un solo precio</div>
-        <div class="camino-kicker" data-i18n="mp1_kicker">Todo incluido</div>
-        <p data-i18n="mp1_p">Alquiler, expensas, servicios y muebles en un solo número. Lo que ves publicado es lo que pagás por mes.</p>
-      </div>
-
-      <div class="camino reveal d2">
-        <div class="camino-name" data-i18n="mp2_name">Sin garantía inmobiliaria</div>
-        <div class="camino-kicker" data-i18n="mp2_kicker">Ni seguro de caución</div>
-        <p data-i18n="mp2_p">No hace falta garantía propietaria ni seguro de caución. Reservás con un contrato digital en dólares.</p>
-      </div>
-
-      <div class="camino reveal d3">
-        <div class="camino-name" data-i18n="mp3_name">Listo para vivir</div>
-        <div class="camino-kicker" data-i18n="mp3_kicker">De 3 a 12 meses</div>
-        <p data-i18n="mp3_p">Departamentos amoblados y equipados en Belgrano, Núñez, Palermo, Recoleta y Puerto Madero. Llegás con la valija.</p>
-      </div>
-
-    </div>
-    <div class="caminos-cta reveal d1"><a class="go" href="catalogo.html" data-i18n="mp_go">Ver departamentos</a></div>
+    <div class="destacadas-grid" id="destacadasGrid"></div>
+    <div class="destacadas-footer caminos-cta reveal"><a class="go" href="catalogo.html" data-i18n="ult_go">Ver todos los departamentos</a></div>
   </div>
 </section>
 
@@ -1199,11 +1194,7 @@
         nav_alquilar:"Alugar",nav_resenas:"Avaliações",nav_contacto:"Contato",nav_busca:"O que você procura?",
         hero_t2:"no seu",hero_t3:"máximo esplendor.",
         btn_ver:"Ver apartamentos",
-        mp_eyebrow:"Aluguel de médio prazo",mp_h:"Mobiliados, tudo incluído e sem garantia imobiliária.",
-        mp1_name:"Um só preço",mp1_kicker:"Tudo incluído",mp1_p:"Aluguel, condomínio, serviços e mobília em um único número. O que está publicado é o que você paga por mês.",
-        mp2_name:"Sem garantia imobiliária",mp2_kicker:"Nem seguro fiança",mp2_p:"Não é preciso fiador nem seguro fiança. Você reserva com um contrato digital em dólares.",
-        mp3_name:"Pronto para morar",mp3_kicker:"De 3 a 12 meses",mp3_p:"Apartamentos mobiliados e equipados em Belgrano, Núñez, Palermo, Recoleta e Puerto Madero. Você chega com a mala.",
-        mp_go:"Ver apartamentos",
+        ult_eyebrow:"Recém-publicados",ult_h:"Últimas entradas",ult_go:"Ver todos os apartamentos",
         contacto_eyebrow:"Contato",contacto_h:"Vamos conversar.",contacto_sub:"Conte o que procura e preparamos uma proposta.",ci_wa:"WhatsApp direto",
         f_nombre:"Nome",f_contacto:"Telefone ou e-mail",f_interes:"Tenho interesse em",
         opt_alquilar:"Alugar",opt_propietario:"Sou proprietário",
@@ -1217,11 +1208,7 @@
         nav_alquilar:"Rent",nav_resenas:"Reviews",nav_contacto:"Contact",nav_busca:"What are you looking for?",
         hero_t2:"at its",hero_t3:"finest.",
         btn_ver:"See apartments",
-        mp_eyebrow:"Medium-term rental",mp_h:"Furnished, all inclusive and no property guarantor.",
-        mp1_name:"One price",mp1_kicker:"All inclusive",mp1_p:"Rent, building fees, utilities and furniture in a single number. The published price is what you pay per month.",
-        mp2_name:"No property guarantor",mp2_kicker:"No surety bond",mp2_p:"No property guarantor and no surety bond required. You reserve with a digital contract in US dollars.",
-        mp3_name:"Move-in ready",mp3_kicker:"3 to 12 months",mp3_p:"Furnished, fully equipped apartments in Belgrano, Núñez, Palermo, Recoleta and Puerto Madero. Arrive with your suitcase.",
-        mp_go:"See apartments",
+        ult_eyebrow:"Just listed",ult_h:"Latest arrivals",ult_go:"See all apartments",
         contacto_eyebrow:"Contact",contacto_h:"Let's talk.",contacto_sub:"Tell us what you're looking for and we'll prepare a proposal.",ci_wa:"Direct WhatsApp",
         f_nombre:"Name",f_contacto:"Phone or email",f_interes:"I'm interested in",
         opt_alquilar:"Rent",opt_propietario:"I am an owner",
@@ -1277,7 +1264,12 @@ window.sbImg = window.sbImg || function(u){return u};
   // solo mediano plazo. El código queda porque las dos pueden volver, pero si
   // no hay nada que pintar NO se le pide nada a Supabase: era un viaje de red
   // en cada visita a la portada, a cambio de nada.
-  (async () => {
+  // Desde el 21/10/2026 la franja vuelve como "Últimos ingresos" y se mantiene al
+  // día sola: se pide al cargar la página y otra vez cada vez que la persona
+  // vuelve a la pestaña (si pasaron más de 2 minutos).
+  let cargadaEn = 0;
+  async function cargarPortada() {
+    cargadaEn = Date.now();
     function escapeHTML(s) {
       return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     }
@@ -1325,8 +1317,12 @@ window.sbImg = window.sbImg || function(u){return u};
       // La sección salió de la home el 22/9 (la web ofrece solo mediano plazo). El bloque
       // queda porque los conteos de barrios de arriba SÍ se usan; si la sección vuelve al
       // HTML, esto la vuelve a pintar solo. Mientras no exista, no se toca nada.
+      // Últimos ingresos: las 6 de mediano plazo disponibles cargadas más
+      // recientemente (la consulta ya viene ordenada por fecha de alta)
       const secDest = document.getElementById('destacadas');
-      DEST_TOP3 = props.slice(0, 3);
+      DEST_TOP3 = props.filter(p =>
+        (p.tipo === 'Temporal' || p.tipo === 'Ambos') && p.estado === 'Disponible' && Number(p.precio_temporal) > 0
+      ).slice(0, 6);
       if (DEST_TOP3.length && secDest) {
         renderDestacadas();
         secDest.style.display = '';
@@ -1335,15 +1331,22 @@ window.sbImg = window.sbImg || function(u){return u};
     } catch (err) {
       console.error('[index] Error cargando destacadas:', err);
     }
-  })();
+  }
+  cargarPortada();
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && Date.now() - cargadaEn > 120000) cargarPortada();
+  });
 
 // ─── i18n de las tarjetas destacadas (se re-renderizan al cambiar idioma) ───
 const DEST_T = {
-  es: { reservado:'Reservado', disponible:'Disponible', consultar:'Consultar', ver_mas:'Ver más →', amb:'amb', tipo_ambos:'Mediano · Largo plazo', tipo_temporal:'Mediano plazo', tipo_tradicional:'Largo plazo',
+  es: { nuevo:'Nuevo', pm_todo:'por mes · todo incluido', plazo_rango:'De {a} a {b} meses', plazo_uno:'{n} meses',
+        reservado:'Reservado', disponible:'Disponible', consultar:'Consultar', ver_mas:'Ver más →', amb:'amb', tipo_ambos:'Mediano · Largo plazo', tipo_temporal:'Mediano plazo', tipo_tradicional:'Largo plazo',
         lib_hoy:'Se libera hoy', lib_manana:'Se libera mañana', lib_dias:'Se libera en {d} días', lib_fecha:'Se libera: {f}', lib_locale:'es-AR' },
-  pt: { reservado:'Reservado', disponible:'Disponível', consultar:'Consultar', ver_mas:'Ver mais →', amb:'amb', tipo_ambos:'Médio · Longo prazo', tipo_temporal:'Médio prazo', tipo_tradicional:'Longo prazo',
+  pt: { nuevo:'Novo', pm_todo:'por mês · tudo incluído', plazo_rango:'De {a} a {b} meses', plazo_uno:'{n} meses',
+        reservado:'Reservado', disponible:'Disponível', consultar:'Consultar', ver_mas:'Ver mais →', amb:'amb', tipo_ambos:'Médio · Longo prazo', tipo_temporal:'Médio prazo', tipo_tradicional:'Longo prazo',
         lib_hoy:'Libera hoje', lib_manana:'Libera amanhã', lib_dias:'Libera em {d} dias', lib_fecha:'Libera em: {f}', lib_locale:'pt-BR' },
-  en: { reservado:'Reserved', disponible:'Available', consultar:'Ask us', ver_mas:'See more →', amb:'rooms', tipo_ambos:'Medium · Long-term', tipo_temporal:'Medium-term', tipo_tradicional:'Long-term',
+  en: { nuevo:'New', pm_todo:'per month · all inclusive', plazo_rango:'{a} to {b} months', plazo_uno:'{n} months',
+        reservado:'Reserved', disponible:'Available', consultar:'Ask us', ver_mas:'See more →', amb:'rooms', tipo_ambos:'Medium · Long-term', tipo_temporal:'Medium-term', tipo_tradicional:'Long-term',
         lib_hoy:'Available today', lib_manana:'Available tomorrow', lib_dias:'Available in {d} days', lib_fecha:'Available: {f}', lib_locale:'en-US' }
 };
 let DEST_TOP3 = [];
@@ -1358,18 +1361,23 @@ function renderDestacadas() {
   const grid = document.getElementById('destacadasGrid');
   if (!grid) return;   // la sección no está en esta página
   grid.innerHTML = DEST_TOP3.map(p => {
-    const portada = (p.imagenes || []).sort((a,b) => a.orden - b.orden)[0];
-    const fotoStyle = portada ? "background-image:url('" + window.sbImg(portada.url,700) + "')" : '';
+    // La foto de portada del catálogo, si la cargaron; si no, la primera de la galería
+    const primera = (p.imagenes || []).sort((a,b) => a.orden - b.orden)[0];
+    const fotoUrl = p.portada_url || (primera ? window.sbImg(primera.url,700) : '');
+    const fotoStyle = fotoUrl ? "background-image:url('" + fotoUrl + "')" : '';
     const reservado = p.estado === 'Reservado';
     const precio = (p.tipo === 'Tradicional' ? p.precio_tradicional : p.precio_temporal) || 0;
     const precioStr = precio > 0 ? 'USD ' + Number(precio).toLocaleString('es-AR') : d.consultar;
-    const tipoTag = p.tipo === 'Ambos' ? d.tipo_ambos : (p.tipo === 'Temporal' ? d.tipo_temporal : d.tipo_tradicional);
+    // Etiqueta con el plazo cargado en el admin, igual que en el catálogo
+    const r = window.BairenVisita ? window.BairenVisita.rango(p.plazo) : { min: 3, max: 12 };
+    const tipoTag = r.min === r.max ? d.plazo_uno.replace('{n}', r.min) : d.plazo_rango.replace('{a}', r.min).replace('{b}', r.max);
+    const nuevo = p.created_at && (Date.now() - new Date(p.created_at).getTime()) < 10 * 86400000;
     const slugHref = '/propiedades/' + encodeURIComponent(p.slug);
     return (
       '<a class="dest-card" href="' + slugHref + '" aria-label="Ver ' + escapeHTML(p.dir) + (p.unidad ? ' ' + escapeHTML(p.unidad) : '') + '">' +
         '<div class="dest-img" style="' + fotoStyle + '">' +
           '<span class="dest-tag">' + escapeHTML(tipoTag) + '</span>' +
-          '<span class="dest-status' + (reservado ? ' res' : '') + '">' + (reservado ? d.reservado : d.disponible) + '</span>' +
+          (nuevo ? '<span class="dest-status nuevo">' + d.nuevo + '</span>' : '') +
           (reservado && p.fecha_liberacion ? '<div class="badge-liberacion"><span>' + formatFechaLiberacion(p.fecha_liberacion) + '</span></div>' : '') +
         '</div>' +
         '<div class="dest-body">' +
@@ -1380,7 +1388,7 @@ function renderDestacadas() {
             (p.m2 ? '<span>' + p.m2 + ' m²</span>' : '') +
           '</div>' +
           '<div class="dest-bottom-row">' +
-            '<span class="dest-price">' + precioStr + '</span>' +
+            '<span class="dest-price">' + precioStr + (precio > 0 ? '<small>' + d.pm_todo + '</small>' : '') + '</span>' +
             '<span class="dest-cta-txt">' + d.ver_mas + '</span>' +
           '</div>' +
         '</div>' +
