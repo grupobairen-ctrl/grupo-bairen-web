@@ -1,0 +1,89 @@
+/* ─── BAIREN · Coordinar visita (21/10/2026) ─────────────────────────
+   Un solo camino para pedir una visita en toda la web: el botón de arriba
+   a la derecha, la tarjeta de la ficha y la barra fija del celular abren
+   lo mismo. Llegada + estadía (y en el catálogo, barrio y presupuesto) y
+   un botón que abre WhatsApp con el mensaje listo. Lo arma visita.js. */
+
+:root{
+  --vis-navy:#2A3A52;--vis-navy-dark:#1E2A3F;--vis-navy-deeper:#131D2D;
+  --vis-gold:#C2A968;--vis-gold-dark:#8A7547;--vis-gold-light:#DECDA0;
+  --vis-white:#FBFAF6;--vis-off:#EEE5D0;--vis-mid:#6B7589;
+  --vis-ease:cubic-bezier(0.22,1,0.36,1);
+}
+
+/* "¿Qué estás buscando?" arriba: sutil, como texto y no como botón (Tomás, 21/10).
+   En la compu va con los links de arriba; en el celular ocupa el lugar del
+   menú de tres líneas, que se sacó (nadie lo usaba). */
+.nav-busca{
+  display:none;align-items:center;gap:7px;margin-left:14px;flex-shrink:0;white-space:nowrap;cursor:pointer;
+  font-family:'Jost',sans-serif;font-size:.76rem;font-weight:400;letter-spacing:.02em;
+  color:rgba(255,255,255,.78);background:none;border:none;padding:8px 2px;transition:color .2s;
+}
+.nav-busca svg{color:var(--vis-gold);flex-shrink:0;}
+.nav-busca:hover{color:var(--vis-gold-light);}
+@media(max-width:700px){
+  .nav-busca{display:inline-flex;}
+  nav > .lang-switch,.navbar > .lang-switch{margin-left:auto;}
+}
+
+/* Ventana (abajo en el celular, al centro en la compu) */
+.vis-dlg{
+  border:none;padding:0;margin:auto;background:var(--vis-white);color:var(--vis-navy);
+  width:min(440px,calc(100vw - 32px));max-height:calc(100dvh - 48px);overflow:auto;
+  border-top:2px solid var(--vis-gold);box-shadow:0 30px 80px rgba(19,29,45,.45);
+  font-family:'Jost',sans-serif;font-weight:300;
+}
+.vis-dlg::backdrop{background:rgba(19,29,45,.62);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);}
+.vis-dlg[open]{animation:vis-in .42s var(--vis-ease);}
+@keyframes vis-in{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:none;}}
+@media(max-width:700px){
+  .vis-dlg{width:100%;max-width:100%;margin:auto 0 0;max-height:92dvh;}
+  .vis-dlg[open]{animation:vis-up .42s var(--vis-ease);}
+  @keyframes vis-up{from{transform:translateY(100%);}to{transform:none;}}
+}
+@media(prefers-reduced-motion:reduce){.vis-dlg[open]{animation:none;}}
+
+.vis-hd{position:relative;background:var(--vis-navy);padding:24px 56px 20px 24px;}
+.vis-eyebrow{font-size:.58rem;letter-spacing:.3em;text-transform:uppercase;color:var(--vis-gold-light);font-weight:500;margin-bottom:8px;}
+.vis-title{font-family:'Playfair Display',Georgia,serif;font-size:1.45rem;font-weight:400;line-height:1.2;color:var(--vis-white);}
+.vis-sub{font-size:.78rem;color:rgba(222,205,160,.85);margin-top:6px;letter-spacing:.02em;}
+.vis-x{position:absolute;top:12px;right:10px;width:40px;height:40px;background:none;border:none;color:rgba(255,255,255,.6);font-size:1.6rem;line-height:1;cursor:pointer;transition:color .2s;}
+.vis-x:hover{color:var(--vis-gold);}
+.vis-dlg .vis-form{padding:22px 24px calc(22px + env(safe-area-inset-bottom,0px));}
+
+/* Formulario (el mismo en la ventana y en la tarjeta de la ficha) */
+.vis-field{margin-bottom:18px;}
+.vis-lbl{display:block;font-size:.6rem;letter-spacing:.28em;text-transform:uppercase;color:var(--vis-gold-dark);font-weight:600;margin-bottom:9px;}
+.vis-lbl small{font-size:inherit;letter-spacing:.12em;color:var(--vis-mid);font-weight:400;text-transform:none;margin-left:4px;}
+
+.vis-chips{display:flex;flex-wrap:wrap;gap:8px;}
+.vis-chip{
+  flex:1 1 auto;min-height:44px;padding:0 12px;cursor:pointer;
+  font-family:'Jost',sans-serif;font-size:.84rem;font-weight:400;color:var(--vis-navy);
+  background:#fff;border:1px solid rgba(42,58,82,.2);transition:background .2s,color .2s,border-color .2s;
+}
+.vis-chip:hover{border-color:var(--vis-navy);}
+.vis-chip[aria-pressed="true"]{background:var(--vis-navy);color:var(--vis-white);border-color:var(--vis-navy);}
+.vis-chips--meses .vis-chip{flex:1 1 0;min-width:0;padding:0 6px;}
+/* 12 meses (o más, si el plazo lo permite y la unidad también tiene contratos cortos):
+   recuadro verde sutil; al elegirlo aparece "Honorarios preferenciales" */
+.vis-chip--plus{border-color:rgba(42,122,75,.55);background:rgba(42,122,75,.05);color:#21603b;}
+.vis-chip--plus:hover{border-color:#2a7a4b;}
+.vis-chip--plus[aria-pressed="true"]{background:#2a7a4b;border-color:#2a7a4b;color:#fff;}
+.vis-plus{display:flex;align-items:center;gap:7px;max-height:0;opacity:0;overflow:hidden;margin:0;font-size:.8rem;font-weight:400;line-height:1.4;color:#2a7a4b;letter-spacing:.03em;
+  transition:max-height .35s var(--vis-ease),opacity .3s,margin .35s var(--vis-ease);}
+.vis-plus.on{max-height:3em;opacity:1;margin-top:12px;}
+.vis-plus svg{flex-shrink:0;}
+@media(prefers-reduced-motion:reduce){.vis-plus{transition:none;}}
+
+.vis-btn{
+  display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:54px;margin-top:6px;
+  background:var(--vis-navy);color:var(--vis-white);border:none;cursor:pointer;text-decoration:none;
+  font-family:'Jost',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
+  transition:background .2s;
+}
+.vis-btn:hover{background:var(--vis-navy-deeper);color:var(--vis-white);}
+.vis-btn svg{width:18px;height:18px;fill:#25D366;flex-shrink:0;}
+.vis-nota{font-size:.72rem;line-height:1.5;color:var(--vis-mid);text-align:center;margin-top:10px;}
+
+.vis-dlg :focus-visible,.vis-form :focus-visible{outline:2px solid var(--vis-gold);outline-offset:2px;}

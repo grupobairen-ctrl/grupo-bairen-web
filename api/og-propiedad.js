@@ -101,16 +101,17 @@ function escribirFicha(html, p) {
   const tag = isAmbos ? 'Alquiler a mediano y largo plazo' : isVenta ? 'En Venta' : isTemp ? 'Alquiler a Mediano Plazo' : 'Alquiler a Largo Plazo';
   const fmt = n => (n ? B.usd(n) : 'Consultar');
   let precio, precioMo, precioAc;
-  if (isAmbos) { precio = fmt(p.precio_temporal); precioMo = 'mediano plazo · all in'; precioAc = precioMo; }
-  else if (isTemp) { precio = fmt(p.precio_temporal); precioMo = B.todoIncluido(p) ? 'por mes · all in' : 'por mes + expensas'; precioAc = B.todoIncluido(p) ? 'por mes · todo incluido' : 'por mes + expensas'; }
+  // Todo incluido siempre (21/10/2026): expensas y servicios van dentro del precio
+  if (isAmbos || isTemp) { precio = fmt(p.precio_temporal); precioMo = precioAc = 'por mes · todo incluido'; }
   else if (isTrad) { precio = fmt(p.precio_tradicional); precioMo = precioAc = 'por mes'; }
   else { precio = fmt(p.precio_venta); precioMo = precioAc = ''; }
 
   const { min, max } = B.plazoMeses(p.plazo);
+  // Lo que no está cargado no se muestra (antes salía "— M²")
   const stats = [
-    [p.m2 || '—', 'M²'],
-    [p.unidad || '—', 'Unidad'],
-    [p.ambientes || '—', 'Ambientes'],
+    ...(p.m2 ? [[p.m2, 'M²']] : []),
+    ...(p.unidad ? [[p.unidad, 'Unidad']] : []),
+    ...(p.ambientes ? [[p.ambientes, 'Ambientes']] : []),
     ...(isVenta ? [] : [[isTrad ? '2+' : `${min}–${max}`, isTrad ? 'Años' : 'Meses']]),
   ].map(([v, l]) => `<div class="stat"><div class="stat-val">${B.esc(v)}</div><div class="stat-lbl">${B.esc(l)}</div></div>`).join('');
 
@@ -119,17 +120,15 @@ function escribirFicha(html, p) {
   if (p.ambientes) rows.push(['Ambientes', `${p.ambientes} ${p.ambientes !== 1 ? 'ambientes' : 'ambiente'}`]);
   if (!isVenta) rows.push(['Plazo', p.plazo || '3 a 12 meses']);
   if (isTemp || isAmbos) {
-    const v = p.expensas_incluidas === false
-      ? (p.expensas ? `$${Number(p.expensas).toLocaleString('es-AR')} + servicios, aparte` : 'A cargo del inquilino')
-      : 'Todos incluidos';
-    rows.push(['Expensas y serv.', v]);
+    rows.push(['Expensas y servicios', 'Incluidos']);
   } else if (isTrad) rows.push(['Servicios', 'A cargo del inquilino']);
   if (!isVenta) rows.push(['Garantía', isTrad ? 'Gtía CABA / Seguro de Caución' : 'No requerida']);
   rows.push(['Estado', p.estado]);
   const unidadRef = `${p.dir}${p.unidad ? ' unidad ' + p.unidad : ''}${p.barrio ? ', ' + p.barrio : ''}`;
-  const wa = `https://wa.me/${B.WHATSAPP_NUM}?text=${encodeURIComponent(`Hola, me interesa ${unidadRef}, que vi en la web. ¿Sigue disponible?`)}`;
-  const acBody = rows.map(([l, v]) => `<div class="ac-row"><span class="ac-lbl">${B.esc(l)}</span><span class="ac-val">${B.esc(v)}</span></div>`).join('')
-    + (reservado ? '' : `<a class="btn-primary" href="${wa}" target="_blank" rel="noopener noreferrer">CONSULTAR POR WHATSAPP</a>`);
+  // Mismo botón que arma visita.js en el navegador (que después suma Llegada y Estadía)
+  const wa = `https://wa.me/${B.WHATSAPP_NUM}?text=${encodeURIComponent(`Hola, quiero coordinar una visita a ${unidadRef}.`)}`;
+  const acBody = (reservado ? '' : `<a class="btn-primary" href="${wa}" target="_blank" rel="noopener noreferrer">COORDINAR VISITA</a>`)
+    + rows.map(([l, v]) => `<div class="ac-row"><span class="ac-lbl">${B.esc(l)}</span><span class="ac-val">${B.esc(v)}</span></div>`).join('');
 
   const desc = p.descripcion || `${B.titulo(p)} — unidad disponible en ${p.barrio}, Buenos Aires. Listo para vivir desde el primer día.`;
   const ams = p.amenities.length
@@ -147,6 +146,7 @@ function escribirFicha(html, p) {
   out = fill(out, 'heroSub', `${p.barrio} · Buenos Aires`);
   out = fill(out, 'heroPrice', precio);
   out = fill(out, 'heroPriceMo', precioMo);
+  if (isAmbos || isTemp) out = fill(out, 'heroPriceInc', 'Incluye expensas y servicios');
   out = fill(out, 'acPrice', precio);
   out = fill(out, 'acPriceMo', precioAc);
   out = fillHTML(out, 'statsRow', stats);

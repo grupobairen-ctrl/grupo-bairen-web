@@ -557,6 +557,7 @@ body.sheet-open{overflow:hidden;}
 @media(prefers-reduced-motion:reduce){.mapa-sheet,.mapa-fab,.sheet-backdrop{transition:none;}}
 </style>
 <link rel="stylesheet" href="/premium.css">
+<link rel="stylesheet" href="/visita.css?v=3">
 <script src="/meta-pixel.js"></script>
 </head>
 <body>
@@ -569,26 +570,23 @@ body.sheet-open{overflow:hidden;}
   <div class="nav-links">
     <a href="catalogo.html" class="active" data-i18n="nav_alquilar">Alquilar</a>
     <a href="index.html#contacto" data-i18n="nav_contacto">Contacto</a>
+    <a href="#buscar" data-busqueda data-i18n="nav_busca">¿Qué estás buscando?</a>
   </div>
   <div class="lang-switch">
     <button class="flag" data-lang="es" aria-label="Español" title="Español">ES</button>
     <button class="flag" data-lang="pt" aria-label="Português" title="Português">PT</button>
     <button class="flag" data-lang="en" aria-label="English" title="English">EN</button>
   </div>
-  <button class="burger" id="burger" type="button" aria-label="Menú" aria-expanded="false" aria-controls="mobileMenu"><span></span><span></span><span></span></button>
+  <button class="nav-busca" type="button" data-busqueda><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><span data-i18n="nav_busca">¿Qué estás buscando?</span></button>
 </nav>
 
-<div class="mobile-menu" id="mobileMenu">
-  <a href="catalogo.html" class="m-link" data-i18n="nav_alquilar">Alquilar</a>
-  <a href="index.html#contacto" class="m-link" data-i18n="nav_contacto">Contacto</a>
-</div>
 
 <!-- HERO: el mapa es el filtro de barrios (desktop) -->
 <div class="cat-hero">
   <div class="cat-hero-inner">
     <div class="cat-hero-text">
       <p class="cat-eyebrow">BAIREN · Buenos Aires</p>
-      <h1 class="cat-title" id="catTitle">Departamentos a mediano plazo</h1>
+      <h1 class="cat-title" id="catTitle">Departamentos de 3 a 12 meses</h1>
       <p class="cat-sub" id="catSub">Amoblados · Todo incluido · Sin garantía inmobiliaria ni seguro de caución</p>
       <div class="cat-panel" id="catPanel" aria-live="polite"></div>
     </div>
@@ -680,10 +678,11 @@ body.sheet-open{overflow:hidden;}
 <!-- FOOTER -->
 <footer>
   <img src="bairen_logo.png?v=3" alt="BAIREN" style="height:46px;width:auto;">
-  <span class="ft-copy" data-i18n="cat_copy">© 2026 Grupo Bairen · Todos los derechos reservados</span>
+  <span class="ft-copy" data-i18n="cat_copy">© 2026 BAIREN · Todos los derechos reservados</span>
 </footer>
 
-<script src="i18n.js?v=3"></script>
+<script src="i18n.js?v=4"></script>
+<script src="/visita.js?v=5"></script>
 <script src="supabase-config.js"></script>
 <script src="mapa-barrios.js"></script>
 <script>
@@ -837,32 +836,32 @@ function sorted(arr) {
 /* Textos dinámicos del catálogo por idioma (lee window.BAIREN_LANG de i18n.js) */
 const CT = {
   es: {
-    title_todos:'Departamentos a mediano plazo', sub_todos:'Amoblados · Todo incluido · Sin garantía inmobiliaria ni seguro de caución',
+    title_todos:'Departamentos de 3 a 12 meses', sub_todos:'Amoblados · Todo incluido · Sin garantía inmobiliaria ni seguro de caución',
     count_one:'propiedad', count_many:'propiedades', empty_t:'Sin resultados', empty_s:'Probá con otro barrio.',
     loading:'Cargando propiedades...', err_t:'No pudimos cargar las propiedades', err_s:'Revisá la conexión a internet. Si el problema persiste, contactanos por WhatsApp.',
-    per_month:'por mes', per_month_all:'por mes · all in', per_month_exp:'por mes + expensas', consult:'Consultar precio', ver_mas:'Ver más →',
-    disponible:'Disponible', reservado:'Reservado', reservado_sem:'Reservada esta semana', serv_allin:'All in', serv_sin:'Sin incl.', serv_lbl:'Servicios',
-    amb:'Amb.', sup:'Sup.', foto_ph:'Fotografía de la unidad', tipo_temporal:'Mediano plazo', tipo_tradicional:'Largo plazo',
+    per_month:'por mes', per_month_all:'por mes · todo incluido', consult:'Consultar precio', ver_mas:'Ver más →',
+    disponible:'Disponible', reservado:'Reservado', reservado_sem:'Reservada esta semana', serv_allin:'Incluye expensas y servicios', serv_lbl:'Servicios',
+    amb:'Amb.', sup:'Sup.', foto_ph:'Fotografía de la unidad', tipo_temporal:'De 3 a 12 meses', tipo_tradicional:'Largo plazo', plazo_rango:'De {a} a {b} meses', plazo_uno:'{n} meses',
     lib_hoy:'Se libera hoy', lib_manana:'Se libera mañana', lib_dias:'Se libera en {d} días', lib_fecha:'Se libera el {f}', lib_locale:'es-AR',
     barrios:'Barrios', borrar_filtro:'Borrar filtro', todos_barrios:'Todos los barrios', sheet_title:'Elegí un barrio', cerrar:'Cerrar', clear_aria:'Quitar filtro de barrio', u_one:'unidad', u_many:'unidades', panel_todos:'<b>{n}</b> unidades en <b>{z}</b> barrios'
   },
   pt: {
-    title_todos:'Apartamentos de médio prazo', sub_todos:'Mobiliados · Tudo incluído · Sem garantia imobiliária nem seguro fiança',
+    title_todos:'Apartamentos de 3 a 12 meses', sub_todos:'Mobiliados · Tudo incluído · Sem garantia imobiliária nem seguro fiança',
     count_one:'imóvel', count_many:'imóveis', empty_t:'Sem resultados', empty_s:'Tente outro bairro.',
     loading:'Carregando imóveis...', err_t:'Não foi possível carregar os imóveis', err_s:'Verifique sua conexão. Se o problema persistir, fale conosco pelo WhatsApp.',
-    per_month:'por mês', per_month_all:'por mês · tudo incluído', per_month_exp:'por mês + condomínio', consult:'Consultar preço', ver_mas:'Ver mais →',
-    disponible:'Disponível', reservado:'Reservado', reservado_sem:'Reservada esta semana', serv_allin:'Tudo incl.', serv_sin:'Não incl.', serv_lbl:'Serviços',
-    amb:'Amb.', sup:'Sup.', foto_ph:'Foto do imóvel', tipo_temporal:'Médio prazo', tipo_tradicional:'Longo prazo',
+    per_month:'por mês', per_month_all:'por mês · tudo incluído', consult:'Consultar preço', ver_mas:'Ver mais →',
+    disponible:'Disponível', reservado:'Reservado', reservado_sem:'Reservada esta semana', serv_allin:'Inclui condomínio e serviços', serv_lbl:'Serviços',
+    amb:'Amb.', sup:'Sup.', foto_ph:'Foto do imóvel', tipo_temporal:'De 3 a 12 meses', tipo_tradicional:'Longo prazo', plazo_rango:'De {a} a {b} meses', plazo_uno:'{n} meses',
     lib_hoy:'Disponível hoje', lib_manana:'Disponível amanhã', lib_dias:'Disponível em {d} dias', lib_fecha:'Disponível em {f}', lib_locale:'pt-BR',
     barrios:'Bairros', borrar_filtro:'Limpar filtro', todos_barrios:'Todos os bairros', sheet_title:'Escolha um bairro', cerrar:'Fechar', clear_aria:'Remover filtro de bairro', u_one:'unidade', u_many:'unidades', panel_todos:'<b>{n}</b> unidades em <b>{z}</b> bairros'
   },
   en: {
-    title_todos:'Medium-term apartments', sub_todos:'Furnished · All inclusive · No property guarantor and no surety bond',
+    title_todos:'Apartments for 3 to 12 months', sub_todos:'Furnished · All inclusive · No property guarantor and no surety bond',
     count_one:'property', count_many:'properties', empty_t:'No results', empty_s:'Try another neighbourhood.',
     loading:'Loading properties...', err_t:'We could not load the properties', err_s:'Check your internet connection. If the problem persists, contact us on WhatsApp.',
-    per_month:'per month', per_month_all:'per month · all in', per_month_exp:'per month + building fees', consult:'Ask for price', ver_mas:'See more →',
-    disponible:'Available', reservado:'Reserved', reservado_sem:'Reserved this week', serv_allin:'All in', serv_sin:'Not incl.', serv_lbl:'Services',
-    amb:'Rooms', sup:'Area', foto_ph:'Unit photo', tipo_temporal:'Medium-term', tipo_tradicional:'Long-term',
+    per_month:'per month', per_month_all:'per month · all inclusive', consult:'Ask for price', ver_mas:'See more →',
+    disponible:'Available', reservado:'Reserved', reservado_sem:'Reserved this week', serv_allin:'Building fees and utilities included', serv_lbl:'Services',
+    amb:'Rooms', sup:'Area', foto_ph:'Unit photo', tipo_temporal:'3 to 12 months', tipo_tradicional:'Long-term', plazo_rango:'{a} to {b} months', plazo_uno:'{n} months',
     lib_hoy:'Available today', lib_manana:'Available tomorrow', lib_dias:'Available in {d} days', lib_fecha:'Available {f}', lib_locale:'en-US',
     barrios:'Neighbourhoods', borrar_filtro:'Clear filter', todos_barrios:'All neighbourhoods', sheet_title:'Choose a neighbourhood', cerrar:'Close', clear_aria:'Remove neighbourhood filter', u_one:'unit', u_many:'units', panel_todos:'<b>{n}</b> units across <b>{z}</b> neighbourhoods'
   }
@@ -870,16 +869,21 @@ const CT = {
 const L = () => (window.BAIREN_LANG || 'es');
 const ct = (k) => { const d = CT[L()] || CT.es; return d[k] != null ? d[k] : CT.es[k]; };
 const tipoLabel = (t) => t === 'Temporal' ? ct('tipo_temporal') : ct('tipo_tradicional');
+// La etiqueta de cada tarjeta dice el plazo cargado en el admin (Tomás, 21/10/2026):
+// "3-12 meses" → "De 3 a 12 meses"; "12 - 24 meses" → "De 12 a 24 meses"
+const plazoLabel = (p) => {
+  if (p.tipo !== 'Temporal' || !window.BairenVisita) return tipoLabel(p.tipo);
+  const r = window.BairenVisita.rango(p.plazo);
+  return r.min === r.max ? ct('plazo_uno').replace('{n}', r.min)
+                         : ct('plazo_rango').replace('{a}', r.min).replace('{b}', r.max);
+};
 
 function priceHTML(p) {
   if (p.precio > 0) {
     const fmt = p.precio.toLocaleString('es-AR').replace(/\./g,'.'); // punto como miles
-    // "all in" solo si el precio es de verdad un paquete. Las unidades con
-    // expensas aparte (23/9/2026) muestran "+ expensas" ya en la tarjeta: el
-    // catálogo no puede prometer algo que la ficha después desmiente.
-    const period = p.tipo !== 'Temporal'          ? ct('per_month')
-                 : p.expensasIncluidas === false  ? ct('per_month_exp')
-                 : ct('per_month_all');
+    // Todas las unidades son paquete completo (Tomás, 21/10/2026): el precio
+    // incluye expensas y servicios, sin excepciones
+    const period = p.tipo !== 'Temporal' ? ct('per_month') : ct('per_month_all');
     return `<div class="card-price"><span class="price-amount">USD ${fmt}</span><br><span class="price-period">${period}</span></div>`;
   }
   return `<div class="card-price"><span class="price-consult">${ct('consult')}</span></div>`;
@@ -931,7 +935,7 @@ function render() {
     const metaLine = [
       p.amb ? `${p.amb} ${ct('amb').toLowerCase()}` : null,
       p.m2 ? m2txt : null,
-      p.tipo === 'Temporal' ? (p.expensasIncluidas === false ? ct('serv_sin') : ct('serv_allin')) : null,
+      p.tipo === 'Temporal' ? ct('serv_allin') : null,
     ].filter(Boolean).join(' · ');
     const imgHTML = p.foto
       ? `<img src="${p.fotoEsPortada ? p.foto : window.sbImg(p.foto,700)}" alt="${p.dir} — foto principal" loading="lazy">`
@@ -942,7 +946,7 @@ function render() {
     <a class="prop-card" href="${destino}" aria-label="${aria.replace(/"/g,'&quot;')}">
       <div class="card-img">
         ${imgHTML}
-        <span class="card-tag tag-${p.tipo.toLowerCase()}">${tipoLabel(p.tipo)}</span>
+        <span class="card-tag tag-${p.tipo.toLowerCase()}">${plazoLabel(p)}</span>
         ${libera ? `<span class="card-status status-libera">${libera}</span>`
           : reservado ? `<span class="card-status status-reservado">${(p.reservada_at && (Date.now() - new Date(p.reservada_at).getTime()) < 7*24*3600*1000) ? ct('reservado_sem') : ct('reservado')}</span>` : ''}
       </div>
@@ -972,16 +976,6 @@ function readURLParams() {
     updateBarrioTrigger();
   }
 }
-
-/* ═══════════════════════════════════════════════════════════════
-   BURGER
-═══════════════════════════════════════════════════════════════ */
-document.getElementById('burger').addEventListener('click', function() {
-  const isOpen = this.classList.toggle('open');
-  document.getElementById('mobileMenu').classList.toggle('open');
-  this.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-  closeDropdown();
-});
 
 /* ═══════════════════════════════════════════════════════════════
    SUPABASE — fetch de propiedades publicadas
@@ -1026,8 +1020,7 @@ async function loadFromSupabase() {
         estado: p.estado,
         reservada_at: p.reservada_at || null,
         fechaLiberacion: p.fecha_liberacion || null,
-        // expensas_incluidas = false → el precio es seco y las expensas van aparte
-        expensasIncluidas: p.expensas_incluidas !== false,
+        plazo: p.plazo || null,
         expensas: p.expensas == null ? null : Number(p.expensas),
         amenities: amList,
         foto,
