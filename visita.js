@@ -3,9 +3,9 @@
    WhatsApp" y "Coordinar visita", que llevaba a un cuestionario de 5
    preguntas) y la gente no sabía cuál tocar. Ahora hay uno solo: se elige
    la duración del contrato y el botón abre WhatsApp con el mensaje escrito.
-   12 y 24 meses van en verde y, al elegirlos, avisan el beneficio: una
-   bonificación en la comisión inmobiliaria (Tomás, 21/10/2026). El mensaje
-   pregunta cuánto es.
+   12 y 24 meses van en verde y, al elegirlos, avisan el beneficio: honorarios
+   preferenciales (Tomás, 21/10/2026: menos comisión con contratos largos,
+   dicho en tono premium). El mensaje pide conocerlos.
 
    - La ficha avisa la unidad con BairenVisita.setUnidad({...}) y monta el
      formulario adentro de su tarjeta con BairenVisita.mount(el).
@@ -28,11 +28,11 @@
   var T = {
     es: {
       eyebrow: 'Coordinar visita', duracion: 'Duración del contrato', meses: '{n} meses',
-      beneficios: '+ bonificación: con {n} meses pagás menos comisión inmobiliaria',
+      beneficios: 'Honorarios preferenciales',
       btn: 'Coordinar visita', cerrar: 'Cerrar',
       nota: 'Se abre WhatsApp con tu mensaje listo. Te responde una persona del equipo.',
       msg: 'Hola, quiero coordinar una visita a {u}.', m_duracion: 'Duración del contrato: {n} meses.',
-      m_beneficios: 'Quiero saber cuánto es la bonificación en la comisión.',
+      m_beneficios: 'Me gustaría conocer los honorarios preferenciales.',
       b_title: '¿Qué estás buscando?', b_sub: 'Contanos y te mandamos por WhatsApp las opciones que encajan.',
       barrio: 'Barrio', amb: 'Ambientes', presu: 'Presupuesto por mes', opcional: 'opcional',
       a1: 'Mono', a2: '2', a3: '3', a4: '4 o más',
@@ -43,11 +43,11 @@
     },
     pt: {
       eyebrow: 'Agendar visita', duracion: 'Duração do contrato', meses: '{n} meses',
-      beneficios: '+ bonificação: com {n} meses você paga menos comissão imobiliária',
+      beneficios: 'Honorários preferenciais',
       btn: 'Agendar visita', cerrar: 'Fechar',
       nota: 'O WhatsApp abre com a sua mensagem pronta. Quem responde é uma pessoa da equipe.',
       msg: 'Olá, quero agendar uma visita a {u}.', m_duracion: 'Duração do contrato: {n} meses.',
-      m_beneficios: 'Quero saber de quanto é a bonificação na comissão.',
+      m_beneficios: 'Gostaria de conhecer os honorários preferenciais.',
       b_title: 'O que você procura?', b_sub: 'Conte para nós e enviamos pelo WhatsApp as opções que combinam.',
       barrio: 'Bairro', amb: 'Ambientes', presu: 'Orçamento por mês', opcional: 'opcional',
       a1: 'Studio', a2: '2', a3: '3', a4: '4 ou mais',
@@ -58,11 +58,11 @@
     },
     en: {
       eyebrow: 'Book a viewing', duracion: 'Contract length', meses: '{n} months',
-      beneficios: '+ discount: with {n} months you pay a lower agency fee',
+      beneficios: 'Preferential agency fees',
       btn: 'Book a viewing', cerrar: 'Close',
       nota: 'WhatsApp opens with your message ready. A person from our team replies.',
       msg: 'Hi, I would like to book a viewing at {u}.', m_duracion: 'Contract length: {n} months.',
-      m_beneficios: 'I would like to know how much the agency fee discount is.',
+      m_beneficios: 'I would like to know about the preferential fees.',
       b_title: 'What are you looking for?', b_sub: 'Tell us and we send you the options that fit on WhatsApp.',
       barrio: 'Neighbourhood', amb: 'Rooms', presu: 'Monthly budget', opcional: 'optional',
       a1: 'Studio', a2: '2', a3: '3', a4: '4+',
@@ -81,6 +81,7 @@
   var forms = [];         // formularios montados (ventana + tarjeta de la ficha)
   var dlg = null;
 
+  var ICO_OK = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12.5l4.5 4.5L19.5 7"/></svg>';
   var ICO_WA = '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 0C7.163 0 0 7.163 0 16c0 2.83.736 5.487 2.023 7.793L0 32l8.438-2.01A15.93 15.93 0 0016 32c8.837 0 16-7.163 16-16S24.837 0 16 0zm0 29.333a13.278 13.278 0 01-6.77-1.848l-.484-.287-5.013 1.195 1.228-4.88-.317-.502A13.278 13.278 0 012.667 16C2.667 8.636 8.636 2.667 16 2.667S29.333 8.636 29.333 16 23.364 29.333 16 29.333zm7.3-9.96c-.4-.2-2.363-1.166-2.728-1.3-.366-.133-.633-.2-.9.2-.266.4-1.033 1.3-1.266 1.566-.233.267-.466.3-.866.1-2.367-1.183-3.917-2.117-5.475-4.8-.413-.712.413-.663 1.183-2.202.133-.267.067-.5-.033-.7-.1-.2-.9-2.163-1.233-2.963-.324-.778-.653-.672-.9-.685l-.767-.013a1.47 1.47 0 00-1.067.5c-.366.4-1.4 1.367-1.4 3.33s1.434 3.863 1.634 4.13c.2.267 2.823 4.312 6.837 6.05 2.54 1.097 3.534 1.19 4.804.999.773-.115 2.363-.966 2.696-1.9.333-.933.333-1.733.233-1.9-.1-.166-.366-.266-.766-.466z"/></svg>';
 
   function esc(s) {
@@ -147,7 +148,7 @@
       });
       var p = f.querySelector('.vis-plus');
       if (p) {
-        p.textContent = plus;
+        p.innerHTML = plus ? ICO_OK + '<span>' + esc(plus) + '</span>' : '';
         p.classList.toggle('on', !!plus);
       }
       var a = f.querySelector('.vis-btn');

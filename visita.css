@@ -65,13 +65,14 @@
 .vis-chip:hover{border-color:var(--vis-navy);}
 .vis-chip[aria-pressed="true"]{background:var(--vis-navy);color:var(--vis-white);border-color:var(--vis-navy);}
 .vis-chips--meses .vis-chip{flex:1 1 0;min-width:0;padding:0 6px;}
-/* 12 y 24 meses: recuadro verde sutil; al elegirlos aparece la bonificación en la comisión */
+/* 12 y 24 meses: recuadro verde sutil; al elegirlos aparece "Honorarios preferenciales" */
 .vis-chip--plus{border-color:rgba(42,122,75,.55);background:rgba(42,122,75,.05);color:#21603b;}
 .vis-chip--plus:hover{border-color:#2a7a4b;}
 .vis-chip--plus[aria-pressed="true"]{background:#2a7a4b;border-color:#2a7a4b;color:#fff;}
-.vis-plus{max-height:0;opacity:0;overflow:hidden;margin:0;font-size:.8rem;font-weight:500;line-height:1.4;color:#2a7a4b;letter-spacing:.01em;
+.vis-plus{display:flex;align-items:center;gap:7px;max-height:0;opacity:0;overflow:hidden;margin:0;font-size:.8rem;font-weight:400;line-height:1.4;color:#2a7a4b;letter-spacing:.03em;
   transition:max-height .35s var(--vis-ease),opacity .3s,margin .35s var(--vis-ease);}
-.vis-plus.on{max-height:3em;opacity:1;margin-top:10px;}
+.vis-plus.on{max-height:3em;opacity:1;margin-top:12px;}
+.vis-plus svg{flex-shrink:0;}
 @media(prefers-reduced-motion:reduce){.vis-plus{transition:none;}}
 
 .vis-btn{
