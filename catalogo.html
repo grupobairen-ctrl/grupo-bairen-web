@@ -557,7 +557,7 @@ body.sheet-open{overflow:hidden;}
 @media(prefers-reduced-motion:reduce){.mapa-sheet,.mapa-fab,.sheet-backdrop{transition:none;}}
 </style>
 <link rel="stylesheet" href="/premium.css">
-<link rel="stylesheet" href="/visita.css?v=2">
+<link rel="stylesheet" href="/visita.css?v=3">
 <script src="/meta-pixel.js"></script>
 </head>
 <body>
@@ -586,7 +586,7 @@ body.sheet-open{overflow:hidden;}
   <div class="cat-hero-inner">
     <div class="cat-hero-text">
       <p class="cat-eyebrow">BAIREN · Buenos Aires</p>
-      <h1 class="cat-title" id="catTitle">Departamentos de 3 a 24 meses</h1>
+      <h1 class="cat-title" id="catTitle">Departamentos de 3 a 12 meses</h1>
       <p class="cat-sub" id="catSub">Amoblados · Todo incluido · Sin garantía inmobiliaria ni seguro de caución</p>
       <div class="cat-panel" id="catPanel" aria-live="polite"></div>
     </div>
@@ -682,7 +682,7 @@ body.sheet-open{overflow:hidden;}
 </footer>
 
 <script src="i18n.js?v=4"></script>
-<script src="/visita.js?v=3"></script>
+<script src="/visita.js?v=4"></script>
 <script src="supabase-config.js"></script>
 <script src="mapa-barrios.js"></script>
 <script>
@@ -836,32 +836,32 @@ function sorted(arr) {
 /* Textos dinámicos del catálogo por idioma (lee window.BAIREN_LANG de i18n.js) */
 const CT = {
   es: {
-    title_todos:'Departamentos de 3 a 24 meses', sub_todos:'Amoblados · Todo incluido · Sin garantía inmobiliaria ni seguro de caución',
+    title_todos:'Departamentos de 3 a 12 meses', sub_todos:'Amoblados · Todo incluido · Sin garantía inmobiliaria ni seguro de caución',
     count_one:'propiedad', count_many:'propiedades', empty_t:'Sin resultados', empty_s:'Probá con otro barrio.',
     loading:'Cargando propiedades...', err_t:'No pudimos cargar las propiedades', err_s:'Revisá la conexión a internet. Si el problema persiste, contactanos por WhatsApp.',
     per_month:'por mes', per_month_all:'por mes · todo incluido', consult:'Consultar precio', ver_mas:'Ver más →',
     disponible:'Disponible', reservado:'Reservado', reservado_sem:'Reservada esta semana', serv_allin:'Incluye expensas y servicios', serv_lbl:'Servicios',
-    amb:'Amb.', sup:'Sup.', foto_ph:'Fotografía de la unidad', tipo_temporal:'De 3 a 24 meses', tipo_tradicional:'Largo plazo', plazo_rango:'De {a} a {b} meses', plazo_uno:'{n} meses',
+    amb:'Amb.', sup:'Sup.', foto_ph:'Fotografía de la unidad', tipo_temporal:'De 3 a 12 meses', tipo_tradicional:'Largo plazo', plazo_rango:'De {a} a {b} meses', plazo_uno:'{n} meses',
     lib_hoy:'Se libera hoy', lib_manana:'Se libera mañana', lib_dias:'Se libera en {d} días', lib_fecha:'Se libera el {f}', lib_locale:'es-AR',
     barrios:'Barrios', borrar_filtro:'Borrar filtro', todos_barrios:'Todos los barrios', sheet_title:'Elegí un barrio', cerrar:'Cerrar', clear_aria:'Quitar filtro de barrio', u_one:'unidad', u_many:'unidades', panel_todos:'<b>{n}</b> unidades en <b>{z}</b> barrios'
   },
   pt: {
-    title_todos:'Apartamentos de 3 a 24 meses', sub_todos:'Mobiliados · Tudo incluído · Sem garantia imobiliária nem seguro fiança',
+    title_todos:'Apartamentos de 3 a 12 meses', sub_todos:'Mobiliados · Tudo incluído · Sem garantia imobiliária nem seguro fiança',
     count_one:'imóvel', count_many:'imóveis', empty_t:'Sem resultados', empty_s:'Tente outro bairro.',
     loading:'Carregando imóveis...', err_t:'Não foi possível carregar os imóveis', err_s:'Verifique sua conexão. Se o problema persistir, fale conosco pelo WhatsApp.',
     per_month:'por mês', per_month_all:'por mês · tudo incluído', consult:'Consultar preço', ver_mas:'Ver mais →',
     disponible:'Disponível', reservado:'Reservado', reservado_sem:'Reservada esta semana', serv_allin:'Inclui condomínio e serviços', serv_lbl:'Serviços',
-    amb:'Amb.', sup:'Sup.', foto_ph:'Foto do imóvel', tipo_temporal:'De 3 a 24 meses', tipo_tradicional:'Longo prazo', plazo_rango:'De {a} a {b} meses', plazo_uno:'{n} meses',
+    amb:'Amb.', sup:'Sup.', foto_ph:'Foto do imóvel', tipo_temporal:'De 3 a 12 meses', tipo_tradicional:'Longo prazo', plazo_rango:'De {a} a {b} meses', plazo_uno:'{n} meses',
     lib_hoy:'Disponível hoje', lib_manana:'Disponível amanhã', lib_dias:'Disponível em {d} dias', lib_fecha:'Disponível em {f}', lib_locale:'pt-BR',
     barrios:'Bairros', borrar_filtro:'Limpar filtro', todos_barrios:'Todos os bairros', sheet_title:'Escolha um bairro', cerrar:'Fechar', clear_aria:'Remover filtro de bairro', u_one:'unidade', u_many:'unidades', panel_todos:'<b>{n}</b> unidades em <b>{z}</b> bairros'
   },
   en: {
-    title_todos:'Apartments for 3 to 24 months', sub_todos:'Furnished · All inclusive · No property guarantor and no surety bond',
+    title_todos:'Apartments for 3 to 12 months', sub_todos:'Furnished · All inclusive · No property guarantor and no surety bond',
     count_one:'property', count_many:'properties', empty_t:'No results', empty_s:'Try another neighbourhood.',
     loading:'Loading properties...', err_t:'We could not load the properties', err_s:'Check your internet connection. If the problem persists, contact us on WhatsApp.',
     per_month:'per month', per_month_all:'per month · all inclusive', consult:'Ask for price', ver_mas:'See more →',
     disponible:'Available', reservado:'Reserved', reservado_sem:'Reserved this week', serv_allin:'Building fees and utilities included', serv_lbl:'Services',
-    amb:'Rooms', sup:'Area', foto_ph:'Unit photo', tipo_temporal:'3 to 24 months', tipo_tradicional:'Long-term', plazo_rango:'{a} to {b} months', plazo_uno:'{n} months',
+    amb:'Rooms', sup:'Area', foto_ph:'Unit photo', tipo_temporal:'3 to 12 months', tipo_tradicional:'Long-term', plazo_rango:'{a} to {b} months', plazo_uno:'{n} months',
     lib_hoy:'Available today', lib_manana:'Available tomorrow', lib_dias:'Available in {d} days', lib_fecha:'Available {f}', lib_locale:'en-US',
     barrios:'Neighbourhoods', borrar_filtro:'Clear filter', todos_barrios:'All neighbourhoods', sheet_title:'Choose a neighbourhood', cerrar:'Close', clear_aria:'Remove neighbourhood filter', u_one:'unit', u_many:'units', panel_todos:'<b>{n}</b> units across <b>{z}</b> neighbourhoods'
   }
@@ -870,7 +870,7 @@ const L = () => (window.BAIREN_LANG || 'es');
 const ct = (k) => { const d = CT[L()] || CT.es; return d[k] != null ? d[k] : CT.es[k]; };
 const tipoLabel = (t) => t === 'Temporal' ? ct('tipo_temporal') : ct('tipo_tradicional');
 // La etiqueta de cada tarjeta dice el plazo cargado en el admin (Tomás, 21/10/2026):
-// "3-24 meses" → "De 3 a 24 meses"; "12 - 24 meses" → "De 12 a 24 meses"
+// "3-12 meses" → "De 3 a 12 meses"; "12 - 24 meses" → "De 12 a 24 meses"
 const plazoLabel = (p) => {
   if (p.tipo !== 'Temporal' || !window.BairenVisita) return tipoLabel(p.tipo);
   const r = window.BairenVisita.rango(p.plazo);

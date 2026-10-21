@@ -3,12 +3,13 @@
    WhatsApp" y "Coordinar visita", que llevaba a un cuestionario de 5
    preguntas) y la gente no sabía cuál tocar. Ahora hay uno solo: se elige
    la duración del contrato y el botón abre WhatsApp con el mensaje escrito.
-   12 y 24 meses van en verde y, al elegirlos, avisan el beneficio: honorarios
-   preferenciales (Tomás, 21/10/2026: menos comisión con contratos largos,
-   dicho en tono premium). El mensaje pide conocerlos.
-   En la ficha, los meses salen del plazo cargado en el admin: "3-24 meses"
-   muestra 3, 6, 12 y 24; "12-24 meses", solo 12 y 24, y entonces sin verde,
-   porque el beneficio es frente a los contratos cortos y esa unidad no tiene.
+   El modelo de BAIREN es de 3 a 12 meses, todo incluido (Tomás, 21/10/2026).
+   12 meses va en verde y, al elegirlo, avisa el beneficio: honorarios
+   preferenciales (menos comisión con el contrato largo, dicho en tono premium).
+   El mensaje pide conocerlos.
+   En la ficha, los meses salen del plazo cargado en el admin: "3-12 meses"
+   muestra 3, 6 y 12; "12-24 meses" (Álvarez Thomas 800, la excepción), solo
+   12 y 24 y sin verde, porque el beneficio es frente a los contratos cortos.
 
    - La ficha avisa la unidad con BairenVisita.setUnidad({...}) y monta el
      formulario adentro de su tarjeta con BairenVisita.mount(el).
@@ -92,22 +93,22 @@
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
   }
-  // El plazo del admin es texto libre: "3-12 meses", "3 a 24 meses",
-  // "12-24 meses", "12 meses", "A partir de 12 meses", "1 a 2 años"...
-  // Sin dato, el plazo de BAIREN: de 3 a 24 meses.
+  // El plazo del admin es texto libre: "3-12 meses", "3 a 12 meses",
+  // "12 - 24 meses", "12 meses", "A partir de 6 meses", "1 a 2 años"...
+  // Sin dato, el plazo de BAIREN: de 3 a 12 meses.
   function rangoPlazo(txt) {
     var s = String(txt || '').toLowerCase();
     var x = /a[ñn]os?/.test(s) && !/mes/.test(s) ? 12 : 1;
     var n = (s.match(/\d+/g) || []).slice(0, 2).map(function (v) { return +v * x; });
-    if (!n.length) return { min: 3, max: 24 };
-    if (n.length === 1) return /partir|desde|m[ií]n/.test(s) ? { min: n[0], max: Math.max(n[0], 24) } : { min: n[0], max: n[0] };
+    if (!n.length) return { min: 3, max: 12 };
+    if (n.length === 1) return /partir|desde|m[ií]n/.test(s) ? { min: n[0], max: Math.max(n[0], 12) } : { min: n[0], max: n[0] };
     return { min: Math.min(n[0], n[1]), max: Math.max(n[0], n[1]) };
   }
   // Los botones de duración que van: los de siempre dentro del plazo, más el
   // mínimo y el máximo si son otros (ej. "6-18 meses" → 6, 12 y 18)
   function opciones(m) {
-    if (m === 'busqueda' || !unidad) return MESES.slice();
-    var r = unidad.rango, o = MESES.filter(function (n) { return n >= r.min && n <= r.max; });
+    // La búsqueda ofrece el plazo de BAIREN: de 3 a 12 meses
+    var r = m === 'busqueda' || !unidad ? rangoPlazo('') : unidad.rango, o = MESES.filter(function (n) { return n >= r.min && n <= r.max; });
     if (o.indexOf(r.min) === -1) o.push(r.min);
     if (o.indexOf(r.max) === -1) o.push(r.max);
     return o.sort(function (a, b) { return a - b; });
@@ -266,7 +267,7 @@
     open: abrir,
     close: cerrar,
     mount: mount,
-    // El catálogo arma su etiqueta ("De 3 a 24 meses") con el mismo lector del plazo
+    // El catálogo arma su etiqueta ("De 3 a 12 meses") con el mismo lector del plazo
     rango: rangoPlazo,
     setUnidad: function (u) {
       unidad = u ? Object.assign({}, u, { rango: rangoPlazo(u.plazo) }) : null;

@@ -65,7 +65,8 @@
 .vis-chip:hover{border-color:var(--vis-navy);}
 .vis-chip[aria-pressed="true"]{background:var(--vis-navy);color:var(--vis-white);border-color:var(--vis-navy);}
 .vis-chips--meses .vis-chip{flex:1 1 0;min-width:0;padding:0 6px;}
-/* 12 y 24 meses: recuadro verde sutil; al elegirlos aparece "Honorarios preferenciales" */
+/* 12 meses (o más, si el plazo lo permite y la unidad también tiene contratos cortos):
+   recuadro verde sutil; al elegirlo aparece "Honorarios preferenciales" */
 .vis-chip--plus{border-color:rgba(42,122,75,.55);background:rgba(42,122,75,.05);color:#21603b;}
 .vis-chip--plus:hover{border-color:#2a7a4b;}
 .vis-chip--plus[aria-pressed="true"]{background:#2a7a4b;border-color:#2a7a4b;color:#fff;}

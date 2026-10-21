@@ -118,7 +118,7 @@ function escribirFicha(html, p) {
   const rows = [['Dirección', p.dir + unidadLbl], ['Barrio', p.barrio]];
   if (p.m2) rows.push(['Superficie', `${p.m2} m²`]);
   if (p.ambientes) rows.push(['Ambientes', `${p.ambientes} ${p.ambientes !== 1 ? 'ambientes' : 'ambiente'}`]);
-  if (!isVenta) rows.push(['Plazo', p.plazo || '3 a 24 meses']);
+  if (!isVenta) rows.push(['Plazo', p.plazo || '3 a 12 meses']);
   if (isTemp || isAmbos) {
     rows.push(['Expensas y servicios', 'Incluidos']);
   } else if (isTrad) rows.push(['Servicios', 'A cargo del inquilino']);
