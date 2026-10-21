@@ -372,7 +372,7 @@ textarea.fi{resize:vertical;min-height:96px;line-height:1.6;}
             <input type="file" id="photoInput" accept="image/*" multiple style="display:none">
             <p class="hint" style="margin-top:10px">Arrastrá imágenes al grid o click para seleccionar. Arrastrá entre slots para reordenar. Se comprimen automáticamente al subir.</p>
             <!-- Referencia de la prueba del 1/10/2026 con calidad alta; si cambia OPENAI_IMAGE_QUALITY en Vercel, actualizar -->
-            <p class="hint" style="margin-top:6px">Para mejorar una foto con IA, tocá "Embellecer" sobre esa foto y después guardá. Sale en 4:5, recortada al centro. Si la foto ya estaba guardada, la embellecida reemplaza a la original. Aprox. USD 0,06 por foto.</p>
+            <p class="hint" style="margin-top:6px">Para mejorar una foto con IA, tocá "Embellecer" sobre esa foto y después guardá. La IA usa la foto entera y la vuelve a encuadrar en 4:5. Si la foto ya estaba guardada, la embellecida reemplaza a la original. Aprox. USD 0,15 por foto.</p>
           </div>
         </div>
 
@@ -951,7 +951,7 @@ function renderPhotoGrid() {
       // Cada foto, nueva o guardada, se embellece por separado.
       const iaHTML = ph._ia ? '<span class="ph-ia-ok">Con IA</span>'
                    : (puedeEmbellecer(ph) && !ph._uploading)
-                     ? `<button class="ph-ia" data-ia="${i}" type="button" title="Embellecer esta foto con IA (aprox. USD 0,06)">Embellecer</button>`
+                     ? `<button class="ph-ia" data-ia="${i}" type="button" title="Embellecer esta foto con IA (aprox. USD 0,15)">Embellecer</button>`
                      : '';
       s.innerHTML =
         `<img src="${ph.url}" alt="">
@@ -1085,36 +1085,40 @@ function puedeEmbellecer(ph) {
   return !!(ph && (ph.file || ph.url) && !ph._ia && !ph._iaWorking);
 }
 
-// La IA recibe la foto ya recortada al centro en 4:5, el formato de la web: si la
-// tuviera que pasar ella de apaisada a vertical, rehace la toma desde otro ángulo e
-// inventa lo que falta. Va en JPG al 92 %: con el 72 % de la subida, los bloques de
-// la compresión la llevan a redibujar texturas y bordes. Una foto recién elegida sale
-// de su archivo original; una guardada se baja del storage (público).
+// La IA recibe la foto entera, como cuando se sube a ChatGPT, y la vuelve a encuadrar
+// ella en 4:5 (21/10/2026). Antes se recortaba al centro y las apaisadas perdían los
+// costados. Va con el lado largo hasta 2048 px y en JPG al 92 %: con el 72 % de la
+// subida, los bloques de la compresión la llevan a redibujar texturas y bordes. Una
+// foto recién elegida sale de su archivo original; una guardada se baja del storage.
+const IA_LADO = 2048;
 const IA_CALIDAD = 0.92;
 async function archivoParaIA(ph) {
-  if (ph.orig) return recortar45(ph.orig);
-  if (ph.file) return recortar45(ph.file);
+  if (ph.orig) return fotoParaIA(ph.orig);
+  if (ph.file) return fotoParaIA(ph.file);
   const r = await fetch(ph.url);
   if (!r.ok) throw new Error('No se pudo leer la foto guardada.');
-  return recortar45(await r.blob());
+  return fotoParaIA(await r.blob());
 }
 
-// Recorte al centro en 4:5, con el lado largo hasta 1600 px
-function recortar45(file) {
+// La foto entera, sin recortes, con el lado largo hasta IA_LADO. Si pesa más de 3 MB
+// baja la calidad: Vercel no recibe pedidos de más de 4,5 MB y el base64 suma un tercio.
+function fotoParaIA(file) {
   return new Promise((resolve, reject) => {
     const url = URL.createObjectURL(file);
     const img = new Image();
     img.onload = () => {
       URL.revokeObjectURL(url);
-      let sw = img.width, sh = img.height;
-      if (sw / sh > 0.8) sw = Math.round(sh * 0.8);
-      else sh = Math.round(sw / 0.8);
-      const k = Math.min(1, 1600 / sh);
+      const k = Math.min(1, IA_LADO / Math.max(img.width, img.height));
       const canvas = document.createElement('canvas');
-      canvas.width = Math.round(sw * k);
-      canvas.height = Math.round(sh * k);
-      canvas.getContext('2d').drawImage(img, (img.width - sw) / 2, (img.height - sh) / 2, sw, sh, 0, 0, canvas.width, canvas.height);
-      canvas.toBlob(b => b ? resolve(b) : reject(new Error('No se pudo procesar la imagen')), 'image/jpeg', IA_CALIDAD);
+      canvas.width = Math.round(img.width * k);
+      canvas.height = Math.round(img.height * k);
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      const pasar = calidad => canvas.toBlob(b => {
+        if (!b) return reject(new Error('No se pudo procesar la imagen'));
+        if (b.size > 3e6 && calidad > 0.7) return pasar(calidad - 0.1);
+        resolve(b);
+      }, 'image/jpeg', calidad);
+      pasar(IA_CALIDAD);
     };
     img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Imagen inválida')); };
     img.src = url;

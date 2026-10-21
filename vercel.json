@@ -42,6 +42,6 @@
     { "path": "/api/indexnow", "schedule": "0 12 * * *" }
   ],
   "functions": {
-    "api/embellecer.js": { "maxDuration": 150 }
+    "api/embellecer.js": { "maxDuration": 300 }
   }
 }
