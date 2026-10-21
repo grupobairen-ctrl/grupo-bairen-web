@@ -266,6 +266,8 @@
     open: abrir,
     close: cerrar,
     mount: mount,
+    // El catálogo arma su etiqueta ("De 3 a 24 meses") con el mismo lector del plazo
+    rango: rangoPlazo,
     setUnidad: function (u) {
       unidad = u ? Object.assign({}, u, { rango: rangoPlazo(u.plazo) }) : null;
       // Cambian los meses que se ofrecen: se vuelven a escribir los formularios
