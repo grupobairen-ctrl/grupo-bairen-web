@@ -84,6 +84,80 @@ nav{position:sticky;top:0;z-index:100;height:60px;background:var(--navy);border-
 .pc-btn:hover{background:var(--navy);color:var(--white);}
 .pc-btn.danger:hover{background:var(--err);color:var(--white);border-color:var(--err);}
 
+/* ─── SELECCIÓN DE VARIAS ───────────────────────────────── */
+.prop-card.sel{outline:3px solid var(--gold);outline-offset:0;}
+.pc-check{position:absolute;top:0;right:0;width:60px;height:60px;display:flex;align-items:flex-start;justify-content:flex-end;padding:10px;cursor:pointer;z-index:2;}
+.pc-check input,.sel-all input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none;}
+.ck-box{width:28px;height:28px;flex-shrink:0;background:rgba(251,250,246,.94);border:2px solid var(--navy);display:flex;align-items:center;justify-content:center;box-shadow:0 1px 5px rgba(19,29,45,.3);transition:background .15s,border-color .15s;}
+input:checked + .ck-box{background:var(--gold);border-color:var(--gold);}
+input:checked + .ck-box::after{content:'';width:7px;height:13px;border:solid var(--navy);border-width:0 3px 3px 0;transform:translateY(-2px) rotate(45deg);}
+input:indeterminate + .ck-box::after{content:'';width:12px;height:3px;background:var(--navy);}
+input:focus-visible + .ck-box{outline:2px solid var(--gold);outline-offset:2px;}
+.sel-row{margin-bottom:14px;}
+.sel-all{display:inline-flex;align-items:center;gap:12px;min-height:48px;padding:8px 16px 8px 10px;background:var(--white);border:1px solid var(--border);cursor:pointer;user-select:none;font-size:.62rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--navy);}
+.sel-all .ck-box{box-shadow:none;width:26px;height:26px;}
+.sel-all:hover{border-color:var(--gold-dark);}
+
+.bulk-bar{position:fixed;left:0;right:0;bottom:0;z-index:150;background:var(--navy);border-top:2px solid var(--gold);color:var(--white);padding:12px 24px calc(12px + env(safe-area-inset-bottom));transform:translateY(110%);visibility:hidden;transition:transform .22s ease,visibility .22s;}
+.bulk-bar.show{transform:none;visibility:visible;}
+.bulk-in{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:14px;}
+.bulk-info{flex:1;min-width:0;font-size:.8rem;line-height:1.3;}
+.bulk-info b{font-family:var(--fd);font-size:1.35rem;font-weight:700;color:var(--gold);margin-right:5px;}
+.bulk-hidden{display:block;font-size:.66rem;color:var(--gold-light);}
+.bulk-hidden:empty{display:none;}
+.bulk-actions{display:flex;gap:8px;}
+.bk-btn{min-height:48px;min-width:118px;padding:6px 14px;background:transparent;color:var(--white);border:1px solid rgba(222,205,160,.45);font-size:.62rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;transition:all .18s;}
+.bk-btn small{font-size:.62rem;font-weight:500;letter-spacing:.02em;text-transform:none;color:var(--gold-light);}
+.bk-btn:hover:not(:disabled){background:var(--gold);color:var(--navy);border-color:var(--gold);}
+.bk-btn:hover:not(:disabled) small{color:var(--navy);}
+.bk-btn.danger{background:var(--err);border-color:var(--err);}
+.bk-btn.danger small{color:rgba(251,250,246,.85);}
+.bk-btn.danger:hover:not(:disabled){background:#9a3b3b;border-color:#9a3b3b;color:var(--white);}
+.bk-btn.danger:hover:not(:disabled) small{color:var(--white);}
+.bk-btn:disabled{opacity:.35;cursor:not-allowed;}
+.bk-cancel{background:none;border:none;color:var(--gold-light);font-size:.62rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;min-height:48px;padding:0 8px;}
+.bk-cancel:hover{color:var(--white);}
+body.con-barra #viewDash .page{padding-bottom:130px;}
+body.con-barra .toast-wrap{bottom:100px;}
+@media(max-width:700px){
+  .bulk-bar{padding:10px 14px calc(12px + env(safe-area-inset-bottom));}
+  .bulk-in{flex-wrap:wrap;gap:8px 10px;}
+  .bulk-actions{order:3;flex-basis:100%;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+  .bk-btn{min-width:0;padding:6px 4px;letter-spacing:.08em;}
+  body.con-barra #viewDash .page{padding-bottom:170px;}
+  body.con-barra .toast-wrap{bottom:150px;}
+}
+
+/* Ventana de "varias a la vez": lista, progreso y resultado */
+.confirm-box.bulk-box{width:100%;max-width:500px;max-height:calc(100vh - 40px);display:flex;flex-direction:column;}
+.bulk-box .confirm-msg{margin-bottom:14px;}
+.bk-sub{font-size:.58rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mid);margin:0 0 6px;}
+.bk-list{list-style:none;overflow-y:auto;border:1px solid var(--border);margin-bottom:16px;min-height:0;flex-shrink:1;}
+.bk-list li{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-bottom:1px solid rgba(42,58,82,.07);font-size:.82rem;line-height:1.35;}
+.bk-list li:last-child{border-bottom:none;}
+.bk-list li.run{background:var(--off);}
+.bk-dir{flex:1;min-width:0;overflow-wrap:anywhere;}
+.bk-dir small{display:block;font-size:.68rem;color:var(--mid);margin-top:2px;}
+.bk-list li.err .bk-dir small{color:var(--err);}
+.bk-tag{flex-shrink:0;font-size:.5rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:4px 7px;color:var(--white);background:var(--mid);margin-top:1px;}
+.bk-tag.pub{background:var(--ok);}
+.bk-st{flex-shrink:0;width:20px;text-align:center;font-weight:700;font-size:.9rem;color:var(--mid);}
+.bk-st:empty{display:none;}
+.bk-list li.ok .bk-st{color:var(--ok);}
+.bk-list li.err .bk-st{color:var(--err);}
+.bk-list.trabadas{max-height:30vh;flex-shrink:0;}
+.bk-list.trabadas li{color:var(--mid);}
+.bk-prog{margin-bottom:14px;}
+.bk-prog-txt{font-size:.85rem;font-weight:600;color:var(--navy);margin-bottom:8px;}
+.bk-prog-bar{height:6px;background:var(--off);overflow:hidden;}
+.bk-prog-bar span{display:block;height:100%;width:0;background:var(--gold);transition:width .25s ease;}
+.bulk-box .confirm-actions button{min-height:46px;}
+@media(max-width:560px){
+  .confirm-ovl.bulk-ovl{align-items:flex-end;padding:0;}
+  .confirm-box.bulk-box{max-width:none;max-height:92vh;padding:22px 16px calc(16px + env(safe-area-inset-bottom));}
+  .bulk-box .confirm-actions button{flex:1;}
+}
+
 .empty-state{background:var(--white);border:1px dashed var(--border);padding:60px 24px;text-align:center;}
 .empty-ttl{font-family:var(--fd);font-size:1.2rem;color:var(--mid);margin-bottom:8px;}
 .empty-sub{font-size:.78rem;color:var(--mid);}
@@ -218,6 +292,7 @@ textarea.fi{resize:vertical;min-height:96px;line-height:1.6;}
 .cf-ok{background:var(--navy);color:var(--white);}
 .cf-ok.danger{background:var(--err);}
 .cf-ok:hover{background:var(--navy-dark);}
+.cf-ok.danger:hover{background:#9a3b3b;}
 
 *:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
 
@@ -283,11 +358,35 @@ textarea.fi{resize:vertical;min-height:96px;line-height:1.6;}
 
     <div class="stats-row" id="statsRow"></div>
 
-    <div class="search-bar" style="margin-bottom:18px">
+    <div class="search-bar" style="margin-bottom:14px">
       <input class="fi" id="searchInput" type="text" placeholder="Buscar por dirección, barrio, unidad...">
     </div>
 
+    <div class="sel-row" id="selRow" hidden>
+      <label class="sel-all">
+        <input type="checkbox" id="selAll">
+        <span class="ck-box" aria-hidden="true"></span>
+        <span id="selAllTxt">Seleccionar todas</span>
+      </label>
+    </div>
+
     <div id="propsContainer"></div>
+  </div>
+
+  <!-- Barra de abajo: aparece cuando hay al menos una seleccionada -->
+  <div class="bulk-bar" id="bulkBar" role="region" aria-label="Acciones con las seleccionadas">
+    <div class="bulk-in">
+      <div class="bulk-info" aria-live="polite">
+        <b id="bulkCount">0</b><span id="bulkCountLbl">seleccionadas</span>
+        <span class="bulk-hidden" id="bulkHidden"></span>
+      </div>
+      <div class="bulk-actions">
+        <button class="bk-btn" id="bkUnpub" type="button">Despublicar<small id="bkUnpubN"></small></button>
+        <button class="bk-btn" id="bkPub" type="button">Publicar<small id="bkPubN"></small></button>
+        <button class="bk-btn danger" id="bkDel" type="button">Borrar<small id="bkDelN"></small></button>
+      </div>
+      <button class="bk-cancel" id="bkCancel" type="button">Cancelar</button>
+    </div>
   </div>
 </section>
 
@@ -479,6 +578,24 @@ textarea.fi{resize:vertical;min-height:96px;line-height:1.6;}
     </div>
   </div>
 </div>
+<!-- Varias a la vez: confirmar, progreso y resultado en la misma ventana -->
+<div class="confirm-ovl bulk-ovl" id="bulkOvl" role="dialog" aria-modal="true" aria-labelledby="bkTtl">
+  <div class="confirm-box bulk-box">
+    <h2 class="confirm-ttl" id="bkTtl"></h2>
+    <p class="confirm-msg" id="bkMsg"></p>
+    <div class="bk-prog" id="bkProg" hidden>
+      <div class="bk-prog-txt" id="bkProgTxt" aria-live="polite"></div>
+      <div class="bk-prog-bar"><span id="bkProgFill"></span></div>
+    </div>
+    <ul class="bk-list" id="bkList"></ul>
+    <p class="bk-sub" id="bkTrabTtl" hidden>No se pueden publicar todavía</p>
+    <ul class="bk-list trabadas" id="bkTrab" hidden></ul>
+    <div class="confirm-actions">
+      <button class="cf-cancel" id="bkNo" type="button">Cancelar</button>
+      <button class="cf-ok" id="bkYes" type="button">Confirmar</button>
+    </div>
+  </div>
+</div>
 
 <script src="supabase-config.js"></script>
 <script>
@@ -497,6 +614,8 @@ const state = {
   selAmenities: new Map(),   // nombre -> icono
   vType: 'bunny',            // tipo de video activo
   customAmenities: new Set(),// amenities custom agregadas en sesión
+  sel: new Set(),            // ids tildados en el listado (para actuar sobre varias a la vez)
+  loteCorriendo: false,      // true mientras se despublican / publican / borran varias
 };
 
 // ════════════════════════════════════════════════════════════════════
@@ -546,6 +665,7 @@ function showView(name) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   $('view' + name).classList.add('active');
   window.scrollTo({ top: 0, behavior: 'instant' });
+  actualizarSeleccion();
 }
 
 function toast(msg, type) {
@@ -673,6 +793,7 @@ async function doLogin(email, password) {
 async function doLogout() {
   if (!await confirm({ title: 'Cerrar sesión', msg: 'Vas a tener que volver a ingresar.', okText: 'Cerrar sesión' })) return;
   clearDraft();
+  state.sel.clear();
   await state.sb.auth.signOut();
 }
 
@@ -683,6 +804,7 @@ async function loadDashboard() {
   showView('Dash');
   $('propsContainer').innerHTML = '<div class="empty-state"><div class="empty-ttl">Cargando propiedades...</div></div>';
   $('statsRow').innerHTML = '';
+  $('selRow').hidden = true;
   try {
     const { data, error } = await state.sb
       .from('propiedades')
@@ -690,6 +812,9 @@ async function loadDashboard() {
       .order('created_at', { ascending: false });
     if (error) throw error;
     state.properties = data || [];
+    // La selección sobrevive a la recarga, menos las que ya no existen
+    const ids = new Set(state.properties.map(p => p.id));
+    state.sel = new Set([...state.sel].filter(id => ids.has(id)));
     renderStats();
     renderProperties();
     // Si hay un borrador sin guardar (primera vez en esta sesión), restaurarlo automáticamente
@@ -718,19 +843,26 @@ function renderStats() {
   `;
 }
 
-function renderProperties() {
+// Las que se ven en el listado ahora (respeta la búsqueda)
+function propiedadesVisibles() {
   const q = $('searchInput').value.trim().toLowerCase();
-  const list = q
+  return q
     ? state.properties.filter(p =>
         (p.dir || '').toLowerCase().includes(q) ||
         (p.barrio || '').toLowerCase().includes(q) ||
         (p.unidad || '').toLowerCase().includes(q))
     : state.properties;
+}
+
+function renderProperties() {
+  const q = $('searchInput').value.trim().toLowerCase();
+  const list = propiedadesVisibles();
 
   if (!list.length) {
     $('propsContainer').innerHTML = q
-      ? '<div class="empty-state"><div class="empty-ttl">Sin resultados</div><div class="empty-sub">No encontramos propiedades que coincidan con "' + q + '".</div></div>'
+      ? '<div class="empty-state"><div class="empty-ttl">Sin resultados</div><div class="empty-sub">No encontramos propiedades que coincidan con "' + escapeHTML(q) + '".</div></div>'
       : '<div class="empty-state"><div class="empty-ttl">Todavía no hay propiedades</div><div class="empty-sub">Tocá "+ Nueva propiedad" para crear la primera.</div></div>';
+    actualizarSeleccion();
     return;
   }
 
@@ -745,9 +877,15 @@ function renderProperties() {
       : p.estado === 'Reservado'
         ? '<span class="pc-badge res">Reservada</span>'
         : '<span class="pc-badge pub">Publicada</span>';
+    const tildada = state.sel.has(p.id);
     return `
-      <div class="prop-card" data-id="${p.id}">
-        <div class="pc-img ${fotoCls}" style="${fotoStyle}">${fotoTxt}${badge}</div>
+      <div class="prop-card${tildada ? ' sel' : ''}" data-id="${p.id}">
+        <div class="pc-img ${fotoCls}" style="${fotoStyle}">${fotoTxt}${badge}
+          <label class="pc-check" title="Seleccionar">
+            <input type="checkbox" data-sel="${p.id}"${tildada ? ' checked' : ''} aria-label="Seleccionar ${escapeHTML(nombreProp(p))}">
+            <span class="ck-box" aria-hidden="true"></span>
+          </label>
+        </div>
         <div class="pc-body">
           <div class="pc-dir">${escapeHTML(p.dir)}${p.unidad ? ' ' + escapeHTML(p.unidad) : ''}</div>
           <div class="pc-sub">${escapeHTML(p.barrio || '')} · ${escapeHTML(p.tipo)}</div>
@@ -780,10 +918,41 @@ function renderProperties() {
       if (act === 'delete') deleteProperty(prop);
     });
   });
+  actualizarSeleccion();
 }
 
 function escapeHTML(s) {
   return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function nombreProp(p) {
+  return (p.dir || '') + (p.unidad ? ' ' + p.unidad : '');
+}
+
+// Publica o despublica una propiedad en la base. Es el único camino: lo usan
+// el botón de la tarjeta, el de la ficha y "varias a la vez". Tira error si no
+// cambió ninguna fila (por ejemplo, si alguien ya la había borrado).
+async function cambiarPublicada(id, publicada) {
+  const { data, error } = await state.sb.from('propiedades').update({ publicada }).eq('id', id).select('id');
+  if (error) throw error;
+  if (!data || !data.length) throw new Error('No se encontró la propiedad. Puede que ya no exista.');
+}
+
+// Borra una propiedad con todas sus fotos. Es el único camino de borrado: lo
+// usan el botón de la tarjeta, el de la ficha y "varias a la vez".
+// Primero la fila y después los archivos: si falla el borrado, las fotos quedan.
+async function borrarPropiedad(p) {
+  const { data: imgs } = await state.sb.from('imagenes').select('storage_path').eq('propiedad_id', p.id);
+  const paths = (imgs || []).map(i => i.storage_path).filter(Boolean);
+  if (p.portada_path) paths.push(p.portada_path);
+  // cascade borra imagenes + amenities por FK
+  const { data, error } = await state.sb.from('propiedades').delete().eq('id', p.id).select('id');
+  if (error) throw error;
+  if (!data || !data.length) throw new Error('No se encontró la propiedad. Puede que ya esté borrada.');
+  if (paths.length) {
+    const { error: stErr } = await state.sb.storage.from('imagenes-propiedades').remove(paths);
+    if (stErr) console.warn('[admin] La propiedad se borró pero quedaron fotos en el storage:', stErr.message);
+  }
 }
 
 async function togglePublish(p) {
@@ -798,8 +967,7 @@ async function togglePublish(p) {
   if (!ok) return;
   showLoader(target ? 'Publicando...' : 'Despublicando...');
   try {
-    const { error } = await state.sb.from('propiedades').update({ publicada: target }).eq('id', p.id);
-    if (error) throw error;
+    await cambiarPublicada(p.id, target);
     toast(target ? 'Propiedad publicada' : 'Propiedad despublicada', 'ok');
     await loadDashboard();
   } catch (err) {
@@ -819,16 +987,7 @@ async function deleteProperty(p) {
   if (!ok) return;
   showLoader('Eliminando...');
   try {
-    // borrar fotos del storage
-    const { data: imgs } = await state.sb.from('imagenes').select('storage_path').eq('propiedad_id', p.id);
-    const paths = (imgs || []).map(i => i.storage_path).filter(Boolean);
-    if (p.portada_path) paths.push(p.portada_path);
-    if (paths.length) {
-      await state.sb.storage.from('imagenes-propiedades').remove(paths);
-    }
-    // cascade borra imagenes + amenities por FK
-    const { error } = await state.sb.from('propiedades').delete().eq('id', p.id);
-    if (error) throw error;
+    await borrarPropiedad(p);
     toast('Propiedad eliminada', 'ok');
     await loadDashboard();
   } catch (err) {
@@ -836,6 +995,248 @@ async function deleteProperty(p) {
   } finally {
     hideLoader();
   }
+}
+
+// ════════════════════════════════════════════════════════════════════
+// VARIAS A LA VEZ: tildar en el listado y despublicar / publicar / borrar
+// ════════════════════════════════════════════════════════════════════
+function seleccionadas() {
+  return state.properties.filter(p => state.sel.has(p.id));
+}
+
+function cuantas(n, uno, varios) {
+  return n + ' ' + (n === 1 ? uno : varios);
+}
+
+// Pinta las tildes, el "Seleccionar todas" y la barra de abajo según state.sel
+function actualizarSeleccion() {
+  const vis = propiedadesVisibles();
+  const visIds = new Set(vis.map(p => p.id));
+
+  document.querySelectorAll('#propsContainer .prop-card').forEach(card => {
+    const on = state.sel.has(card.dataset.id);
+    card.classList.toggle('sel', on);
+    const cb = card.querySelector('.pc-check input');
+    if (cb) cb.checked = on;
+  });
+
+  const enListado = $('viewDash').classList.contains('active');
+  const hayTarjetas = enListado && !!$('propsContainer').querySelector('.prop-card');
+  $('selRow').hidden = !hayTarjetas;
+  const visSel = vis.filter(p => state.sel.has(p.id)).length;
+  const todas = vis.length > 0 && visSel === vis.length;
+  $('selAll').checked = todas;
+  $('selAll').indeterminate = visSel > 0 && !todas;
+  const q = $('searchInput').value.trim();
+  $('selAllTxt').textContent = todas
+    ? 'Quitar selección'
+    : q ? `Seleccionar las ${vis.length} de la búsqueda` : `Seleccionar todas (${vis.length})`;
+
+  const sel = seleccionadas();
+  const n = sel.length;
+  const mostrar = n > 0 && enListado;
+  $('bulkBar').classList.toggle('show', mostrar);
+  document.body.classList.toggle('con-barra', mostrar);
+  if (!n) return;
+
+  const pub = sel.filter(p => p.publicada).length;
+  const bor = n - pub;
+  const ocultas = sel.filter(p => !visIds.has(p.id)).length;
+  $('bulkCount').textContent = n;
+  $('bulkCountLbl').textContent = n === 1 ? 'seleccionada' : 'seleccionadas';
+  $('bulkHidden').textContent = ocultas
+    ? (ocultas === 1 ? '1 no se ve con esta búsqueda' : `${ocultas} no se ven con esta búsqueda`)
+    : '';
+  $('bkUnpub').disabled = !pub;
+  $('bkUnpubN').textContent = cuantas(pub, 'publicada', 'publicadas');
+  $('bkPub').disabled = !bor;
+  $('bkPubN').textContent = cuantas(bor, 'borrador', 'borradores');
+  $('bkDelN').textContent = n + ' en total';
+}
+
+const LOTE = {
+  despublicar: {
+    titulo: n => `Despublicar ${cuantas(n, 'propiedad', 'propiedades')}`,
+    boton: n => `Despublicar ${n}`,
+    haciendo: 'Despublicando',
+    hecho: n => n === 1 ? 'Se despublicó' : 'Se despublicaron',
+    peligro: false,
+    hacer: p => cambiarPublicada(p.id, false),
+  },
+  publicar: {
+    titulo: n => `Publicar ${cuantas(n, 'propiedad', 'propiedades')}`,
+    boton: n => `Publicar ${n}`,
+    haciendo: 'Publicando',
+    hecho: n => n === 1 ? 'Se publicó' : 'Se publicaron',
+    peligro: false,
+    hacer: p => cambiarPublicada(p.id, true),
+  },
+  borrar: {
+    titulo: n => `Borrar ${cuantas(n, 'propiedad', 'propiedades')}`,
+    boton: n => `Borrar ${n}`,
+    haciendo: 'Borrando',
+    hecho: n => n === 1 ? 'Se borró' : 'Se borraron',
+    peligro: true,
+    hacer: p => borrarPropiedad(p),
+  },
+};
+
+function filaLote(p, detalle) {
+  const li = document.createElement('li');
+  li.innerHTML = `
+    <span class="bk-st" aria-hidden="true"></span>
+    <span class="bk-dir">${escapeHTML(nombreProp(p))}${p.barrio ? ' · ' + escapeHTML(p.barrio) : ''}${detalle ? `<small>${escapeHTML(detalle)}</small>` : ''}</span>
+    <span class="bk-tag${p.publicada ? ' pub' : ''}">${p.publicada ? 'Publicada' : 'Borrador'}</span>`;
+  return li;
+}
+
+function cerrarLote() {
+  if (state.loteCorriendo) return;
+  $('bulkOvl').classList.remove('show');
+}
+
+function avisarSalida(e) {
+  e.preventDefault();
+  e.returnValue = '';
+}
+
+// Arma la ventana para una acción: qué se va a tocar, qué no y por qué
+function abrirLote(accion) {
+  if (state.loteCorriendo) return;
+  const cfg = LOTE[accion];
+  const sel = seleccionadas();
+  if (!sel.length) return;
+  let lista = [];
+  const trabadas = [];
+  let msg = '';
+
+  if (accion === 'despublicar') {
+    lista = sel.filter(p => p.publicada);
+    const otras = sel.length - lista.length;
+    msg = 'Salen del sitio, pero quedan los datos y las fotos. Las podés volver a publicar cuando quieras.';
+    if (otras) msg += otras === 1
+      ? ' 1 ya está en borrador y no se toca.'
+      : ` ${otras} ya están en borrador y no se tocan.`;
+  } else if (accion === 'publicar') {
+    const borradores = sel.filter(p => !p.publicada);
+    borradores.forEach(p => {
+      const falta = faltaParaPublicar(p, (p.imagenes || []).length);
+      if (falta) trabadas.push({ p, falta });
+      else lista.push(p);
+    });
+    const yaPub = sel.length - borradores.length;
+    msg = lista.length ? 'Van a aparecer en el sitio.' : 'Ninguna se puede publicar todavía. Abrí cada una, completá lo que falta y publicala.';
+    if (yaPub) msg += yaPub === 1
+      ? ' 1 ya está publicada y no se toca.'
+      : ` ${yaPub} ya están publicadas y no se tocan.`;
+  } else {
+    lista = sel.slice();
+    const pub = lista.filter(p => p.publicada).length;
+    msg = 'Se borran con todas sus fotos. No se puede deshacer.';
+    if (pub) msg += pub === 1
+      ? ' 1 está publicada y sale del sitio.'
+      : ` ${pub} están publicadas y salen del sitio.`;
+  }
+
+  $('bkTtl').textContent = lista.length ? cfg.titulo(lista.length) : 'Nada para publicar';
+  $('bkMsg').textContent = msg;
+  $('bkProg').hidden = true;
+  $('bkProgFill').style.width = '0';
+
+  const ul = $('bkList');
+  ul.innerHTML = '';
+  ul.hidden = !lista.length;
+  const filas = lista.map(p => { const li = filaLote(p); ul.appendChild(li); return li; });
+
+  const trab = $('bkTrab');
+  trab.innerHTML = '';
+  trabadas.forEach(t => trab.appendChild(filaLote(t.p, t.falta)));
+  trab.hidden = $('bkTrabTtl').hidden = !trabadas.length;
+
+  const yes = $('bkYes');
+  const no = $('bkNo');
+  yes.hidden = !lista.length;
+  yes.disabled = false;
+  yes.textContent = lista.length ? cfg.boton(lista.length) : '';
+  yes.classList.toggle('danger', cfg.peligro);
+  no.hidden = false;
+  no.textContent = lista.length ? 'Cancelar' : 'Entendido';
+  yes.onclick = () => correrLote(accion, lista, filas);
+  no.onclick = cerrarLote;
+  $('bulkOvl').classList.add('show');
+  no.focus(); // con Enter no se borra nada por accidente
+}
+
+// Una por una, sin cortar si alguna falla. Al final, el resumen y el listado al día.
+async function correrLote(accion, lista, filas) {
+  if (state.loteCorriendo) return;
+  const cfg = LOTE[accion];
+  state.loteCorriendo = true;
+  window.addEventListener('beforeunload', avisarSalida);
+  $('bkYes').disabled = true;
+  $('bkYes').hidden = true;
+  $('bkNo').hidden = true;
+  $('bkTrab').hidden = $('bkTrabTtl').hidden = true;
+  $('bkProg').hidden = false;
+  filas.forEach(li => { li.querySelector('.bk-st').textContent = '·'; });
+
+  const total = lista.length;
+  const fallas = [];
+  for (let i = 0; i < total; i++) {
+    const p = lista[i];
+    const li = filas[i];
+    const st = li.querySelector('.bk-st');
+    $('bkProgTxt').textContent = `${cfg.haciendo} ${i + 1} de ${total}…`;
+    li.classList.add('run');
+    st.textContent = '…';
+    li.scrollIntoView({ block: 'nearest' });
+    try {
+      await cfg.hacer(p);
+      li.classList.add('ok');
+      st.textContent = '✓';
+    } catch (err) {
+      console.error('[admin] ' + accion + ' falló en ' + nombreProp(p), err);
+      const motivo = (err && err.message) || String(err);
+      fallas.push({ p, li, motivo });
+      li.classList.add('err');
+      st.textContent = '✗';
+      const small = document.createElement('small');
+      small.textContent = 'Error: ' + motivo;
+      li.querySelector('.bk-dir').appendChild(small);
+    }
+    li.classList.remove('run');
+    $('bkProgFill').style.width = ((i + 1) / total * 100) + '%';
+  }
+
+  const bien = total - fallas.length;
+  $('bkProg').hidden = true;
+  $('bkTtl').textContent = fallas.length ? 'Terminó con errores' : 'Listo';
+  let msg = `${cfg.hecho(bien)} ${bien} de ${total}.`;
+  if (fallas.length) {
+    msg += fallas.length === 1
+      ? ' Falló 1: tiene el error abajo y quedó seleccionada para que pruebes de nuevo.'
+      : ` Fallaron ${fallas.length}: tienen el error abajo y quedaron seleccionadas para que pruebes de nuevo.`;
+    // las que fallaron, arriba de todo
+    const ul = $('bkList');
+    fallas.slice().reverse().forEach(f => ul.prepend(f.li));
+    ul.scrollTop = 0;
+  }
+  $('bkMsg').textContent = msg;
+
+  // quedan tildadas solo las que fallaron
+  state.sel = new Set(fallas.map(f => f.p.id));
+  state.loteCorriendo = false;
+  window.removeEventListener('beforeunload', avisarSalida);
+
+  const yes = $('bkYes');
+  yes.hidden = false;
+  yes.disabled = false;
+  yes.classList.remove('danger');
+  yes.textContent = 'Cerrar';
+  yes.onclick = cerrarLote;
+  yes.focus();
+
+  await loadDashboard();
 }
 
 // ════════════════════════════════════════════════════════════════════
@@ -1488,6 +1889,12 @@ function collectFormData() {
 }
 
 function validate(d) {
+  return faltaParaPublicar(d, state.photos.length);
+}
+
+// Qué le falta a una propiedad para poder guardarse/publicarse (null = nada).
+// La usan el formulario y "Publicar" de varias a la vez, así la regla es una sola.
+function faltaParaPublicar(d, cantFotos) {
   if (!d.dir)    return 'Falta la dirección.';
   if (!d.barrio) return 'Falta el barrio.';
   if (!d.tipo)   return 'Falta el tipo de operación.';
@@ -1499,7 +1906,7 @@ function validate(d) {
     return 'Si el tipo es "Ambos", necesitás los dos precios.';
   if (d.tipo === 'Venta' && !d.precio_venta)
     return 'Falta el precio de venta (o poné 0 si es "consultar").';
-  if (state.photos.length === 0)
+  if (!cantFotos)
     return 'Subí al menos una foto (será la portada).';
   return null;
 }
@@ -1640,8 +2047,7 @@ async function unpublishCurrent() {
   if (!ok) return;
   showLoader('Despublicando...');
   try {
-    const { error } = await state.sb.from('propiedades').update({ publicada: false }).eq('id', state.editing.id);
-    if (error) throw error;
+    await cambiarPublicada(state.editing.id, false);
     toast('Propiedad despublicada', 'ok');
     await loadDashboard();
   } catch (err) {
@@ -1934,6 +2340,27 @@ function wireUI() {
   // dashboard
   $('btnNew').addEventListener('click', () => openForm(null));
   $('searchInput').addEventListener('input', renderProperties);
+
+  // varias a la vez
+  $('propsContainer').addEventListener('change', e => {
+    const cb = e.target.closest('.pc-check input');
+    if (!cb) return;
+    if (cb.checked) state.sel.add(cb.dataset.sel);
+    else state.sel.delete(cb.dataset.sel);
+    actualizarSeleccion();
+  });
+  $('selAll').addEventListener('change', () => {
+    const marcar = $('selAll').checked;
+    propiedadesVisibles().forEach(p => marcar ? state.sel.add(p.id) : state.sel.delete(p.id));
+    actualizarSeleccion();
+  });
+  $('bkCancel').addEventListener('click', () => { state.sel.clear(); actualizarSeleccion(); });
+  $('bkUnpub').addEventListener('click', () => abrirLote('despublicar'));
+  $('bkPub').addEventListener('click', () => abrirLote('publicar'));
+  $('bkDel').addEventListener('click', () => abrirLote('borrar'));
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && $('bulkOvl').classList.contains('show')) cerrarLote();
+  });
 
   // form
   $('btnBack').addEventListener('click', () => { state.editing = null; loadDashboard(); });
