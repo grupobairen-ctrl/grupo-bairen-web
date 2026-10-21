@@ -60,6 +60,13 @@ nav{position:sticky;top:0;z-index:100;height:60px;background:var(--navy);border-
 .stat-pill{background:var(--white);border:1px solid var(--border);padding:10px 16px;display:flex;align-items:baseline;gap:8px;}
 .stat-num{font-family:var(--fd);font-size:1.2rem;font-weight:700;color:var(--navy);}
 .stat-lbl{font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--mid);font-weight:600;}
+/* Los números de arriba filtran el listado (21/10/2026): tocás "Publicadas" y ves solo esas */
+button.stat-pill{font-family:var(--fb);cursor:pointer;min-height:44px;transition:border-color .15s,background .15s;}
+button.stat-pill:hover{border-color:var(--gold);}
+button.stat-pill[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);}
+button.stat-pill[aria-pressed="true"] .stat-num{color:var(--white);}
+button.stat-pill[aria-pressed="true"] .stat-lbl{color:var(--gold-light);}
+@media(max-width:600px){.stats-row{gap:8px;}.stats-row .stat-pill{flex:1 1 calc(50% - 4px);justify-content:center;padding:10px 8px;}}
 .dash-actions{display:flex;gap:10px;flex-wrap:wrap;}
 .search-bar{flex:1;min-width:200px;}
 .search-bar input{width:100%;}
@@ -830,28 +837,41 @@ async function loadDashboard() {
   }
 }
 
-function renderStats() {
-  const total = state.properties.length;
-  const pub   = state.properties.filter(p => p.publicada).length;
-  const bor   = total - pub;
-  const res   = state.properties.filter(p => p.estado === 'Reservado').length;
-  $('statsRow').innerHTML = `
-    <div class="stat-pill"><span class="stat-num">${total}</span><span class="stat-lbl">Total</span></div>
-    <div class="stat-pill"><span class="stat-num">${pub}</span><span class="stat-lbl">Publicadas</span></div>
-    <div class="stat-pill"><span class="stat-num">${bor}</span><span class="stat-lbl">Borradores</span></div>
-    <div class="stat-pill"><span class="stat-num">${res}</span><span class="stat-lbl">Reservadas</span></div>
-  `;
+// Los números de arriba son también el filtro del listado (pedido de Tomás,
+// 21/10/2026: "filtrar por publicadas así solo veo las publicadas"). El
+// elegido queda guardado en este navegador.
+const FILTROS = {
+  todas:      { lbl: 'Total',      cumple: () => true,                        nombre: '' },
+  publicadas: { lbl: 'Publicadas', cumple: p => p.publicada,                  nombre: 'publicadas' },
+  borradores: { lbl: 'Borradores', cumple: p => !p.publicada,                 nombre: 'en borrador' },
+  reservadas: { lbl: 'Reservadas', cumple: p => p.estado === 'Reservado',     nombre: 'reservadas' },
+};
+const FILTRO_KEY = 'bairen_admin_filtro';
+state.filtro = (() => { try { const f = localStorage.getItem(FILTRO_KEY); return FILTROS[f] ? f : 'todas'; } catch { return 'todas'; } })();
+
+function elegirFiltro(f) {
+  state.filtro = FILTROS[f] ? f : 'todas';
+  try { localStorage.setItem(FILTRO_KEY, state.filtro); } catch {}
+  renderStats();
+  renderProperties();
 }
 
-// Las que se ven en el listado ahora (respeta la búsqueda)
+function renderStats() {
+  $('statsRow').innerHTML = Object.entries(FILTROS).map(([f, x]) => {
+    const n = state.properties.filter(x.cumple).length;
+    return `<button type="button" class="stat-pill" data-filtro="${f}" aria-pressed="${state.filtro === f}"><span class="stat-num">${n}</span><span class="stat-lbl">${x.lbl}</span></button>`;
+  }).join('');
+  $('statsRow').querySelectorAll('.stat-pill').forEach(b => b.addEventListener('click', () => elegirFiltro(b.dataset.filtro)));
+}
+
+// Las que se ven en el listado ahora (respeta el filtro y la búsqueda)
 function propiedadesVisibles() {
   const q = $('searchInput').value.trim().toLowerCase();
-  return q
-    ? state.properties.filter(p =>
-        (p.dir || '').toLowerCase().includes(q) ||
-        (p.barrio || '').toLowerCase().includes(q) ||
-        (p.unidad || '').toLowerCase().includes(q))
-    : state.properties;
+  const cumple = FILTROS[state.filtro].cumple;
+  return state.properties.filter(p => cumple(p) && (!q ||
+    (p.dir || '').toLowerCase().includes(q) ||
+    (p.barrio || '').toLowerCase().includes(q) ||
+    (p.unidad || '').toLowerCase().includes(q)));
 }
 
 function renderProperties() {
@@ -859,9 +879,12 @@ function renderProperties() {
   const list = propiedadesVisibles();
 
   if (!list.length) {
+    const nombre = FILTROS[state.filtro].nombre;
     $('propsContainer').innerHTML = q
-      ? '<div class="empty-state"><div class="empty-ttl">Sin resultados</div><div class="empty-sub">No encontramos propiedades que coincidan con "' + escapeHTML(q) + '".</div></div>'
-      : '<div class="empty-state"><div class="empty-ttl">Todavía no hay propiedades</div><div class="empty-sub">Tocá "+ Nueva propiedad" para crear la primera.</div></div>';
+      ? '<div class="empty-state"><div class="empty-ttl">Sin resultados</div><div class="empty-sub">No encontramos propiedades' + (nombre ? ' ' + nombre : '') + ' que coincidan con "' + escapeHTML(q) + '".</div></div>'
+      : nombre
+        ? '<div class="empty-state"><div class="empty-ttl">No hay propiedades ' + nombre + '</div><div class="empty-sub">Tocá "Total" para ver todas.</div></div>'
+        : '<div class="empty-state"><div class="empty-ttl">Todavía no hay propiedades</div><div class="empty-sub">Tocá "+ Nueva propiedad" para crear la primera.</div></div>';
     actualizarSeleccion();
     return;
   }
@@ -1028,9 +1051,11 @@ function actualizarSeleccion() {
   $('selAll').checked = todas;
   $('selAll').indeterminate = visSel > 0 && !todas;
   const q = $('searchInput').value.trim();
+  const nombre = FILTROS[state.filtro].nombre;
   $('selAllTxt').textContent = todas
     ? 'Quitar selección'
-    : q ? `Seleccionar las ${vis.length} de la búsqueda` : `Seleccionar todas (${vis.length})`;
+    : q ? `Seleccionar las ${vis.length} de la búsqueda`
+    : nombre ? `Seleccionar las ${vis.length} ${nombre}` : `Seleccionar todas (${vis.length})`;
 
   const sel = seleccionadas();
   const n = sel.length;
@@ -1045,7 +1070,7 @@ function actualizarSeleccion() {
   $('bulkCount').textContent = n;
   $('bulkCountLbl').textContent = n === 1 ? 'seleccionada' : 'seleccionadas';
   $('bulkHidden').textContent = ocultas
-    ? (ocultas === 1 ? '1 no se ve con esta búsqueda' : `${ocultas} no se ven con esta búsqueda`)
+    ? (ocultas === 1 ? '1 no se ve con este filtro o búsqueda' : `${ocultas} no se ven con este filtro o búsqueda`)
     : '';
   $('bkUnpub').disabled = !pub;
   $('bkUnpubN').textContent = cuantas(pub, 'publicada', 'publicadas');
