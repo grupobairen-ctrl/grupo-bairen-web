@@ -6,6 +6,9 @@
    12 y 24 meses van en verde y, al elegirlos, avisan el beneficio: honorarios
    preferenciales (Tomás, 21/10/2026: menos comisión con contratos largos,
    dicho en tono premium). El mensaje pide conocerlos.
+   En la ficha, los meses salen del plazo cargado en el admin: "3-24 meses"
+   muestra 3, 6, 12 y 24; "12-24 meses", solo 12 y 24, y entonces sin verde,
+   porque el beneficio es frente a los contratos cortos y esa unidad no tiene.
 
    - La ficha avisa la unidad con BairenVisita.setUnidad({...}) y monta el
      formulario adentro de su tarjeta con BairenVisita.mount(el).
@@ -89,11 +92,34 @@
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
   }
-  function conBeneficios(n) { return CON_BENEFICIOS.indexOf(n) !== -1; }
+  // El plazo del admin es texto libre: "3-12 meses", "3 a 24 meses",
+  // "12-24 meses", "12 meses", "A partir de 12 meses", "1 a 2 años"...
+  // Sin dato, el plazo de BAIREN: de 3 a 24 meses.
+  function rangoPlazo(txt) {
+    var s = String(txt || '').toLowerCase();
+    var x = /a[ñn]os?/.test(s) && !/mes/.test(s) ? 12 : 1;
+    var n = (s.match(/\d+/g) || []).slice(0, 2).map(function (v) { return +v * x; });
+    if (!n.length) return { min: 3, max: 24 };
+    if (n.length === 1) return /partir|desde|m[ií]n/.test(s) ? { min: n[0], max: Math.max(n[0], 24) } : { min: n[0], max: n[0] };
+    return { min: Math.min(n[0], n[1]), max: Math.max(n[0], n[1]) };
+  }
+  // Los botones de duración que van: los de siempre dentro del plazo, más el
+  // mínimo y el máximo si son otros (ej. "6-18 meses" → 6, 12 y 18)
+  function opciones(m) {
+    if (m === 'busqueda' || !unidad) return MESES.slice();
+    var r = unidad.rango, o = MESES.filter(function (n) { return n >= r.min && n <= r.max; });
+    if (o.indexOf(r.min) === -1) o.push(r.min);
+    if (o.indexOf(r.max) === -1) o.push(r.max);
+    return o.sort(function (a, b) { return a - b; });
+  }
+  // Verde y "Honorarios preferenciales" solo si la unidad también tiene contratos cortos
+  function conBeneficios(m, n) {
+    return CON_BENEFICIOS.indexOf(n) !== -1 && opciones(m)[0] < 12;
+  }
 
-  function lineaDuracion(L) {
-    if (!meses) return '';
-    return L.m_duracion.replace('{n}', meses) + (conBeneficios(meses) ? ' ' + L.m_beneficios : '');
+  function lineaDuracion(L, m) {
+    if (!meses || opciones(m).indexOf(meses) === -1) return '';
+    return L.m_duracion.replace('{n}', meses) + (conBeneficios(m, meses) ? ' ' + L.m_beneficios : '');
   }
   function mensaje(m) {
     var L = t(), lineas;
@@ -102,11 +128,11 @@
       if (busca.barrio.length) lineas.push(L.m_barrio.replace('{v}', busca.barrio.join(L.m_y)));
       if (busca.amb) lineas.push(L.m_amb.replace('{v}', L['a' + busca.amb]));
       if (busca.presu) lineas.push(L.m_presu.replace('{v}', L[busca.presu]));
-      if (meses) lineas.push(lineaDuracion(L));
+      if (lineaDuracion(L, m)) lineas.push(lineaDuracion(L, m));
       lineas.push(L.b_cierre);
     } else {
       lineas = [L.msg.replace('{u}', unidad ? unidad.ref : 'BAIREN')];
-      if (meses) lineas.push(lineaDuracion(L));
+      if (lineaDuracion(L, m)) lineas.push(lineaDuracion(L, m));
     }
     return lineas.join('\n');
   }
@@ -127,8 +153,8 @@
         + grupo(L.amb, L.opcional, AMBS.map(function (a) { return chip('amb', a, L['a' + a]); }).join(''), ' vis-chips--meses') + '</div>'
         + grupo(L.presu, L.opcional, PRESUS.map(function (k) { return chip('presu', k, L[k]); }).join('')) + '</div>';
     }
-    h += grupo(L.duracion, m === 'busqueda' ? L.opcional : '', MESES.map(function (n) {
-        return chip('meses', n, L.meses.replace('{n}', n), conBeneficios(n) ? ' vis-chip--plus' : '');
+    h += grupo(L.duracion, m === 'busqueda' ? L.opcional : '', opciones(m).map(function (n) {
+        return chip('meses', n, L.meses.replace('{n}', n), conBeneficios(m, n) ? ' vis-chip--plus' : '');
       }).join(''), ' vis-chips--meses')
       + '<p class="vis-plus" aria-live="polite"></p></div>'
       + '<a class="vis-btn" href="' + esc(waHref(m)) + '" target="_blank" rel="noopener noreferrer">' + ICO_WA
@@ -139,8 +165,8 @@
 
   // Deja cada formulario montado igual que lo elegido (ventana y tarjeta van juntas)
   function sync() {
-    var plus = conBeneficios(meses) ? t().beneficios.replace('{n}', meses) : '';
     forms.forEach(function (f) {
+      var plus = conBeneficios(f.dataset.modo, meses) ? t().beneficios.replace('{n}', meses) : '';
       f.querySelectorAll('.vis-chip').forEach(function (c) {
         var g = c.dataset.g, v = c.dataset.v;
         var on = g === 'meses' ? String(meses) === v : g === 'barrio' ? busca.barrio.indexOf(v) !== -1 : busca[g] === v;
@@ -241,9 +267,11 @@
     close: cerrar,
     mount: mount,
     setUnidad: function (u) {
-      unidad = u || null;
+      unidad = u ? Object.assign({}, u, { rango: rangoPlazo(u.plazo) }) : null;
+      // Cambian los meses que se ofrecen: se vuelven a escribir los formularios
+      vivos();
+      forms.forEach(function (f) { mount(f); });
       if (dlg) cabecera();
-      sync();
     }
   };
 })();

@@ -236,7 +236,7 @@ footer{background:var(--navy-dark);border-top:1px solid var(--gold);padding:40px
 *:focus-visible{outline:2px solid var(--gold);outline-offset:3px;}
 </style>
 <link rel="stylesheet" href="/premium.css">
-<link rel="stylesheet" href="/visita.css">
+<link rel="stylesheet" href="/visita.css?v=2">
 <script src="/meta-pixel.js"></script>
 </head>
 <body>
@@ -357,7 +357,7 @@ footer{background:var(--navy-dark);border-top:1px solid var(--gold);padding:40px
 
 <script src="/supabase-config.js"></script>
 <script src="/i18n.js?v=4"></script>
-<script src="/visita.js"></script>
+<script src="/visita.js?v=2"></script>
 <script>
 window.sbImg = window.sbImg || function(u){return u};
 'use strict';
@@ -897,6 +897,7 @@ function renderActionCard(p, titleFull, unidadLbl, reservado, isTemp, isTrad) {
     window.BairenVisita && window.BairenVisita.setUnidad({
       ref: unidadRef,
       titulo: titleFull,
+      plazo: p.plazo,
       sub: `${p.barrio} · ${fmtUSD(precio)}${precio ? ' ' + pmTxt : ''}`,
       desde
     });
