@@ -3,8 +3,9 @@
    WhatsApp" y "Coordinar visita", que llevaba a un cuestionario de 5
    preguntas) y la gente no sabía cuál tocar. Ahora hay uno solo: se elige
    la duración del contrato y el botón abre WhatsApp con el mensaje escrito.
-   12 y 24 meses van en verde y, al elegirlos, avisan que hay beneficios
-   (Tomás, 21/10/2026); el mensaje pide que se los cuenten.
+   12 y 24 meses van en verde y, al elegirlos, avisan el beneficio: una
+   bonificación en la comisión inmobiliaria (Tomás, 21/10/2026). El mensaje
+   pregunta cuánto es.
 
    - La ficha avisa la unidad con BairenVisita.setUnidad({...}) y monta el
      formulario adentro de su tarjeta con BairenVisita.mount(el).
@@ -27,11 +28,11 @@
   var T = {
     es: {
       eyebrow: 'Coordinar visita', duracion: 'Duración del contrato', meses: '{n} meses',
-      beneficios: '+ beneficios con el contrato de {n} meses',
+      beneficios: '+ bonificación: con {n} meses pagás menos comisión inmobiliaria',
       btn: 'Coordinar visita', cerrar: 'Cerrar',
       nota: 'Se abre WhatsApp con tu mensaje listo. Te responde una persona del equipo.',
       msg: 'Hola, quiero coordinar una visita a {u}.', m_duracion: 'Duración del contrato: {n} meses.',
-      m_beneficios: 'Quiero saber los beneficios.',
+      m_beneficios: 'Quiero saber cuánto es la bonificación en la comisión.',
       b_title: '¿Qué estás buscando?', b_sub: 'Contanos y te mandamos por WhatsApp las opciones que encajan.',
       barrio: 'Barrio', amb: 'Ambientes', presu: 'Presupuesto por mes', opcional: 'opcional',
       a1: 'Mono', a2: '2', a3: '3', a4: '4 o más',
@@ -42,11 +43,11 @@
     },
     pt: {
       eyebrow: 'Agendar visita', duracion: 'Duração do contrato', meses: '{n} meses',
-      beneficios: '+ benefícios com o contrato de {n} meses',
+      beneficios: '+ bonificação: com {n} meses você paga menos comissão imobiliária',
       btn: 'Agendar visita', cerrar: 'Fechar',
       nota: 'O WhatsApp abre com a sua mensagem pronta. Quem responde é uma pessoa da equipe.',
       msg: 'Olá, quero agendar uma visita a {u}.', m_duracion: 'Duração do contrato: {n} meses.',
-      m_beneficios: 'Quero saber quais são os benefícios.',
+      m_beneficios: 'Quero saber de quanto é a bonificação na comissão.',
       b_title: 'O que você procura?', b_sub: 'Conte para nós e enviamos pelo WhatsApp as opções que combinam.',
       barrio: 'Bairro', amb: 'Ambientes', presu: 'Orçamento por mês', opcional: 'opcional',
       a1: 'Studio', a2: '2', a3: '3', a4: '4 ou mais',
@@ -57,11 +58,11 @@
     },
     en: {
       eyebrow: 'Book a viewing', duracion: 'Contract length', meses: '{n} months',
-      beneficios: '+ perks with a {n}-month contract',
+      beneficios: '+ discount: with {n} months you pay a lower agency fee',
       btn: 'Book a viewing', cerrar: 'Close',
       nota: 'WhatsApp opens with your message ready. A person from our team replies.',
       msg: 'Hi, I would like to book a viewing at {u}.', m_duracion: 'Contract length: {n} months.',
-      m_beneficios: 'I would like to know the perks.',
+      m_beneficios: 'I would like to know how much the agency fee discount is.',
       b_title: 'What are you looking for?', b_sub: 'Tell us and we send you the options that fit on WhatsApp.',
       barrio: 'Neighbourhood', amb: 'Rooms', presu: 'Monthly budget', opcional: 'optional',
       a1: 'Studio', a2: '2', a3: '3', a4: '4+',
