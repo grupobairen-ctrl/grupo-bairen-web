@@ -225,9 +225,6 @@
     var b = e.target.closest && e.target.closest('[data-visita],[data-busqueda]');
     if (!b) return;
     e.preventDefault();
-    // Si el menú del celular estaba abierto, se cierra antes
-    var mm = document.getElementById('mobileMenu'), bg = document.getElementById('burger');
-    if (mm && mm.classList.contains('open') && bg) bg.click();
     abrir(b.hasAttribute('data-busqueda') ? 'busqueda' : 'unidad');
   });
 

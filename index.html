@@ -800,19 +800,8 @@
     <button class="flag" data-lang="en" aria-label="English" title="English">EN</button>
   </div>
   <button class="nav-busca" type="button" data-busqueda><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><span data-i18n="nav_busca">¿Qué estás buscando?</span></button>
-  <button class="burger" id="burger" type="button" aria-label="Menú" aria-expanded="false" aria-controls="mobileMenu"><span></span><span></span><span></span></button>
 </nav>
 
-<div class="mobile-menu" id="mobileMenu">
-  <a href="catalogo.html" class="m-link" data-i18n="nav_alquilar">Alquilar</a>
-  <a href="#resenas" class="m-link" data-i18n="nav_resenas">Reseñas</a>
-  <a href="#contacto" class="m-link" data-i18n="nav_contacto">Contacto</a>
-  <div class="lang-switch m-lang">
-    <button class="flag" data-lang="es" aria-label="Español" title="Español">ES</button>
-    <button class="flag" data-lang="pt" aria-label="Português" title="Português">PT</button>
-    <button class="flag" data-lang="en" aria-label="English" title="English">EN</button>
-  </div>
-</div>
 
 <section class="hero" id="inicio">
   <div class="hero-bg">
@@ -1270,20 +1259,6 @@
 <script src="supabase-config.js"></script>
 <script>
 window.sbImg = window.sbImg || function(u){return u};
-  const burger = document.getElementById('burger');
-  const mobileMenu = document.getElementById('mobileMenu');
-  burger.addEventListener('click', () => {
-    const open = burger.classList.toggle('open');
-    mobileMenu.classList.toggle('open');
-    burger.setAttribute('aria-expanded', open ? 'true' : 'false');
-  });
-  document.querySelectorAll('.m-link').forEach(l =>
-    l.addEventListener('click', () => {
-      burger.classList.remove('open');
-      mobileMenu.classList.remove('open');
-      burger.setAttribute('aria-expanded', 'false');
-    })
-  );
   document.querySelectorAll('.pill').forEach(pill => {
     pill.setAttribute('aria-pressed', 'false');
     pill.addEventListener('click', () => pill.setAttribute('aria-pressed', 'true'));

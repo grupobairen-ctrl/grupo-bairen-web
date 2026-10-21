@@ -12,10 +12,10 @@
 }
 
 /* "¿Qué estás buscando?" arriba: sutil, como texto y no como botón (Tomás, 21/10).
-   En la compu va con los links del menú; en el celular, al lado del menú, y
-   el idioma pasa adentro del menú para que entre. */
+   En la compu va con los links de arriba; en el celular ocupa el lugar del
+   menú de tres líneas, que se sacó (nadie lo usaba). */
 .nav-busca{
-  display:none;align-items:center;gap:7px;margin-left:auto;margin-right:6px;flex-shrink:0;white-space:nowrap;cursor:pointer;
+  display:none;align-items:center;gap:7px;margin-left:14px;flex-shrink:0;white-space:nowrap;cursor:pointer;
   font-family:'Jost',sans-serif;font-size:.76rem;font-weight:400;letter-spacing:.02em;
   color:rgba(255,255,255,.78);background:none;border:none;padding:8px 2px;transition:color .2s;
 }
@@ -23,10 +23,8 @@
 .nav-busca:hover{color:var(--vis-gold-light);}
 @media(max-width:700px){
   .nav-busca{display:inline-flex;}
-  nav > .lang-switch,.navbar > .lang-switch{display:none;}
+  nav > .lang-switch,.navbar > .lang-switch{margin-left:auto;}
 }
-.m-lang{display:none;}
-@media(max-width:700px){.m-lang{display:flex;gap:18px;margin-top:22px;}.m-lang .flag{font-size:.7rem;}}
 
 /* Ventana (abajo en el celular, al centro en la compu) */
 .vis-dlg{
