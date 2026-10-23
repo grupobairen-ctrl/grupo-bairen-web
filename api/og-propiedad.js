@@ -41,10 +41,15 @@ module.exports = async (req, res) => {
   }
 
   const slug = String(req.query.slug || '');
-  const p = slug ? await B.porSlug(slug) : undefined;
+  let p = slug ? await B.porSlug(slug) : undefined;
+  // Supabase no respondió: un segundo intento antes de mandar la página sin datos
+  if (p === null) p = await B.porSlug(slug);
 
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
-  res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600');
+  // La página sin datos (sin foto ni título) no se guarda en el CDN: el 23/10/2026
+  // Quintana 4671 quedó unos 10 minutos con el logo como vista previa de WhatsApp
+  // porque se cacheó una respuesta en la que Supabase no llegó a contestar.
+  res.setHeader('Cache-Control', p === null ? 'no-store' : 'public, s-maxage=300, stale-while-revalidate=600');
   if (p === undefined) res.statusCode = 404;
   res.end(p ? escribirFicha(injectMeta(html, p), p) : html);
 };
