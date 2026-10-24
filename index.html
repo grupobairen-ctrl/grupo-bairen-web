@@ -221,7 +221,8 @@
     .dest-cta-txt{font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;font-weight:600;color:var(--navy);}
     .destacadas-footer{text-align:center;margin-top:42px;}
     .dest-price small{display:block;font-family:var(--font-body);font-size:.6rem;font-weight:400;letter-spacing:.06em;color:var(--text-mid);margin-top:7px;}
-    .dest-status.nuevo{background:var(--gold);color:var(--navy-deeper);}
+    /* "Nuevo" sutil, igual que en el catálogo (24/10/2026) */
+    .dest-status.nuevo{color:#fff;font-weight:500;line-height:1;padding:6px 12px 6px 13px;border:1px solid rgba(255,255,255,.8);border-radius:999px;background:rgba(19,29,45,.22);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);text-shadow:0 1px 2px rgba(19,29,45,.35);}
     @media(max-width:960px){
       .destacadas{padding:72px 0 64px;}
       .destacadas-hd{margin-bottom:36px;padding:0 24px;}
@@ -1373,7 +1374,7 @@ function renderDestacadas() {
     // Etiqueta con el plazo cargado en el admin, igual que en el catálogo
     const r = window.BairenVisita ? window.BairenVisita.rango(p.plazo) : { min: 3, max: 12 };
     const tipoTag = r.min === r.max ? d.plazo_uno.replace('{n}', r.min) : d.plazo_rango.replace('{a}', r.min).replace('{b}', r.max);
-    // 7 días, igual que "Nuevo ingreso" en el catálogo (24/10/2026)
+    // 7 días, igual que "Nuevo" en el catálogo (24/10/2026)
     const nuevo = p.created_at && (Date.now() - new Date(p.created_at).getTime()) < 7 * 86400000;
     const slugHref = '/propiedades/' + encodeURIComponent(p.slug);
     return (
