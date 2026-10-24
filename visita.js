@@ -161,6 +161,9 @@
       + '<a class="vis-btn" href="' + esc(waHref(m)) + '" target="_blank" rel="noopener noreferrer">' + ICO_WA
       + '<span>' + esc(m === 'busqueda' ? L.b_btn : L.btn) + '</span></a>'
       + '<p class="vis-nota">' + esc(L.nota) + '</p>';
+    // La ficha pone debajo una reseña real (24/10/2026): BairenVisita.pie()
+    var api = window.BairenVisita;
+    if (m !== 'busqueda' && api && typeof api.pie === 'function') h += api.pie();
     return h;
   }
 
