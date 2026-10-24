@@ -1031,7 +1031,8 @@ async function loadFromSupabase() {
         estado: p.estado,
         reservada_at: p.reservada_at || null,
         fechaLiberacion: p.fecha_liberacion || null,
-        creado: p.created_at || null,
+        // cuándo se publicó (sin la columna, cuándo se cargó)
+        publicadaEn: p.publicada_at || p.created_at || null,
         plazo: p.plazo || null,
         expensas: p.expensas == null ? null : Number(p.expensas),
         amenities: amList,
@@ -1066,17 +1067,17 @@ async function loadFromSupabase() {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   NUEVO (Tomás, 24/10/2026): las cargadas en el admin hace menos
-   de 7 días, disponibles, y como mucho las 6 más nuevas: las mismas que
-   "Últimos ingresos" en la home. El tope es porque el 20 y 21/10 entraron
-   19 juntas; con todas marcadas, el cartel deja de decir algo.
+   NUEVO (Tomás, 24/10/2026): las primeras 48 horas desde que se publica
+   (publicada_at, que la base escribe sola al publicar; migración web 07).
+   Disponibles y como mucho las 6 más nuevas, por si se publican muchas
+   juntas: con todas marcadas, el cartel deja de decir algo.
 ═══════════════════════════════════════════════════════════════ */
 function nuevosIngresos() {
-  const SEMANA = 7 * 86400000;
+  const HORAS_48 = 48 * 3600000;
   return new Set(props
-    .filter(p => p.creado && p.estado === 'Disponible' && p.precio > 0 &&
-                 Date.now() - new Date(p.creado).getTime() < SEMANA)
-    .sort((a, b) => new Date(b.creado) - new Date(a.creado))
+    .filter(p => p.publicadaEn && p.estado === 'Disponible' && p.precio > 0 &&
+                 Date.now() - new Date(p.publicadaEn).getTime() < HORAS_48)
+    .sort((a, b) => new Date(b.publicadaEn) - new Date(a.publicadaEn))
     .slice(0, 6)
     .map(p => p.id));
 }
