@@ -234,6 +234,64 @@ footer{background:var(--navy-dark);border-top:1px solid var(--gold);padding:40px
 @media(max-width:960px){.libera-pop{left:16px;bottom:calc(56px + env(safe-area-inset-bottom,0px) + 12px);}}
 @media(prefers-reduced-motion:reduce){.libera-pop{transition:none;}}
 
+/* TE PUEDE INTERESAR (24/10/2026, Tomás): 3 departamentos disponibles al
+   final de la ficha. Antes la página terminaba en el mapa y, si ese no
+   gustaba, la persona se iba. Precio parecido y mismo barrio primero. Las
+   tarjetas son las del catálogo (plazo arriba a la izquierda, "Todo
+   incluido" en oro arriba a la derecha). */
+.parecidos{background:var(--off-white);padding:clamp(52px,7vw,80px) 0;}
+.parecidos[hidden]{display:none;}
+body.con-parecidos footer{margin-top:0;}
+.pi-in{max-width:1200px;margin:0 auto;padding:0 40px;}
+.pi-hd{display:flex;align-items:baseline;justify-content:space-between;gap:10px 24px;flex-wrap:wrap;margin-bottom:28px;}
+.pi-hd h2{font-family:var(--font-display);font-weight:500;font-size:clamp(1.6rem,3vw,2.2rem);color:var(--navy);line-height:1.15;letter-spacing:-.01em;}
+.pi-go{font-size:.64rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-dark);border-bottom:1px solid rgba(138,117,71,.4);padding-bottom:3px;transition:color .2s,border-color .2s;}
+.pi-go:hover{color:var(--navy);border-color:var(--navy);}
+.pi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+.pi-card{background:#fff;border:1px solid rgba(42,58,82,.08);display:flex;flex-direction:column;transition:transform .3s var(--ease),box-shadow .3s var(--ease);}
+@media(hover:hover) and (pointer:fine){.pi-card:hover{transform:translateY(-4px);box-shadow:0 22px 48px rgba(19,29,45,.18);}}
+.pi-card:active{transform:scale(.99);}
+.pi-img{aspect-ratio:16/9;position:relative;overflow:hidden;background:var(--navy);}
+.pi-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;}
+.pi-tag,.pi-incl{position:absolute;top:12px;z-index:2;font-size:.54rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;padding:5px 10px;}
+.pi-tag{left:12px;background:var(--navy);color:var(--white);}
+.pi-incl{right:12px;background:var(--gold);color:var(--navy-deeper);box-shadow:0 4px 12px rgba(19,29,45,.18);}
+.pi-body{padding:18px 20px 16px;display:flex;flex-direction:column;flex:1;}
+.pi-addr{font-family:var(--font-display);font-size:1.05rem;font-weight:500;color:var(--navy);line-height:1.2;margin-bottom:3px;}
+.pi-barrio{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-dark);font-weight:500;margin-bottom:12px;}
+.pi-meta{font-size:.76rem;color:var(--text-mid);letter-spacing:.03em;margin-bottom:14px;}
+.pi-foot{margin-top:auto;display:flex;align-items:flex-end;justify-content:space-between;gap:10px;padding-top:14px;border-top:1px solid rgba(42,58,82,.07);}
+.pi-price{font-family:var(--font-display);font-size:1.2rem;font-weight:700;color:var(--navy);line-height:1.1;}
+.pi-price small{display:block;font-family:var(--font-body);font-size:.66rem;font-weight:400;color:var(--text-mid);letter-spacing:.03em;margin-top:4px;}
+.pi-ver{font-size:.6rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--navy);white-space:nowrap;}
+/* celular y tablet: se deslizan de costado y asoma la siguiente */
+@media(max-width:960px){
+  .pi-in{padding:0;}
+  .pi-hd{padding:0 20px;margin-bottom:20px;}
+  .pi-grid{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 20px 16px;scroll-padding:0 20px;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+  .pi-grid::-webkit-scrollbar{display:none;}
+  .pi-card{flex:0 0 min(82%,340px);scroll-snap-align:start;}
+}
+
+/* RESEÑA JUNTO AL BOTÓN (24/10/2026, Tomás): debajo de "Coordinar visita",
+   en la tarjeta y en la ventana que abre la barra del celular. Reales, de la
+   tabla resenas; se pasan con las flechas o deslizando. */
+.vr{margin-top:18px;padding-top:16px;border-top:1px solid rgba(42,58,82,.1);}
+.vr-hd{font-size:.58rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold-dark);font-weight:600;margin-bottom:9px;}
+.vr-txt{font-family:var(--font-display);font-style:italic;font-size:.98rem;line-height:1.5;color:var(--navy);display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;animation:vrIn .35s var(--ease);}
+.vr.abierta .vr-txt{display:block;overflow:visible;}
+@keyframes vrIn{from{opacity:0;}to{opacity:1;}}
+.vr-leer{background:none;border:none;padding:0;margin-top:6px;font-family:var(--font-body);font-size:.58rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-dark);cursor:pointer;}
+.vr-ft{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;}
+.vr-who{font-size:.76rem;color:var(--text-mid);line-height:1.35;display:flex;align-items:center;gap:5px;flex-wrap:wrap;min-width:0;}
+.vr-who b{font-weight:500;color:var(--navy);}
+.vr-who svg{width:12px;height:12px;flex:none;fill:none;stroke:var(--gold-dark);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
+.vr-nav{display:flex;align-items:center;flex-shrink:0;}
+.vr-nav button{width:38px;height:38px;display:grid;place-items:center;background:none;border:1px solid rgba(42,58,82,.18);color:var(--navy);cursor:pointer;transition:background .2s,color .2s,border-color .2s;}
+.vr-nav button:hover{background:var(--navy);border-color:var(--navy);color:var(--gold-light);}
+.vr-nav svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.vr-n{font-size:.68rem;letter-spacing:.08em;color:var(--text-mid);min-width:40px;text-align:center;font-feature-settings:"tnum" 1;}
+@media(prefers-reduced-motion:reduce){.vr-txt{animation:none;}}
 
 *:focus-visible{outline:2px solid var(--gold);outline-offset:3px;}
 </style>
@@ -314,6 +372,14 @@ footer{background:var(--navy-dark);border-top:1px solid var(--gold);padding:40px
     </div>
   </div>
 
+  <!-- TE PUEDE INTERESAR (24/10/2026): lo arma cargarParecidos() -->
+  <section class="parecidos" id="parecidos" hidden aria-labelledby="piH">
+    <div class="pi-in">
+      <div class="pi-hd"><h2 id="piH"></h2><a class="pi-go" id="piGo" href="/catalogo.html"></a></div>
+      <div class="pi-grid" id="piGrid"></div>
+    </div>
+  </section>
+
   <!-- CONSULTA FIJA (celular) -->
   <a class="wa-bar" id="waBar" href="https://wa.me/5491123106629" target="_blank" rel="noopener noreferrer">
     <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 0C7.163 0 0 7.163 0 16c0 2.83.736 5.487 2.023 7.793L0 32l8.438-2.01A15.93 15.93 0 0016 32c8.837 0 16-7.163 16-16S24.837 0 16 0zm0 29.333a13.278 13.278 0 01-6.77-1.848l-.484-.287-5.013 1.195 1.228-4.88-.317-.502A13.278 13.278 0 012.667 16C2.667 8.636 8.636 2.667 16 2.667S29.333 8.636 29.333 16 23.364 29.333 16 29.333zm7.3-9.96c-.4-.2-2.363-1.166-2.728-1.3-.366-.133-.633-.2-.9.2-.266.4-1.033 1.3-1.266 1.566-.233.267-.466.3-.866.1-2.367-1.183-3.917-2.117-5.475-4.8-.413-.712.413-.663 1.183-2.202.133-.267.067-.5-.033-.7-.1-.2-.9-2.163-1.233-2.963-.324-.778-.653-.672-.9-.685l-.767-.013a1.47 1.47 0 00-1.067.5c-.366.4-1.4 1.367-1.4 3.33s1.434 3.863 1.634 4.13c.2.267 2.823 4.312 6.837 6.05 2.54 1.097 3.534 1.19 4.804.999.773-.115 2.363-.966 2.696-1.9.333-.933.333-1.733.233-1.9-.1-.166-.366-.266-.766-.466z"/></svg>
@@ -360,7 +426,7 @@ footer{background:var(--navy-dark);border-top:1px solid var(--gold);padding:40px
 
 <script src="/supabase-config.js"></script>
 <script src="/i18n.js?v=4"></script>
-<script src="/visita.js?v=5"></script>
+<script src="/visita.js?v=6"></script>
 <script>
 window.sbImg = window.sbImg || function(u){return u};
 'use strict';
@@ -391,6 +457,7 @@ const PROP_T = {
     wa_venta:'Hola muy buenas, me interesa la propiedad en venta en {p}. Me gustaría coordinar una visita. Gracias!',
     default_desc:'{t} — unidad disponible en {b}, Buenos Aires. Listo para vivir desde el primer día.',
     lib_lbl:'Se libera', lib_hoy:'hoy', lib_manana:'mañana', lib_dias:'en {d} días', lib_fecha:'el {f}',
+    pi_h:'Te puede interesar', pi_go:'Ver todos los departamentos', pi_incl:'Todo incluido', pi_ver:'Ver más →', pi_plazo:'De {a} a {b} meses', pi_plazo_uno:'{n} meses',
     locale:'es-AR'
   },
   pt: {
@@ -417,6 +484,7 @@ const PROP_T = {
     wa_venta:'Olá, tenho interesse no imóvel à venda em {p}. Gostaria de agendar uma visita. Obrigado!',
     default_desc:'{t} — unidade disponível em {b}, Buenos Aires. Pronta para morar desde o primeiro dia.',
     lib_lbl:'Disponível', lib_hoy:'hoje', lib_manana:'amanhã', lib_dias:'em {d} dias', lib_fecha:'a partir de {f}',
+    pi_h:'Você também pode gostar', pi_go:'Ver todos os apartamentos', pi_incl:'Tudo incluído', pi_ver:'Ver mais →', pi_plazo:'De {a} a {b} meses', pi_plazo_uno:'{n} meses',
     locale:'pt-BR',
     amen:{'Pileta':'Piscina','Gimnasio':'Academia','Spa / Sauna':'Spa / Sauna','SUM':'Salão de festas','Cochera':'Garagem','Ascensor':'Elevador','Aire acond.':'Ar-condicionado','Jardín / Terraza':'Jardim / Terraço','Parrilla':'Churrasqueira','Laundry':'Lavanderia','Seguridad 24hs':'Segurança 24h','Conserje 24hs':'Portaria 24h','Bicicletero':'Bicicletário','Pet friendly':'Aceita pets','Calefacción central':'Aquecimento central','Baulera':'Depósito','Amoblado':'Mobiliado','All in':'Tudo incluído'}
   },
@@ -444,6 +512,7 @@ const PROP_T = {
     wa_venta:'Hello, I am interested in the property for sale at {p}. I would like to schedule a visit. Thank you!',
     default_desc:'{t} — unit available in {b}, Buenos Aires. Move-in ready from day one.',
     lib_lbl:'Available', lib_hoy:'today', lib_manana:'tomorrow', lib_dias:'in {d} days', lib_fecha:'from {f}',
+    pi_h:'You may also like', pi_go:'See all apartments', pi_incl:'All inclusive', pi_ver:'See more →', pi_plazo:'{a} to {b} months', pi_plazo_uno:'{n} months',
     locale:'en-US',
     amen:{'Pileta':'Pool','Gimnasio':'Gym','Spa / Sauna':'Spa / Sauna','SUM':'Common room','Cochera':'Parking','Ascensor':'Elevator','Aire acond.':'Air conditioning','Jardín / Terraza':'Garden / Terrace','Parrilla':'BBQ area','Laundry':'Laundry','Seguridad 24hs':'24h security','Conserje 24hs':'24h concierge','Bicicletero':'Bike storage','Pet friendly':'Pet friendly','Calefacción central':'Central heating','Baulera':'Storage room','Amoblado':'Furnished','All in':'All in'}
   }
@@ -454,7 +523,7 @@ function LT() {
 }
 let LAST_P = null;
 let REVEALS_WIRED = false;
-document.addEventListener('bairen:lang', () => { if (LAST_P) renderDynamicTexts(LAST_P); });
+document.addEventListener('bairen:lang', () => { if (LAST_P) renderDynamicTexts(LAST_P); pintarParecidos(); });
 
 // SVGs minimalistas line-style (premium feel, no emojis)
 const SVG = {
@@ -725,7 +794,194 @@ function renderProperty(p) {
   wireGallery();
   wireLightbox();
   wireReveals();
+
+  // Después de pintar la ficha, sin frenarla
+  cargarParecidos(p);
+  cargarResenas();
 }
+
+// ════════════════════════════════════════════════════════════════════
+// TE PUEDE INTERESAR (24/10/2026, Tomás)
+// Las disponibles de mediano plazo (sin la que se está viendo ni las que
+// se liberan más adelante), ordenadas por parecido: precio, barrio y
+// ambientes. Con menos de 2, la sección no aparece.
+// ════════════════════════════════════════════════════════════════════
+let PARECIDOS = [];
+async function cargarParecidos(p) {
+  try {
+    const sb = await window.bairenReady;
+    const { data, error } = await sb
+      .from('propiedades')
+      .select('slug, dir, unidad, barrio, ambientes, m2, tipo, plazo, precio_temporal, fecha_liberacion, portada_url, portada_titulo, portada_titulo_pt, portada_titulo_en, imagenes(url, orden)')
+      .eq('publicada', true)
+      .eq('estado', 'Disponible');
+    if (error) throw error;
+    PARECIDOS = elegirParecidos(p, data || []);
+    pintarParecidos();
+  } catch (err) {
+    console.warn('[propiedad] sin "Te puede interesar":', err && err.message || err);
+  }
+}
+
+function seLiberaMasAdelante(f) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(f || '');
+  if (!m) return false;
+  const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+  return new Date(+m[1], +m[2] - 1, +m[3]) > hoy;
+}
+
+// Puntaje (menos es más parecido): diferencia de precio en proporción (hasta 1),
+// +0,35 si es de otro barrio, +0,12 por cada ambiente de diferencia (hasta 2)
+function elegirParecidos(p, todas) {
+  const base = Number(p.tipo === 'Tradicional' ? p.precio_tradicional : p.precio_temporal) || 0;
+  const barrio = (p.barrio || '').trim().toLowerCase();
+  return todas
+    .filter(q => q.slug && q.slug !== p.slug && (q.tipo === 'Temporal' || q.tipo === 'Ambos') &&
+                 Number(q.precio_temporal) > 0 && !seLiberaMasAdelante(q.fecha_liberacion))
+    .map(q => {
+      let s = base ? Math.min(Math.abs(Number(q.precio_temporal) - base) / base, 1) : 0.5;
+      if ((q.barrio || '').trim().toLowerCase() !== barrio) s += 0.35;
+      if (p.ambientes && q.ambientes) s += 0.12 * Math.min(Math.abs(q.ambientes - p.ambientes), 2);
+      return { q, s };
+    })
+    .sort((a, b) => a.s - b.s)
+    .slice(0, 3)
+    .map(x => x.q);
+}
+
+function pintarParecidos() {
+  const sec = $('parecidos');
+  if (!sec) return;
+  if (PARECIDOS.length < 2) { sec.hidden = true; document.body.classList.remove('con-parecidos'); return; }
+  const t = LT(), L = window.BAIREN_LANG || 'es';
+  $('piH').textContent = t.pi_h;
+  $('piGo').textContent = t.pi_go;
+  $('piGrid').innerHTML = PARECIDOS.map(q => {
+    const primera = (q.imagenes || []).slice().sort((a, b) => a.orden - b.orden)[0];
+    // la portada del catálogo ya viene optimizada: va tal cual, como en el catálogo
+    const foto = q.portada_url || (primera ? window.sbImg(primera.url, 700) : '');
+    const r = window.BairenVisita ? window.BairenVisita.rango(q.plazo) : { min: 3, max: 12 };
+    const plazo = r.min === r.max ? t.pi_plazo_uno.replace('{n}', r.min)
+                                  : t.pi_plazo.replace('{a}', r.min).replace('{b}', r.max);
+    const unidad = q.unidad && q.unidad !== '-' ? ' · ' + q.unidad : '';
+    const titulo = (L === 'pt' && q.portada_titulo_pt) || (L === 'en' && q.portada_titulo_en) || q.portada_titulo || q.dir + unidad;
+    const meta = [
+      q.ambientes ? `${q.ambientes} ${q.ambientes !== 1 ? t.amb_pl : t.amb_sing}` : '',
+      q.m2 ? `${q.m2} m²` : ''
+    ].filter(Boolean).join(' · ');
+    return `<a class="pi-card" href="/propiedades/${encodeURIComponent(q.slug)}">
+      <div class="pi-img">
+        ${foto ? `<img src="${escapeHTML(foto)}" alt="${escapeHTML(q.dir + unidad)}" loading="lazy" decoding="async">` : ''}
+        <span class="pi-tag">${escapeHTML(plazo)}</span>
+        <span class="pi-incl">${escapeHTML(t.pi_incl)}</span>
+      </div>
+      <div class="pi-body">
+        <div class="pi-addr">${escapeHTML(titulo)}</div>
+        <div class="pi-barrio">${escapeHTML(q.barrio || '')}</div>
+        ${meta ? `<div class="pi-meta">${escapeHTML(meta)}</div>` : ''}
+        <div class="pi-foot">
+          <div class="pi-price">${fmtUSD(q.precio_temporal)}<small>${escapeHTML(t.pm_todo)}</small></div>
+          <span class="pi-ver">${escapeHTML(t.pi_ver)}</span>
+        </div>
+      </div>
+    </a>`;
+  }).join('');
+  sec.hidden = false;
+  document.body.classList.add('con-parecidos');
+}
+
+// ════════════════════════════════════════════════════════════════════
+// RESEÑA JUNTO AL BOTÓN (24/10/2026, Tomás)
+// visita.js llama a BairenVisita.pie() al armar el formulario de la unidad
+// (tarjeta y ventana del celular) y pone lo que devuelve debajo del botón.
+// Primero las de inquilinos, de la más corta a la más larga: quien mira la
+// ficha está por alquilar. Las largas se cortan en 4 líneas con "Leer completa".
+// ════════════════════════════════════════════════════════════════════
+const RV_T = {
+  es: { h:'Lo que dicen nuestros clientes', leer:'Leer completa', menos:'Ver menos', prev:'Reseña anterior', next:'Reseña siguiente', verif:'Cliente verificado',
+        roles:{ inquilino:'Inquilino', inquilina:'Inquilina', propietario:'Propietario', propietaria:'Propietaria' } },
+  pt: { h:'O que dizem nossos clientes', leer:'Ler completa', menos:'Ver menos', prev:'Avaliação anterior', next:'Próxima avaliação', verif:'Cliente verificado',
+        roles:{ inquilino:'Inquilino', inquilina:'Inquilina', propietario:'Proprietário', propietaria:'Proprietária' } },
+  en: { h:'What our clients say', leer:'Read in full', menos:'Show less', prev:'Previous review', next:'Next review', verif:'Verified client',
+        roles:{ inquilino:'Tenant', inquilina:'Tenant', propietario:'Owner', propietaria:'Owner' } }
+};
+const RV_LARGA = 160;   // a partir de acá suele pasar de 4 líneas en la tarjeta
+const RV_CHECK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>';
+const RV_FLECHA = { prev:'<path d="M15 18l-6-6 6-6"/>', next:'<path d="M9 18l6-6-6-6"/>' };
+let RESENAS = [], RV_I = 0;
+
+function rvT() { return RV_T[window.BAIREN_LANG] || RV_T.es; }
+function rvTexto(r) {
+  const L = window.BAIREN_LANG || 'es';
+  return (r.idioma !== L && r.traducciones && r.traducciones[L]) || r.texto;
+}
+function htmlResena() {
+  if (!RESENAS.length) return '';
+  const t = rvT(), r = RESENAS[RV_I], txt = rvTexto(r), rol = t.roles[r.rol] || '';
+  const flecha = k => `<button type="button" class="vr-${k}" aria-label="${escapeHTML(t[k])}"><svg viewBox="0 0 24 24" aria-hidden="true">${RV_FLECHA[k]}</svg></button>`;
+  return `<div class="vr" data-vr>
+    <div class="vr-hd">${escapeHTML(t.h)}</div>
+    <p class="vr-txt">“${escapeHTML(txt)}”</p>
+    ${txt.length > RV_LARGA ? `<button type="button" class="vr-leer">${escapeHTML(t.leer)}</button>` : ''}
+    <div class="vr-ft">
+      <div class="vr-who"><b>${escapeHTML(r.nombre_publico)}</b>${r.verificada ? `<span title="${escapeHTML(t.verif)}" style="display:inline-flex">${RV_CHECK}</span>` : ''}${rol ? `<span>· ${escapeHTML(rol)}</span>` : ''}</div>
+      ${RESENAS.length > 1 ? `<div class="vr-nav">${flecha('prev')}<span class="vr-n">${RV_I + 1} / ${RESENAS.length}</span>${flecha('next')}</div>` : ''}
+    </div>
+  </div>`;
+}
+function pintarResenas() {
+  document.querySelectorAll('[data-vr]').forEach(el => { el.outerHTML = htmlResena(); });
+}
+function moverResena(d) {
+  if (RESENAS.length < 2) return;
+  RV_I = (RV_I + d + RESENAS.length) % RESENAS.length;
+  pintarResenas();
+}
+
+async function cargarResenas() {
+  if (RESENAS.length) return;
+  try {
+    const sb = await window.bairenReady;
+    const { data, error } = await sb
+      .from('resenas')
+      .select('nombre_publico, rol, texto, idioma, traducciones, verificada, publicada_en, creada_en')
+      .order('publicada_en', { ascending: false, nullsFirst: false })
+      .order('creada_en', { ascending: false })
+      .limit(60);
+    if (error) throw error;
+    const inq = r => /^inquilin/.test(r.rol || '') ? 0 : 1;
+    RESENAS = (data || []).filter(r => r.texto)
+      .sort((a, b) => inq(a) - inq(b) || a.texto.length - b.texto.length);
+    if (!RESENAS.length || !window.BairenVisita) return;
+    window.BairenVisita.pie = htmlResena;
+    // los formularios que ya están armados (la tarjeta) se vuelven a armar con la reseña
+    document.querySelectorAll('.vis-form[data-modo="unidad"]').forEach(f => window.BairenVisita.mount(f));
+  } catch (err) {
+    console.warn('[propiedad] sin reseñas junto al botón:', err && err.message || err);
+  }
+}
+
+document.addEventListener('click', e => {
+  const b = e.target.closest && e.target.closest('.vr-prev, .vr-next, .vr-leer');
+  if (!b) return;
+  if (b.classList.contains('vr-leer')) {
+    const abierta = b.closest('.vr').classList.toggle('abierta');
+    b.textContent = abierta ? rvT().menos : rvT().leer;
+    return;
+  }
+  moverResena(b.classList.contains('vr-next') ? 1 : -1);
+});
+// deslizar de costado sobre la reseña también la pasa
+let vrX = 0, vrY = 0;
+document.addEventListener('touchstart', e => {
+  if (!e.target.closest || !e.target.closest('.vr')) return;
+  vrX = e.touches[0].clientX; vrY = e.touches[0].clientY;
+}, { passive: true });
+document.addEventListener('touchend', e => {
+  if (!e.target.closest || !e.target.closest('.vr')) return;
+  const dx = e.changedTouches[0].clientX - vrX, dy = e.changedTouches[0].clientY - vrY;
+  if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) moverResena(dx < 0 ? 1 : -1);
+}, { passive: true });
 
 // Meta description de mediano plazo: primero los datos (qué, dónde, cuánto,
 // plazo), que es lo que citan buscadores y asistentes de IA; después el
