@@ -1373,7 +1373,8 @@ function renderDestacadas() {
     // Etiqueta con el plazo cargado en el admin, igual que en el catálogo
     const r = window.BairenVisita ? window.BairenVisita.rango(p.plazo) : { min: 3, max: 12 };
     const tipoTag = r.min === r.max ? d.plazo_uno.replace('{n}', r.min) : d.plazo_rango.replace('{a}', r.min).replace('{b}', r.max);
-    const nuevo = p.created_at && (Date.now() - new Date(p.created_at).getTime()) < 10 * 86400000;
+    // 7 días, igual que "Nuevo ingreso" en el catálogo (24/10/2026)
+    const nuevo = p.created_at && (Date.now() - new Date(p.created_at).getTime()) < 7 * 86400000;
     const slugHref = '/propiedades/' + encodeURIComponent(p.slug);
     return (
       '<a class="dest-card" href="' + slugHref + '" aria-label="Ver ' + escapeHTML(p.dir) + (p.unidad ? ' ' + escapeHTML(p.unidad) : '') + '">' +
