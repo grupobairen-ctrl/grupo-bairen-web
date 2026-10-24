@@ -966,9 +966,11 @@
       var p=c.querySelector('.rs-txt'); c.querySelector('.rs-leer').hidden = p.scrollHeight <= p.clientHeight+2;
     });
   }
-  /* Con muchas, el muro se corta con un velo y "Ver las N reseñas" */
+  /* Con muchas, el muro se corta con un velo y "Ver las N reseñas".
+     En el celu el corte es más bajo (24/10/2026, Tomás): con 640 el muro
+     apenas lo pasaba y en los iPhone grandes el botón no salía nunca. */
   function cerrar(){
-    var tope = window.innerWidth<640 ? 640 : 760, box=$('rsMasBox');
+    var tope = window.innerWidth<640 ? 480 : 760, box=$('rsMasBox');
     if(abiertoMuro || muro.scrollHeight <= tope+120){ muro.classList.remove('cerrado'); box.hidden=true; return; }
     muro.style.setProperty('--rs-alto', tope+'px');
     muro.classList.add('cerrado');
